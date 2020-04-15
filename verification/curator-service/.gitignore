@@ -114,5 +114,5 @@ dist
 .pnp.*
 
 # Editor files
-.idea
+*.idea
 *.iml
