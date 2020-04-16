@@ -1,14 +1,14 @@
 import express from "express";
 
+// Controllers (route handlers).
+import * as homeController from "./controllers/home";
+
 const app = express();
-const port = 3000;
 
-// Default route handler.
-app.get("/", (req, res) => {
-    res.send('Data service under construction.');
-});
+// Express configuration.
+app.set("port", process.env.PORT || 3000);
 
-// Start the server and listen on the default port.
-app.listen(port, () => {
-    console.log(`App running at http://localhost:${port}.`);
-})
+// Configure app routes.
+app.get("/", homeController.index);
+
+export default app;
