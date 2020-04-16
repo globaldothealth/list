@@ -25,16 +25,16 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: curator-service ci
-      run: npm ci
+      run: |
+          npm ci
+          npm run build
       working-directory: verification/curator-service
-    - name: curator-service build
-      run: npm run build
-      working-directory: verification/curator-service
+      env:
+        CI: true
     - name: data-service ci
-      run: npm ci
-      working-directory: data-serving/data-service
-    - name: data-service build
-      run: npm run build
+      run: |
+          npm ci
+          npm run build
       working-directory: data-serving/data-service
       env:
         CI: true
