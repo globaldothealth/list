@@ -15,5 +15,5 @@ export const getCase = (req: Request, res: Response) => {
  * Handles HTTP GET /cases.
  */
 export const listCases = (req: Request, res: Response) => {
-    res.send('Triggered listCases API.');
+    res.send('Triggered list cases.');
 };
