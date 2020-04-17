@@ -1,7 +1,12 @@
 {
   "name": "data-service",
   "version": "1.0.0",
-  "description": "",
+  "description": "Centralized dataserver for epidemiological line list data",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-covid-data/healthmap-gdo-temp",
+    "directory": "data-serving/data-service"
+  },
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
