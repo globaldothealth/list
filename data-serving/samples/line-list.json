@@ -1,0 +1,115 @@
+{
+  "_id": {
+    "$oid": "5e99f21a1c9d440000ceb088"
+  },
+  "demographics": {
+    "age": {
+      "years": {
+	"$numberInt": "55"
+      },
+      "range": {
+	"start": {
+	  "$numberInt": "50"
+	},
+	"end": {
+	  "$numberInt": "59"
+	}
+      }
+    },
+    "sex": "female"
+  },
+  "location": {
+    "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+    "country": "France",
+    "administrative_area_level_1": "Île-de-France",
+    "administrative_area_level_2": "Paris",
+    "locality": "Paris",
+    "geometry": {
+      "latitude": {
+	"$numberDouble": "2.3522219"
+      },
+      "longitude": {
+	"$numberDouble": "48.85661400000001"
+      }
+    }
+  },
+  "time_sequence": {
+    "confirmed": {
+      "$date": {
+	"$numberLong": "1578027600000"
+      }
+    },
+    "symptoms_onset": {
+      "$date": {
+	"$numberLong": "1578632400000"
+      }
+    },
+    "hospital_admission": {
+      "$date": {
+	"$numberLong": "1579582800000"
+      }
+    },
+    "death_or_discharge": {
+      "$date": {
+	"$numberLong": "1581483600000"
+      }
+    }
+  },
+  "symptoms": {
+    "provided": ["severe pneumonia", "dyspnea", "weakness"],
+    "imputed": ["severe pneumonia", "pneumonia", "dyspnea", "difficulty breathing", "weakness"],
+    "notes": ["some free-form symptoms", "that don't match the symptom dictionary"]
+  },
+  "chronic_disease": {
+    "provided": ["hypertension", "type 2 diabetes", "coronary heart disease", "lung cancer"],
+    "imputed": ["hypertension", "type 2 diabetes", "diabetes", "coronary heart disease", "heart disease", "lung cancer", "cancer"],
+    "notes": ["some free-form chronic diseases", "that don't match the chronic disease dictionary"]
+  },
+  "outcome": "discharged",
+  "travel_history": [{
+    "location": {
+      "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
+      "country": "China",
+      "administrative_area_level_1": "Hubei",
+      "locality": "Wuhan",
+      "geometry": {
+	"latitude": {
+	  "$numberDouble": "30.592849"
+	},
+	"longitude": {
+	  "$numberDouble": "114.305539"
+	}
+      }
+    },
+    "date": {
+      "$date": {
+	"$numberLong": "1576386000000"
+      }
+    }
+  }],
+  "source": {
+    "type": "government",
+    "name": "Colorado Department of Health and Environment",
+    "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+  },
+  "outbreak_specifics": {
+    "lives_in_wuhan": false,
+    "reported_market_exposure": true
+  },
+  "sequence": {
+    "type": "some lab maybe",
+    "name": "WHO Know",
+    "url": "https://www.whoknows.org"
+  },
+  "notes": ["Contact of a confirmed case at work.", "Other stuff from notes"],
+  "archive": {
+    "additional_information": "Contact of a confirmed case at work.",
+    "notes_for_discussion": "Other stuff from notes",
+    "geo_resolution": "admin_2",
+    "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
+    "chronic_disease_binary": true,
+    "chronic_disease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+    "outcome": "discharge 2/12",
+    "admin_id": "291"
+  }
+}
