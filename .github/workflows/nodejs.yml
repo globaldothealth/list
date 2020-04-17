@@ -35,6 +35,7 @@ jobs:
       run: |
           npm ci
           npm run build
+          npm test
       working-directory: data-serving/data-service
       env:
         CI: true
