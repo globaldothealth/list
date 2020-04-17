@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 /**
  * Get a specific case.
- * 
+ *
  * Handles HTTP GET /cases/:id.
  */
 export const getCase = (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ export const getCase = (req: Request, res: Response) => {
 
 /**
  * List all cases.
- * 
+ *
  * Handles HTTP GET /cases.
  */
 export const listCases = (req: Request, res: Response) => {
