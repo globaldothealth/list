@@ -1,13 +1,14 @@
 import express from 'express';
 
+// Controllers (route handlers).
+import * as homeController from './controllers/home';
+
 const app = express();
 
 // Express configuration.
 app.set('port', process.env.PORT || 3000);
 
-// Default route handler.
-app.get('/', (req, res) => {
-    res.send('Curator service under construction.');
-});
+// Configure app routes.
+app.get('/', homeController.index);
 
 export default app;
