@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure app routes.
-app.get('/', homeController.index);
-app.get('/cases/:id', caseController.getCase);
-app.get('/cases', caseController.listCases);
-app.post('/cases', caseController.createCase);
+app.get('/', homeController.get);
+app.get('/cases/:id', caseController.get);
+app.get('/cases', caseController.list);
+app.post('/cases', caseController.create);
 
 export default app;
