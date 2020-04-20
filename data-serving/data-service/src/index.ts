@@ -1,11 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
 import * as caseController from './controllers/case';
 
 const app = express();
+
+dotenv.config();
 
 // Express configuration.
 app.set('port', process.env.PORT || 3000);
