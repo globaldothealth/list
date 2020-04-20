@@ -1,10 +1,13 @@
 import express from 'express';
+import dotenv from 'dotenv';
 
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
 const app = express();
+
+dotenv.config();
 
 // Express configuration.
 app.set('port', process.env.PORT || 3001);
