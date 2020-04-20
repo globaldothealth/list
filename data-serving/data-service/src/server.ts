@@ -32,7 +32,7 @@ const server = app.listen(app.get('port'), async () => {
             .toArray();
         console.log(`    Found ${docs.length} records`);
     } catch (e) {
-        console.log('  Failed to connect to the database. :(', e);
+        console.error('  Failed to connect to the database. :(', e);
     }
 });
 
