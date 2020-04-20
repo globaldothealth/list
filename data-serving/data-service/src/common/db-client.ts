@@ -10,15 +10,15 @@ export default class DbClient {
         });
     }
 
-    public async connect() {
+    async connect() {
         await this.client.connect();
     }
 
-    public db(dbName: string): Db {
+    db(dbName: string): Db {
         return this.client.db(dbName);
     }
 
-    public disconnect() {
+    disconnect() {
         this.client.close();
     }
 }
