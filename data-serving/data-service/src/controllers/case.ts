@@ -53,7 +53,7 @@ export const update = (req: Request, res: Response) => {
 /**
  * Delete a specific case.
  *
- * Handles HTTP PUT /cases/:id.
+ * Handles HTTP DELETE /cases/:id.
  */
 export const del = (req: Request, res: Response) => {
     res.send(`Triggered delete case with ID ${req.params.id}.`);
