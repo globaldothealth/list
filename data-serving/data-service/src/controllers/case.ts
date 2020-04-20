@@ -25,7 +25,7 @@ export const list = (req: Request, res: Response) => {
  * Handles HTTP POST /cases.
  *
  * For now, just attempts to parse an "age" field and return it in the response.
- * Returns 422 if "age" isn't present int he request body.
+ * Returns 422 if "age" isn't present in the request body.
  */
 export const create = async (req: Request, res: Response) => {
     await check('age', 'Age must be a valid number')
