@@ -6,7 +6,7 @@ import * as homeController from './controllers/home';
 const app = express();
 
 // Express configuration.
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3001);
 
 // Configure app routes.
 app.get('/', homeController.index);
