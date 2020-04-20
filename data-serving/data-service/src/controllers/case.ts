@@ -40,3 +40,21 @@ export const create = async (req: Request, res: Response) => {
 
     res.send(`Triggered create case with age: ${req.body.age}`);
 };
+
+/**
+ * Update a specific case.
+ *
+ * Handles HTTP PUT /cases/:id.
+ */
+export const update = (req: Request, res: Response) => {
+    res.send(`Triggered update case with ID ${req.params.id}.`);
+};
+
+/**
+ * Delete a specific case.
+ *
+ * Handles HTTP PUT /cases/:id.
+ */
+export const del = (req: Request, res: Response) => {
+    res.send(`Triggered delete case with ID ${req.params.id}.`);
+};
