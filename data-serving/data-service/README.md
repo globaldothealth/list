@@ -5,4 +5,5 @@
    `npm run dev`
 
 # Import data into local MongoDB instance
-`mongoimport --db dev --collection covid19 --file data-serving/samples/line-list.json`
+From the data-service root, run:
+`npm run import-data`

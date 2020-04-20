@@ -1,20 +1,24 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 
-class DbClient {
+/** A thin wrapper around [[`MongoClient`]]. */
+export default class DbClient {
     client: MongoClient;
 
-    constructor() {
-        this.client = new MongoClient('mongodb://localhost:27017', { useUnifiedTopology: true });
+    constructor(connectionString: string) {
+        this.client = new MongoClient(connectionString, {
+            useUnifiedTopology: true,
+        });
     }
 
     public async connect() {
         await this.client.connect();
-        return this.client;
+    }
+
+    public db(dbName: string): Db {
+        return this.client.db(dbName);
     }
 
     public disconnect() {
         this.client.close();
     }
 }
-
-export = new DbClient();

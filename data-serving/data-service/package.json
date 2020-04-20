@@ -13,7 +13,8 @@
     "dev": "nodemon",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",
-    "test": "jest --forceExit --coverage --verbose"
+    "test": "jest --forceExit --coverage --verbose",
+    "import-data": "mongoimport --db dev --collection covid19 --file ../samples/line-list.json"
   },
   "keywords": [],
   "author": "",
