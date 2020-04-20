@@ -28,6 +28,7 @@ jobs:
       run: |
           npm ci
           npm run build
+          npm test
       working-directory: verification/curator-service
       env:
         CI: true
