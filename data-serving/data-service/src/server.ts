@@ -3,7 +3,7 @@ import DbClient from './common/db-client';
 
 // Start Express server.
 const server = app.listen(app.get('port'), async () => {
-    console.log('App running at http://localhost:%d.', app.get('port'));
+    console.log(`Listening on port ${app.get('port')}`);
     console.log('  Press CTRL-C to stop\n');
 
     try {
