@@ -28,3 +28,15 @@ describe('POST', () => {
             });
     });
 });
+
+describe('PUT', () => {
+    it('update should return 200 OK', (done) => {
+        request(app).put('/cases/id').expect(200, done);
+    });
+});
+
+describe('DELETE', () => {
+    it('should return 200 OK', (done) => {
+        request(app).delete('/cases/id').expect(200, done);
+    });
+});
