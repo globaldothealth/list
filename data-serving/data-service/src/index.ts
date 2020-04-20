@@ -17,5 +17,7 @@ app.get('/', homeController.get);
 app.get('/cases/:id', caseController.get);
 app.get('/cases', caseController.list);
 app.post('/cases', caseController.create);
+app.put('/cases/:id', caseController.update);
+app.delete('/cases/:id', caseController.del);
 
 export default app;
