@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 
 beforeAll(async () => {
     await mongoose.connect(
+        // This is provided by jest-mongodb.
+        // The `else testurl` is to appease Typescript.
         process.env.MONGO_URL || 'testurl',
         { useNewUrlParser: true, useCreateIndex: true },
         (err) => {
