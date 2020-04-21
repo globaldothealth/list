@@ -17,10 +17,10 @@ app.get('/', homeController.index);
 
 // Configure API app routes.
 const apiRouter = express.Router();
-apiRouter.get('/', sourcesController.list);
-apiRouter.get('/:id', sourcesController.get);
-apiRouter.post('/', sourcesController.create);
-apiRouter.put('/:id', sourcesController.update);
-apiRouter.delete('/:id', sourcesController.del);
+apiRouter.get('/sources/', sourcesController.list);
+apiRouter.get('/sources/:id', sourcesController.get);
+apiRouter.post('/sources/', sourcesController.create);
+apiRouter.put('/sources/:id', sourcesController.update);
+apiRouter.delete('/sources/:id', sourcesController.del);
 app.use('/api', apiRouter);
 export default app;
