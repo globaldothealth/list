@@ -1,8 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import DbClient from './common/db-client';
 import validateEnv from './util/validate-env';
+import mongoose from 'mongoose';
 
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
@@ -36,13 +36,11 @@ app.use('/api', apiRouter);
                and collection ${env.DB_COLLECTION}`,
         );
 
-        const client = new DbClient(env.DB_CONNECTION_STRING);
-        await client.connect();
+        await mongoose.connect(`${env.DB_CONNECTION_STRING}/${env.DB_NAME}`, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         console.log('  Connected to the database!');
-
-        const db = client.db(env.DB_NAME);
-        const docs = await db.collection(env.DB_COLLECTION).find().toArray();
-        console.log(`    Found ${docs.length} records`);
     } catch (e) {
         console.error('  Failed to connect to the database. :(', e);
     }
