@@ -11,6 +11,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
+    "import-data": "mongoimport --db dev --collection covid19 --file ../samples/line-list.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",
     "test": "jest --forceExit --coverage --verbose --detectOpenHandles"
@@ -25,6 +26,7 @@
     "@types/eslint": "^6.8.0",
     "@types/express": "^4.17.6",
     "@types/jest": "^25.2.1",
+    "@types/mongodb": "^3.5.8",
     "@types/node": "^13.11.1",
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
@@ -46,6 +48,7 @@
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-validator": "^6.4.0"
+    "express-validator": "^6.4.0",
+    "mongodb": "^3.5.6"
   }
 }
