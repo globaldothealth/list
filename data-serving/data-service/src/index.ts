@@ -11,10 +11,10 @@ import * as caseController from './controllers/case';
 const app = express();
 
 dotenv.config();
-validateEnv();
+const env = validateEnv();
 
 // Express configuration.
-app.set('port', process.env.PORT || 3000);
+app.set('port', env.PORT);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -31,20 +31,17 @@ app.use('/api', apiRouter);
 (async (): Promise<void> => {
     try {
         console.log(
-            `  Connecting to instance ${process.env.DB_CONNECTION_STRING}
-               with db ${process.env.DB_NAME}
-               and collection ${process.env.DB_COLLECTION}`,
+            `  Connecting to instance ${env.DB_CONNECTION_STRING}
+               with db ${env.DB_NAME}
+               and collection ${env.DB_COLLECTION}`,
         );
 
-        const client = new DbClient(process.env.DB_CONNECTION_STRING);
+        const client = new DbClient(env.DB_CONNECTION_STRING);
         await client.connect();
         console.log('  Connected to the database!');
 
-        const db = client.db(process.env.DB_NAME);
-        const docs = await db
-            .collection(process.env.DB_COLLECTION)
-            .find()
-            .toArray();
+        const db = client.db(env.DB_NAME);
+        const docs = await db.collection(env.DB_COLLECTION).find().toArray();
         console.log(`    Found ${docs.length} records`);
     } catch (e) {
         console.error('  Failed to connect to the database. :(', e);
