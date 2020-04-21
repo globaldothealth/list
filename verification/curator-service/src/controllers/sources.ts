@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 /**
  * List the sources.
  */
-export const list = (req: Request, res: Response) => {
+export const list = (req: Request, res: Response): void => {
     res.sendStatus(501);
     return;
 };
@@ -11,7 +11,7 @@ export const list = (req: Request, res: Response) => {
 /**
  * Get a single source.
  */
-export const get = (req: Request, res: Response) => {
+export const get = (req: Request, res: Response): void => {
     res.sendStatus(501);
     return;
 };
@@ -19,7 +19,7 @@ export const get = (req: Request, res: Response) => {
 /**
  * Update a single source.
  */
-export const update = (req: Request, res: Response) => {
+export const update = (req: Request, res: Response): void => {
     res.sendStatus(501);
     return;
 };
@@ -27,7 +27,7 @@ export const update = (req: Request, res: Response) => {
 /**
  * Create a single source.
  */
-export const create = (req: Request, res: Response) => {
+export const create = (req: Request, res: Response): void => {
     res.sendStatus(501);
     return;
 };
@@ -35,7 +35,7 @@ export const create = (req: Request, res: Response) => {
 /**
  * Delete a single source.
  */
-export const del = (req: Request, res: Response) => {
+export const del = (req: Request, res: Response): void => {
     res.sendStatus(501);
     return;
 };
