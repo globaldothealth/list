@@ -2,7 +2,7 @@ import { MongoClient, Db } from 'mongodb';
 
 /** A thin wrapper around [[`MongoClient`]]. */
 export default class DbClient {
-    client: MongoClient;
+    private client: MongoClient;
 
     constructor(connectionString: string) {
         this.client = new MongoClient(connectionString, {
