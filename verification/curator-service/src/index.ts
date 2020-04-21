@@ -16,7 +16,7 @@ app.set('port', process.env.PORT || 3001);
 app.get('/', homeController.index);
 
 // Configure API app routes.
-var apiRouter = express.Router();
+const apiRouter = express.Router();
 apiRouter.get('/', sourcesController.list);
 apiRouter.get('/:id', sourcesController.get);
 apiRouter.post('/', sourcesController.create);
