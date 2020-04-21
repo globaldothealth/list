@@ -5,6 +5,6 @@ import { Request, Response } from 'express';
  *
  * Handles HTTP GET /.
  */
-export const index = (req: Request, res: Response) => {
+export const index = (req: Request, res: Response): void => {
     res.send('Curator service under construction.');
 };
