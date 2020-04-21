@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { check, validationResult } from 'express-validator';
-import { Case } from '../model/case';
+import { Case, validOutcomes } from '../model/case';
 
 /**
  * Get a specific case.
@@ -31,9 +31,8 @@ export const list = (req: Request, res: Response): void => {
  * Handles HTTP POST /cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
-    const acceptedOutcomes = ['pending', 'recovered', 'death'];
-    await check('outcome', `Outcome must be one of: ${acceptedOutcomes}`)
-        .isIn(acceptedOutcomes)
+    await check('outcome', `Outcome must be one of: ${validOutcomes}`)
+        .isIn(validOutcomes)
         .run(req);
     await check('date', 'Date must be avalid ISO 8601 date.')
         .isISO8601()
