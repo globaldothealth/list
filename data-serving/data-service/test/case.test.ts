@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../src/index';
 import mongoose from 'mongoose';
+import { Case } from '../src/model/case';
 
 beforeAll(async () => {
     await mongoose.connect(
@@ -15,6 +16,10 @@ beforeAll(async () => {
             }
         },
     );
+});
+
+beforeEach(async () => {
+    await Case.deleteMany({});
 });
 
 afterAll(async () => {
