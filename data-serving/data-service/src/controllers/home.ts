@@ -5,6 +5,6 @@ import { Request, Response } from 'express';
  *
  * Handles HTTP GET /.
  */
-export const get = (req: Request, res: Response) => {
+export const get = (req: Request, res: Response): void => {
     res.send('Data service under construction.');
 };
