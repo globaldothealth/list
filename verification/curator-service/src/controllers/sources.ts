@@ -1,41 +1,48 @@
 import { Request, Response } from 'express';
+import { Store } from '../storage/store';
 
-/**
- * List the sources.
- */
-export const list = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
-};
+export class Sources {
+    constructor(private readonly store: Store) {}
 
-/**
- * Get a single source.
- */
-export const get = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
-};
+    /**
+     * List the sources.
+     */
+    list = async (req: Request, res: Response): Promise<void> => {
+        console.log('listing sources from handler');
+        const sources = await this.store.listSources();
+        res.send(sources);
+        return;
+    };
 
-/**
- * Update a single source.
- */
-export const update = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
-};
+    /**
+     * Get a single source.
+     */
+    get(req: Request, res: Response): void {
+        res.sendStatus(501);
+        return;
+    }
 
-/**
- * Create a single source.
- */
-export const create = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
-};
+    /**
+     * Update a single source.
+     */
+    update(req: Request, res: Response): void {
+        res.sendStatus(501);
+        return;
+    }
 
-/**
- * Delete a single source.
- */
-export const del = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
-};
+    /**
+     * Create a single source.
+     */
+    create(req: Request, res: Response): void {
+        res.sendStatus(501);
+        return;
+    }
+
+    /**
+     * Delete a single source.
+     */
+    del(req: Request, res: Response): void {
+        res.sendStatus(501);
+        return;
+    }
+}
