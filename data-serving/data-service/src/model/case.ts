@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+export const validOutcomes = ['pending', 'recovered', 'death'];
+
 const demographicsSchema = new mongoose.Schema({
     age: {
         type: Number,
@@ -21,7 +23,7 @@ const caseSchema = new mongoose.Schema({
     },
     outcome: {
         type: String,
-        enum: ['pending', 'recovered', 'death'],
+        enum: validOutcomes,
         required: 'Enter an outcome.',
     },
     demographics: demographicsSchema,
