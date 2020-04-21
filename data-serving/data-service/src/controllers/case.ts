@@ -19,7 +19,7 @@ export const get = (req: Request, res: Response): void => {
 export const list = (req: Request, res: Response): void => {
     Case.find({}, (err, c) => {
         if (err) {
-            res.send(err);
+            res.status(500).send(err);
         }
         res.json(c);
     });
@@ -31,14 +31,12 @@ export const list = (req: Request, res: Response): void => {
  * Handles HTTP POST /cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
+    const acceptedOutcomes = ['pending', 'recovered', 'death'];
+    await check('outcome', `Outcome must be one of: ${acceptedOutcomes}`)
+        .isIn(acceptedOutcomes)
+        .run(req);
     await check('date', 'Date must be avalid ISO 8601 date.')
         .isISO8601()
-        .run(req);
-    await check(
-        'outcome',
-        'Outcome must be one "pending", "recovered", or "death".',
-    )
-        .isIn(['pending', 'recovered', 'death'])
         .run(req);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -53,7 +51,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     c.save((err, c) => {
         if (err) {
-            res.send(err);
+            res.status(500).send(err);
         }
         res.json(c);
     });
