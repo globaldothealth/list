@@ -17,10 +17,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure app routes.
 app.get('/', homeController.get);
-app.get('/cases/:id', caseController.get);
-app.get('/cases', caseController.list);
-app.post('/cases', caseController.create);
-app.put('/cases/:id', caseController.update);
-app.delete('/cases/:id', caseController.del);
-
+const apiRouter = express.Router();
+apiRouter.get('/cases/:id', caseController.get);
+apiRouter.get('/cases/', caseController.list);
+apiRouter.post('/cases/', caseController.create);
+apiRouter.put('/cases/:id', caseController.update);
+apiRouter.delete('/cases/:id', caseController.del);
+app.use('/api', apiRouter);
 export default app;
