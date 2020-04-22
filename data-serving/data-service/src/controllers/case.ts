@@ -5,7 +5,7 @@ import { Case, validOutcomes } from '../model/case';
 /**
  * Get a specific case.
  *
- * Handles HTTP GET /cases/:id.
+ * Handles HTTP GET /api/cases/:id.
  */
 export const get = (req: Request, res: Response): void => {
     res.send(`Triggered get case with ID ${req.params.id}.`);
@@ -14,7 +14,7 @@ export const get = (req: Request, res: Response): void => {
 /**
  * List all cases.
  *
- * Handles HTTP GET /cases.
+ * Handles HTTP GET /api/cases.
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
     const cases = await Case.find({});
@@ -24,7 +24,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 /**
  * Create a case.
  *
- * Handles HTTP POST /cases.
+ * Handles HTTP POST /api/cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     await check('outcome', `Outcome must be one of: ${validOutcomes}`)
@@ -50,7 +50,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 /**
  * Update a specific case.
  *
- * Handles HTTP PUT /cases/:id.
+ * Handles HTTP PUT /api/cases/:id.
  */
 export const update = (req: Request, res: Response): void => {
     res.send(`Triggered update case with ID ${req.params.id}.`);
@@ -59,7 +59,7 @@ export const update = (req: Request, res: Response): void => {
 /**
  * Delete a specific case.
  *
- * Handles HTTP DELETE /cases/:id.
+ * Handles HTTP DELETE /api/cases/:id.
  */
 export const del = (req: Request, res: Response): void => {
     res.send(`Triggered delete case with ID ${req.params.id}.`);
