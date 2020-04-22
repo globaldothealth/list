@@ -99,7 +99,21 @@ describe('POST', () => {
 });
 
 describe('DELETE', () => {
-    it('should return 501 Not Implemented', (done) => {
-        request(app).delete('/api/sources/42').expect(501, done);
+    it('should delete a source', async () => {
+        const source = new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        });
+        const saved = await source.save();
+        const res = await request(app)
+            .delete(`/api/sources/${saved.id}`)
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body._id).toEqual(saved.id);
+    });
+    it('should not be able to delete a non existent source', (done) => {
+        request(app)
+            .delete('/api/sources/424242424242424242424242')
+            .expect(404, done);
     });
 });

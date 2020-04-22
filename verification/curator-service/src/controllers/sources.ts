@@ -67,6 +67,11 @@ export const create = async (req: Request, res: Response): Promise<void> => {
  * Delete a single source.
  */
 export const del = async (req: Request, res: Response): Promise<void> => {
-    res.sendStatus(501);
+    const source = await Source.findByIdAndDelete(req.params.id);
+    if (!source) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(source);
     return;
 };
