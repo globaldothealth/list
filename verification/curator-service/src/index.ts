@@ -27,9 +27,8 @@ app.use('/api', apiRouter);
 
 (async (): Promise<void> => {
     try {
-        console.log(
-            'Connecting to instance ${process.env.DB_CONNECTION_STRING}',
-        );
+        console.log('Connecting to instance', process.env.DB_CONNECTION_STRING);
+
         await mongoose.connect(process.env.DB_CONNECTION_STRING || '', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
