@@ -7,8 +7,13 @@ import { Case, validOutcomes } from '../model/case';
  *
  * Handles HTTP GET /api/cases/:id.
  */
-export const get = (req: Request, res: Response): void => {
-    res.send(`Triggered get case with ID ${req.params.id}.`);
+export const get = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findById(req.params.id);
+    if (!c) {
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        return;
+    }
+    res.json(c);
 };
 
 /**
@@ -52,8 +57,15 @@ export const create = async (req: Request, res: Response): Promise<void> => {
  *
  * Handles HTTP PUT /api/cases/:id.
  */
-export const update = (req: Request, res: Response): void => {
-    res.send(`Triggered update case with ID ${req.params.id}.`);
+export const update = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+    });
+    if (!c) {
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        return;
+    }
+    res.json(c);
 };
 
 /**
@@ -61,6 +73,11 @@ export const update = (req: Request, res: Response): void => {
  *
  * Handles HTTP DELETE /api/cases/:id.
  */
-export const del = (req: Request, res: Response): void => {
-    res.send(`Triggered delete case with ID ${req.params.id}.`);
+export const del = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findByIdAndDelete(req.params.id, req.body);
+    if (!c) {
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        return;
+    }
+    res.json(c);
 };
