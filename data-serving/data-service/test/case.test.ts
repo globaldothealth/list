@@ -1,5 +1,24 @@
 import request from 'supertest';
 import app from '../src/index';
+import mongoose from 'mongoose';
+import { Case } from '../src/model/case';
+
+beforeAll(() => {
+    return mongoose.connect(
+        // This is provided by jest-mongodb.
+        // The `else testurl` is to appease Typescript.
+        process.env.MONGO_URL || 'testurl',
+        { useNewUrlParser: true, useUnifiedTopology: true },
+    );
+});
+
+beforeEach(() => {
+    return Case.deleteMany({});
+});
+
+afterAll(() => {
+    return mongoose.disconnect();
+});
 
 describe('GET', () => {
     it('one item should return 200 OK', (done) => {
@@ -11,21 +30,24 @@ describe('GET', () => {
 });
 
 describe('POST', () => {
-    it('create without age should return 422', (done) => {
-        request(app).post('/api/cases').expect(422, done);
-    });
-    it('create with age should return 200 OK with provided age', (done) => {
+    it('create without valid date should return 422', (done) => {
         request(app)
             .post('/api/cases')
-            .send({ age: 26 })
-            .expect(200)
-            .end((err, res) => {
-                if (err) {
-                    return done(err);
-                }
-                expect(res.text).toMatch(/26/);
-                return done();
-            });
+            .send({ date: 'not-a-date', outcome: 'recovered' })
+            .expect(422, done);
+    });
+    it('create without valid outcome should return 422', (done) => {
+        request(app)
+            .post('/api/cases')
+            .send({ date: '2020-04-01', outcome: 'not-a-valid-outcome' })
+            .expect(422, done);
+    });
+    it('create with valid input should return 200 OK with json', (done) => {
+        request(app)
+            .post('/api/cases')
+            .send({ date: '2020-04-01', outcome: 'recovered' })
+            .expect('Content-Type', /json/)
+            .expect(200, done);
     });
 });
 

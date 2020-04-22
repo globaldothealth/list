@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { check, validationResult } from 'express-validator';
+import { Case, validOutcomes } from '../model/case';
 
 /**
  * Get a specific case.
@@ -15,23 +16,22 @@ export const get = (req: Request, res: Response): void => {
  *
  * Handles HTTP GET /cases.
  */
-export const list = (req: Request, res: Response): void => {
-    res.send('Triggered list cases.');
+export const list = async (req: Request, res: Response): Promise<void> => {
+    const cases = await Case.find({});
+    res.json(cases);
 };
 
 /**
  * Create a case.
  *
  * Handles HTTP POST /cases.
- *
- * For now, just attempts to parse an "age" field and return it in the response.
- * Returns 422 if "age" isn't present in the request body.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
-    await check('age', 'Age must be a valid number')
-        .not()
-        .isEmpty()
-        .isNumeric()
+    await check('outcome', `Outcome must be one of: ${validOutcomes}`)
+        .isIn(validOutcomes)
+        .run(req);
+    await check('date', 'Date must be a valid ISO 8601 date.')
+        .isISO8601()
         .run(req);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -39,7 +39,12 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
-    res.send(`Triggered create case with age: ${req.body.age}`);
+    const c = new Case({
+        date: req.body.date,
+        outcome: req.body.outcome,
+    });
+    const result = await c.save();
+    res.json(result);
 };
 
 /**
