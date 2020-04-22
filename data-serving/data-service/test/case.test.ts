@@ -21,11 +21,17 @@ afterAll(() => {
 });
 
 describe('GET', () => {
-    it('one present item should return 200 OK', async (done) => {
+    it('one present item should return 200 OK', async () => {
         const id = '53cb6b9b4f4ddef1ad47f943';
         const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
         await c.save();
-        request(app).get(`/api/cases/${id}`).expect(200, done);
+
+        const res = await request(app)
+            .get(`/api/cases/${id}`)
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body._id).toEqual(id);
     });
     it('one absent item should return 404 NOT FOUND', (done) => {
         request(app)
@@ -33,7 +39,10 @@ describe('GET', () => {
             .expect(404, done);
     });
     it('list should return 200 OK', (done) => {
-        request(app).get('/api/cases').expect(200, done);
+        request(app)
+            .get('/api/cases')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
     });
 });
 
@@ -50,23 +59,58 @@ describe('POST', () => {
             .send({ date: '2020-04-01', outcome: 'not-a-valid-outcome' })
             .expect(422, done);
     });
-    it('create with valid input should return 200 OK with json', (done) => {
-        request(app)
+    it('create with valid input should return 200 OK', async () => {
+        const inputDate = new Date('2020-04-01').toJSON();
+        const inputOutcome = 'recovered';
+        const res = await request(app)
             .post('/api/cases')
-            .send({ date: '2020-04-01', outcome: 'recovered' })
+            .send({ date: inputDate, outcome: inputOutcome })
             .expect('Content-Type', /json/)
-            .expect(200, done);
+            .expect(200);
+
+        expect(res.body.date).toEqual(inputDate);
+        expect(res.body.outcome).toEqual(inputOutcome);
     });
 });
 
 describe('PUT', () => {
-    it('update should return 200 OK', (done) => {
-        request(app).put('/api/cases/id').expect(200, done);
+    it('update present item should return 200 OK', async () => {
+        const id = '53cb6b9b4f4ddef1ad47f943';
+        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
+        await c.save();
+
+        const newOutcome = 'recovered';
+        const res = await request(app)
+            .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .send({ outcome: newOutcome })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.outcome).toEqual(newOutcome);
+    });
+    it('update absent item should return 404 NOT FOUND', (done) => {
+        request(app)
+            .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .expect(404, done);
     });
 });
 
 describe('DELETE', () => {
-    it('should return 200 OK', (done) => {
-        request(app).delete('/api/cases/id').expect(200, done);
+    it('delete present item should return 200 OK', async () => {
+        const id = '53cb6b9b4f4ddef1ad47f943';
+        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
+        await c.save();
+
+        const res = await request(app)
+            .delete(`/api/cases/${id}`)
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body._id).toEqual(id);
+    });
+    it('delete absent item should return 404 NOT FOUND', (done) => {
+        request(app)
+            .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .expect(404, done);
     });
 });
