@@ -30,12 +30,9 @@ app.use('/api', apiRouter);
 
 (async (): Promise<void> => {
     try {
-        console.log(
-            `  Connecting to instance ${env.DB_CONNECTION_STRING}
-               with db ${env.DB_NAME}`,
-        );
+        console.log(`  Connecting to instance ${env.DB_CONNECTION_STRING}`);
 
-        await mongoose.connect(`${env.DB_CONNECTION_STRING}/${env.DB_NAME}`, {
+        await mongoose.connect(env.DB_CONNECTION_STRING, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
