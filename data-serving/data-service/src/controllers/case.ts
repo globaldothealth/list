@@ -16,13 +16,9 @@ export const get = (req: Request, res: Response): void => {
  *
  * Handles HTTP GET /cases.
  */
-export const list = (req: Request, res: Response): void => {
-    Case.find({}, (err, c) => {
-        if (err) {
-            res.status(500).send(err);
-        }
-        res.json(c);
-    });
+export const list = async (req: Request, res: Response): Promise<void> => {
+    const cases = await Case.find({});
+    res.json(cases);
 };
 
 /**
@@ -34,7 +30,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     await check('outcome', `Outcome must be one of: ${validOutcomes}`)
         .isIn(validOutcomes)
         .run(req);
-    await check('date', 'Date must be avalid ISO 8601 date.')
+    await check('date', 'Date must be a valid ISO 8601 date.')
         .isISO8601()
         .run(req);
     const errors = validationResult(req);
@@ -47,13 +43,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         date: req.body.date,
         outcome: req.body.outcome,
     });
-
-    c.save((err, c) => {
-        if (err) {
-            res.status(500).send(err);
-        }
-        res.json(c);
-    });
+    const result = await c.save();
+    res.json(result);
 };
 
 /**
