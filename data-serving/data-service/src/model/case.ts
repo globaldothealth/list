@@ -18,7 +18,7 @@ const caseSchema = new mongoose.Schema({
     date: {
         type: Date,
         min: '2019-11-01',
-        max: '2020-04-21',
+        max: Date.now,
         required: 'Enter a date.',
     },
     outcome: {
