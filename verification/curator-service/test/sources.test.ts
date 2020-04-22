@@ -2,8 +2,8 @@ import request from 'supertest';
 import app from '../src/index';
 
 describe('GET', () => {
-    it('list should return 501 Not Implemented', (done) => {
-        request(app).get('/api/sources').expect(501, done);
+    it('list should return 200', (done) => {
+        request(app).get('/api/sources').expect(200, done);
     });
     it('one item should return 501 Not Implemented', (done) => {
         request(app).get('/api/sources/42').expect(501, done);
