@@ -10,7 +10,7 @@ import { Case, validOutcomes } from '../model/case';
 export const get = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findById(req.params.id);
     if (!c) {
-        res.status(404).send('Case with provided ID not found.');
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
         return;
     }
     res.json(c);
@@ -62,7 +62,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
         new: true,
     });
     if (!c) {
-        res.status(404).send('Case with provided ID not found.');
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
         return;
     }
     res.json(c);
@@ -76,7 +76,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const del = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findByIdAndDelete(req.params.id, req.body);
     if (!c) {
-        res.status(404).send('Case with provided ID not found.');
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
         return;
     }
     res.json(c);
