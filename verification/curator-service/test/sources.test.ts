@@ -1,6 +1,27 @@
 import request from 'supertest';
 import app from '../src/index';
 
+import mongoose from 'mongoose';
+
+beforeAll(async () => {
+    await mongoose.connect(
+        // This is provided by jest-mongodb.
+        // The `else testurl` is to appease Typescript.
+        process.env.MONGO_URL || 'testurl',
+        { useNewUrlParser: true, useUnifiedTopology: true },
+        (err) => {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            }
+        },
+    );
+});
+
+afterAll(async () => {
+    await mongoose.disconnect();
+});
+
 describe('GET', () => {
     it('list should return 200', (done) => {
         request(app).get('/api/sources').expect(200, done);
