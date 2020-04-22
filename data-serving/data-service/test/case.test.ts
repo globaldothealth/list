@@ -23,14 +23,14 @@ afterAll(() => {
 describe('GET', () => {
     it('one present item should return 200 OK', async () => {
         const c = new Case({ outcome: 'pending', date: '2020-04-21' });
-        const savedCase = await c.save();
+        await c.save();
 
         const res = await request(app)
-            .get(`/api/cases/${savedCase._id}`)
+            .get(`/api/cases/${c._id}`)
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(savedCase._id.toString());
+        expect(res.body._id).toEqual(c._id.toString());
     });
     it('one absent item should return 404 NOT FOUND', (done) => {
         request(app)
@@ -75,11 +75,11 @@ describe('POST', () => {
 describe('PUT', () => {
     it('update present item should return 200 OK', async () => {
         const c = new Case({ outcome: 'pending', date: '2020-04-21' });
-        const savedCase = await c.save();
+        await c.save();
 
         const newOutcome = 'recovered';
         const res = await request(app)
-            .put(`/api/cases/${savedCase._id}`)
+            .put(`/api/cases/${c._id}`)
             .send({ outcome: newOutcome })
             .expect('Content-Type', /json/)
             .expect(200);
@@ -96,14 +96,14 @@ describe('PUT', () => {
 describe('DELETE', () => {
     it('delete present item should return 200 OK', async () => {
         const c = new Case({ outcome: 'pending', date: '2020-04-21' });
-        const savedCase = await c.save();
+        await c.save();
 
         const res = await request(app)
-            .delete(`/api/cases/${savedCase._id}`)
+            .delete(`/api/cases/${c._id}`)
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(savedCase._id.toString());
+        expect(res.body._id).toEqual(c._id.toString());
     });
     it('delete absent item should return 404 NOT FOUND', (done) => {
         request(app)
