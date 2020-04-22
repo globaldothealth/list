@@ -1,12 +1,14 @@
-import express from 'express';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import express from 'express';
 import mongoose from 'mongoose';
-
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 dotenv.config();
 

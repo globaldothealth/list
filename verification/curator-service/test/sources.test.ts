@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../src/index';
 
 import mongoose from 'mongoose';
+import { Source } from '../src/model/source';
 
 beforeAll(() => {
     return mongoose.connect(
@@ -16,12 +17,36 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
+beforeEach(() => {
+    return Source.deleteMany({});
+});
+
 describe('GET', () => {
-    it('list should return 200', (done) => {
-        request(app).get('/api/sources').expect(200, done);
+    it('list should return 200', async () => {
+        const source = new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        });
+        const saved = await source.save();
+        const res = await request(app)
+            .get('/api/sources')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body).toHaveLength(1);
+        expect(res.body[0]._id).toEqual(saved.id);
     });
-    it('one item should return 501 Not Implemented', (done) => {
-        request(app).get('/api/sources/42').expect(501, done);
+    it('one existing item should return 200', async () => {
+        const source = new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        });
+        const saved = await source.save();
+        console.log(saved);
+        const res = await request(app)
+            .get(`/api/sources/${saved.id}`)
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body._id).toEqual(saved.id);
     });
 });
 

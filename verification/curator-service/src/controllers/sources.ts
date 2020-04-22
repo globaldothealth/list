@@ -7,15 +7,19 @@ import { Source } from '../model/source';
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
     const docs = await Source.find({});
-    res.send(docs);
+    res.json(docs);
 };
 
 /**
  * Get a single source.
  */
-export const get = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
+export const get = async (req: Request, res: Response): Promise<void> => {
+    const doc = await Source.findById(req.params.id);
+    if (!doc) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(doc);
 };
 
 /**
