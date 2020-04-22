@@ -26,29 +26,47 @@ export const get = async (req: Request, res: Response): Promise<void> => {
  * Update a single source.
  */
 export const update = async (req: Request, res: Response): Promise<void> => {
-    const source = await Source.findByIdAndUpdate(req.params.id, req.body, {
-        // Return the udpated object.
-        new: true,
-    });
-    if (!source) {
-        res.sendStatus(404);
+    try {
+        const source = await Source.findByIdAndUpdate(req.params.id, req.body, {
+            // Return the udpated object.
+            new: true,
+            runValidators: true,
+        });
+        if (!source) {
+            res.sendStatus(404);
+            return;
+        }
+        res.json(source);
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
         return;
     }
-    res.json(source);
 };
 
 /**
  * Create a single source.
  */
-export const create = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
+export const create = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const source = await Source.create(req.body);
+        res.location(`/sources/${source.id}`);
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
+    }
 };
 
 /**
  * Delete a single source.
  */
-export const del = (req: Request, res: Response): void => {
+export const del = async (req: Request, res: Response): Promise<void> => {
     res.sendStatus(501);
     return;
 };

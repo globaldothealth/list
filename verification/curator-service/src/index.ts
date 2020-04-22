@@ -34,6 +34,7 @@ app.use('/api', apiRouter);
         await mongoose.connect(process.env.DB_CONNECTION_STRING || '', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useFindAndModify: false,
         });
         console.log('Connected to the database');
     } catch (e) {

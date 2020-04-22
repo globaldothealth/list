@@ -41,7 +41,6 @@ describe('GET', () => {
             origin: { url: 'http://foo.bar' },
         });
         const saved = await source.save();
-        console.log(saved);
         const res = await request(app)
             .get(`/api/sources/${saved.id}`)
             .expect(200)
@@ -57,7 +56,6 @@ describe('PUT', () => {
             origin: { url: 'http://foo.bar' },
         });
         const saved = await source.save();
-        saved.name = 'new name';
         const res = await request(app)
             .put(`/api/sources/${saved.id}`)
             .send({ name: 'new name' })
@@ -73,11 +71,30 @@ describe('PUT', () => {
             .put('/api/sources/424242424242424242424242')
             .expect(404, done);
     });
+    it('should not update to an invalid source', async () => {
+        const source = new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        });
+        const saved = await source.save();
+        const res = await request(app)
+            .put(`/api/sources/${saved.id}`)
+            .send({ name: '' })
+            .expect(422);
+        expect(res.body).toMatch('Enter a name');
+    });
 });
 
 describe('POST', () => {
-    it('should return 501 Not Implemented', (done) => {
-        request(app).post('/api/sources/').expect(501, done);
+    it('should return the created source', async () => {
+        request(app)
+            .post('/api/sources/')
+            .send({ name: 'some name', origin: { url: 'http://what.ever' } })
+            .expect(201);
+    });
+    it('should not create invalid source', async () => {
+        const res = await request(app).post('/api/sources').expect(422);
+        expect(res.body).toMatch('Enter a name');
     });
 });
 
