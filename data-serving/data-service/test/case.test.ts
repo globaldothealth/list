@@ -1,24 +1,23 @@
 import request from 'supertest';
 import app from '../src/index';
 import mongoose from 'mongoose';
+import { Case } from '../src/model/case';
 
-beforeAll(async () => {
-    await mongoose.connect(
+beforeAll(() => {
+    return mongoose.connect(
         // This is provided by jest-mongodb.
         // The `else testurl` is to appease Typescript.
         process.env.MONGO_URL || 'testurl',
-        { useNewUrlParser: true, useCreateIndex: true },
-        (err) => {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-        },
+        { useNewUrlParser: true, useUnifiedTopology: true },
     );
 });
 
-afterAll(async () => {
-    await mongoose.disconnect();
+beforeEach(() => {
+    return Case.deleteMany({});
+});
+
+afterAll(() => {
+    return mongoose.disconnect();
 });
 
 describe('GET', () => {
