@@ -8,7 +8,6 @@ import { Source } from '../model/source';
 export const list = async (req: Request, res: Response): Promise<void> => {
     const docs = await Source.find({});
     res.send(docs);
-    return;
 };
 
 /**
