@@ -22,16 +22,15 @@ afterAll(() => {
 
 describe('GET', () => {
     it('one present item should return 200 OK', async () => {
-        const id = '53cb6b9b4f4ddef1ad47f943';
-        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
-        await c.save();
+        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const savedCase = await c.save();
 
         const res = await request(app)
-            .get(`/api/cases/${id}`)
+            .get(`/api/cases/${savedCase._id}`)
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(id);
+        expect(res.body._id).toEqual(savedCase._id.toString());
     });
     it('one absent item should return 404 NOT FOUND', (done) => {
         request(app)
@@ -75,13 +74,12 @@ describe('POST', () => {
 
 describe('PUT', () => {
     it('update present item should return 200 OK', async () => {
-        const id = '53cb6b9b4f4ddef1ad47f943';
-        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
-        await c.save();
+        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const savedCase = await c.save();
 
         const newOutcome = 'recovered';
         const res = await request(app)
-            .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .put(`/api/cases/${savedCase._id}`)
             .send({ outcome: newOutcome })
             .expect('Content-Type', /json/)
             .expect(200);
@@ -97,16 +95,15 @@ describe('PUT', () => {
 
 describe('DELETE', () => {
     it('delete present item should return 200 OK', async () => {
-        const id = '53cb6b9b4f4ddef1ad47f943';
-        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
-        await c.save();
+        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const savedCase = await c.save();
 
         const res = await request(app)
-            .delete(`/api/cases/${id}`)
+            .delete(`/api/cases/${savedCase._id}`)
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body._id).toEqual(id);
+        expect(res.body._id).toEqual(savedCase._id.toString());
     });
     it('delete absent item should return 404 NOT FOUND', (done) => {
         request(app)
