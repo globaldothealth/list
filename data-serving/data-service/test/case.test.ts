@@ -91,7 +91,7 @@ describe('PUT', () => {
         await c.save();
 
         const newOutcome = 'not-valid';
-        await request(app)
+        request(app)
             .put(`/api/cases/${c._id}`)
             .send({ outcome: newOutcome })
             .expect(422);
