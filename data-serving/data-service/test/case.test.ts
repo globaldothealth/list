@@ -86,6 +86,16 @@ describe('PUT', () => {
 
         expect(res.body.outcome).toEqual(newOutcome);
     });
+    it('invalid update present item should return 422', async () => {
+        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        await c.save();
+
+        const newOutcome = 'not-valid';
+        await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({ outcome: newOutcome })
+            .expect(422);
+    });
     it('update absent item should return 404 NOT FOUND', (done) => {
         request(app)
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
