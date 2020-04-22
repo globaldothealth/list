@@ -32,8 +32,7 @@ app.use('/api', apiRouter);
     try {
         console.log(
             `  Connecting to instance ${env.DB_CONNECTION_STRING}
-               with db ${env.DB_NAME}
-               and collection ${env.DB_COLLECTION}`,
+               with db ${env.DB_NAME}`,
         );
 
         await mongoose.connect(`${env.DB_CONNECTION_STRING}/${env.DB_NAME}`, {
