@@ -3,23 +3,17 @@ import app from '../src/index';
 
 import mongoose from 'mongoose';
 
-beforeAll(async () => {
-    await mongoose.connect(
+beforeAll(() => {
+    return mongoose.connect(
         // This is provided by jest-mongodb.
         // The `else testurl` is to appease Typescript.
         process.env.MONGO_URL || 'testurl',
         { useNewUrlParser: true, useUnifiedTopology: true },
-        (err) => {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-        },
     );
 });
 
-afterAll(async () => {
-    await mongoose.disconnect();
+afterAll(() => {
+    return mongoose.disconnect();
 });
 
 describe('GET', () => {
