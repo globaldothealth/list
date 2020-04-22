@@ -51,8 +51,27 @@ describe('GET', () => {
 });
 
 describe('PUT', () => {
-    it('should return 501 Not Implemented', (done) => {
-        request(app).put('/api/sources/id').expect(501, done);
+    it('should update a source', async () => {
+        const source = new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        });
+        const saved = await source.save();
+        saved.name = 'new name';
+        const res = await request(app)
+            .put(`/api/sources/${saved.id}`)
+            .send({ name: 'new name' })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.name).toEqual('new name');
+        // Check stuff that didn't change.
+        expect(res.body.origin.url).toEqual('http://foo.bar');
+    });
+    it('cannot update an inexistent source', (done) => {
+        request(app)
+            .put('/api/sources/424242424242424242424242')
+            .expect(404, done);
     });
 });
 

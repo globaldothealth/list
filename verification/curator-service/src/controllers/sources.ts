@@ -25,9 +25,16 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 /**
  * Update a single source.
  */
-export const update = (req: Request, res: Response): void => {
-    res.sendStatus(501);
-    return;
+export const update = async (req: Request, res: Response): Promise<void> => {
+    const source = await Source.findByIdAndUpdate(req.params.id, req.body, {
+        // Return the udpated object.
+        new: true,
+    });
+    if (!source) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(source);
 };
 
 /**
