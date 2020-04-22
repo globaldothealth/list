@@ -60,6 +60,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
+        runValidators: true,
     });
     if (!c) {
         res.status(404).send(`Case with ID ${req.params.id} not found.`);
