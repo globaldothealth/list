@@ -7,8 +7,13 @@ import { Case, validOutcomes } from '../model/case';
  *
  * Handles HTTP GET /cases/:id.
  */
-export const get = (req: Request, res: Response): void => {
-    res.send(`Triggered get case with ID ${req.params.id}.`);
+export const get = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findById(req.params.id);
+    if (!c) {
+        res.status(404).send('Case with provided ID not found.');
+        return;
+    }
+    res.json(c);
 };
 
 /**

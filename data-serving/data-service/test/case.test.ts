@@ -21,8 +21,16 @@ afterAll(() => {
 });
 
 describe('GET', () => {
-    it('one item should return 200 OK', (done) => {
-        request(app).get('/api/cases/id').expect(200, done);
+    it('one present item should return 200 OK', async (done) => {
+        const id = '53cb6b9b4f4ddef1ad47f943';
+        const c = new Case({ _id: id, outcome: 'pending', date: '2020-04-21' });
+        await c.save();
+        request(app).get(`/api/cases/${id}`).expect(200, done);
+    });
+    it('one absent item should return 404 NOT FOUND', (done) => {
+        request(app)
+            .get('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .expect(404, done);
     });
     it('list should return 200 OK', (done) => {
         request(app).get('/api/cases').expect(200, done);
