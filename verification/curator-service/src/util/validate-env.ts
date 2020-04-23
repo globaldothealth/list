@@ -1,7 +1,7 @@
 import { CleanEnv, cleanEnv, str, port, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
-    DATASERVIER_API_URL: string;
+    DATASERVER_API_URL: string;
     DB_CONNECTION_STRING: string;
     PORT: number;
 }> &
@@ -10,7 +10,7 @@ export default function validateEnv(): Readonly<{
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
-        DATASERVIER_API_URL: url({
+        DATASERVER_API_URL: url({
             desc: 'URL at which to make requests to the data-service API',
             devDefault: 'http://localhost:3000/api',
         }),
