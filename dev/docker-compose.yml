@@ -9,11 +9,15 @@ services:
         build: ../verification/curator-service
         ports:
             - "3001:3001"
+        depends_on:
+            - mongo
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/test"
     data:
         build: ../data-serving/data-service
         ports:
             - "3000:3000"
+        depends_on:
+            - mongo
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/test"
