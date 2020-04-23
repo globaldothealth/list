@@ -15,19 +15,19 @@ export default function Home() {
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
         }
 
         main {
-          padding: 5rem 0;
           flex: 1;
+          padding: 5rem 0;
+        }
+
+        main,
+        .container {
+          align-items: center;
           display: flex;
           flex-direction: column;
           justify-content: center;
-          align-items: center;
         }
       `}</style>
     </div>
