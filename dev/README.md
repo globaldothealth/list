@@ -10,7 +10,7 @@ During development, you can run each service individually using `docker` or plug
 
 ### All services composed with hot reload
 
-From this folder run:
+Just run `./dev/run_stack.sh` from anywhere or from this folder run:
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
