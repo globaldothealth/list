@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import axios from 'axios';
+import validateEnv from './util/validate-env';
 
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
@@ -13,9 +14,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 dotenv.config();
+const env = validateEnv();
 
 // Express configuration.
-app.set('port', process.env.PORT || 3001);
+app.set('port', env.PORT);
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
@@ -30,12 +32,12 @@ apiRouter.delete('/sources/:id', sourcesController.del);
 app.use('/api', apiRouter);
 
 // Configure dependencies.
-axios.defaults.baseURL = process.env.DATASERVER_API_URL;
+axios.defaults.baseURL = env.DATASERVER_API_URL;
 (async (): Promise<void> => {
     try {
-        console.log('Connecting to instance', process.env.DB_CONNECTION_STRING);
+        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
 
-        await mongoose.connect(process.env.DB_CONNECTION_STRING || '', {
+        await mongoose.connect(env.DB_CONNECTION_STRING || '', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
