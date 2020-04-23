@@ -16,7 +16,9 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 export const get = async (req: Request, res: Response): Promise<void> => {
     const doc = await Source.findById(req.params.id);
     if (!doc) {
-        res.sendStatus(404);
+        res.status(404).json(
+            `source with id ${req.params.id} could not be found`,
+        );
         return;
     }
     res.json(doc);
@@ -33,7 +35,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
             runValidators: true,
         });
         if (!source) {
-            res.sendStatus(404);
+            res.status(404).json(
+                `source with id ${req.params.id} could not be found`,
+            );
             return;
         }
         res.json(source);
