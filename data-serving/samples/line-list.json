@@ -2,7 +2,67 @@
     "_id": {
         "$oid": "5e99f21a1c9d440000ceb088"
     },
+    "demographics": {
+        "age": {
+            "years": 55,
+            "range": {
+                "start": 50,
+                "end": 59
+            }
+        },
+        "sex": "female",
+        "species": "homo sapien"
+    },
+    "location": {
+        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+        "country": "France",
+        "administrative_area_level_1": "Île-de-France",
+        "administrative_area_level_2": "Paris",
+        "locality": "Paris",
+        "geometry": {
+            "latitude": 2.3522219,
+            "longitude": 48.85661400000001
+        }
+    },
+    "event_sequence": {
+        "onset_symptoms": {
+            "$date": "2020-01-03T05:00:00Z"
+        },
+        "confirmed": {
+            "$date": "2020-01-10T05:00:00Z"
+        },
+        "hospital_admission": {
+            "$date": "2020-01-21T05:00:00Z"
+        },
+        "death_or_discharge": {
+            "$date": "2020-02-12T05:00:00Z"
+        }
+    },
+    "symptoms": {
+        "provided": [
+            "severe pneumonia",
+            "dyspnea",
+            "weakness"
+        ],
+        "imputed": [
+            "severe pneumonia",
+            "pneumonia",
+            "dyspnea",
+            "difficulty breathing",
+            "weakness"
+        ],
+        "other": [
+            "some free-form symptoms",
+            "that don't match the symptom dictionary"
+        ]
+    },
     "chronic_disease": {
+        "provided": [
+            "hypertension",
+            "type 2 diabetes",
+            "coronary heart disease",
+            "lung cancer"
+        ],
         "imputed": [
             "hypertension",
             "type 2 diabetes",
@@ -15,72 +75,41 @@
         "other": [
             "some free-form chronic diseases",
             "that don't match the chronic disease dictionary"
-        ],
-        "provided": [
-            "hypertension",
-            "type 2 diabetes",
-            "coronary heart disease",
-            "lung cancer"
         ]
     },
-    "demographics": {
-        "age": {
-            "range": {
-                "end": 59,
-                "start": 50
+    "outcome": "discharged",
+    "travel_history": [
+        {
+            "location": {
+                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
+                "country": "China",
+                "administrative_area_level_1": "Hubei",
+                "locality": "Wuhan",
+                "geometry": {
+                    "latitude": 30.592849,
+                    "longitude": 114.305539
+                }
             },
-            "years": 55
-        },
-        "sex": "female",
-        "species": "homo sapien"
-    },
-    "event_sequence": {
-        "confirmed": {
-            "$date": "2020-01-10T05:00:00Z"
-        },
-        "death_or_discharge": {
-            "$date": "2020-02-12T05:00:00Z"
-        },
-        "hospital_admission": {
-            "$date": "2020-01-21T05:00:00Z"
-        },
-        "onset_symptoms": {
-            "$date": "2020-01-03T05:00:00Z"
+            "dates": {
+                "start": {
+                    "$date": "2019-12-15T05:00:00Z"
+                },
+                "end": {
+                    "$date": "2019-12-30T05:00:00Z"
+                }
+            },
+            "purpose": "family",
+            "additional_information": "large family gathering for holidays"
         }
+    ],
+    "source": {
+        "id": "def456",
+        "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
     },
-    "imported_case": {
-        "additional_information": "Contact of a confirmed case at work.",
-        "admin_id": "291",
-        "chronic_disease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
-        "chronic_disease_binary": true,
-        "geo_resolution": "admin_2",
-        "notes_for_discussion": "Other stuff from notes",
-        "outcome": "discharge 2/12",
-        "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\""
-    },
-    "location": {
-        "administrative_area_level_1": "\u00cele-de-France",
-        "administrative_area_level_2": "Paris",
-        "country": "France",
-        "geometry": {
-            "latitude": 2.3522219,
-            "longitude": 48.85661400000001
-        },
-        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
-        "locality": "Paris"
-    },
-    "metadata": {
-        "moderator_id": "abc123",
-        "submission_date": {
-            "$date": "2020-04-23T04:00:00Z"
-        }
-    },
-    "notes": "Contact of a confirmed case at work. Other stuff from notes",
     "outbreak_specifics": {
         "lives_in_wuhan": false,
         "reported_market_exposure": true
     },
-    "outcome": "discharged",
     "pathogens": [
         {
             "name": "sars-cov-2",
@@ -89,54 +118,25 @@
             }
         },
         {
-            "additional_information": "patient had a urinary catheter",
-            "name": "e. coli"
+            "name": "e. coli",
+            "additional_information": "patient had a urinary catheter"
         }
     ],
-    "source": {
-        "id": "def456",
-        "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
-    },
-    "symptoms": {
-        "imputed": [
-            "severe pneumonia",
-            "pneumonia",
-            "dyspnea",
-            "difficulty breathing",
-            "weakness"
-        ],
-        "other": [
-            "some free-form symptoms",
-            "that don't match the symptom dictionary"
-        ],
-        "provided": [
-            "severe pneumonia",
-            "dyspnea",
-            "weakness"
-        ]
-    },
-    "travel_history": [
-        {
-            "additional_information": "large family gathering for holidays",
-            "dates": {
-                "end": {
-                    "$date": "2019-12-30T05:00:00Z"
-                },
-                "start": {
-                    "$date": "2019-12-15T05:00:00Z"
-                }
-            },
-            "location": {
-                "administrative_area_level_1": "Hubei",
-                "country": "China",
-                "geometry": {
-                    "latitude": 30.592849,
-                    "longitude": 114.305539
-                },
-                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
-                "locality": "Wuhan"
-            },
-            "purpose": "family"
+    "notes": "Contact of a confirmed case at work. Other stuff from notes",
+    "metadata": {
+        "moderator_id": "abc123",
+        "submission_date": {
+            "$date": "2020-04-23T04:00:00Z"
         }
-    ]
+    },
+    "imported_case": {
+        "additional_information": "Contact of a confirmed case at work.",
+        "notes_for_discussion": "Other stuff from notes",
+        "geo_resolution": "admin_2",
+        "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
+        "chronic_disease_binary": true,
+        "chronic_disease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+        "outcome": "discharge 2/12",
+        "admin_id": "291"
+    }
 }
