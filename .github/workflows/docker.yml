@@ -17,4 +17,4 @@ jobs:
       - name: Test Curator Service
         run: docker-compose -f dev/docker-compose.yml exec -T curator curl --retry-connrefused --retry 5 --retry-delay 5 -f http://localhost:3001
       - name: Test Data Service
-        run: docker-compose -f dev/docker-compose.yml exec -T data curl --retry-connrefused --retry 5 --retry-delay 5 -f http://localhost:3001
+        run: docker-compose -f dev/docker-compose.yml exec -T data curl --retry-connrefused --retry 5 --retry-delay 5 -f http://localhost:3000
