@@ -8,14 +8,13 @@ interface Case {
 }
 
 function getLatestCaseDate(cases: [Case]): Date {
-    cases.sort((case1, case2) => {
-        const time1 = case1.date.getTime();
-        const time2 = case2.date.getTime();
-        if (time1 > time2) return 1;
-        if (time1 < time2) return -1;
-        return 0;
-    });
-    return cases[cases.length - 1].date;
+    return cases.reduce((case1, case2) =>
+        // These casts are required.
+        // JSON deserialization doesn't add functions to the object.
+        new Date(case1.date).getTime() > new Date(case2.date).getTime()
+            ? case1
+            : case2,
+    ).date;
 }
 
 /**
@@ -32,6 +31,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
             `Found ${cases.length} cases (latest case date: ${latestDate}).`,
         );
     } catch (err) {
+        console.log(err);
         res.status(500).send(err);
     }
 };
