@@ -17,8 +17,8 @@ COPY . .
 # Build the app
 RUN npm run-script build
 
-# Expose service on port 3001.
-EXPOSE 3001
+# Expose service on port 3000.
+EXPOSE 3000
 
 # Start service.
 CMD [ "npm", "start" ]

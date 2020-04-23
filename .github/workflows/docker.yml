@@ -1,0 +1,21 @@
+name: Docker Compose Actions Workflow
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Stack
+        run: docker-compose -f dev/docker-compose.yml up --build -d -V
+      # Containers are run detached above, which means we have to wait until they are up to produce meaningful logs.
+      - name: Sleep for 30 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: "30s"
+      - name: Print Logs
+        run: docker-compose -f dev/docker-compose.yml logs
+      # Flaky on github, need to figure out why.
+      # - name: Test Curator Service
+      #   run: docker-compose -f dev/docker-compose.yml exec -T curator curl --retry-connrefused --retry 20 --retry-delay 5 -f --silent --show-error http://localhost:3001
+      # - name: Test Data Service
+      #   run: docker-compose -f dev/docker-compose.yml exec -T data curl --retry-connrefused --retry 20 --retry-delay 5 -f --silent --show-error http://localhost:3000
