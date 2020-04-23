@@ -2,6 +2,8 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import axios from 'axios';
+
 // Controllers (route handlers).
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
@@ -27,6 +29,8 @@ apiRouter.put('/sources/:id', sourcesController.update);
 apiRouter.delete('/sources/:id', sourcesController.del);
 app.use('/api', apiRouter);
 
+// Configure dependencies.
+axios.defaults.baseURL = process.env.DATASERVER_API_URL;
 (async (): Promise<void> => {
     try {
         console.log('Connecting to instance', process.env.DB_CONNECTION_STRING);
