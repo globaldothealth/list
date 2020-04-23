@@ -9,10 +9,6 @@ jobs:
         run: docker-compose -f dev/docker-compose.yml up --build -d -V
       - name: Print Logs
         run: docker-compose -f dev/docker-compose.yml logs
-      - name: Print src dir
-        run: |
-          docker-compose -f dev/docker-compose.yml exec curator ls -l /usr/src/app
-          docker-compose -f dev/docker-compose.yml exec data ls -l /usr/src/app
       - name: Test Curator Service
         run: docker-compose -f dev/docker-compose.yml exec data curl -s --retry 10 --retry-connrefused http://localhost:3001/
       - name: Test Data Service
