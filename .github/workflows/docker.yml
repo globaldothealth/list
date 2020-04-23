@@ -7,5 +7,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         run: docker-compose -f dev/docker-compose.yml up -d
-      - name: Test
-        run: docker run --network container:curator appropriate/curl -s --retry 10 --retry-connrefused http://localhost:3001/
+      - name: Test Curator Service
+        run: docker run --network container:curator curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3001/
+      - name: Test Data Service
+        run: docker run --network container:data curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3000/
