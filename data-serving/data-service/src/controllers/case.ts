@@ -7,8 +7,13 @@ import { Case, validOutcomes } from '../model/case';
  *
  * Handles HTTP GET /api/cases/:id.
  */
-export const get = (req: Request, res: Response): void => {
-    res.send(`Triggered get case with ID ${req.params.id}.`);
+export const get = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findById(req.params.id);
+    if (!c) {
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        return;
+    }
+    res.json(c);
 };
 
 /**
@@ -27,24 +32,21 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  * Handles HTTP POST /api/cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
-    await check('outcome', `Outcome must be one of: ${validOutcomes}`)
-        .isIn(validOutcomes)
-        .run(req);
-    await check('date', 'Date must be a valid ISO 8601 date.')
-        .isISO8601()
-        .run(req);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.status(422).json({ errors: errors.array() });
+    try {
+        const c = new Case({
+            date: req.body.date,
+            outcome: req.body.outcome,
+        });
+        const result = await c.save();
+        res.json(result);
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
         return;
     }
-
-    const c = new Case({
-        date: req.body.date,
-        outcome: req.body.outcome,
-    });
-    const result = await c.save();
-    res.json(result);
 };
 
 /**
@@ -52,8 +54,25 @@ export const create = async (req: Request, res: Response): Promise<void> => {
  *
  * Handles HTTP PUT /api/cases/:id.
  */
-export const update = (req: Request, res: Response): void => {
-    res.send(`Triggered update case with ID ${req.params.id}.`);
+export const update = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!c) {
+            res.status(404).send(`Case with ID ${req.params.id} not found.`);
+            return;
+        }
+        res.json(c);
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
+        return;
+    }
 };
 
 /**
@@ -61,6 +80,11 @@ export const update = (req: Request, res: Response): void => {
  *
  * Handles HTTP DELETE /api/cases/:id.
  */
-export const del = (req: Request, res: Response): void => {
-    res.send(`Triggered delete case with ID ${req.params.id}.`);
+export const del = async (req: Request, res: Response): Promise<void> => {
+    const c = await Case.findByIdAndDelete(req.params.id, req.body);
+    if (!c) {
+        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        return;
+    }
+    res.json(c);
 };
