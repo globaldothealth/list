@@ -14,7 +14,9 @@
     "import-data": "mongoimport --db dev --collection covid19 --file ../samples/line-list.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",
-    "test": "jest --forceExit --coverage --verbose --detectOpenHandles"
+    "test": "jest --clearCache && jest --forceExit --coverage --verbose --detectOpenHandles",
+    "test-watch": "jest --clearCache && jest --verbose --detectOpenHandles --watch",
+    "test-watch-all": "jest --clearCache && jest --coverage --verbose --detectOpenHandles --watchAll"
   },
   "keywords": [],
   "author": "",
