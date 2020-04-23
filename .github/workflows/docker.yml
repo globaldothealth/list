@@ -5,9 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Build Stack
         run: docker-compose -f dev/docker-compose.yml up -d
       - name: Test Curator Service
-        run: docker run --network container:curator curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3001/
+        run: docker run --network container:dev_curator curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3001/
       - name: Test Data Service
-        run: docker run --network container:data curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3000/
+        run: docker run --network container:dev_data curlimages/curl -s --retry 10 --retry-connrefused http://localhost:3000/
