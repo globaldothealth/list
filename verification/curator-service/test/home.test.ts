@@ -14,7 +14,7 @@ describe('GET /', () => {
                 date: '2020-04-21',
             },
         ];
-        const axiosResponse: AxiosResponse = {
+        const axiosResponse = {
             data: cases,
             status: 200,
             statusText: 'OK',
