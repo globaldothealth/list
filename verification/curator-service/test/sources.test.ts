@@ -23,41 +23,38 @@ beforeEach(() => {
 
 describe('GET', () => {
     it('list should return 200', async () => {
-        const source = new Source({
+        const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
-        });
-        const saved = await source.save();
+        }).save();
         const res = await request(app)
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body).toHaveLength(1);
-        expect(res.body[0]._id).toEqual(saved.id);
+        expect(res.body[0]._id).toEqual(source.id);
     });
     it('one existing item should return 200', async () => {
-        const source = new Source({
+        const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
-        });
-        const saved = await source.save();
+        }).save();
         const res = await request(app)
-            .get(`/api/sources/${saved.id}`)
+            .get(`/api/sources/${source.id}`)
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body._id).toEqual(saved.id);
+        expect(res.body._id).toEqual(source.id);
     });
 });
 
 describe('PUT', () => {
     it('should update a source', async () => {
-        const source = new Source({
+        const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
-        });
-        const saved = await source.save();
+        }).save();
         const res = await request(app)
-            .put(`/api/sources/${saved.id}`)
+            .put(`/api/sources/${source.id}`)
             .send({ name: 'new name' })
             .expect(200)
             .expect('Content-Type', /json/);
@@ -72,13 +69,12 @@ describe('PUT', () => {
             .expect(404, done);
     });
     it('should not update to an invalid source', async () => {
-        const source = new Source({
+        const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
-        });
-        const saved = await source.save();
+        }).save();
         const res = await request(app)
-            .put(`/api/sources/${saved.id}`)
+            .put(`/api/sources/${source.id}`)
             .send({ name: '' })
             .expect(422);
         expect(res.body).toMatch('Enter a name');
@@ -100,16 +96,15 @@ describe('POST', () => {
 
 describe('DELETE', () => {
     it('should delete a source', async () => {
-        const source = new Source({
+        const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
-        });
-        const saved = await source.save();
+        }).save();
         const res = await request(app)
-            .delete(`/api/sources/${saved.id}`)
+            .delete(`/api/sources/${source.id}`)
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body._id).toEqual(saved.id);
+        expect(res.body._id).toEqual(source.id);
     });
     it('should not be able to delete a non existent source', (done) => {
         request(app)
