@@ -8,11 +8,17 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
-# RUN npm install
+# RUN npm clean install
 RUN npm ci
 
 # Bundle app source
 COPY . .
 
+# Build the app
+RUN npm run-script build
+
+# Expose service on port 3000.
 EXPOSE 3000
+
+# Start service.
 CMD [ "npm", "start" ]
