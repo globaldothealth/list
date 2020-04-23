@@ -6,6 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: docker-compose up -f dev/docker-compose.yml -d
+        run: docker-compose -f dev/docker-compose.yml -d up
       - name: Test
         run: docker run --network container:curator appropriate/curl -s --retry 10 --retry-connrefused http://localhost:3001/
