@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Stack
-        run: docker-compose -f dev/docker-compose.yml up -d -V
+        run: docker-compose -f dev/docker-compose.yml up --build -d -V
       - name: Print Logs
         run: docker-compose -f dev/docker-compose.yml logs
       - name: Print src dir
