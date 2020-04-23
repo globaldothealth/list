@@ -6,7 +6,7 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('GET /', () => {
-    it('should return 200 OK with latest date', (done) => {
+    it('should return 200 OK with latest case date', (done) => {
         const cases = [
             {
                 _id: 'abc123',
