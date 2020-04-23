@@ -1,0 +1,19 @@
+version: "3"
+services:
+    mongo:
+        image: mongo
+        restart: always
+        ports:
+            - "27017:27017"
+    curator:
+        build: ../verification/curator-service
+        ports:
+            - "3001:3001"
+        environment:
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/test"
+    data:
+        build: ../data-serving/data-service
+        ports:
+            - "3000:3000"
+        environment:
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/test"
