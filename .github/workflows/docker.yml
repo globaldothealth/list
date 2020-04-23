@@ -7,6 +7,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Stack
         run: docker-compose -f dev/docker-compose.yml up -d
+      - name: Logs
+        run: docker-compose -f dev/docker-compose.yml logs
       - name: Test Curator Service
         run: docker-compose -f dev/docker-compose.yml exec data curl -s --retry 10 --retry-connrefused http://localhost:3001/
       - name: Test Data Service
