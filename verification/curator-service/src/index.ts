@@ -37,7 +37,7 @@ axios.defaults.baseURL = env.DATASERVER_API_URL;
     try {
         console.log('Connecting to instance', env.DB_CONNECTION_STRING);
 
-        await mongoose.connect(env.DB_CONNECTION_STRING || '', {
+        await mongoose.connect(env.DB_CONNECTION_STRING, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
