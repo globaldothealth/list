@@ -49,10 +49,7 @@ interface Automation {
 
 const automationSchema = new mongoose.Schema({
     name: {
-        name: {
-            type: String,
-            required: 'Enter an automation rule name',
-        },
+        name: String,
         tag: String,
         active: Boolean,
         // TODO: Should probably use a validator for "cron(..." or "rate(...".
@@ -66,7 +63,10 @@ const sourceSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a name',
     },
-    origin: originSchema,
+    origin: {
+        type: originSchema,
+        required: 'Enter an origin',
+    },
     format: String,
     automation: automationSchema,
 });
