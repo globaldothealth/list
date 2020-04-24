@@ -1,11 +1,11 @@
 {
-  "name": "curator-service",
+  "name": "curator-service-api",
   "version": "1.0.0",
-  "description": "Webserver providing curation and ingestion configuration for epidemiological line list data",
+  "description": "Curation and ingestion configuration APIs for epidemiological line list data",
   "repository": {
     "type": "git",
     "url": "https://github.com/open-covid-data/healthmap-gdo-temp",
-    "directory": "verification/curator-service"
+    "directory": "verification/curator-service/api"
   },
   "main": "dist/server.js",
   "scripts": {
