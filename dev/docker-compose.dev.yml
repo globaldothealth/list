@@ -1,9 +1,9 @@
-version: "3"
+version: "3.7"
 services:
   curator:
     command: "npm run-script dev"
     volumes:
-      - ../verification/curator-service/src:/usr/src/app/src
+      - ../verification/curator-service/api/src:/usr/src/app/src
   data:
     command: "npm run-script dev"
     volumes:
