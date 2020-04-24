@@ -3,6 +3,7 @@ import app from '../src/index';
 
 import mongoose from 'mongoose';
 import { Source } from '../src/model/source';
+import { isMainThread } from 'worker_threads';
 
 beforeAll(() => {
     return mongoose.connect(
