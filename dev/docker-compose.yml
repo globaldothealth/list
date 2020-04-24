@@ -1,0 +1,27 @@
+version: "3"
+services:
+    mongo:
+        image: mongo
+        restart: always
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_DATABASE: "dev"
+    curator:
+        build: ../verification/curator-service
+        ports:
+            - "3001:3001"
+        depends_on:
+            - mongo
+            - data
+        environment:
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/dev"
+            DATASERVER_API_URL: "http://data:3000/api"
+    data:
+        build: ../data-serving/data-service
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo
+        environment:
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/dev"

@@ -1,0 +1,43 @@
+import mongoose from 'mongoose';
+
+export const validOutcomes = ['pending', 'recovered', 'death'];
+
+const demographicsSchema = new mongoose.Schema({
+    age: {
+        type: Number,
+        min: 0,
+        max: 200,
+    },
+    sex: {
+        type: String,
+        enum: ['female', 'male'],
+    },
+});
+
+const caseSchema = new mongoose.Schema({
+    date: {
+        type: Date,
+        min: '2019-11-01',
+        max: Date.now,
+        required: 'Enter a date.',
+    },
+    outcome: {
+        type: String,
+        enum: validOutcomes,
+        required: 'Enter an outcome.',
+    },
+    demographics: demographicsSchema,
+});
+
+interface Demographics {
+    age: number;
+    sex: string;
+}
+
+type CaseDocument = mongoose.Document & {
+    date: Date;
+    outcome: string;
+    demographics: Demographics;
+};
+
+export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
