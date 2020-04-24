@@ -1,5 +1,5 @@
 # Lint as: python3
-'''Script to convert CSV line-list data into json compliant with the MongodB schema.'''
+'''Script to convert CSV line-list data into json compliant with the MongoDB schema.'''
 
 import argparse
 import csv
@@ -7,7 +7,7 @@ import logging
 import json
 
 parser = argparse.ArgumentParser(
-    description='Convert CSV line-list data into json compliant with the MongodB schema.')
+    description='Convert CSV line-list data into json compliant with the MongoDB schema.')
 parser.add_argument('--csv_path', required=True)
 parser.add_argument('--json_path', default='cases.json')
 
