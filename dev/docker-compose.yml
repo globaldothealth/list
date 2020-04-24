@@ -9,7 +9,7 @@ services:
         environment:
             MONGO_INITDB_DATABASE: "dev"
     curator:
-        build: ../verification/curator-service
+        build: ../verification/curator-service/api
         init: true
         ports:
             - "3001:3001"
