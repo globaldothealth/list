@@ -23,12 +23,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: curator-service ci
+      - name: curator-service-api ci
         run: |
           npm ci
           npm run build
           npm test
-        working-directory: verification/curator-service
+        working-directory: verification/curator-service/api
         env:
           CI: true
       - name: data-service ci
