@@ -5,6 +5,8 @@ import argparse
 import csv
 import logging
 import json
+import pandas as pd
+from pandas import DataFrame
 from typing import List
 
 
@@ -20,37 +22,29 @@ def main():
     logging.info("Args: %s", args)
 
     print('Reading data from', args.csv_path)
-    cases = read_csv(args.csv_path)
+    original_cases = read_csv(args.csv_path)
 
     print('Converting data to new schema')
-    convert(cases)
+    converted_cases = convert(original_cases)
 
     print('Writing results to', args.json_path)
-    write_json(cases, args.json_path)
+    write_json(converted_cases, args.json_path)
 
     print('Great success! 🎉')
 
 
-def read_csv(csv_path: str) -> List[object]:
-    cases = []
-    with open(csv_path, newline='') as csvfile:
-        csvreader = csv.DictReader(csvfile)
-        logging.debug('fields: %s', csvreader.fieldnames)
-        for record in csvreader:
-            cases.append(record)
-    return cases
+def read_csv(csv_path: str) -> DataFrame:
+    return pd.read_csv(csv_path, header=0, low_memory=False)
 
 
-def convert(cases: List[object]) -> None:
-    logging.info('Converting %d cases', len(cases))
-    for case in cases:
-        case['_id'] = case.pop('ID')
+def convert(original_cases: DataFrame) -> DataFrame:
+    logging.info('Converting %d cases', len(original_cases))
     # TODO: Much, much more conversion.
+    return original_cases.rename(columns={"ID": "_id"})
 
 
-def write_json(cases: List[object], json_path: str) -> None:
-    with open(json_path, 'w') as outfile:
-        json.dump(cases, outfile, sort_keys=True, indent=2)
+def write_json(cases: DataFrame, json_path: str) -> None:
+    cases.to_json(json_path, orient='records', indent=2)
 
 
 if __name__ == '__main__':
