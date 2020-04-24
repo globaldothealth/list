@@ -36,9 +36,7 @@ interface Parsing {
 }
 
 const parsingSchema = new mongoose.Schema({
-    fields: {
-        type: [fieldSchema],
-    },
+    fields: [fieldSchema],
 });
 
 interface Automation {
@@ -57,6 +55,7 @@ const automationSchema = new mongoose.Schema({
         },
         tag: String,
         active: Boolean,
+        // TODO: Should probably use a validator for "cron(..." or "rate(...".
         scheduleExpression: String,
         parsing: parsingSchema,
     },
