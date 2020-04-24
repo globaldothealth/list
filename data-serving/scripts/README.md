@@ -1,4 +1,4 @@
-# Working with ine-list data
+# Working with line-list data
 
 This directory contains scripts for converting, ingesting, and otherwise munging line-list data.
 
@@ -9,3 +9,5 @@ This directory contains scripts for converting, ingesting, and otherwise munging
 ```console
 python3 convert_data.py --csv_path="latestdata.csv" [--json_path="cases.json"]
 ```
+
+Logs will be written to `convert_data.log`.
