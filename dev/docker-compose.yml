@@ -1,14 +1,16 @@
-version: "3"
+version: "3.7"
 services:
     mongo:
         image: mongo
         restart: always
+        init: true
         ports:
             - "27017:27017"
         environment:
             MONGO_INITDB_DATABASE: "dev"
     curator:
         build: ../verification/curator-service/api
+        init: true
         ports:
             - "3001:3001"
         depends_on:
@@ -19,6 +21,7 @@ services:
             DATASERVER_API_URL: "http://data:3000/api"
     data:
         build: ../data-serving/data-service
+        init: true
         ports:
             - "3000:3000"
         depends_on:
