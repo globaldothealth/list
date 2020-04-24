@@ -25,10 +25,10 @@ app.get('/', homeController.index);
 // Configure API app routes.
 const apiRouter = express.Router();
 apiRouter.get('/sources/', sourcesController.list);
-apiRouter.get('/sources/:id', sourcesController.get);
+apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
 apiRouter.post('/sources/', sourcesController.create);
-apiRouter.put('/sources/:id', sourcesController.update);
-apiRouter.delete('/sources/:id', sourcesController.del);
+apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
+apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 app.use('/api', apiRouter);
 
 // Configure dependencies.
