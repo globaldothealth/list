@@ -1,4 +1,5 @@
 import React from "react";
+import displayDate from "../util/display-date";
 
 interface RowProps {
     case: Case
@@ -16,7 +17,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
         return (
             <tr>
                 <td>{c._id}</td>
-                <td>{new Date(c.date).toDateString()}</td>
+                <td>{displayDate(new Date(c.date))}</td>
                 <td>{c.outcome}</td>
             </tr>
         );
