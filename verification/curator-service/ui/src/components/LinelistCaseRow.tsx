@@ -1,8 +1,13 @@
 import React from "react";
-import { Case } from "../../../api/src/controllers/cases";
 
 interface RowProps {
     case: Case
+}
+
+export interface Case {
+    _id: string;
+    outcome: string;
+    date: Date;
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {

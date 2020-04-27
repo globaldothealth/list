@@ -28,3 +28,17 @@ services:
             - mongo
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/dev"
+    curatorui:
+        build: ../verification/curator-service/ui
+        init: true
+        ports:
+            - "3002:3002"
+        depends_on:
+            - curator
+        # Necessary because react start script requires a TTY.
+        stdin_open: true
+        environment:
+            PORT: "3002"
+            # Can't use http://curator:3001 here because we open the browser
+            # outside of the container so it wouldn't work.
+            REACT_APP_API_ENDPOINT: "http://localhost:3001"
