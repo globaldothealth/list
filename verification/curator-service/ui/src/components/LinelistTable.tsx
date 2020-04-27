@@ -1,7 +1,6 @@
 import React from "react";
 import axios from 'axios';
-import { Case } from '../../../api/src/controllers/cases'
-import LinelistCaseRow from "./LinelistCaseRow";
+import LinelistCaseRow, { Case } from "./LinelistCaseRow";
 import Table from 'react-bootstrap/Table';
 
 interface TableState {
@@ -23,7 +22,7 @@ export default class LinelistTable extends React.Component<{}, TableState> {
 
     async componentDidMount() {
         try {
-            const response = await axios.get<Case[]>('/api/cases');
+            const response = await axios.get<Case[]>(process.env.REACT_APP_API_ENDPOINT + '/api/cases');
             this.setState({
                 isLoaded: true,
                 linelist: response.data

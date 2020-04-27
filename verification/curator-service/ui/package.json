@@ -2,7 +2,6 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001/",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -20,7 +19,8 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "start": "PORT=3002 react-scripts start",
+    "start-noenv": "react-scripts start",
+    "start": "PORT=3002 REACT_APP_API_ENDPOINT=http://localhost:3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
