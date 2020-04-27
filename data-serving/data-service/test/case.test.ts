@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../src/index';
 import mongoose from 'mongoose';
-import { Case } from '../src/model/case';
+import { Case, Outcome } from '../src/model/case';
 
 beforeAll(() => {
     return mongoose.connect(
@@ -22,7 +22,7 @@ afterAll(() => {
 
 describe('GET', () => {
     it('one present item should return 200 OK', async () => {
-        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const c = new Case({ outcome: Outcome.Pending });
         await c.save();
 
         const res = await request(app)
@@ -49,35 +49,48 @@ describe('POST', () => {
     it('create without valid date should return 422', (done) => {
         request(app)
             .post('/api/cases')
-            .send({ date: 'not-a-date', outcome: 'recovered' })
+            .send({
+                eventSequence: { confirmed: 'not-a-date' },
+                outcome: 'Recovered',
+            })
             .expect(422, done);
     });
     it('create without valid outcome should return 422', (done) => {
         request(app)
             .post('/api/cases')
-            .send({ date: '2020-04-01', outcome: 'not-a-valid-outcome' })
+            .send({
+                eventSequence: { confirmed: new Date('2020-04-01') },
+                outcome: 'not-a-valid-outcome',
+            })
             .expect(422, done);
     });
     it('create with valid input should return 200 OK', async () => {
         const inputDate = new Date('2020-04-01').toJSON();
-        const inputOutcome = 'recovered';
+        const inputOutcome = 'Recovered';
         const res = await request(app)
             .post('/api/cases')
-            .send({ date: inputDate, outcome: inputOutcome })
+            .send({
+                eventSequence: { confirmed: inputDate },
+                outcome: inputOutcome,
+            })
             .expect('Content-Type', /json/)
             .expect(200);
+        console.log('\n\n' + res.body.toString());
 
-        expect(res.body.date).toEqual(inputDate);
+        expect(res.body.eventSequence.confirmed).toEqual(inputDate);
         expect(res.body.outcome).toEqual(inputOutcome);
     });
 });
 
 describe('PUT', () => {
     it('update present item should return 200 OK', async () => {
-        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const c = new Case({
+            outcome: 'Pending',
+            eventSequence: { confirmed: new Date('2020-04-21') },
+        });
         await c.save();
 
-        const newOutcome = 'recovered';
+        const newOutcome = 'Recovered';
         const res = await request(app)
             .put(`/api/cases/${c._id}`)
             .send({ outcome: newOutcome })
@@ -87,7 +100,7 @@ describe('PUT', () => {
         expect(res.body.outcome).toEqual(newOutcome);
     });
     it('invalid update present item should return 422', async () => {
-        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const c = new Case({ outcome: 'Pending', date: '2020-04-21' });
         await c.save();
 
         const newOutcome = 'not-valid';
@@ -105,7 +118,7 @@ describe('PUT', () => {
 
 describe('DELETE', () => {
     it('delete present item should return 200 OK', async () => {
-        const c = new Case({ outcome: 'pending', date: '2020-04-21' });
+        const c = new Case({ outcome: 'Pending', date: '2020-04-21' });
         await c.save();
 
         const res = await request(app)
