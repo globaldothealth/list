@@ -42,26 +42,25 @@ export default class LinelistTable extends React.Component<{}, TableState> {
             return <div>Error: {errorMessage}</div>;
         } else if (!isLoaded) {
             return <div>Loading...</div>;
-        } else {
-            return (
-                <Table bordered hover striped>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Date</th>
-                            <th>Outcome</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {linelist.map(item => (
-                            <LinelistCaseRow
-                                case={item}
-                                key={item._id}
-                            />
-                        ))}
-                    </tbody>
-                </Table>
-            )
         }
+        return (
+            <Table bordered hover striped>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {linelist.map(item => (
+                        <LinelistCaseRow
+                            case={item}
+                            key={item._id}
+                        />
+                    ))}
+                </tbody>
+            </Table>
+        )
     }
 }
