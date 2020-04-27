@@ -73,7 +73,10 @@ export default class LinelistTable extends React.Component<{}, TableState> {
                             </TableRow>
                         </TableHead>
                         <TableBody >
-                            {linelist.map((item, index) => (
+                            {(rowsPerPage > 0
+                                ? linelist.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : linelist
+                            ).map((item, index) => (
                                 <LinelistCaseRow
                                     background={index % 2 ? "white" : "#f5f5f5"}
                                     case={item}
