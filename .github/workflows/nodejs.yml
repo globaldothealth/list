@@ -39,3 +39,11 @@ jobs:
         working-directory: data-serving/data-service
         env:
           CI: true
+      - name: curator-service-ui ci
+        run: |
+          npm ci
+          npm run build
+          npm test
+        working-directory: verification/curator-service/ui
+        env:
+          CI: true

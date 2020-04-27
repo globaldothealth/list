@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import axios from 'axios';
+import cors from 'cors';
 import validateEnv from './util/validate-env';
 
 // Controllers (route handlers).
@@ -19,6 +20,10 @@ const env = validateEnv();
 
 // Express configuration.
 app.set('port', env.PORT);
+
+// We run the frontend on another port, support queries from all origins.
+// TODO: This will need to be tweaked in production.
+app.use(cors());
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
