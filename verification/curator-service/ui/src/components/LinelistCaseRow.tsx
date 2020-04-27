@@ -7,7 +7,9 @@ interface RowProps {
 export interface Case {
     _id: string;
     outcome: string;
-    date: Date;
+    eventSequence: {
+        confirmed: Date;
+    };
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
@@ -16,7 +18,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
         return (
             <tr>
                 <td>{c._id}</td>
-                <td>{new Date(c.date).toDateString()}</td>
+                <td>{c.eventSequence ? new Date(c.eventSequence.confirmed).toDateString() : ''}</td>
                 <td>{c.outcome}</td>
             </tr>
         );
