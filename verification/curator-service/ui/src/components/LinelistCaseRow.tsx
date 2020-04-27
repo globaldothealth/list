@@ -1,6 +1,9 @@
 import React from "react";
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 
 interface RowProps {
+    background: string
     case: Case
 }
 
@@ -11,14 +14,18 @@ export interface Case {
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
+
     render() {
         const c = this.props.case;
+        const bg = this.props.background;
         return (
-            <tr>
-                <td>{c._id}</td>
-                <td>{new Date(c.date).toDateString()}</td>
-                <td>{c.outcome}</td>
-            </tr>
+            <TableRow key={c._id} style={{ background: bg }}>
+                <TableCell component="th" scope="row">
+                    {c._id}
+                </TableCell>
+                <TableCell>{new Date(c.date).toDateString()}</TableCell>
+                <TableCell>{c.outcome}</TableCell>
+            </TableRow >
         );
     }
 }
