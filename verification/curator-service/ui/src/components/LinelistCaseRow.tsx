@@ -19,7 +19,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
         return (
             <tr>
                 <td>{c._id}</td>
-                <td>{c.eventSequence ? new Date(c.eventSequence.confirmed).toDateString() : ''}</td>
+                <td>{c.eventSequence ? displayDate(new Date(c.eventSequence.confirmed)) : ''}</td>
                 <td>{c.outcome}</td>
             </tr>
         );
