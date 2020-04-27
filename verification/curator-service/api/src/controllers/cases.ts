@@ -14,7 +14,7 @@ export interface Case {
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
     try {
-        const response = await axios.get<[Case]>('/cases');
+        const response = await axios.get<Case[]>('/cases');
         const cases = response.data;
         res.json(cases);
     } catch (err) {
