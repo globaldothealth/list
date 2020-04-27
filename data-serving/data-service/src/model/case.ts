@@ -151,7 +151,6 @@ const locationSchema = new mongoose.Schema({
 
 const dateRangeSchema = new mongoose.Schema({
     start: Date,
-
     end: Date,
 });
 
