@@ -20,7 +20,6 @@ def main():
     parser.add_argument('--infile', type=argparse.FileType('r'))
     parser.add_argument('--outfile', nargs='?', type=argparse.FileType('w', encoding='UTF-8'),
                         default=sys.stdout)
-
     args = parser.parse_args()
     logging.info("Args: %s", args)
 
