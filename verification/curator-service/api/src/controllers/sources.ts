@@ -19,7 +19,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     const docs = await Source.find({})
-        .skip(limit * page - limit)
+        .skip(limit * (page - 1))
         .limit(limit + 1);
     // If we have more items than limit, add a response param
     // indicating that there is more to fetch on the next page.
