@@ -29,7 +29,7 @@ const dateValidator = {
     max: Date.now,
 };
 
-const rangeSchema = new mongoose.Schema({
+const ageRangeSchema = new mongoose.Schema({
     minimum: {
         type: Number,
         min: -1,
@@ -48,7 +48,7 @@ const ageSchema = new mongoose.Schema({
         min: -0.75,
         max: 200,
     },
-    range: rangeSchema,
+    range: ageRangeSchema,
 });
 
 const demographicsSchema = new mongoose.Schema({
@@ -65,7 +65,12 @@ const demographicsSchema = new mongoose.Schema({
 
 const eventSequenceSchema = new mongoose.Schema({
     onsetSymptoms: dateValidator,
-    confirmed: dateValidator,
+    confirmed: {
+        ...dateValidator,
+        ...{
+            required: 'Enter a confirmation date',
+        },
+    },
     hospitalAdmission: dateValidator,
     deathOrDischarge: dateValidator,
 });
@@ -109,7 +114,7 @@ const pathogenSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a pathogen name',
     },
-    source: sourceSchema,
+    sequenceSource: sourceSchema,
     additionalInformation: String,
 });
 
@@ -239,7 +244,7 @@ interface OutbreakSpecifics {
 
 interface Pathogen {
     name: string;
-    source: Source;
+    sequenceSource: Source;
     additionalInformation: string;
 }
 

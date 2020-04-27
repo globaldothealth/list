@@ -75,7 +75,6 @@ describe('POST', () => {
             })
             .expect('Content-Type', /json/)
             .expect(200);
-        console.log('\n\n' + res.body.toString());
 
         expect(res.body.eventSequence.confirmed).toEqual(inputDate);
         expect(res.body.outcome).toEqual(inputOutcome);
