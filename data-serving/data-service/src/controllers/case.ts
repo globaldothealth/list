@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { Case } from '../model/case';
-import { Z_BEST_COMPRESSION } from 'zlib';
 
 /**
  * Get a specific case.
