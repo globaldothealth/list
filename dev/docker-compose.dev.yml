@@ -8,3 +8,6 @@ services:
     command: "npm run-script dev"
     volumes:
       - ../data-serving/data-service/src:/usr/src/app/src
+  curatorui:
+    volumes:
+      - ../verification/curator-service/ui/src:/usr/src/app/src
