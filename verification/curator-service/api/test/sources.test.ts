@@ -31,8 +31,50 @@ describe('GET', () => {
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body).toHaveLength(1);
-        expect(res.body[0]._id).toEqual(source.id);
+        expect(res.body.sources).toHaveLength(1);
+        expect(res.body.sources[0]._id).toEqual(source.id);
+        // No continuation expected.
+        expect(res.body.nextPage).toBeUndefined();
+    });
+    it('list should paginate', async () => {
+        for (const i of Array.from(Array(15).keys())) {
+            await new Source({
+                name: `test-source-${i}`,
+                origin: { url: 'http://foo.bar' },
+            }).save();
+        }
+        // Fetch first page.
+        let res = await request(app)
+            .get('/api/sources?page=1&limit=10')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.sources).toHaveLength(10);
+        // Second page is expected.
+        expect(res.body.nextPage).toEqual(2);
+
+        // Fetch second page.
+        res = await request(app)
+            .get(`/api/sources?page=${res.body.nextPage}&limit=10`)
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.sources).toHaveLength(5);
+        // No continuation expected.
+        expect(res.body.nextPage).toBeUndefined();
+
+        // Fetch inexistant page.
+        res = await request(app)
+            .get('/api/sources?page=42&limit=10')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.sources).toHaveLength(0);
+        // No continuation expected.
+        expect(res.body.nextPage).toBeUndefined();
+    });
+    it('rejects negative page param', (done) => {
+        request(app).get('/api/sources?page=-7').expect(422, done);
+    });
+    it('rejects negative limit param', (done) => {
+        request(app).get('/api/sources?page=1&limit=-2').expect(422, done);
     });
     it('one existing item should return 200', async () => {
         const source = await new Source({
