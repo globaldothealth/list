@@ -15,7 +15,9 @@ it('renders provided case', () => {
             {
               _id: id,
               outcome: outcome,
-              date: date
+              eventSequence: {
+                confirmed: date
+              }
             }}
         />
       </tbody>
