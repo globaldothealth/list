@@ -4,7 +4,7 @@
     },
     "demographics": {
         "age": {
-            "years": 55,
+            "years": 55.0,
             "range": {
                 "start": 50,
                 "end": 59
@@ -16,25 +16,25 @@
     "location": {
         "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
         "country": "France",
-        "administrative_area_level_1": "Île-de-France",
-        "administrative_area_level_2": "Paris",
+        "administrativeAreaLevel1": "Île-de-France",
+        "administrativeAreaLevel2": "Paris",
         "locality": "Paris",
         "geometry": {
             "latitude": 2.3522219,
             "longitude": 48.85661400000001
         }
     },
-    "event_sequence": {
-        "onset_symptoms": {
+    "eventSequence": {
+        "onsetSymptoms": {
             "$date": "2020-01-03T05:00:00Z"
         },
         "confirmed": {
             "$date": "2020-01-10T05:00:00Z"
         },
-        "hospital_admission": {
+        "hospitalAdmission": {
             "$date": "2020-01-21T05:00:00Z"
         },
-        "death_or_discharge": {
+        "deathOrDischarge": {
             "$date": "2020-02-12T05:00:00Z"
         }
     },
@@ -56,7 +56,7 @@
             "that don't match the symptom dictionary"
         ]
     },
-    "chronic_disease": {
+    "chronicDisease": {
         "provided": [
             "hypertension",
             "type 2 diabetes",
@@ -78,12 +78,12 @@
         ]
     },
     "outcome": "discharged",
-    "travel_history": [
+    "travelHistory": [
         {
             "location": {
                 "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
                 "country": "China",
-                "administrative_area_level_1": "Hubei",
+                "administrativeAreaLevel1": "Hubei",
                 "locality": "Wuhan",
                 "geometry": {
                     "latitude": 30.592849,
@@ -99,16 +99,16 @@
                 }
             },
             "purpose": "family",
-            "additional_information": "large family gathering for holidays"
+            "additionalInformation": "large family gathering for holidays"
         }
     ],
     "source": {
         "id": "def456",
         "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
     },
-    "outbreak_specifics": {
-        "lives_in_wuhan": false,
-        "reported_market_exposure": true
+    "outbreakSpecifics": {
+        "livesInWuhan": false,
+        "reportedMarketExposure": true
     },
     "pathogens": [
         {
@@ -119,24 +119,24 @@
         },
         {
             "name": "e. coli",
-            "additional_information": "patient had a urinary catheter"
+            "additionalInformation": "patient had a urinary catheter"
         }
     ],
     "notes": "Contact of a confirmed case at work. Other stuff from notes",
     "metadata": {
-        "moderator_id": "abc123",
-        "submission_date": {
+        "moderatorId": "abc123",
+        "submissionDate": {
             "$date": "2020-04-23T04:00:00Z"
         }
     },
-    "imported_case": {
-        "additional_information": "Contact of a confirmed case at work.",
-        "notes_for_discussion": "Other stuff from notes",
-        "geo_resolution": "admin_2",
+    "importedCase": {
+        "additionalInformation": "Contact of a confirmed case at work.",
+        "notesForDiscussion": "Other stuff from notes",
+        "geoResolution": "admin_2",
         "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
-        "chronic_disease_binary": true,
-        "chronic_disease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+        "chronicDiseaseNinary": true,
+        "chronicDisease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
         "outcome": "discharge 2/12",
-        "admin_id": "291"
+        "adminId": "291"
     }
 }
