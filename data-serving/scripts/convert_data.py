@@ -1,4 +1,3 @@
-# Lint as: python3
 '''Script to convert CSV line-list data into json compliant with the MongoDB schema.'''
 
 import argparse
