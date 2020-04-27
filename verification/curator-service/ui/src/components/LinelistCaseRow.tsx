@@ -5,7 +5,7 @@ interface RowProps {
     case: Case
 }
 
-export default class LinelistRow extends React.Component<RowProps, {}> {
+export default class LinelistCaseRow extends React.Component<RowProps, {}> {
     render() {
         const c = this.props.case;
         return (
