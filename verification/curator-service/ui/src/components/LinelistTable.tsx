@@ -1,7 +1,7 @@
 import React from "react";
 import axios from 'axios';
 import { Case } from '../../../api/src/controllers/cases'
-import LinelistRow from "./LinelistRow";
+import LinelistCaseRow from "./LinelistCaseRow";
 import Table from 'react-bootstrap/Table';
 
 interface TableState {
@@ -54,7 +54,7 @@ export default class LinelistTable extends React.Component<{}, TableState> {
                     </thead>
                     <tbody>
                         {linelist.map(item => (
-                            <LinelistRow
+                            <LinelistCaseRow
                                 case={item}
                                 key={item._id}
                             />

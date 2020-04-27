@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import LinelistRow from './LinelistRow';
+import LinelistCaseRow from './LinelistCaseRow';
 
 it('renders provided case', () => {
   const id = 'abc123';
@@ -10,7 +10,7 @@ it('renders provided case', () => {
   const { getByText } = render(
     <table>
       <tbody>
-        <LinelistRow
+        <LinelistCaseRow
           case={
             {
               _id: id,
