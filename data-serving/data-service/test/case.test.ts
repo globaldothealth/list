@@ -22,7 +22,10 @@ afterAll(() => {
 
 describe('GET', () => {
     it('one present item should return 200 OK', async () => {
-        const c = new Case({ outcome: Outcome.Pending });
+        const c = new Case({
+            eventSequence: { confirmed: new Date('2020-04-01') },
+            outcome: Outcome.Pending,
+        });
         await c.save();
 
         const res = await request(app)
@@ -99,7 +102,10 @@ describe('PUT', () => {
         expect(res.body.outcome).toEqual(newOutcome);
     });
     it('invalid update present item should return 422', async () => {
-        const c = new Case({ outcome: 'Pending', date: '2020-04-21' });
+        const c = new Case({
+            eventSequence: { confirmed: new Date('2020-04-01') },
+            outcome: 'Pending',
+        });
         await c.save();
 
         const newOutcome = 'not-valid';
@@ -117,7 +123,10 @@ describe('PUT', () => {
 
 describe('DELETE', () => {
     it('delete present item should return 200 OK', async () => {
-        const c = new Case({ outcome: 'Pending', date: '2020-04-21' });
+        const c = new Case({
+            eventSequence: { confirmed: new Date('2020-04-01') },
+            outcome: 'Pending',
+        });
         await c.save();
 
         const res = await request(app)

@@ -171,7 +171,10 @@ const travelHistorySchema = new mongoose.Schema({
 const caseSchema = new mongoose.Schema({
     chronicDisease: dictionaryValueSchema,
     demographics: demographicsSchema,
-    eventSequence: eventSequenceSchema,
+    eventSequence: {
+        type: eventSequenceSchema,
+        required: 'Enter an event sequence',
+    },
     importedCase: Object,
     location: locationSchema,
     metadata: metadataSchema,
