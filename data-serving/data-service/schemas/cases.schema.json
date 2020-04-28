@@ -61,10 +61,10 @@
           "country": {
             "bsonType": "string"
           },
-          "administrative_region_1": {
+          "administrativeRegion1": {
             "bsonType": "string"
           },
-          "administrative_region_2": {
+          "administrativeRegion2": {
             "bsonType": "string"
           },
           "locality": {
@@ -91,22 +91,22 @@
           }
         }
       },
-      "event_sequence": {
+      "eventSequence": {
         "bsonType": "object",
         "required": [
           "confirmed"
         ],
         "properties": {
-          "onset_symptoms": {
+          "onsetSymptoms": {
             "bsonType": "date"
           },
           "confirmed": {
             "bsonType": "date"
           },
-          "hospital_admission": {
+          "hospitalAdmission": {
             "bsonType": "date"
           },
-          "death_or_discharge": {
+          "deathOrDischarge": {
             "bsonType": "date"
           }
         }
@@ -140,7 +140,7 @@
           }
         }
       },
-      "chronic_disease": {
+      "chronicDisease": {
         "bsonType": "object",
         "properties": {
           "provided": {
@@ -176,7 +176,7 @@
           "discharged"
         ]
       },
-      "travel_history": {
+      "travelHistory": {
         "bsonType": "array",
         "uniqueItems": true,
         "additionalProperties": false,
@@ -195,10 +195,10 @@
                 "country": {
                   "bsonType": "string"
                 },
-                "administrative_region_1": {
+                "administrativeRegion1": {
                   "bsonType": "string"
                 },
-                "administrative_region_2": {
+                "administrativeRegion2": {
                   "bsonType": "string"
                 },
                 "locality": {
@@ -242,7 +242,7 @@
                 "conference"
               ]
             },
-            "additional_information": {
+            "additionalInformation": {
               "bsonType": "string"
             }
           }
@@ -262,13 +262,13 @@
           }
         }
       },
-      "outbreak_specifics": {
+      "outbreakSpecifics": {
         "bsonType": "object",
         "properties": {
-          "lives_in_wuhan": {
+          "livesInWuhan": {
             "bsonType": "bool"
           },
-          "reported_market_exposure": {
+          "reportedMarketExposure": {
             "bsonType": "bool"
           }
         }
@@ -300,7 +300,7 @@
                 }
               }
             },
-            "additional_information": {
+            "additionalInformation": {
               "bsonType": "string"
             }
           }
@@ -312,43 +312,43 @@
       "metadata": {
         "bsonType": "object",
         "required": [
-          "moderator_id",
-          "submission_date"
+          "moderatorId",
+          "submissionDate"
         ],
         "properties": {
-          "moderator_id": {
+          "moderatorId": {
             "bsonType": "string"
           },
-          "submission_date": {
+          "submissionDate": {
             "bsonType": "date"
           }
         }
       },
-      "imported_case": {
+      "importedCase": {
         "bsonType": "object",
         "properties": {
-          "additional_information": {
+          "additionalInformation": {
             "bsonType": "string"
           },
-          "notes_for_discussion": {
+          "notesForDiscussion": {
             "bsonType": "string"
           },
-          "geo_resolution": {
+          "geoResolution": {
             "bsonType": "string"
           },
           "symptoms": {
             "bsonType": "string"
           },
-          "chronic_disease_binary": {
+          "chronicDiseaseBinary": {
             "bsonType": "string"
           },
-          "chronic_disease": {
+          "chronicDisease": {
             "bsonType": "string"
           },
           "outcome": {
             "bsonType": "string"
           },
-          "admin_id": {
+          "adminId": {
             "bsonType": "string"
           }
         }
