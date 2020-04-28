@@ -1,4 +1,4 @@
-import { CleanEnv, cleanEnv, str, port, url } from 'envalid';
+import { CleanEnv, cleanEnv, port, str, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     DATASERVER_API_URL: string;

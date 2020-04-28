@@ -1,6 +1,6 @@
-import React from 'react';
-import LinelistTable from './LinelistTable';
 import EpidNavbar from './EpidNavbar';
+import LinelistTable from './LinelistTable';
+import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';

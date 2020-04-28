@@ -1,4 +1,4 @@
-import { CleanEnv, cleanEnv, str, port } from 'envalid';
+import { CleanEnv, cleanEnv, port, str } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     DB_CONNECTION_STRING: string;

@@ -1,5 +1,5 @@
+import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
-import { ObjectId, Double } from 'mongodb';
 
 export enum Sex {
     Female,

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import displayDate from "../util/display-date";

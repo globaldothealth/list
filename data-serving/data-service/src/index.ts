@@ -1,12 +1,11 @@
-import express from 'express';
+import * as caseController from './controllers/case';
+import * as homeController from './controllers/home';
+
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import validateEnv from './util/validate-env';
+import express from 'express';
 import mongoose from 'mongoose';
-
-// Controllers (route handlers).
-import * as homeController from './controllers/home';
-import * as caseController from './controllers/case';
+import validateEnv from './util/validate-env';
 
 const app = express();
 
