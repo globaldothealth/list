@@ -1,7 +1,10 @@
-import React from "react";
+import React from 'react';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 import displayDate from "../util/display-date";
 
 interface RowProps {
+    background: string
     case: Case
 }
 
@@ -14,14 +17,18 @@ export interface Case {
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
+
     render() {
         const c = this.props.case;
+        const bg = this.props.background;
         return (
-            <tr>
-                <td>{c._id}</td>
-                <td>{c.eventSequence ? displayDate(new Date(c.eventSequence.confirmed)) : ''}</td>
-                <td>{c.outcome}</td>
-            </tr>
+            <TableRow key={c._id} style={{ background: bg }}>
+                <TableCell component="th" scope="row">
+                    {c._id}
+                </TableCell>
+                <TableCell>{c.eventSequence ? displayDate(new Date(c.eventSequence.confirmed)) : ''}</TableCell>
+                <TableCell>{c.outcome}</TableCell>
+            </TableRow >
         );
     }
 }

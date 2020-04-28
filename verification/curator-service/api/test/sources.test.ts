@@ -1,8 +1,7 @@
-import request from 'supertest';
-import app from '../src/index';
-
-import mongoose from 'mongoose';
 import { Source } from '../src/model/source';
+import app from '../src/index';
+import mongoose from 'mongoose';
+import request from 'supertest';
 
 beforeAll(() => {
     return mongoose.connect(

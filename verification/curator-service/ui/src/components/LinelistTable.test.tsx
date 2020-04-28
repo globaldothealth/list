@@ -1,8 +1,9 @@
-import React from 'react'
-import { render } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import axios from 'axios'
+import '@testing-library/jest-dom/extend-expect';
+
 import LinelistTable from './LinelistTable';
+import React from 'react';
+import axios from 'axios';
+import { render } from '@testing-library/react';
 
 jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>;
