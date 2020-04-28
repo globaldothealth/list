@@ -1,15 +1,15 @@
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-import express from 'express';
-import mongoose from 'mongoose';
-import axios from 'axios';
-import cors from 'cors';
-import validateEnv from './util/validate-env';
-
 // Controllers (route handlers).
 import * as casesController from './controllers/cases';
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
+
+import axios from 'axios';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import mongoose from 'mongoose';
+import validateEnv from './util/validate-env';
 
 const app = express();
 app.use(bodyParser.json());

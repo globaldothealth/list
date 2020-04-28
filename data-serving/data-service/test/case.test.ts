@@ -1,7 +1,7 @@
-import request from 'supertest';
+import { Case } from '../src/model/case';
 import app from '../src/index';
 import mongoose from 'mongoose';
-import { Case } from '../src/model/case';
+import request from 'supertest';
 
 beforeAll(() => {
     return mongoose.connect(

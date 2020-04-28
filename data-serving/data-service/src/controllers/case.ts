@@ -1,6 +1,6 @@
+import { Case, validOutcomes } from '../model/case';
 import { Request, Response } from 'express';
 import { check, validationResult } from 'express-validator';
-import { Case, validOutcomes } from '../model/case';
 
 /**
  * Get a specific case.

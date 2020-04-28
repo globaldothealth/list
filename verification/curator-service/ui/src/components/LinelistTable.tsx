@@ -1,7 +1,8 @@
-import React from "react";
-import axios from 'axios';
 import LinelistCaseRow, { Case } from "./LinelistCaseRow";
+
+import React from "react";
 import Table from 'react-bootstrap/Table';
+import axios from 'axios';
 
 interface TableState {
     errorMessage: string,

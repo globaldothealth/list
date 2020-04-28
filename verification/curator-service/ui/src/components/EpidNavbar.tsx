@@ -1,5 +1,5 @@
-import React from "react";
 import Navbar from 'react-bootstrap/Navbar';
+import React from "react";
 
 export default class EpidNavbar extends React.Component {
     render() {
