@@ -1,5 +1,4 @@
 import * as caseController from './controllers/case';
-// Controllers (route handlers).
 import * as homeController from './controllers/home';
 
 import bodyParser from 'body-parser';
