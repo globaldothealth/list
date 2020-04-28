@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.9.12",
+    "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -11,11 +13,10 @@
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "axios": "^0.19.2",
-    "bootstrap": "^4.4.1",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "typeface-roboto": "0.0.75",
     "typescript": "^3.7.5"
   },
   "scripts": {
@@ -23,6 +24,7 @@
     "start": "PORT=3002 REACT_APP_API_ENDPOINT=http://localhost:3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
