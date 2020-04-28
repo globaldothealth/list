@@ -16,7 +16,7 @@ export default function validateEnv(): Readonly<{
         }),
         DB_CONNECTION_STRING: str({
             desc: 'MongoDB URI provided to MongoClient.',
-            devDefault: 'mongodb://localhost:27017/dev',
+            devDefault: 'mongodb://localhost:27017/covid19',
         }),
         PORT: port({ default: 3001 }),
     });
