@@ -1,5 +1,5 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
+import 'typeface-roboto';
 
 import * as serviceWorker from './serviceWorker';
 

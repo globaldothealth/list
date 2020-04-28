@@ -1,7 +1,7 @@
-import React from 'react';
-import { render } from '@testing-library/react';
 import LinelistCaseRow from './LinelistCaseRow';
+import React from 'react';
 import displayDate from '../util/display-date';
+import { render } from '@testing-library/react';
 
 it('renders provided case', () => {
   const id = 'abc123';
