@@ -5,7 +5,9 @@ import axios from 'axios';
 export interface Case {
     _id: string;
     outcome: string;
-    date: Date;
+    eventSequence: {
+        confirmed: Date;
+    };
 }
 
 /**

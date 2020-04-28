@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import LinelistCaseRow from './LinelistCaseRow';
+import displayDate from '../util/display-date';
 
 it('renders provided case', () => {
   const id = 'abc123';
@@ -15,7 +16,9 @@ it('renders provided case', () => {
             {
               _id: id,
               outcome: outcome,
-              date: date
+              eventSequence: {
+                confirmed: date
+              }
             }}
         />
       </tbody>
@@ -24,5 +27,5 @@ it('renders provided case', () => {
 
   expect(getByText(new RegExp(id))).toBeInTheDocument();
   expect(getByText(new RegExp(outcome))).toBeInTheDocument();
-  expect(getByText(new RegExp(date.toDateString()))).toBeInTheDocument();
+  expect(getByText(new RegExp(displayDate(date)))).toBeInTheDocument();
 });

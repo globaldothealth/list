@@ -1,4 +1,5 @@
 import React from "react";
+import displayDate from "../util/display-date";
 
 interface RowProps {
     case: Case
@@ -7,7 +8,9 @@ interface RowProps {
 export interface Case {
     _id: string;
     outcome: string;
-    date: Date;
+    eventSequence: {
+        confirmed: Date;
+    };
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
@@ -16,7 +19,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
         return (
             <tr>
                 <td>{c._id}</td>
-                <td>{new Date(c.date).toDateString()}</td>
+                <td>{c.eventSequence ? displayDate(new Date(c.eventSequence.confirmed)) : ''}</td>
                 <td>{c.outcome}</td>
             </tr>
         );

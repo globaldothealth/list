@@ -12,7 +12,9 @@ it('loads and displays cases', async () => {
     {
       _id: 'abc123',
       outcome: 'recovered',
-      date: new Date().toJSON(),
+      eventSequence: {
+        confirmed: new Date().toJSON(),
+      },
     },
   ];
   const axiosResponse = {
