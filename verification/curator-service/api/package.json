@@ -13,7 +13,8 @@
     "dev": "nodemon",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",
-    "test": "jest --forceExit --coverage --verbose --detectOpenHandles"
+    "test": "jest --forceExit --coverage --verbose --detectOpenHandles",
+    "test-silent": "jest --forceExit --silent --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

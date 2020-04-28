@@ -24,6 +24,7 @@
     "start": "PORT=3002 REACT_APP_API_ENDPOINT=http://localhost:3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

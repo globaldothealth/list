@@ -7,7 +7,7 @@ services:
         ports:
             - "27017:27017"
         environment:
-            MONGO_INITDB_DATABASE: "dev"
+            MONGO_INITDB_DATABASE: "covid19"
     curator:
         build: ../verification/curator-service/api
         init: true
@@ -17,7 +17,7 @@ services:
             - mongo
             - data
         environment:
-            DB_CONNECTION_STRING: "mongodb://mongo:27017/dev"
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
             DATASERVER_API_URL: "http://data:3000/api"
     data:
         build: ../data-serving/data-service
@@ -27,7 +27,7 @@ services:
         depends_on:
             - mongo
         environment:
-            DB_CONNECTION_STRING: "mongodb://mongo:27017/dev"
+            DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
     curatorui:
         build: ../verification/curator-service/ui
         init: true
