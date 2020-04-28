@@ -1,9 +1,11 @@
+import './index.css';
+import 'typeface-roboto';
+
+import * as serviceWorker from './serviceWorker';
+
+import App from './components/App';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './components/App';
-import * as serviceWorker from './serviceWorker';
-import 'typeface-roboto';
 
 ReactDOM.render(
   <React.StrictMode>

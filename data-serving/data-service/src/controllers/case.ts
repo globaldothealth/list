@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import { Case } from '../model/case';
 
 /**
