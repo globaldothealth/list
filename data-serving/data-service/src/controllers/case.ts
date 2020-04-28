@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { check, validationResult } from 'express-validator';
-import { Case, validOutcomes } from '../model/case';
+import { Case } from '../model/case';
 
 /**
  * Get a specific case.
@@ -33,10 +32,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        const c = new Case({
-            date: req.body.date,
-            outcome: req.body.outcome,
-        });
+        const c = new Case(req.body);
         const result = await c.save();
         res.json(result);
     } catch (err) {
