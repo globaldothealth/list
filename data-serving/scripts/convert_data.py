@@ -6,7 +6,7 @@ import logging
 import json
 import pandas as pd
 import sys
-from converters import convert_to_demographics, convert_to_events
+from converters import convert_demographics, convert_events
 from pandas import DataFrame
 
 
@@ -28,10 +28,10 @@ def main():
     original_cases = read_csv(args.infile)
 
     if args.sample_rate < 1.0:
-        original_size = original_cases.size
+        original_rows = original_cases.shape[0]
         original_cases = original_cases.sample(frac=args.sample_rate)
         print(
-            f'Downsampling to {args.sample_rate} cases from {original_size} to {original_cases.size} rows')
+            f'Downsampling to {args.sample_rate} cases from {original_rows} to {original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
     converted_cases = convert(original_cases)
@@ -54,11 +54,11 @@ def convert(cases: DataFrame) -> DataFrame:
 
     # [[demographics]]
     cases['demographics'] = cases.apply(
-        lambda x: convert_to_demographics(x['_id'], x['age'], x['sex']), axis=1)
+        lambda x: convert_demographics(x['_id'], x['age'], x['sex']), axis=1)
 
     # [[events]]
     cases['events'] = cases.apply(
-        lambda x: convert_to_events(x['_id'], {
+        lambda x: convert_events(x['_id'], {
             'onsetSymptoms': x['date_onset_symptoms'],
             'admissionHospital': x['date_admission_hospital'],
             'confirmed': x['date_confirmation'],
