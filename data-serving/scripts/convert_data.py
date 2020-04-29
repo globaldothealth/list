@@ -6,7 +6,8 @@ import logging
 import json
 import pandas as pd
 import sys
-from converters import convert_demographics, convert_events
+from constants import CSV_ID_FIELD, JSON_FIELDS
+from converters import convert_demographics, convert_events, convert_imported_case
 from pandas import DataFrame
 
 
@@ -31,7 +32,7 @@ def main():
         original_rows = original_cases.shape[0]
         original_cases = original_cases.sample(frac=args.sample_rate)
         print(
-            f'Downsampling to {args.sample_rate} cases from {original_rows} to {original_cases.shape[0]} rows')
+            f'Downsampling to {args.sample_rate*100}% of cases from {original_rows} to {original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
     converted_cases = convert(original_cases)
@@ -49,27 +50,26 @@ def read_csv(infile: str) -> DataFrame:
 def convert(cases: DataFrame) -> DataFrame:
     logging.info('Converting %d cases', len(cases))
 
-    # [[_id]]
-    cases = cases.rename(columns={'ID': '_id'})
-
     # [[demographics]]
     cases['demographics'] = cases.apply(
-        lambda x: convert_demographics(x['_id'], x['age'], x['sex']), axis=1)
+        lambda x: convert_demographics(x[CSV_ID_FIELD], x['age'], x['sex']), axis=1)
 
     # [[events]]
     cases['events'] = cases.apply(
-        lambda x: convert_events(x['_id'], {
+        lambda x: convert_events(x[CSV_ID_FIELD], {
             'onsetSymptoms': x['date_onset_symptoms'],
             'admissionHospital': x['date_admission_hospital'],
             'confirmed': x['date_confirmation'],
             'deathOrDischarge': x['date_death_or_discharge']
         }, x['outcome']), axis=1)
 
-    # Filter out deprecated columns
-    cases = cases.filter(
-        items=['demographics', 'events'])
+    # Archive the original fields.
+    cases['importedCase'] = cases.apply(
+        lambda x: convert_imported_case(x[CSV_ID_FIELD],
+                                        x[cases.columns.difference(JSON_FIELDS)]), axis=1)
 
-    return cases
+    # Filter down to only the new fields.
+    return cases.filter(JSON_FIELDS)
 
 
 def write_json(cases: DataFrame, outfile: str) -> None:
