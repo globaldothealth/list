@@ -7,7 +7,7 @@ import json
 import pandas as pd
 import sys
 from constants import CSV_ID_FIELD, JSON_FIELDS
-from converters import convert_demographics, convert_events, convert_imported_case
+from converters import convert_demographics, convert_events, convert_imported_case, convert_location
 from pandas import DataFrame
 
 
@@ -50,11 +50,11 @@ def read_csv(infile: str) -> DataFrame:
 def convert(cases: DataFrame) -> DataFrame:
     logging.info('Converting %d cases', len(cases))
 
-    # [[demographics]]
+    # demographics
     cases['demographics'] = cases.apply(
         lambda x: convert_demographics(x[CSV_ID_FIELD], x['age'], x['sex']), axis=1)
 
-    # [[events]]
+    # events
     cases['events'] = cases.apply(
         lambda x: convert_events(x[CSV_ID_FIELD], {
             'onsetSymptoms': x['date_onset_symptoms'],
@@ -62,6 +62,10 @@ def convert(cases: DataFrame) -> DataFrame:
             'confirmed': x['date_confirmation'],
             'deathOrDischarge': x['date_death_or_discharge']
         }, x['outcome']), axis=1)
+
+    # location
+    cases['location'] = cases.apply(
+        lambda x: convert_location(x[CSV_ID_FIELD], x['admin_id'], x['country'], x['admin1'], x['admin2'], x['city'], x['latitude'], x['longitude']), axis=1)
 
     # Archive the original fields.
     cases['importedCase'] = cases.apply(
