@@ -1,3 +1,9 @@
+import {
+  BrowserRouter,
+  Route,
+  Switch
+} from "react-router-dom";
+
 import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
 import React from 'react';
@@ -27,16 +33,38 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
-  const classes = useStyles();
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
         <EpidNavbar />
-        <div className={classes.tableContainer} >
-          <LinelistTable />
-        </div>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/new">
+              <NewEntry />
+            </Route>
+            <Route exact path="/">
+              <Linelist />
+            </Route>
+          </Switch>
+        </BrowserRouter>
       </div>
     </ThemeProvider>
+  );
+}
+
+function Linelist() {
+  const classes = useStyles();
+  return (
+    <div className={classes.tableContainer} >
+      <LinelistTable />
+    </div>
+  );
+}
+
+// TODO(timothe): this should be in its own component.
+function NewEntry() {
+  return (
+    <p>WIP</p>
   );
 }
 
