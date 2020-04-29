@@ -5,13 +5,9 @@ import logging
 import math
 import numbers
 import pandas as pd
+from constants import VALID_SEXES
+from pandas import DataFrame, Series
 from typing import Any, Callable, Dict, List
-
-
-VALID_SEXES = ['female', 'male', 'other']
-
-range_ct = 0
-single_ct = 1
 
 
 def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callable[[Any], Any]):
@@ -119,3 +115,8 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
 
     # If the dictionary is empty, we want to omit it from the JSON output
     return demographics if demographics else None
+
+
+def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
+    return {k: v for k, v in values_to_archive.iteritems()
+            if pd.notna(v)}
