@@ -2,15 +2,12 @@
 
 import argparse
 import csv
-import datetime
 import logging
-import math
-import numbers
 import json
 import pandas as pd
 import sys
+from converters import convert_to_demographics, convert_to_events
 from pandas import DataFrame
-from typing import List
 
 
 def main():
@@ -56,54 +53,12 @@ def convert(cases: DataFrame) -> DataFrame:
     cases = cases.rename(columns={'ID': '_id'})
 
     # [[demographics]]
-    validSexes = ['female', 'male']
-
-    def generateDemographics(id, age, sex: str):
-        demographics = {}
-
-        try:
-            ageFloat = float(age)
-            # Without the below, it prints null in the JSON
-            if not math.isnan(ageFloat):
-                demographics['age'] = {
-                    'years': ageFloat
-                }
-        except ValueError:
-            logging.warning('[%s] [demographics.age] value error %s', id, age)
-
-        if str(sex).lower() in validSexes:
-            demographics['sex'] = str(sex).capitalize()
-
-        return demographics
-
     cases['demographics'] = cases.apply(
-        lambda x: generateDemographics(x['_id'], x['age'], x['sex']), axis=1)
+        lambda x: convert_to_demographics(x['_id'], x['age'], x['sex']), axis=1)
 
     # [[events]]
-    def generateEvents(id, dates, outcome):
-        events = []
-
-        for key in dates:
-            try:
-                date = datetime.datetime.strptime(
-                    dates[key], '%d.%m.%Y').date()
-                events.append({
-                    'name': key,
-                    'date': {
-                        '$date': date.strftime('%Y-%m-%dT%H:%M:%SZ')
-                    }
-                })
-            except (TypeError, ValueError):
-                logging.warning(
-                    '[%s] [eventSequence.%s] value error %s', id, key, dates[key])
-
-        if outcome and type(outcome) is str:
-            events.append({'name': outcome})
-
-        return events
-
     cases['events'] = cases.apply(
-        lambda x: generateEvents(x['_id'], {
+        lambda x: convert_to_events(x['_id'], {
             'onsetSymptoms': x['date_onset_symptoms'],
             'admissionHospital': x['date_admission_hospital'],
             'confirmed': x['date_confirmation'],
