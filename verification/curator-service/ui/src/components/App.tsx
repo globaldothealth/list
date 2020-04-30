@@ -6,6 +6,7 @@ import {
 
 import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
+import NewCaseForm from './NewCaseForm';
 import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
@@ -64,7 +65,7 @@ function Linelist() {
 // TODO(timothe): this should be in its own component.
 function NewEntry() {
   return (
-    <p>WIP</p>
+    <NewCaseForm />
   );
 }
 
