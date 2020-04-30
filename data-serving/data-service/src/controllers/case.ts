@@ -19,7 +19,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 /**
  * List all cases.
  *
- * Handles HTTP GET /api/cases.
+ * Handles HTTP GET /api/cases/.
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
     const cases = await Case.find({});
@@ -29,7 +29,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 /**
  * Create a case.
  *
- * Handles HTTP POST /api/cases.
+ * Handles HTTP POST /api/cases/.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {

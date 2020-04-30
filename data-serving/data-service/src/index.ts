@@ -2,6 +2,7 @@ import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -11,6 +12,10 @@ const app = express();
 
 dotenv.config();
 const env = validateEnv();
+
+// We run the frontend on another port, support queries from all origins.
+// TODO: This will need to be tweaked in production.
+app.use(cors());
 
 // Express configuration.
 app.set('port', env.PORT);
