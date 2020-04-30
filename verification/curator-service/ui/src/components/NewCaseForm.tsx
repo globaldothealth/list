@@ -23,7 +23,7 @@ export default function NewCaseForm() {
             }}
             onSubmit={async (values, errors) => {
                 try {
-                    const response = await axios.post(
+                    await axios.post(
                         (process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/',
                         {
                             demographics: {
