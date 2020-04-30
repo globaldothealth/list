@@ -43,7 +43,7 @@ describe('GET', () => {
     });
     it('list should return 200 OK', (done) => {
         request(app)
-            .get('/api/cases')
+            .get('/api/cases/')
             .expect('Content-Type', /json/)
             .expect(200, done);
     });
@@ -52,7 +52,7 @@ describe('GET', () => {
 describe('POST', () => {
     it('create without valid date should return 422', (done) => {
         request(app)
-            .post('/api/cases')
+            .post('/api/cases/')
             .send({
                 eventSequence: { confirmed: 'not-a-date' },
                 outcome: 'Recovered',
@@ -61,7 +61,7 @@ describe('POST', () => {
     });
     it('create without valid outcome should return 422', (done) => {
         request(app)
-            .post('/api/cases')
+            .post('/api/cases/')
             .send({
                 eventSequence: { confirmed: new Date('2020-04-01') },
                 outcome: 'not-a-valid-outcome',
@@ -72,7 +72,7 @@ describe('POST', () => {
         const inputDate = new Date('2020-04-01').toJSON();
         const inputOutcome = 'Recovered';
         const res = await request(app)
-            .post('/api/cases')
+            .post('/api/cases/')
             .send({
                 eventSequence: { confirmed: inputDate },
                 outcome: inputOutcome,
