@@ -30,5 +30,17 @@
   "typescript.referencesCodeLens.enabled": true,
   "telemetry.enableTelemetry": false,
   "telemetry.enableCrashReporter": false,
-  "window.zoomLevel": 0
+  "window.zoomLevel": 0,
+  "python.formatting.provider": "autopep8",
+  "python.linting.pep8Args": [
+    "--max-line-length=80"
+  ],
+  "python.formatting.autopep8Args": [
+    "--max-line-length",
+    "80",
+    "--experimental"
+  ],
+  "editor.rulers": [
+    80
+  ]
 }
