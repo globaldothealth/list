@@ -31,7 +31,8 @@ def main():
         original_rows = original_cases.shape[0]
         original_cases = original_cases.sample(frac=args.sample_rate)
         print(
-            f'Downsampling to {args.sample_rate*100}% of cases from {original_rows} to {original_cases.shape[0]} rows')
+            f'Downsampling to {args.sample_rate*100} % of cases from {original_rows} to'
+            f'{original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
     converted_cases = convert(original_cases)
@@ -62,7 +63,18 @@ def convert(cases: DataFrame) -> DataFrame:
 
     # location
     cases['location'] = cases.apply(
-        lambda x: convert_location(x[CSV_ID_FIELD], x['admin_id'], x['country'], x['admin1'], x['admin2'], x['city'], x['latitude'], x['longitude']), axis=1)
+        lambda
+        x:
+        convert_location(
+            x[CSV_ID_FIELD],
+            x['admin_id'],
+            x['country'],
+            x['admin1'],
+            x['admin2'],
+            x['city'],
+            x['latitude'],
+            x['longitude']),
+        axis=1)
 
     # Archive the original fields.
     cases['importedCase'] = cases.apply(
