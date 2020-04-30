@@ -1,8 +1,5 @@
 '''Script to convert CSV line-list data into json compliant with the MongoDB schema.'''
 
-from pandas import DataFrame
-from converters import convert_demographics, convert_events
-from converters import convert_demographics, convert_events, convert_imported_case, convert_location
 import argparse
 import csv
 import logging
@@ -10,6 +7,8 @@ import json
 import pandas as pd
 import sys
 from constants import CSV_ID_FIELD, OUTPUT_COLUMNS
+from converters import convert_demographics, convert_events, convert_imported_case, convert_location
+from pandas import DataFrame
 
 
 def main():
