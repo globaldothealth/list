@@ -6,7 +6,7 @@ import logging
 import json
 import pandas as pd
 import sys
-from constants import CSV_ID_FIELD, JSON_FIELDS
+from constants import CSV_ID_FIELD, OUTPUT_COLUMNS
 from converters import convert_demographics, convert_events, convert_imported_case, convert_location
 from pandas import DataFrame
 
@@ -23,7 +23,6 @@ def main():
     parser.add_argument('--sample_rate', default=1.0, type=float)
 
     args = parser.parse_args()
-    logging.info("Args: %s", args)
 
     print('Reading data from', args.infile.name)
     original_cases = read_csv(args.infile)
@@ -48,8 +47,6 @@ def read_csv(infile: str) -> DataFrame:
 
 
 def convert(cases: DataFrame) -> DataFrame:
-    logging.info('Converting %d cases', len(cases))
-
     # demographics
     cases['demographics'] = cases.apply(
         lambda x: convert_demographics(x[CSV_ID_FIELD], x['age'], x['sex']), axis=1)
@@ -70,10 +67,10 @@ def convert(cases: DataFrame) -> DataFrame:
     # Archive the original fields.
     cases['importedCase'] = cases.apply(
         lambda x: convert_imported_case(x[CSV_ID_FIELD],
-                                        x[cases.columns.difference(JSON_FIELDS)]), axis=1)
+                                        x[cases.columns.difference(OUTPUT_COLUMNS)]), axis=1)
 
     # Filter down to only the new fields.
-    return cases.filter(JSON_FIELDS)
+    return cases.filter(OUTPUT_COLUMNS)
 
 
 def write_json(cases: DataFrame, outfile: str) -> None:

@@ -2,7 +2,7 @@
 CSV_ID_FIELD = 'ID'
 
 ''' The top-level fields that belong to the JSON schema. '''
-JSON_FIELDS = ['demographics', 'events', 'location', 'importedCase']
+OUTPUT_COLUMNS = ['demographics', 'events', 'location', 'importedCase']
 
 ''' Valid values for sex field. '''
 VALID_SEXES = ['female', 'male', 'other']

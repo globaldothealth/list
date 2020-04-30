@@ -6,13 +6,14 @@ import math
 import numbers
 import pandas as pd
 from constants import VALID_SEXES
-from pandas import DataFrame, Series
+from pandas import Series
 from typing import Any, Callable, Dict, List
 
 
 def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callable[[Any], Any]):
     '''
-    Converts either a string representation of a single value or a range of values into a range object. The values can be of any types using the custom parse and format functions.
+    Converts either a string representation of a single value or a range of values into a range 
+    object. The values can be of any types using the custom parse and format functions.
     '''
     if pd.isna(value):
         return None
@@ -30,11 +31,11 @@ def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callabl
         if len(value_range) == 1:
             return {
                 'range': {
-                    'min': format_fn(range_min)
+                    'max': format_fn(range_min)
                 }
             } if value.startswith('-') else {
                 'range': {
-                    'max': format_fn(range_min)
+                    'min': format_fn(range_min)
                 }
             }
 
