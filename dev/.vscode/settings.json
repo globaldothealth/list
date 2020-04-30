@@ -33,10 +33,14 @@
   "window.zoomLevel": 0,
   "python.formatting.provider": "autopep8",
   "python.linting.pep8Args": [
-    "--max-line-length=100"
+    "--max-line-length=80"
   ],
   "python.formatting.autopep8Args": [
-    "--max-line-length", "100", "--experimental"
+    "--max-line-length",
+    "80",
+    "--experimental"
   ],
-  "editor.rulers": [100]
+  "editor.rulers": [
+    80
+  ]
 }
