@@ -103,6 +103,6 @@ export default function NewCaseForm() {
                         <h3> {errorMessage} </h3>}
                 </Form>
             )}
-        </Formik >
+        </Formik>
     );
 }
