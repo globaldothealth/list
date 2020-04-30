@@ -1,5 +1,4 @@
 // Controllers (route handlers).
-import * as casesController from './controllers/cases';
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
@@ -30,7 +29,6 @@ app.get('/', homeController.index);
 
 // Configure API app routes.
 const apiRouter = express.Router();
-apiRouter.get('/cases/', casesController.list);
 apiRouter.get('/sources/', sourcesController.list);
 apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
 apiRouter.post('/sources/', sourcesController.create);
