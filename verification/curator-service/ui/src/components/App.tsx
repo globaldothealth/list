@@ -36,8 +36,8 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <EpidNavbar />
         <BrowserRouter>
+          <EpidNavbar />
           <Switch>
             <Route path="/new">
               <NewEntry />
