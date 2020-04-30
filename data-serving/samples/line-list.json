@@ -4,14 +4,17 @@
     },
     "demographics": {
         "age": {
-            "years": 55.0,
             "range": {
-                "start": 50,
-                "end": 59
+                "start": {
+                    "$numberDouble": "50"
+                },
+                "end": {
+                    "$numberDouble": "59"
+                }
             }
         },
-        "sex": "female",
-        "species": "homo sapien"
+        "sex": "Female",
+        "species": "Homo sapien"
     },
     "location": {
         "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
@@ -20,24 +23,84 @@
         "administrativeAreaLevel2": "Paris",
         "locality": "Paris",
         "geometry": {
-            "latitude": 2.3522219,
-            "longitude": 48.85661400000001
+            "latitude": {
+                "$numberDouble": "2.3522219"
+            },
+            "longitude": {
+                "$numberDouble": "48.85661400000001"
+            }
         }
     },
-    "eventSequence": {
-        "onsetSymptoms": {
-            "$date": "2020-01-03T05:00:00Z"
+    "events": [
+        {
+            "name": "onsetSymptoms",
+            "date": {
+                "range": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1578027600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1578027600000"
+                        }
+                    }
+                }
+            }
         },
-        "confirmed": {
-            "$date": "2020-01-10T05:00:00Z"
+        {
+            "name": "confirmed",
+            "date": {
+                "range": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1578891600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1578891600000"
+                        }
+                    }
+                }
+            }
         },
-        "hospitalAdmission": {
-            "$date": "2020-01-21T05:00:00Z"
+        {
+            "name": "hospitalAdmission",
+            "date": {
+                "range": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1579395600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1581469200000"
+                        }
+                    }
+                }
+            }
         },
-        "deathOrDischarge": {
-            "$date": "2020-02-12T05:00:00Z"
+        {
+            "name": "discharged",
+            "date": {
+                "range": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1581483600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1581483600000"
+                        }
+                    }
+                }
+            }
         }
-    },
+    ],
     "symptoms": {
         "provided": [
             "severe pneumonia",
@@ -50,10 +113,6 @@
             "dyspnea",
             "difficulty breathing",
             "weakness"
-        ],
-        "other": [
-            "some free-form symptoms",
-            "that don't match the symptom dictionary"
         ]
     },
     "chronicDisease": {
@@ -71,13 +130,8 @@
             "heart disease",
             "lung cancer",
             "cancer"
-        ],
-        "other": [
-            "some free-form chronic diseases",
-            "that don't match the chronic disease dictionary"
         ]
     },
-    "outcome": "discharged",
     "travelHistory": [
         {
             "location": {
@@ -86,16 +140,24 @@
                 "administrativeAreaLevel1": "Hubei",
                 "locality": "Wuhan",
                 "geometry": {
-                    "latitude": 30.592849,
-                    "longitude": 114.305539
+                    "latitude": {
+                        "$numberDouble": "30.592849"
+                    },
+                    "longitude": {
+                        "$numberDouble": "114.305539"
+                    }
                 }
             },
             "dates": {
                 "start": {
-                    "$date": "2019-12-15T05:00:00Z"
+                    "$date": {
+                        "$numberLong": "1576386000000"
+                    }
                 },
                 "end": {
-                    "$date": "2019-12-30T05:00:00Z"
+                    "$date": {
+                        "$numberLong": "1577682000000"
+                    }
                 }
             },
             "purpose": "family",
@@ -113,7 +175,7 @@
     "pathogens": [
         {
             "name": "sars-cov-2",
-            "source": {
+            "sequenceSource": {
                 "id": "ghi789"
             }
         },
@@ -122,19 +184,25 @@
             "additionalInformation": "patient had a urinary catheter"
         }
     ],
-    "notes": "Contact of a confirmed case at work. Other stuff from notes",
-    "metadata": {
-        "moderatorId": "abc123",
-        "submissionDate": {
-            "$date": "2020-04-23T04:00:00Z"
-        }
+    "notes": "Contact of a confirmed case at work.",
+    "revisionMetadata": {
+        "id": {
+            "$numberInt": "0"
+        },
+        "moderator": "abc123",
+        "date": {
+            "$date": {
+                "$numberLong": "1587614400000"
+            }
+        },
+        "notes": "initial data entry"
     },
     "importedCase": {
         "additionalInformation": "Contact of a confirmed case at work.",
         "notesForDiscussion": "Other stuff from notes",
         "geoResolution": "admin_2",
         "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
-        "chronicDiseaseNinary": true,
+        "chronicDiseaseBinary": true,
         "chronicDisease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
         "outcome": "discharge 2/12",
         "adminId": "291"
