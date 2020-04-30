@@ -19,7 +19,7 @@ app.use(cors());
 
 // Express configuration.
 app.set('port', env.PORT);
-app.use(bodyParser.json());
+app.use(bodyParser.json({ strict: false }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure app routes.
