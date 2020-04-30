@@ -1,36 +1,36 @@
 {
   "$jsonSchema": {
+    "bsonType": "object",
+    "additionalProperties": false,
     "required": [
       "_id",
       "location",
       "source",
-      "metadata"
+      "revisionMetadata"
     ],
     "properties": {
-      "id": {
+      "_id": {
         "bsonType": "objectId"
       },
       "demographics": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "age": {
             "bsonType": "object",
+            "additionalProperties": false,
             "properties": {
-              "years": {
-                "bsonType": "double",
-                "minimum": -0.75,
-                "maximum": 200.0
-              },
               "range": {
                 "bsonType": "object",
+                "additionalProperties": false,
                 "properties": {
                   "start": {
-                    "bsonType": "int",
+                    "bsonType": "double",
                     "minimum": -1,
                     "maximum": 200
                   },
                   "end": {
-                    "bsonType": "int",
+                    "bsonType": "double",
                     "minimum": -1,
                     "maximum": 200
                   }
@@ -40,20 +40,21 @@
           },
           "sex": {
             "enum": [
-              "male",
-              "female",
-              "other"
+              "Male",
+              "Female",
+              "Other"
             ]
           },
           "species": {
             "enum": [
-              "homo sapien"
+              "Homo sapien"
             ]
           }
         }
       },
       "location": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
             "bsonType": "string"
@@ -61,10 +62,10 @@
           "country": {
             "bsonType": "string"
           },
-          "administrativeRegion1": {
+          "administrativeAreaLevel1": {
             "bsonType": "string"
           },
-          "administrativeRegion2": {
+          "administrativeAreaLevel2": {
             "bsonType": "string"
           },
           "locality": {
@@ -72,6 +73,7 @@
           },
           "geometry": {
             "bsonType": "object",
+            "additionalProperties": false,
             "required": [
               "latitude",
               "longitude"
@@ -91,33 +93,44 @@
           }
         }
       },
-      "eventSequence": {
-        "bsonType": "object",
-        "required": [
-          "confirmed"
-        ],
-        "properties": {
-          "onsetSymptoms": {
-            "bsonType": "date"
-          },
-          "confirmed": {
-            "bsonType": "date"
-          },
-          "hospitalAdmission": {
-            "bsonType": "date"
-          },
-          "deathOrDischarge": {
-            "bsonType": "date"
+      "events": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": {
+          "bsonType": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "bsonType": "string"
+            },
+            "date": {
+              "bsonType": "object",
+              "additionalProperties": false,
+              "properties": {
+                "range": {
+                  "bsonType": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "bsonType": "date"
+                    },
+                    "end": {
+                      "bsonType": "date"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
       "symptoms": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "provided": {
             "bsonType": "array",
             "uniqueItems": true,
-            "additionalProperties": false,
             "items": {
               "bsonType": "string"
             }
@@ -125,15 +138,6 @@
           "imputed": {
             "bsonType": "array",
             "uniqueItems": true,
-            "additionalProperties": false,
-            "items": {
-              "bsonType": "string"
-            }
-          },
-          "other": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "additionalProperties": false,
             "items": {
               "bsonType": "string"
             }
@@ -142,11 +146,11 @@
       },
       "chronicDisease": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "provided": {
             "bsonType": "array",
             "uniqueItems": true,
-            "additionalProperties": false,
             "items": {
               "bsonType": "string"
             }
@@ -154,40 +158,25 @@
           "imputed": {
             "bsonType": "array",
             "uniqueItems": true,
-            "additionalProperties": false,
-            "items": {
-              "bsonType": "string"
-            }
-          },
-          "other": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "additionalProperties": false,
             "items": {
               "bsonType": "string"
             }
           }
         }
       },
-      "outcome": {
-        "enum": [
-          "recovered",
-          "died",
-          "discharged"
-        ]
-      },
       "travelHistory": {
         "bsonType": "array",
         "uniqueItems": true,
-        "additionalProperties": false,
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": [
             "location"
           ],
           "properties": {
             "location": {
               "bsonType": "object",
+              "additionalProperties": false,
               "properties": {
                 "id": {
                   "bsonType": "string"
@@ -195,10 +184,10 @@
                 "country": {
                   "bsonType": "string"
                 },
-                "administrativeRegion1": {
+                "administrativeAreaLevel1": {
                   "bsonType": "string"
                 },
-                "administrativeRegion2": {
+                "administrativeAreaLevel2": {
                   "bsonType": "string"
                 },
                 "locality": {
@@ -206,6 +195,7 @@
                 },
                 "geometry": {
                   "bsonType": "object",
+                  "additionalProperties": false,
                   "required": [
                     "latitude",
                     "longitude"
@@ -227,6 +217,7 @@
             },
             "dates": {
               "bsonType": "object",
+              "additionalProperties": false,
               "properties": {
                 "start": {
                   "bsonType": "date"
@@ -250,6 +241,7 @@
       },
       "source": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "id": {
             "bsonType": "string"
@@ -264,6 +256,7 @@
       },
       "outbreakSpecifics": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "livesInWuhan": {
             "bsonType": "bool"
@@ -276,9 +269,9 @@
       "pathogens": {
         "bsonType": "array",
         "uniqueItems": true,
-        "additionalProperties": false,
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": [
             "name"
           ],
@@ -286,8 +279,9 @@
             "name": {
               "bsonType": "string"
             },
-            "source": {
+            "sequenceSource": {
               "bsonType": "object",
+              "additionalProperties": false,
               "properties": {
                 "id": {
                   "bsonType": "string"
@@ -309,23 +303,32 @@
       "notes": {
         "bsonType": "string"
       },
-      "metadata": {
+      "revisionMetadata": {
         "bsonType": "object",
+        "additionalProperties": false,
         "required": [
-          "moderatorId",
-          "submissionDate"
+          "id",
+          "moderator",
+          "date"
         ],
         "properties": {
-          "moderatorId": {
+          "id": {
+            "bsonType": "int"
+          },
+          "moderator": {
             "bsonType": "string"
           },
-          "submissionDate": {
+          "date": {
             "bsonType": "date"
+          },
+          "notes": {
+            "bsonType": "string"
           }
         }
       },
       "importedCase": {
         "bsonType": "object",
+        "additionalProperties": false,
         "properties": {
           "additionalInformation": {
             "bsonType": "string"
@@ -340,7 +343,7 @@
             "bsonType": "string"
           },
           "chronicDiseaseBinary": {
-            "bsonType": "string"
+            "bsonType": "bool"
           },
           "chronicDisease": {
             "bsonType": "string"
