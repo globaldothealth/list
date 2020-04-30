@@ -6,6 +6,7 @@ import logging
 import json
 import pandas as pd
 import sys
+from constants import CSV_ID_FIELD, OUTPUT_COLUMNS
 from converters import convert_demographics, convert_events
 from pandas import DataFrame
 
@@ -22,7 +23,6 @@ def main():
     parser.add_argument('--sample_rate', default=1.0, type=float)
 
     args = parser.parse_args()
-    logging.info("Args: %s", args)
 
     print('Reading data from', args.infile.name)
     original_cases = read_csv(args.infile)
@@ -47,18 +47,13 @@ def read_csv(infile: str) -> DataFrame:
 
 
 def convert(cases: DataFrame) -> DataFrame:
-    logging.info('Converting %d cases', len(cases))
-
-    # [[_id]]
-    cases = cases.rename(columns={'ID': '_id'})
-
     # [[demographics]]
     cases['demographics'] = cases.apply(
-        lambda x: convert_demographics(x['_id'], x['age'], x['sex']), axis=1)
+        lambda x: convert_demographics(x[CSV_ID_FIELD], x['age'], x['sex']), axis=1)
 
     # [[events]]
     cases['events'] = cases.apply(
-        lambda x: convert_events(x['_id'], {
+        lambda x: convert_events(x[CSV_ID_FIELD], {
             'onsetSymptoms': x['date_onset_symptoms'],
             'admissionHospital': x['date_admission_hospital'],
             'confirmed': x['date_confirmation'],
@@ -66,10 +61,7 @@ def convert(cases: DataFrame) -> DataFrame:
         }, x['outcome']), axis=1)
 
     # Filter out deprecated columns
-    cases = cases.filter(
-        items=['demographics', 'events'])
-
-    return cases
+    return cases.filter(items=OUTPUT_COLUMNS)
 
 
 def write_json(cases: DataFrame, outfile: str) -> None:
