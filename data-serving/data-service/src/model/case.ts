@@ -2,77 +2,30 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
 export enum Sex {
-    Female,
-    Male,
-    Other,
-}
-
-export enum Outcome {
-    Pending,
-    Recovered,
-    Death,
+    Female = 'Female',
+    Male = 'Male',
+    Other = 'Other',
 }
 
 export enum Species {
-    HomoSapien,
+    HomoSapien = 'Homo sapien',
 }
 
 export enum TravelPurpose {
-    Family,
-    Conference,
-    Work,
+    Family = 'Family',
+    Conference = 'Conference',
+    Work = 'Work',
 }
 
 const dateValidator = {
     type: Date,
-    min: '2019-11-01',
-    max: Date.now,
+    start: '2019-11-01',
+    end: Date.now,
 };
 
-const ageRangeSchema = new mongoose.Schema({
-    minimum: {
-        type: Number,
-        min: -1,
-        max: 200,
-    },
-    maximum: {
-        type: Number,
-        min: 0,
-        max: 200,
-    },
-});
-
-const ageSchema = new mongoose.Schema({
-    years: {
-        type: Number,
-        min: -0.75,
-        max: 200,
-    },
-    range: ageRangeSchema,
-});
-
-const demographicsSchema = new mongoose.Schema({
-    ageSchema,
-    species: {
-        type: String,
-        enum: Object.keys(Species),
-    },
-    sex: {
-        type: String,
-        enum: Object.keys(Sex),
-    },
-});
-
-const eventSequenceSchema = new mongoose.Schema({
-    onsetSymptoms: dateValidator,
-    confirmed: {
-        ...dateValidator,
-        ...{
-            required: 'Enter a confirmation date',
-        },
-    },
-    hospitalAdmission: dateValidator,
-    deathOrDischarge: dateValidator,
+const dateRangeSchema = new mongoose.Schema({
+    start: dateValidator,
+    end: dateValidator,
 });
 
 const dictionaryValueSchema = new mongoose.Schema({
@@ -84,24 +37,62 @@ const dictionaryValueSchema = new mongoose.Schema({
         type: [String],
         uniqueItems: true,
     },
-    other: {
-        type: [String],
-        uniqueItems: true,
+});
+
+const demographicsSchema = new mongoose.Schema({
+    age: {
+        range: {
+            start: {
+                type: Number,
+                min: -1,
+                max: 200,
+            },
+            end: {
+                type: Number,
+                min: 0,
+                max: 200,
+            },
+        },
+    },
+    species: {
+        type: String,
+        enum: Object.values(Species),
+    },
+    sex: {
+        type: String,
+        enum: Object.values(Sex),
     },
 });
 
-const metadataSchema = new mongoose.Schema({
-    moderatorId: {
-        type: String,
-        required: 'Enter a moderator id',
+const revisionMetadataSchema = new mongoose.Schema({
+    id: {
+        type: Number,
+        required: 'Enter a revision id',
     },
-    submissionDate: dateValidator,
+    moderator: {
+        type: String,
+        required: 'Enter a revision moderator id',
+    },
+    date: {
+        ...dateValidator,
+        ...{
+            required: 'Enter a revision date',
+        },
+    },
+    notes: String,
 });
 
 const outbreakSpecificsSchema = new mongoose.Schema({
     livesInWuhan: Boolean,
     reportedMarketExposure: Boolean,
 });
+
+const minimumSourceFieldsValidator = {
+    validator: function (source: Source) {
+        return !!source.id || !!source.url || !!source.other;
+    },
+    message: 'One of source.id, source.url, or source.other is required',
+};
 
 const sourceSchema = new mongoose.Schema({
     id: String,
@@ -114,91 +105,126 @@ const pathogenSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a pathogen name',
     },
-    sequenceSource: sourceSchema,
+    sequenceSource: {
+        type: sourceSchema,
+        validate: minimumSourceFieldsValidator,
+    },
     additionalInformation: String,
 });
 
-const pathogensSchema = new mongoose.Schema({
-    fields: [pathogenSchema],
-});
-
-const geometrySchema = new mongoose.Schema({
-    latitude: {
-        type: Number,
-        min: -90.0,
-        max: 90.0,
+const minimumLocationFieldsValidator = {
+    validator: function (location: Location) {
+        return (
+            !!location.country ||
+            !!location.administrativeAreaLevel1 ||
+            !!location.administrativeAreaLevel2 ||
+            !!location.locality
+        );
     },
-    longitude: {
-        type: Number,
-        min: -180.0,
-        max: 180.0,
-    },
-});
+    message:
+        'One of location.country, location.administrativeRegion1, ' +
+        'location.administrativeRegion2, or locality is required',
+};
 
 const locationSchema = new mongoose.Schema({
     id: String,
-
-    country: {
-        type: String,
-        required: 'Enter a country',
-    },
+    country: String,
     administrativeRegion1: String,
     administrativeRegion2: String,
-
     locality: String,
-    geometry: geometrySchema,
-});
-
-const dateRangeSchema = new mongoose.Schema({
-    start: Date,
-    end: Date,
+    geometry: {
+        latitude: {
+            type: Number,
+            min: -90.0,
+            max: 90.0,
+        },
+        longitude: {
+            type: Number,
+            min: -180.0,
+            max: 180.0,
+        },
+    },
 });
 
 const travelSchema = new mongoose.Schema({
-    location: locationSchema,
+    location: {
+        type: locationSchema,
+        validate: minimumLocationFieldsValidator,
+    },
     dates: dateRangeSchema,
     purpose: {
         type: String,
-        enum: Object.keys(TravelPurpose),
+        enum: Object.values(TravelPurpose),
     },
     additionalInformation: String,
 });
 
-const travelHistorySchema = new mongoose.Schema({
-    fields: [travelSchema],
-});
-
-const caseSchema = new mongoose.Schema({
-    chronicDisease: dictionaryValueSchema,
-    demographics: demographicsSchema,
-    eventSequence: {
-        type: eventSequenceSchema,
-        required: 'Enter an event sequence',
+const caseSchema = new mongoose.Schema(
+    {
+        chronicDisease: dictionaryValueSchema,
+        demographics: demographicsSchema,
+        events: {
+            type: [
+                {
+                    name: {
+                        type: String,
+                        required: 'Enter a name for the event',
+                    },
+                    date: dateRangeSchema,
+                },
+            ],
+            validate: {
+                validator: function (events: [Event]) {
+                    return events.some((e) => e.name == 'confirmed');
+                },
+                message: 'Must include a case confirmed event',
+            },
+        },
+        importedCase: {},
+        location: {
+            type: locationSchema,
+            required: 'Enter a location',
+            validate: minimumLocationFieldsValidator,
+        },
+        revisionMetadata: {
+            type: revisionMetadataSchema,
+            required: 'Enter revision metadata',
+        },
+        notes: String,
+        outbreakSpecifics: outbreakSpecificsSchema,
+        pathogens: [pathogenSchema],
+        source: {
+            type: sourceSchema,
+            required: 'Enter a source',
+            validate: minimumSourceFieldsValidator,
+        },
+        symptoms: dictionaryValueSchema,
+        travelHistory: [travelSchema],
     },
-    importedCase: Object,
-    location: locationSchema,
-    metadata: metadataSchema,
-    notes: String,
-    outbreakSpecifics: outbreakSpecificsSchema,
-    outcome: {
-        type: String,
-        enum: Object.keys(Outcome),
-        required: 'Enter an outcome.',
+    {
+        useNestedStrict: true,
+        toObject: {
+            transform: function (__, ret) {
+                // TODO: Transform the model layer to the API layer.
+                return ret;
+            },
+        },
+        toJSON: {
+            transform: function (__, ret) {
+                // TODO: Transform the model layer to the API layer.
+                return ret;
+            },
+        },
     },
-    pathogens: pathogensSchema,
-    source: sourceSchema,
-    symptoms: dictionaryValueSchema,
-    travelHistory: travelHistorySchema,
-});
+);
 
-interface Range {
-    min: number;
-    max: number;
+interface Range<T> {
+    start: T;
+    end: T;
 }
 
 interface Age {
-    years: number;
-    range: Range;
+    range: Range<number>;
 }
 
 interface Demographics {
@@ -210,14 +236,15 @@ interface Demographics {
 interface ChronicDisease {
     provided: [string];
     imputed: [string];
-    other: [string];
 }
 
-interface EventSequence {
-    onsetSymptoms: Date;
-    confirmed: Date;
-    hospitalAdmission: Date;
-    deathOrDischarge: Date;
+interface EventDate {
+    range: Range<Date>;
+}
+
+interface Event {
+    name: string;
+    date: EventDate;
 }
 
 interface Geometry {
@@ -228,15 +255,17 @@ interface Geometry {
 interface Location {
     id: string;
     country: string;
-    administrativeRegion1: string;
-    administrativeRegion2: string;
+    administrativeAreaLevel1: string;
+    administrativeAreaLevel2: string;
     locality: string;
     geometry: Geometry;
 }
 
-interface Metadata {
-    moderatorId: string;
-    submissionDate: Date;
+interface RevisionMetadata {
+    id: number;
+    moderator: string;
+    date: Date;
+    notes: string;
 }
 
 interface OutbreakSpecifics {
@@ -246,7 +275,7 @@ interface OutbreakSpecifics {
 
 interface Pathogen {
     name: string;
-    sequenceSource: Source;
+    //sequenceSource: Source;
     additionalInformation: string;
 }
 
@@ -259,7 +288,6 @@ interface Source {
 interface Symptoms {
     provided: [string];
     imputed: [string];
-    other: [string];
 }
 
 interface DateRange {
@@ -267,12 +295,14 @@ interface DateRange {
     end: Date;
 }
 
+interface TravelDates {
+    range: DateRange;
+}
+
 interface Travel {
     location: Location;
-    dates: DateRange;
-
+    dates: TravelDates;
     purpose: TravelPurpose;
-
     additionalInformation: string;
 }
 
@@ -280,13 +310,12 @@ type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     chronicDisease: ChronicDisease;
     demographics: Demographics;
-    eventSequence: EventSequence;
+    events: [Event];
     importedCase: {};
     location: Location;
-    metadata: Metadata;
+    revisionMetadata: RevisionMetadata;
     notes: string;
     outbreakSpecifics: OutbreakSpecifics;
-    outcome: Outcome;
     pathogens: [Pathogen];
     source: Source;
     symptoms: Symptoms;
