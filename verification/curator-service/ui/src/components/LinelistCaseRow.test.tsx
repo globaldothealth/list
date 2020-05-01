@@ -15,7 +15,9 @@ it('renders provided case', () => {
           case={
             {
               _id: id,
-              outcome: outcome,
+              importedCase: {
+                outcome,
+              },
               events: [
                 {
                   name: 'confirmed',

@@ -50,7 +50,9 @@ it('submits case ok', async () => {
                 },
             },
         },
-        "outcome": "Pending",
+        "importedCase": {
+            "outcome": "Pending",
+        },
         "province": "",
     });
 });
