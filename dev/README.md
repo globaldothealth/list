@@ -40,6 +40,15 @@ docker exec -it mongod mongo
 
 You can also just run `mongo` from your workstation if you have it installed.
 
+##### How to clear cases data?
+
+By default docker wil persist the container data unless you rm it, to remove data in the db first run a mongo shell as explained above then:
+
+```
+use covid19
+db.cases.remove({})
+```
+
 #### Data service
 
 From the `data-service` directory where the `Dockerfile` is located, run:
