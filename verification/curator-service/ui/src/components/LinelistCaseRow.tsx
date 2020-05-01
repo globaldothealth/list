@@ -31,7 +31,6 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
     render() {
         const c = this.props.case;
         const bg = this.props.background;
-        console.log(c);
         const confirmedEvent = c.events.filter((e) => e.name === 'confirmed')[0];
         const confirmedStartDate = confirmedEvent.date.range.start;
         return (
