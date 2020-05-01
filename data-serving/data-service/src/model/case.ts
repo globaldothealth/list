@@ -177,7 +177,7 @@ const caseSchema = new mongoose.Schema(
                 validator: function (events: [Event]) {
                     return events.some((e) => e.name == 'confirmed');
                 },
-                message: 'Must include a case confirmed event',
+                message: 'Must include an event with name "confirmed"',
             },
         },
         importedCase: {},
@@ -290,13 +290,8 @@ interface Symptoms {
     imputed: [string];
 }
 
-interface DateRange {
-    start: Date;
-    end: Date;
-}
-
 interface TravelDates {
-    range: DateRange;
+    range: Range<Date>;
 }
 
 interface Travel {
