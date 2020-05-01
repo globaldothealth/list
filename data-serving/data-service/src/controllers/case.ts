@@ -23,7 +23,6 @@ export const get = async (req: Request, res: Response): Promise<void> => {
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
     const cases = await Case.find({});
-
     res.json(cases);
 };
 

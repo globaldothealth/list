@@ -275,7 +275,7 @@ interface OutbreakSpecifics {
 
 interface Pathogen {
     name: string;
-    //sequenceSource: Source;
+    sequenceSource: Source;
     additionalInformation: string;
 }
 
