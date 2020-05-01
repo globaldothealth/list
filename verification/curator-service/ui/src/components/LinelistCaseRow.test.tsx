@@ -15,11 +15,21 @@ it('renders provided case', () => {
           case={
             {
               _id: id,
-              outcome: outcome,
-              eventSequence: {
-                confirmed: date
-              }
-            }}
+              events: [
+                {
+                  name: 'confirmed',
+                  date: {
+                    range: {
+                      start: date,
+                    },
+                  },
+                }
+              ],
+              importedCase: {
+                outcome: outcome,
+              },
+            }
+          }
         />
       </tbody>
     </table>
