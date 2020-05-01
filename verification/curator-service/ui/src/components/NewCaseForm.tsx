@@ -33,9 +33,16 @@ export default function NewCaseForm() {
                             province: values.province,
                             country: values.country,
                             confirmed: values.confirmed,
-                            outcome: values.outcome,
-                            eventSequence: {
-                                confirmed: values.confirmed,
+                            importedCase: {
+                                outcome: values.outcome,
+                            },
+                            events: {
+                                name: 'confirmed',
+                                date: {
+                                    range: {
+                                        start: values.confirmed,
+                                    },
+                                },
                             },
                         });
                     setErrorMessage('');
