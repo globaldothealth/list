@@ -202,7 +202,6 @@ const caseSchema = new mongoose.Schema(
         travelHistory: [travelSchema],
     },
     {
-        useNestedStrict: true,
         toObject: {
             transform: function (__, ret) {
                 // TODO: Transform the model layer to the API layer.
