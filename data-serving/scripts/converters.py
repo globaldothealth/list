@@ -182,6 +182,33 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
     return location
 
 
+def convert_dictionary_field(
+        id: str, field_name: str, value: str) -> Dict[
+        str, List[str]]:
+    if pd.isna(value):
+        return None
+    if type(value) is not str:
+        logging.warning(
+            '[%s] [field_name] invalid value %s', id, value)
+        return None
+
+    is_comma_delimited = value.find(',') >= 0
+    is_colon_delimited = value.find(':') >= 0
+
+    if is_comma_delimited:
+        if is_colon_delimited:
+            logging.warning(
+                '[%s] [field_name] two delimiters detected, using comma %s', id,
+                value)
+
+        return {'provided': trim_string_array(value.split(','))}
+    if is_colon_delimited:
+        return {'provided': trim_string_array(value.split(':'))}
+
+    # Assuming this wasn't a list, but a singular value.
+    return {'provided': value}
+
+
 def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
     '''
     Converts original field names and values to the importedCase archival
