@@ -38,7 +38,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
                 <TableCell component="th" scope="row">
                     {c._id}
                 </TableCell>
-                <TableCell>{c.events ? displayDate(new Date(confirmedStartDate)) : ''}</TableCell>
+                <TableCell>{confirmedStartDate ? displayDate(new Date(confirmedStartDate)) : ''}</TableCell>
                 <TableCell>{c.importedCase.outcome}</TableCell>
             </TableRow >
         );
