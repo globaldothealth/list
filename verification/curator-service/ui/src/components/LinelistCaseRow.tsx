@@ -20,7 +20,9 @@ interface Event {
 
 export interface Case {
     _id: string;
-    outcome: string;
+    importedCase: {
+        outcome: string;
+    };
     events: Event[];
 }
 
@@ -29,6 +31,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
     render() {
         const c = this.props.case;
         const bg = this.props.background;
+        console.log(c);
         const confirmedEvent = c.events.filter((e) => e.name === 'confirmed')[0];
         const confirmedStartDate = confirmedEvent.date.range.start;
         return (
@@ -37,7 +40,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
                     {c._id}
                 </TableCell>
                 <TableCell>{confirmedStartDate ? displayDate(new Date(confirmedStartDate)) : ''}</TableCell>
-                <TableCell>{c.outcome}</TableCell>
+                <TableCell>{c.importedCase.outcome}</TableCell>
             </TableRow >
         );
     }

@@ -12,7 +12,9 @@ it('loads and displays cases', async () => {
   const cases = [
     {
       _id: 'abc123',
-      outcome: 'Recovered',
+      importedCase: {
+        outcome: 'Recovered',
+      },
       events: [
         {
           name: 'confirmed',
