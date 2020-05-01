@@ -10,7 +10,7 @@ from pandas import Series
 from typing import Any, Callable, Dict, List
 
 
-def trim_string_array(values: [str]):
+def trim_string_array(values: List[str]) -> List[str]:
     # Remove whitespace that might surround the delimiter ('cough, fever')
     values = [x.strip() for x in values]
 
@@ -24,7 +24,7 @@ def convert_range(
         value: str, parse_fn: Callable[[str],
                                        str],
         format_fn: Callable[[Any],
-                            Any]):
+                            Any]) -> Dict[str, Any]:
     '''
     Converts either a string representation of a single value or a range of
     values into a range object. The values can be of any types using the custom
