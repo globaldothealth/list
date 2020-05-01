@@ -34,8 +34,13 @@ export default function NewCaseForm() {
                             country: values.country,
                             confirmed: values.confirmed,
                             outcome: values.outcome,
-                            eventSequence: {
-                                confirmed: values.confirmed,
+                            events: {
+                                name: 'confirmed',
+                                date: {
+                                    range: {
+                                        start: values.confirmed,
+                                    },
+                                },
                             },
                         });
                     setErrorMessage('');

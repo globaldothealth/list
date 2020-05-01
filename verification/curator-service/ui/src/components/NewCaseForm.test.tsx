@@ -42,8 +42,13 @@ it('submits case ok', async () => {
         "demographics": {
             "sex": "",
         },
-        "eventSequence": {
-            "confirmed": "",
+        "events": {
+            "name": "confirmed",
+            "date": {
+                "range": {
+                    "start": "",
+                },
+            },
         },
         "outcome": "Pending",
         "province": "",
