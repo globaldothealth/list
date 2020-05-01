@@ -10,10 +10,15 @@ from pandas import Series
 from typing import Any, Callable, Dict, List
 
 
-def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callable[[Any], Any]):
+def convert_range(
+        value: str, parse_fn: Callable[[str],
+                                       str],
+        format_fn: Callable[[Any],
+                            Any]):
     '''
-    Converts either a string representation of a single value or a range of values into a range 
-    object. The values can be of any types using the custom parse and format functions.
+    Converts either a string representation of a single value or a range of
+    values into a range object. The values can be of any types using the custom
+    parse and format functions.
     '''
     if pd.isna(value):
         return None
@@ -48,7 +53,8 @@ def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callabl
             }
         }
 
-    # We have a specific value. We create a range with identical min and max values.
+    # We have a specific value. We create a range with identical min and max
+    # values.
     parsed_value = parse_fn(value)
     return {
         'range': {
@@ -60,16 +66,19 @@ def convert_range(value: str, parse_fn: Callable[[str], str], format_fn: Callabl
 
 def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
     '''
-    Converts a single event date column to the new event object with a name and range of dates.
+    Converts a single event date column to the new event object with a name and
+    range of dates.
     '''
     if pd.isna(date_str):
         return None
 
     try:
-        date_range = convert_range(date_str, lambda x: datetime.datetime.strptime(
-            x, '%d.%m.%Y'), lambda x: {
+        date_range = convert_range(
+            date_str,
+            lambda x: datetime.datetime.strptime(x, '%d.%m.%Y'),
+            lambda x: {
                 '$date': x.strftime('%Y-%m-%dT%H:%M:%SZ')
-        })
+            })
 
         return {
             'name': name,
@@ -82,14 +91,14 @@ def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
 
 def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
     '''
-    Converts event date columns to the new events array. Also includes the outcome field as an
-    event, even though we don't have an associated date.
+    Converts event date columns to the new events array. Also includes the
+    outcome field as an event, even though we don't have an associated date.
     '''
     events = list(map(lambda i: convert_event(
         id, i[0], i[1]), dates.items()))
 
-    # The old data model had an outcome string, which will become an event in the new data model,
-    # but it won't have a date associated with it.
+    # The old data model had an outcome string, which will become an event in
+    # the new data model, but it won't have a date associated with it.
     if outcome and type(outcome) is str:
         events.append({'name': outcome})
 
@@ -120,8 +129,9 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
     return demographics if demographics else None
 
 
-def convert_location(id: str, location_id: float, country: str, adminL1: str, adminL2: str,
-                     locality: str, latitude: float, longitude: float) -> Dict[str, Any]:
+def convert_location(id: str, location_id: float, country: str, adminL1: str,
+                     adminL2: str, locality: str, latitude: float,
+                     longitude: float) -> Dict[str, Any]:
     '''Converts location fields to a location object.'''
     location = {}
 
@@ -167,6 +177,9 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str, ad
 
 
 def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
-    '''Converts original field names and values to the importedCase archival object. '''
+    '''
+    Converts original field names and values to the importedCase archival
+    object.
+    '''
     return {k: v for k, v in values_to_archive.iteritems()
             if pd.notna(v)}
