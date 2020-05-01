@@ -21,9 +21,7 @@ interface Event {
 export interface Case {
     _id: string;
     events: Event[];
-    importedCase : {
-        outcome: string;
-    }
+    outcome : string;
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
@@ -39,7 +37,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
                     {c._id}
                 </TableCell>
                 <TableCell>{confirmedStartDate ? displayDate(new Date(confirmedStartDate)) : ''}</TableCell>
-                <TableCell>{c.importedCase.outcome}</TableCell>
+                <TableCell>{c.outcome}</TableCell>
             </TableRow >
         );
     }
