@@ -5,7 +5,7 @@ import { render } from '@testing-library/react';
 
 it('renders provided case', () => {
   const id = 'abc123';
-  const outcome = 'pending';
+  const outcome = 'Pending';
   const date = new Date();
 
   const { getByText } = render(
@@ -25,9 +25,7 @@ it('renders provided case', () => {
                   },
                 }
               ],
-              importedCase: {
-                outcome: outcome,
-              },
+              outcome: outcome,
             }
           }
         />

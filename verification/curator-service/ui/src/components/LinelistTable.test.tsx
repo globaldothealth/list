@@ -22,9 +22,7 @@ it('loads and displays cases', async () => {
           },
         }
       ],
-      importedCase: {
-        outcome: 'recovered',
-      },
+      outcome: 'Recovered',
     },
   ];
   const axiosResponse = {
