@@ -9,7 +9,7 @@ import logging
 import json
 import pandas as pd
 import sys
-from converters import (convert_demographics,
+from converters import (convert_demographics, convert_dictionary_field,
                         convert_events, convert_imported_case, convert_location)
 from pandas import DataFrame, Series
 from typing import Any
@@ -86,6 +86,22 @@ def convert(df_import: DataFrame) -> DataFrame:
             'confirmed': x['date_confirmation'],
             'deathOrDischarge': x['date_death_or_discharge']
         }, x['outcome']), axis=1)
+
+    # Generate new symptoms column.
+    df_export['symptoms'] = df_import.apply(
+        lambda x: convert_dictionary_field(
+            x['ID'],
+            'symptoms',
+            x['symptoms']),
+        axis=1)
+
+    # Generate new chronic disease column.
+    df_export['chronicDisease'] = df_import.apply(
+        lambda x: convert_dictionary_field(
+            x['ID'],
+            'chronicDisease',
+            x['chronic_disease']),
+        axis=1)
 
     # Archive the original fields.
     df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
