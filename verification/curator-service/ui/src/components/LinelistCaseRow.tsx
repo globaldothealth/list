@@ -20,8 +20,8 @@ interface Event {
 
 export interface Case {
     _id: string;
+    outcome: string;
     events: Event[];
-    outcome : string;
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
