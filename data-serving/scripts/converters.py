@@ -10,6 +10,16 @@ from pandas import Series
 from typing import Any, Callable, Dict, List
 
 
+def trim_string_array(values: [str]):
+    # Remove whitespace that might surround the delimiter ('cough, fever')
+    values = [x.strip() for x in values]
+
+    # Remove empty strings that can result from trailing delimiters ('cough,')
+    values = [i for i in values if i]
+
+    return values
+
+
 def convert_range(
         value: str, parse_fn: Callable[[str],
                                        str],
@@ -25,11 +35,7 @@ def convert_range(
 
     # First check if the value is represented as a range.
     if type(value) is str and value.find('-') >= 0:
-        value_range = value.split('-')
-        # Remove whitespace that might surround the dash ('23 - 72')
-        value_range = [x.strip() for x in value_range]
-        # Remove empty strings that can result from open ranges ('18-')
-        value_range = [i for i in value_range if i]
+        value_range = trim_string_array(value.split('-'))
 
         # Handle open ranges (i.e. missing min or max).
         range_min = parse_fn(value_range[0])
