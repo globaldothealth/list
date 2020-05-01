@@ -15,6 +15,7 @@ it('renders provided case', () => {
           case={
             {
               _id: id,
+              outcome: outcome,
               events: [
                 {
                   name: 'confirmed',
@@ -25,7 +26,6 @@ it('renders provided case', () => {
                   },
                 }
               ],
-              outcome: outcome,
             }
           }
         />
