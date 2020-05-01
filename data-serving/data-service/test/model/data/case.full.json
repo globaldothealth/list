@@ -1,10 +1,8 @@
 {
     "demographics": {
-        "age": {
-            "range": {
-                "start": 50.0,
-                "end": 59.0
-            }
+        "ageRange": {
+            "start": 50.0,
+            "end": 59.0
         },
         "sex": "Female",
         "species": "Homo sapien"
@@ -23,38 +21,30 @@
     "events": [
         {
             "name": "onsetSymptoms",
-            "date": {
-                "range": {
-                    "start": 578027600000,
-                    "end": 1578027600000
-                }
+            "dateRange": {
+                "start": 578027600000,
+                "end": 1578027600000
             }
         },
         {
             "name": "confirmed",
-            "date": {
-                "range": {
-                    "start": 1578891600000,
-                    "end": 1578891600000
-                }
+            "dateRange": {
+                "start": 1578891600000,
+                "end": 1578891600000
             }
         },
         {
             "name": "hospitalAdmission",
-            "date": {
-                "range": {
-                    "start": 1579395600000,
-                    "end": 1581469200000
-                }
+            "dateRange": {
+                "start": 1579395600000,
+                "end": 1581469200000
             }
         },
         {
             "name": "discharged",
-            "date": {
-                "range": {
-                    "start": "1581483600000",
-                    "end": "1581483600000"
-                }
+            "dateRange": {
+                "start": "1581483600000",
+                "end": "1581483600000"
             }
         }
     ],
@@ -101,11 +91,9 @@
                     "longitude": 114.305539
                 }
             },
-            "dates": {
-                "range": {
-                    "start": "2020-01-03",
-                    "end": "2020-01-03"
-                }
+            "dateRange": {
+                "start": "2020-01-03",
+                "end": "2020-01-03"
             },
             "purpose": "Family",
             "additionalInformation": "large family gathering for holidays"

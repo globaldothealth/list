@@ -40,9 +40,8 @@ const dictionaryValueSchema = new mongoose.Schema({
 });
 
 const demographicsSchema = new mongoose.Schema({
-    age: {
-        range: {
-            start: {
+    ageRange: {
+        start: {
                 type: Number,
                 min: -1,
                 max: 200,
@@ -53,7 +52,6 @@ const demographicsSchema = new mongoose.Schema({
                 max: 200,
             },
         },
-    },
     species: {
         type: String,
         enum: Object.values(Species),
@@ -151,7 +149,7 @@ const travelSchema = new mongoose.Schema({
         type: locationSchema,
         validate: minimumLocationFieldsValidator,
     },
-    dates: dateRangeSchema,
+    dateRange: dateRangeSchema,
     purpose: {
         type: String,
         enum: Object.values(TravelPurpose),
@@ -222,12 +220,8 @@ interface Range<T> {
     end: T;
 }
 
-interface Age {
-    range: Range<number>;
-}
-
 interface Demographics {
-    age: Age;
+    ageRange: Range<number>;
     sex: Sex;
     species: Species;
 }
@@ -237,13 +231,9 @@ interface ChronicDisease {
     imputed: [string];
 }
 
-interface EventDate {
-    range: Range<Date>;
-}
-
 interface Event {
     name: string;
-    date: EventDate;
+    dateRange: Range<Date>;
 }
 
 interface Geometry {
@@ -289,13 +279,9 @@ interface Symptoms {
     imputed: [string];
 }
 
-interface TravelDates {
-    range: Range<Date>;
-}
-
 interface Travel {
     location: Location;
-    dates: TravelDates;
+    dateRange: Range<Date>;
     purpose: TravelPurpose;
     additionalInformation: string;
 }
