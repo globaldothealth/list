@@ -8,12 +8,22 @@ interface RowProps {
     case: Case
 }
 
+interface Event {
+    name: string;
+    date: {
+        range: {
+            start: string;
+            end: string;
+        };
+    };
+}
+
 export interface Case {
     _id: string;
-    outcome: string;
-    eventSequence: {
-        confirmed: Date;
-    };
+    events: Event[];
+    importedCase : {
+        outcome: string;
+    }
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
@@ -21,13 +31,15 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
     render() {
         const c = this.props.case;
         const bg = this.props.background;
+        const confirmedEvent = c.events.filter((e) => e.name === 'confirmed')[0];
+        const confirmedStartDate = confirmedEvent.date.range.start;
         return (
             <TableRow key={c._id} style={{ background: bg }}>
                 <TableCell component="th" scope="row">
                     {c._id}
                 </TableCell>
-                <TableCell>{c.eventSequence ? displayDate(new Date(c.eventSequence.confirmed)) : ''}</TableCell>
-                <TableCell>{c.outcome}</TableCell>
+                <TableCell>{c.events ? displayDate(new Date(confirmedStartDate)) : ''}</TableCell>
+                <TableCell>{c.importedCase.outcome}</TableCell>
             </TableRow >
         );
     }
