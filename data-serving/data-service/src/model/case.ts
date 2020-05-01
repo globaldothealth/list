@@ -42,16 +42,16 @@ const dictionaryValueSchema = new mongoose.Schema({
 const demographicsSchema = new mongoose.Schema({
     ageRange: {
         start: {
-                type: Number,
-                min: -1,
-                max: 200,
-            },
-            end: {
-                type: Number,
-                min: 0,
-                max: 200,
-            },
+            type: Number,
+            min: -1,
+            max: 200,
         },
+        end: {
+            type: Number,
+            min: 0,
+            max: 200,
+        },
+    },
     species: {
         type: String,
         enum: Object.values(Species),

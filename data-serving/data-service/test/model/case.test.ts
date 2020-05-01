@@ -14,14 +14,12 @@ describe('validate', () => {
 
         return c.validate();
     });
-    
+
     it('incomplete model should be invalid', async () => {
         const c = new Case({});
 
         return c.validate((e) => {
-            expect(e.errors)
-            .not
-            .toBe({});
+            expect(e.errors).not.toBe({});
         });
     });
     // TODO: Add more validation tests once the schema is more stable.
