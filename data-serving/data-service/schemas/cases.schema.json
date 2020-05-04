@@ -16,25 +16,19 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "age": {
+          "ageRange": {
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
-              "range": {
-                "bsonType": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "start": {
-                    "bsonType": "double",
-                    "minimum": -1,
-                    "maximum": 200
-                  },
-                  "end": {
-                    "bsonType": "double",
-                    "minimum": -1,
-                    "maximum": 200
-                  }
-                }
+              "start": {
+                "bsonType": "double",
+                "minimum": -1,
+                "maximum": 200
+              },
+              "end": {
+                "bsonType": "double",
+                "minimum": -1,
+                "maximum": 200
               }
             }
           },
@@ -103,21 +97,15 @@
             "name": {
               "bsonType": "string"
             },
-            "date": {
+            "dateRange": {
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
-                "range": {
-                  "bsonType": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "start": {
-                      "bsonType": "date"
-                    },
-                    "end": {
-                      "bsonType": "date"
-                    }
-                  }
+                "start": {
+                  "bsonType": "date"
+                },
+                "end": {
+                  "bsonType": "date"
                 }
               }
             }
@@ -215,7 +203,7 @@
                 }
               }
             },
-            "dates": {
+            "dateRange": {
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {

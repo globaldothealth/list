@@ -39,10 +39,8 @@ export default function NewCaseForm() {
                             },
                             events: {
                                 name: 'confirmed',
-                                date: {
-                                    range: {
-                                        start: values.confirmed,
-                                    },
+                                dateRange: {
+                                    start: values.confirmed,
                                 },
                             },
                             source: {
@@ -51,7 +49,7 @@ export default function NewCaseForm() {
                             revisionMetadata: {
                                 id: 0,
                                 moderator: "TODO",
-                                date: "",
+                                date: Date.now(),
                             },
                         });
                     setErrorMessage('');
