@@ -36,24 +36,32 @@ it('submits case ok', async () => {
     })
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases/', {
-        "city": "",
-        "confirmed": "",
-        "country": "",
         "demographics": {
             "sex": "",
         },
         "events": {
             "name": "confirmed",
-            "date": {
-                "range": {
-                    "start": "",
-                },
+            "dateRange": {
+                "start": "",
             },
         },
         "importedCase": {
             "outcome": "Pending",
         },
-        "province": "",
+        "location": {
+            "administrativeAreaLevel1": "",
+            "administrativeAreaLevel2": "",
+            "country": "",
+        },
+        "revisionMetadata": {
+            "date": "",
+            "id": 0,
+            "moderator": "TODO",
+        },
+        "source": {
+            "url": "",
+        },
+
     });
 });
 

@@ -19,11 +19,46 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 /**
  * List all cases.
  *
- * Handles HTTP GET /api/cases/.
+ * Handles HTTP GET /api/cases.
  */
 export const list = async (req: Request, res: Response): Promise<void> => {
-    const cases = await Case.find({});
-    res.json(cases);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    if (page < 1) {
+        res.status(422).json('page must be > 0');
+        return;
+    }
+    if (limit < 1) {
+        res.status(422).json('limit must be > 0');
+        return;
+    }
+    // Do a fetch of documents and another fetch in parallel for total documents
+    // count used in pagination.
+    try {
+        const [docs, total] = await Promise.all([
+            Case.find({})
+                .skip(limit * (page - 1))
+                .limit(limit + 1),
+            Case.countDocuments({}),
+        ]);
+        // If we have more items than limit, add a response param
+        // indicating that there is more to fetch on the next page.
+        if (docs.length == limit + 1) {
+            docs.splice(limit);
+            res.json({
+                cases: docs,
+                nextPage: page + 1,
+                total: total,
+            });
+            return;
+        }
+        // If we fetched all available data, just return it.
+        res.json({ cases: docs, total: total });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
 };
 
 /**

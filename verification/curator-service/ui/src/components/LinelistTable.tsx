@@ -4,6 +4,11 @@ import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import axios from 'axios';
 
+interface ListResponse {
+    cases: Case[],
+    nextPage: number,
+    total: number,
+}
 interface TableState {
     errorMessage: string,
     isLoaded: boolean,
@@ -27,15 +32,15 @@ export default class LinelistTable extends React.Component<{}, TableState> {
 
     async componentDidMount() {
         try {
-            const response = await axios.get<Case[]>((process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/');
+            const response = await axios.get<ListResponse>((process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/');
             this.setState({
                 isLoaded: true,
-                linelist: response.data
+                linelist: response.data.cases,
             });
         } catch (e) {
             this.setState({
                 isLoaded: true,
-                errorMessage: e.message
+                errorMessage: e.message,
             });
         }
     }
