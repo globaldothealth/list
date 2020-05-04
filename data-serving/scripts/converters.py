@@ -17,7 +17,8 @@ def trim_string_array(values: List[str]) -> List[str]:
     # Remove empty strings that can result from trailing delimiters ('cough,')
     values = [str(i) for i in values if i]
 
-    return values
+    # Remove duplicate values
+    return list(set(values))
 
 
 def convert_range(
@@ -224,7 +225,7 @@ def convert_dictionary_field(
         return {'provided': trim_string_array(value.split(':'))}
 
     # Assuming this wasn't a list, but a singular value.
-    return {'provided': value}
+    return {'provided': [str(value)]}
 
 
 def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
