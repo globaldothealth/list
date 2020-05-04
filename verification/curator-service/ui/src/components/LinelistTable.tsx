@@ -39,7 +39,7 @@ export default class LinelistTable extends React.Component<{}, TableState> {
 
     async componentDidMount() {
         try {
-            const response = await axios.get<ListResponse>((process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/');
+            const response = await axios.get<ListResponse>((process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases');
             this.setState({
                 isLoaded: true,
                 linelist: response.data.cases,
