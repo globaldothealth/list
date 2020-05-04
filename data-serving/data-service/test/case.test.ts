@@ -38,11 +38,52 @@ describe('GET', () => {
             .get('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
-    it('list should return 200 OK', () => {
-        return request(app)
-            .get('/api/cases/')
-            .expect('Content-Type', /json/)
-            .expect(200);
+    describe('list', () => {
+        it('should return 200 OK', () => {
+            return request(app)
+                .get('/api/cases')
+                .expect('Content-Type', /json/)
+                .expect(200);
+        });
+        it('should paginate', async () => {
+            for (const i of Array.from(Array(15).keys())) {
+                await new Case(minimalCase).save();
+            }
+            // Fetch first page.
+            let res = await request(app)
+                .get('/api/cases?page=1&limit=10')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(10);
+            // Second page is expected.
+            expect(res.body.nextPage).toEqual(2);
+            expect(res.body.total).toEqual(15);
+
+            // Fetch second page.
+            res = await request(app)
+                .get(`/api/cases?page=${res.body.nextPage}&limit=10`)
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(5);
+            // No continuation expected.
+            expect(res.body.nextPage).toBeUndefined();
+            expect(res.body.total).toEqual(15);
+
+            // Fetch inexistant page.
+            res = await request(app)
+                .get('/api/cases?page=42&limit=10')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(0);
+            // No continuation expected.
+            expect(res.body.nextPage).toBeUndefined();
+        });
+        it('rejects negative page param', (done) => {
+            request(app).get('/api/cases?page=-7').expect(422, done);
+        });
+        it('rejects negative limit param', (done) => {
+            request(app).get('/api/cases?page=1&limit=-2').expect(422, done);
+        });
     });
 });
 
