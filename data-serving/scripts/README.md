@@ -12,7 +12,15 @@ python3 convert_data.py --infile="latestdata.csv" [--outfile="cases.json"]
 
 Logs will be written to `convert_data.log`.
 
-## What's included in the converted data?
+### Current stats
+
+- 99.7% of rows from the CSV file convert successfully to JSON
+  + Of the 0.3% of rows with errors:
+    - 99.6% have age values outside the valid range
+    - 0.4% have invalid date formats
+- 100% of rows from `cases.json` import successfully into mongodb using `cases.schema.json` as a validator
+
+## What's included in the new schema?
 
 ### New fields
 
