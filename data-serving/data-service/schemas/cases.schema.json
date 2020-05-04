@@ -331,10 +331,10 @@
             "bsonType": "string"
           },
           "latitude": {
-            "bsonType": "double"
+            "bsonType": "string"
           },
           "longitude": {
-            "bsonType": "double"
+            "bsonType": "string"
           },
           "geo_resolution": {
             "bsonType": "string"
@@ -367,7 +367,7 @@
             "bsonType": "string"
           },
           "chronic_disease_binary": {
-            "bsonType": "bool"
+            "bsonType": "string"
           },
           "chronic_disease": {
             "bsonType": "string"
@@ -403,13 +403,13 @@
             "bsonType": "string"
           },
           "admin_id": {
-            "bsonType": "double"
+            "bsonType": "string"
           },
           "data_moderator_initials": {
             "bsonType": "string"
           },
           "travel_history_binary": {
-            "bsonType": "bool"
+            "bsonType": "string"
           }
         }
       }
