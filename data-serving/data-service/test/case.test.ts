@@ -89,13 +89,11 @@ describe('GET', () => {
 
 describe('POST', () => {
     it('create with invalid input should return 422', () => {
-        return request(app).post('/api/cases/').send({}).expect(422);
+        return request(app).post('/api/cases').send({}).expect(422);
     });
     it('create with valid input should return 200 OK', async () => {
-        const inputDate = new Date('2020-04-01').toJSON();
-        const inputOutcome = 'Recovered';
         return request(app)
-            .post('/api/cases/')
+            .post('/api/cases')
             .send(minimalCase)
             .expect('Content-Type', /json/)
             .expect(200);

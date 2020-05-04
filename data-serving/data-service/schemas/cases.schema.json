@@ -2,12 +2,6 @@
   "$jsonSchema": {
     "bsonType": "object",
     "additionalProperties": false,
-    "required": [
-      "_id",
-      "location",
-      "source",
-      "revisionMetadata"
-    ],
     "properties": {
       "_id": {
         "bsonType": "objectId"
@@ -216,10 +210,7 @@
               }
             },
             "purpose": {
-              "enum": [
-                "family",
-                "conference"
-              ]
+              "bsonType": "string"
             },
             "additionalInformation": {
               "bsonType": "string"
@@ -318,28 +309,103 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "additionalInformation": {
+          "ID": {
             "bsonType": "string"
           },
-          "notesForDiscussion": {
+          "age": {
             "bsonType": "string"
           },
-          "geoResolution": {
+          "sex": {
+            "bsonType": "string"
+          },
+          "city": {
+            "bsonType": "string"
+          },
+          "province": {
+            "bsonType": "string"
+          },
+          "country": {
+            "bsonType": "string"
+          },
+          "latitude": {
+            "bsonType": "string"
+          },
+          "longitude": {
+            "bsonType": "string"
+          },
+          "geo_resolution": {
+            "bsonType": "string"
+          },
+          "date_onset_symptoms": {
+            "bsonType": "string"
+          },
+          "date_admission_hospital": {
+            "bsonType": "string"
+          },
+          "date_confirmation": {
             "bsonType": "string"
           },
           "symptoms": {
             "bsonType": "string"
           },
-          "chronicDiseaseBinary": {
-            "bsonType": "bool"
+          "lives_in_Wuhan": {
+            "bsonType": "string"
           },
-          "chronicDisease": {
+          "travel_history_dates": {
+            "bsonType": "string"
+          },
+          "travel_history_location": {
+            "bsonType": "string"
+          },
+          "reported_market_exposure": {
+            "bsonType": "string"
+          },
+          "additional_information": {
+            "bsonType": "string"
+          },
+          "chronic_disease_binary": {
+            "bsonType": "string"
+          },
+          "chronic_disease": {
+            "bsonType": "string"
+          },
+          "source": {
+            "bsonType": "string"
+          },
+          "sequence_available": {
             "bsonType": "string"
           },
           "outcome": {
             "bsonType": "string"
           },
-          "adminId": {
+          "date_death_or_discharge": {
+            "bsonType": "string"
+          },
+          "notes_for_discussion": {
+            "bsonType": "string"
+          },
+          "location": {
+            "bsonType": "string"
+          },
+          "admin3": {
+            "bsonType": "string"
+          },
+          "admin2": {
+            "bsonType": "string"
+          },
+          "admin1": {
+            "bsonType": "string"
+          },
+          "country_new": {
+            "bsonType": "string"
+          },
+          "admin_id": {
+            "bsonType": "string"
+          },
+          "data_moderator_initials": {
+            "bsonType": "string"
+          },
+          "travel_history_binary": {
             "bsonType": "string"
           }
         }
