@@ -15,7 +15,7 @@ def trim_string_array(values: List[str]) -> List[str]:
     values = [x.strip() for x in values]
 
     # Remove empty strings that can result from trailing delimiters ('cough,')
-    values = [i for i in values if i]
+    values = [str(i) for i in values if i]
 
     return values
 
@@ -38,35 +38,29 @@ def convert_range(
         value_range = trim_string_array(value.split('-'))
 
         # Handle open ranges (i.e. missing min or max).
-        range_min = parse_fn(value_range[0])
+        first_val = parse_fn(value_range[0])
         if len(value_range) == 1:
             return {
-                'range': {
-                    'max': format_fn(range_min)
-                }
+                'end': format_fn(first_val)
+
             } if value.startswith('-') else {
-                'range': {
-                    'min': format_fn(range_min)
-                }
+                'start': format_fn(first_val)
             }
 
         # Handle cases with a min and max.
-        range_max = parse_fn(value_range[1])
+        second_val = parse_fn(value_range[1])
         return {
-            'range': {
-                'min': format_fn(range_min),
-                'max': format_fn(range_max)
-            }
+            'start': format_fn(first_val),
+            'end': format_fn(second_val)
+
         }
 
     # We have a specific value. We create a range with identical min and max
     # values.
     parsed_value = parse_fn(value)
     return {
-        'range': {
-            'min': format_fn(parsed_value),
-            'max': format_fn(parsed_value)
-        }
+        'start': format_fn(parsed_value),
+        'end': format_fn(parsed_value)
     }
 
 
@@ -87,8 +81,8 @@ def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
             })
 
         return {
-            'name': name,
-            'date': date_range
+            'name': str(name),
+            'dateRange': date_range
         }
     except (TypeError, ValueError):
         logging.warning(
@@ -106,7 +100,7 @@ def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
     # The old data model had an outcome string, which will become an event in
     # the new data model, but it won't have a date associated with it.
     if outcome and type(outcome) is str:
-        events.append({'name': outcome})
+        events.append({'name': str(outcome)})
 
     # Filter out None values.
     return [e for e in events if e]
@@ -115,7 +109,20 @@ def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
 def convert_age(id: str, age: str) -> Dict[str, Any]:
     '''Converts age column to the new demographics.age object. '''
     try:
-        return convert_range(age, float, lambda x: x)
+        age_range = convert_range(age, float, lambda x: x)
+
+        if not age_range:
+            return None
+        if 'start' in age_range and(
+                age_range['start'] < -1 or age_range['start'] > 300):
+            raise ValueError('age_range.start outside of valid range')
+        if 'end' in age_range and(
+                age_range['end'] < -1 or age_range['end'] > 300):
+            raise ValueError('age_range.end outside of valid range')
+
+        return {
+            'ageRange': age_range
+        }
     except ValueError:
         logging.warning('[%s] [demographics.age] value error %s', id, age)
 
@@ -128,8 +135,16 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
     if converted_age:
         demographics['age'] = converted_age
 
-    if str(sex).lower() in VALID_SEXES:
-        demographics['sex'] = str(sex).capitalize()
+    if pd.notna(sex):
+        try:
+            if str(sex).lower() not in VALID_SEXES:
+                raise ValueError('sex not in enum')
+
+            demographics['sex'] = str(sex).capitalize()
+        except ValueError:
+            logging.warning('[%s] [demographics.sex] value error %s', id, age)
+
+    demographics['species'] = 'Homo sapien'
 
     # If the dictionary is empty, we want to omit it from the JSON output
     return demographics if demographics else None
@@ -141,37 +156,40 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
     '''Converts location fields to a location object.'''
     location = {}
 
-    try:
-        if pd.notna(location_id):
-            location['id'] = float(location_id)
-    except (TypeError, ValueError):
-        logging.warning(
-            '[%s] [location.id] invalid value %s', id, location_id)
-
     if pd.notna(country):
-        location['country'] = country
+        location['country'] = str(country)
 
     if pd.notna(adminL1):
-        location['administrativeAreaLevel1'] = adminL1
+        location['administrativeAreaLevel1'] = str(adminL1)
 
     if pd.notna(adminL2):
-        location['administrativeAreaLevel2'] = adminL2
+        location['administrativeAreaLevel2'] = str(adminL2)
 
     if pd.notna(locality):
-        location['locality'] = locality
+        location['locality'] = str(locality)
 
     geometry = {}
 
     try:
         if pd.notna(latitude):
-            geometry['latitude'] = float(latitude)
+            normalized_latitude = float(latitude)
+
+            if normalized_latitude < -90 or normalized_latitude > 90:
+                raise ValueError('latitude outside of valid range')
+
+            geometry['latitude'] = normalized_latitude
     except (TypeError, ValueError):
         logging.warning(
             '[%s] [location.latitude] invalid value %s', id, latitude)
 
     try:
         if pd.notna(longitude):
-            geometry['longitude'] = float(longitude)
+            normalized_longitude = float(longitude)
+
+            if normalized_longitude < -180 or normalized_latitude > 180:
+                raise ValueError('longitude outside of valid range')
+
+            geometry['longitude'] = normalized_longitude
     except (TypeError, ValueError):
         logging.warning(
             '[%s] [location.longitude] invalid value %s', id, longitude)
@@ -214,5 +232,5 @@ def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
     Converts original field names and values to the importedCase archival
     object.
     '''
-    return {k: v for k, v in values_to_archive.iteritems()
+    return {k: str(v) for k, v in values_to_archive.iteritems()
             if pd.notna(v)}
