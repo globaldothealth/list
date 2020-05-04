@@ -116,6 +116,7 @@ export default class LinelistTable extends React.Component {
                     title="COVID-19 cases"
                     icons={tableIcons}
                     options={{
+                        // TODO: would be really useful, send query to server.
                         search: false,
                     }}
                 />
