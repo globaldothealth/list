@@ -59,6 +59,7 @@ describe('GET', () => {
         expect(res.body.sources).toHaveLength(5);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
+        expect(res.body.total).toEqual(15);
 
         // Fetch inexistant page.
         res = await request(app)
@@ -68,6 +69,7 @@ describe('GET', () => {
         expect(res.body.sources).toHaveLength(0);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
+        expect(res.body.total).toEqual(15);
     });
     it('rejects negative page param', (done) => {
         request(app).get('/api/sources?page=-7').expect(422, done);
