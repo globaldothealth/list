@@ -253,7 +253,7 @@ def convert_dictionary_field(
 def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
         str, str]:
     '''
-    Populates a revisionMetadata field with an initial revision version of 0 and
+    Populates a revisionMetadata field with an initial revision number of 0 and
     the data moderator's initials where available.
     '''
     revision_metadata = {
@@ -267,7 +267,7 @@ def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
 
 
 def convert_notes_field(notes_fields: [str]) -> Dict[str, Any]:
-    '''Creates a notes field from up to a list of original notes fields '''
+    '''Creates a notes field from a list of original notes fields.'''
     notes = '; '.join([x for x in notes_fields if pd.notna(x)])
 
     return notes if notes else None
