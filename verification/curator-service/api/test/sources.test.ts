@@ -127,7 +127,7 @@ describe('PUT', () => {
 describe('POST', () => {
     it('should return the created source', async () => {
         request(app)
-            .post('/api/sources/')
+            .post('/api/sources')
             .send({ name: 'some name', origin: { url: 'http://what.ever' } })
             .expect(201);
     });
