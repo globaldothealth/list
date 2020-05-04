@@ -212,5 +212,5 @@ def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
     Converts original field names and values to the importedCase archival
     object.
     '''
-    return {k: v for k, v in values_to_archive.iteritems()
+    return {k: str(v) for k, v in values_to_archive.iteritems()
             if pd.notna(v)}
