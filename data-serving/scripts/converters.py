@@ -41,32 +41,27 @@ def convert_range(
         range_min = parse_fn(value_range[0])
         if len(value_range) == 1:
             return {
-                'range': {
-                    'max': format_fn(range_min)
-                }
+                'start': format_fn(range_min)
+
             } if value.startswith('-') else {
-                'range': {
-                    'min': format_fn(range_min)
-                }
+                'end': format_fn(range_min)
+
             }
 
         # Handle cases with a min and max.
         range_max = parse_fn(value_range[1])
         return {
-            'range': {
-                'min': format_fn(range_min),
-                'max': format_fn(range_max)
-            }
+            'start': format_fn(range_min),
+            'end': format_fn(range_max)
+
         }
 
     # We have a specific value. We create a range with identical min and max
     # values.
     parsed_value = parse_fn(value)
     return {
-        'range': {
-            'min': format_fn(parsed_value),
-            'max': format_fn(parsed_value)
-        }
+        'start': format_fn(parsed_value),
+        'end': format_fn(parsed_value)
     }
 
 
@@ -88,7 +83,7 @@ def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
 
         return {
             'name': name,
-            'date': date_range
+            'dateRange': date_range
         }
     except (TypeError, ValueError):
         logging.warning(
@@ -115,7 +110,10 @@ def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
 def convert_age(id: str, age: str) -> Dict[str, Any]:
     '''Converts age column to the new demographics.age object. '''
     try:
-        return convert_range(age, float, lambda x: x)
+        age_range = convert_range(age, float, lambda x: x)
+        return {
+            'ageRange': age_range
+        } if age_range else None
     except ValueError:
         logging.warning('[%s] [demographics.age] value error %s', id, age)
 
@@ -143,7 +141,7 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
 
     try:
         if pd.notna(location_id):
-            location['id'] = float(location_id)
+            location['id'] = str(int(location_id))
     except (TypeError, ValueError):
         logging.warning(
             '[%s] [location.id] invalid value %s', id, location_id)
