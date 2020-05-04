@@ -286,9 +286,7 @@
         "bsonType": "object",
         "additionalProperties": false,
         "required": [
-          "id",
-          "moderator",
-          "date"
+          "id"
         ],
         "properties": {
           "id": {
