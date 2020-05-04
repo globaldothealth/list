@@ -20,7 +20,7 @@ it('loads and displays cases', async () => {
           name: 'confirmed',
           date: {
             range: {
-              start:new Date().toJSON(),
+              start: new Date().toJSON(),
             },
           },
         }
@@ -28,7 +28,11 @@ it('loads and displays cases', async () => {
     },
   ];
   const axiosResponse = {
-    data: cases,
+    data: {
+      cases: cases,
+      total: 15,
+      nextPage: 2,
+    },
     status: 200,
     statusText: 'OK',
     config: {},

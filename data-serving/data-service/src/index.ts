@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', homeController.get);
 const apiRouter = express.Router();
 apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
-apiRouter.get('/cases/', caseController.list);
+apiRouter.get('/cases', caseController.list);
 apiRouter.post('/cases/', caseController.create);
 apiRouter.put('/cases/:id([a-z0-9]{24})', caseController.update);
 apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
