@@ -41,10 +41,8 @@ it('submits case ok', async () => {
         },
         "events": {
             "name": "confirmed",
-            "date": {
-                "range": {
-                    "start": "",
-                },
+            "dateRange": {
+                "start": "",
             },
         },
         "importedCase": {

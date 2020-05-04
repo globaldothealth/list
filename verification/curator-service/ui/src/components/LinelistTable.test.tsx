@@ -18,10 +18,8 @@ it('loads and displays cases', async () => {
       events: [
         {
           name: 'confirmed',
-          date: {
-            range: {
-              start: new Date().toJSON(),
-            },
+          dateRange: {
+            start: new Date().toJSON(),
           },
         }
       ],
