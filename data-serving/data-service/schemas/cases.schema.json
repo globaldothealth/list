@@ -210,10 +210,7 @@
               }
             },
             "purpose": {
-              "enum": [
-                "family",
-                "conference"
-              ]
+              "bsonType": "string"
             },
             "additionalInformation": {
               "bsonType": "string"
