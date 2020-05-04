@@ -121,11 +121,22 @@ def convert_age(id: str, age: str) -> Dict[str, Any]:
                 age_range['end'] < -1 or age_range['end'] > 300):
             raise ValueError('age_range.end outside of valid range')
 
-        return {
-            'ageRange': age_range
-        }
+        return age_range
     except ValueError:
         logging.warning('[%s] [demographics.age] value error %s', id, age)
+
+
+def convert_sex(id: str, sex: str) -> str:
+    if pd.isna(sex):
+        return None
+
+    try:
+        if str(sex).lower() not in VALID_SEXES:
+            raise ValueError('sex not in enum')
+
+        return str(sex).capitalize()
+    except ValueError:
+        logging.warning('[%s] [demographics.sex] value error %s', id, age)
 
 
 def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
@@ -134,16 +145,11 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
 
     converted_age = convert_age(id, age)
     if converted_age:
-        demographics['age'] = converted_age
+        demographics['ageRange'] = converted_age
 
-    if pd.notna(sex):
-        try:
-            if str(sex).lower() not in VALID_SEXES:
-                raise ValueError('sex not in enum')
-
-            demographics['sex'] = str(sex).capitalize()
-        except ValueError:
-            logging.warning('[%s] [demographics.sex] value error %s', id, age)
+    converted_sex = convert_sex(id, sex)
+    if converted_sex:
+        demographics['sex'] = converted_sex
 
     demographics['species'] = 'Homo sapien'
 
@@ -151,7 +157,7 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
     return demographics if demographics else None
 
 
-def convert_location(id: str, location_id: float, country: str, adminL1: str,
+def convert_location(id: str, country: str, adminL1: str,
                      adminL2: str, locality: str, latitude: float,
                      longitude: float) -> Dict[str, Any]:
     '''Converts location fields to a location object.'''
@@ -225,7 +231,7 @@ def convert_dictionary_field(
         return {'provided': trim_string_array(value.split(':'))}
 
     # Assuming this wasn't a list, but a singular value.
-    return {'provided': [str(value)]}
+    return {'provided': [value]}
 
 
 def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
