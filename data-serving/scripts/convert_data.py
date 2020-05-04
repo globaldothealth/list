@@ -38,7 +38,7 @@ def main():
         original_rows = original_cases.shape[0]
         original_cases = original_cases.sample(frac=args.sample_rate)
         print(
-            f'Downsampling to {args.sample_rate*100} % of cases from '
+            f'Downsampling to {args.sample_rate*100}% of cases from '
             f'{original_rows} to {original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
@@ -69,7 +69,6 @@ def convert(df_import: DataFrame) -> DataFrame:
         x:
         convert_location(
             x['ID'],
-            x['admin_id'],
             x['country'],
             x['admin1'],
             x['admin2'],
