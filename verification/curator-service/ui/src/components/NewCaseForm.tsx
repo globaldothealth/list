@@ -39,10 +39,8 @@ export default function NewCaseForm() {
                             },
                             events: {
                                 name: 'confirmed',
-                                date: {
-                                    range: {
-                                        start: values.confirmed,
-                                    },
+                                dateRange: {
+                                    start: values.confirmed,
                                 },
                             },
                             source: {

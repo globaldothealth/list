@@ -3,14 +3,12 @@
         "$oid": "5e99f21a1c9d440000ceb088"
     },
     "demographics": {
-        "age": {
-            "range": {
-                "start": {
-                    "$numberDouble": "50"
-                },
-                "end": {
-                    "$numberDouble": "59"
-                }
+        "ageRange": {
+            "start": {
+                "$numberDouble": "50"
+            },
+            "end": {
+                "$numberDouble": "59"
             }
         },
         "sex": "Female",
@@ -34,68 +32,60 @@
     "events": [
         {
             "name": "onsetSymptoms",
-            "date": {
-                "range": {
-                    "start": {
-                        "$date": {
-                            "$numberLong": "1578027600000"
-                        }
-                    },
-                    "end": {
-                        "$date": {
-                            "$numberLong": "1578027600000"
-                        }
+            "dateRange": {
+                "start": {
+                    "$date": {
+                        "$numberLong": "1578027600000"
+                    }
+                },
+                "end": {
+                    "$date": {
+                        "$numberLong": "1578027600000"
                     }
                 }
             }
         },
         {
             "name": "confirmed",
-            "date": {
-                "range": {
-                    "start": {
-                        "$date": {
-                            "$numberLong": "1578891600000"
-                        }
-                    },
-                    "end": {
-                        "$date": {
-                            "$numberLong": "1578891600000"
-                        }
+            "dateRange": {
+                "start": {
+                    "$date": {
+                        "$numberLong": "1578891600000"
+                    }
+                },
+                "end": {
+                    "$date": {
+                        "$numberLong": "1578891600000"
                     }
                 }
             }
         },
         {
             "name": "hospitalAdmission",
-            "date": {
-                "range": {
-                    "start": {
-                        "$date": {
-                            "$numberLong": "1579395600000"
-                        }
-                    },
-                    "end": {
-                        "$date": {
-                            "$numberLong": "1581469200000"
-                        }
+            "dateRange": {
+                "start": {
+                    "$date": {
+                        "$numberLong": "1579395600000"
+                    }
+                },
+                "end": {
+                    "$date": {
+                        "$numberLong": "1581469200000"
                     }
                 }
             }
         },
         {
             "name": "discharged",
-            "date": {
-                "range": {
-                    "start": {
-                        "$date": {
-                            "$numberLong": "1581483600000"
-                        }
-                    },
-                    "end": {
-                        "$date": {
-                            "$numberLong": "1581483600000"
-                        }
+            "dateRange": {
+                "start": {
+                    "$date": {
+                        "$numberLong": "1581483600000"
+                    }
+                },
+                "end": {
+                    "$date": {
+                        "$numberLong": "1581483600000"
                     }
                 }
             }
@@ -148,7 +138,7 @@
                     }
                 }
             },
-            "dates": {
+            "dateRange": {
                 "start": {
                     "$date": {
                         "$numberLong": "1576386000000"
