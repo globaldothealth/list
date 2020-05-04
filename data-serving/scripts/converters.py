@@ -38,21 +38,20 @@ def convert_range(
         value_range = trim_string_array(value.split('-'))
 
         # Handle open ranges (i.e. missing min or max).
-        range_min = parse_fn(value_range[0])
+        first_val = parse_fn(value_range[0])
         if len(value_range) == 1:
             return {
-                'start': format_fn(range_min)
+                'end': format_fn(first_val)
 
             } if value.startswith('-') else {
-                'end': format_fn(range_min)
-
+                'start': format_fn(first_val)
             }
 
         # Handle cases with a min and max.
-        range_max = parse_fn(value_range[1])
+        second_val = parse_fn(value_range[1])
         return {
-            'start': format_fn(range_min),
-            'end': format_fn(range_max)
+            'start': format_fn(first_val),
+            'end': format_fn(second_val)
 
         }
 
@@ -111,9 +110,19 @@ def convert_age(id: str, age: str) -> Dict[str, Any]:
     '''Converts age column to the new demographics.age object. '''
     try:
         age_range = convert_range(age, float, lambda x: x)
+
+        if not age_range:
+            return None
+        if 'start' in age_range and(
+                age_range['start'] < -1 or age_range['start'] > 300):
+            raise ValueError('age_range.start outside of valid range')
+        if 'end' in age_range and(
+                age_range['end'] < -1 or age_range['end'] > 300):
+            raise ValueError('age_range.end outside of valid range')
+
         return {
             'ageRange': age_range
-        } if age_range else None
+        }
     except ValueError:
         logging.warning('[%s] [demographics.age] value error %s', id, age)
 
@@ -126,8 +135,16 @@ def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
     if converted_age:
         demographics['age'] = converted_age
 
-    if str(sex).lower() in VALID_SEXES:
-        demographics['sex'] = str(sex).capitalize()
+    if pd.notna(sex):
+        try:
+            if str(sex).lower() not in VALID_SEXES:
+                raise ValueError('sex not in enum')
+
+            demographics['sex'] = str(sex).capitalize()
+        except ValueError:
+            logging.warning('[%s] [demographics.sex] value error %s', id, age)
+
+    demographics['species'] = 'Homo sapien'
 
     # If the dictionary is empty, we want to omit it from the JSON output
     return demographics if demographics else None
@@ -138,13 +155,6 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
                      longitude: float) -> Dict[str, Any]:
     '''Converts location fields to a location object.'''
     location = {}
-
-    try:
-        if pd.notna(location_id):
-            location['id'] = str(int(location_id))
-    except (TypeError, ValueError):
-        logging.warning(
-            '[%s] [location.id] invalid value %s', id, location_id)
 
     if pd.notna(country):
         location['country'] = str(country)
@@ -162,14 +172,24 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
 
     try:
         if pd.notna(latitude):
-            geometry['latitude'] = float(latitude)
+            normalized_latitude = float(latitude)
+
+            if normalized_latitude < -90 or normalized_latitude > 90:
+                raise ValueError('latitude outside of valid range')
+
+            geometry['latitude'] = normalized_latitude
     except (TypeError, ValueError):
         logging.warning(
             '[%s] [location.latitude] invalid value %s', id, latitude)
 
     try:
         if pd.notna(longitude):
-            geometry['longitude'] = float(longitude)
+            normalized_longitude = float(longitude)
+
+            if normalized_longitude < -180 or normalized_latitude > 180:
+                raise ValueError('longitude outside of valid range')
+
+            geometry['longitude'] = normalized_longitude
     except (TypeError, ValueError):
         logging.warning(
             '[%s] [location.longitude] invalid value %s', id, longitude)
