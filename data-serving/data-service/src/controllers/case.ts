@@ -64,7 +64,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 /**
  * Create a case.
  *
- * Handles HTTP POST /api/cases/.
+ * Handles HTTP POST /api/cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
