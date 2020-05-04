@@ -36,7 +36,6 @@ it('submits case ok', async () => {
     })
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases/', {
-        "confirmed": "",
         "demographics": {
             "sex": "",
         },
@@ -57,7 +56,7 @@ it('submits case ok', async () => {
             "country": "",
         },
         "revisionMetadata": {
-            "date": 4,
+            "date": "",
             "id": 0,
             "moderator": "TODO",
         },

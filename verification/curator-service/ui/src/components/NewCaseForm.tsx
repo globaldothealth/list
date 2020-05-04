@@ -34,7 +34,6 @@ export default function NewCaseForm() {
                                 administrativeAreaLevel1: values.province,
                                 country: values.country,
                             },
-                            confirmed: values.confirmed,
                             importedCase: {
                                 outcome: values.outcome,
                             },
@@ -52,7 +51,7 @@ export default function NewCaseForm() {
                             revisionMetadata: {
                                 id: 0,
                                 moderator: "TODO",
-                                date: new Date().getUTCDate(),
+                                date: "",
                             },
                         });
                     setErrorMessage('');

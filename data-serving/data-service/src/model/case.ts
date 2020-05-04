@@ -172,7 +172,7 @@ const caseSchema = new mongoose.Schema(
                 },
             ],
             validate: {
-                validator: function (events: [Event]) {
+                validator: function (events: [Event]): boolean {
                     return events.some((e) => e.name == 'confirmed');
                 },
                 message: 'Must include an event with name "confirmed"',
