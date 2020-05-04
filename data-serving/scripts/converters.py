@@ -15,7 +15,7 @@ def trim_string_array(values: List[str]) -> List[str]:
     values = [x.strip() for x in values]
 
     # Remove empty strings that can result from trailing delimiters ('cough,')
-    values = [i for i in values if i]
+    values = [str(i) for i in values if i]
 
     return values
 
@@ -82,7 +82,7 @@ def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
             })
 
         return {
-            'name': name,
+            'name': str(name),
             'dateRange': date_range
         }
     except (TypeError, ValueError):
@@ -101,7 +101,7 @@ def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
     # The old data model had an outcome string, which will become an event in
     # the new data model, but it won't have a date associated with it.
     if outcome and type(outcome) is str:
-        events.append({'name': outcome})
+        events.append({'name': str(outcome)})
 
     # Filter out None values.
     return [e for e in events if e]
@@ -147,16 +147,16 @@ def convert_location(id: str, location_id: float, country: str, adminL1: str,
             '[%s] [location.id] invalid value %s', id, location_id)
 
     if pd.notna(country):
-        location['country'] = country
+        location['country'] = str(country)
 
     if pd.notna(adminL1):
-        location['administrativeAreaLevel1'] = adminL1
+        location['administrativeAreaLevel1'] = str(adminL1)
 
     if pd.notna(adminL2):
-        location['administrativeAreaLevel2'] = adminL2
+        location['administrativeAreaLevel2'] = str(adminL2)
 
     if pd.notna(locality):
-        location['locality'] = locality
+        location['locality'] = str(locality)
 
     geometry = {}
 
