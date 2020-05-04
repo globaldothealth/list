@@ -18,12 +18,17 @@ interface Event {
     };
 }
 
+interface Demographics {
+    sex: string;
+}
+
 export interface Case {
     _id: string;
     importedCase: {
         outcome: string;
     };
     events: Event[];
+    demographics: Demographics;
 }
 
 export default class LinelistCaseRow extends React.Component<RowProps, {}> {
