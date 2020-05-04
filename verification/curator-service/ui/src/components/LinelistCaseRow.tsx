@@ -10,11 +10,9 @@ interface RowProps {
 
 interface Event {
     name: string;
-    date: {
-        range: {
-            start: string;
-            end: string;
-        };
+    dateRange: {
+        start: string;
+        end: string;
     };
 }
 
@@ -32,7 +30,7 @@ export default class LinelistCaseRow extends React.Component<RowProps, {}> {
         const c = this.props.case;
         const bg = this.props.background;
         const confirmedEvent = c.events.filter((e) => e.name === 'confirmed')[0];
-        const confirmedStartDate = confirmedEvent.date.range.start;
+        const confirmedStartDate = confirmedEvent.dateRange.start;
         return (
             <TableRow key={c._id} style={{ background: bg }}>
                 <TableCell component="th" scope="row">
