@@ -1,0 +1,139 @@
+{
+    "demographics": {
+        "ageRange": {
+            "start": 50.0,
+            "end": 59.0
+        },
+        "sex": "Female",
+        "species": "Homo sapien"
+    },
+    "location": {
+        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+        "country": "France",
+        "administrativeAreaLevel1": "Île-de-France",
+        "administrativeAreaLevel2": "Paris",
+        "locality": "Paris",
+        "geometry": {
+            "latitude": 2.3522219,
+            "longitude": 48.85661400000001
+        }
+    },
+    "events": [
+        {
+            "name": "onsetSymptoms",
+            "dateRange": {
+                "start": 578027600000,
+                "end": 1578027600000
+            }
+        },
+        {
+            "name": "confirmed",
+            "dateRange": {
+                "start": 1578891600000,
+                "end": 1578891600000
+            }
+        },
+        {
+            "name": "hospitalAdmission",
+            "dateRange": {
+                "start": 1579395600000,
+                "end": 1581469200000
+            }
+        },
+        {
+            "name": "discharged",
+            "dateRange": {
+                "start": "1581483600000",
+                "end": "1581483600000"
+            }
+        }
+    ],
+    "symptoms": {
+        "provided": [
+            "severe pneumonia",
+            "dyspnea",
+            "weakness"
+        ],
+        "imputed": [
+            "severe pneumonia",
+            "pneumonia",
+            "dyspnea",
+            "difficulty breathing",
+            "weakness"
+        ]
+    },
+    "chronicDisease": {
+        "provided": [
+            "hypertension",
+            "type 2 diabetes",
+            "coronary heart disease",
+            "lung cancer"
+        ],
+        "imputed": [
+            "hypertension",
+            "type 2 diabetes",
+            "diabetes",
+            "coronary heart disease",
+            "heart disease",
+            "lung cancer",
+            "cancer"
+        ]
+    },
+    "travelHistory": [
+        {
+            "location": {
+                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
+                "country": "China",
+                "administrativeAreaLevel1": "Hubei",
+                "locality": "Wuhan",
+                "geometry": {
+                    "latitude": 30.592849,
+                    "longitude": 114.305539
+                }
+            },
+            "dateRange": {
+                "start": "2020-01-03",
+                "end": "2020-01-03"
+            },
+            "purpose": "Family",
+            "additionalInformation": "large family gathering for holidays"
+        }
+    ],
+    "source": {
+        "id": "def456",
+        "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+    },
+    "outbreakSpecifics": {
+        "livesInWuhan": false,
+        "reportedMarketExposure": true
+    },
+    "pathogens": [
+        {
+            "name": "sars-cov-2",
+            "sequenceSource": {
+                "id": "ghi789"
+            }
+        },
+        {
+            "name": "e. coli",
+            "additionalInformation": "patient had a urinary catheter"
+        }
+    ],
+    "notes": "Contact of a confirmed case at work.",
+    "revisionMetadata": {
+        "id": 0,
+        "moderator": "abc123",
+        "date": "2020-01-03",
+        "notes": "initial data entry"
+    },
+    "importedCase": {
+        "additionalInformation": "Contact of a confirmed case at work.",
+        "notesForDiscussion": "Other stuff from notes",
+        "geoResolution": "admin_2",
+        "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
+        "chronicDiseaseBinary": true,
+        "chronicDisease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+        "outcome": "discharge 2/12",
+        "adminId": "291"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "events": [
+        {
+            "name": "confirmed",
+            "dateRange": {
+                "start": "2018-10-03T14:07:03.382Z",
+                "end": "2018-10-03T14:07:03.382Z"
+            }
+        }
+    ],
+    "source": {
+        "url": "cdc.gov"
+    },
+    "revisionMetadata": {
+        "id": 0,
+        "moderator": "abc",
+        "date": "2020-01-03T05:00:00Z"
+    },
+    "location": {
+        "country": "China"
+    }
+}
