@@ -23,13 +23,16 @@ it('loads and displays cases', async () => {
           },
         }
       ],
+      notes: "some notes",
+      source: {
+        url: "http://foo.bar",
+      }
     },
   ];
   const axiosResponse = {
     data: {
       cases: cases,
       total: 15,
-      nextPage: 2,
     },
     status: 200,
     statusText: 'OK',
@@ -41,7 +44,7 @@ it('loads and displays cases', async () => {
   const { findByText } = render(<LinelistTable />)
 
   expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/');
+  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=5&page=1');
   const items = await findByText(/abc123/);
   expect(items).toBeInTheDocument();
 })
