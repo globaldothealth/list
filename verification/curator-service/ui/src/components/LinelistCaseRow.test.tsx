@@ -21,10 +21,8 @@ it('renders provided case', () => {
               events: [
                 {
                   name: 'confirmed',
-                  date: {
-                    range: {
-                      start: date,
-                    },
+                  dateRange: {
+                    start: date,
                   },
                 }
               ],

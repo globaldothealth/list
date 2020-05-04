@@ -18,17 +18,19 @@ it('loads and displays cases', async () => {
       events: [
         {
           name: 'confirmed',
-          date: {
-            range: {
-              start:new Date().toJSON(),
-            },
+          dateRange: {
+            start: new Date().toJSON(),
           },
         }
       ],
     },
   ];
   const axiosResponse = {
-    data: cases,
+    data: {
+      cases: cases,
+      total: 15,
+      nextPage: 2,
+    },
     status: 200,
     statusText: 'OK',
     config: {},

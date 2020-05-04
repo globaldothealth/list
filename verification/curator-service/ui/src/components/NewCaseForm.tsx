@@ -29,20 +29,27 @@ export default function NewCaseForm() {
                             demographics: {
                                 sex: values.sex,
                             },
-                            city: values.city,
-                            province: values.province,
-                            country: values.country,
-                            confirmed: values.confirmed,
+                            location: {
+                                administrativeAreaLevel2: values.city,
+                                administrativeAreaLevel1: values.province,
+                                country: values.country,
+                            },
                             importedCase: {
                                 outcome: values.outcome,
                             },
                             events: {
                                 name: 'confirmed',
-                                date: {
-                                    range: {
-                                        start: values.confirmed,
-                                    },
+                                dateRange: {
+                                    start: values.confirmed,
                                 },
+                            },
+                            source: {
+                                url: values.url,
+                            },
+                            revisionMetadata: {
+                                id: 0,
+                                moderator: "TODO",
+                                date: "",
                             },
                         });
                     setErrorMessage('');
