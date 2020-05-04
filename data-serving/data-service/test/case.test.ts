@@ -1,6 +1,6 @@
-import { Case, Outcome } from '../src/model/case';
-
+import { Case } from '../src/model/case';
 import app from '../src/index';
+import minimalCase from './model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
@@ -23,10 +23,7 @@ afterAll(() => {
 
 describe('GET', () => {
     it('one present item should return 200 OK', async () => {
-        const c = new Case({
-            eventSequence: { confirmed: new Date('2020-04-01') },
-            outcome: Outcome.Pending,
-        });
+        const c = new Case(minimalCase);
         await c.save();
 
         const res = await request(app)
@@ -36,110 +33,77 @@ describe('GET', () => {
 
         expect(res.body._id).toEqual(c._id.toString());
     });
-    it('one absent item should return 404 NOT FOUND', (done) => {
-        request(app)
+    it('one absent item should return 404 NOT FOUND', () => {
+        return request(app)
             .get('/api/cases/53cb6b9b4f4ddef1ad47f943')
-            .expect(404, done);
+            .expect(404);
     });
-    it('list should return 200 OK', (done) => {
-        request(app)
+    it('list should return 200 OK', () => {
+        return request(app)
             .get('/api/cases/')
             .expect('Content-Type', /json/)
-            .expect(200, done);
+            .expect(200);
     });
 });
 
 describe('POST', () => {
-    it('create without valid date should return 422', (done) => {
-        request(app)
-            .post('/api/cases/')
-            .send({
-                eventSequence: { confirmed: 'not-a-date' },
-                outcome: 'Recovered',
-            })
-            .expect(422, done);
-    });
-    it('create without valid outcome should return 422', (done) => {
-        request(app)
-            .post('/api/cases/')
-            .send({
-                eventSequence: { confirmed: new Date('2020-04-01') },
-                outcome: 'not-a-valid-outcome',
-            })
-            .expect(422, done);
+    it('create with invalid input should return 422', () => {
+        return request(app).post('/api/cases/').send({}).expect(422);
     });
     it('create with valid input should return 200 OK', async () => {
         const inputDate = new Date('2020-04-01').toJSON();
         const inputOutcome = 'Recovered';
-        const res = await request(app)
+        return request(app)
             .post('/api/cases/')
-            .send({
-                eventSequence: { confirmed: inputDate },
-                outcome: inputOutcome,
-            })
+            .send(minimalCase)
             .expect('Content-Type', /json/)
             .expect(200);
-
-        expect(res.body.eventSequence.confirmed).toEqual(inputDate);
-        expect(res.body.outcome).toEqual(inputOutcome);
     });
 });
 
 describe('PUT', () => {
     it('update present item should return 200 OK', async () => {
-        const c = new Case({
-            outcome: 'Pending',
-            eventSequence: { confirmed: new Date('2020-04-21') },
-        });
+        const c = new Case(minimalCase);
         await c.save();
 
-        const newOutcome = 'Recovered';
+        const newNotes = 'abc';
         const res = await request(app)
             .put(`/api/cases/${c._id}`)
-            .send({ outcome: newOutcome })
+            .send({ notes: newNotes })
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body.outcome).toEqual(newOutcome);
+        expect(res.body.notes).toEqual(newNotes);
     });
     it('invalid update present item should return 422', async () => {
-        const c = new Case({
-            eventSequence: { confirmed: new Date('2020-04-01') },
-            outcome: 'Pending',
-        });
+        const c = new Case(minimalCase);
         await c.save();
 
-        const newOutcome = 'not-valid';
-        request(app)
+        return request(app)
             .put(`/api/cases/${c._id}`)
-            .send({ outcome: newOutcome })
+            .send({ location: {} })
             .expect(422);
     });
-    it('update absent item should return 404 NOT FOUND', (done) => {
-        request(app)
+    it('update absent item should return 404 NOT FOUND', () => {
+        return request(app)
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
-            .expect(404, done);
+            .expect(404);
     });
 });
 
 describe('DELETE', () => {
     it('delete present item should return 200 OK', async () => {
-        const c = new Case({
-            eventSequence: { confirmed: new Date('2020-04-01') },
-            outcome: 'Pending',
-        });
+        const c = new Case(minimalCase);
         await c.save();
 
-        const res = await request(app)
+        return await request(app)
             .delete(`/api/cases/${c._id}`)
             .expect('Content-Type', /json/)
             .expect(200);
-
-        expect(res.body._id).toEqual(c._id.toString());
     });
-    it('delete absent item should return 404 NOT FOUND', (done) => {
-        request(app)
+    it('delete absent item should return 404 NOT FOUND', () => {
+        return request(app)
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
-            .expect(404, done);
+            .expect(404);
     });
 });
