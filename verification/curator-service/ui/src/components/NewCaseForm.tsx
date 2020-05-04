@@ -49,7 +49,7 @@ export default function NewCaseForm() {
                             revisionMetadata: {
                                 id: 0,
                                 moderator: "TODO",
-                                date: Date.now(),
+                                date: "",
                             },
                         });
                     setErrorMessage('');
