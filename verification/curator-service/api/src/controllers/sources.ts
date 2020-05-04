@@ -19,9 +19,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.status(422).json('limit must be > 0');
         return;
     }
-    const docs = await Source.find({})
-        .skip(limit * (page - 1))
-        .limit(limit + 1);
+    const [docs, total] = await Promise.all([
+        Source.find({})
+            .skip(limit * (page - 1))
+            .limit(limit + 1),
+        Source.countDocuments({}),
+    ]);
     // If we have more items than limit, add a response param
     // indicating that there is more to fetch on the next page.
     if (docs.length == limit + 1) {
@@ -29,11 +32,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.json({
             sources: docs,
             nextPage: page + 1,
+            total: total,
         });
         return;
     }
     // If we fetched all available data, just return it.
-    res.json({ sources: docs });
+    res.json({ sources: docs, total: total });
 };
 
 /**
