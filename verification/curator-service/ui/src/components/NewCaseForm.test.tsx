@@ -35,7 +35,7 @@ it('submits case ok', async () => {
         fireEvent.click(getByText(/Submit case/));
     })
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases/', {
+    expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases', {
         "city": "",
         "confirmed": "",
         "country": "",
