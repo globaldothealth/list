@@ -86,7 +86,7 @@ const outbreakSpecificsSchema = new mongoose.Schema({
 });
 
 const minimumSourceFieldsValidator = {
-    validator: function (source: Source) {
+    validator: function (source: Source): boolean {
         return !!source.id || !!source.url || !!source.other;
     },
     message: 'One of source.id, source.url, or source.other is required',
@@ -111,7 +111,7 @@ const pathogenSchema = new mongoose.Schema({
 });
 
 const minimumLocationFieldsValidator = {
-    validator: function (location: Location) {
+    validator: function (location: Location): boolean {
         return (
             !!location.country ||
             !!location.administrativeAreaLevel1 ||

@@ -29,9 +29,11 @@ export default function NewCaseForm() {
                             demographics: {
                                 sex: values.sex,
                             },
-                            city: values.city,
-                            province: values.province,
-                            country: values.country,
+                            location: {
+                                administrativeAreaLevel2: values.city,
+                                administrativeAreaLevel1: values.province,
+                                country: values.country,
+                            },
                             confirmed: values.confirmed,
                             importedCase: {
                                 outcome: values.outcome,
@@ -43,6 +45,14 @@ export default function NewCaseForm() {
                                         start: values.confirmed,
                                     },
                                 },
+                            },
+                            source: {
+                                url: values.url,
+                            },
+                            revisionMetadata: {
+                                id: 0,
+                                moderator: "TODO",
+                                date: new Date().getUTCDate(),
                             },
                         });
                     setErrorMessage('');
