@@ -5,6 +5,7 @@ import logging
 import math
 import numbers
 import pandas as pd
+import re
 from constants import VALID_SEXES
 from pandas import Series
 from typing import Any, Callable, Dict, List
@@ -107,10 +108,25 @@ def convert_events(id: str, dates: str, outcome: str) -> List[Dict[str, Any]]:
     return [e for e in events if e]
 
 
+def parse_age(age: str) -> float:
+    if type(age) is str:
+        # Convert ages in the format of "x month(s)" to floats
+        num_months = re.findall(r'(\d+)\smonth', age)
+        if num_months:
+            return int(num_months[0]) / 12
+
+        # Convert ages in the format "x week(s)" to floats
+        num_weeks = re.findall(r'(\d+)\sweek', age)
+        if num_weeks:
+            return int(num_weeks[0]) / 52
+
+    return float(age)
+
+
 def convert_age(id: str, age: str) -> Dict[str, Any]:
     '''Converts age column to the new demographics.age object. '''
     try:
-        age_range = convert_range(age, float, lambda x: x)
+        age_range = convert_range(age, parse_age, lambda x: x)
 
         if not age_range:
             return None
