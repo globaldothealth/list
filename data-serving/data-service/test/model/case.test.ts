@@ -1,5 +1,4 @@
 import { Case } from '../../src/model/case';
-import { doesNotMatch } from 'assert';
 import fullCase from './data/case.full.json';
 import minimalCase from './data/case.minimal.json';
 
