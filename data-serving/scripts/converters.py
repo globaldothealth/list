@@ -14,8 +14,8 @@ from urllib.parse import urlparse
 
 def is_url(value: str) -> bool:
     try:
-        urlparse(value)
-        return True
+        parts = urlparse(value)
+        return parts.scheme and parts.netloc
     except:
         return False
 
