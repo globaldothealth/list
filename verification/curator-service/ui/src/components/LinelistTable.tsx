@@ -57,6 +57,7 @@ export default class LinelistTable extends React.Component {
                         { title: 'Notes', field: 'notes' },
                         {
                             title: 'Source', field: 'source',
+                            filtering: false,
                             render: rowData => <span>{rowData.source?.url}</span>,
                         },
                     ]}
