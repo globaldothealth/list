@@ -1,5 +1,15 @@
-name: Docker Compose Actions Workflow
-on: [pull_request]
+# Action that verifies the epid Docker compose stack can run.
+
+name: Docker compose up
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+    - '.github/workflows/docker.yml'
+    - 'data-serving/data-service/**'
+    - 'verification/curator-service/**'
+
 jobs:
   test:
     runs-on: ubuntu-latest
