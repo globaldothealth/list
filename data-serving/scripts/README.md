@@ -31,6 +31,8 @@ We are currently populating the following new (top-level) fields in the schema:
 - Events
 - Symptoms
 - ChronicDisease
+- Notes
+- RevisionMetadata
 
 The following fields are not yet populated:
 
@@ -38,8 +40,6 @@ The following fields are not yet populated:
 - Source
 - OutbreakSpecifics
 - Pathogens
-- Notes
-- RevisionMetadata
 
 ### Original fields
 
