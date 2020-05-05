@@ -33,7 +33,7 @@ def lambda_handler(event, context):
     try:
         ip = requests.get("http://checkip.amazonaws.com/").text.strip()
         print(ip)
-        return {'ip': ip}
+        return {"ip": ip}
     except requests.RequestException as e:
         print(e)
         raise e
