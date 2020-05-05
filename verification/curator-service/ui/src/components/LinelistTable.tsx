@@ -50,7 +50,29 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         }
     }
 
-     deleteCase(rowData: Case) {
+    addCase(newRowData: Case) {
+        return new Promise((resolve, reject) => {
+            const newCase = {
+                demographics: {
+                    sex: newRowData.demographics
+                },
+                notes: newRowData.notes,
+                source: {
+                    url: newRowData.source
+                }
+            }
+            const response = axios.post(this.state.url, newCase);
+            response.then(() => {
+                resolve();
+                // Refresh the table data
+                this.state.tableRef.current.onQueryChange();
+            }).catch((e) => {
+                reject(e);
+            });
+        });
+    }
+
+    deleteCase(rowData: Case) {
         return new Promise((reject) => {
             let deleteUrl = this.state.url + rowData._id;
             const response = axios.delete(deleteUrl);
@@ -61,16 +83,16 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 reject(e);
             });
         })
-     }
+    }
 
-     editCase(newRowData: Case, oldRowData: Case | undefined) {
+    editCase(newRowData: Case, oldRowData: Case | undefined) {
         return new Promise(() => {
             console.log("TODO: edit " + newRowData);
             // Refresh the table data
             this.state.tableRef.current.onQueryChange();
         });
-     }
-    
+    }
+
     render() {
         return (
             <Paper>
@@ -120,8 +142,9 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
-                        onRowUpdate: (newRowData: Case, oldRowData: Case | undefined) => 
-                                        this.editCase(newRowData, oldRowData),
+                        onRowAdd: (newRowData: Case) => this.addCase(newRowData),
+                        onRowUpdate: (newRowData: Case, oldRowData: Case | undefined) =>
+                            this.editCase(newRowData, oldRowData),
                         onRowDelete: (rowData: Case) => this.deleteCase(rowData),
                     }}
                 />
