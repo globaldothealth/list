@@ -33,13 +33,13 @@ We are currently populating the following new (top-level) fields in the schema:
 - ChronicDisease
 - Notes
 - RevisionMetadata
+- Source
+- Pathogens
 
 The following fields are not yet populated:
 
 - TravelHistory
-- Source
 - OutbreakSpecifics
-- Pathogens
 
 ### Original fields
 
