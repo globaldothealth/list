@@ -35,12 +35,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     // Filter query param looks like &filter=notes:work,other_field:foo
     const filterQuery = String(req.query.filter || '').trim();
     // Query to mongo looks like { "notes": {$regex: /work/} }
-    // Note: We sould use $text instead of regexp but until we have indexes
+    // Note: We should use $text instead of $regex but until we have indexes
     // that's not possible.
     const query: { [k: string]: { [k: string]: RegExp } } = {};
     if (filterQuery.length > 0) {
         const filters = filterQuery.split(',');
-        for (const filter of filters || []) {
+        for (const filter of filters) {
             const [field, value] = filter.split(':');
             query[field] = { $regex: new RegExp(value, 'i') };
         }
