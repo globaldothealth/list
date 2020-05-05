@@ -7,10 +7,12 @@ on:
   push:
     branches: [master]
     paths:
+    - '.github/workflows/curator-ui-node.yml
     - 'verification/curator-service/ui/**'
   pull_request:
     branches: [master]
     paths:
+    - '.github/workflows/**'
     - 'verification/curator-service/ui/**'
 
 jobs:

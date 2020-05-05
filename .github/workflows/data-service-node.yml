@@ -7,10 +7,12 @@ on:
   push:
     branches: [master]
     paths:
+    - '.github/workflows/data-service-node.yml'
     - 'data-serving/data-service/**'
   pull_request:
     branches: [master]
     paths:
+    - '.github/workflows/**'
     - 'data-serving/data-service/**'
 
 jobs:

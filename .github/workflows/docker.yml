@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [master]
     paths:
+    - '.github/workflows/docker.yml'
     - 'data-serving/data-service/**'
     - 'verification/curator-service/**'
 
