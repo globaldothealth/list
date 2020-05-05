@@ -9,6 +9,15 @@ import re
 from constants import VALID_SEXES
 from pandas import Series
 from typing import Any, Callable, Dict, List
+from urllib.parse import urlparse
+
+
+def is_url(value: str) -> bool:
+    try:
+        urlparse(value)
+        return True
+    except:
+        return False
 
 
 def trim_string_array(values: List[str]) -> List[str]:
@@ -271,6 +280,37 @@ def convert_notes_field(notes_fields: [str]) -> Dict[str, Any]:
     notes = '; '.join([x for x in notes_fields if pd.notna(x)])
 
     return notes if notes else None
+
+
+def convert_source_field(source: str) -> Dict[str, str]:
+    '''
+    Converts the source field to a new source object that has either a URL or
+    an unknown reference type.
+    '''
+    if pd.isna(source):
+        return None
+
+    return {
+        'url': source
+    } if is_url(source) else {
+        'other': source
+    }
+
+
+def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
+    '''
+    Converts the sequence field to an array of pathogens that may have sequence
+    source data.
+    '''
+    cov_pathogen = {
+        'name': 'sars-cov-2'
+    }
+
+    source = convert_source_field(sequence)
+    if source:
+        cov_pathogen['sequenceSource'] = source
+
+    return [cov_pathogen]
 
 
 def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
