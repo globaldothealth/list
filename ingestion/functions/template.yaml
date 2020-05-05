@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda functions for epid ingestion
+
+Resources:
+  RetrievalFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: retrieval/
+      Handler: retrieval.lambda_handler
+      Runtime: python3.8
+      Description: Retrieve the executing machine IP
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 10 # Seconds
+
+Outputs:
+  RetrievalFunction:
+    Description: "Retrieval Lambda function ARN"
+    Value: !GetAtt RetrievalFunction.Arn
