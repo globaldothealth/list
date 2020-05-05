@@ -250,7 +250,30 @@ def convert_dictionary_field(
     return {'provided': [value]}
 
 
-def convert_imported_case(id: str, values_to_archive: Series) -> Dict[str, Any]:
+def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
+        str, str]:
+    '''
+    Populates a revisionMetadata field with an initial revision number of 0 and
+    the data moderator's initials where available.
+    '''
+    revision_metadata = {
+        'id': 0
+    }
+
+    if pd.notna(data_moderator_initials):
+        revision_metadata['moderator'] = data_moderator_initials
+
+    return revision_metadata
+
+
+def convert_notes_field(notes_fields: [str]) -> Dict[str, Any]:
+    '''Creates a notes field from a list of original notes fields.'''
+    notes = '; '.join([x for x in notes_fields if pd.notna(x)])
+
+    return notes if notes else None
+
+
+def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
     '''
     Converts original field names and values to the importedCase archival
     object.

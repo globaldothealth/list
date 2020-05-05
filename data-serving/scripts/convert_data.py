@@ -9,8 +9,10 @@ import logging
 import json
 import pandas as pd
 import sys
-from converters import (convert_demographics, convert_dictionary_field,
-                        convert_events, convert_imported_case, convert_location)
+from converters import (
+    convert_demographics, convert_dictionary_field, convert_events,
+    convert_imported_case, convert_location, convert_revision_metadata_field,
+    convert_notes_field)
 from pandas import DataFrame, Series
 from typing import Any
 
@@ -102,9 +104,19 @@ def convert(df_import: DataFrame) -> DataFrame:
             x['chronic_disease']),
         axis=1)
 
+    # Generate revision metadata.
+    df_export['revisionMetadata'] = df_import.apply(
+        lambda x: convert_revision_metadata_field(
+            x['data_moderator_initials']
+        ), axis=1)
+
+    # Generate notes.
+    df_export['notes'] = df_import.apply(lambda x: convert_notes_field(
+        [x['notes_for_discussion'], x['additional_information']]), axis=1)
+
     # Archive the original fields.
     df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
-        x['ID'], x), axis=1)
+        x), axis=1)
 
     return df_export
 
