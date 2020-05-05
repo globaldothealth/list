@@ -90,7 +90,7 @@ it('can delete a row', async () => {
   // Load table
   const { getByText, findByText, queryByText } = render(<LinelistTable />)
   expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=5&page=1');
+  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1&filter=');
   const row = await findByText(/abc123/);
   expect(row).toBeInTheDocument();
 
