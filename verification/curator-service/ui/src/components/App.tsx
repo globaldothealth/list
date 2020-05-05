@@ -10,7 +10,6 @@ import NewCaseForm from './NewCaseForm';
 import React from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
   palette: {
@@ -22,16 +21,6 @@ const theme = createMuiTheme({
     },
   },
 });
-
-const useStyles = makeStyles((theme) => ({
-  tableContainer: {
-    padding: theme.spacing(6),
-    paddingTop: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-}));
 
 function App() {
   return (
@@ -54,15 +43,11 @@ function App() {
 }
 
 function Linelist() {
-  const classes = useStyles();
   return (
-    <div className={classes.tableContainer} >
-      <LinelistTable />
-    </div>
-  );
+    <LinelistTable />
+  )
 }
 
-// TODO(timothe): this should be in its own component.
 function NewEntry() {
   return (
     <NewCaseForm />
