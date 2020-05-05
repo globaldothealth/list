@@ -20,6 +20,19 @@ def is_url(value: str) -> bool:
         return False
 
 
+def convert_bool(value: str) -> bool:
+    if pd.isna(value) or value == 'na':
+        return None
+
+    # Throw an error if the value can't be converted to a boolean.
+    if not re.match(r'\b(true|yes|false|no)\b', value, re.IGNORECASE):
+        raise ValueError('not a valid bool')
+
+    # If it can be converted to a boolean, return whether it's True or False.
+    match = re.match(r'\b(true|yes)\b', value, re.IGNORECASE)
+    return True if match else False
+
+
 def trim_string_array(values: List[str]) -> List[str]:
     # Remove whitespace that might surround the delimiter ('cough, fever')
     values = [x.strip() for x in values]
@@ -161,7 +174,7 @@ def convert_sex(id: str, sex: str) -> str:
 
         return str(sex).capitalize()
     except ValueError:
-        logging.warning('[%s] [demographics.sex] value error %s', id, age)
+        logging.warning('[%s] [demographics.sex] value error %s', id, sex)
 
 
 def convert_demographics(id: str, age: str, sex: str) -> Dict[str, Any]:
@@ -311,6 +324,31 @@ def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
         cov_pathogen['sequenceSource'] = source
 
     return [cov_pathogen]
+
+
+def convert_outbreak_specifics(id: str, reported_market_exposure: str,
+                               lives_in_wuhan: str) -> Dict[str, bool]:
+    outbreak_specifics = {}
+
+    try:
+        normalized = convert_bool(reported_market_exposure)
+        if normalized is not None:
+            outbreak_specifics['reportedMarketExposure'] = normalized
+    except (ValueError):
+        logging.warning(
+            '[%s] [outbreakSpecifics[reportedMarketExposure]] invalid value %s',
+            id, reported_market_exposure)
+
+    try:
+        normalized = convert_bool(lives_in_wuhan)
+        if normalized is not None:
+            outbreak_specifics['livesInWuhan'] = normalized
+    except (ValueError):
+        logging.warning(
+            '[%s] [outbreakSpecifics[livesInWuhan]] invalid value %s', id,
+            lives_in_wuhan)
+
+    return outbreak_specifics if outbreak_specifics else None
 
 
 def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
