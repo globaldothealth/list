@@ -77,14 +77,16 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 <MaterialTable
                     tableRef={this.state.tableRef}
                     columns={[
-                        { title: 'ID', field: '_id' },
+                        { title: 'ID', field: '_id', filtering: false },
                         {
                             title: 'Demographics', field: 'demographics',
+                            filtering: false,
                             render: rowData => <span>{rowData.demographics?.sex}</span>,
                         },
                         { title: 'Notes', field: 'notes' },
                         {
                             title: 'Source', field: 'source',
+                            filtering: false,
                             render: rowData => <span>{rowData.source?.url}</span>,
                         },
                     ]}
@@ -94,6 +96,8 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (query.page + 1);
+                            listUrl += '&filter=';
+                            listUrl += query.filters.map((filter) => `${filter.column.field}:${filter.value}`).join(",");
                             const response = axios.get<ListResponse>(listUrl);
                             response.then(result => {
                                 resolve({
@@ -108,8 +112,12 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                     }
                     title="COVID-19 cases"
                     options={{
-                        // TODO: would be really useful, send query to server.
+                        // TODO: Create text indexes and support search queries.
+                        // https://docs.mongodb.com/manual/text-search/
                         search: false,
+                        filtering: true,
+                        pageSize: 10,
+                        pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
                         onRowUpdate: (newRowData: Case, oldRowData: Case | undefined) => 

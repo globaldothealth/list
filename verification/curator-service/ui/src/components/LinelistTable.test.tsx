@@ -49,7 +49,7 @@ it('loads and displays cases', async () => {
   const { findByText } = render(<LinelistTable />)
 
   expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=5&page=1');
+  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1&filter=');
   const items = await findByText(/abc123/);
   expect(items).toBeInTheDocument();
 })

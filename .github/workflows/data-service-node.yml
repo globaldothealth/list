@@ -1,13 +1,19 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Data service Node.js CI
 
 on:
   push:
     branches: [master]
+    paths:
+    - '.github/workflows/data-service-node.yml'
+    - 'data-serving/data-service/**'
   pull_request:
     branches: [master]
+    paths:
+    - '.github/workflows/data-service-node.yml'
+    - 'data-serving/data-service/**'
 
 jobs:
   build:
@@ -23,27 +29,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: curator-service-api ci
-        run: |
-          npm ci
-          npm run build
-          npm test
-        working-directory: verification/curator-service/api
-        env:
-          CI: true
-      - name: data-service ci
+      - name: Build and test
         run: |
           npm ci
           npm run build
           npm test
         working-directory: data-serving/data-service
-        env:
-          CI: true
-      - name: curator-service-ui ci
-        run: |
-          npm ci
-          npm run build
-          npm test
-        working-directory: verification/curator-service/ui
         env:
           CI: true

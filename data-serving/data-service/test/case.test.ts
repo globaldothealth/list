@@ -78,6 +78,25 @@ describe('GET', () => {
             // No continuation expected.
             expect(res.body.nextPage).toBeUndefined();
         });
+        it('should filter results', async () => {
+            const c = new Case(minimalCase);
+            c.notes = 'got it at work';
+            await c.save();
+            // Search for non-matching notes.
+            let res = await request(app)
+                .get('/api/cases?page=1&limit=10&filter=notes:home')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(0);
+            expect(res.body.total).toEqual(0);
+            // Search for matching notes.
+            res = await request(app)
+                .get('/api/cases?page=1&limit=10&filter=notes:work')
+                .expect(200)
+                .expect('Content-Type', /json/);
+            expect(res.body.cases).toHaveLength(1);
+            expect(res.body.total).toEqual(1);
+        });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(422, done);
         });
