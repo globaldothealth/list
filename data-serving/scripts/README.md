@@ -26,20 +26,20 @@ Logs will be written to `convert_data.log`.
 
 We are currently populating the following new (top-level) fields in the schema:
 
-- Demographics
-- Location
-- Events
-- Symptoms
 - ChronicDisease
+- Demographics
+- Events
+- Location
 - Notes
+- OutbreakSpecifics
+- Pathogens
 - RevisionMetadata
 - Source
-- Pathogens
+- Symptoms
 
 The following fields are not yet populated:
 
 - TravelHistory
-- OutbreakSpecifics
 
 ### Original fields
 
