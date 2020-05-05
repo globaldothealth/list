@@ -9,11 +9,6 @@ interface ListResponse {
     total: number,
 }
 
-interface RowProps {
-    background: string
-    case: Case
-}
-
 interface Event {
     name: string;
     dateRange: {
@@ -41,12 +36,46 @@ interface Case {
     notes: string;
 }
 
-export default class LinelistTable extends React.Component {
+interface LinelistTableState {
+    tableRef: any,
+    url: string,
+}
 
+export default class LinelistTable extends React.Component<{}, LinelistTableState> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            tableRef: React.createRef(),
+            url: (process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/',
+        }
+    }
+
+     deleteCase(rowData: Case) {
+        return new Promise((reject) => {
+            let deleteUrl = this.state.url + rowData._id;
+            const response = axios.delete(deleteUrl);
+            response.then(() => {
+                // Refresh the table data
+                this.state.tableRef.current.onQueryChange();
+            }).catch((e) => {
+                reject(e);
+            });
+        })
+     }
+
+     editCase(newRowData: Case, oldRowData: Case | undefined) {
+        return new Promise(() => {
+            console.log("TODO: edit " + newRowData);
+            // Refresh the table data
+            this.state.tableRef.current.onQueryChange();
+        });
+     }
+    
     render() {
         return (
             <Paper>
                 <MaterialTable
+                    tableRef={this.state.tableRef}
                     columns={[
                         { title: 'ID', field: '_id' },
                         {
@@ -62,10 +91,10 @@ export default class LinelistTable extends React.Component {
 
                     data={query =>
                         new Promise((resolve, reject) => {
-                            let url = (process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/';
-                            url += '?limit=' + query.pageSize;
-                            url += '&page=' + (query.page + 1);
-                            const response = axios.get<ListResponse>(url);
+                            let listUrl = this.state.url;
+                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '&page=' + (query.page + 1);
+                            const response = axios.get<ListResponse>(listUrl);
                             response.then(result => {
                                 resolve({
                                     data: result.data.cases,
@@ -82,18 +111,11 @@ export default class LinelistTable extends React.Component {
                         // TODO: would be really useful, send query to server.
                         search: false,
                     }}
-                    actions={[
-                        {
-                            icon: 'edit',
-                            tooltip: 'Edit case',
-                            onClick: (event, rowData) => console.log("TODO: edit " + rowData),
-                        },
-                        {
-                            icon: 'delete',
-                            tooltip: 'Delete case',
-                            onClick: (event, rowData) => console.log("TODO: delete " + rowData),
-                        }
-                    ]}
+                    editable={{
+                        onRowUpdate: (newRowData: Case, oldRowData: Case | undefined) => 
+                                        this.editCase(newRowData, oldRowData),
+                        onRowDelete: (rowData: Case) => this.deleteCase(rowData),
+                    }}
                 />
             </Paper>
         )
