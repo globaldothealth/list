@@ -32,14 +32,28 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.status(422).json('limit must be > 0');
         return;
     }
+    // Filter query param looks like &filter=notes:work,other_field:foo
+    const filterQuery = String(req.query.filter || '').trim();
+    // Query to mongo looks like { "notes": {$regex: /work/} }
+    // Note: We sould use $text instead of regexp but until we have indexes
+    // that's not possible.
+    const query: { [k: string]: { [k: string]: RegExp } } = {};
+    if (filterQuery.length > 0) {
+        const filters = filterQuery.split(',');
+        for (const filter of filters || []) {
+            const [field, value] = filter.split(':');
+            query[field] = { $regex: new RegExp(value, 'i') };
+        }
+    }
+    console.info('Querying cases with query:', query);
     // Do a fetch of documents and another fetch in parallel for total documents
     // count used in pagination.
     try {
         const [docs, total] = await Promise.all([
-            Case.find({})
+            Case.find(query)
                 .skip(limit * (page - 1))
                 .limit(limit + 1),
-            Case.countDocuments({}),
+            Case.countDocuments(query),
         ]);
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.

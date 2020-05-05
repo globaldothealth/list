@@ -48,9 +48,10 @@ export default class LinelistTable extends React.Component {
             <Paper>
                 <MaterialTable
                     columns={[
-                        { title: 'ID', field: '_id' },
+                        { title: 'ID', field: '_id', filtering: false },
                         {
                             title: 'Demographics', field: 'demographics',
+                            filtering: false,
                             render: rowData => <span>{rowData.demographics?.sex}</span>,
                         },
                         { title: 'Notes', field: 'notes' },
@@ -65,6 +66,8 @@ export default class LinelistTable extends React.Component {
                             let url = (process.env.REACT_APP_DATA_API_ENDPOINT || "") + '/api/cases/';
                             url += '?limit=' + query.pageSize;
                             url += '&page=' + (query.page + 1);
+                            url += '&filter=';
+                            url += query.filters.map((filter) => `${filter.column.field}:${filter.value}`).join(",");
                             const response = axios.get<ListResponse>(url);
                             response.then(result => {
                                 resolve({
@@ -79,8 +82,12 @@ export default class LinelistTable extends React.Component {
                     }
                     title="COVID-19 cases"
                     options={{
-                        // TODO: would be really useful, send query to server.
+                        // TODO: Create text indexes and support search queries.
+                        // https://docs.mongodb.com/manual/text-search/
                         search: false,
+                        filtering: true,
+                        pageSize: 10,
+                        pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     actions={[
                         {
