@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.6
       Description: Retrieve the executing machine IP
       # Function's execution role
       Policies:
