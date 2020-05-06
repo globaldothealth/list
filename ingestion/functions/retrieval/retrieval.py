@@ -13,8 +13,7 @@ s3_client = boto3.client("s3")
 def extract_source_id(event):
     if SOURCE_ID_FIELD not in event:
         error_message = (
-            "Required field {:s} not found in input event json.".format(
-                SOURCE_ID_FIELD))
+            f"Required field {SOURCE_ID_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
     return event[SOURCE_ID_FIELD]
@@ -24,13 +23,13 @@ def retrieve_content(source_id):
     try:
         ip = requests.get("http://checkip.amazonaws.com/").text.strip()
         key_filename_part = "ip.txt"
-        file = open("/tmp/{:s}".format(key_filename_part), "w")
+        file = open(f"/tmp/{key_filename_part}", "w")
         file.write(ip)
         file.close()
-        s3_object_key = "{:s}{:s}{:s}".format(
-            source_id,
-            datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT),
-            key_filename_part)
+        s3_object_key = (
+            f"{source_id}"
+            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+            f"{key_filename_part}")
         return (file.name, s3_object_key)
     except requests.RequestException as e:
         print(e)
@@ -41,8 +40,9 @@ def upload_to_s3(file_name, s3_object_key):
     try:
         s3_client.upload_file(
             file_name, OUTPUT_BUCKET, s3_object_key)
-        print("Uploaded source content to bucket {:s} with key {:s}".format(
-            OUTPUT_BUCKET, s3_object_key))
+        print(
+            f"Uploaded source content to bucket {OUTPUT_BUCKET} "
+            f"with key {s3_object_key}")
     except Exception as e:
         print(e)
         raise e
