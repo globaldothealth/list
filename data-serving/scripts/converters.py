@@ -407,18 +407,22 @@ def convert_travel_history(id: str, date_str: str, location_str: str) -> Dict[st
     travel_history = {}
 
     try:
-        date_range = convert_date_range(date_str)
-        if date_range:
-            travel_history['dateRange'] = date_range
-    except (TypeError, ValueError):
-        logging.warning(
-            '[%s] [travelHistory.dateRange] invalid value %s', id,
-            date_str)
-
-    try:
         location = convert_location_string(location_str)
-        if location:
-            travel_history['location'] = location
+        if not location:
+            return None
+
+        travel_history['location'] = location
+
+        # It's invalid to have dates without a location; only convert the date
+        # if location was successful.
+        try:
+            date_range = convert_date_range(date_str)
+            if date_range:
+                travel_history['dateRange'] = date_range
+        except (TypeError, ValueError):
+            logging.warning(
+                '[%s] [travelHistory.dateRange] invalid value %s', id,
+                date_str)
     except (LookupError, ValueError) as e:
         logging.warning(
             '[%s] [travelHistory.location] invalid value "%s" (%s)', id,
