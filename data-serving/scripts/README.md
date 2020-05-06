@@ -14,8 +14,8 @@ Logs will be written to `convert_data.log`.
 
 ### Current stats
 
-- 99.68% of rows from the CSV file convert successfully to JSON
-- 100% of rows from `cases.json` validate and import successfully into mongodb
+- 99.2% of rows from the CSV file convert entirely successfully to JSON. For those with errors, only the failed fields are ommitted.
+- 100% of rows from `cases.json` validate and import successfully into mongodb.
 
 ### Lossy fields
 
@@ -26,8 +26,8 @@ The following fields are lossy:
 - `demographics.ageRange`: Some values are too large to be ages. Ex. row `002-23162` with age value `2073`.
 - `events[name='onsetSymptoms']`: Some values are in an invalid format, ex. row `000-1-20073` with value `08.03.20202`
 - `outbreakSpecifics.reportedMarketExposure`: Some values are not bools, ex. row `000-1-13167` has value `exposed to people who come back from wuhan`
-- `travelHistory.location`: TODO: Finish this
-- `travelHistory.dateRange`: TODO: Finish this
+- `travelHistory.location`: This field is highly unstructured, and includes lists of locations, free-form text, and locations of all (unmarked) granularity.
+- `travelHistory.dateRange`: As with `events[name='onsetSymptoms']`, the date format varies.
 
 The following fields are *not* lossy, although they require conversion to a new type, because their data is properly normalized in the source (as of writing):
 
@@ -37,6 +37,12 @@ The following fields are *not* lossy, although they require conversion to a new 
 - `events[name='admissionHospital']`, `events[name='confirmed']`, `events[name='deathOrDischarge']`
 
 ### Future improvements
+
+- Add geocoding for `travelHistory.location` -- specifically, adding lat/long where locations are present.
+
+- Improve parsing of the `travelHistory.location` field. We lose ~40% of the data as of today because it's highly unstructured.
+
+- Improve disambiguation of `travelHistory.location`. For example, if the person lives in Florida and has traveled to Georgia, it's more likely to be the state than the country.
 
 - Add validation logic to all dates to ensure that they are between 12/2019 and today.
 
