@@ -381,7 +381,7 @@ def convert_location_string(location_str: str) -> Dict[str, Any]:
         return {
             'country': country.name
         }
-    except:
+    except LookupError:
         pass
 
     # If the format is ${CITY}, ${COUNTRY}, we want to keep the more specific
@@ -401,8 +401,8 @@ def convert_location_string(location_str: str) -> Dict[str, Any]:
 
 def convert_travel_history(id: str, date_str: str, location_str: str) -> Dict[str, Any]:
     '''
-    Converts the travel history date and location fields to th enew travelHistory
-    document.
+    Converts the travel history date and location fields to the new
+    travelHistory document.
     '''
     travel_history = {}
 
