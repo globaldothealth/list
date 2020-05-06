@@ -25,8 +25,10 @@ def trim_string_list(values: List[str]) -> List[str]:
     # Remove empty strings that can result from trailing delimiters ('cough,').
     values = [str(i) for i in values if i]
 
-    # Remove duplicate values.
-    return list(set(values))
+    # Remove duplicate values (stable).
+    deduped = []
+    [deduped.append(x) for x in values if x not in deduped]
+    return deduped
 
 
 def format_iso_8601_date(value: str) -> str:
