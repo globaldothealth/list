@@ -5,8 +5,9 @@ import logging
 import math
 import numbers
 import pandas as pd
+import pycountry
 import re
-from constants import VALID_SEXES
+from constants import LOCATIONS, VALID_SEXES
 from pandas import Series
 from typing import Any, Callable, Dict, List
 from urllib.parse import urlparse
@@ -88,6 +89,15 @@ def convert_range(
     }
 
 
+def convert_date_range(date_str: str) -> Dict[str, Any]:
+    return convert_range(
+        date_str,
+        lambda x: datetime.datetime.strptime(x, '%d.%m.%Y'),
+        lambda x: {
+            '$date': x.strftime('%Y-%m-%dT%H:%M:%SZ')
+        })
+
+
 def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
     '''
     Converts a single event date column to the new event object with a name and
@@ -97,12 +107,7 @@ def convert_event(id: str, name: str, date_str: str) -> Dict[str, str]:
         return None
 
     try:
-        date_range = convert_range(
-            date_str,
-            lambda x: datetime.datetime.strptime(x, '%d.%m.%Y'),
-            lambda x: {
-                '$date': x.strftime('%Y-%m-%dT%H:%M:%SZ')
-            })
+        date_range = convert_date_range(date_str)
 
         return {
             'name': str(name),
@@ -146,7 +151,7 @@ def parse_age(age: str) -> float:
 
 
 def convert_age(id: str, age: str) -> Dict[str, Any]:
-    '''Converts age column to the new demographics.age object. '''
+    '''Converts age column to the new demographics.ageRange object. '''
     try:
         age_range = convert_range(age, parse_age, lambda x: x)
 
@@ -161,7 +166,7 @@ def convert_age(id: str, age: str) -> Dict[str, Any]:
 
         return age_range
     except ValueError:
-        logging.warning('[%s] [demographics.age] value error %s', id, age)
+        logging.warning('[%s] [demographics.ageRange] value error %s', id, age)
 
 
 def convert_sex(id: str, sex: str) -> str:
@@ -334,7 +339,7 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
         normalized = convert_bool(reported_market_exposure)
         if normalized is not None:
             outbreak_specifics['reportedMarketExposure'] = normalized
-    except (ValueError):
+    except ValueError:
         logging.warning(
             '[%s] [outbreakSpecifics[reportedMarketExposure]] invalid value %s',
             id, reported_market_exposure)
@@ -343,12 +348,87 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
         normalized = convert_bool(lives_in_wuhan)
         if normalized is not None:
             outbreak_specifics['livesInWuhan'] = normalized
-    except (ValueError):
+    except ValueError:
         logging.warning(
             '[%s] [outbreakSpecifics[livesInWuhan]] invalid value %s', id,
             lives_in_wuhan)
 
     return outbreak_specifics if outbreak_specifics else None
+
+
+def convert_location_string(location_str: str) -> Dict[str, Any]:
+    if pd.isna(location_str) or location_str.lower() == 'no' or location_str.lower() == 'none':
+        return None
+    if type(location_str) is not str:
+        raise ValueError('location is not a string')
+    if ';' in location_str or ':' in location_str or location_str.count(',') > 1:
+        raise ValueError('location is a list')
+
+    # Remove common prefixes 'travelled to' and 'traveled to' and lowercase it.
+    normalized_location = re.sub(
+        r'(travelled|traveled)\sto\s(the\s*)?',
+        '', location_str.lower())
+
+    # First try to look up the location in a hard-coded map that accounts for
+    # most popular locations that the lookup (below) misses.
+    location = LOCATIONS.get(normalized_location)
+    if location is not None:
+        return location
+
+    # Next, attempt to look up the location in a countries database.
+    try:
+        country = pycountry.countries.lookup(normalized_location)
+        return {
+            'country': country.name
+        }
+    except LookupError:
+        pass
+
+    # If the format is ${CITY}, ${COUNTRY}, we want to keep the more specific
+    # piece. If not, look it up as is. We do this split after checking for the
+    # country to avoid false positives in the case where it's actually a
+    # comma-separated list of countries ("China, Brazil")
+    normalized_subdivision = normalized_location.split(',')[0]
+
+    # Well, if it's not a country, maybe it's a subdivision. And if not, it will
+    # throw!
+    subdivision = pycountry.subdivisions.lookup(normalized_subdivision)
+    return {
+        'administrativeAreaLevel1': subdivision.name,
+        'country': subdivision.country.name
+    }
+
+
+def convert_travel_history(id: str, date_str: str, location_str: str) -> Dict[str, Any]:
+    '''
+    Converts the travel history date and location fields to the new
+    travelHistory document.
+    '''
+    travel_history = {}
+
+    try:
+        location = convert_location_string(location_str)
+        if not location:
+            return None
+
+        travel_history['location'] = location
+
+        # It's invalid to have dates without a location; only convert the date
+        # if location was successful.
+        try:
+            date_range = convert_date_range(date_str)
+            if date_range:
+                travel_history['dateRange'] = date_range
+        except (TypeError, ValueError):
+            logging.warning(
+                '[%s] [travelHistory.dateRange] invalid value %s', id,
+                date_str)
+    except (LookupError, ValueError) as e:
+        logging.warning(
+            '[%s] [travelHistory.location] invalid value "%s" (%s)', id,
+            location_str, e)
+
+    return [travel_history] if travel_history else None
 
 
 def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
