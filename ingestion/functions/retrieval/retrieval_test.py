@@ -51,6 +51,23 @@ def test_persist_supplied_source_id_to_s3(valid_event, requests_mock, s3):
 
     assert response["bucket"] == expected_s3_bucket
     assert str.startswith(response["key"], valid_event["sourceId"])
+    assert s3.list_objects_v2(Bucket=expected_s3_bucket)['KeyCount'] == 1
+
+
+@mock_s3
+def test_s3_object_contains_machine_ip(valid_event, requests_mock, s3):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    expected_s3_bucket = retrieval.OUTPUT_BUCKET
+    s3.create_bucket(Bucket=expected_s3_bucket)
+    expected_ip = "111.1.1.1"
+    requests_mock.get("http://checkip.amazonaws.com/", text=expected_ip)
+
+    response = retrieval.lambda_handler(valid_event, "")
+
+    actual_object = s3.get_object(
+        Bucket=expected_s3_bucket, Key=response["key"])
+    actual_ip = actual_object['Body'].read().decode("utf-8")
+    assert actual_ip == expected_ip
 
 
 def test_error_for_event_without_source_id(invalid_event, requests_mock):
