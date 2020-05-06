@@ -37,6 +37,11 @@ The following fields are lossy:
   locations of all (unmarked) granularity.
 - `travelHistory.dateRange`: As with `events[name='onsetSymptoms']`, the date format varies.
 
+> **Open question:** How much effort should be put into converting these fields? What are the requirements and use cases
+> for the line-list data?
+
+> **Open question:** Where on the ROC curve do we want to be? Are we optimizing for precision or recall?
+
 The following fields are *not* lossy, although they require conversion to a new type, because their data is properly
 normalized in the source (as of writing):
 
