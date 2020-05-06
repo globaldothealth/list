@@ -151,7 +151,7 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
 
     try:
         return {
-            'name': name,
+            'name': str(name),
             'dateRange': convert_date_range(dates)
         }
     except ValueError as e:
@@ -266,16 +266,16 @@ def convert_location(id: str, country: str, adminL1: str,
     location = {}
 
     if pd.notna(country):
-        location['country'] = country
+        location['country'] = str(country)
 
     if pd.notna(adminL1):
-        location['administrativeAreaLevel1'] = adminL1
+        location['administrativeAreaLevel1'] = str(adminL1)
 
     if pd.notna(adminL2):
-        location['administrativeAreaLevel2'] = adminL2
+        location['administrativeAreaLevel2'] = str(adminL2)
 
     if pd.notna(locality):
-        location['locality'] = locality
+        location['locality'] = str(locality)
 
     geometry = {}
 
@@ -343,7 +343,7 @@ def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
     }
 
     if pd.notna(data_moderator_initials):
-        revision_metadata['moderator'] = data_moderator_initials
+        revision_metadata['moderator'] = str(data_moderator_initials)
 
     return revision_metadata
 
@@ -377,9 +377,9 @@ def convert_source_field(source: str) -> Dict[str, str]:
         return None
 
     return {
-        'url': source
+        'url': str(source)
     } if is_url(source) else {
-        'other': source
+        'other': str(source)
     }
 
 
@@ -459,7 +459,7 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
       id: The id of the input row for logging a failed conversion.
 
     Returns:
-      None: When the input is empty.
+      None: When the input is empty or fails to parse.
       Dict[str, Any]: When the input is nonempty. The dictionary is in the
         format:
         {
@@ -471,14 +471,15 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
 
     try:
         parsed_location = parse_location(location)
-        if not parsed_location:
-            # It's invalid to have dates without a location; only convert the
-            # rest of the field (i.e. the dates) if location was successful.
-            return None
-
-        travel_history['location'] = parsed_location
+        if parsed_location:
+            travel_history['location'] = parsed_location
     except (LookupError, ValueError) as e:
         warn(id, 'travelHistory.location', location, e)
+
+    # It's invalid to have dates without a location; only convert the rest of
+    # the field (i.e. the dates) if location was successfully parsed.
+    if not travel_history.get('location'):
+        return None
 
     try:
         date_range = convert_date_range(dates)
