@@ -21,6 +21,12 @@
   "[markdown]": {
     "editor.formatOnSave": false
   },
+  "editor.rulers": [
+    80
+  ],
+  "files.exclude": {
+      "**/node_modules/": true
+  },
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
@@ -39,8 +45,5 @@
     "--max-line-length",
     "80",
     "--experimental"
-  ],
-  "editor.rulers": [
-    80
   ]
 }

@@ -8,6 +8,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
 
+// TODO: Remove in favor of the table's add function.
 export default function NewCaseForm() {
     const [errorMessage, setErrorMessage] = useState('');
     return (

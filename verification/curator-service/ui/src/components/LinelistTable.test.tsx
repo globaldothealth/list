@@ -11,6 +11,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 afterEach(() => {
   mockedAxios.get.mockClear();
   mockedAxios.delete.mockClear();
+  mockedAxios.post.mockClear();
 });
 
 it('loads and displays cases', async () => {
@@ -126,6 +127,71 @@ it('can delete a row', async () => {
 
   // Check table data is reloaded
   expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-  const newRow = await queryByText(/abc123/);
+  const newRow = queryByText(/abc123/);
   expect(newRow).not.toBeInTheDocument();
+})
+
+it('can add a row', async () => {
+  const axiosGetResponse = {
+    data: {
+      cases: [],
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+  const { getByText, findByText, queryByText } = render(<LinelistTable />)
+
+  // Check table is empty on load
+  const row = queryByText(/abc123/);
+  expect(row).not.toBeInTheDocument();
+
+  // Add a row
+  const newCase =
+  {
+    _id: 'abc123',
+    demographics: {
+      sex: "Female",
+    },
+    notes: "some notes",
+    source: {
+      url: "http://foo.bar",
+    }
+  };
+  const axiosPostResponse = {
+    data: {
+      case: newCase,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  const axiosGetAfterAddResponse = {
+    data: {
+      cases: [newCase],
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.post.mockResolvedValue(axiosPostResponse);
+  mockedAxios.get.mockResolvedValue(axiosGetAfterAddResponse);
+
+  const addButton = getByText(/add_box/);
+  fireEvent.click(addButton);
+  const confirmButton = getByText(/check/);
+  fireEvent.click(confirmButton);
+  expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+  // Check table is reloaded
+  expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+  const newRow = await findByText(/abc123/);
+  expect(newRow).toBeInTheDocument();
 })

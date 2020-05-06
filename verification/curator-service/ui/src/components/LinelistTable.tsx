@@ -19,6 +19,7 @@ interface Event {
 
 interface Demographics {
     sex: string;
+    age: string;
 }
 
 interface Source {
@@ -41,6 +42,17 @@ interface LinelistTableState {
     url: string,
 }
 
+// Material table doesn't handle structured fields well, we flatten all fields in this row.
+interface TableRow {
+    id: string;
+    // demographics
+    sex: string;
+    age: string;
+    // source
+    source_url: string;
+    notes: string;
+}
+
 export default class LinelistTable extends React.Component<{}, LinelistTableState> {
     constructor(props: any) {
         super(props);
@@ -50,9 +62,31 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         }
     }
 
-     deleteCase(rowData: Case) {
+    addCase(newRowData: TableRow) {
+        return new Promise((resolve, reject) => {
+            const newCase = {
+                demographics: {
+                    sex: newRowData.sex
+                },
+                notes: newRowData.notes,
+                source: {
+                    url: newRowData.source_url
+                }
+            }
+            const response = axios.post(this.state.url, newCase);
+            response.then(() => {
+                resolve();
+                // Refresh the table data
+                this.state.tableRef.current.onQueryChange();
+            }).catch((e) => {
+                reject(e);
+            });
+        });
+    }
+
+    deleteCase(rowData: TableRow) {
         return new Promise((reject) => {
-            let deleteUrl = this.state.url + rowData._id;
+            let deleteUrl = this.state.url + rowData.id;
             const response = axios.delete(deleteUrl);
             response.then(() => {
                 // Refresh the table data
@@ -61,34 +95,27 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 reject(e);
             });
         })
-     }
+    }
 
-     editCase(newRowData: Case, oldRowData: Case | undefined) {
+    editCase(newRowData: TableRow, oldRowData: TableRow | undefined) {
         return new Promise(() => {
             console.log("TODO: edit " + newRowData);
             // Refresh the table data
             this.state.tableRef.current.onQueryChange();
         });
-     }
-    
+    }
+
     render() {
         return (
             <Paper>
                 <MaterialTable
                     tableRef={this.state.tableRef}
                     columns={[
-                        { title: 'ID', field: '_id', filtering: false },
-                        {
-                            title: 'Demographics', field: 'demographics',
-                            filtering: false,
-                            render: rowData => <span>{rowData.demographics?.sex}</span>,
-                        },
+                        { title: 'ID', field: 'id', filtering: false },
+                        { title: 'Sex', field: 'sex', filtering: false },
+                        { title: 'Age', field: 'age', filtering: false },
                         { title: 'Notes', field: 'notes' },
-                        {
-                            title: 'Source', field: 'source',
-                            filtering: false,
-                            render: rowData => <span>{rowData.source?.url}</span>,
-                        },
+                        { title: 'Source URL', field: 'source_url', filtering: false },
                     ]}
 
                     data={query =>
@@ -100,8 +127,19 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                             listUrl += query.filters.map((filter) => `${filter.column.field}:${filter.value}`).join(",");
                             const response = axios.get<ListResponse>(listUrl);
                             response.then(result => {
+                                let flattened_cases: TableRow[] = [];
+                                const cases = result.data.cases;
+                                for (const c of cases) {
+                                    flattened_cases.push({
+                                        id: c._id,
+                                        sex: c.demographics?.sex,
+                                        age: c.demographics?.age,
+                                        notes: c.notes,
+                                        source_url: c.source?.url,
+                                    });
+                                }
                                 resolve({
-                                    data: result.data.cases,
+                                    data: flattened_cases,
                                     page: query.page,
                                     totalCount: result.data.total,
                                 });
@@ -116,13 +154,15 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                         // https://docs.mongodb.com/manual/text-search/
                         search: false,
                         filtering: true,
+                        padding: "dense",
                         pageSize: 10,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
-                        onRowUpdate: (newRowData: Case, oldRowData: Case | undefined) => 
-                                        this.editCase(newRowData, oldRowData),
-                        onRowDelete: (rowData: Case) => this.deleteCase(rowData),
+                        onRowAdd: (newRowData: TableRow) => this.addCase(newRowData),
+                        onRowUpdate: (newRowData: TableRow, oldRowData: TableRow | undefined) =>
+                            this.editCase(newRowData, oldRowData),
+                        onRowDelete: (rowData: TableRow) => this.deleteCase(rowData),
                     }}
                 />
             </Paper>
