@@ -7,7 +7,7 @@ import numbers
 import pandas as pd
 import pycountry
 import re
-from constants import VALID_SEXES, WUHAN_LOCATION
+from constants import LOCATIONS, VALID_SEXES
 from pandas import Series
 from typing import Any, Callable, Dict, List
 from urllib.parse import urlparse
@@ -357,29 +357,42 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
 
 
 def convert_location_string(location_str: str) -> Dict[str, Any]:
-    if pd.isna(location_str) or location_str.lower() == 'no':
+    if pd.isna(location_str) or location_str.lower() == 'no' or location_str.lower() == 'none':
         return None
     if type(location_str) is not str:
         raise ValueError('location is not a string')
-    if ';' in location_str or ':' in location_str or ',' in location_str:
+    if ';' in location_str or ':' in location_str or location_str.count(',') > 1:
         raise ValueError('location is a list')
 
-    # This is the most common value, so explicitly support it.
-    if location_str.lower() == 'wuhan':
-        return WUHAN_LOCATION
+    # Remove common prefixes 'travelled to' and 'traveled to' and lowercase it.
+    normalized_location = re.sub(
+        r'(travelled|traveled)\sto\s(the\s*)?',
+        '', location_str.lower())
 
-    # Attempt to look up the location in a countries database.
+    # First try to look up the location in a hard-coded map that accounts for
+    # most popular locations that the lookup (below) misses.
+    location = LOCATIONS.get(normalized_location)
+    if location is not None:
+        return location
+
+    # Next, attempt to look up the location in a countries database.
     try:
-        country = pycountry.countries.lookup(location_str)
+        country = pycountry.countries.lookup(normalized_location)
         return {
             'country': country.name
         }
     except:
         pass
 
-    # Well, if it's not a country, maybe it's a subdivision. (If not, this will
-    # throw and we'll log it.)
-    subdivision = pycountry.subdivisions.lookup(location_str)
+    # If the format is ${CITY}, ${COUNTRY}, we want to keep the more specific
+    # piece. If not, look it up as is. We do this split after checking for the
+    # country to avoid false positives in the case where it's actually a
+    # comma-separated list of countries ("China, Brazil")
+    normalized_subdivision = normalized_location.split(',')[0]
+
+    # Well, if it's not a country, maybe it's a subdivision. And if not, it will
+    # throw!
+    subdivision = pycountry.subdivisions.lookup(normalized_subdivision)
     return {
         'administrativeAreaLevel1': subdivision.name,
         'country': subdivision.country.name

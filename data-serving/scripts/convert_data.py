@@ -13,7 +13,7 @@ from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
     convert_imported_case, convert_location, convert_revision_metadata_field,
     convert_notes_field, convert_source_field, convert_pathogens_field,
-    convert_outbreak_specifics)
+    convert_outbreak_specifics, convert_travel_history)
 from pandas import DataFrame
 from typing import Any
 
@@ -126,6 +126,10 @@ def convert(df_import: DataFrame) -> DataFrame:
     # Generate new outbreak specifics column.
     df_export['outbreakSpecifics'] = df_import.apply(lambda x: convert_outbreak_specifics(
         x['ID'], x['reported_market_exposure'], x['lives_in_Wuhan']), axis=1)
+
+    # Generate new travel history column.
+    df_export['travelHistory'] = df_import.apply(lambda x: convert_travel_history(
+        x['ID'], x['travel_history_dates'], x['travel_history_location']), axis=1)
 
     # Archive the original fields.
     df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
