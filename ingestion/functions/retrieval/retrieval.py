@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 
 SOURCE_ID_FIELD = "sourceId"
-OUTPUT_BUCKET = "epid-raw-sources"
+OUTPUT_BUCKET = "epid-sources-raw"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
 s3_client = boto3.client("s3")
