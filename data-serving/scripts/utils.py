@@ -1,6 +1,5 @@
 '''Utilities for the parsers and converters.'''
 
-import datetime
 import logging
 from typing import List
 from urllib.parse import urlparse
@@ -30,11 +29,6 @@ def trim_string_list(values: List[str]) -> List[str]:
     deduped = []
     [deduped.append(x) for x in values if x not in deduped]
     return deduped
-
-
-def format_iso_8601_date(value: datetime) -> str:
-    '''Formats a datetime into an ISO 8601 string.'''
-    return value.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 def warn(id: str, field_name: str, value: str, error: Exception) -> None:

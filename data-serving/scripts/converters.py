@@ -9,13 +9,14 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
+import datetime
 import pandas as pd
 from parsers import (parse_age, parse_bool, parse_date,
                      parse_latitude, parse_location, parse_longitude,
                      parse_range, parse_sex, parse_string_list)
 from pandas import Series
 from typing import Any, Callable, Dict, List
-from utils import format_iso_8601_date, is_url, warn
+from utils import is_url, warn
 
 
 def convert_range(value: Any, parser: Callable[[Any], Any],
@@ -48,7 +49,7 @@ def convert_range(value: Any, parser: Callable[[Any], Any],
     if end is not None:
         range['end'] = formatter(end)
 
-    return range if range else None
+    return range or None
 
 
 def convert_age_range(ages: Any) -> Dict[str, float]:
@@ -81,7 +82,7 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
     return convert_range(ages, parse_age, lambda x: x)
 
 
-def convert_date_range(dates: Any) -> Dict[str, Dict[str, str]]:
+def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
     '''
     Converts a date value to the expected date range output format. This wraps
     convert_range with a date-specific parser and formatter.
@@ -112,7 +113,7 @@ def convert_date_range(dates: Any) -> Dict[str, Dict[str, str]]:
         the value represents a single date.
     '''
     return convert_range(dates, parse_date, lambda x: {
-        '$date': format_iso_8601_date(x)
+        '$date': datetime.datetime.isoformat(x)
     })
 
 
@@ -154,10 +155,10 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
             'dateRange': convert_date_range(dates)
         }
     except ValueError as e:
-        warn(id, 'event[name="' + name + '"', dates, e)
+        warn(id, f'event[name="{name}"]', dates, e)
 
 
-def convert_events(id: str, dates: Dict[str, Any],
+def convert_events(id: str, event_dates: Dict[str, Any],
                    outcome: str) -> List[Dict[str, Any]]:
     '''
     Converts event date columns to the new events array. Also includes the
@@ -165,7 +166,7 @@ def convert_events(id: str, dates: Dict[str, Any],
 
     Parameters:
       id: The id of the input row for logging a failed conversion.
-      dates: A map from event name to event date.
+      event_dates: A map from event name to event date.
       outcome: String representing the outcome of the case.
 
     Returns:
@@ -184,7 +185,7 @@ def convert_events(id: str, dates: Dict[str, Any],
         where the date strings are ISO 8601 date representations.
     '''
     events = list(map(lambda i: convert_event(
-        id, i[0], i[1]), dates.items()))
+        id, i[0], i[1]), event_dates.items()))
 
     # The old data model had an outcome string, which will become an event in
     # the new data model, but it won't have a date associated with it.
@@ -194,7 +195,7 @@ def convert_events(id: str, dates: Dict[str, Any],
     # Filter out None values.
     events = [e for e in events if e]
 
-    return events if events else None
+    return events or None
 
 
 def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
@@ -355,7 +356,7 @@ def convert_notes_field(notes_fields: [str]) -> str:
       str: Always.
     '''
     notes = '; '.join([x for x in notes_fields if pd.notna(x)])
-    return notes if notes else None
+    return notes or None
 
 
 def convert_source_field(source: str) -> Dict[str, str]:
@@ -376,7 +377,7 @@ def convert_source_field(source: str) -> Dict[str, str]:
         return None
 
     return {
-        'url': str(source)
+        'url': source
     } if is_url(source) else {
         'other': str(source)
     }
@@ -445,7 +446,7 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
     except ValueError as e:
         warn(id, 'outbreakSpecifics.livesInWuhan', lives_in_wuhan, e)
 
-    return outbreak_specifics if outbreak_specifics else None
+    return outbreak_specifics or None
 
 
 def convert_travel_history(id: str, dates: str, location: str) -> Dict[
