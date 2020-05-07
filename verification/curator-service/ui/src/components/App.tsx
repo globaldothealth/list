@@ -63,7 +63,7 @@ function Home() {
     <nav>
       <Link to="/cases">Linelist</Link><br />
       <Link to="/cases/new">Enter new case</Link><br />
-      <Link to="/privacypolicy">Privacy policy</Link><br />
+      <Link to="/privacy-policy">Privacy policy</Link><br />
       <Link to="/terms">Terms of service</Link><br />
     </nav>
   )
