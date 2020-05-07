@@ -8,10 +8,14 @@ describe('auth', () => {
     });
     it('logout', (done) => {
         // Redirects to /
-        request(app).get('/auth/logout').expect(302, done);
+        request(app)
+            .get('/auth/logout')
+            .expect(302)
+            .expect('Location', '/')
+            .end(done);
     });
     it('handles redirect from google', (done) => {
-        // Redirects because not authenticated.
+        // Redirects to consent screen because not authenticated.
         request(app).get('/auth/google/redirect').expect(302, done);
     });
 });
