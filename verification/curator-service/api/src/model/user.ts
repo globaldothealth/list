@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-type UserDocument = mongoose.Document & {
+export type UserDocument = mongoose.Document & {
     googleID: string;
     name: string;
     email: string;
