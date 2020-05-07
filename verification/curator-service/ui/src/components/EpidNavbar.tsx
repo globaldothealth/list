@@ -35,7 +35,7 @@ export default function EpidNavbar() {
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton onClick={handleHomeClick} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                    <IconButton data-testid="home-btn" onClick={handleHomeClick} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                         <HomeIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
