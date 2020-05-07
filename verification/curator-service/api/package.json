@@ -29,6 +29,7 @@
     "@types/jest": "^25.2.1",
     "@types/mongoose": "^5.7.12",
     "@types/node": "^13.11.1",
+    "@types/passport": "^1.0.3",
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
