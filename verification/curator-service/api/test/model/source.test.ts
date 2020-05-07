@@ -1,4 +1,4 @@
-import { Source } from '../src/model/source';
+import { Source } from '../../src/model/source';
 
 describe('Source schema', () => {
     it('should build a valid source', () => {
@@ -17,13 +17,6 @@ describe('Source schema', () => {
         const errors = new Source({}).validateSync();
         expect(errors).toBeDefined();
         expect(errors?.toString()).toMatch('Enter a name');
-    });
-    it('should fail validation without origin url', () => {
-        const errors = new Source({
-            name: 'test source',
-            origin: {},
-        }).validateSync();
-        expect(errors).toBeDefined();
         expect(errors?.toString()).toMatch('Enter an origin');
     });
 });
