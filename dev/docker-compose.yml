@@ -19,9 +19,6 @@ services:
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
             DATASERVER_API_URL: "http://data:3000/api"
-            GOOGLE_OAUTH_CLIENT_ID: "dummyplaceholder"
-            GOOGLE_OAUTH_CLIENT_SECRET: "dummyplaceholder"
-            SESSION_COOKIE_KEY: "dummyplaceholder"
     data:
         build: ../data-serving/data-service
         init: true

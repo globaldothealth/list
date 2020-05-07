@@ -8,6 +8,8 @@ export const router = require('express').Router();
 
 router.get(
     '/google/redirect',
+    // Try to authenticate with the google strategy.
+    // This 'google' string is hardcoded within passport.
     passport.authenticate('google'),
     (req: Request, res: Response): void => {
         // After login, redirect to the home page.
