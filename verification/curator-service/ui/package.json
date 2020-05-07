@@ -16,6 +16,7 @@
     "axios": "^0.19.2",
     "formik": "^2.1.4",
     "formik-material-ui": "^2.0.0-beta.1",
+    "http-proxy-middleware": "^1.0.3",
     "material-table": "^1.57.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "start-noenv": "react-scripts start",
-    "start": "PORT=3002 REACT_APP_API_ENDPOINT=http://localhost:3001 react-scripts start",
+    "start": "PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test-silent": "react-scripts test --watchAll=false",
