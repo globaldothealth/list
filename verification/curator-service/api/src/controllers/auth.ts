@@ -82,6 +82,7 @@ export const configurePassport = (
                     }
                     cb(undefined, user);
                 } catch (e) {
+                    // Catch any error and end our authentication session with it.
                     cb(e, null);
                 }
             },
