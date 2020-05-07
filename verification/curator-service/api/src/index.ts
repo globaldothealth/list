@@ -4,10 +4,10 @@ import * as sourcesController from './controllers/sources';
 
 import { router as authRouter, configurePassport } from './controllers/auth';
 
-import axios from 'axios';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -46,7 +46,16 @@ app.use('/auth', authRouter);
 // Configure frontend app routes.
 app.get('/', homeController.index);
 
-// Configure API app routes.
+// Proxy /api/cases API calls from frontend to data service.
+app.use(
+    '/api/cases',
+    createProxyMiddleware({
+        target: env.DATASERVER_URL,
+        changeOrigin: true,
+    }),
+);
+
+// Configure curator API routes.
 const apiRouter = express.Router();
 apiRouter.get('/sources', sourcesController.list);
 apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
@@ -55,8 +64,7 @@ apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 app.use('/api', apiRouter);
 
-// Configure dependencies.
-axios.defaults.baseURL = env.DATASERVER_API_URL;
+// Connect to MongoDB.
 (async (): Promise<void> => {
     try {
         console.log('Connecting to instance', env.DB_CONNECTION_STRING);
