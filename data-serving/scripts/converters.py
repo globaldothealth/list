@@ -9,14 +9,13 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-import datetime
 import pandas as pd
 from parsers import (parse_age, parse_bool, parse_date,
                      parse_latitude, parse_location, parse_longitude,
                      parse_range, parse_sex, parse_string_list)
 from pandas import Series
 from typing import Any, Callable, Dict, List
-from utils import is_url, warn
+from utils import format_iso_8601_date, is_url, warn
 
 
 def convert_range(value: Any, parser: Callable[[Any], Any],
@@ -113,7 +112,7 @@ def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
         the value represents a single date.
     '''
     return convert_range(dates, parse_date, lambda x: {
-        '$date': datetime.datetime.isoformat(x)
+        '$date': format_iso_8601_date(x)
     })
 
 
