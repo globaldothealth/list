@@ -3,6 +3,10 @@ Transform: AWS::Serverless-2016-10-31
 Description: AWS Lambda functions for epid ingestion
 
 Resources:
+  RawSourcesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: epid-sources-raw
   RetrievalFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -14,6 +18,8 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+        - S3WritePolicy:
+            BucketName: !Ref RawSourcesBucket
       Timeout: 10 # Seconds
 
 # Declare values that can be imported to other CloudFormation stacks, or should
