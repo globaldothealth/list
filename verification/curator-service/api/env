@@ -1,5 +1,0 @@
-DATASERVER_API_URL=http://localhost:3000/api
-DB_CONNECTION_STRING=mongodb://localhost:27017/covid19
-PORT=3001
-GOOGLE_OAUTH_CLIENT_ID=471626618881-gel6mfu4rg137qfr3slb1hgi4fsru74h.apps.googleusercontent.com
-GOOGLE_OAUTH_CLIENT_SECRET=-enmhcvQUBHDOoAR-D5do22b
