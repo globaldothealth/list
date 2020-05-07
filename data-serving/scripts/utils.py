@@ -32,7 +32,7 @@ def trim_string_list(values: List[str]) -> List[str]:
     return deduped
 
 
-def format_iso_8601_date(value: str) -> str:
+def format_iso_8601_date(value: datetime) -> str:
     return value.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
