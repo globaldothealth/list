@@ -1,0 +1,23 @@
+{
+  "name": "import-data",
+  "version": "1.0.0",
+  "description": "Creates a database and collection as necessary and imports data into it.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-covid-data/healthmap-gdo-temp.git",
+    "directory": "data-serving/scripts/import-data"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/open-covid-data/healthmap-gdo-temp/issues"
+  },
+  "homepage": "https://github.com/open-covid-data/healthmap-gdo-temp#readme",
+  "node_modules": []
+}
