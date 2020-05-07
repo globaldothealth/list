@@ -39,6 +39,4 @@ services:
         stdin_open: true
         environment:
             PORT: "3002"
-            # Can't use http://curator:3001 here because we open the browser
-            # outside of the container so it wouldn't work.
-            REACT_APP_API_ENDPOINT: "http://localhost:3001"
+            REACT_APP_PROXY_URL: "http://curator:3001"
