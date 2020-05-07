@@ -2,13 +2,17 @@
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
+import { router as authRouter, configurePassport } from './controllers/auth';
+
 import axios from 'axios';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import session from 'express-session';
 import validateEnv from './util/validate-env';
 
 const app = express();
@@ -25,8 +29,19 @@ app.set('port', env.PORT);
 // TODO: This will need to be tweaked in production.
 app.use(cors());
 
-// Configure auth.
+// Configure authentication.
+app.use(cookieParser());
+app.use(
+    session({
+        secret: env.SESSION_COOKIE_KEY,
+        resave: true,
+        saveUninitialized: true,
+    }),
+);
+configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
 app.use(passport.initialize());
+app.use(passport.session());
+app.use('/auth', authRouter);
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
