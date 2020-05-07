@@ -8,6 +8,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import passport from 'passport';
 import validateEnv from './util/validate-env';
 
 const app = express();
@@ -23,6 +24,9 @@ app.set('port', env.PORT);
 // We run the frontend on another port, support queries from all origins.
 // TODO: This will need to be tweaked in production.
 app.use(cors());
+
+// Configure auth.
+app.use(passport.initialize());
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
