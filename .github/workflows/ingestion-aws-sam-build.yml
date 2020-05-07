@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: sam build
-      uses: youyo/aws-sam-action/python3.8@master
+      uses: youyo/aws-sam-action/python3.6@master
       with:
         sam_command: build -t ingestion/functions/template.yaml
       env:
