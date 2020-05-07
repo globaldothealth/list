@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
     paths:
-    - '.github/workflows/ingestion-aws-sam-build.yml'
+    - '.github/workflows/ingestion-aws-sam-deploy.yml'
     - 'ingestion/functions/**'
 
 jobs:
