@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
     - '.github/workflows/ingestion-aws-sam-deploy.yml'
+    - 'ingestion/functions/**'
   push:
     branches: [master]
     paths:
