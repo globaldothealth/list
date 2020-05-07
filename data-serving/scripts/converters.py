@@ -21,8 +21,7 @@ from utils import format_iso_8601_date, is_url, warn
 def convert_range(value: Any, parser: Callable[[Any], Any],
                   formatter: Callable[[Any], Any]) -> Dict[str, Any]:
     '''
-    Converts a value to a a range format, given the provided parser and
-    formatter.
+    Converts a value to a range format, given the provided parser and formatter.
 
     Parameters:
       value: Input to be parsed and formatted as a range.
@@ -224,7 +223,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
 
     try:
         converted_age = convert_age_range(age)
-        if converted_age:
+        if converted_age is not None:
             demographics['ageRange'] = converted_age
     except ValueError as e:
         warn(id, 'demographics.ageRange', age, e)
@@ -281,14 +280,14 @@ def convert_location(id: str, country: str, adminL1: str,
 
     try:
         parsed_latitude = parse_latitude(latitude)
-        if parsed_latitude:
+        if parsed_latitude is not None:
             geometry['latitude'] = parsed_latitude
     except ValueError as e:
         warn(id, 'location.latitude', latitude, e)
 
     try:
         parsed_longitude = parse_longitude(longitude)
-        if parsed_longitude:
+        if parsed_longitude is not None:
             geometry['longitude'] = parsed_longitude
     except ValueError as e:
         warn(id, 'location.longitude', longitude, e)
