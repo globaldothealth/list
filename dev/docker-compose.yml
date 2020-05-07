@@ -18,7 +18,7 @@ services:
             - data
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
-            DATASERVER_API_URL: "http://data:3000/api"
+            DATASERVER_URL: "http://data:3000"
     data:
         build: ../data-serving/data-service
         init: true
@@ -39,6 +39,6 @@ services:
         stdin_open: true
         environment:
             PORT: "3002"
-            # Can't use http://data:3000 here because we open the browser
+            # Can't use http://curator:3001 here because we open the browser
             # outside of the container so it wouldn't work.
-            REACT_APP_DATA_API_ENDPOINT: "http://localhost:3000"
+            REACT_APP_API_ENDPOINT: "http://localhost:3001"
