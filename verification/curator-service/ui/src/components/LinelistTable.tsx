@@ -3,7 +3,6 @@ import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import axios from 'axios';
 import { isUndefined } from 'util';
-import { rejects } from 'assert';
 
 interface ListResponse {
     cases: Case[],
