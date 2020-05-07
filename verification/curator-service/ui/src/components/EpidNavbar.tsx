@@ -1,7 +1,6 @@
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 
 import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
 import HomeIcon from '@material-ui/icons/Home';
 import IconButton from '@material-ui/core/IconButton';
 import React from "react";
@@ -23,9 +22,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-
-
-
 export default function EpidNavbar() {
     let history = useHistory();
     const classes = useStyles();
@@ -34,23 +30,22 @@ export default function EpidNavbar() {
         history.push('/');
     };
 
-    const handleAddCase = () => {
-        history.push('/new');
-    };
-
     return (
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton onClick={handleHomeClick} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                    <IconButton
+                        data-testid="home-btn"
+                        onClick={handleHomeClick}
+                        edge="start"
+                        className={classes.menuButton}
+                        color="inherit"
+                        aria-label="menu">
                         <HomeIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
                         epid
                     </Typography>
-                    <Button color="inherit" onClick={handleAddCase}>
-                        Add a new case
-                    </Button>
                 </Toolbar>
             </AppBar>
         </div>

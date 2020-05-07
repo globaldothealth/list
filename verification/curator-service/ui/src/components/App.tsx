@@ -1,5 +1,6 @@
 import {
   BrowserRouter,
+  Link,
   Route,
   Switch
 } from "react-router-dom";
@@ -29,11 +30,14 @@ function App() {
         <BrowserRouter>
           <EpidNavbar />
           <Switch>
-            <Route path="/new">
+            <Route path="/cases/new">
               <NewEntry />
             </Route>
-            <Route exact path="/">
+            <Route path="/cases">
               <Linelist />
+            </Route>
+            <Route exact path="/">
+              <Home />
             </Route>
           </Switch>
         </BrowserRouter>
@@ -52,6 +56,17 @@ function NewEntry() {
   return (
     <NewCaseForm />
   );
+}
+
+function Home() {
+  return (
+    <nav>
+      <Link to="/cases">Linelist</Link><br />
+      <Link to="/cases/new">Enter new case</Link><br />
+      <Link to="/privacy-policy">Privacy policy</Link><br />
+      <Link to="/terms">Terms of service</Link><br />
+    </nav>
+  )
 }
 
 export default App;
