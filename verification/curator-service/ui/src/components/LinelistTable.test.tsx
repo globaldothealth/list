@@ -12,6 +12,7 @@ afterEach(() => {
   mockedAxios.get.mockClear();
   mockedAxios.delete.mockClear();
   mockedAxios.post.mockClear();
+  mockedAxios.put.mockClear();
 });
 
 it('loads and displays cases', async () => {
@@ -115,7 +116,7 @@ it('can delete a row', async () => {
     config: {},
     headers: {},
   };
-  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterDeleteResponse);
+  mockedAxios.get.mockResolvedValue(axiosGetAfterDeleteResponse);
   mockedAxios.delete.mockResolvedValueOnce(axiosDeleteResponse);
 
   const deleteButton = getByText(/delete_outline/);
@@ -194,4 +195,102 @@ it('can add a row', async () => {
   expect(mockedAxios.get).toHaveBeenCalledTimes(1);
   const newRow = await findByText(/abc123/);
   expect(newRow).toBeInTheDocument();
+})
+
+
+it('can edit a row', async () => {
+  const cases = [
+    {
+      _id: 'abc123',
+      importedCase: {
+        outcome: 'Recovered',
+      },
+      events: [
+        {
+          name: 'confirmed',
+          dateRange: {
+            start: new Date().toJSON(),
+          },
+        }
+      ],
+      notes: "some notes",
+      source: {
+        url: "http://foo.bar",
+      }
+    },
+  ];
+  const axiosGetResponse = {
+    data: {
+      cases: cases,
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+  // Load table
+  const { getByText, findByText, queryByText } = render(<LinelistTable />)
+  expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+  expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1&filter=');
+  const row = await findByText("some notes");
+  expect(row).toBeInTheDocument();
+
+  // Edit case
+  const editedCases = [
+    {
+      _id: 'abc123',
+      importedCase: {
+        outcome: 'Recovered',
+      },
+      events: [
+        {
+          name: 'confirmed',
+          dateRange: {
+            start: new Date().toJSON(),
+          },
+        }
+      ],
+      notes: "some edited notes",
+      source: {
+        url: "http://foo.bar",
+      }
+    },
+  ];
+  const axiosGetAfterEditResponse = {
+    data: {
+      cases: editedCases,
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  const axiosEditResponse = {
+    data: {
+      case: editedCases[0],
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.put.mockResolvedValueOnce(axiosEditResponse);
+  mockedAxios.get.mockResolvedValue(axiosGetAfterEditResponse);
+
+  const editButton = getByText(/edit/);
+  fireEvent.click(editButton);
+  const confirmButton = getByText(/check/);
+  fireEvent.click(confirmButton);
+  expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+
+  // Check table data is reloaded
+  expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+  const oldRow = queryByText("some notes");
+  expect(oldRow).not.toBeInTheDocument();
+  const editedRow = await findByText("some edited notes");
+  expect(editedRow).toBeInTheDocument();
 })
