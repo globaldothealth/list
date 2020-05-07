@@ -1,0 +1,25 @@
+name: Ingestion functions AWS SAM build
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+    - '.github/workflows/ingestion-aws-sam-build.yml'
+    - 'ingestion/functions/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/functions
+    steps:
+    - uses: actions/checkout@v2
+    - name: sam build
+      uses: youyo/aws-sam-action/python3.8@master
+      with:
+        sam_command: build
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1
