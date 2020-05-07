@@ -1,11 +1,6 @@
 name: Ingestion functions AWS SAM deploy
 
 on:
-  pull_request:
-    branches: [master]
-    paths:
-    - '.github/workflows/ingestion-aws-sam-deploy.yml'
-    - 'ingestion/functions/**'
   push:
     branches: [master]
     paths:
