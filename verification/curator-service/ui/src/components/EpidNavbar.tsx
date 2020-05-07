@@ -23,19 +23,12 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-
-
-
 export default function EpidNavbar() {
     let history = useHistory();
     const classes = useStyles();
 
     const handleHomeClick = () => {
         history.push('/');
-    };
-
-    const handleAddCase = () => {
-        history.push('/new');
     };
 
     return (
@@ -48,9 +41,6 @@ export default function EpidNavbar() {
                     <Typography variant="h6" className={classes.title}>
                         epid
                     </Typography>
-                    <Button color="inherit" onClick={handleAddCase}>
-                        Add a new case
-                    </Button>
                 </Toolbar>
             </AppBar>
         </div>
