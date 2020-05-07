@@ -14,12 +14,12 @@ test('renders epid brand', () => {
     expect(brandName).toBeInTheDocument();
 });
 
-test('redirects to new case on click', () => {
+test('redirects to home on click', () => {
     const history = createMemoryHistory()
-    const { getByText } = render(
+    const { getByTestId } = render(
         <Router history={history}>
             <EpidNavbar />
         </Router>);
-    fireEvent.click(getByText(/Add a new case/))
-    expect(history.location.pathname).toBe("/new");
+    fireEvent.click(getByTestId('home-btn'))
+    expect(history.location.pathname).toBe("/");
 });  
