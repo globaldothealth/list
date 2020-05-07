@@ -2,6 +2,8 @@ import MaterialTable from 'material-table';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import axios from 'axios';
+import { isUndefined } from 'util';
+import { rejects } from 'assert';
 
 interface ListResponse {
     cases: Case[],
@@ -62,22 +64,42 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         }
     }
 
+    createCaseFromRowData(rowData: TableRow) {
+        return {
+            demographics: {
+                sex: rowData.sex
+            },
+            notes: rowData.notes,
+            source: {
+                url: rowData.source_url
+            },
+            // TODO: Replace data below with data from rowData
+            location: {
+                country: "France",
+            },
+            events: {
+                name: "confirmed",
+                dateRange: {
+                    start: "2020-01-13T05:00:00.000Z",
+                    end: "2020-01-13T05:00:00.000Z",
+                },
+            },
+            revisionMetadata: {
+                date: "2020-04-23T04:00:00.000Z",
+                id: 0,
+                moderator: "abc123"
+            }
+        }
+    }
+
     addCase(newRowData: TableRow) {
         return new Promise((resolve, reject) => {
-            const newCase = {
-                demographics: {
-                    sex: newRowData.sex
-                },
-                notes: newRowData.notes,
-                source: {
-                    url: newRowData.source_url
-                }
-            }
+            const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.post(this.state.url, newCase);
             response.then(() => {
-                resolve();
                 // Refresh the table data
                 this.state.tableRef.current.onQueryChange();
+                resolve();
             }).catch((e) => {
                 reject(e);
             });
@@ -85,12 +107,13 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     }
 
     deleteCase(rowData: TableRow) {
-        return new Promise((reject) => {
+        return new Promise((resolve, reject) => {
             let deleteUrl = this.state.url + rowData.id;
             const response = axios.delete(deleteUrl);
             response.then(() => {
                 // Refresh the table data
                 this.state.tableRef.current.onQueryChange();
+                resolve();
             }).catch((e) => {
                 reject(e);
             });
@@ -98,10 +121,19 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     }
 
     editCase(newRowData: TableRow, oldRowData: TableRow | undefined) {
-        return new Promise(() => {
-            console.log("TODO: edit " + newRowData);
-            // Refresh the table data
-            this.state.tableRef.current.onQueryChange();
+        return new Promise((resolve, reject) => {
+            if (isUndefined(oldRowData)) {
+                return reject();
+            }
+            const newCase = this.createCaseFromRowData(newRowData);
+            const response = axios.put(this.state.url + oldRowData.id, newCase);
+            response.then(() => {
+                // Refresh the table data
+                this.state.tableRef.current.onQueryChange();
+                resolve();
+            }).catch((e) => {
+                reject(e);
+            });
         });
     }
 
