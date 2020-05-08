@@ -20,5 +20,5 @@ EXPOSE 3002
 # Start service, will trigger a build.
 # Environment variables must be passed, notably:
 # - PORT
-# - REACT_APP_API_ENDPOINT
+# - REACT_APP_PROXY_URL
 CMD [ "npm", "run-script", "start-noenv" ]
