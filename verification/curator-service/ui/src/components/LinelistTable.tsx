@@ -142,7 +142,7 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 <MaterialTable
                     tableRef={this.state.tableRef}
                     columns={[
-                        { title: 'ID', field: 'id', filtering: false },
+                        { title: 'ID', field: 'id', filtering: false, editable: "never" },
                         { title: 'Sex', field: 'sex', filtering: false },
                         { title: 'Age', field: 'age', filtering: false },
                         { title: 'Notes', field: 'notes' },
