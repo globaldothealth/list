@@ -6,7 +6,7 @@ import axios from 'axios';
  * CasesController forwards requests to the data service.
  * It handles CRUD operations from curators.
  */
-export class CasesController {
+export default class CasesController {
     constructor(private readonly dataServerURL: string) {}
 
     list = async (req: Request, res: Response): Promise<void> => {
