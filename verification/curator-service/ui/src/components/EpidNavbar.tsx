@@ -1,12 +1,12 @@
+import React, { useEffect } from "react";
 import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 
 import AppBar from '@material-ui/core/AppBar';
 import HomeIcon from '@material-ui/icons/Home';
 import IconButton from '@material-ui/core/IconButton';
-import React from "react";
+import { Link } from "react-router-dom";
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -23,26 +23,25 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function EpidNavbar() {
-    let history = useHistory();
     const classes = useStyles();
 
-    const handleHomeClick = () => {
-        history.push('/');
-    };
+    useEffect(() => {
+        // TODO: Fetch /api/profile and display user info in navbar.
+    });
 
     return (
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton
-                        data-testid="home-btn"
-                        onClick={handleHomeClick}
-                        edge="start"
-                        className={classes.menuButton}
-                        color="inherit"
-                        aria-label="menu">
-                        <HomeIcon />
-                    </IconButton>
+                    <Link to="/">
+                        <IconButton
+                            data-testid="home-btn"
+                            edge="start"
+                            className={classes.menuButton}
+                            aria-label="menu">
+                            <HomeIcon />
+                        </IconButton>
+                    </Link>
                     <Typography variant="h6" className={classes.title}>
                         epid
                     </Typography>
