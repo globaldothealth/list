@@ -4,9 +4,9 @@ import * as sourcesController from './controllers/sources';
 
 import { router as authRouter, configurePassport } from './controllers/auth';
 
+import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -41,14 +41,8 @@ app.use('/auth', authRouter);
 // Configure frontend app routes.
 app.get('/', homeController.index);
 
-// Proxy /api/cases API calls from frontend to data service.
-app.use(
-    '/api/cases',
-    createProxyMiddleware({
-        target: env.DATASERVER_URL,
-        changeOrigin: true,
-    }),
-);
+// Configure cases controller proxying to data service.
+const casesController = new CasesController(env.DATASERVER_URL);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
@@ -57,6 +51,13 @@ apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
 apiRouter.post('/sources', sourcesController.create);
 apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
+
+apiRouter.get('/cases', casesController.list);
+apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
+apiRouter.post('/cases', casesController.create);
+apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
+apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
+
 app.use('/api', apiRouter);
 
 // Connect to MongoDB.
