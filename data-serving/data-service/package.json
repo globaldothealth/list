@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "import-data": "mongoimport --db covid19 --collection cases --file ../samples/line-list.json",
+    "import-data": "mongoimport --db covid19 --collection cases --jsonArray --file ../samples/cases.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",
     "test": "jest --clearCache && jest --forceExit --coverage --verbose --detectOpenHandles",
