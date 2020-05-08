@@ -4,7 +4,7 @@ import * as sourcesController from './controllers/sources';
 
 import { router as authRouter, configurePassport } from './controllers/auth';
 
-import { CasesController } from './controllers/cases';
+import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
