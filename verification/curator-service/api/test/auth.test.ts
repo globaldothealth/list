@@ -19,3 +19,9 @@ describe('auth', () => {
         request(app).get('/auth/google/redirect').expect(302, done);
     });
 });
+
+describe('profile', () => {
+    it('returns 403 when not authenticated', (done) => {
+        request(app).get('/auth/profile').expect(403, done);
+    });
+});
