@@ -1,0 +1,5 @@
+{
+    "name": "@types/mongo-cli",
+    "private": true,
+    "types": "index.d.ts"
+}
