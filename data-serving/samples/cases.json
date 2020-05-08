@@ -1,0 +1,5801 @@
+[
+    {
+        "demographics": {
+            "ageRange": {
+                "start": {
+                    "$numberDouble": "50"
+                },
+                "end": {
+                    "$numberDouble": "59"
+                }
+            },
+            "sex": "Female",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+            "country": "France",
+            "administrativeAreaLevel1": "Île-de-France",
+            "administrativeAreaLevel2": "Paris",
+            "locality": "Paris",
+            "geometry": {
+                "latitude": {
+                    "$numberDouble": "2.3522219"
+                },
+                "longitude": {
+                    "$numberDouble": "48.85661400000001"
+                }
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1578027600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1578027600000"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1578891600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1578891600000"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "hospitalAdmission",
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1579395600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1581469200000"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "discharged",
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1581483600000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1581483600000"
+                        }
+                    }
+                }
+            }
+        ],
+        "symptoms": {
+            "provided": [
+                "severe pneumonia",
+                "dyspnea",
+                "weakness"
+            ],
+            "imputed": [
+                "severe pneumonia",
+                "pneumonia",
+                "dyspnea",
+                "difficulty breathing",
+                "weakness"
+            ]
+        },
+        "chronicDisease": {
+            "provided": [
+                "hypertension",
+                "type 2 diabetes",
+                "coronary heart disease",
+                "lung cancer"
+            ],
+            "imputed": [
+                "hypertension",
+                "type 2 diabetes",
+                "diabetes",
+                "coronary heart disease",
+                "heart disease",
+                "lung cancer",
+                "cancer"
+            ]
+        },
+        "travelHistory": [
+            {
+                "location": {
+                    "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
+                    "country": "China",
+                    "administrativeAreaLevel1": "Hubei",
+                    "locality": "Wuhan",
+                    "geometry": {
+                        "latitude": {
+                            "$numberDouble": "30.592849"
+                        },
+                        "longitude": {
+                            "$numberDouble": "114.305539"
+                        }
+                    }
+                },
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1576386000000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1577682000000"
+                        }
+                    }
+                },
+                "purpose": "family",
+                "additionalInformation": "large family gathering for holidays"
+            }
+        ],
+        "source": {
+            "id": "def456",
+            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+        },
+        "outbreakSpecifics": {
+            "livesInWuhan": false,
+            "reportedMarketExposure": true
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2",
+                "sequenceSource": {
+                    "id": "ghi789"
+                }
+            },
+            {
+                "name": "e. coli",
+                "additionalInformation": "patient had a urinary catheter"
+            }
+        ],
+        "notes": "Contact of a confirmed case at work.",
+        "revisionMetadata": {
+            "id": {
+                "$numberInt": "0"
+            },
+            "moderator": "abc123",
+            "date": {
+                "$date": {
+                    "$numberLong": "1587614400000"
+                }
+            },
+            "notes": "initial data entry"
+        },
+        "importedCase": {
+            "additional_information": "Contact of a confirmed case at work.",
+            "notes_for_discussion": "Other stuff from notes",
+            "geo_resolution": "admin_2",
+            "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
+            "chronic_disease_binary": "true",
+            "chronic_disease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+            "outcome": "discharge 2/12",
+            "admin_id": "291"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "locality": "Trento",
+            "geometry": {
+                "latitude": 46.317890197180155,
+                "longitude": 10.799654880295963
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-21756",
+            "city": "Trento",
+            "province": "P.A. Trento",
+            "country": "Italy",
+            "latitude": "46.317890197180155",
+            "longitude": "10.799654880295963",
+            "geo_resolution": "point",
+            "date_confirmation": "13.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv",
+            "country_new": "Italy",
+            "admin_id": "10781.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-248003",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Kuwait",
+            "geometry": {
+                "latitude": 29.35656,
+                "longitude": 47.61266
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "Twitter MoH Update 19",
+        "source": {
+            "url": "https://twitter.com/KUWAIT_MOH/status/1236224946495516675"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "001-120",
+            "country": "Kuwait",
+            "latitude": "29.35656",
+            "longitude": "47.61266",
+            "geo_resolution": "admin0",
+            "date_confirmation": "07.03.2020",
+            "additional_information": "Twitter MoH Update 19",
+            "chronic_disease_binary": "False",
+            "source": "https://twitter.com/KUWAIT_MOH/status/1236224946495516675",
+            "country_new": "Kuwait",
+            "admin_id": "118.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 56.0,
+                "end": 56.0
+            },
+            "sex": "Male",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hong Kong",
+            "locality": "Hong Kong",
+            "geometry": {
+                "latitude": 22.38074,
+                "longitude": 114.1324
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "no travel history to mainland China",
+        "source": {
+            "url": "https://twitter.com/JeromeTaylor/status/1224978462236000256; https://news.rthk.hk/rthk/en/component/k2/1506776-20200205.htm"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "outbreakSpecifics": {
+            "livesInWuhan": false
+        },
+        "importedCase": {
+            "ID": "002-6909",
+            "age": "56",
+            "sex": "male",
+            "city": "Hong Kong",
+            "province": "Hong Kong",
+            "country": "China",
+            "latitude": "22.38074",
+            "longitude": "114.1324",
+            "geo_resolution": "admin1",
+            "date_confirmation": "05.02.2020",
+            "lives_in_Wuhan": "no",
+            "additional_information": "no travel history to mainland China",
+            "chronic_disease_binary": "False",
+            "source": "https://twitter.com/JeromeTaylor/status/1224978462236000256; https://news.rthk.hk/rthk/en/component/k2/1506776-20200205.htm",
+            "admin1": "Hong Kong",
+            "country_new": "China",
+            "admin_id": "4267.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-176151",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "13.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Marche",
+            "administrativeAreaLevel2": "Ancona",
+            "locality": "Ancona",
+            "geometry": {
+                "latitude": 43.50473,
+                "longitude": 13.15595
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200309.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-13538",
+            "city": "Ancona",
+            "province": "Marche",
+            "country": "Italy",
+            "latitude": "43.50473",
+            "longitude": "13.15595",
+            "geo_resolution": "admin2",
+            "date_confirmation": "09.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200309.csv",
+            "admin2": "Ancona",
+            "admin1": "Marche",
+            "country_new": "Italy",
+            "admin_id": "1124.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United Kingdom",
+            "administrativeAreaLevel1": "Scotland",
+            "geometry": {
+                "latitude": 56.90528000000001,
+                "longitude": -4.17787
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.gov.scot/coronavirus-covid-19/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-12886",
+            "province": "Scotland",
+            "country": "United Kingdom",
+            "latitude": "56.90528000000001",
+            "longitude": "-4.17787",
+            "geo_resolution": "admin1",
+            "date_confirmation": "14.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.gov.scot/coronavirus-covid-19/",
+            "admin1": "Scotland",
+            "country_new": "United Kingdom",
+            "admin_id": "809.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-179290",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "14.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Milano",
+            "locality": "Milano",
+            "geometry": {
+                "latitude": 45.46589,
+                "longitude": 9.121072
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-11T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-11T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200311.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-16565",
+            "city": "Milano",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.46589",
+            "longitude": "9.121072",
+            "geo_resolution": "admin2",
+            "date_confirmation": "11.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200311.csv",
+            "admin2": "Milano",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "6195.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Emilia-Romagna",
+            "administrativeAreaLevel2": "Reggio Nell'Emilia",
+            "locality": "Reggio nell'Emilia",
+            "geometry": {
+                "latitude": 44.6078,
+                "longitude": 10.55291
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-16T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-16T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200316.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-29838",
+            "city": "Reggio nell'Emilia",
+            "province": "Emilia-Romagna",
+            "country": "Italy",
+            "latitude": "44.6078",
+            "longitude": "10.55291",
+            "geo_resolution": "admin2",
+            "date_confirmation": "16.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200316.csv",
+            "admin2": "Reggio Nell'Emilia",
+            "admin1": "Emilia-Romagna",
+            "country_new": "Italy",
+            "admin_id": "7470.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Netherlands",
+            "administrativeAreaLevel1": "Zeeland",
+            "administrativeAreaLevel2": "Terneuzen",
+            "locality": "Terneuzen",
+            "geometry": {
+                "latitude": 51.28684000000001,
+                "longitude": 3.8477
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://www.rivm.nl/coronavirus-kaart-van-nederland-per-gemeente"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-46879",
+            "city": "Terneuzen",
+            "province": "Zeeland",
+            "country": "Netherlands",
+            "latitude": "51.28684000000001",
+            "longitude": "3.8477",
+            "geo_resolution": "admin2",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.rivm.nl/coronavirus-kaart-van-nederland-per-gemeente",
+            "admin2": "Terneuzen",
+            "admin1": "Zeeland",
+            "country_new": "Netherlands",
+            "admin_id": "8587.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Fujian",
+            "administrativeAreaLevel2": "Nanping City",
+            "locality": "Songxi County, Nanping City",
+            "geometry": {
+                "latitude": 27.60811,
+                "longitude": 118.7543
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-01-31T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-01-31T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://headline.fjtv.net/folder875/2020-02-01/2162239.html"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-4417",
+            "city": "Songxi County, Nanping City",
+            "province": "Fujian",
+            "country": "China",
+            "latitude": "27.60811",
+            "longitude": "118.7543",
+            "geo_resolution": "admin3",
+            "date_confirmation": "31.01.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://headline.fjtv.net/folder875/2020-02-01/2162239.html",
+            "admin3": "Songxi County",
+            "admin2": "Nanping City",
+            "admin1": "Fujian",
+            "country_new": "China",
+            "admin_id": "8262.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "California",
+            "geometry": {
+                "latitude": 37.3802002,
+                "longitude": -119.67788
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.mercurynews.com/2020/03/20/map-coronavirus-cases-in-california-by-county/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-29871",
+            "province": "California",
+            "country": "United States",
+            "latitude": "37.3802002",
+            "longitude": "-119.67788",
+            "geo_resolution": "admin1",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.mercurynews.com/2020/03/20/map-coronavirus-cases-in-california-by-county/",
+            "admin1": "California",
+            "country_new": "United States",
+            "admin_id": "340.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200314.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-23033",
+            "city": "Bergamo",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.79841",
+            "longitude": "9.79008",
+            "geo_resolution": "admin2",
+            "date_confirmation": "14.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200314.csv",
+            "admin2": "Bergamo",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Kentucky",
+            "geometry": {
+                "latitude": 37.53400720000001,
+                "longitude": -85.283396
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://govstatus.egov.com/kycovid19"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-39300",
+            "province": "Kentucky",
+            "country": "United States",
+            "latitude": "37.53400720000001",
+            "longitude": "-85.283396",
+            "geo_resolution": "admin1",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://govstatus.egov.com/kycovid19",
+            "admin1": "Kentucky",
+            "country_new": "United States",
+            "admin_id": "525.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Austria",
+            "administrativeAreaLevel1": "Vorarlberg",
+            "geometry": {
+                "latitude": 47.2497,
+                "longitude": 9.9797
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.sozialministerium.at/Informationen-zum-Coronavirus/Neuartiges-Coronavirus-(2019-nCov).html"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-1037",
+            "province": "Vorarlberg",
+            "country": "Austria",
+            "latitude": "47.2497",
+            "longitude": "9.9797",
+            "geo_resolution": "admin1",
+            "date_confirmation": "17.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.sozialministerium.at/Informationen-zum-Coronavirus/Neuartiges-Coronavirus-(2019-nCov).html",
+            "admin1": "Vorarlberg",
+            "country_new": "Austria",
+            "admin_id": "924.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Lecco",
+            "locality": "Lecco",
+            "geometry": {
+                "latitude": 45.90438,
+                "longitude": 9.387806
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200321.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-54216",
+            "city": "Lecco",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.90438",
+            "longitude": "9.387806",
+            "geo_resolution": "admin2",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200321.csv",
+            "admin2": "Lecco",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "5344.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Lipetsk Oblast",
+            "locality": "Lipetsk Oblast",
+            "geometry": {
+                "latitude": 52.5265,
+                "longitude": 39.2032
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-183510",
+            "city": "Lipetsk Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "52.5265",
+            "longitude": "39.2032",
+            "geo_resolution": "admin2",
+            "date_confirmation": "16.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Lipetsk Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "5588.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Michigan",
+            "administrativeAreaLevel2": "Wayne County",
+            "locality": "Wayne County",
+            "geometry": {
+                "latitude": 42.2844327,
+                "longitude": -83.287789
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.michigan.gov/coronavirus/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-33217",
+            "city": "Wayne County",
+            "province": "Michigan",
+            "country": "United States",
+            "latitude": "42.2844327",
+            "longitude": "-83.287789",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.michigan.gov/coronavirus/",
+            "admin2": "Wayne County",
+            "admin1": "Michigan",
+            "country_new": "United States",
+            "admin_id": "9139.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-01T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-01T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-161383",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "01.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Japan",
+            "administrativeAreaLevel1": "Kanagawa Prefecture",
+            "locality": "Yokohama",
+            "geometry": {
+                "latitude": 35.45085,
+                "longitude": 139.6651
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "65 new cases (total on ship = 135) \u201cDiamond Princess\u201d cruise ship off Yokohama",
+        "source": {
+            "url": "https://www.mhlw.go.jp/stf/newpage_09419.html"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-10966",
+            "city": "Yokohama",
+            "province": "Kanagawa Prefecture",
+            "country": "Japan",
+            "latitude": "35.45085",
+            "longitude": "139.6651",
+            "geo_resolution": "point",
+            "date_confirmation": "10.02.2020",
+            "additional_information": "65 new cases (total on ship = 135) \u201cDiamond Princess\u201d cruise ship off Yokohama",
+            "chronic_disease_binary": "False",
+            "source": "https://www.mhlw.go.jp/stf/newpage_09419.html",
+            "location": "Yokohama",
+            "admin1": "Kanagawa Prefecture",
+            "country_new": "Japan",
+            "admin_id": "9875.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-173681",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "12.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "locality": "Buryatia",
+            "geometry": {
+                "latitude": 53.54593905400004,
+                "longitude": 109.57733225100009
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-5351",
+            "city": "Buryatia",
+            "province": "Far Eastern",
+            "country": "Russia",
+            "latitude": "53.54593905400004",
+            "longitude": "109.57733225100009",
+            "geo_resolution": "point",
+            "date_confirmation": "24.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "country_new": "Russia",
+            "admin_id": "10857.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow Oblast",
+            "locality": "Moscow Oblast",
+            "geometry": {
+                "latitude": 55.3404,
+                "longitude": 38.2918
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-196137",
+            "city": "Moscow Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.3404",
+            "longitude": "38.2918",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6362.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Spain",
+            "geometry": {
+                "latitude": 39.58103245600006,
+                "longitude": -3.004513841999937
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-7487",
+            "province": "Castilla\u2013La Mancha",
+            "country": "Spain",
+            "latitude": "39.58103245600006",
+            "longitude": "-3.004513841999937",
+            "geo_resolution": "point",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain",
+            "country_new": "Spain",
+            "admin_id": "353.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-162856",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "03.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Western",
+            "administrativeAreaLevel2": "Novgorod Oblast",
+            "locality": "Novgorod Oblast",
+            "geometry": {
+                "latitude": 58.2428,
+                "longitude": 32.5665
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-170503",
+            "city": "Novgorod Oblast",
+            "province": "North Western",
+            "country": "Russia",
+            "latitude": "58.2428",
+            "longitude": "32.5665",
+            "geo_resolution": "admin2",
+            "date_confirmation": "10.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Novgorod Oblast",
+            "admin1": "North Western",
+            "country_new": "Russia",
+            "admin_id": "6688.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "locality": "Bolzano",
+            "geometry": {
+                "latitude": 46.49528000000004,
+                "longitude": 11.353460000000037
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200320.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-44917",
+            "city": "Bolzano",
+            "province": "P.A. Bolzano",
+            "country": "Italy",
+            "latitude": "46.49528000000004",
+            "longitude": "11.353460000000037",
+            "geo_resolution": "point",
+            "date_confirmation": "20.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200320.csv",
+            "country_new": "Italy",
+            "admin_id": "10792.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United Kingdom",
+            "geometry": {
+                "latitude": 54.37002,
+                "longitude": -2.95214
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://twitter.com/DHSCgovuk/status/1240347223424106497"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-35207",
+            "country": "United Kingdom",
+            "latitude": "54.37002",
+            "longitude": "-2.95214",
+            "geo_resolution": "admin0",
+            "date_confirmation": "18.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://twitter.com/DHSCgovuk/status/1240347223424106497",
+            "country_new": "United Kingdom",
+            "admin_id": "236.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Veneto",
+            "administrativeAreaLevel2": "Venezia",
+            "locality": "Venezia",
+            "geometry": {
+                "latitude": 45.52732,
+                "longitude": 12.47941
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200408.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-142632",
+            "city": "Venezia",
+            "province": "Veneto",
+            "country": "Italy",
+            "latitude": "45.52732",
+            "longitude": "12.47941",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200408.csv",
+            "admin2": "Venezia",
+            "admin1": "Veneto",
+            "country_new": "Italy",
+            "admin_id": "8930.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "South Africa",
+            "geometry": {
+                "latitude": -26.0,
+                "longitude": 28.0
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "001-1671",
+            "province": "Gauteng",
+            "country": "South Africa",
+            "latitude": "-26.0",
+            "longitude": "28.0",
+            "geo_resolution": "admin1",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "admin_id": "438.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "locality": "Trento",
+            "geometry": {
+                "latitude": 46.317890197180155,
+                "longitude": 10.799654880295963
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200410.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-150322",
+            "city": "Trento",
+            "province": "P.A. Trento",
+            "country": "Italy",
+            "latitude": "46.317890197180155",
+            "longitude": "10.799654880295963",
+            "geo_resolution": "point",
+            "date_confirmation": "10.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200410.csv",
+            "country_new": "Italy",
+            "admin_id": "10781.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Ohio",
+            "administrativeAreaLevel2": "Trumbull County",
+            "locality": "Trumbull County",
+            "geometry": {
+                "latitude": 41.317146,
+                "longitude": -80.76084300000002
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.ohio.gov/wps/portal/gov/covid-19/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-34511",
+            "city": "Trumbull County",
+            "province": "Ohio",
+            "country": "United States",
+            "latitude": "41.317146",
+            "longitude": "-80.76084300000002",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.ohio.gov/wps/portal/gov/covid-19/",
+            "admin2": "Trumbull County",
+            "admin1": "Ohio",
+            "country_new": "United States",
+            "admin_id": "8773.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-175310",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "13.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "California",
+            "geometry": {
+                "latitude": 37.3802002,
+                "longitude": -119.67788
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.mercurynews.com/2020/03/20/map-coronavirus-cases-in-california-by-county/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-36564",
+            "province": "California",
+            "country": "United States",
+            "latitude": "37.3802002",
+            "longitude": "-119.67788",
+            "geo_resolution": "admin1",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.mercurynews.com/2020/03/20/map-coronavirus-cases-in-california-by-county/",
+            "admin1": "California",
+            "country_new": "United States",
+            "admin_id": "340.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 32.0,
+                "end": 32.0
+            },
+            "sex": "Female",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Florida",
+            "administrativeAreaLevel2": "Volusia County",
+            "locality": "Volusia County",
+            "geometry": {
+                "latitude": 29.057307300000005,
+                "longitude": -81.184136
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://floridahealthcovid19.gov/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-19741",
+            "age": "32",
+            "sex": "female",
+            "city": "Volusia County",
+            "province": "Florida",
+            "country": "United States",
+            "latitude": "29.057307300000005",
+            "longitude": "-81.184136",
+            "geo_resolution": "admin2",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://floridahealthcovid19.gov/",
+            "admin2": "Volusia County",
+            "admin1": "Florida",
+            "country_new": "United States",
+            "admin_id": "8984.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-48971",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "43.0140874",
+            "longitude": "-75.646457",
+            "geo_resolution": "admin1",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200315.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-26391",
+            "city": "Bergamo",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.79841",
+            "longitude": "9.79008",
+            "geo_resolution": "admin2",
+            "date_confirmation": "15.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200315.csv",
+            "admin2": "Bergamo",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Connecticut",
+            "administrativeAreaLevel2": "Fairfield County",
+            "locality": "Fairfield County",
+            "geometry": {
+                "latitude": 41.27362700000001,
+                "longitude": -73.38968
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://portal.ct.gov/Coronavirus"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-53717",
+            "city": "Fairfield County",
+            "province": "Connecticut",
+            "country": "United States",
+            "latitude": "41.27362700000001",
+            "longitude": "-73.38968",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://portal.ct.gov/Coronavirus",
+            "admin2": "Fairfield County",
+            "admin1": "Connecticut",
+            "country_new": "United States",
+            "admin_id": "3213.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Liguria",
+            "administrativeAreaLevel2": "Genova",
+            "locality": "Genova",
+            "geometry": {
+                "latitude": 44.46792,
+                "longitude": 9.122742
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200412.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-156416",
+            "city": "Genova",
+            "province": "Liguria",
+            "country": "Italy",
+            "latitude": "44.46792",
+            "longitude": "9.122742",
+            "geo_resolution": "admin2",
+            "date_confirmation": "12.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200412.csv",
+            "admin2": "Genova",
+            "admin1": "Liguria",
+            "country_new": "Italy",
+            "admin_id": "3574.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Alessandria",
+            "locality": "Alessandria",
+            "geometry": {
+                "latitude": 44.8304,
+                "longitude": 8.663941000000001
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200315.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-28384",
+            "city": "Alessandria",
+            "province": "Piemonte",
+            "country": "Italy",
+            "latitude": "44.8304",
+            "longitude": "8.663941000000001",
+            "geo_resolution": "admin2",
+            "date_confirmation": "15.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200315.csv",
+            "admin2": "Alessandria",
+            "admin1": "Piemonte",
+            "country_new": "Italy",
+            "admin_id": "1051.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-24987",
+            "city": "New York City",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "40.661",
+            "longitude": "-73.944",
+            "geo_resolution": "point",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "6555.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 34.0,
+                "end": 34.0
+            },
+            "sex": "Female",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Australia",
+            "administrativeAreaLevel1": "New South Wales",
+            "geometry": {
+                "latitude": -32.2383,
+                "longitude": 147.0047
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "NSW Case 89; linked to NSW Case 88",
+        "source": {
+            "url": "https://www.health.nsw.gov.au/news/Pages/20200313_00.aspx"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "travelHistory": [
+            {
+                "location": {
+                    "country": "Philippines"
+                }
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-21414",
+            "age": "34",
+            "sex": "female",
+            "province": "New South Wales",
+            "country": "Australia",
+            "latitude": "-32.2383",
+            "longitude": "147.0047",
+            "geo_resolution": "admin1",
+            "date_confirmation": "13.03.2020",
+            "travel_history_location": "Philippines",
+            "additional_information": "NSW Case 89; linked to NSW Case 88",
+            "chronic_disease_binary": "False",
+            "source": "https://www.health.nsw.gov.au/news/Pages/20200313_00.aspx",
+            "admin1": "New South Wales",
+            "country_new": "Australia",
+            "admin_id": "657.0"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 55.0,
+                "end": 55.0
+            },
+            "sex": "Female",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hong Kong",
+            "locality": "Hong Kong",
+            "geometry": {
+                "latitude": 22.38074,
+                "longitude": 114.1324
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-17T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-17T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "admissionHospital",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-24T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "symptoms": {
+            "provided": [
+                "cough"
+            ]
+        },
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "Have been to the \"Fuhui Jingshe\" buddhist hall in meilun building",
+        "source": {
+            "url": "https://www.info.gov.hk/gia/general/202002/25/P2020022500772.htm"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "outbreakSpecifics": {
+            "livesInWuhan": false
+        },
+        "importedCase": {
+            "ID": "002-12494",
+            "age": "55",
+            "sex": "female",
+            "city": "Hong Kong",
+            "province": "Hong Kong",
+            "country": "China",
+            "latitude": "22.38074",
+            "longitude": "114.1324",
+            "geo_resolution": "admin1",
+            "date_onset_symptoms": "17.02.2020",
+            "date_admission_hospital": "24.02.2020",
+            "date_confirmation": "24.02.2020",
+            "symptoms": "cough",
+            "lives_in_Wuhan": "no",
+            "additional_information": "Have been to the \"Fuhui Jingshe\" buddhist hall in meilun building",
+            "chronic_disease_binary": "False",
+            "source": "https://www.info.gov.hk/gia/general/202002/25/P2020022500772.htm",
+            "admin1": "Hong Kong",
+            "country_new": "China",
+            "admin_id": "4267.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-218132",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "23.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Norway",
+            "administrativeAreaLevel1": "Rogaland",
+            "geometry": {
+                "latitude": 59.149,
+                "longitude": 6.0143
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://www.fhi.no/en/id/infectious-diseases/coronavirus/daily-reports/daily-reports-COVID19/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-27163",
+            "province": "Rogaland",
+            "country": "Norway",
+            "latitude": "59.149",
+            "longitude": "6.0143",
+            "geo_resolution": "admin1",
+            "date_confirmation": "22.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.fhi.no/en/id/infectious-diseases/coronavirus/daily-reports/daily-reports-COVID19/",
+            "admin1": "Rogaland",
+            "country_new": "Norway",
+            "admin_id": "772.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Iran",
+            "administrativeAreaLevel1": "Tehran",
+            "geometry": {
+                "latitude": 35.556791,
+                "longitude": 51.8769204
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "other": "Iran Ministry of Health"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-15375",
+            "province": "Tehran",
+            "country": "Iran",
+            "latitude": "35.556791",
+            "longitude": "51.8769204",
+            "geo_resolution": "admin1",
+            "date_confirmation": "05.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "Iran Ministry of Health",
+            "admin1": "Tehran",
+            "country_new": "Iran",
+            "admin_id": "859.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Campania",
+            "administrativeAreaLevel2": "Avellino",
+            "locality": "Avellino",
+            "geometry": {
+                "latitude": 40.97777,
+                "longitude": 15.08004
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-89264",
+            "city": "Avellino",
+            "province": "Campania",
+            "country": "Italy",
+            "latitude": "40.97777",
+            "longitude": "15.08004",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv",
+            "admin2": "Avellino",
+            "admin1": "Campania",
+            "country_new": "Italy",
+            "admin_id": "1278.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-199827",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-9366",
+            "city": "New York City",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "40.661",
+            "longitude": "-73.944",
+            "geo_resolution": "point",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "6555.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow Oblast",
+            "locality": "Moscow Oblast",
+            "geometry": {
+                "latitude": 55.3404,
+                "longitude": 38.2918
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-177358",
+            "city": "Moscow Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.3404",
+            "longitude": "38.2918",
+            "geo_resolution": "admin2",
+            "date_confirmation": "14.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6362.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Western",
+            "administrativeAreaLevel2": "Murmansk Oblast",
+            "locality": "Murmansk Oblast",
+            "geometry": {
+                "latitude": 67.8443,
+                "longitude": 35.0884
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-204832",
+            "city": "Murmansk Oblast",
+            "province": "North Western",
+            "country": "Russia",
+            "latitude": "67.8443",
+            "longitude": "35.0884",
+            "geo_resolution": "admin2",
+            "date_confirmation": "20.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Murmansk Oblast",
+            "admin1": "North Western",
+            "country_new": "Russia",
+            "admin_id": "6401.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "administrativeAreaLevel2": "Westchester County",
+            "locality": "Westchester County",
+            "geometry": {
+                "latitude": 41.1624921,
+                "longitude": -73.756966
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-39165",
+            "city": "Westchester County",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "41.1624921",
+            "longitude": "-73.756966",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin2": "Westchester County",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "9234.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-243803",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "27.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hubei",
+            "administrativeAreaLevel2": "Wuhan City",
+            "locality": "Wuhan City",
+            "geometry": {
+                "latitude": 30.62506,
+                "longitude": 114.3421
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-01-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-01-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://news.163.com/special/epidemic/?spssid=7283291fcdba1d8c2d13ee3da2cfb760&spsw=7&spss=other#map_block"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-2-1600",
+            "city": "Wuhan City",
+            "province": "Hubei",
+            "country": "China",
+            "latitude": "30.62506",
+            "longitude": "114.3421",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.01.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://news.163.com/special/epidemic/?spssid=7283291fcdba1d8c2d13ee3da2cfb760&spsw=7&spss=other#map_block",
+            "admin2": "Wuhan City",
+            "admin1": "Hubei",
+            "country_new": "China",
+            "admin_id": "9390.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "locality": "Catania",
+            "geometry": {
+                "latitude": 37.511360000000025,
+                "longitude": 15.06752000000006
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200323.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-66648",
+            "city": "Catania",
+            "province": "Sicilia",
+            "country": "Italy",
+            "latitude": "37.511360000000025",
+            "longitude": "15.06752000000006",
+            "geo_resolution": "point",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200323.csv",
+            "country_new": "Italy",
+            "admin_id": "10786.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "locality": "Kemerovo Oblast",
+            "geometry": {
+                "latitude": 55.35833000000007,
+                "longitude": 86.06754000000005
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-170781",
+            "city": "Kemerovo Oblast",
+            "province": "Siberia",
+            "country": "Russia",
+            "latitude": "55.35833000000007",
+            "longitude": "86.06754000000005",
+            "geo_resolution": "point",
+            "date_confirmation": "10.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "country_new": "Russia",
+            "admin_id": "10854.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-51008",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "43.0140874",
+            "longitude": "-75.646457",
+            "geo_resolution": "admin1",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Campania",
+            "administrativeAreaLevel2": "Caserta",
+            "locality": "Caserta",
+            "geometry": {
+                "latitude": 41.2187,
+                "longitude": 14.16129
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200404.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-121651",
+            "city": "Caserta",
+            "province": "Campania",
+            "country": "Italy",
+            "latitude": "41.2187",
+            "longitude": "14.16129",
+            "geo_resolution": "admin2",
+            "date_confirmation": "04.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200404.csv",
+            "admin2": "Caserta",
+            "admin1": "Campania",
+            "country_new": "Italy",
+            "admin_id": "2004.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 70.0,
+                "end": 79.0
+            },
+            "sex": "Female",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Nevada",
+            "administrativeAreaLevel2": "Clark County",
+            "locality": "Clark County",
+            "geometry": {
+                "latitude": 36.2192139,
+                "longitude": -115.01857
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "notes": "Hospitalized in serious condition; underlying medical conditions",
+        "source": {
+            "url": "https://www.reviewjournal.com/news/politics-and-government/nevada/clark-countys-2nd-coronavirus-case-reported-1975226/, https://www.southernnevadahealthdistrict.org/news-release/southern-nevada-health-district-announces-nine-new-positive-cases-of-covid-19/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-19093",
+            "age": "70-79",
+            "sex": "female",
+            "city": "Clark County",
+            "province": "Nevada",
+            "country": "United States",
+            "latitude": "36.2192139",
+            "longitude": "-115.01857",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.03.2020",
+            "travel_history_location": "Reno, NV",
+            "additional_information": "Hospitalized in serious condition; underlying medical conditions",
+            "chronic_disease_binary": "False",
+            "source": "https://www.reviewjournal.com/news/politics-and-government/nevada/clark-countys-2nd-coronavirus-case-reported-1975226/, https://www.southernnevadahealthdistrict.org/news-release/southern-nevada-health-district-announces-nine-new-positive-cases-of-covid-19/",
+            "admin2": "Clark County",
+            "admin1": "Nevada",
+            "country_new": "United States",
+            "admin_id": "2315.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-160593",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "30.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Volga",
+            "administrativeAreaLevel2": "Ulyanovsk Oblast",
+            "locality": "Ulyanovsk Oblast",
+            "geometry": {
+                "latitude": 53.9793,
+                "longitude": 47.7762
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-29T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-29T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-257685",
+            "city": "Ulyanovsk Oblast",
+            "province": "Volga",
+            "country": "Russia",
+            "latitude": "53.9793",
+            "longitude": "47.7762",
+            "geo_resolution": "admin2",
+            "date_confirmation": "29.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Ulyanovsk Oblast",
+            "admin1": "Volga",
+            "country_new": "Russia",
+            "admin_id": "8840.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Pavia",
+            "locality": "Pavia",
+            "geometry": {
+                "latitude": 45.11049000000001,
+                "longitude": 9.037306
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-09T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200409.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-145013",
+            "city": "Pavia",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.11049000000001",
+            "longitude": "9.037306",
+            "geo_resolution": "admin2",
+            "date_confirmation": "09.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200409.csv",
+            "admin2": "Pavia",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "6932.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New Jersey",
+            "geometry": {
+                "latitude": 40.2030102,
+                "longitude": -74.67119699999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.nj.gov/health/cd/topics/covid2019_dashboard.shtml"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-22080",
+            "province": "New Jersey",
+            "country": "United States",
+            "latitude": "40.2030102",
+            "longitude": "-74.67119699999998",
+            "geo_resolution": "admin1",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.nj.gov/health/cd/topics/covid2019_dashboard.shtml",
+            "admin1": "New Jersey",
+            "country_new": "United States",
+            "admin_id": "655.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Connecticut",
+            "administrativeAreaLevel2": "New Haven County",
+            "locality": "New Haven County",
+            "geometry": {
+                "latitude": 41.4111485,
+                "longitude": -72.93220699999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://portal.ct.gov/Coronavirus"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-53929",
+            "city": "New Haven County",
+            "province": "Connecticut",
+            "country": "United States",
+            "latitude": "41.4111485",
+            "longitude": "-72.93220699999998",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://portal.ct.gov/Coronavirus",
+            "admin2": "New Haven County",
+            "admin1": "Connecticut",
+            "country_new": "United States",
+            "admin_id": "6548.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "locality": "Crimea",
+            "geometry": {
+                "latitude": 61.989526183000066,
+                "longitude": 96.80537153400007
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-176814",
+            "city": "Crimea",
+            "province": "South",
+            "country": "Russia",
+            "latitude": "61.989526183000066",
+            "longitude": "96.80537153400007",
+            "geo_resolution": "point",
+            "date_confirmation": "13.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "country_new": "Russia",
+            "admin_id": "10849.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-25259",
+            "city": "New York City",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "40.661",
+            "longitude": "-73.944",
+            "geo_resolution": "point",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "6555.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Torino",
+            "locality": "Torino",
+            "geometry": {
+                "latitude": 45.14739,
+                "longitude": 7.443546
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200330.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-102865",
+            "city": "Torino",
+            "province": "Piemonte",
+            "country": "Italy",
+            "latitude": "45.14739",
+            "longitude": "7.443546",
+            "geo_resolution": "admin2",
+            "date_confirmation": "30.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200330.csv",
+            "admin2": "Torino",
+            "admin1": "Piemonte",
+            "country_new": "Italy",
+            "admin_id": "8737.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Louisiana",
+            "administrativeAreaLevel2": "Orleans Parish",
+            "locality": "Orleans Parish",
+            "geometry": {
+                "latitude": 30.06923,
+                "longitude": -89.9312
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://ldh.la.gov/Coronavirus/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-39584",
+            "city": "Orleans Parish",
+            "province": "Louisiana",
+            "country": "United States",
+            "latitude": "30.06923",
+            "longitude": "-89.9312",
+            "geo_resolution": "admin2",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://ldh.la.gov/Coronavirus/",
+            "admin2": "Orleans Parish",
+            "admin1": "Louisiana",
+            "country_new": "United States",
+            "admin_id": "6801.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-42724",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "43.0140874",
+            "longitude": "-75.646457",
+            "geo_resolution": "admin1",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200325.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-74169",
+            "city": "Bergamo",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.79841",
+            "longitude": "9.79008",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200325.csv",
+            "admin2": "Bergamo",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Veneto",
+            "administrativeAreaLevel2": "Verona",
+            "locality": "Verona",
+            "geometry": {
+                "latitude": 45.41846,
+                "longitude": 11.03704
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200402.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-116912",
+            "city": "Verona",
+            "province": "Veneto",
+            "country": "Italy",
+            "latitude": "45.41846",
+            "longitude": "11.03704",
+            "geo_resolution": "admin2",
+            "date_confirmation": "02.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200402.csv",
+            "admin2": "Verona",
+            "admin1": "Veneto",
+            "country_new": "Italy",
+            "admin_id": "8944.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lazio",
+            "administrativeAreaLevel2": "Frosinone",
+            "locality": "Frosinone",
+            "geometry": {
+                "latitude": 41.61661,
+                "longitude": 13.53626
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-29T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-29T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200329.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-96085",
+            "city": "Frosinone",
+            "province": "Lazio",
+            "country": "Italy",
+            "latitude": "41.61661",
+            "longitude": "13.53626",
+            "geo_resolution": "admin2",
+            "date_confirmation": "29.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200329.csv",
+            "admin2": "Frosinone",
+            "admin1": "Lazio",
+            "country_new": "Italy",
+            "admin_id": "3401.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Torino",
+            "locality": "Torino",
+            "geometry": {
+                "latitude": 45.14739,
+                "longitude": 7.443546
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-21535",
+            "city": "Torino",
+            "province": "Piemonte",
+            "country": "Italy",
+            "latitude": "45.14739",
+            "longitude": "7.443546",
+            "geo_resolution": "admin2",
+            "date_confirmation": "13.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv",
+            "admin2": "Torino",
+            "admin1": "Piemonte",
+            "country_new": "Italy",
+            "admin_id": "8737.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "administrativeAreaLevel2": "Westchester County",
+            "locality": "Westchester County",
+            "geometry": {
+                "latitude": 41.1624921,
+                "longitude": -73.756966
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-39161",
+            "city": "Westchester County",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "41.1624921",
+            "longitude": "-73.756966",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin2": "Westchester County",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "9234.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Brescia",
+            "locality": "Brescia",
+            "geometry": {
+                "latitude": 45.70507,
+                "longitude": 10.31322
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200308.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-11577",
+            "city": "Brescia",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.70507",
+            "longitude": "10.31322",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200308.csv",
+            "admin2": "Brescia",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1743.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Emilia-Romagna",
+            "administrativeAreaLevel2": "Parma",
+            "locality": "Parma",
+            "geometry": {
+                "latitude": 44.67171,
+                "longitude": 10.04892
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200327.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-84117",
+            "city": "Parma",
+            "province": "Emilia-Romagna",
+            "country": "Italy",
+            "latitude": "44.67171",
+            "longitude": "10.04892",
+            "geo_resolution": "admin2",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200327.csv",
+            "admin2": "Parma",
+            "admin1": "Emilia-Romagna",
+            "country_new": "Italy",
+            "admin_id": "6911.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Milano",
+            "locality": "Milano",
+            "geometry": {
+                "latitude": 45.46589,
+                "longitude": 9.121072
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-01T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-01T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200401.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-110392",
+            "city": "Milano",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.46589",
+            "longitude": "9.121072",
+            "geo_resolution": "admin2",
+            "date_confirmation": "01.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200401.csv",
+            "admin2": "Milano",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "6195.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Liguria",
+            "administrativeAreaLevel2": "Genova",
+            "locality": "Genova",
+            "geometry": {
+                "latitude": 44.46792,
+                "longitude": 9.122742
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-127223",
+            "city": "Genova",
+            "province": "Liguria",
+            "country": "Italy",
+            "latitude": "44.46792",
+            "longitude": "9.122742",
+            "geo_resolution": "admin2",
+            "date_confirmation": "05.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv",
+            "admin2": "Genova",
+            "admin1": "Liguria",
+            "country_new": "Italy",
+            "admin_id": "3574.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "South Korea",
+            "administrativeAreaLevel1": "Daegu",
+            "geometry": {
+                "latitude": 35.78134,
+                "longitude": 128.58
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://ncov.mohw.go.kr/tcmBoardView.do?brdId=&brdGubun=&dataGubun=&ncvContSeq=353219&contSeq=353219&board_id=&gubun=ALL"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-12575",
+            "province": "Daegu",
+            "country": "South Korea",
+            "latitude": "35.78134",
+            "longitude": "128.58",
+            "geo_resolution": "admin1",
+            "date_confirmation": "28.02.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://ncov.mohw.go.kr/tcmBoardView.do?brdId=&brdGubun=&dataGubun=&ncvContSeq=353219&contSeq=353219&board_id=&gubun=ALL",
+            "admin1": "Daegu",
+            "country_new": "South Korea",
+            "admin_id": "392.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-22T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-22T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-215064",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "22.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Spain",
+            "administrativeAreaLevel1": "Canary Islands",
+            "geometry": {
+                "latitude": 28.3447827,
+                "longitude": -15.66459
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-7242",
+            "province": "Canary Islands",
+            "country": "Spain",
+            "latitude": "28.3447827",
+            "longitude": "-15.66459",
+            "geo_resolution": "admin1",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain",
+            "admin1": "Canary Islands",
+            "country_new": "Spain",
+            "admin_id": "343.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200327.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-85472",
+            "city": "Bergamo",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.79841",
+            "longitude": "9.79008",
+            "geo_resolution": "admin2",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200327.csv",
+            "admin2": "Bergamo",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-39777",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "43.0140874",
+            "longitude": "-75.646457",
+            "geo_resolution": "admin1",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-219604",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.7558",
+            "longitude": "37.6173",
+            "geo_resolution": "admin2",
+            "date_confirmation": "23.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Illinois",
+            "administrativeAreaLevel2": "Lake County",
+            "locality": "Lake County",
+            "geometry": {
+                "latitude": 42.3259331,
+                "longitude": -88.002775
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-39145",
+            "city": "Lake County",
+            "province": "Illinois",
+            "country": "United States",
+            "latitude": "42.3259331",
+            "longitude": "-88.002775",
+            "geo_resolution": "admin2",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus",
+            "admin2": "Lake County",
+            "admin1": "Illinois",
+            "country_new": "United States",
+            "admin_id": "5210.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Nevada",
+            "geometry": {
+                "latitude": 39.4150221,
+                "longitude": -116.66716
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://app.powerbigov.us/view?r=eyJrIjoiMjA2ZThiOWUtM2FlNS00MGY5LWFmYjUtNmQwNTQ3Nzg5N2I2IiwidCI6ImU0YTM0MGU2LWI4OWUtNGU2OC04ZWFhLTE1NDRkMjcwMzk4MCJ9"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-41548",
+            "province": "Nevada",
+            "country": "United States",
+            "latitude": "39.4150221",
+            "longitude": "-116.66716",
+            "geo_resolution": "admin1",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://app.powerbigov.us/view?r=eyJrIjoiMjA2ZThiOWUtM2FlNS00MGY5LWFmYjUtNmQwNTQ3Nzg5N2I2IiwidCI6ImU0YTM0MGU2LWI4OWUtNGU2OC04ZWFhLTE1NDRkMjcwMzk4MCJ9",
+            "admin1": "Nevada",
+            "country_new": "United States",
+            "admin_id": "652.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Louisiana",
+            "administrativeAreaLevel2": "Jefferson Parish",
+            "locality": "Jefferson Parish",
+            "geometry": {
+                "latitude": 29.83975,
+                "longitude": -90.1382
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://ldh.la.gov/Coronavirus/"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-39537",
+            "city": "Jefferson Parish",
+            "province": "Louisiana",
+            "country": "United States",
+            "latitude": "29.83975",
+            "longitude": "-90.1382",
+            "geo_resolution": "admin2",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://ldh.la.gov/Coronavirus/",
+            "admin2": "Jefferson Parish",
+            "admin1": "Louisiana",
+            "country_new": "United States",
+            "admin_id": "4635.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hubei",
+            "administrativeAreaLevel2": "Wuhan City",
+            "locality": "Wuhan City",
+            "geometry": {
+                "latitude": 30.62506,
+                "longitude": 114.3421
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-01-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-01-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "http://wjw.hubei.gov.cn/fbjd/dtyw/202001/t20200131_2016680.shtml"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-2-3317",
+            "city": "Wuhan City",
+            "province": "Hubei",
+            "country": "China",
+            "latitude": "30.62506",
+            "longitude": "114.3421",
+            "geo_resolution": "admin2",
+            "date_confirmation": "30.01.2020",
+            "chronic_disease_binary": "False",
+            "source": "http://wjw.hubei.gov.cn/fbjd/dtyw/202001/t20200131_2016680.shtml",
+            "admin2": "Wuhan City",
+            "admin1": "Hubei",
+            "country_new": "China",
+            "admin_id": "9390.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Kaluga Oblast",
+            "locality": "Kaluga Oblast",
+            "geometry": {
+                "latitude": 54.3873,
+                "longitude": 35.1889
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-13T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-174666",
+            "city": "Kaluga Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "54.3873",
+            "longitude": "35.1889",
+            "geo_resolution": "admin2",
+            "date_confirmation": "13.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Kaluga Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "4944.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Brescia",
+            "locality": "Brescia",
+            "geometry": {
+                "latitude": 45.70507,
+                "longitude": 10.31322
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200317.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-33802",
+            "city": "Brescia",
+            "province": "Lombardia",
+            "country": "Italy",
+            "latitude": "45.70507",
+            "longitude": "10.31322",
+            "geo_resolution": "admin2",
+            "date_confirmation": "17.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200317.csv",
+            "admin2": "Brescia",
+            "admin1": "Lombardia",
+            "country_new": "Italy",
+            "admin_id": "1743.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow Oblast",
+            "locality": "Moscow Oblast",
+            "geometry": {
+                "latitude": 55.3404,
+                "longitude": 38.2918
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-240259",
+            "city": "Moscow Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "55.3404",
+            "longitude": "38.2918",
+            "geo_resolution": "admin2",
+            "date_confirmation": "27.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Moscow Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "6362.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 19.0,
+                "end": 19.0
+            },
+            "sex": "Male",
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Mexico",
+            "administrativeAreaLevel1": "Distrito Federal",
+            "locality": "Ciudad de Mexico",
+            "geometry": {
+                "latitude": 19.43333,
+                "longitude": -99.1333
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.gob.mx/cms/uploads/attachment/file/545297/Tabla_casos_positivos_COVID-19_resultado_InDRE_2020.04.05.pdf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "004-21605",
+            "age": "19",
+            "sex": "male",
+            "city": "Ciudad de Mexico",
+            "province": "Ciudad de Mexico",
+            "country": "Mexico",
+            "latitude": "19.43333",
+            "longitude": "-99.1333",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "30.03.2020",
+            "date_confirmation": "05.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.gob.mx/cms/uploads/attachment/file/545297/Tabla_casos_positivos_COVID-19_resultado_InDRE_2020.04.05.pdf",
+            "location": "Mexico City",
+            "admin1": "Distrito Federal",
+            "country_new": "Mexico",
+            "admin_id": "2298.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Puglia",
+            "administrativeAreaLevel2": "Brindisi",
+            "locality": "Brindisi",
+            "geometry": {
+                "latitude": 40.61018,
+                "longitude": 17.69139
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200408.csv"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-141852",
+            "city": "Brindisi",
+            "province": "Puglia",
+            "country": "Italy",
+            "latitude": "40.61018",
+            "longitude": "17.69139",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200408.csv",
+            "admin2": "Brindisi",
+            "admin1": "Puglia",
+            "country_new": "Italy",
+            "admin_id": "1750.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Bryansk Oblast",
+            "locality": "Bryansk Oblast",
+            "geometry": {
+                "latitude": 53.0409,
+                "longitude": 33.2691
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "source": {
+            "other": "stopcoronavirus.rf"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-233483",
+            "city": "Bryansk Oblast",
+            "province": "Central",
+            "country": "Russia",
+            "latitude": "53.0409",
+            "longitude": "33.2691",
+            "geo_resolution": "admin2",
+            "date_confirmation": "26.04.2020",
+            "chronic_disease_binary": "False",
+            "source": "stopcoronavirus.rf",
+            "admin2": "Bryansk Oblast",
+            "admin1": "Central",
+            "country_new": "Russia",
+            "admin_id": "1788.0",
+            "data_moderator_initials": "TR",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "France",
+            "administrativeAreaLevel1": "Ile-de-France",
+            "geometry": {
+                "latitude": 48.71114,
+                "longitude": 2.502813
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-5383",
+            "province": "Ile-de-France",
+            "country": "France",
+            "latitude": "48.71114",
+            "longitude": "2.502813",
+            "geo_resolution": "admin1",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "admin1": "Ile-de-France",
+            "country_new": "France",
+            "admin_id": "492.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New Jersey",
+            "geometry": {
+                "latitude": 40.2030102,
+                "longitude": -74.67119699999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.nj.gov/health/cd/topics/covid2019_dashboard.shtml"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-41969",
+            "province": "New Jersey",
+            "country": "United States",
+            "latitude": "40.2030102",
+            "longitude": "-74.67119699999998",
+            "geo_resolution": "admin1",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.nj.gov/health/cd/topics/covid2019_dashboard.shtml",
+            "admin1": "New Jersey",
+            "country_new": "United States",
+            "admin_id": "655.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "France",
+            "administrativeAreaLevel1": "Grand Est",
+            "geometry": {
+                "latitude": 48.6973,
+                "longitude": 5.610144999999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-11T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-11T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://www.santepubliquefrance.fr/maladies-et-traumatismes/maladies-et-infections-respiratoires/infection-a-corovirus/articles/infection-au-nouveau-corovirus-sars-cov-2-covid-19-france-et-monde"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-22783",
+            "province": "Grand Est",
+            "country": "France",
+            "latitude": "48.6973",
+            "longitude": "5.610144999999998",
+            "geo_resolution": "admin1",
+            "date_confirmation": "11.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://www.santepubliquefrance.fr/maladies-et-traumatismes/maladies-et-infections-respiratoires/infection-a-corovirus/articles/infection-au-nouveau-corovirus-sars-cov-2-covid-19-france-et-monde",
+            "admin1": "Grand Est",
+            "country_new": "France",
+            "admin_id": "450.0"
+        }
+    },
+    {
+        "demographics": {
+            "species": "Homo sapien"
+        },
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "source": {
+            "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+        },
+        "pathogens": [
+            {
+                "name": "sars-cov-2"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-50029",
+            "province": "New York",
+            "country": "United States",
+            "latitude": "43.0140874",
+            "longitude": "-75.646457",
+            "geo_resolution": "admin1",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "source": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "admin1": "New York",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    }
+]
