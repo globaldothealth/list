@@ -7,9 +7,11 @@
 declare let Mongo: any;
 
 /** Mongo CLI has its own print and read functions. OK, I guess! */
+declare function cat(path: string): Promise<string>;
+declare function listFiles(path: string): Promise<[string]>;
 declare function print(message: string): void;
-declare function printjson(message: number): void;
-declare function cat(path: string): string;
+declare function printjson(message: {}): void;
+declare function quit(): void;
 
 /**
  * The main connection object, representing the connection to the instance
@@ -49,6 +51,7 @@ interface CollModCommand {
 interface InsertCommand {
     insert: string;
     documents: JSON;
+    ordered: boolean;
 }
 
 /** Options to pass with the command to create a collection. */
