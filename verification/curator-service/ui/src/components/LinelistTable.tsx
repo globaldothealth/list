@@ -59,7 +59,7 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         super(props);
         this.state = {
             tableRef: React.createRef(),
-            url: (process.env.REACT_APP_API_ENDPOINT || "") + '/api/cases/',
+            url: '/api/cases/',
         }
     }
 
