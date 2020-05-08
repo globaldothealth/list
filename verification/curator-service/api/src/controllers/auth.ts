@@ -29,26 +29,39 @@ router.get(
     }),
 );
 
+router.get('/profile', (req: Request, res: Response): void => {
+    if (req.user) {
+        res.json(req.user);
+        return;
+    }
+    res.sendStatus(403);
+});
+
 export const configurePassport = (
     clientID: string,
     clientSecret: string,
 ): void => {
     passport.serializeUser<UserDocument, string>((user, done) => {
         // Serializes the user id in the cookie, no user info should be in there, just the id.
+        console.log('serializing user id in cookie');
         done(null, user.id);
     });
 
     passport.deserializeUser<UserDocument, string>((id, done) => {
+        console.log('deserializing user id from cookie');
         // Find the user based on its id in the cookie.
         User.findById(id)
             .then((user) => {
+                console.log('Got user:', user);
                 if (user) {
                     done(null, user);
                 } else {
+                    console.error('User not fetched');
                     done(new Error('User could not be found'), undefined);
                 }
             })
             .catch((e) => {
+                console.error('Failed to get user:', e);
                 done(e, undefined);
             });
     });
