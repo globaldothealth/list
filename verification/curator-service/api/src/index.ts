@@ -6,7 +6,6 @@ import { router as authRouter, configurePassport } from './controllers/auth';
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -24,10 +23,6 @@ const env = validateEnv();
 
 // Express configuration.
 app.set('port', env.PORT);
-
-// We run the frontend on another port, support queries from all origins.
-// TODO: This will need to be tweaked in production.
-app.use(cors());
 
 // Configure authentication.
 app.use(cookieParser());
