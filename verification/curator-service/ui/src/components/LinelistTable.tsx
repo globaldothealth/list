@@ -1,5 +1,6 @@
 import MaterialTable from 'material-table';
 import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
 import React from 'react';
 import axios from 'axios';
 import { isUndefined } from 'util';
@@ -93,6 +94,9 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
 
     addCase(newRowData: TableRow) {
         return new Promise((resolve, reject) => {
+            if (!this.validateRequired(newRowData.source_url)) {
+                return reject();
+            }
             const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.post(this.state.url, newCase);
             response.then(() => {
@@ -124,6 +128,9 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             if (isUndefined(oldRowData)) {
                 return reject();
             }
+            if (!this.validateRequired(newRowData.source_url)) {
+                return reject();
+            }
             const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.put(this.state.url + oldRowData.id, newCase);
             response.then(() => {
@@ -136,6 +143,10 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         });
     }
 
+    validateRequired(field: String) {
+        return field != "";
+    }
+
     render() {
         return (
             <Paper>
@@ -143,10 +154,22 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                     tableRef={this.state.tableRef}
                     columns={[
                         { title: 'ID', field: 'id', filtering: false, editable: "never" },
-                        { title: 'Sex', field: 'sex', filtering: false },
-                        { title: 'Age', field: 'age', filtering: false },
+                        { title: 'Sex', field: 'sex', filtering: false, lookup: { "Female": "Female", "Male": "Male" } },
+                        { title: 'Age', field: 'age', filtering: false, type: "numeric" },
                         { title: 'Notes', field: 'notes' },
-                        { title: 'Source URL', field: 'source_url', filtering: false },
+                        {
+                            title: 'Source URL', field: 'source_url', filtering: false,
+                            editComponent: (props) =>
+                                (<TextField
+                                    type="text"
+                                    size="small"
+                                    fullWidth
+                                    placeholder="Source URL"
+                                    error={!this.validateRequired(props.value)}
+                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
+                                    onChange={event => props.onChange(event.target.value)}
+                                    defaultValue={props.value} />)
+                        },
                     ]}
 
                     data={query =>
