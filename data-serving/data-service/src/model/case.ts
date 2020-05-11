@@ -1,3 +1,5 @@
+import { SourceDocument, sourceSchema } from './source';
+
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
@@ -85,28 +87,12 @@ const outbreakSpecificsSchema = new mongoose.Schema({
     reportedMarketExposure: Boolean,
 });
 
-const minimumSourceFieldsValidator = {
-    validator: function (source: Source): boolean {
-        return !!source.id || !!source.url || !!source.other;
-    },
-    message: 'One of source.id, source.url, or source.other is required',
-};
-
-const sourceSchema = new mongoose.Schema({
-    id: String,
-    url: String,
-    other: String,
-});
-
 const pathogenSchema = new mongoose.Schema({
     name: {
         type: String,
         required: 'Enter a pathogen name',
     },
-    sequenceSource: {
-        type: sourceSchema,
-        validate: minimumSourceFieldsValidator,
-    },
+    sequenceSource: sourceSchema,
     additionalInformation: String,
 });
 
@@ -191,11 +177,7 @@ const caseSchema = new mongoose.Schema(
         notes: String,
         outbreakSpecifics: outbreakSpecificsSchema,
         pathogens: [pathogenSchema],
-        source: {
-            type: sourceSchema,
-            required: 'Enter a source',
-            validate: minimumSourceFieldsValidator,
-        },
+        source: sourceSchema,
         symptoms: dictionaryValueSchema,
         travelHistory: [travelSchema],
     },
@@ -264,14 +246,8 @@ interface OutbreakSpecifics {
 
 interface Pathogen {
     name: string;
-    sequenceSource: Source;
+    sequenceSource: SourceDocument;
     additionalInformation: string;
-}
-
-interface Source {
-    id: string;
-    url: string;
-    other: string;
 }
 
 interface Symptoms {
@@ -297,7 +273,7 @@ type CaseDocument = mongoose.Document & {
     notes: string;
     outbreakSpecifics: OutbreakSpecifics;
     pathogens: [Pathogen];
-    source: Source;
+    source: SourceDocument;
     symptoms: Symptoms;
     travelHistory: [Travel];
 };
