@@ -8,7 +8,11 @@ beforeAll(() => {
         // This is provided by jest-mongodb.
         // The `else testurl` is to appease Typescript.
         process.env.MONGO_URL || 'testurl',
-        { useNewUrlParser: true, useUnifiedTopology: true },
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+        },
     );
 });
 
