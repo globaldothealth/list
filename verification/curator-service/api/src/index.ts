@@ -6,6 +6,7 @@ import { router as authRouter, configurePassport } from './controllers/auth';
 
 import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
+import { default as connectMongo } from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -24,13 +25,35 @@ const env = validateEnv();
 // Express configuration.
 app.set('port', env.PORT);
 
+// Connect to MongoDB.
+console.log('Connecting to instance', env.DB_CONNECTION_STRING);
+
+mongoose
+    .connect(env.DB_CONNECTION_STRING, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    })
+    .then(() => {
+        console.log('Connected to the database');
+    })
+    .catch((e) => {
+        console.error('Failed to connect to DB', e);
+    });
+
 // Configure authentication.
 app.use(cookieParser());
+// Store session info in MongoDB.
+const MongoStore = connectMongo(session);
 app.use(
     session({
         secret: env.SESSION_COOKIE_KEY,
         resave: true,
         saveUninitialized: true,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection,
+            secret: env.SESSION_COOKIE_KEY,
+        }),
     }),
 );
 configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
@@ -60,19 +83,4 @@ apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
 
 app.use('/api', apiRouter);
 
-// Connect to MongoDB.
-(async (): Promise<void> => {
-    try {
-        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
-
-        await mongoose.connect(env.DB_CONNECTION_STRING, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        });
-        console.log('Connected to the database');
-    } catch (e) {
-        console.error('Failed to connect to DB', e);
-    }
-})();
 export default app;
