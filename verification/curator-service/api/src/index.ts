@@ -2,8 +2,7 @@
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
-import { router as authRouter, configurePassport } from './controllers/auth';
-
+import { AuthController } from './controllers/auth';
 import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
 import { default as connectMongo } from 'connect-mongo';
@@ -56,10 +55,14 @@ app.use(
         }),
     }),
 );
-configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
+const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
+authController.configurePassport(
+    env.GOOGLE_OAUTH_CLIENT_ID,
+    env.GOOGLE_OAUTH_CLIENT_SECRET,
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/auth', authRouter);
+app.use('/auth', authController.router);
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
