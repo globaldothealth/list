@@ -14,6 +14,9 @@ RUN npm ci
 # Bundle app source
 COPY verification/curator-service/ui/. .
 
+# Bundle common files
+COPY common/* ../../../common/
+
 # Expose service on port 3002.
 EXPOSE 3002
 
