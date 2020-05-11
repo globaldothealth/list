@@ -70,7 +70,7 @@ class EpidNavbar extends React.Component<Props, User> {
                             <Button variant="contained" color="primary" href="/auth/logout">
                                 Logout {this.state.email}
                             </Button> :
-                            <Button variant="contained" color="secondary" href="/auth/google">
+                            <Button variant="contained" color="secondary" href={process.env.REACT_APP_LOGIN_URL}>
                                 Login
                             </Button>}
                     </Toolbar>
