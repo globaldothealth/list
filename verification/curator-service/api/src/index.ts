@@ -5,10 +5,10 @@ import * as sourcesController from './controllers/sources';
 import { AuthController } from './controllers/auth';
 import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
-import { default as connectMongo } from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
+import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import session from 'express-session';
@@ -43,7 +43,7 @@ mongoose
 // Configure authentication.
 app.use(cookieParser());
 // Store session info in MongoDB.
-const MongoStore = connectMongo(session);
+const MongoStore = mongo(session);
 app.use(
     session({
         secret: env.SESSION_COOKIE_KEY,
