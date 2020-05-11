@@ -21,4 +21,5 @@ EXPOSE 3002
 # Environment variables must be passed, notably:
 # - PORT
 # - REACT_APP_PROXY_URL
+# - REACT_APP_LOGIN_URL
 CMD [ "npm", "run-script", "start-noenv" ]

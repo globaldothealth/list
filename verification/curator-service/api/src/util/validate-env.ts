@@ -7,6 +7,7 @@ export default function validateEnv(): Readonly<{
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
     SESSION_COOKIE_KEY: string;
+    AFTER_LOGIN_REDIRECT_URL: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -33,6 +34,10 @@ export default function validateEnv(): Readonly<{
         SESSION_COOKIE_KEY: str({
             desc: 'Secret key to sign cookies',
             devDefault: 'default-dev-key',
+        }),
+        AFTER_LOGIN_REDIRECT_URL: str({
+            desc: 'URL to redirect to after the oauth consent screen',
+            devDefault: 'http://localhost:3002/',
         }),
     });
 }
