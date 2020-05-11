@@ -2,10 +2,10 @@
 import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
 
-import { router as authRouter, configurePassport } from './controllers/auth';
-
+import { AuthController } from './controllers/auth';
 import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
+import { default as connectMongo } from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -24,19 +24,45 @@ const env = validateEnv();
 // Express configuration.
 app.set('port', env.PORT);
 
+// Connect to MongoDB.
+console.log('Connecting to instance', env.DB_CONNECTION_STRING);
+
+mongoose
+    .connect(env.DB_CONNECTION_STRING, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    })
+    .then(() => {
+        console.log('Connected to the database');
+    })
+    .catch((e) => {
+        console.error('Failed to connect to DB', e);
+    });
+
 // Configure authentication.
 app.use(cookieParser());
+// Store session info in MongoDB.
+const MongoStore = connectMongo(session);
 app.use(
     session({
         secret: env.SESSION_COOKIE_KEY,
         resave: true,
         saveUninitialized: true,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection,
+            secret: env.SESSION_COOKIE_KEY,
+        }),
     }),
 );
-configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
+const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
+authController.configurePassport(
+    env.GOOGLE_OAUTH_CLIENT_ID,
+    env.GOOGLE_OAUTH_CLIENT_SECRET,
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/auth', authRouter);
+app.use('/auth', authController.router);
 
 // Configure frontend app routes.
 app.get('/', homeController.index);
@@ -60,19 +86,4 @@ apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
 
 app.use('/api', apiRouter);
 
-// Connect to MongoDB.
-(async (): Promise<void> => {
-    try {
-        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
-
-        await mongoose.connect(env.DB_CONNECTION_STRING, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        });
-        console.log('Connected to the database');
-    } catch (e) {
-        console.error('Failed to connect to DB', e);
-    }
-})();
 export default app;
