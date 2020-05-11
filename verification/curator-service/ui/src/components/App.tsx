@@ -1,5 +1,4 @@
 import {
-  BrowserRouter,
   Link,
   Route,
   Switch
@@ -27,20 +26,18 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <BrowserRouter>
-          <EpidNavbar />
-          <Switch>
-            <Route path="/cases/new">
-              <NewEntry />
-            </Route>
-            <Route path="/cases">
-              <Linelist />
-            </Route>
-            <Route exact path="/">
-              <Home />
-            </Route>
-          </Switch>
-        </BrowserRouter>
+        <EpidNavbar />
+        <Switch>
+          <Route path="/cases/new">
+            <NewEntry />
+          </Route>
+          <Route path="/cases">
+            <Linelist />
+          </Route>
+          <Route exact path="/">
+            <Home />
+          </Route>
+        </Switch>
       </div>
     </ThemeProvider>
   );
