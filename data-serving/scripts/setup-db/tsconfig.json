@@ -1,7 +1,8 @@
 {
-  "extends": "../../common/tsconfig.json",
+  "extends": "../../../common/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist", /* Redirect output structure to the directory. */
+    "baseUrl": "./", /* Base directory to resolve non-absolute module names. */
     "paths": { /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
       "*": [
         "node_modules/*",
