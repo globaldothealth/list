@@ -7,9 +7,21 @@
 declare let Mongo: any;
 
 /** Mongo CLI has its own print and read functions. OK, I guess! */
+declare function cat(path: string): Promise<string>;
 declare function print(message: string): void;
-declare function printjson(message: number): void;
-declare function cat(path: string): string;
+declare function printjson(message: {}): void;
+declare function quit(): void;
+
+interface Collection {
+    drop: () => Promise<CommandResult>;
+    stats: () => Promise<CollectionStats>;
+}
+
+interface CollectionStats {
+    ns: string;
+    count: number;
+    nindexes: number;
+}
 
 /**
  * The main connection object, representing the connection to the instance
@@ -30,25 +42,9 @@ interface Database {
         options?: CreateCollectionOptions,
     ) => Promise<CommandResult>;
 
+    getCollection: (name: string) => Promise<Collection>;
+
     getCollectionNames: () => Promise<[string]>;
-
-    runCommand: (
-        command: InsertCommand | CollModCommand,
-    ) => Promise<CommandResult>;
-}
-
-/** A command to modify a collection, as an arg to `runCommand`. */
-interface CollModCommand {
-    collMod: string;
-    validator: JSON;
-}
-
-/**
- * A command to insert documents into a collection, as an arg to `runCommand`.
- */
-interface InsertCommand {
-    insert: string;
-    documents: JSON;
 }
 
 /** Options to pass with the command to create a collection. */
@@ -59,16 +55,4 @@ interface CreateCollectionOptions {
 /** The result of a call to `runCommand.` */
 interface CommandResult {
     ok: number;
-}
-
-/** The result of a call to `runCommand` with an `InsertCommand.` */
-interface InsertDataCommandResult extends CommandResult {
-    n: number;
-    writeErrors: [
-        {
-            index: number;
-            code: number;
-            errmsg: string;
-        },
-    ];
 }
