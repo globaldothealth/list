@@ -9,7 +9,9 @@ services:
         environment:
             MONGO_INITDB_DATABASE: "covid19"
     curator:
-        build: ../verification/curator-service/api
+        build:
+          context: ../.
+          dockerfile: verification/curator-service/api/Dockerfile
         init: true
         ports:
             - "3001:3001"
@@ -20,7 +22,9 @@ services:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
             DATASERVER_URL: "http://data:3000"
     data:
-        build: ../data-serving/data-service
+        build:
+          context: ../.
+          dockerfile: data-serving/data-service/Dockerfile
         init: true
         ports:
             - "3000:3000"
@@ -29,7 +33,9 @@ services:
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
     curatorui:
-        build: ../verification/curator-service/ui
+        build:
+          context: ../.
+          dockerfile: verification/curator-service/ui/Dockerfile
         init: true
         ports:
             - "3002:3002"
@@ -39,4 +45,9 @@ services:
         stdin_open: true
         environment:
             PORT: "3002"
+            # UI and API run on different ports in dev, make the custom proxy work.
             REACT_APP_PROXY_URL: "http://curator:3001"
+            # We can't use curator:3001 here because that's an internal DNS,
+            # not accessible from the user's browser.
+            # In production simply /auth/google would work.
+            REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"
