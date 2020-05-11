@@ -1,5 +1,6 @@
 import app from '../src/index';
 import axios from 'axios';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 jest.mock('axios');
@@ -7,6 +8,23 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 afterEach(() => {
     jest.clearAllMocks();
+});
+
+beforeAll(() => {
+    return mongoose.connect(
+        // This is provided by jest-mongodb.
+        // The `else testurl` is to appease Typescript.
+        process.env.MONGO_URL || 'testurl',
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+        },
+    );
+});
+
+afterAll(() => {
+    return mongoose.disconnect();
 });
 
 const emptyAxiosResponse = {
