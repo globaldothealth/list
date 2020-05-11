@@ -1,7 +1,7 @@
 {
-  "name": "import-data",
+  "name": "setup-db",
   "version": "1.0.0",
-  "description": "Creates a database and collection as necessary and imports data into it.",
+  "description": "Creates or replaces a database and collection and sets it up with a schema and indexes.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -12,7 +12,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/open-covid-data/healthmap-gdo-temp.git",
-    "directory": "data-serving/scripts/import-data"
+    "directory": "data-serving/scripts/setup-db"
   },
   "author": "",
   "license": "MIT",
