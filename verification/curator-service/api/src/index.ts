@@ -5,6 +5,7 @@ import * as sourcesController from './controllers/sources';
 import { router as authRouter, configurePassport } from './controllers/auth';
 
 import CasesController from './controllers/cases';
+import { MongoStore } from 'connect-mongo';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -24,15 +25,33 @@ const env = validateEnv();
 // Express configuration.
 app.set('port', env.PORT);
 
+// Connect to MongoDB.
+(async (): Promise<void> => {
+    try {
+        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
+
+        const conn = await mongoose.connect(env.DB_CONNECTION_STRING, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+        });
+        console.log('Connected to the database');
+        // Store session info in MongoDB.
+        app.use(
+            session({
+                secret: env.SESSION_COOKIE_KEY,
+                resave: true,
+                saveUninitialized: true,
+                store: new MongoStore(conn),
+            }),
+        );
+    } catch (e) {
+        console.error('Failed to connect to DB', e);
+    }
+})();
+
 // Configure authentication.
 app.use(cookieParser());
-app.use(
-    session({
-        secret: env.SESSION_COOKIE_KEY,
-        resave: true,
-        saveUninitialized: true,
-    }),
-);
 configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
 app.use(passport.initialize());
 app.use(passport.session());
@@ -60,19 +79,4 @@ apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
 
 app.use('/api', apiRouter);
 
-// Connect to MongoDB.
-(async (): Promise<void> => {
-    try {
-        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
-
-        await mongoose.connect(env.DB_CONNECTION_STRING, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        });
-        console.log('Connected to the database');
-    } catch (e) {
-        console.error('Failed to connect to DB', e);
-    }
-})();
 export default app;
