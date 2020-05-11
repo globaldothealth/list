@@ -14,6 +14,9 @@ RUN npm ci
 # Bundle app source
 COPY data-serving/data-service/. .
 
+# Bundle common files
+COPY common/* ../../common/
+
 # Build the app
 RUN npm run-script build
 
