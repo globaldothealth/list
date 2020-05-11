@@ -65,7 +65,7 @@ class EpidNavbar extends React.Component<Props, User> {
                         </Link>
                         <Typography variant="h6" className={classes.title}>
                             epid
-                    </Typography>
+                        </Typography>
                         {this.state.email ?
                             <Button variant="contained" color="primary" href="/auth/logout">
                                 Logout {this.state.email}
