@@ -43,16 +43,13 @@ export const configurePassport = (
 ): void => {
     passport.serializeUser<UserDocument, string>((user, done) => {
         // Serializes the user id in the cookie, no user info should be in there, just the id.
-        console.log('serializing user id in cookie');
         done(null, user.id);
     });
 
     passport.deserializeUser<UserDocument, string>((id, done) => {
-        console.log('deserializing user id from cookie');
         // Find the user based on its id in the cookie.
         User.findById(id)
             .then((user) => {
-                console.log('Got user:', user);
                 if (user) {
                     done(null, user);
                 } else {
