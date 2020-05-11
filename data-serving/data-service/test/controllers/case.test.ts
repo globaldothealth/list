@@ -1,6 +1,6 @@
-import { Case } from '../src/model/case';
-import app from '../src/index';
-import minimalCase from './model/data/case.minimal.json';
+import { Case } from '../../src/model/case';
+import app from './../../src/index';
+import minimalCase from './../model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
