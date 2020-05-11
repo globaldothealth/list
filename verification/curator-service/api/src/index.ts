@@ -5,8 +5,8 @@ import * as sourcesController from './controllers/sources';
 import { router as authRouter, configurePassport } from './controllers/auth';
 
 import CasesController from './controllers/cases';
-import { MongoStore } from 'connect-mongo';
 import bodyParser from 'body-parser';
+import { default as connectMongo } from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -26,32 +26,36 @@ const env = validateEnv();
 app.set('port', env.PORT);
 
 // Connect to MongoDB.
-(async (): Promise<void> => {
-    try {
-        console.log('Connecting to instance', env.DB_CONNECTION_STRING);
+console.log('Connecting to instance', env.DB_CONNECTION_STRING);
 
-        const conn = await mongoose.connect(env.DB_CONNECTION_STRING, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        });
+mongoose
+    .connect(env.DB_CONNECTION_STRING, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    })
+    .then(() => {
         console.log('Connected to the database');
-        // Store session info in MongoDB.
-        app.use(
-            session({
-                secret: env.SESSION_COOKIE_KEY,
-                resave: true,
-                saveUninitialized: true,
-                store: new MongoStore(conn),
-            }),
-        );
-    } catch (e) {
+    })
+    .catch((e) => {
         console.error('Failed to connect to DB', e);
-    }
-})();
+    });
 
 // Configure authentication.
 app.use(cookieParser());
+// Store session info in MongoDB.
+const MongoStore = connectMongo(session);
+app.use(
+    session({
+        secret: env.SESSION_COOKIE_KEY,
+        resave: true,
+        saveUninitialized: true,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection,
+            secret: env.SESSION_COOKIE_KEY,
+        }),
+    }),
+);
 configurePassport(env.GOOGLE_OAUTH_CLIENT_ID, env.GOOGLE_OAUTH_CLIENT_SECRET);
 app.use(passport.initialize());
 app.use(passport.session());
