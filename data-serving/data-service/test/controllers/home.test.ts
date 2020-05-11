@@ -1,4 +1,4 @@
-import app from '../src/index';
+import app from '../../src/index';
 import request from 'supertest';
 
 describe('GET /', () => {
