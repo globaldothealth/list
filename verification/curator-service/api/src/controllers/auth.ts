@@ -1,8 +1,23 @@
+import { NextFunction, Request, Response } from 'express';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
 
 import passport from 'passport';
+
+// mustBeAuthenticated is a middleware that checks that the user making the call is
+// authenticated.
+// Subsequent request handlers can be assured req.user will be defined.
+export const mustBeAuthenticated = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): void => {
+    if (req.user) {
+        next();
+        return;
+    }
+    res.sendStatus(403);
+};
 
 export const router = require('express').Router();
 
@@ -22,6 +37,8 @@ router.get('/logout', (req: Request, res: Response): void => {
     res.redirect('/');
 });
 
+// Starts the authentication flow with Google OAuth.
+// This will redirect the browser to the OAuth consent screen.
 router.get(
     '/google',
     passport.authenticate('google', {
@@ -29,13 +46,13 @@ router.get(
     }),
 );
 
-router.get('/profile', (req: Request, res: Response): void => {
-    if (req.user) {
+router.get(
+    '/profile',
+    mustBeAuthenticated,
+    (req: Request, res: Response): void => {
         res.json(req.user);
-        return;
-    }
-    res.sendStatus(403);
-});
+    },
+);
 
 export const configurePassport = (
     clientID: string,
