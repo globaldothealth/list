@@ -14,6 +14,9 @@ RUN npm ci
 # Bundle app source
 COPY verification/curator-service/api/. .
 
+# Bundle common files
+COPY common/* ../../../common/
+
 # Build the app
 RUN npm run-script build
 
