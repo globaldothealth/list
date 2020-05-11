@@ -23,35 +23,24 @@ const setupDatabase = async ({
         const database = await connection.getDB(databaseName);
         print(`Connected to database "${database}"`);
 
-        // Either update the collection with the schema if it already exists, or
-        // create the collection with the schema.
-        let collection;
+        // If the collection already exists, drop it so we can recreate it
+        // fresh.
         if (
             (await database.getCollectionNames()).some(
                 (c) => c == collectionName,
             )
         ) {
-            // Drop existing data, if any.
-            collection = await database.getCollection(collectionName);
-            collection.remove({});
-            print('Dropped existing data');
-
-            // Update the collection with the schema validator.
-            database.runCommand({
-                collMod: collectionName,
-                validator: schema,
-            });
-            print(`Applied schema to collection "${collectionName}"`);
-        } else {
-            await database.createCollection(collectionName, {
-                validator: schema,
-            });
-            print(`Created collection "${collectionName}" with schema`);
+            await (await database.getCollection(collectionName)).drop();
+            print('Dropped existing collection');
         }
 
+        await database.createCollection(collectionName, {
+            validator: schema,
+        });
+        print(`Created collection "${collectionName}" with schema`);
+
+        const collection = await database.getCollection(collectionName);
         // TODO(khmoran): Create indexes.
-        collection =
-            collection ?? (await database.getCollection(collectionName));
 
         // Print some stats -- for fun and confirmation!
         const stats = await collection.stats();

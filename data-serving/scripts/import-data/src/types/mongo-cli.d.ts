@@ -13,8 +13,7 @@ declare function printjson(message: {}): void;
 declare function quit(): void;
 
 interface Collection {
-    remove: (query: {}) => Promise<CommandResult>;
-
+    drop: () => Promise<CommandResult>;
     stats: () => Promise<CollectionStats>;
 }
 
@@ -46,16 +45,6 @@ interface Database {
     getCollection: (name: string) => Promise<Collection>;
 
     getCollectionNames: () => Promise<[string]>;
-
-    runCommand: (
-        command: CollModCommand,
-    ) => Promise<CommandResult>;
-}
-
-/** A command to modify a collection, as an arg to `runCommand`. */
-interface CollModCommand {
-    collMod: string;
-    validator: JSON;
 }
 
 /** Options to pass with the command to create a collection. */
