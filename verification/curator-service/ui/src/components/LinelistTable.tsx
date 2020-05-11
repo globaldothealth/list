@@ -144,7 +144,7 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     }
 
     validateRequired(field: String) {
-        return field.trim() !== "";
+        return field?.trim() !== "";
     }
 
     render() {
