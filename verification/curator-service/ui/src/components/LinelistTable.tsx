@@ -1,7 +1,7 @@
 import MaterialTable from 'material-table';
 import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
 import React from 'react';
+import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
 
@@ -77,13 +77,13 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             location: {
                 country: "France",
             },
-            events: {
+            events: [{
                 name: "confirmed",
                 dateRange: {
                     start: "2020-01-13T05:00:00.000Z",
                     end: "2020-01-13T05:00:00.000Z",
                 },
-            },
+            }],
             revisionMetadata: {
                 date: "2020-04-23T04:00:00.000Z",
                 id: 0,
