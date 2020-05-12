@@ -17,7 +17,7 @@ All services require specific environement variables to be set when running.
 
 Specific .env files in each service directory are used when you run `npm run dev` from the service directory directly.
 
-If you run the docker-compose script described below to run the whole stack, environment variables should be passed in the docker-compose.dev.yml environement overrides or in the docker-compose .env file itself in this directory. No service-specific .env files are included in the docker compose build as we shouldn't put secrets into (soon-to-be) images.
+If you run the docker-compose script described below to run the whole stack, environment variables should be passed in the docker-compose.dev.yml environement overrides or in the docker-compose .env file itself in this directory. No service-specific .env files are included in the docker compose build as we shouldn't put secrets into docker images.
 
 ## Docker
 
