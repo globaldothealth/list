@@ -1,0 +1,6 @@
+version: "3.7"
+services:
+  curator:
+    environment:
+      GOOGLE_OAUTH_CLIENT_ID: "foo"
+      GOOGLE_OAUTH_CLIENT_SECRET: "bar"
