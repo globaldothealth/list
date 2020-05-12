@@ -35,5 +35,3 @@ export type SourceDocument = mongoose.Document & {
     url: string;
     other: string;
 };
-
-export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);

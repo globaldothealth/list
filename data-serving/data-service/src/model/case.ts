@@ -5,7 +5,7 @@ import {
 import { SourceDocument, sourceSchema } from './source';
 
 import { ObjectId } from 'mongodb';
-import { dateSchema } from './date';
+import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 
 export enum Sex {
@@ -25,8 +25,8 @@ export enum TravelPurpose {
 }
 
 const dateRangeSchema = new mongoose.Schema({
-    start: dateSchema,
-    end: dateSchema,
+    start: dateFieldInfo,
+    end: dateFieldInfo,
 });
 
 const dictionaryValueSchema = new mongoose.Schema({

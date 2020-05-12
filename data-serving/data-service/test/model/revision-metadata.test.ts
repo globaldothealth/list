@@ -1,5 +1,15 @@
+import {
+    RevisionMetadataDocument,
+    revisionMetadataSchema,
+} from '../../src/model/revision-metadata';
+
 import { Error } from 'mongoose';
-import { RevisionMetadata } from '../../src/model/revision-metadata';
+import mongoose from 'mongoose';
+
+const RevisionMetadata = mongoose.model<RevisionMetadataDocument>(
+    'RevisionMetadata',
+    revisionMetadataSchema,
+);
 
 /** A sample document with the minimim required fields. */
 const minimalModel = {
