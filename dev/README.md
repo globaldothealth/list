@@ -65,3 +65,9 @@ db.cases.remove({})
 ## IDE setup
 
 If you're using VSCode, `.vscode/settings.json` contains useful default settings for working with Typescript and NodeJS.
+
+## Database setup
+
+To start with a premade development database for the dataserver to use, run `setup_db.sh`. The
+script will connect to your locally-running MongoDB instance, (re)create the necessary environment,
+apply the schema, and insert some sample data.
