@@ -6,6 +6,9 @@
       "_id": {
         "bsonType": "objectId"
       },
+      "__v": {
+        "bsonType": "int"
+      },
       "demographics": {
         "bsonType": "object",
         "additionalProperties": false,
