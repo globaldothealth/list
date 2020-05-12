@@ -1,5 +1,7 @@
+import { Source, sourceSchema } from '../../src/model/source';
+
 import { Error } from 'mongoose';
-import { Source } from '../../src/model/source';
+import mongoose from 'mongoose';
 
 describe('validate', () => {
     it('empty source is invalid', async () => {
@@ -26,5 +28,18 @@ describe('validate', () => {
             url: 'http://abc.def',
             other: 'ghi',
         }).validate();
+    });
+
+    it('validators work for embedded sources', async () => {
+        const FakeModel = mongoose.model(
+            'FakeDocument',
+            new mongoose.Schema({
+                source: sourceSchema,
+            }),
+        );
+        return new FakeModel({ source: {} }).validate((e) => {
+            console.log(e);
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
     });
 });

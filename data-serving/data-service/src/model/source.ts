@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 
 const fieldRequiredValidator = [
     function (this: SourceDocument) {
-        return this.id == null && this.url == null && this.other == null;
+        return (
+            this != null &&
+            this.id == null &&
+            this.url == null &&
+            this.other == null
+        );
     },
     'Source must specify id, url, or other',
 ];
