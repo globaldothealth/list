@@ -2,6 +2,15 @@
 
 This directory contains the docker compose file to run an isolated environment of the full stack during development.
 
+## Prerequisite
+
+**Important** running the full stack correctly requires having access to a few secrets: you should have a .env file at the top of your repository (where you run the `docker-compose` command) that looks like this:
+
+```
+GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
+GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
+```
+
 ## Docker
 
 During development, you can run each service individually using `docker` or plug them together using `docker-compose`.
@@ -10,11 +19,7 @@ During development, you can run each service individually using `docker` or plug
 
 ### All services composed with hot reload
 
-Just run `./dev/run_stack.sh` from anywhere or from this folder run:
-
-```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
-```
+Just run `./dev/run_stack.sh` from anywhere.
 
 Services will be accessible and connected to each other.
 
@@ -48,36 +53,6 @@ By default docker wil persist the container data unless you rm it, to remove dat
 use covid19
 db.cases.remove({})
 ```
-
-#### Data service
-
-From the `data-service` directory where the `Dockerfile` is located, run:
-
-```
-docker build . -t epid/dataservice
-```
-
-then run it with:
-
-```
-docker run --network=host epid/dataservice
-```
-
-#### Curator service
-
-From the `curator-service` directory where the `Dockerfile` is located, run:
-
-```
-docker build . -t epid/curatorservice
-```
-
-then run it with:
-
-```
-docker run --network=host epid/curatorservice
-```
-
-This will connect to the default mongo db exposed by the docker container if run as explained in the _Mongo_ section above.
 
 ## IDE setup
 
