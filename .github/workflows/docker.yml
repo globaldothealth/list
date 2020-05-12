@@ -6,9 +6,9 @@ on:
   pull_request:
     branches: [master]
     paths:
-    - '.github/workflows/docker.yml'
-    - 'data-serving/data-service/**'
-    - 'verification/curator-service/**'
+      - ".github/workflows/docker.yml"
+      - "data-serving/data-service/**"
+      - "verification/curator-service/**"
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Stack
-        run: docker-compose -f dev/docker-compose.yml up --build -d -V
+        run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
       # Containers are run detached above, which means we have to wait until they are up to produce meaningful logs.
       - name: Sleep for 30 seconds
         uses: jakejarvis/wait-action@master
