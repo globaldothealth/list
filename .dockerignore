@@ -1,0 +1,15 @@
+# verification/curation/(ui|api)
+*/*/*/.env
+*/*/*/coverage
+*/*/*/dist
+*/*/*/node_modules
+*/*/*/npm-debug.log
+
+# data-serving/data-service
+*/*/.env
+*/*/coverage
+*/*/dist
+*/*/node_modules
+*/*/npm-debug.log
+
+.git
