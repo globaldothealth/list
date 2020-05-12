@@ -1,12 +1,12 @@
 import { Error } from 'mongoose';
-import { dateSchema } from '../../src/model/date';
+import { dateFieldInfo } from '../../src/model/date';
 import mongoose from 'mongoose';
 
 /** A fake model with a field using the date schema. */
 const FakeModel = mongoose.model(
     'FakeDocument',
     new mongoose.Schema({
-        date: dateSchema,
+        date: dateFieldInfo,
     }),
 );
 
@@ -33,7 +33,17 @@ describe('validate', () => {
         });
     });
 
-    it('a date between 2019-11-01 and now is valid', async () => {
+    it('a date ISO date form is valid', async () => {
         return new FakeModel({ date: '2019-11-01' }).validate();
+    });
+
+    it('a date in ISO date-time form is valid', async () => {
+        return new FakeModel({ date: '2020-05-10T14:48:00' }).validate();
+    });
+
+    it('a date in ISO date-time + ms + tz form is valid', async () => {
+        return new FakeModel({
+            date: '2020-05-10T14:48:00.000+09:00',
+        }).validate();
     });
 });

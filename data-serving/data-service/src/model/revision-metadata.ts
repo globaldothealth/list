@@ -1,4 +1,4 @@
-import { dateSchema } from './date';
+import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 
 export const revisionMetadataSchema = new mongoose.Schema({
@@ -16,7 +16,7 @@ export const revisionMetadataSchema = new mongoose.Schema({
         required: 'Enter a revision moderator id',
     },
     date: {
-        ...dateSchema,
+        ...dateFieldInfo,
         required: 'Enter a revision date',
     },
     notes: String,
@@ -28,8 +28,3 @@ export type RevisionMetadataDocument = mongoose.Document & {
     date: Date;
     notes: string;
 };
-
-export const RevisionMetadata = mongoose.model<RevisionMetadataDocument>(
-    'RevisionMetadata',
-    revisionMetadataSchema,
-);
