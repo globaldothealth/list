@@ -1,2 +1,4 @@
 # Local AWS testing and deployment artifacts.
 .aws
+# Never submit .env files that might contain secrets.
+.env

@@ -4,6 +4,8 @@ services:
     command: "npm run-script dev"
     volumes:
       - ../verification/curator-service/api/src:/usr/src/app/src
+    environment:
+      AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
   data:
     command: "npm run-script dev"
     volumes:
