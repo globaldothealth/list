@@ -1,6 +1,11 @@
+import {
+    RevisionMetadataDocument,
+    revisionMetadataSchema,
+} from './revision-metadata';
 import { SourceDocument, sourceSchema } from './source';
 
 import { ObjectId } from 'mongodb';
+import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 
 export enum Sex {
@@ -19,15 +24,9 @@ export enum TravelPurpose {
     Work = 'Work',
 }
 
-const dateValidator = {
-    type: Date,
-    start: '2019-11-01',
-    end: Date.now,
-};
-
 const dateRangeSchema = new mongoose.Schema({
-    start: dateValidator,
-    end: dateValidator,
+    start: dateFieldInfo,
+    end: dateFieldInfo,
 });
 
 const dictionaryValueSchema = new mongoose.Schema({
@@ -62,24 +61,6 @@ const demographicsSchema = new mongoose.Schema({
         type: String,
         enum: Object.values(Sex),
     },
-});
-
-const revisionMetadataSchema = new mongoose.Schema({
-    id: {
-        type: Number,
-        required: 'Enter a revision id',
-    },
-    moderator: {
-        type: String,
-        required: 'Enter a revision moderator id',
-    },
-    date: {
-        ...dateValidator,
-        ...{
-            required: 'Enter a revision date',
-        },
-    },
-    notes: String,
 });
 
 const outbreakSpecificsSchema = new mongoose.Schema({
@@ -232,13 +213,6 @@ interface Location {
     geometry: Geometry;
 }
 
-interface RevisionMetadata {
-    id: number;
-    moderator: string;
-    date: Date;
-    notes: string;
-}
-
 interface OutbreakSpecifics {
     livesInWuhan: boolean;
     reportedMarketExposure: boolean;
@@ -269,7 +243,7 @@ type CaseDocument = mongoose.Document & {
     events: [Event];
     importedCase: {};
     location: Location;
-    revisionMetadata: RevisionMetadata;
+    revisionMetadata: RevisionMetadataDocument;
     notes: string;
     outbreakSpecifics: OutbreakSpecifics;
     pathogens: [Pathogen];

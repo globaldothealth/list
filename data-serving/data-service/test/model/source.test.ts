@@ -1,7 +1,9 @@
-import { Source, sourceSchema } from '../../src/model/source';
+import { SourceDocument, sourceSchema } from '../../src/model/source';
 
 import { Error } from 'mongoose';
 import mongoose from 'mongoose';
+
+const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
 
 describe('validate', () => {
     it('empty source is invalid', async () => {
