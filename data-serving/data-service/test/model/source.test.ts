@@ -38,7 +38,6 @@ describe('validate', () => {
             }),
         );
         return new FakeModel({ source: {} }).validate((e) => {
-            console.log(e);
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
