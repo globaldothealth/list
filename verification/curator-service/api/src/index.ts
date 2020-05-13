@@ -84,13 +84,14 @@ apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
 
 app.use('/api', apiRouter);
 
-// Serve static UI content.
-const staticDir = path.join(__dirname, '..', '..', 'ui', 'build');
-console.log('Serving static files from', staticDir);
-app.use(express.static(staticDir));
-// Send index to any unmatched route.
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(staticDir, 'index.html'));
-});
+// Serve static UI content if static directory was specified.
+if (env.STATIC_DIR) {
+    console.log('Serving static files from', env.STATIC_DIR);
+    app.use(express.static(env.STATIC_DIR));
+    // Send index to any unmatched route.
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
+    });
+}
 
 export default app;
