@@ -22,6 +22,9 @@ it('loads and displays cases', async () => {
       importedCase: {
         outcome: 'Recovered',
       },
+      location: {
+        country: "France",
+      },
       events: [
         {
           name: 'confirmed',
@@ -62,6 +65,9 @@ it('can delete a row', async () => {
       _id: 'abc123',
       importedCase: {
         outcome: 'Recovered',
+      },
+      location: {
+        country: "France",
       },
       events: [
         {
@@ -158,6 +164,17 @@ it('can add a row', async () => {
     demographics: {
       sex: "Female",
     },
+    location: {
+      country: "France",
+    },
+    events: [
+      {
+        name: 'confirmed',
+        dateRange: {
+          start: new Date().toJSON(),
+        },
+      }
+    ],
     notes: "some notes",
     source: {
       url: "http://foo.bar",
@@ -205,6 +222,9 @@ it('can edit a row', async () => {
       importedCase: {
         outcome: 'Recovered',
       },
+      location: {
+        country: "France",
+      },
       events: [
         {
           name: 'confirmed',
@@ -244,6 +264,9 @@ it('can edit a row', async () => {
       _id: 'abc123',
       importedCase: {
         outcome: 'Recovered',
+      },
+      location: {
+        country: "France",
       },
       events: [
         {
