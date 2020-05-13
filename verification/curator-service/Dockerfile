@@ -35,5 +35,7 @@ RUN npm run-script build
 
 # Go back to curator service
 WORKDIR /usr/src/app/verification/curator-service/api
+# Set environment variable to serve static files from built UI.
+ENV STATIC_DIR /usr/src/app/verification/curator-service/ui/build
 # Start service.
 CMD [ "npm", "start" ]
