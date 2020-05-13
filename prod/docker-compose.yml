@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  mongo:
+    image: mongo
+    restart: always
+    init: true
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: "covid19"
+  curator:
+    build:
+      context: ../.
+      dockerfile: verification/curator-service/Dockerfile
+    init: true
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+      - data
+    environment:
+      DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+      DATASERVER_URL: "http://data:3000"
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      SESSION_COOKIE_KEY: "${SESSION_COOKIE_KEY}"
+      AFTER_LOGIN_REDIRECT_URL: "/"
+  data:
+    build:
+      context: ../.
+      dockerfile: data-serving/data-service/Dockerfile
+    init: true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
