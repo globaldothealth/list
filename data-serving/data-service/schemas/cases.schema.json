@@ -6,14 +6,23 @@
       "_id": {
         "bsonType": "objectId"
       },
+      "__v": {
+        "bsonType": "int"
+      },
       "demographics": {
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "ageRange": {
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
+              "_id": {
+                "bsonType": "objectId"
+              },
               "start": {
                 "bsonType": "double",
                 "minimum": -1,
@@ -44,6 +53,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "id": {
             "bsonType": "string"
           },
@@ -67,6 +79,9 @@
               "longitude"
             ],
             "properties": {
+              "_id": {
+                "bsonType": "objectId"
+              },
               "latitude": {
                 "bsonType": "double",
                 "minimum": -90.0,
@@ -88,6 +103,9 @@
           "bsonType": "object",
           "additionalProperties": false,
           "properties": {
+            "_id": {
+              "bsonType": "objectId"
+            },
             "name": {
               "bsonType": "string"
             },
@@ -95,6 +113,9 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
                 "start": {
                   "bsonType": "date"
                 },
@@ -110,6 +131,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "provided": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -130,6 +154,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "provided": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -156,10 +183,16 @@
             "location"
           ],
           "properties": {
+            "_id": {
+              "bsonType": "objectId"
+            },
             "location": {
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
                 "id": {
                   "bsonType": "string"
                 },
@@ -183,6 +216,9 @@
                     "longitude"
                   ],
                   "properties": {
+                    "_id": {
+                      "bsonType": "objectId"
+                    },
                     "latitude": {
                       "bsonType": "double",
                       "minimum": -90.0,
@@ -201,6 +237,9 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
                 "start": {
                   "bsonType": "date"
                 },
@@ -222,6 +261,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "id": {
             "bsonType": "string"
           },
@@ -237,6 +279,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "livesInWuhan": {
             "bsonType": "bool"
           },
@@ -255,6 +300,9 @@
             "name"
           ],
           "properties": {
+            "_id": {
+              "bsonType": "objectId"
+            },
             "name": {
               "bsonType": "string"
             },
@@ -262,6 +310,9 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
                 "id": {
                   "bsonType": "string"
                 },
@@ -289,6 +340,9 @@
           "id"
         ],
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "id": {
             "bsonType": "int"
           },
@@ -307,6 +361,9 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
           "ID": {
             "bsonType": "string"
           },
