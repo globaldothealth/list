@@ -42,7 +42,7 @@ export default function validateEnv(): Readonly<{
         }),
         STATIC_DIR: str({
             desc: 'directory to serve static files from',
-            default: '',
+            devDefault: '',
         }),
     });
 }
