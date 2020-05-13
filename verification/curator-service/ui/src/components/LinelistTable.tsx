@@ -84,7 +84,7 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             events: [{
                 name: "confirmed",
                 dateRange: {
-                    start: rowData.confirmedDate?.toISOString(),
+                    start: rowData.confirmedDate?.toISOString() ?? '',
                 },
             }],
             // TODO: Replace data below with real values
@@ -131,7 +131,9 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             if (!this.validateRequired(newRowData.source_url)) {
                 return reject();
             }
+            console.log('here');
             const newCase = this.createCaseFromRowData(newRowData);
+            console.log('here2');
             const response = axios.put(this.state.url + oldRowData.id, newCase);
             response.then(() => {
                 resolve();
