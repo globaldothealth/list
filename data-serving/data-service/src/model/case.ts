@@ -1,3 +1,4 @@
+import { LocationDocument, locationSchema } from './location';
 import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
@@ -77,45 +78,8 @@ const pathogenSchema = new mongoose.Schema({
     additionalInformation: String,
 });
 
-const minimumLocationFieldsValidator = {
-    validator: function (location: Location): boolean {
-        return (
-            !!location.country ||
-            !!location.administrativeAreaLevel1 ||
-            !!location.administrativeAreaLevel2 ||
-            !!location.locality
-        );
-    },
-    message:
-        'One of location.country, location.administrativeRegion1, ' +
-        'location.administrativeRegion2, or locality is required',
-};
-
-const locationSchema = new mongoose.Schema({
-    id: String,
-    country: String,
-    administrativeRegion1: String,
-    administrativeRegion2: String,
-    locality: String,
-    geometry: {
-        latitude: {
-            type: Number,
-            min: -90.0,
-            max: 90.0,
-        },
-        longitude: {
-            type: Number,
-            min: -180.0,
-            max: 180.0,
-        },
-    },
-});
-
 const travelSchema = new mongoose.Schema({
-    location: {
-        type: locationSchema,
-        validate: minimumLocationFieldsValidator,
-    },
+    location: locationSchema,
     dateRange: dateRangeSchema,
     purpose: {
         type: String,
@@ -146,11 +110,7 @@ const caseSchema = new mongoose.Schema(
             },
         },
         importedCase: {},
-        location: {
-            type: locationSchema,
-            required: 'Enter a location',
-            validate: minimumLocationFieldsValidator,
-        },
+        location: locationSchema,
         revisionMetadata: {
             type: revisionMetadataSchema,
             required: 'Enter revision metadata',
@@ -163,6 +123,8 @@ const caseSchema = new mongoose.Schema(
         travelHistory: [travelSchema],
     },
     {
+        strict: true,
+        useNestedStrict: true,
         toObject: {
             transform: function (__, ret) {
                 // TODO: Transform the model layer to the API layer.
@@ -199,20 +161,6 @@ interface Event {
     dateRange: Range<Date>;
 }
 
-interface Geometry {
-    latitude: number;
-    longitude: number;
-}
-
-interface Location {
-    id: string;
-    country: string;
-    administrativeAreaLevel1: string;
-    administrativeAreaLevel2: string;
-    locality: string;
-    geometry: Geometry;
-}
-
 interface OutbreakSpecifics {
     livesInWuhan: boolean;
     reportedMarketExposure: boolean;
@@ -230,7 +178,7 @@ interface Symptoms {
 }
 
 interface Travel {
-    location: Location;
+    location: LocationDocument;
     dateRange: Range<Date>;
     purpose: TravelPurpose;
     additionalInformation: string;
@@ -242,7 +190,7 @@ type CaseDocument = mongoose.Document & {
     demographics: Demographics;
     events: [Event];
     importedCase: {};
-    location: Location;
+    location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     outbreakSpecifics: OutbreakSpecifics;
