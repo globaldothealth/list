@@ -135,7 +135,7 @@ const caseSchema = new mongoose.Schema(
                         type: String,
                         required: 'Enter a name for the event',
                     },
-                    date: dateRangeSchema,
+                    dateRange: dateRangeSchema,//
                 },
             ],
             validate: {
