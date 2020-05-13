@@ -10,8 +10,8 @@ const fieldRequiredValidator = [
             this.locality == null
         );
     },
-    'One of location.country, location.administrativeRegion1, ' +
-        'location.administrativeRegion2, or locality is required',
+    'One of country, administrativeAreaLevel1, administrativeAreaLevel2, ' +
+        'or locality is required',
 ];
 
 export const locationSchema = new mongoose.Schema(
