@@ -27,8 +27,6 @@ COPY verification/curator-service/ui/package*.json ./
 RUN npm ci
 # Bundle app source
 COPY verification/curator-service/ui/. .
-# Bundle common files
-COPY common/* ../../../common/
 # Build the app.
 ENV REACT_APP_LOGIN_URL /auth/google
 RUN npm run-script build
