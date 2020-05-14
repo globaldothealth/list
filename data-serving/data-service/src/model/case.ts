@@ -1,3 +1,4 @@
+import { DemographicsDocument, demographicsSchema } from './demographics';
 import { LocationDocument, locationSchema } from './location';
 import {
     RevisionMetadataDocument,
@@ -6,18 +7,9 @@ import {
 import { SourceDocument, sourceSchema } from './source';
 
 import { ObjectId } from 'mongodb';
+import { Range } from './range';
 import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
-
-export enum Sex {
-    Female = 'Female',
-    Male = 'Male',
-    Other = 'Other',
-}
-
-export enum Species {
-    HomoSapien = 'Homo sapien',
-}
 
 export enum TravelPurpose {
     Family = 'Family',
@@ -38,29 +30,6 @@ const dictionaryValueSchema = new mongoose.Schema({
     imputed: {
         type: [String],
         uniqueItems: true,
-    },
-});
-
-const demographicsSchema = new mongoose.Schema({
-    ageRange: {
-        start: {
-            type: Number,
-            min: -1,
-            max: 200,
-        },
-        end: {
-            type: Number,
-            min: 0,
-            max: 200,
-        },
-    },
-    species: {
-        type: String,
-        enum: Object.values(Species),
-    },
-    sex: {
-        type: String,
-        enum: Object.values(Sex),
     },
 });
 
@@ -140,17 +109,6 @@ const caseSchema = new mongoose.Schema(
     },
 );
 
-interface Range<T> {
-    start: T;
-    end: T;
-}
-
-interface Demographics {
-    ageRange: Range<number>;
-    sex: Sex;
-    species: Species;
-}
-
 interface ChronicDisease {
     provided: [string];
     imputed: [string];
@@ -187,7 +145,7 @@ interface Travel {
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     chronicDisease: ChronicDisease;
-    demographics: Demographics;
+    demographics: DemographicsDocument;
     events: [Event];
     importedCase: {};
     location: LocationDocument;
