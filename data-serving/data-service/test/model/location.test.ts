@@ -1,14 +1,11 @@
 import { LocationDocument, locationSchema } from '../../src/model/location';
 
 import { Error } from 'mongoose';
+import fullLocation from './data/location.full.json';
+import minimalLocation from './data/location.minimal.json';
 import mongoose from 'mongoose';
 
 const Location = mongoose.model<LocationDocument>('Location', locationSchema);
-
-/** A sample document with the minimim required fields. */
-const minimalModel = {
-    locality: 'Brooklyn',
-};
 
 describe('validate', () => {
     it('empty location is invalid', async () => {
@@ -39,7 +36,7 @@ describe('validate', () => {
 
     it('a latitude without a longitude is invalid', async () => {
         return new Location({
-            ...minimalModel,
+            ...minimalLocation,
             geometry: {
                 latitude: 40.6,
             },
@@ -50,7 +47,7 @@ describe('validate', () => {
 
     it('a longitude without a latitude is invalid', async () => {
         return new Location({
-            ...minimalModel,
+            ...minimalLocation,
             geometry: {
                 longitude: -73.9,
             },
@@ -60,17 +57,7 @@ describe('validate', () => {
     });
 
     it('a fully specified location is valid', async () => {
-        return new Location({
-            id: 'abc',
-            country: 'United States',
-            administrativeAreaLevel1: 'New York',
-            administrativeAreaLevel2: 'Kings County',
-            locality: 'Brooklyn',
-            geometry: {
-                latitude: 40.6,
-                longitude: -73.9,
-            },
-        }).validate();
+        return new Location(fullLocation).validate();
     });
 
     it('validators work for embedded locations', async () => {
