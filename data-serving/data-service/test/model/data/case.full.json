@@ -22,7 +22,7 @@
         {
             "name": "onsetSymptoms",
             "dateRange": {
-                "start": 578027600000,
+                "start": 1578000000000,
                 "end": 1578027600000
             }
         },

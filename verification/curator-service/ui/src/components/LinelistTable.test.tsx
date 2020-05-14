@@ -22,6 +22,9 @@ it('loads and displays cases', async () => {
       importedCase: {
         outcome: 'Recovered',
       },
+      location: {
+        country: "France",
+      },
       events: [
         {
           name: 'confirmed',
@@ -62,6 +65,9 @@ it('can delete a row', async () => {
       _id: 'abc123',
       importedCase: {
         outcome: 'Recovered',
+      },
+      location: {
+        country: "France",
       },
       events: [
         {
@@ -116,7 +122,7 @@ it('can delete a row', async () => {
     config: {},
     headers: {},
   };
-  mockedAxios.get.mockResolvedValue(axiosGetAfterDeleteResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterDeleteResponse);
   mockedAxios.delete.mockResolvedValueOnce(axiosDeleteResponse);
 
   const deleteButton = getByText(/delete_outline/);
@@ -158,6 +164,17 @@ it('can add a row', async () => {
     demographics: {
       sex: "Female",
     },
+    location: {
+      country: "France",
+    },
+    events: [
+      {
+        name: 'confirmed',
+        dateRange: {
+          start: new Date().toJSON(),
+        },
+      }
+    ],
     notes: "some notes",
     source: {
       url: "http://foo.bar",
@@ -182,8 +199,8 @@ it('can add a row', async () => {
     config: {},
     headers: {},
   };
-  mockedAxios.post.mockResolvedValue(axiosPostResponse);
-  mockedAxios.get.mockResolvedValue(axiosGetAfterAddResponse);
+  mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
 
   const addButton = getByText(/add_box/);
   fireEvent.click(addButton);
@@ -204,6 +221,9 @@ it('can edit a row', async () => {
       _id: 'abc123',
       importedCase: {
         outcome: 'Recovered',
+      },
+      location: {
+        country: "France",
       },
       events: [
         {
@@ -245,6 +265,9 @@ it('can edit a row', async () => {
       importedCase: {
         outcome: 'Recovered',
       },
+      location: {
+        country: "France",
+      },
       events: [
         {
           name: 'confirmed',
@@ -279,7 +302,7 @@ it('can edit a row', async () => {
     headers: {},
   };
   mockedAxios.put.mockResolvedValueOnce(axiosEditResponse);
-  mockedAxios.get.mockResolvedValue(axiosGetAfterEditResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterEditResponse);
 
   const editButton = getByText(/edit/);
   fireEvent.click(editButton);
