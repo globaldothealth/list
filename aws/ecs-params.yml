@@ -1,0 +1,21 @@
+# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-ecsparams.html
+version: 1
+task_definition:
+  task_execution_role: ecsTaskExecutionRole
+  ecs_network_mode: awsvpc
+  # TODO: Tune those numbers, these are the tutorial ones.
+  task_size:
+    mem_limit: 0.5GB
+    cpu_limit: 256
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - "subnet-05b8367a71fd6646e"
+        - "subnet-02cd1fe09aadd399d"
+      security_groups:
+        - "sg-0491184b79409a6d2"
+      # FYI: IP of the cluster is public for now but access from the internet
+      # to services inside it isn't possible as long as the security group
+      # above doesn't allow ingress to ports exposed by services in the cluster.
+      assign_public_ip: ENABLED
