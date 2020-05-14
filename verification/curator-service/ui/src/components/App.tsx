@@ -7,6 +7,7 @@ import {
 import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
 import React from 'react';
+import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 
@@ -30,6 +31,9 @@ function App() {
           <Route path="/cases">
             <Linelist />
           </Route>
+          <Route path="/sources">
+            <Sources />
+          </Route>
           <Route exact path="/">
             <Home />
           </Route>
@@ -42,6 +46,12 @@ function App() {
 function Linelist() {
   return (
     <LinelistTable />
+  )
+}
+
+function Sources() {
+  return (
+    <SourceTable />
   )
 }
 
