@@ -122,7 +122,7 @@ it('can delete a row', async () => {
     config: {},
     headers: {},
   };
-  mockedAxios.get.mockResolvedValue(axiosGetAfterDeleteResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterDeleteResponse);
   mockedAxios.delete.mockResolvedValueOnce(axiosDeleteResponse);
 
   const deleteButton = getByText(/delete_outline/);
@@ -199,8 +199,8 @@ it('can add a row', async () => {
     config: {},
     headers: {},
   };
-  mockedAxios.post.mockResolvedValue(axiosPostResponse);
-  mockedAxios.get.mockResolvedValue(axiosGetAfterAddResponse);
+  mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
 
   const addButton = getByText(/add_box/);
   fireEvent.click(addButton);
@@ -302,7 +302,7 @@ it('can edit a row', async () => {
     headers: {},
   };
   mockedAxios.put.mockResolvedValueOnce(axiosEditResponse);
-  mockedAxios.get.mockResolvedValue(axiosGetAfterEditResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterEditResponse);
 
   const editButton = getByText(/edit/);
   fireEvent.click(editButton);

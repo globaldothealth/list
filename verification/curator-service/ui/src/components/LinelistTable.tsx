@@ -84,7 +84,7 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             events: [{
                 name: "confirmed",
                 dateRange: {
-                    start: rowData.confirmedDate?.toISOString() ?? '',
+                    start: rowData.confirmedDate,
                 },
             }],
             // TODO: Replace data below with real values
@@ -103,11 +103,11 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             }
             const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.post(this.state.url, newCase);
-            response.then(() => {
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         });
     }
 
@@ -115,11 +115,11 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         return new Promise((resolve, reject) => {
             let deleteUrl = this.state.url + rowData.id;
             const response = axios.delete(deleteUrl);
-            response.then(() => {
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         })
     }
 
@@ -131,15 +131,13 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             if (!this.validateRequired(newRowData.source_url)) {
                 return reject();
             }
-            console.log('here');
             const newCase = this.createCaseFromRowData(newRowData);
-            console.log('here2');
             const response = axios.put(this.state.url + oldRowData.id, newCase);
-            response.then(() => {
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         });
     }
 
