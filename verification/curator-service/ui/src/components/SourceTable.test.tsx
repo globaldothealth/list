@@ -8,13 +8,6 @@ import { render } from '@testing-library/react';
 jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-afterEach(() => {
-  mockedAxios.get.mockClear();
-  mockedAxios.delete.mockClear();
-  mockedAxios.post.mockClear();
-  mockedAxios.put.mockClear();
-});
-
 it('loads and displays sources', async () => {
   const sources = [
     {
