@@ -4,6 +4,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core/styles';
 
 interface ListResponse {
     cases: Case[],
@@ -46,6 +47,7 @@ interface Case {
 
 interface LinelistTableState {
     url: string,
+    error: string,
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -61,11 +63,22 @@ interface TableRow {
     notes: string;
 }
 
-export default class LinelistTable extends React.Component<{}, LinelistTableState> {
+const styles = (theme: Theme) => createStyles({
+    error: {
+        color: 'red',
+        marginTop: theme.spacing(2),
+    },
+});
+
+// Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
+interface Props extends WithStyles<typeof styles> { }
+
+class LinelistTable extends React.Component<Props, LinelistTableState> {
     constructor(props: any) {
         super(props);
         this.state = {
             url: '/api/cases/',
+            error: '',
         }
     }
 
@@ -102,10 +115,12 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 return reject();
             }
             const newCase = this.createCaseFromRowData(newRowData);
+            this.setState({ error: '' });
             const response = axios.post(this.state.url, newCase);
             response
                 .then(resolve)
                 .catch((e) => {
+                    this.setState({ error: e.toString() });
                     reject(e);
                 });
         });
@@ -114,10 +129,12 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     deleteCase(rowData: TableRow) {
         return new Promise((resolve, reject) => {
             let deleteUrl = this.state.url + rowData.id;
+            this.setState({ error: '' });
             const response = axios.delete(deleteUrl);
             response
                 .then(resolve)
                 .catch((e) => {
+                    this.setState({ error: e.toString() });
                     reject(e);
                 });
         })
@@ -132,10 +149,12 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                 return reject();
             }
             const newCase = this.createCaseFromRowData(newRowData);
+            this.setState({ error: '' });
             const response = axios.put(this.state.url + oldRowData.id, newCase);
             response
                 .then(resolve)
                 .catch((e) => {
+                    this.setState({ error: e.toString() });
                     reject(e);
                 });
         });
@@ -146,83 +165,91 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     }
 
     render() {
+        const { classes } = this.props;
         return (
-            <Paper>
-                <MaterialTable
-                    columns={[
-                        { title: 'ID', field: 'id', filtering: false, editable: "never" },
-                        { title: 'Sex', field: 'sex', filtering: false, lookup: { "Female": "Female", "Male": "Male" } },
-                        { title: 'Age', field: 'age', filtering: false, type: "numeric" },
-                        { title: 'Country', field: 'country', filtering: false },
-                        { title: 'Confirmed date', field: 'confirmedDate', filtering: false, type: "date" },
-                        { title: 'Notes', field: 'notes' },
-                        {
-                            title: 'Source URL', field: 'source_url', filtering: false,
-                            editComponent: (props) =>
-                                (<TextField
-                                    type="text"
-                                    size="small"
-                                    fullWidth
-                                    placeholder="Source URL"
-                                    error={!this.validateRequired(props.value)}
-                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
-                                    onChange={event => props.onChange(event.target.value)}
-                                    defaultValue={props.value} />)
-                        },
-                    ]}
+            <div>
+                <Paper>
+                    <MaterialTable
+                        columns={[
+                            { title: 'ID', field: 'id', filtering: false, editable: "never" },
+                            { title: 'Sex', field: 'sex', filtering: false, lookup: { "Female": "Female", "Male": "Male" } },
+                            { title: 'Age', field: 'age', filtering: false, type: "numeric" },
+                            { title: 'Country', field: 'country', filtering: false },
+                            { title: 'Confirmed date', field: 'confirmedDate', filtering: false, type: "date" },
+                            { title: 'Notes', field: 'notes' },
+                            {
+                                title: 'Source URL', field: 'source_url', filtering: false,
+                                editComponent: (props) =>
+                                    (<TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="Source URL"
+                                        error={!this.validateRequired(props.value)}
+                                        helperText={this.validateRequired(props.value) ? "" : "Required field"}
+                                        onChange={event => props.onChange(event.target.value)}
+                                        defaultValue={props.value} />)
+                            },
+                        ]}
 
-                    data={query =>
-                        new Promise((resolve, reject) => {
-                            let listUrl = this.state.url;
-                            listUrl += '?limit=' + query.pageSize;
-                            listUrl += '&page=' + (query.page + 1);
-                            listUrl += '&filter=';
-                            listUrl += query.filters.map((filter) => `${filter.column.field}:${filter.value}`).join(",");
-                            const response = axios.get<ListResponse>(listUrl);
-                            response.then(result => {
-                                let flattened_cases: TableRow[] = [];
-                                const cases = result.data.cases;
-                                for (const c of cases) {
-                                    const confirmedDate =
-                                        c.events.find((event) => event.name === "confirmed")?.dateRange?.start;
-                                    flattened_cases.push({
-                                        id: c._id,
-                                        sex: c.demographics?.sex,
-                                        age: c.demographics?.age,
-                                        country: c.location.country,
-                                        confirmedDate: confirmedDate ? new Date(confirmedDate) : null,
-                                        notes: c.notes,
-                                        source_url: c.source?.url,
+                        data={query =>
+                            new Promise((resolve, reject) => {
+                                let listUrl = this.state.url;
+                                listUrl += '?limit=' + query.pageSize;
+                                listUrl += '&page=' + (query.page + 1);
+                                listUrl += '&filter=';
+                                listUrl += query.filters.map((filter) => `${filter.column.field}:${filter.value}`).join(",");
+                                this.setState({ error: '' });
+                                const response = axios.get<ListResponse>(listUrl);
+                                response.then(result => {
+                                    let flattened_cases: TableRow[] = [];
+                                    const cases = result.data.cases;
+                                    for (const c of cases) {
+                                        const confirmedDate =
+                                            c.events.find((event) => event.name === "confirmed")?.dateRange?.start;
+                                        flattened_cases.push({
+                                            id: c._id,
+                                            sex: c.demographics?.sex,
+                                            age: c.demographics?.age,
+                                            country: c.location.country,
+                                            confirmedDate: confirmedDate ? new Date(confirmedDate) : null,
+                                            notes: c.notes,
+                                            source_url: c.source?.url,
+                                        });
+                                    }
+                                    resolve({
+                                        data: flattened_cases,
+                                        page: query.page,
+                                        totalCount: result.data.total,
                                     });
-                                }
-                                resolve({
-                                    data: flattened_cases,
-                                    page: query.page,
-                                    totalCount: result.data.total,
+                                }).catch((e) => {
+                                    this.setState({ error: e.toString() });
+                                    reject(e);
                                 });
-                            }).catch((e) => {
-                                reject(e);
-                            });
-                        })
-                    }
-                    title="COVID-19 cases"
-                    options={{
-                        // TODO: Create text indexes and support search queries.
-                        // https://docs.mongodb.com/manual/text-search/
-                        search: false,
-                        filtering: true,
-                        padding: "dense",
-                        pageSize: 10,
-                        pageSizeOptions: [5, 10, 20, 50, 100],
-                    }}
-                    editable={{
-                        onRowAdd: (newRowData: TableRow) => this.addCase(newRowData),
-                        onRowUpdate: (newRowData: TableRow, oldRowData: TableRow | undefined) =>
-                            this.editCase(newRowData, oldRowData),
-                        onRowDelete: (rowData: TableRow) => this.deleteCase(rowData),
-                    }}
-                />
-            </Paper>
+                            })
+                        }
+                        title="COVID-19 cases"
+                        options={{
+                            // TODO: Create text indexes and support search queries.
+                            // https://docs.mongodb.com/manual/text-search/
+                            search: false,
+                            filtering: true,
+                            padding: "dense",
+                            pageSize: 10,
+                            pageSizeOptions: [5, 10, 20, 50, 100],
+                        }}
+                        editable={{
+                            onRowAdd: (newRowData: TableRow) => this.addCase(newRowData),
+                            onRowUpdate: (newRowData: TableRow, oldRowData: TableRow | undefined) =>
+                                this.editCase(newRowData, oldRowData),
+                            onRowDelete: (rowData: TableRow) => this.deleteCase(rowData),
+                        }}
+                    />
+                </Paper>
+                {this.state.error && <div className={classes.error}>{this.state.error}</div>}
+            </div>
         )
     }
 }
+
+export default withStyles(styles, { withTheme: true })(LinelistTable);
