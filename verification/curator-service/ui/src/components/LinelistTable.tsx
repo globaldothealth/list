@@ -24,6 +24,10 @@ interface Demographics {
     age: string;
 }
 
+interface Location {
+    country: string;
+}
+
 interface Source {
     url: string;
 }
@@ -35,12 +39,12 @@ interface Case {
     };
     events: Event[];
     demographics: Demographics;
+    location: Location;
     source: Source;
     notes: string;
 }
 
 interface LinelistTableState {
-    tableRef: any,
     url: string,
 }
 
@@ -50,6 +54,8 @@ interface TableRow {
     // demographics
     sex: string;
     age: string;
+    country: string;
+    confirmedDate: Date | null;
     // source
     source_url: string;
     notes: string;
@@ -59,7 +65,6 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
     constructor(props: any) {
         super(props);
         this.state = {
-            tableRef: React.createRef(),
             url: '/api/cases/',
         }
     }
@@ -73,17 +78,16 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             source: {
                 url: rowData.source_url
             },
-            // TODO: Replace data below with data from rowData
             location: {
-                country: "France",
+                country: rowData.country,
             },
             events: [{
                 name: "confirmed",
                 dateRange: {
-                    start: "2020-01-13T05:00:00.000Z",
-                    end: "2020-01-13T05:00:00.000Z",
+                    start: rowData.confirmedDate,
                 },
             }],
+            // TODO: Replace data below with real values
             revisionMetadata: {
                 date: "2020-04-23T04:00:00.000Z",
                 id: 0,
@@ -99,13 +103,11 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             }
             const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.post(this.state.url, newCase);
-            response.then(() => {
-                // Refresh the table data
-                this.state.tableRef.current.onQueryChange();
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         });
     }
 
@@ -113,13 +115,11 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         return new Promise((resolve, reject) => {
             let deleteUrl = this.state.url + rowData.id;
             const response = axios.delete(deleteUrl);
-            response.then(() => {
-                // Refresh the table data
-                this.state.tableRef.current.onQueryChange();
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         })
     }
 
@@ -133,13 +133,11 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
             }
             const newCase = this.createCaseFromRowData(newRowData);
             const response = axios.put(this.state.url + oldRowData.id, newCase);
-            response.then(() => {
-                // Refresh the table data
-                this.state.tableRef.current.onQueryChange();
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
         });
     }
 
@@ -151,11 +149,12 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
         return (
             <Paper>
                 <MaterialTable
-                    tableRef={this.state.tableRef}
                     columns={[
                         { title: 'ID', field: 'id', filtering: false, editable: "never" },
                         { title: 'Sex', field: 'sex', filtering: false, lookup: { "Female": "Female", "Male": "Male" } },
                         { title: 'Age', field: 'age', filtering: false, type: "numeric" },
+                        { title: 'Country', field: 'country', filtering: false },
+                        { title: 'Confirmed date', field: 'confirmedDate', filtering: false, type: "date" },
                         { title: 'Notes', field: 'notes' },
                         {
                             title: 'Source URL', field: 'source_url', filtering: false,
@@ -184,10 +183,14 @@ export default class LinelistTable extends React.Component<{}, LinelistTableStat
                                 let flattened_cases: TableRow[] = [];
                                 const cases = result.data.cases;
                                 for (const c of cases) {
+                                    const confirmedDate =
+                                        c.events.find((event) => event.name === "confirmed")?.dateRange?.start;
                                     flattened_cases.push({
                                         id: c._id,
                                         sex: c.demographics?.sex,
                                         age: c.demographics?.age,
+                                        country: c.location.country,
+                                        confirmedDate: confirmedDate ? new Date(confirmedDate) : null,
                                         notes: c.notes,
                                         source_url: c.source?.url,
                                     });
