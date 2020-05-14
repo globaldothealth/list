@@ -1,6 +1,7 @@
 import { SourceDocument, sourceSchema } from '../../src/model/source';
 
 import { Error } from 'mongoose';
+import fullModel from './data/source.full.json';
 import mongoose from 'mongoose';
 
 const Source = mongoose.model<SourceDocument>('Source', sourceSchema);
@@ -25,11 +26,7 @@ describe('validate', () => {
     });
 
     it('a fully specified source is valid', async () => {
-        return new Source({
-            id: 'abc',
-            url: 'http://abc.def',
-            other: 'ghi',
-        }).validate();
+        return new Source(fullModel).validate();
     });
 
     it('validators work for embedded sources', async () => {

@@ -12,23 +12,20 @@ const fieldRequiredValidator = [
     'Source must specify id, url, or other',
 ];
 
-export const sourceSchema = new mongoose.Schema(
-    {
-        id: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        url: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        other: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
+export const sourceSchema = new mongoose.Schema({
+    id: {
+        type: String,
+        required: fieldRequiredValidator,
     },
-    { strict: true },
-);
+    url: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    other: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+});
 
 export type SourceDocument = mongoose.Document & {
     id: string;
