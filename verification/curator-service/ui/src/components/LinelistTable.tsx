@@ -246,7 +246,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }}
                     />
                 </Paper>
-                <div className={classes.error}>{this.state.error}</div>
+                {this.state.error && <div className={classes.error}>{this.state.error}</div>}
             </div>
         )
     }
