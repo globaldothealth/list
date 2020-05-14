@@ -59,6 +59,57 @@ it('loads and displays cases', async () => {
   expect(items).toBeInTheDocument();
 })
 
+it('API errors are displayed', async () => {
+  const cases = [
+    {
+      _id: 'abc123',
+      importedCase: {
+        outcome: 'Recovered',
+      },
+      location: {
+        country: "France",
+      },
+      events: [
+        {
+          name: 'confirmed',
+          dateRange: {
+            start: new Date().toJSON(),
+          },
+        }
+      ],
+      notes: "some notes",
+      source: {
+        url: "http://foo.bar",
+      }
+    },
+  ];
+  const axiosResponse = {
+    data: {
+      cases: cases,
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+  const { getByText, findByText } = render(<LinelistTable />)
+
+  // Throw error on add request.
+  mockedAxios.post.mockRejectedValueOnce(new Error("Request failed"));
+
+  const addButton = getByText(/add_box/);
+  fireEvent.click(addButton);
+  const confirmButton = getByText(/check/);
+  fireEvent.click(confirmButton);
+  expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+  const error = await findByText("Error: Request failed");
+  expect(error).toBeInTheDocument();
+})
+
 it('can delete a row', async () => {
   const cases = [
     {
