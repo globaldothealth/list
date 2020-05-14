@@ -1,6 +1,6 @@
-// Controllers (route handlers).
-import * as homeController from './controllers/home';
 import * as sourcesController from './controllers/sources';
+
+import { Request, Response } from 'express';
 
 import { AuthController } from './controllers/auth';
 import CasesController from './controllers/cases';
@@ -11,6 +11,7 @@ import express from 'express';
 import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import path from 'path';
 import session from 'express-session';
 import validateEnv from './util/validate-env';
 
@@ -64,9 +65,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
 
-// Configure frontend app routes.
-app.get('/', homeController.index);
-
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL);
 
@@ -85,5 +83,15 @@ apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
 apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
 
 app.use('/api', apiRouter);
+
+// Serve static UI content if static directory was specified.
+if (env.STATIC_DIR) {
+    console.log('Serving static files from', env.STATIC_DIR);
+    app.use(express.static(env.STATIC_DIR));
+    // Send index to any unmatched route.
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
+    });
+}
 
 export default app;

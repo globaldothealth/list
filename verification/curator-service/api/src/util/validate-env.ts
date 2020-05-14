@@ -8,6 +8,7 @@ export default function validateEnv(): Readonly<{
     GOOGLE_OAUTH_CLIENT_SECRET: string;
     SESSION_COOKIE_KEY: string;
     AFTER_LOGIN_REDIRECT_URL: string;
+    STATIC_DIR: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -38,6 +39,10 @@ export default function validateEnv(): Readonly<{
         AFTER_LOGIN_REDIRECT_URL: str({
             desc: 'URL to redirect to after the oauth consent screen',
             devDefault: 'http://localhost:3002/',
+        }),
+        STATIC_DIR: str({
+            desc: 'directory to serve static files from',
+            devDefault: '',
         }),
     });
 }
