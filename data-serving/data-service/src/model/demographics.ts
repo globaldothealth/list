@@ -16,12 +16,12 @@ export const demographicsSchema = new mongoose.Schema({
         start: {
             type: Number,
             min: -1,
-            max: 200,
+            max: 300,
         },
         end: {
             type: Number,
-            min: 0,
-            max: 200,
+            min: -1,
+            max: 300,
         },
     },
     species: {

@@ -18,12 +18,12 @@ describe('validate', () => {
         });
     });
     it('a start age over 300 is invalid', async () => {
-        return new Demographics({ ageRange: { start: 300 } }).validate((e) => {
+        return new Demographics({ ageRange: { start: 301 } }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
-    it('an end age under 0 is invalid', async () => {
-        return new Demographics({ ageRange: { end: -1 } }).validate((e) => {
+    it('an end age under -1 is invalid', async () => {
+        return new Demographics({ ageRange: { end: -2 } }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
