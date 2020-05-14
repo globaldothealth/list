@@ -60,6 +60,7 @@ function Home() {
   return (
     <nav>
       <Link to="/cases">Linelist</Link><br />
+      <Link to="/sources">Sources</Link><br />
       <Link to="/privacy-policy">Privacy policy</Link><br />
       <Link to="/terms">Terms of service</Link><br />
     </nav>
