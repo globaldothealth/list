@@ -11,7 +11,7 @@ services:
     curator:
         build:
             context: ../.
-            dockerfile: verification/curator-service/api/Dockerfile
+            dockerfile: verification/curator-service/Dockerfile
         init: true
         ports:
             - "3001:3001"
@@ -37,7 +37,7 @@ services:
     curatorui:
         build:
             context: ../.
-            dockerfile: verification/curator-service/ui/Dockerfile
+            dockerfile: verification/curator-service/Dockerfile
         init: true
         ports:
             - "3002:3002"
@@ -45,11 +45,8 @@ services:
             - curator
         # Necessary because react start script requires a TTY.
         stdin_open: true
+        working_dir: "/usr/src/app/verification/curator-service/ui"
         environment:
             PORT: "3002"
             # UI and API run on different ports in dev, make the custom proxy work.
             REACT_APP_PROXY_URL: "http://curator:3001"
-            # We can't use curator:3001 here because that's an internal DNS,
-            # not accessible from the user's browser.
-            # In production simply /auth/google would work.
-            REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"

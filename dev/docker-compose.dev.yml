@@ -11,5 +11,11 @@ services:
     volumes:
       - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
   curatorui:
+    command: "npm run-script start-noenv"
     volumes:
       - ../verification/curator-service/ui/src:/usr/src/app/verification/curator-service/ui/src
+    environment:
+      # We can't use curator:3001 here because that's an internal DNS,
+      # not accessible from the user's browser.
+      # In production simply /auth/google would work.
+      REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"
