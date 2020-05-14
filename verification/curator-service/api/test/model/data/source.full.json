@@ -1,0 +1,16 @@
+{
+    "name": "source name",
+    "origin": {
+        "url": "foo.bar",
+        "license": "MIT"
+    },
+    "format": "PDF",
+    "automation": {
+        "parser": {
+            "awsLambdaArn": "arn-parser"
+        },
+        "schedule": {
+            "awsRuleArn": "arn-rule"
+        }
+    }
+}
