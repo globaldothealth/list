@@ -21,7 +21,7 @@ ecs-cli configure --cluster epid-dev --default-launch-type FARGATE --region us-e
 Create the cluster:
 
 ```shell
-ecs-cli up --cluster-config epid-dev
+ecs-cli up
 ```
 
 You now have a cluster with some default networking enabled and without any tasks in it.
@@ -41,7 +41,7 @@ Once your `ecs-params.yml` file is complete, you can move on to the next section
 Bring up the tasks in the cluster:
 
 ```shell
-ecs-cli compose --project-name epid-dev service up --cluster-config epid-dev --ecs-profile epid-dev
+ecs-cli compose --project-name data service up --ecs-profile epid-dev
 ```
 
 You can then check the status of the cluster and do most operations from the [web console](https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/epid-dev/services).
