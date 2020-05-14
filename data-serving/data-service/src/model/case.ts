@@ -71,7 +71,6 @@ const caseSchema = new mongoose.Schema(
         travelHistory: [travelSchema],
     },
     {
-        strict: true,
         useNestedStrict: true,
         toObject: {
             transform: function (__, ret) {

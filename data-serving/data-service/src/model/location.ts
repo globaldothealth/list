@@ -14,58 +14,55 @@ const fieldRequiredValidator = [
         'or locality is required',
 ];
 
-export const locationSchema = new mongoose.Schema(
-    {
-        id: String,
-        country: {
-            type: String,
-            required: fieldRequiredValidator,
+export const locationSchema = new mongoose.Schema({
+    id: String,
+    country: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    administrativeAreaLevel1: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    administrativeAreaLevel2: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    locality: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    geometry: {
+        latitude: {
+            type: Number,
+            min: -90.0,
+            max: 90.0,
+            required: [
+                function (this: LocationDocument): boolean {
+                    return (
+                        this.geometry.latitude == null &&
+                        this.geometry.longitude != null
+                    );
+                },
+                'latitude must be specified if geometry is present',
+            ],
         },
-        administrativeAreaLevel1: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        administrativeAreaLevel2: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        locality: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        geometry: {
-            latitude: {
-                type: Number,
-                min: -90.0,
-                max: 90.0,
-                required: [
-                    function (this: LocationDocument): boolean {
-                        return (
-                            this.geometry.latitude == null &&
-                            this.geometry.longitude != null
-                        );
-                    },
-                    'latitude must be specified if geometry is present',
-                ],
-            },
-            longitude: {
-                type: Number,
-                min: -180.0,
-                max: 180.0,
-                required: [
-                    function (this: LocationDocument): boolean {
-                        return (
-                            this.geometry.longitude == null &&
-                            this.geometry.latitude != null
-                        );
-                    },
-                    'longitude must be specified if geometry is present',
-                ],
-            },
+        longitude: {
+            type: Number,
+            min: -180.0,
+            max: 180.0,
+            required: [
+                function (this: LocationDocument): boolean {
+                    return (
+                        this.geometry.longitude == null &&
+                        this.geometry.latitude != null
+                    );
+                },
+                'longitude must be specified if geometry is present',
+            ],
         },
     },
-    { strict: true },
-);
+});
 
 interface Geometry {
     latitude: number;
