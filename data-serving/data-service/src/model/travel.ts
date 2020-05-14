@@ -9,20 +9,15 @@ export enum TravelPurpose {
     Work = 'Work',
 }
 
-export const travelSchema = new mongoose.Schema(
-    {
-        location: locationSchema,
-        dateRange: dateRangeSchema,
-        purpose: {
-            type: String,
-            enum: Object.values(TravelPurpose),
-        },
-        additionalInformation: String,
+export const travelSchema = new mongoose.Schema({
+    location: locationSchema,
+    dateRange: dateRangeSchema,
+    purpose: {
+        type: String,
+        enum: Object.values(TravelPurpose),
     },
-    {
-        strict: true,
-    },
-);
+    additionalInformation: String,
+});
 
 export type TravelDocument = mongoose.Document & {
     location: LocationDocument;
