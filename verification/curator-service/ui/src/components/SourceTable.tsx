@@ -40,7 +40,6 @@ interface Source {
 }
 
 interface SourceTableState {
-    tableRef: any,
     url: string,
 }
 
@@ -48,7 +47,6 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            tableRef: React.createRef(),
             url: '/api/sources/',
         }
     }
@@ -57,7 +55,6 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         return (
             <Paper>
                 <MaterialTable
-                    tableRef={this.state.tableRef}
                     columns={[
                         { title: 'ID', field: '_id' },
                         { title: 'Name', field: 'name' },
