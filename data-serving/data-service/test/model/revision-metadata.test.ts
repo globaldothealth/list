@@ -20,7 +20,7 @@ const minimalModel = {
 
 describe('validate', () => {
     it('revision metadata without id is invalid', async () => {
-        const noId = Object.assign({}, minimalModel);
+        const noId = { ...minimalModel };
         delete noId.id;
 
         return new RevisionMetadata(noId).validate((e) => {
@@ -29,7 +29,7 @@ describe('validate', () => {
     });
 
     it('revision metadata without moderator is invalid', async () => {
-        const noModerator = Object.assign({}, minimalModel);
+        const noModerator = { ...minimalModel };
         delete noModerator.moderator;
 
         return new RevisionMetadata(noModerator).validate((e) => {
@@ -38,7 +38,7 @@ describe('validate', () => {
     });
 
     it('revision metadata without date is invalid', async () => {
-        const noDate = Object.assign({}, minimalModel);
+        const noDate = { ...minimalModel };
         delete noDate.date;
 
         return new RevisionMetadata(noDate).validate((e) => {
@@ -47,10 +47,10 @@ describe('validate', () => {
     });
 
     it('revision metadata with non-integer id invalid', async () => {
-        const badId = Object.assign({}, minimalModel);
-        badId.id = 2.2;
-
-        return new RevisionMetadata(badId).validate((e) => {
+        return new RevisionMetadata({
+            ...minimalModel,
+            ...{ id: 2.2 },
+        }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
