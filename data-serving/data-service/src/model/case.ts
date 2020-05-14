@@ -1,3 +1,4 @@
+import { DateRangeDocument, dateRangeSchema } from './date-range';
 import { DemographicsDocument, demographicsSchema } from './demographics';
 import { LocationDocument, locationSchema } from './location';
 import {
@@ -5,22 +6,10 @@ import {
     revisionMetadataSchema,
 } from './revision-metadata';
 import { SourceDocument, sourceSchema } from './source';
+import { TravelDocument, travelSchema } from './travel';
 
 import { ObjectId } from 'mongodb';
-import { Range } from './range';
-import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
-
-export enum TravelPurpose {
-    Family = 'Family',
-    Conference = 'Conference',
-    Work = 'Work',
-}
-
-const dateRangeSchema = new mongoose.Schema({
-    start: dateFieldInfo,
-    end: dateFieldInfo,
-});
 
 const dictionaryValueSchema = new mongoose.Schema({
     provided: {
@@ -44,16 +33,6 @@ const pathogenSchema = new mongoose.Schema({
         required: 'Enter a pathogen name',
     },
     sequenceSource: sourceSchema,
-    additionalInformation: String,
-});
-
-const travelSchema = new mongoose.Schema({
-    location: locationSchema,
-    dateRange: dateRangeSchema,
-    purpose: {
-        type: String,
-        enum: Object.values(TravelPurpose),
-    },
     additionalInformation: String,
 });
 
@@ -116,7 +95,7 @@ interface ChronicDisease {
 
 interface Event {
     name: string;
-    dateRange: Range<Date>;
+    dateRange: DateRangeDocument;
 }
 
 interface OutbreakSpecifics {
@@ -135,13 +114,6 @@ interface Symptoms {
     imputed: [string];
 }
 
-interface Travel {
-    location: LocationDocument;
-    dateRange: Range<Date>;
-    purpose: TravelPurpose;
-    additionalInformation: string;
-}
-
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     chronicDisease: ChronicDisease;
@@ -155,7 +127,7 @@ type CaseDocument = mongoose.Document & {
     pathogens: [Pathogen];
     source: SourceDocument;
     symptoms: Symptoms;
-    travelHistory: [Travel];
+    travelHistory: [TravelDocument];
 };
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
