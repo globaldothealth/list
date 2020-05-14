@@ -34,9 +34,6 @@ interface Automation {
 interface Source {
     _id: string;
     name: string;
-    origin: Origin;
-    format: string;
-    automation: Automation;
 }
 
 interface SourceTableState {
@@ -51,12 +48,24 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         }
     }
 
+    deleteSource(source: Source) {
+        return new Promise((resolve, reject) => {
+            let deleteUrl = this.state.url + source._id;
+            const response = axios.delete(deleteUrl);
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
+        })
+    }
+
     render() {
         return (
             <Paper>
                 <MaterialTable
                     columns={[
-                        { title: 'ID', field: '_id' },
+                        { title: 'ID', field: '_id', editable: "never" },
                         { title: 'Name', field: 'name' },
                     ]}
 
@@ -85,6 +94,9 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         filtering: false,
                         pageSize: 10,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                    }}
+                    editable={{
+                        onRowDelete: (source: Source) => this.deleteSource(source),
                     }}
                 />
             </Paper>
