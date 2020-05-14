@@ -25,9 +25,9 @@ const fieldSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a dotted.field.name',
     },
-    regexp: {
+    regex: {
         type: String,
-        required: 'Enter a field extraction regexp',
+        required: 'Enter a field extraction regex',
     },
 });
 
