@@ -60,10 +60,6 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         })
     }
 
-    validateRequired(field: String) {
-        return field?.trim() !== "";
-    }
-
     render() {
         return (
             <Paper>
