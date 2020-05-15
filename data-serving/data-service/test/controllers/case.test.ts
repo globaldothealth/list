@@ -110,12 +110,12 @@ describe('POST', () => {
     it('create with invalid input should return 422', () => {
         return request(app).post('/api/cases').send({}).expect(422);
     });
-    it('create with valid input should return 200 OK', async () => {
+    it('create with valid input should return 201 OK', async () => {
         return request(app)
             .post('/api/cases')
             .send(minimalCase)
             .expect('Content-Type', /json/)
-            .expect(200);
+            .expect(201);
     });
 });
 

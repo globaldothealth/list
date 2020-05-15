@@ -86,7 +86,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         // storage.
         const c = new Case(req.body);
         const result = await c.save();
-        res.json(result);
+        res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);
