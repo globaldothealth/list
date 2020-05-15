@@ -93,7 +93,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     try {
         const source = new Source(req.body);
         const result = await source.save();
-        res.json(result);
+        res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);
