@@ -3,6 +3,10 @@ import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { LocationDocument, locationSchema } from './location';
 import {
+    OutbreakSpecificsDocument,
+    outbreakSpecificsSchema,
+} from './outbreak-specifics';
+import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
 } from './revision-metadata';
@@ -11,11 +15,6 @@ import { TravelDocument, travelSchema } from './travel';
 
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
-
-const outbreakSpecificsSchema = new mongoose.Schema({
-    livesInWuhan: Boolean,
-    reportedMarketExposure: Boolean,
-});
 
 const pathogenSchema = new mongoose.Schema({
     name: {
@@ -81,11 +80,6 @@ interface Event {
     dateRange: DateRangeDocument;
 }
 
-interface OutbreakSpecifics {
-    livesInWuhan: boolean;
-    reportedMarketExposure: boolean;
-}
-
 interface Pathogen {
     name: string;
     sequenceSource: SourceDocument;
@@ -101,7 +95,7 @@ type CaseDocument = mongoose.Document & {
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
-    outbreakSpecifics: OutbreakSpecifics;
+    outbreakSpecifics: OutbreakSpecificsDocument;
     pathogens: [Pathogen];
     source: SourceDocument;
     symptoms: DictionaryDocument;
