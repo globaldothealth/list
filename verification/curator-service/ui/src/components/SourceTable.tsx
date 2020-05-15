@@ -16,28 +16,45 @@ interface Origin {
 
 interface Field {
     name: string;
-    regexp: string;
+    regex: string;
 }
 
-interface Parsing {
+interface RegexParsing {
     fields: Array<Field>;
 }
 
+interface Parser {
+    awsLambdaArn: string;
+}
+
+interface Schedule {
+    awsRuleArn: string;
+}
+
 interface Automation {
-    name: string;
-    tag: string;
-    active: boolean;
-    scheduleExpression: string;
-    parsing: Parsing;
+    parser: Parser;
+    schedule: Schedule;
+    regexParsing: RegexParsing;
 }
 
 interface Source {
     _id: string;
     name: string;
+    format: string;
+    origin: Origin;
+    automation: Automation;
 }
 
 interface SourceTableState {
     url: string,
+}
+
+// Material table doesn't handle structured fields well, we flatten all fields in this row.
+interface TableRow {
+    _id: string;
+    name: string;
+    // origin
+    url: string;
 }
 
 export default class SourceTable extends React.Component<{}, SourceTableState> {
@@ -48,9 +65,9 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         }
     }
 
-    deleteSource(source: Source) {
+    deleteSource(rowData: TableRow) {
         return new Promise((resolve, reject) => {
-            let deleteUrl = this.state.url + source._id;
+            let deleteUrl = this.state.url + rowData._id;
             const response = axios.delete(deleteUrl);
             response
                 .then(resolve)
@@ -67,6 +84,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                     columns={[
                         { title: 'ID', field: '_id', editable: "never" },
                         { title: 'Name', field: 'name' },
+                        { title: 'URL', field: 'url' },
                     ]}
 
                     data={query =>
@@ -76,8 +94,17 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                             listUrl += '&page=' + (query.page + 1);
                             const response = axios.get<ListResponse>(listUrl);
                             response.then(result => {
+                                let flattened_sources: TableRow[] = [];
+                                const sources = result.data.sources;
+                                for (const s of sources) {
+                                    flattened_sources.push({
+                                        _id: s._id,
+                                        name: s.name,
+                                        url: s.origin.url,
+                                    });
+                                }
                                 resolve({
-                                    data: result.data.sources,
+                                    data: flattened_sources,
                                     page: query.page,
                                     totalCount: result.data.total,
                                 });
@@ -96,7 +123,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
-                        onRowDelete: (source: Source) => this.deleteSource(source),
+                        onRowDelete: (rowData: TableRow) => this.deleteSource(rowData),
                     }}
                 />
             </Paper>
