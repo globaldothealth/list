@@ -15,3 +15,22 @@ services:
         awslogs-group: epid-dev
         awslogs-region: us-east-1
         awslogs-stream-prefix: data
+  curator:
+    # TODO: Move to our org repo once we have one.
+    image: "docker.io/attwad/epidcurator"
+    ports:
+      - "3001:3001"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: epid-dev
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: curator
+    environment:
+      # TODO: Move to aws credentials storage as better practice.
+      DB_CONNECTION_STRING: "${CURATOR_DB_CONNECTION_STRING}"
+      DATASERVER_URL: "http://127.0.0.1:3000"
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      AFTER_LOGIN_REDIRECT_URL: "/"
+      SESSION_COOKIE_KEY: "${SESSION_COOKIE_KEY}"
