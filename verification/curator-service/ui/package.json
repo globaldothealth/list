@@ -32,7 +32,7 @@
     "eject": "react-scripts eject",
     "cypress-open": "cypress open",
     "cypress-run": "cypress run",
-    "cypress-ci-test": "start-server-and-test ./../../../../dev/run_stack.sh http://localhost:3002 cypress-run"
+    "cypress-ci-test": "start-server-and-test ./../../../dev/run_stack.sh http://localhost:3002 cypress-run"
   },
   "eslintConfig": {
     "extends": "react-app"
