@@ -4,6 +4,10 @@ import { EventDocument, eventSchema } from './event';
 import { LocationDocument, locationSchema } from './location';
 import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
+    OutbreakSpecificsDocument,
+    outbreakSpecificsSchema,
+} from './outbreak-specifics';
+import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
 } from './revision-metadata';
@@ -12,11 +16,6 @@ import { TravelDocument, travelSchema } from './travel';
 
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
-
-const outbreakSpecificsSchema = new mongoose.Schema({
-    livesInWuhan: Boolean,
-    reportedMarketExposure: Boolean,
-});
 
 const caseSchema = new mongoose.Schema(
     {
@@ -60,11 +59,6 @@ const caseSchema = new mongoose.Schema(
     },
 );
 
-interface OutbreakSpecifics {
-    livesInWuhan: boolean;
-    reportedMarketExposure: boolean;
-}
-
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     chronicDisease: DictionaryDocument;
@@ -74,7 +68,7 @@ type CaseDocument = mongoose.Document & {
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
-    outbreakSpecifics: OutbreakSpecifics;
+    outbreakSpecifics: OutbreakSpecificsDocument;
     pathogens: [PathogenDocument];
     source: SourceDocument;
     symptoms: DictionaryDocument;
