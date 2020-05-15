@@ -2,6 +2,7 @@ import { DateRangeDocument, dateRangeSchema } from './date-range';
 import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { LocationDocument, locationSchema } from './location';
+import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
@@ -15,15 +16,6 @@ import mongoose from 'mongoose';
 const outbreakSpecificsSchema = new mongoose.Schema({
     livesInWuhan: Boolean,
     reportedMarketExposure: Boolean,
-});
-
-const pathogenSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: 'Enter a pathogen name',
-    },
-    sequenceSource: sourceSchema,
-    additionalInformation: String,
 });
 
 const caseSchema = new mongoose.Schema(
@@ -86,12 +78,6 @@ interface OutbreakSpecifics {
     reportedMarketExposure: boolean;
 }
 
-interface Pathogen {
-    name: string;
-    sequenceSource: SourceDocument;
-    additionalInformation: string;
-}
-
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     chronicDisease: DictionaryDocument;
@@ -102,7 +88,7 @@ type CaseDocument = mongoose.Document & {
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     outbreakSpecifics: OutbreakSpecifics;
-    pathogens: [Pathogen];
+    pathogens: [PathogenDocument];
     source: SourceDocument;
     symptoms: DictionaryDocument;
     travelHistory: [TravelDocument];
