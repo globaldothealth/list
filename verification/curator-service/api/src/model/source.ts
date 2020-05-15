@@ -32,7 +32,7 @@ const fieldSchema = new mongoose.Schema({
 });
 
 interface RegexParsing {
-    fields: Array<Field>;
+    fields: [Field];
 }
 
 const regexParsingSchema = new mongoose.Schema({
