@@ -20,7 +20,7 @@ interface Field {
 }
 
 interface RegexParsing {
-    fields: Array<Field>;
+    fields: [Field];
 }
 
 interface Parser {
