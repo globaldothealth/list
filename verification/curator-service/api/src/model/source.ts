@@ -17,45 +17,60 @@ const originSchema = new mongoose.Schema({
 
 interface Field {
     name: string;
-    regexp: string;
+    regex: string;
 }
 
 const fieldSchema = new mongoose.Schema({
-    url: {
+    name: {
         type: String,
         required: 'Enter a dotted.field.name',
     },
-    regexp: {
+    regex: {
         type: String,
-        required: 'Enter a field extraction regexp',
+        required: 'Enter a field extraction regex',
     },
 });
 
-interface Parsing {
-    fields: Array<Field>;
+interface RegexParsing {
+    fields: [Field];
 }
 
-const parsingSchema = new mongoose.Schema({
+const regexParsingSchema = new mongoose.Schema({
     fields: [fieldSchema],
 });
 
+interface Parser {
+    awsLambdaArn: string;
+}
+
+const parserSchema = new mongoose.Schema({
+    awsLambdaArn: {
+        type: String,
+        required: 'Enter a parser AWS Lambda ARN',
+    },
+});
+
+interface Schedule {
+    awsRuleArn: string;
+}
+
+const scheduleSchema = new mongoose.Schema({
+    awsRuleArn: {
+        type: String,
+        required: 'Enter a CloudWatch schedule rule AWS Lambda ARN',
+    },
+});
+
 interface Automation {
-    name: string;
-    tag: string;
-    active: boolean;
-    scheduleExpression: string;
-    parsing: Parsing;
+    parser: Parser;
+    schedule: Schedule;
+    regexParsing: RegexParsing;
 }
 
 const automationSchema = new mongoose.Schema({
-    name: {
-        name: String,
-        tag: String,
-        active: Boolean,
-        // TODO: Should probably use a validator for "cron(..." or "rate(...".
-        scheduleExpression: String,
-        parsing: parsingSchema,
-    },
+    parser: parserSchema,
+    schedule: scheduleSchema,
+    regexParsing: regexParsingSchema,
 });
 
 const sourceSchema = new mongoose.Schema({
