@@ -1,4 +1,4 @@
-# ALB Security Group: Edit to restrict access to the application
+# ALB Security Group, restricts access to the application.
 resource "aws_security_group" "lb" {
   name        = "epid-load-balancer-security-group"
   description = "controls access to the ALB"
@@ -11,6 +11,7 @@ resource "aws_security_group" "lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Default AWS ALLOW ALL rule.
   egress {
     protocol    = "-1"
     from_port   = 0
@@ -33,7 +34,7 @@ resource "aws_security_group" "ecs_tasks" {
   }
 
   egress {
-    protocol    = "-1"
+    protocol    = "-1" # All.
     from_port   = 0
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
