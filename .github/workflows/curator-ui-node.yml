@@ -36,6 +36,6 @@ jobs:
       - name: Cypress integration tests
         run: npm run cypress-ci-test
         working-directory: verification/curator-service/ui
-        timeout: 15m
+        timeout-minutes: 15
         env:
           CI: true
