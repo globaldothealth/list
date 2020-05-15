@@ -1,5 +1,6 @@
 import { DateRangeDocument, dateRangeSchema } from './date-range';
 import { DemographicsDocument, demographicsSchema } from './demographics';
+import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { LocationDocument, locationSchema } from './location';
 import {
     RevisionMetadataDocument,
@@ -10,17 +11,6 @@ import { TravelDocument, travelSchema } from './travel';
 
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
-
-const dictionaryValueSchema = new mongoose.Schema({
-    provided: {
-        type: [String],
-        uniqueItems: true,
-    },
-    imputed: {
-        type: [String],
-        uniqueItems: true,
-    },
-});
 
 const outbreakSpecificsSchema = new mongoose.Schema({
     livesInWuhan: Boolean,
@@ -38,7 +28,7 @@ const pathogenSchema = new mongoose.Schema({
 
 const caseSchema = new mongoose.Schema(
     {
-        chronicDisease: dictionaryValueSchema,
+        chronicDisease: dictionarySchema,
         demographics: demographicsSchema,
         events: {
             type: [
@@ -67,11 +57,10 @@ const caseSchema = new mongoose.Schema(
         outbreakSpecifics: outbreakSpecificsSchema,
         pathogens: [pathogenSchema],
         source: sourceSchema,
-        symptoms: dictionaryValueSchema,
+        symptoms: dictionarySchema,
         travelHistory: [travelSchema],
     },
     {
-        useNestedStrict: true,
         toObject: {
             transform: function (__, ret) {
                 // TODO: Transform the model layer to the API layer.
@@ -86,11 +75,6 @@ const caseSchema = new mongoose.Schema(
         },
     },
 );
-
-interface ChronicDisease {
-    provided: [string];
-    imputed: [string];
-}
 
 interface Event {
     name: string;
@@ -108,14 +92,9 @@ interface Pathogen {
     additionalInformation: string;
 }
 
-interface Symptoms {
-    provided: [string];
-    imputed: [string];
-}
-
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
-    chronicDisease: ChronicDisease;
+    chronicDisease: DictionaryDocument;
     demographics: DemographicsDocument;
     events: [Event];
     importedCase: {};
@@ -125,7 +104,7 @@ type CaseDocument = mongoose.Document & {
     outbreakSpecifics: OutbreakSpecifics;
     pathogens: [Pathogen];
     source: SourceDocument;
-    symptoms: Symptoms;
+    symptoms: DictionaryDocument;
     travelHistory: [TravelDocument];
 };
 
