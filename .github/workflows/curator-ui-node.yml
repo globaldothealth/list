@@ -30,7 +30,8 @@ jobs:
           npm ci
           npm run build
           npm test
-          npm cypress-ci-test
+      - name: Cypress integration tests
+        run: npm cypress-ci-test
         working-directory: verification/curator-service/ui
         env:
           CI: true
