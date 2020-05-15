@@ -3,6 +3,13 @@
 # Log file for conversion warnings
 convert_data.log
 
+# Terraform.
+*.tfstate
+*.tfstate.backup
+.terraform.tfstate.lock.info
+.terraform/
+secrets.tfvars
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
