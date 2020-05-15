@@ -1,19 +1,5 @@
 import mongoose from 'mongoose';
-
-interface Origin {
-    url: string;
-    license: string;
-}
-
-const originSchema = new mongoose.Schema({
-    url: {
-        type: String,
-        required: 'Enter an origin URL',
-    },
-    license: {
-        type: String,
-    },
-});
+import { OriginDocument, originSchema } from './origin';
 
 interface Field {
     name: string;
@@ -88,7 +74,7 @@ const sourceSchema = new mongoose.Schema({
 
 type SourceDocument = mongoose.Document & {
     name: string;
-    origin: Origin;
+    origin: OriginDocument;
     format: string;
     automation: Automation;
 };
