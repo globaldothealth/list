@@ -30,8 +30,9 @@
     "test": "react-scripts test",
     "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
-    "cypress": "cypress open",
-    "cypress-ci-test": "start-server-and-test ./../../../../dev/run_stack.sh start http://localhost:3002 cypress run"
+    "cypress-open": "cypress open",
+    "cypress-run": "cypress run",
+    "cypress-ci-test": "start-server-and-test ./../../../../dev/run_stack.sh start http://localhost:3002 cypress-run"
   },
   "eslintConfig": {
     "extends": "react-app"
