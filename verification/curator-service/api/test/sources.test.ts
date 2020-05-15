@@ -138,7 +138,7 @@ describe('POST', () => {
             .post('/api/sources')
             .send(source)
             .expect('Content-Type', /json/)
-            .expect(200);
+            .expect(201);
         expect(res.body.name).toEqual(source.name);
     });
     it('should not create invalid source', async () => {
