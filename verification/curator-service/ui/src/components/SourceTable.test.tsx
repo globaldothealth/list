@@ -24,12 +24,14 @@ it('loads and displays sources', async () => {
         license: "origin license",
       },
       automation: {
-        name: 'automation name',
-        tag: 'automation tag',
-        active: true,
-        scheduleExpression: "automation schedule",
-        parsing: {
-          fields: [{ name: "field name", regexp: "field regexp" }]
+        parser: {
+          awsLambdaArn: "lambda arn",
+        },
+        schedule: {
+          awsRuleArn: "rule arn",
+        },
+        regexParsing: {
+          fields: [{ name: "field name", regex: "field regexp" }]
         }
       }
     },
@@ -65,12 +67,14 @@ it('can delete a row', async () => {
         license: "origin license",
       },
       automation: {
-        name: 'automation name',
-        tag: 'automation tag',
-        active: true,
-        scheduleExpression: "automation schedule",
-        parsing: {
-          fields: [{ name: "field name", regexp: "field regexp" }]
+        parser: {
+          awsLambdaArn: "lambda arn",
+        },
+        schedule: {
+          awsRuleArn: "rule arn",
+        },
+        regexParsing: {
+          fields: [{ name: "field name", regex: "field regexp" }]
         }
       }
     },
