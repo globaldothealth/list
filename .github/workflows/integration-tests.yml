@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-    - name: Cypress integration tests
+      - name: Cypress integration tests
         run: npm run cypress-ci-test
         working-directory: verification/curator-service/ui
         env:
