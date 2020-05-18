@@ -1,4 +1,4 @@
-import MaterialTable from 'material-table';
+import MaterialTable, { QueryResult } from 'material-table';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
@@ -68,6 +68,8 @@ interface TableRow {
     notes: string;
 }
 
+// Return type isn't meaningful.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = (theme: Theme) =>
     createStyles({
         error: {
@@ -80,7 +82,7 @@ const styles = (theme: Theme) =>
 type Props = WithStyles<typeof styles>;
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
         this.state = {
             url: '/api/cases/',
@@ -88,7 +90,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         };
     }
 
-    createCaseFromRowData(rowData: TableRow) {
+    // TODO: Consider defining distinct RPC-format and UI-format Case types to
+    // improve type-handling here.
+    createCaseFromRowData(rowData: TableRow): unknown {
         return {
             demographics: {
                 sex: rowData.sex,
@@ -117,7 +121,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         };
     }
 
-    addCase(newRowData: TableRow) {
+    addCase(newRowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             if (!this.validateRequired(newRowData.sourceUrl)) {
                 return reject();
@@ -132,7 +136,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    deleteCase(rowData: TableRow) {
+    deleteCase(rowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const deleteUrl = this.state.url + rowData.id;
             this.setState({ error: '' });
@@ -144,7 +148,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    editCase(newRowData: TableRow, oldRowData: TableRow | undefined) {
+    editCase(
+        newRowData: TableRow,
+        oldRowData: TableRow | undefined,
+    ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             if (isUndefined(oldRowData)) {
                 return reject();
@@ -162,11 +169,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    validateRequired(field: string) {
+    validateRequired(field: string): boolean {
         return field?.trim() !== '';
     }
 
-    render() {
+    render(): JSX.Element {
         const { classes } = this.props;
         return (
             <div>
@@ -207,7 +214,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 title: 'Source URL',
                                 field: 'sourceUrl',
                                 filtering: false,
-                                editComponent: (props) => (
+                                editComponent: (props): JSX.Element => (
                                     <TextField
                                         type="text"
                                         size="small"
@@ -221,7 +228,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 ? ''
                                                 : 'Required field'
                                         }
-                                        onChange={(event) =>
+                                        onChange={(event): void =>
                                             props.onChange(event.target.value)
                                         }
                                         defaultValue={props.value}
@@ -229,7 +236,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 ),
                             },
                         ]}
-                        data={(query) =>
+                        data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
                                 let listUrl = this.state.url;
                                 listUrl += '?limit=' + query.pageSize;
@@ -289,14 +296,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
                         editable={{
-                            onRowAdd: (newRowData: TableRow) =>
-                                this.addCase(newRowData),
+                            onRowAdd: (
+                                newRowData: TableRow,
+                            ): Promise<unknown> => this.addCase(newRowData),
                             onRowUpdate: (
                                 newRowData: TableRow,
                                 oldRowData: TableRow | undefined,
-                            ) => this.editCase(newRowData, oldRowData),
-                            onRowDelete: (rowData: TableRow) =>
-                                this.deleteCase(rowData),
+                            ): Promise<unknown> =>
+                                this.editCase(newRowData, oldRowData),
+                            onRowDelete: (
+                                rowData: TableRow,
+                            ): Promise<unknown> => this.deleteCase(rowData),
                         }}
                     />
                 </Paper>

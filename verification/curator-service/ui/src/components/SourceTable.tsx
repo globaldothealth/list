@@ -1,4 +1,4 @@
-import MaterialTable from 'material-table';
+import MaterialTable, { QueryResult } from 'material-table';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
@@ -13,7 +13,7 @@ interface ListResponse {
 
 interface Origin {
     url: string;
-    license: string;
+    license?: string;
 }
 
 interface Field {
@@ -42,9 +42,9 @@ interface Automation {
 interface Source {
     _id: string;
     name: string;
-    format: string;
+    format?: string;
     origin: Origin;
-    automation: Automation;
+    automation?: Automation;
 }
 
 interface SourceTableState {
@@ -60,14 +60,14 @@ interface TableRow {
 }
 
 export default class SourceTable extends React.Component<{}, SourceTableState> {
-    constructor(props: any) {
+    constructor(props: {}) {
         super(props);
         this.state = {
             url: '/api/sources/',
         };
     }
 
-    addSource(rowData: TableRow) {
+    addSource(rowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             if (
                 !(
@@ -85,7 +85,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         });
     }
 
-    deleteSource(rowData: TableRow) {
+    deleteSource(rowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const deleteUrl = this.state.url + rowData._id;
             const response = axios.delete(deleteUrl);
@@ -95,7 +95,10 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         });
     }
 
-    editSource(newRowData: TableRow, oldRowData: TableRow | undefined) {
+    editSource(
+        newRowData: TableRow,
+        oldRowData: TableRow | undefined,
+    ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             if (isUndefined(oldRowData)) {
                 return reject();
@@ -119,7 +122,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         });
     }
 
-    createSourceFromRowData(rowData: TableRow) {
+    createSourceFromRowData(rowData: TableRow): Source {
         return {
             _id: rowData._id,
             name: rowData.name,
@@ -129,11 +132,11 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         };
     }
 
-    validateRequired(field: string) {
+    validateRequired(field: string): boolean {
         return field?.trim() !== '';
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <Paper>
                 <MaterialTable
@@ -142,7 +145,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         {
                             title: 'Name',
                             field: 'name',
-                            editComponent: (props) => (
+                            editComponent: (props): JSX.Element => (
                                 <TextField
                                     type="text"
                                     size="small"
@@ -154,7 +157,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                                             ? ''
                                             : 'Required field'
                                     }
-                                    onChange={(event) =>
+                                    onChange={(event): void =>
                                         props.onChange(event.target.value)
                                     }
                                     defaultValue={props.value}
@@ -164,7 +167,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         {
                             title: 'URL',
                             field: 'url',
-                            editComponent: (props) => (
+                            editComponent: (props): JSX.Element => (
                                 <TextField
                                     type="text"
                                     size="small"
@@ -176,7 +179,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                                             ? ''
                                             : 'Required field'
                                     }
-                                    onChange={(event) =>
+                                    onChange={(event): void =>
                                         props.onChange(event.target.value)
                                     }
                                     defaultValue={props.value}
@@ -184,7 +187,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                             ),
                         },
                     ]}
-                    data={(query) =>
+                    data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
@@ -222,13 +225,14 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
-                        onRowAdd: (rowData: TableRow) =>
+                        onRowAdd: (rowData: TableRow): Promise<unknown> =>
                             this.addSource(rowData),
                         onRowUpdate: (
                             newRowData: TableRow,
                             oldRowData: TableRow | undefined,
-                        ) => this.editSource(newRowData, oldRowData),
-                        onRowDelete: (rowData: TableRow) =>
+                        ): Promise<unknown> =>
+                            this.editSource(newRowData, oldRowData),
+                        onRowDelete: (rowData: TableRow): Promise<unknown> =>
                             this.deleteSource(rowData),
                     }}
                 />

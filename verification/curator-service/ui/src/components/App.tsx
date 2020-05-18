@@ -18,7 +18,7 @@ const theme = createMuiTheme({
     },
 });
 
-function App() {
+function App(): JSX.Element {
     return (
         <ThemeProvider theme={theme}>
             <div className="App">
@@ -39,15 +39,15 @@ function App() {
     );
 }
 
-function Linelist() {
+function Linelist(): JSX.Element {
     return <LinelistTable />;
 }
 
-function Sources() {
+function Sources(): JSX.Element {
     return <SourceTable />;
 }
 
-function Home() {
+function Home(): JSX.Element {
     return (
         <nav>
             <Link to="/cases">Linelist</Link>
