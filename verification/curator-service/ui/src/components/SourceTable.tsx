@@ -114,7 +114,19 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                 <MaterialTable
                     columns={[
                         { title: 'ID', field: '_id', editable: "never" },
-                        { title: 'Name', field: 'name' },
+                        {
+                            title: 'Name', field: 'name',
+                            editComponent: (props) =>
+                                (<TextField
+                                    type="text"
+                                    size="small"
+                                    fullWidth
+                                    placeholder="URL"
+                                    error={!this.validateRequired(props.value)}
+                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
+                                    onChange={event => props.onChange(event.target.value)}
+                                    defaultValue={props.value} />)
+                        },
                         {
                             title: 'URL', field: 'url',
                             editComponent: (props) =>
@@ -122,7 +134,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                                     type="text"
                                     size="small"
                                     fullWidth
-                                    placeholder="Source URL"
+                                    placeholder="URL"
                                     error={!this.validateRequired(props.value)}
                                     helperText={this.validateRequired(props.value) ? "" : "Required field"}
                                     onChange={event => props.onChange(event.target.value)}
