@@ -6,9 +6,9 @@ import axios from 'axios';
 import { isUndefined } from 'util';
 
 interface ListResponse {
-    sources: Source[],
-    nextPage: number,
-    total: number,
+    sources: Source[];
+    nextPage: number;
+    total: number;
 }
 
 interface Origin {
@@ -48,7 +48,7 @@ interface Source {
 }
 
 interface SourceTableState {
-    url: string,
+    url: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -64,35 +64,35 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         super(props);
         this.state = {
             url: '/api/sources/',
-        }
+        };
     }
 
     addSource(rowData: TableRow) {
         return new Promise((resolve, reject) => {
-            if (!(this.validateRequired(rowData.name) &&
-                this.validateRequired(rowData.url))) {
+            if (
+                !(
+                    this.validateRequired(rowData.name) &&
+                    this.validateRequired(rowData.url)
+                )
+            ) {
                 return reject();
             }
             const newSource = this.createSourceFromRowData(rowData);
             const response = axios.post(this.state.url, newSource);
-            response
-                .then(resolve)
-                .catch((e) => {
-                    reject(e);
-                });
+            response.then(resolve).catch((e) => {
+                reject(e);
+            });
         });
     }
 
     deleteSource(rowData: TableRow) {
         return new Promise((resolve, reject) => {
-            let deleteUrl = this.state.url + rowData._id;
+            const deleteUrl = this.state.url + rowData._id;
             const response = axios.delete(deleteUrl);
-            response
-                .then(resolve)
-                .catch((e) => {
-                    reject(e);
-                });
-        })
+            response.then(resolve).catch((e) => {
+                reject(e);
+            });
+        });
     }
 
     editSource(newRowData: TableRow, oldRowData: TableRow | undefined) {
@@ -100,17 +100,22 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
             if (isUndefined(oldRowData)) {
                 return reject();
             }
-            if (!(this.validateRequired(newRowData.name) &&
-                this.validateRequired(newRowData.url))) {
+            if (
+                !(
+                    this.validateRequired(newRowData.name) &&
+                    this.validateRequired(newRowData.url)
+                )
+            ) {
                 return reject();
             }
             const newSource = this.createSourceFromRowData(newRowData);
-            const response = axios.put(this.state.url + oldRowData._id, newSource);
-            response
-                .then(resolve)
-                .catch((e) => {
-                    reject(e);
-                });
+            const response = axios.put(
+                this.state.url + oldRowData._id,
+                newSource,
+            );
+            response.then(resolve).catch((e) => {
+                reject(e);
+            });
         });
     }
 
@@ -119,13 +124,13 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
             _id: rowData._id,
             name: rowData.name,
             origin: {
-                url: rowData.url
-            }
-        }
+                url: rowData.url,
+            },
+        };
     }
 
-    validateRequired(field: String) {
-        return field?.trim() !== "";
+    validateRequired(field: string) {
+        return field?.trim() !== '';
     }
 
     render() {
@@ -133,59 +138,78 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
             <Paper>
                 <MaterialTable
                     columns={[
-                        { title: 'ID', field: '_id', editable: "never" },
+                        { title: 'ID', field: '_id', editable: 'never' },
                         {
-                            title: 'Name', field: 'name',
-                            editComponent: (props) =>
-                                (<TextField
+                            title: 'Name',
+                            field: 'name',
+                            editComponent: (props) => (
+                                <TextField
                                     type="text"
                                     size="small"
                                     fullWidth
                                     placeholder="URL"
                                     error={!this.validateRequired(props.value)}
-                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
-                                    onChange={event => props.onChange(event.target.value)}
-                                    defaultValue={props.value} />)
+                                    helperText={
+                                        this.validateRequired(props.value)
+                                            ? ''
+                                            : 'Required field'
+                                    }
+                                    onChange={(event) =>
+                                        props.onChange(event.target.value)
+                                    }
+                                    defaultValue={props.value}
+                                />
+                            ),
                         },
                         {
-                            title: 'URL', field: 'url',
-                            editComponent: (props) =>
-                                (<TextField
+                            title: 'URL',
+                            field: 'url',
+                            editComponent: (props) => (
+                                <TextField
                                     type="text"
                                     size="small"
                                     fullWidth
                                     placeholder="URL"
                                     error={!this.validateRequired(props.value)}
-                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
-                                    onChange={event => props.onChange(event.target.value)}
-                                    defaultValue={props.value} />)
+                                    helperText={
+                                        this.validateRequired(props.value)
+                                            ? ''
+                                            : 'Required field'
+                                    }
+                                    onChange={(event) =>
+                                        props.onChange(event.target.value)
+                                    }
+                                    defaultValue={props.value}
+                                />
+                            ),
                         },
                     ]}
-
-                    data={query =>
+                    data={(query) =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             const response = axios.get<ListResponse>(listUrl);
-                            response.then(result => {
-                                let flattened_sources: TableRow[] = [];
-                                const sources = result.data.sources;
-                                for (const s of sources) {
-                                    flattened_sources.push({
-                                        _id: s._id,
-                                        name: s.name,
-                                        url: s.origin.url,
+                            response
+                                .then((result) => {
+                                    const flattenedSources: TableRow[] = [];
+                                    const sources = result.data.sources;
+                                    for (const s of sources) {
+                                        flattenedSources.push({
+                                            _id: s._id,
+                                            name: s.name,
+                                            url: s.origin.url,
+                                        });
+                                    }
+                                    resolve({
+                                        data: flattenedSources,
+                                        page: query.page,
+                                        totalCount: result.data.total,
                                     });
-                                }
-                                resolve({
-                                    data: flattened_sources,
-                                    page: query.page,
-                                    totalCount: result.data.total,
+                                })
+                                .catch((e) => {
+                                    reject(e);
                                 });
-                            }).catch((e) => {
-                                reject(e);
-                            });
                         })
                     }
                     title="Ingestion sources"
@@ -198,13 +222,17 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
-                        onRowAdd: (rowData: TableRow) => this.addSource(rowData),
-                        onRowUpdate: (newRowData: TableRow, oldRowData: TableRow | undefined) =>
-                            this.editSource(newRowData, oldRowData),
-                        onRowDelete: (rowData: TableRow) => this.deleteSource(rowData),
+                        onRowAdd: (rowData: TableRow) =>
+                            this.addSource(rowData),
+                        onRowUpdate: (
+                            newRowData: TableRow,
+                            oldRowData: TableRow | undefined,
+                        ) => this.editSource(newRowData, oldRowData),
+                        onRowDelete: (rowData: TableRow) =>
+                            this.deleteSource(rowData),
                     }}
                 />
             </Paper>
-        )
+        );
     }
 }
