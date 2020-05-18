@@ -74,8 +74,8 @@ const styles = (theme: Theme) =>
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
 type Props = WithStyles<typeof styles>;
 
-class SourceTable extends React.Component<{}, SourceTableState> {
-    constructor(props: {}) {
+class SourceTable extends React.Component<Props, SourceTableState> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             url: '/api/sources/',
