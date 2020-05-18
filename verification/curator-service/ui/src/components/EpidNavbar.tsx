@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 
+// Return type isn't meaningful.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = (theme: Theme) =>
     createStyles({
         root: {
@@ -32,14 +34,14 @@ interface User {
 type Props = WithStyles<typeof styles>;
 
 class EpidNavbar extends React.Component<Props, User> {
-    constructor(props: any) {
+    constructor(props: Props) {
         super(props);
         this.state = {
             email: '',
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -51,7 +53,7 @@ class EpidNavbar extends React.Component<Props, User> {
             });
     }
 
-    render() {
+    render(): JSX.Element {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
