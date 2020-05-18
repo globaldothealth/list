@@ -14,12 +14,17 @@ const userSchema = new mongoose.Schema({
         // supporting more identity platforms.
         required: 'User must be logged-in with Google',
     },
+    role: {
+        type: String,
+        // Note: not required as assuming no defined role === no permission
+    }
 });
 
 export type UserDocument = mongoose.Document & {
     googleID: string;
     name: string;
     email: string;
+    role: string;
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);

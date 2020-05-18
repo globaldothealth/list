@@ -17,4 +17,13 @@ describe('User schema', () => {
             'User must be logged-in with Google',
         );
     });
+    it('should allow a user to have a role', () => {
+        const errors = new User({
+            name: 'test source',
+            email: 'foo@bar.com',
+            googleID: 'baz',
+            role: 'admin',
+        }).validateSync();
+        expect(errors).toBeUndefined();
+    });
 });
