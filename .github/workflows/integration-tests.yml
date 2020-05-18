@@ -18,19 +18,17 @@ on:
       - "data-serving/data-service/**"
 
 jobs:
-  build:
+  integration-tests:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
+      - name: Build stack
+        run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
       - name: Cypress integration tests
         run: |
           npm ci
-          npm run cypress-ci-test
+          npm run cypress-run
         working-directory: verification/curator-service/ui
         env:
           CI: true
