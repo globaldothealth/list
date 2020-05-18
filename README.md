@@ -15,8 +15,6 @@ To-be-renamed project repository for the HealthMap/GDO open epidemiology collabo
 
 ![Ingestion functions AWS SAM deploy](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)
 
-![current Docker status badge](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Docker%20compose%20up/badge.svg)
-
 ## Others
 
 ![num languages](https://img.shields.io/github/languages/count/open-covid-data/healthmap-gdo-temp) top: ![top language](https://img.shields.io/github/languages/top/open-covid-data/healthmap-gdo-temp.svg?style=flat-square&colorB=green)
