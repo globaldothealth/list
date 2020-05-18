@@ -26,10 +26,12 @@ export default function validateEnv(): Readonly<{
         PORT: port({ default: 3001 }),
         GOOGLE_OAUTH_CLIENT_ID: str({
             desc: 'OAuth client ID from the Google developer console',
+            default: 'replace to enable auth',
             devDefault: 'replace to enable auth',
         }),
         GOOGLE_OAUTH_CLIENT_SECRET: str({
             desc: 'OAuth client secret from the Google developer console',
+            default: 'replace to enable auth',
             devDefault: 'replace to enable auth',
         }),
         SESSION_COOKIE_KEY: str({
