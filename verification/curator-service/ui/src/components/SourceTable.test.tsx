@@ -222,9 +222,6 @@ it('can edit a row', async () => {
         },
         schedule: {
           awsRuleArn: "rule arn",
-        },
-        regexParsing: {
-          fields: [{ name: "field name", regex: "field regexp" }]
         }
       }
     },
@@ -264,9 +261,6 @@ it('can edit a row', async () => {
         },
         schedule: {
           awsRuleArn: "rule arn",
-        },
-        regexParsing: {
-          fields: [{ name: "field name", regex: "field regexp" }]
         }
       }
     },
