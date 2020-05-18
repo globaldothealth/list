@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
+import { isUndefined } from 'util';
 
 interface ListResponse {
     sources: Source[],
@@ -94,6 +95,25 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         })
     }
 
+    editSource(newRowData: TableRow, oldRowData: TableRow | undefined) {
+        return new Promise((resolve, reject) => {
+            if (isUndefined(oldRowData)) {
+                return reject();
+            }
+            if (!(this.validateRequired(newRowData.name) &&
+                this.validateRequired(newRowData.url))) {
+                return reject();
+            }
+            const newSource = this.createSourceFromRowData(newRowData);
+            const response = axios.put(this.state.url + oldRowData._id, newSource);
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
     createSourceFromRowData(rowData: TableRow) {
         return {
             _id: rowData._id,
@@ -179,6 +199,8 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                     }}
                     editable={{
                         onRowAdd: (rowData: TableRow) => this.addSource(rowData),
+                        onRowUpdate: (newRowData: TableRow, oldRowData: TableRow | undefined) =>
+                            this.editSource(newRowData, oldRowData),
                         onRowDelete: (rowData: TableRow) => this.deleteSource(rowData),
                     }}
                 />
