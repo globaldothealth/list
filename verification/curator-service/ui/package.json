@@ -26,14 +26,12 @@
   "scripts": {
     "start-noenv": "react-scripts start",
     "start": "PORT=3002 react-scripts start",
-    "start-full-stack": "./../../../dev/run_stack.sh",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "cypress-open": "cypress open",
-    "cypress-run": "cypress run",
-    "cypress-ci-test": "WAIT_ON_TIMEOUT=600000 start-server-and-test start-full-stack http://localhost:3002 cypress-run"
+    "cypress-run": "cypress run"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -51,7 +49,6 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^4.5.0",
-    "start-server-and-test": "^1.11.0"
+    "cypress": "^4.5.0"
   }
 }
