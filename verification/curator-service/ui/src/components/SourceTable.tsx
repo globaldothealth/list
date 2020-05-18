@@ -1,6 +1,7 @@
 import MaterialTable from 'material-table';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
+import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 
 interface ListResponse {
@@ -65,6 +66,22 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         }
     }
 
+    addSource(rowData: TableRow) {
+        return new Promise((resolve, reject) => {
+            if (!(this.validateRequired(rowData.name) &&
+                this.validateRequired(rowData.url))) {
+                return reject();
+            }
+            const newSource = this.createSourceFromRowData(rowData);
+            const response = axios.post(this.state.url, newSource);
+            response
+                .then(resolve)
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
     deleteSource(rowData: TableRow) {
         return new Promise((resolve, reject) => {
             let deleteUrl = this.state.url + rowData._id;
@@ -77,14 +94,52 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
         })
     }
 
+    createSourceFromRowData(rowData: TableRow) {
+        return {
+            _id: rowData._id,
+            name: rowData.name,
+            origin: {
+                url: rowData.url
+            }
+        }
+    }
+
+    validateRequired(field: String) {
+        return field?.trim() !== "";
+    }
+
     render() {
         return (
             <Paper>
                 <MaterialTable
                     columns={[
                         { title: 'ID', field: '_id', editable: "never" },
-                        { title: 'Name', field: 'name' },
-                        { title: 'URL', field: 'url' },
+                        {
+                            title: 'Name', field: 'name',
+                            editComponent: (props) =>
+                                (<TextField
+                                    type="text"
+                                    size="small"
+                                    fullWidth
+                                    placeholder="URL"
+                                    error={!this.validateRequired(props.value)}
+                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
+                                    onChange={event => props.onChange(event.target.value)}
+                                    defaultValue={props.value} />)
+                        },
+                        {
+                            title: 'URL', field: 'url',
+                            editComponent: (props) =>
+                                (<TextField
+                                    type="text"
+                                    size="small"
+                                    fullWidth
+                                    placeholder="URL"
+                                    error={!this.validateRequired(props.value)}
+                                    helperText={this.validateRequired(props.value) ? "" : "Required field"}
+                                    onChange={event => props.onChange(event.target.value)}
+                                    defaultValue={props.value} />)
+                        },
                     ]}
 
                     data={query =>
@@ -123,6 +178,7 @@ export default class SourceTable extends React.Component<{}, SourceTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                     }}
                     editable={{
+                        onRowAdd: (rowData: TableRow) => this.addSource(rowData),
                         onRowDelete: (rowData: TableRow) => this.deleteSource(rowData),
                     }}
                 />

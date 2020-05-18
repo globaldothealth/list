@@ -133,3 +133,75 @@ it('can delete a row', async () => {
   const newRow = queryByText(/abc123/);
   expect(newRow).not.toBeInTheDocument();
 })
+
+it('can add a row', async () => {
+  const axiosGetResponse = {
+    data: {
+      sources: [],
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+  const { getByText, findByText, queryByText } = render(<SourceTable />)
+
+  // Check table is empty on load
+  const row = queryByText(/abc123/);
+  expect(row).not.toBeInTheDocument();
+
+  // Add a row
+  const newSource =
+  {
+    _id: 'abc123',
+    name: 'source name',
+    format: 'format',
+    origin: {
+      url: "origin url",
+      license: "origin license",
+    },
+    automation: {
+      parser: {
+        awsLambdaArn: "lambda arn",
+      },
+      schedule: {
+        awsRuleArn: "rule arn",
+      }
+    }
+  };
+  const axiosPostResponse = {
+    data: {
+      source: newSource,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  const axiosGetAfterAddResponse = {
+    data: {
+      sources: [newSource],
+      total: 15,
+    },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {},
+  };
+  mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
+  mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
+
+  const addButton = getByText(/add_box/);
+  fireEvent.click(addButton);
+  const confirmButton = getByText(/check/);
+  fireEvent.click(confirmButton);
+  expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+  // Check table is reloaded
+  expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+  const newRow = await findByText(/abc123/);
+  expect(newRow).toBeInTheDocument();
+})
