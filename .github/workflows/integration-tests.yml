@@ -28,7 +28,9 @@ jobs:
         with:
           node-version: "12.x"
       - name: Cypress integration tests
-        run: npm run cypress-ci-test
+        run: |
+          npm ci
+          npm run cypress-ci-test
         working-directory: verification/curator-service/ui
         env:
           CI: true
