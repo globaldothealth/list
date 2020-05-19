@@ -5,7 +5,7 @@ VALID_SEXES = ['female', 'male', 'other']
 # new events-based outcome field.
 LOSSLESS_FIELDS = [
     'additional_information', 'admin1', 'admin2', 'age', 'chronic_disease',
-    'city', 'country_new', 'data_moderator_initials', 'date_death_or_discharge',
+    'city', 'country', 'data_moderator_initials', 'date_death_or_discharge',
     'latitude', 'lives_in_Wuhan', 'longitude', 'notes_for_discussion',
     'sequence_available', 'sex', 'source', 'symptoms']
 
