@@ -235,9 +235,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
     except ValueError as e:
         warn(id, 'demographics.sex', age, e)
 
-    demographics['species'] = 'Homo sapien'
-
-    return demographics
+    return demographics or None
 
 
 def convert_location(id: str, country: str, adminL1: str,
@@ -397,15 +395,11 @@ def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
           }
         }]
     '''
-    cov_pathogen = {
-        'name': 'sars-cov-2'
-    }
-
     source = convert_source_field(sequence)
-    if source:
-        cov_pathogen['sequenceSource'] = source
-
-    return [cov_pathogen]
+    return [{
+        'name': 'sars-cov-2',
+        'sequenceSource': source
+    }] if source else None
 
 
 def convert_outbreak_specifics(id: str, reported_market_exposure: str,

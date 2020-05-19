@@ -7,7 +7,7 @@ import axios from 'axios';
 import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
-let mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeEach(() => {
     // Provide a default response for the profile fetch
@@ -24,14 +24,15 @@ beforeEach(() => {
 
 afterEach(() => {
     jest.clearAllMocks();
-})
+});
 
 test('renders epid brand', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
                 <EpidNavbar />
-            </MemoryRouter>);
+            </MemoryRouter>,
+        );
     });
     expect(screen.getByText(/epid/i)).toBeInTheDocument();
 });
@@ -41,7 +42,8 @@ test('renders login button when not logged in', async () => {
         render(
             <MemoryRouter>
                 <EpidNavbar />
-            </MemoryRouter>);
+            </MemoryRouter>,
+        );
     });
     expect(screen.getByText(/Login/i)).toBeInTheDocument();
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -50,7 +52,7 @@ test('renders login button when not logged in', async () => {
 
 test('renders logout button when logged in', async () => {
     const axiosResponse = {
-        data: { email: "foo@bar.com" },
+        data: { email: 'foo@bar.com' },
         status: 200,
         statusText: 'Forbidden',
         config: {},
@@ -61,7 +63,8 @@ test('renders logout button when logged in', async () => {
         render(
             <MemoryRouter>
                 <EpidNavbar />
-            </MemoryRouter>);
+            </MemoryRouter>,
+        );
     });
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
@@ -69,13 +72,14 @@ test('renders logout button when logged in', async () => {
 });
 
 test('redirects to home on click', async () => {
-    const history = createMemoryHistory()
+    const history = createMemoryHistory();
     await act(async () => {
         render(
             <MemoryRouter>
                 <EpidNavbar />
-            </MemoryRouter>);
+            </MemoryRouter>,
+        );
     });
     fireEvent.click(screen.getByTestId('home-btn'));
-    expect(history.location.pathname).toBe("/");
-});  
+    expect(history.location.pathname).toBe('/');
+});
