@@ -2,11 +2,11 @@ import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
 import { LocationDocument, locationSchema } from './location';
-import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
     OutbreakSpecificsDocument,
     outbreakSpecificsSchema,
 } from './outbreak-specifics';
+import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
@@ -23,10 +23,10 @@ const caseSchema = new mongoose.Schema(
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
-            validator: {
-                validator: function (events: [EventDocument]): boolean {
-                    return events.some((e) => e.name == 'confirmed');
-                },
+            required: true,
+            validate: {
+                validator: (events: [EventDocument]) =>
+                    events.some((e) => e.name == 'confirmed'),
                 message: 'Must include an event with name "confirmed"',
             },
         },
@@ -34,12 +34,19 @@ const caseSchema = new mongoose.Schema(
         location: locationSchema,
         revisionMetadata: {
             type: revisionMetadataSchema,
-            required: 'Enter revision metadata',
+            required: 'Must include revision metadata',
         },
         notes: String,
         outbreakSpecifics: outbreakSpecificsSchema,
         pathogens: [pathogenSchema],
-        source: sourceSchema,
+        sources: {
+            type: [sourceSchema],
+            required: true,
+            validate: {
+                validator: (sources: [SourceDocument]) => sources.length > 0,
+                message: 'Must include one or more sources',
+            },
+        },
         symptoms: dictionarySchema,
         travelHistory: [travelSchema],
     },
@@ -70,7 +77,7 @@ type CaseDocument = mongoose.Document & {
     notes: string;
     outbreakSpecifics: OutbreakSpecificsDocument;
     pathogens: [PathogenDocument];
-    source: SourceDocument;
+    sources: [SourceDocument];
     symptoms: DictionaryDocument;
     travelHistory: [TravelDocument];
 };

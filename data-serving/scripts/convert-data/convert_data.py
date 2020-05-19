@@ -12,7 +12,7 @@ import sys
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
     convert_imported_case, convert_location, convert_revision_metadata_field,
-    convert_notes_field, convert_source_field, convert_pathogens_field,
+    convert_notes_field, convert_sources_field, convert_pathogens_field,
     convert_outbreak_specifics, convert_travel_history)
 from pandas import DataFrame
 from typing import Any
@@ -117,7 +117,7 @@ def convert(df_import: DataFrame) -> DataFrame:
         [x['notes_for_discussion'], x['additional_information']]), axis=1)
 
     # Generate new source column.
-    df_export['source'] = df_import.apply(lambda x: convert_source_field(
+    df_export['sources'] = df_import.apply(lambda x: convert_sources_field(
         x['source']), axis=1)
 
     # Generate new pathogens column.

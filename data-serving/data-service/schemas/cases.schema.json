@@ -257,21 +257,25 @@
           }
         }
       },
-      "source": {
-        "bsonType": "object",
-        "additionalProperties": false,
-        "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "id": {
-            "bsonType": "string"
-          },
-          "url": {
-            "bsonType": "string"
-          },
-          "other": {
-            "bsonType": "string"
+      "sources": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": {
+          "bsonType": "object",
+          "additionalProperties": false,
+          "properties": {
+            "_id": {
+              "bsonType": "objectId"
+            },
+            "id": {
+              "bsonType": "string"
+            },
+            "url": {
+              "bsonType": "string"
+            },
+            "other": {
+              "bsonType": "string"
+            }
           }
         }
       },
@@ -306,21 +310,25 @@
             "name": {
               "bsonType": "string"
             },
-            "sequenceSource": {
-              "bsonType": "object",
-              "additionalProperties": false,
-              "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
-                "id": {
-                  "bsonType": "string"
-                },
-                "url": {
-                  "bsonType": "string"
-                },
-                "other": {
-                  "bsonType": "string"
+            "sequenceSources": {
+              "bsonType": "array",
+              "uniqueItems": true,
+              "items": {
+                "bsonType": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "_id": {
+                    "bsonType": "objectId"
+                  },
+                  "id": {
+                    "bsonType": "string"
+                  },
+                  "url": {
+                    "bsonType": "string"
+                  },
+                  "other": {
+                    "bsonType": "string"
+                  }
                 }
               }
             },

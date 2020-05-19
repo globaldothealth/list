@@ -7,12 +7,12 @@ export const pathogenSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a pathogen name',
     },
-    sequenceSource: sourceSchema,
+    sequenceSources: [sourceSchema],
     additionalInformation: String,
 });
 
 export type PathogenDocument = mongoose.Document & {
     name: string;
-    sequenceSource: SourceDocument;
+    sequenceSources: [SourceDocument];
     additionalInformation: string;
 };
