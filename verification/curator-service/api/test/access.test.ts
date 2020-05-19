@@ -4,7 +4,8 @@ const accessControl = (
   config: Object,
 ) => (
   curry((config, req, res, next) => {
-    const expectedRoles = config[req.url]['GET'];
+    const method = req.method === 'HEAD' ? 'GET' : req.method; // HEAD and GET have the same visibility
+    const expectedRoles = config[req.url][method];
     if (expectedRoles.indexOf(req.user.role) !== -1) {
       next();
     } else {
@@ -19,14 +20,16 @@ describe('access control middleware', () => {
       role: 'viewer',
     };
     const url = '/sources';
+    const method = 'GET';
     const rbacConfig = {
       [url]: {
-        'GET': ['curator'],
+        [method]: ['curator'],
       },
     };
     const req = { 
       user,
       url,
+      method,
     };
     const res = {
       sendStatus: jest.fn(),
@@ -46,14 +49,16 @@ describe('access control middleware', () => {
       role: 'curator',
     };
     const url = '/sources';
+    const method = 'GET';
     const rbacConfig = {
       [url]: {
-        'GET': ['curator'],
+        [method]: ['curator'],
       },
     };
     const req = { 
       user,
       url,
+      method,
     };
     const res = {
       sendStatus: jest.fn(),
@@ -66,5 +71,35 @@ describe('access control middleware', () => {
 
     expect(next).toHaveBeenCalled();
     expect(res.sendStatus).not.toHaveBeenCalled();
+  });
+
+  it('chooses the correct list of expected roles based on the HTTP method', () => {
+    const user = {
+      role: 'viewer',
+    };
+    const url = '/sources';
+    const method = 'POST';
+    const rbacConfig = {
+      [url]: {
+        'GET': ['viewer'],
+        'POST': ['admin'],
+      },
+    };
+    const req = { 
+      user,
+      url,
+      method,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    };
+    const next = jest.fn();
+
+    const access = accessControl(rbacConfig);
+
+    access(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.sendStatus).toHaveBeenCalledWith(403);
   });
 });
