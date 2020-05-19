@@ -16,6 +16,7 @@ from converters import (
     convert_outbreak_specifics, convert_travel_history)
 from pandas import DataFrame
 from typing import Any
+from constants import LOSSLESS_FIELDS
 
 
 def main():
@@ -133,7 +134,7 @@ def convert(df_import: DataFrame) -> DataFrame:
 
     # Archive the original fields.
     df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
-        x), axis=1)
+        x.drop(LOSSLESS_FIELDS)), axis=1)
 
     return df_export
 
