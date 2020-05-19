@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom/extend-expect';
 
+import { fireEvent, render } from '@testing-library/react';
+
 import LinelistTable from './LinelistTable';
 import React from 'react';
 import axios from 'axios';
-import { fireEvent, render } from '@testing-library/react';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -34,9 +35,11 @@ it('loads and displays cases', async () => {
                 },
             ],
             notes: 'some notes',
-            source: {
-                url: 'http://foo.bar',
-            },
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
         },
     ];
     const axiosResponse = {
@@ -80,9 +83,11 @@ it('API errors are displayed', async () => {
                 },
             ],
             notes: 'some notes',
-            source: {
-                url: 'http://foo.bar',
-            },
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
         },
     ];
     const axiosResponse = {
@@ -131,9 +136,11 @@ it('can delete a row', async () => {
                 },
             ],
             notes: 'some notes',
-            source: {
-                url: 'http://foo.bar',
-            },
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
         },
     ];
     const axiosGetResponse = {
@@ -232,9 +239,11 @@ it('can add a row', async () => {
             },
         ],
         notes: 'some notes',
-        source: {
-            url: 'http://foo.bar',
-        },
+        sources: [
+            {
+                url: 'http://foo.bar',
+            },
+        ],
     };
     const axiosPostResponse = {
         data: {
@@ -289,9 +298,11 @@ it('can edit a row', async () => {
                 },
             ],
             notes: 'some notes',
-            source: {
-                url: 'http://foo.bar',
-            },
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
         },
     ];
     const axiosGetResponse = {
@@ -334,9 +345,11 @@ it('can edit a row', async () => {
                 },
             ],
             notes: 'some edited notes',
-            source: {
-                url: 'http://foo.bar',
-            },
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
         },
     ];
     const axiosGetAfterEditResponse = {

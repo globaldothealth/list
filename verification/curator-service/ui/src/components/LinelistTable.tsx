@@ -1,15 +1,16 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import {
+    Theme,
+    WithStyles,
+    createStyles,
+    withStyles,
+} from '@material-ui/core/styles';
+
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
-import {
-    Theme,
-    createStyles,
-    WithStyles,
-    withStyles,
-} from '@material-ui/core/styles';
 
 interface ListResponse {
     cases: Case[];
@@ -46,7 +47,7 @@ interface Case {
     events: Event[];
     demographics: Demographics;
     location: Location;
-    source: Source;
+    sources: Source[];
     notes: string;
 }
 
@@ -63,8 +64,8 @@ interface TableRow {
     age: string;
     country: string;
     confirmedDate: Date | null;
-    // source
-    sourceUrl: string;
+    // sources
+    sourceUrl: string | null;
     notes: string;
 }
 
@@ -98,9 +99,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 sex: rowData.sex,
             },
             notes: rowData.notes,
-            source: {
-                url: rowData.sourceUrl,
-            },
+            sources: [
+                {
+                    url: rowData.sourceUrl,
+                },
+            ],
             location: {
                 country: rowData.country,
             },
@@ -169,7 +172,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    validateRequired(field: string): boolean {
+    validateRequired(field: string | null): boolean {
         return field?.trim() !== '';
     }
 
@@ -270,7 +273,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ? new Date(confirmedDate)
                                                     : null,
                                                 notes: c.notes,
-                                                sourceUrl: c.source?.url,
+                                                sourceUrl:
+                                                    c.sources &&
+                                                    c.sources.length > 0
+                                                        ? c.sources[0].url
+                                                        : null,
                                             });
                                         }
                                         resolve({
