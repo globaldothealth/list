@@ -29,16 +29,22 @@ app.use('/api', apiRouter);
 
 (async (): Promise<void> => {
     try {
-        console.log(`  Connecting to instance ${env.DB_CONNECTION_STRING}`);
+        console.log(
+            'Connecting to MongoDB instance',
+            // Print only after username and password to not log them.
+            env.DB_CONNECTION_STRING.substring(
+                env.DB_CONNECTION_STRING.indexOf('@'),
+            ),
+        );
 
         await mongoose.connect(env.DB_CONNECTION_STRING, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
         });
-        console.log('  Connected to the database!');
+        console.log('Connected to the database!');
     } catch (e) {
-        console.error('  Failed to connect to the database. :(', e);
+        console.error('Failed to connect to the database. :(', e);
     }
 })();
 
