@@ -5,14 +5,18 @@ on:
     branches: [master]
     paths:
       - ".github/workflows/integration-tests.yml"
+      - "dev/docker-compose.yml"
       - "verification/curator-service/**"
       - "data-serving/data-service/**"
+      - "data-serving/samples/**"
   pull_request:
     branches: [master]
     paths:
       - ".github/workflows/integration-tests.yml"
+      - "dev/docker-compose.yml"
       - "verification/curator-service/**"
       - "data-serving/data-service/**"
+      - "data-serving/samples/**"
 
 jobs:
   integration-tests:
