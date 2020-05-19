@@ -5,7 +5,23 @@ const accessControl = (
 ) => (
   curry((config, req, res, next) => {
     const method = req.method === 'HEAD' ? 'GET' : req.method; // HEAD and GET have the same visibility
-    const expectedRoles = config[req.url][method];
+    let methodRoleMap : { [index: string] : Array<string> };
+    if (config[req.url]) {
+      methodRoleMap = config[req.url];
+    } else {
+      const keys = Object.getOwnPropertyNames(config).filter((prop) => (
+        req.url.match(prop)
+      ));
+      if (keys.length === 1) {
+        // exactly one configuration found, use that
+        methodRoleMap = config[keys[0]];
+      } else {
+        // zero or 2+ configurations found, either way it's bad
+        res.sendStatus(500);
+        return;
+      }
+    }
+    const expectedRoles  = methodRoleMap[method];
     if (expectedRoles.indexOf(req.user.role) !== -1) {
       next();
     } else {
@@ -101,5 +117,35 @@ describe('access control middleware', () => {
 
     expect(next).not.toHaveBeenCalled();
     expect(res.sendStatus).toHaveBeenCalledWith(403);
+  });
+
+  it('can match the URL to its configuration using a regex', () => {
+    const user = {
+      role: 'viewer',
+    };
+    const url = '/sources/c4fe';
+    const method = 'GET';
+    const rbacConfig = {
+      '/sources/[a-z0-9]{4}': {
+        'GET': ['viewer'],
+        'POST': ['admin'],
+      },
+    };
+    const req = { 
+      user,
+      url,
+      method,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    };
+    const next = jest.fn();
+
+    const access = accessControl(rbacConfig);
+
+    access(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+    expect(res.sendStatus).not.toHaveBeenCalled();
   });
 });
