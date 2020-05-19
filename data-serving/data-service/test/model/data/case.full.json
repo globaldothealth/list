@@ -99,10 +99,12 @@
             "additionalInformation": "large family gathering for holidays"
         }
     ],
-    "source": {
-        "id": "def456",
-        "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
-    },
+    "sources": [
+        {
+            "id": "def456",
+            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+        }
+    ],
     "outbreakSpecifics": {
         "livesInWuhan": false,
         "reportedMarketExposure": true
@@ -110,9 +112,11 @@
     "pathogens": [
         {
             "name": "sars-cov-2",
-            "sequenceSource": {
-                "id": "ghi789"
-            }
+            "sequenceSources": [
+                {
+                    "id": "ghi789"
+                }
+            ]
         },
         {
             "name": "e. coli",
