@@ -367,25 +367,7 @@
           "ID": {
             "bsonType": "string"
           },
-          "age": {
-            "bsonType": "string"
-          },
-          "sex": {
-            "bsonType": "string"
-          },
-          "city": {
-            "bsonType": "string"
-          },
           "province": {
-            "bsonType": "string"
-          },
-          "country": {
-            "bsonType": "string"
-          },
-          "latitude": {
-            "bsonType": "string"
-          },
-          "longitude": {
             "bsonType": "string"
           },
           "geo_resolution": {
@@ -400,12 +382,6 @@
           "date_confirmation": {
             "bsonType": "string"
           },
-          "symptoms": {
-            "bsonType": "string"
-          },
-          "lives_in_Wuhan": {
-            "bsonType": "string"
-          },
           "travel_history_dates": {
             "bsonType": "string"
           },
@@ -415,28 +391,10 @@
           "reported_market_exposure": {
             "bsonType": "string"
           },
-          "additional_information": {
-            "bsonType": "string"
-          },
           "chronic_disease_binary": {
             "bsonType": "string"
           },
-          "chronic_disease": {
-            "bsonType": "string"
-          },
-          "source": {
-            "bsonType": "string"
-          },
-          "sequence_available": {
-            "bsonType": "string"
-          },
           "outcome": {
-            "bsonType": "string"
-          },
-          "date_death_or_discharge": {
-            "bsonType": "string"
-          },
-          "notes_for_discussion": {
             "bsonType": "string"
           },
           "location": {
@@ -445,19 +403,10 @@
           "admin3": {
             "bsonType": "string"
           },
-          "admin2": {
-            "bsonType": "string"
-          },
-          "admin1": {
-            "bsonType": "string"
-          },
           "country_new": {
             "bsonType": "string"
           },
           "admin_id": {
-            "bsonType": "string"
-          },
-          "data_moderator_initials": {
             "bsonType": "string"
           },
           "travel_history_binary": {

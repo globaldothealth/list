@@ -9,13 +9,13 @@ To-be-renamed project repository for the HealthMap/GDO open epidemiology collabo
 
 ![Data Service Node.js CI](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Data%20service%20Node.js%20CI/badge.svg)
 
+![Integration Tests CI](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Integration%20Tests%20CI/badge.svg)
+
 ![Ingestion functions Python CI](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Ingestion%20functions%20Python%20CI/badge.svg)
 
 ![Ingestion functions AWS SAM build](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Ingestion%20functions%20AWS%20SAM%20build/badge.svg)
 
 ![Ingestion functions AWS SAM deploy](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)
-
-![current Docker status badge](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Docker%20compose%20up/badge.svg)
 
 ## Others
 
