@@ -11,6 +11,8 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 afterEach(() => {
     mockedAxios.get.mockClear();
     mockedAxios.delete.mockClear();
+    mockedAxios.post.mockClear();
+    mockedAxios.put.mockClear();
 });
 
 it('loads and displays sources', async () => {
@@ -56,6 +58,54 @@ it('loads and displays sources', async () => {
     );
     const items = await findByText(/abc123/);
     expect(items).toBeInTheDocument();
+});
+
+it('API errors are displayed', async () => {
+    // TODO: Write/load json files for this/LLT test.
+    const sources = [
+        {
+            _id: 'abc123',
+            name: 'source name',
+            format: 'format',
+            origin: {
+                url: 'origin url',
+                license: 'origin license',
+            },
+            automation: {
+                parser: {
+                    awsLambdaArn: 'lambda arn',
+                },
+                schedule: {
+                    awsRuleArn: 'rule arn',
+                },
+            },
+        },
+    ];
+    const axiosResponse = {
+        data: {
+            sources: sources,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const { getByText, findByText } = render(<SourceTable />);
+
+    // Throw error on add request.
+    mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
+
+    const addButton = getByText(/add_box/);
+    fireEvent.click(addButton);
+    const confirmButton = getByText(/check/);
+    fireEvent.click(confirmButton);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    const error = await findByText('Error: Request failed');
+    expect(error).toBeInTheDocument();
 });
 
 it('can delete a row', async () => {
