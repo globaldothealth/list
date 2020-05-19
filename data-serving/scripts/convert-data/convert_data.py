@@ -73,7 +73,7 @@ def convert(df_import: DataFrame) -> DataFrame:
         x:
         convert_location(
             x['ID'],
-            x['country_new'],
+            x['country'],
             x['admin1'],
             x['admin2'],
             x['city'],
