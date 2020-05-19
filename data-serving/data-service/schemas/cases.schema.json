@@ -370,9 +370,6 @@
           "province": {
             "bsonType": "string"
           },
-          "country": {
-            "bsonType": "string"
-          },
           "geo_resolution": {
             "bsonType": "string"
           },
@@ -404,6 +401,9 @@
             "bsonType": "string"
           },
           "admin3": {
+            "bsonType": "string"
+          },
+          "country_new": {
             "bsonType": "string"
           },
           "admin_id": {
