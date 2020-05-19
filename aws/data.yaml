@@ -1,0 +1,49 @@
+# Kubernetes deployment file for the epid service on AWS.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data
+  labels:
+    environment: dev
+    app: data
+spec:
+  selector:
+    matchLabels:
+      app: data
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: data
+    spec:
+      containers:
+        - name: data
+          # TODO: Change to new docker hub org repo.
+          image: docker.io/attwad/epiddata:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: data-878ckgc42b
+                  key: db_connection_string
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data
+spec:
+  selector:
+    app: data
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

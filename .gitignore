@@ -3,6 +3,9 @@
 # Log file for conversion warnings
 convert_data.log
 
+# Secrets for kubernetes.
+kustomization.yaml
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
