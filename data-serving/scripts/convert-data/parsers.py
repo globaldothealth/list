@@ -79,6 +79,10 @@ def parse_range(
         second_val = parse_fn(value_range[1])
         return (first_val, second_val)
 
+    # Handle values represented as an open-ended range, e.g. "90+".
+    if type(value) is str and value.endswith('+'):
+        return (parse_fn(value[:-1]), None)
+
     # We have a specific value. We create a range with identical start and end
     # values.
     parsed_value = parse_fn(value)
@@ -139,7 +143,11 @@ def parse_date(value: str) -> datetime:
     if pd.isna(value):
         return None
 
-    return datetime.datetime.strptime(value, '%d.%m.%Y')
+    try:
+        return datetime.datetime.strptime(value, '%d.%m.%Y')
+    except ValueError:
+        # Sometimes values have month and day accidentally inverted -- oops!
+        return datetime.datetime.strptime(value, '%m.%d.%Y')
 
 
 def parse_location(value: Any) -> Dict[str, Any]:
