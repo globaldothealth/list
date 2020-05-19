@@ -1,16 +1,16 @@
 '''
-Library of functions that parse a typed value from a string, e.g. bool, numeric,
-list, or enum.
+  Library of functions that parse a typed value from a string, e.g. bool, numeric,
+  list, or enum.
 
-The convention is for each of these parsers to return None when the value is
-absent, or effectively absent (i.e. the string "na" or "none"). The parsers will
-throw if the input value cannot be succesfully parsed, given the output type and
-other constraints.
+  The convention is for each of these parsers to return None when the value is
+  absent, or effectively absent (i.e. the string "na" or "none"). The parsers will
+  throw if the input value cannot be succesfully parsed, given the output type and
+  other constraints.
 
-These parsers should have no notion of the input or output document format, nor
-should they log errors; they should raise exceptions for the converters to
-handle.
-'''
+  These parsers should have no notion of the input or output document format, nor
+  should they log errors; they should raise exceptions for the converters to
+  handle.
+  '''
 
 import re
 import pycountry
@@ -21,6 +21,22 @@ import datetime
 from typing import Any, Callable, Dict, List, Tuple
 from constants import LOCATIONS, VALID_SEXES
 from utils import trim_string_list
+
+
+def parse_list(value: Any, separator: str) -> List[str]:
+    '''
+    Parses the input into a list of (trimmed) strings on the given separator, if
+    it appears in the input.
+
+    Parameters:
+      value: A value representing a single or multiple items, separated by the
+        provided separator.
+      separator: A string that separates the values in the list.
+
+    Returns:
+      List[str]: Always.
+    '''
+    return trim_string_list(value.split(separator))
 
 
 def parse_bool(value: Any) -> bool:
@@ -68,7 +84,7 @@ def parse_range(
 
     # First check if the value is represented as a range.
     if type(value) is str and value.find('-') >= 0:
-        value_range = trim_string_list(value.split('-'))
+        value_range = parse_list(value, '-')
 
         # Handle open ranges (i.e. missing start or end).
         first_val = parse_fn(value_range[0])
@@ -212,7 +228,7 @@ def parse_location(value: Any) -> Dict[str, Any]:
     # piece. If not, look it up as is. We do this split after checking for the
     # country to avoid false positives in the case where it's actually a
     # comma-separated list of countries ("China, Brazil")
-    normalized_subdivision = normalized_location.split(',')[0]
+    normalized_subdivision = parse_list(normalized_location, ',')[0]
 
     # Well, if it's not a country, maybe it's a subdivision. And if not, it will
     # throw!
@@ -319,9 +335,9 @@ def parse_string_list(value: Any) -> List[str]:
         if is_colon_delimited:
             raise ValueError('two delimiters detected')
 
-        return trim_string_list(value.split(','))
+        return parse_list(value, ',')
     if is_colon_delimited:
-        return trim_string_list(value.split(':'))
+        return parse_list(value, ':')
 
     # Assuming this wasn't a list, but a singular value.
     return [value]
