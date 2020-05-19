@@ -198,18 +198,2115 @@
         }
     },
     {
-        "demographics": {
-            "species": "Homo sapien"
-        },
         "location": {
             "country": "Italy",
-            "locality": "Trento",
+            "administrativeAreaLevel1": "Toscana",
+            "administrativeAreaLevel2": "Arezzo",
+            "locality": "Arezzo",
             "geometry": {
-                "latitude": 46.317890197180155,
-                "longitude": 10.799654880295963
+                "latitude": 43.53554000000001,
+                "longitude": 11.85784
             }
         },
         "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-31T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-31T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200331.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-240664",
+            "province": "Toscana",
+            "geo_resolution": "admin2",
+            "date_confirmation": "31.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "1217.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "administrativeAreaLevel2": "Nassau County",
+            "locality": "Nassau County",
+            "geometry": {
+                "latitude": 40.7399465,
+                "longitude": -73.588254
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-14962",
+            "province": "New York",
+            "geo_resolution": "admin2",
+            "date_confirmation": "20.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "6494.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Straubing-Bogen",
+            "geometry": {
+                "latitude": 48.986026710000026,
+                "longitude": 12.686403735000054
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-29T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-29T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-96587",
+            "province": "Bayern",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "29.03.2020",
+            "date_confirmation": "02.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11901.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-38512",
+            "province": "New York",
+            "geo_resolution": "point",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "6555.0"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "administrativeAreaLevel1": "Bremen",
+            "administrativeAreaLevel2": "Bremen",
+            "locality": "Bremen",
+            "geometry": {
+                "latitude": 53.1198,
+                "longitude": 8.780351
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-19007",
+            "province": "Bremen",
+            "geo_resolution": "admin2",
+            "date_onset_symptoms": "22.03.2020",
+            "date_confirmation": "03.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "1739.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Emilia-Romagna",
+            "administrativeAreaLevel2": "Parma",
+            "locality": "Parma",
+            "geometry": {
+                "latitude": 44.67171,
+                "longitude": 10.04892
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-06T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-06T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200406.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-264998",
+            "province": "Emilia-Romagna",
+            "geo_resolution": "admin2",
+            "date_confirmation": "06.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "6911.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200325.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-208282",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 60.0,
+                "end": 69.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Limburg",
+            "geometry": {
+                "latitude": 50.991423310000066,
+                "longitude": 5.429156289000048
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-54854",
+            "province": "Flanders",
+            "geo_resolution": "point",
+            "date_confirmation": "04.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11422.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-27203",
+            "province": "New York",
+            "geo_resolution": "point",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "6555.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-360434",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Volga",
+            "administrativeAreaLevel2": "Orenburg Oblast",
+            "locality": "Orenburg Oblast",
+            "geometry": {
+                "latitude": 51.7634,
+                "longitude": 54.6188
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-4941",
+            "province": "Volga",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6797.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 80.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "administrativeAreaLevel1": "Hamburg",
+            "administrativeAreaLevel2": "Hamburg",
+            "locality": "Hamburg",
+            "geometry": {
+                "latitude": 53.54661,
+                "longitude": 10.02072
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0?page=4784"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-390766",
+            "province": "Hamburg",
+            "geo_resolution": "admin2",
+            "date_onset_symptoms": "24.04.2020",
+            "date_confirmation": "24.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "3952.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "geometry": {
+                "latitude": 43.0140874,
+                "longitude": -75.646457
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-41295",
+            "province": "New York",
+            "geo_resolution": "admin1",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "658.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "locality": "Monza e della Brianza",
+            "geometry": {
+                "latitude": 45.19346451864605,
+                "longitude": 9.174283044139255
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-262746",
+            "province": "Lombardia",
+            "geo_resolution": "point",
+            "date_confirmation": "05.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "10779.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Lecco",
+            "locality": "Lecco",
+            "geometry": {
+                "latitude": 45.90438,
+                "longitude": 9.387806
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200330.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-235287",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "30.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "5344.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Milano",
+            "locality": "Milano",
+            "geometry": {
+                "latitude": 45.46589,
+                "longitude": 9.121072
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200310.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-149918",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "10.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "6195.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-06T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-06T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-482887",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "06.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Iran",
+            "administrativeAreaLevel1": "Alborz",
+            "geometry": {
+                "latitude": 35.9491,
+                "longitude": 50.8178391
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "other": "Iran Ministry of Health"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-16222",
+            "province": "Alborz",
+            "geo_resolution": "admin1",
+            "date_confirmation": "05.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Iran",
+            "admin_id": "266.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Olpe",
+            "geometry": {
+                "latitude": 51.028860000000066,
+                "longitude": 7.8469800000000305
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-43612",
+            "province": "Nordrhein-Westfalen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "04.04.2020",
+            "date_confirmation": "04.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11782.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Jiangsu",
+            "geometry": {
+                "latitude": 32.9902,
+                "longitude": 119.4564
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-01-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-01-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://m.weibo.cn/status/4467077106746964"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-4160",
+            "province": "Jiangsu",
+            "geo_resolution": "admin1",
+            "date_confirmation": "30.01.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "China",
+            "admin_id": "507.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "location": {
+            "country": "South Korea",
+            "administrativeAreaLevel1": "Daegu",
+            "geometry": {
+                "latitude": 35.78134,
+                "longitude": 128.58
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://ncov.mohw.go.kr/tcmBoardView.do?brdId=&brdGubun=&dataGubun=&ncvContSeq=353219&contSeq=353219&board_id=&gubun=ALL"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-12759",
+            "province": "Daegu",
+            "geo_resolution": "admin1",
+            "date_confirmation": "28.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "South Korea",
+            "admin_id": "392.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "location": {
+            "country": "Sweden",
+            "administrativeAreaLevel1": "Vastra Gotaland",
+            "geometry": {
+                "latitude": 58.2528,
+                "longitude": 13.0596
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-09T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/bekraftade-fall-i-sverige"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-544031",
+            "province": "Vastra Gotaland",
+            "geo_resolution": "admin1",
+            "date_confirmation": "09.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Sweden",
+            "admin_id": "910.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Herford",
+            "geometry": {
+                "latitude": 52.11641000000003,
+                "longitude": 8.669290000000046
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-38568",
+            "province": "Nordrhein-Westfalen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "13.03.2020",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11769.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 60.0,
+                "end": 69.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "geometry": {
+                "latitude": 50.64709000000001,
+                "longitude": 4.6585730000000005
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-85464",
+            "geo_resolution": "admin0",
+            "date_confirmation": "07.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "22.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Torino",
+            "locality": "Torino",
+            "geometry": {
+                "latitude": 45.14739,
+                "longitude": 7.443546
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-12T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200412.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-290527",
+            "province": "Piemonte",
+            "geo_resolution": "admin2",
+            "date_confirmation": "12.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "8737.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-15T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200315.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-161811",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "15.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-453849",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "03.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Siegen-Wittgenstein",
+            "geometry": {
+                "latitude": 50.93775097300005,
+                "longitude": 8.194929822000063
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-44084",
+            "province": "Nordrhein-Westfalen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "14.03.2020",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11783.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Far Eastern",
+            "administrativeAreaLevel2": "Yakutia",
+            "locality": "Yakutia",
+            "geometry": {
+                "latitude": 62.0397,
+                "longitude": 129.7422
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-30T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-30T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-431122",
+            "province": "Far Eastern",
+            "geo_resolution": "admin2",
+            "date_confirmation": "30.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "9702.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 50.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Liege",
+            "geometry": {
+                "latitude": 50.645490000000045,
+                "longitude": 5.572500000000048
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-59015",
+            "province": "Wallonia",
+            "geo_resolution": "point",
+            "date_confirmation": "03.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11421.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Munchen",
+            "geometry": {
+                "latitude": 48.13641000000007,
+                "longitude": 11.577540000000054
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-18T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-18T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-18T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-18T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-412234",
+            "province": "Bayern",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "18.04.2020",
+            "date_confirmation": "18.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11873.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New Jersey",
+            "geometry": {
+                "latitude": 40.2030102,
+                "longitude": -74.67119699999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.nj.gov/health/cd/topics/covid2019_dashboard.shtml"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-12865",
+            "province": "New Jersey",
+            "geo_resolution": "admin1",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "655.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Volga",
+            "administrativeAreaLevel2": "Chuvashia",
+            "locality": "Chuvashia",
+            "geometry": {
+                "latitude": 55.5596,
+                "longitude": 46.9284
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-447424",
+            "province": "Volga",
+            "geo_resolution": "admin2",
+            "date_confirmation": "02.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "2285.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "California",
+            "geometry": {
+                "latitude": 37.3802002,
+                "longitude": -119.67788
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.mercurynews.com/2020/03/20/map-coronavirus-cases-in-california-by-county/"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-23909",
+            "province": "California",
+            "geo_resolution": "admin1",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "340.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Ecuador",
+            "locality": "Samborondon",
+            "geometry": {
+                "latitude": -2.0873135,
+                "longitude": -79.87281879999998
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "004-12633",
+            "province": "Guayas",
+            "geo_resolution": "admin2",
+            "date_confirmation": "20.03.2020",
+            "chronic_disease_binary": "False",
+            "admin_id": "10325.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-315979",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "16.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-497600",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "07.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Waldeck-Frankenberg",
+            "geometry": {
+                "latitude": 51.19043169800005,
+                "longitude": 8.888739099000079
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-15T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-15T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-52178",
+            "province": "Hessen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "07.04.2020",
+            "date_confirmation": "15.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11808.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-350595",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "23.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "South Africa",
+            "geometry": {
+                "latitude": -29.122,
+                "longitude": 25.03147
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "other": "github.com/dsfsi/covid19za"
+            }
+        ],
+        "importedCase": {
+            "ID": "001-24306",
+            "geo_resolution": "admin0",
+            "date_confirmation": "08.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "South Africa",
+            "admin_id": "207.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Emilia-Romagna",
+            "administrativeAreaLevel2": "Rimini",
+            "locality": "Rimini",
+            "geometry": {
+                "latitude": 43.97877,
+                "longitude": 12.55585
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-224061",
+            "province": "Emilia-Romagna",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "7548.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Iran",
+            "administrativeAreaLevel1": "Mazandaran",
+            "geometry": {
+                "latitude": 36.3777482,
+                "longitude": 52.3663753
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "other": "Iran Ministry of Health"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-13224",
+            "province": "Mazandaran",
+            "geo_resolution": "admin1",
+            "date_confirmation": "27.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Iran",
+            "admin_id": "604.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-444526",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "02.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-462073",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "04.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Torino",
+            "locality": "Torino",
+            "geometry": {
+                "latitude": 45.14739,
+                "longitude": 7.443546
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200410.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-282205",
+            "province": "Piemonte",
+            "geo_resolution": "admin2",
+            "date_confirmation": "10.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "8737.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hubei",
+            "administrativeAreaLevel2": "Wuhan City",
+            "locality": "Wuhan City",
+            "geometry": {
+                "latitude": 30.62506,
+                "longitude": 114.3421
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://wjw.hubei.gov.cn/fbjd/dtyw/202002/t20200209_2021930.shtml"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-2-8112",
+            "province": "Hubei",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "China",
+            "admin_id": "9390.0"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Mittelsachsen",
+            "geometry": {
+                "latitude": 50.95592462600007,
+                "longitude": 13.137635153000073
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    }
+                }
+            },
             {
                 "name": "confirmed",
                 "dateRange": {
@@ -223,32 +2320,2406 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "id": 0
         },
-        "source": {
-            "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv"
-        },
-        "pathogens": [
-            {
-                "name": "sars-cov-2"
-            }
-        ],
         "importedCase": {
-            "ID": "007-21756",
-            "city": "Trento",
-            "province": "P.A. Trento",
-            "country": "Italy",
-            "latitude": "46.317890197180155",
-            "longitude": "10.799654880295963",
+            "ID": "007-423045",
+            "province": "Sachsen",
             "geo_resolution": "point",
+            "date_onset_symptoms": "09.03.2020",
             "date_confirmation": "13.03.2020",
             "chronic_disease_binary": "False",
-            "source": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200313.csv",
-            "country_new": "Italy",
-            "admin_id": "10781.0",
-            "data_moderator_initials": "TR",
+            "country_new": "Germany",
+            "admin_id": "11627.0",
             "travel_history_binary": "False"
         }
     },
+    {
+        "location": {
+            "country": "Egypt",
+            "geometry": {
+                "latitude": 26.66796,
+                "longitude": 29.77867
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+            },
+            {
+                "other": "daily totals confirmed on https://www.worldometers.info/coronavirus/"
+            }
+        ],
+        "importedCase": {
+            "ID": "001-27781",
+            "geo_resolution": "admin0",
+            "date_confirmation": "10.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Egypt",
+            "admin_id": "66.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "locality": "New York City",
+            "geometry": {
+                "latitude": 40.661,
+                "longitude": -73.944
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-10285",
+            "province": "New York",
+            "geo_resolution": "point",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "6555.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "New York",
+            "administrativeAreaLevel2": "Nassau County",
+            "locality": "Nassau County",
+            "geometry": {
+                "latitude": 40.7399465,
+                "longitude": -73.588254
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            }
+        ],
+        "importedCase": {
+            "ID": "006-23069",
+            "province": "New York",
+            "geo_resolution": "admin2",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "6494.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Borken",
+            "geometry": {
+                "latitude": 51.84209000000004,
+                "longitude": 6.856130000000063
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-12T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-34746",
+            "province": "Nordrhein-Westfalen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "12.03.2020",
+            "date_confirmation": "20.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11762.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "locality": "Volgograd Oblast",
+            "geometry": {
+                "latitude": 49.634811522000064,
+                "longitude": 44.14392145600005
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-467578",
+            "province": "South",
+            "geo_resolution": "point",
+            "date_confirmation": "04.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "10858.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Belgium",
+            "administrativeAreaLevel1": "Flanders",
+            "geometry": {
+                "latitude": 51.03874,
+                "longitude": 4.240024
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-17T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.info-coronavirus.be/nl/2020/03/17/172-nieuwe-besmettingen-met-coronavirus-covid-19/"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-1-30888",
+            "province": "Flanders",
+            "geo_resolution": "admin1",
+            "date_confirmation": "17.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "422.0"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-22T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-22T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-344793",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "22.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Sweden",
+            "administrativeAreaLevel1": "Stockholm",
+            "geometry": {
+                "latitude": 59.6025,
+                "longitude": 18.1384
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-20T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/bekraftade-fall-i-sverige"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-532848",
+            "province": "Stockholm",
+            "geo_resolution": "admin1",
+            "date_confirmation": "20.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Sweden",
+            "admin_id": "845.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-354426",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "24.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Western",
+            "administrativeAreaLevel2": "Saint Petersburg",
+            "locality": "Saint Petersburg",
+            "geometry": {
+                "latitude": 59.9311,
+                "longitude": 30.3609
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-467173",
+            "province": "North Western",
+            "geo_resolution": "admin2",
+            "date_confirmation": "04.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "7726.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Spain",
+            "geometry": {
+                "latitude": 40.41955000000007,
+                "longitude": -3.6919599999999377
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-41893",
+            "province": "Madrid",
+            "geo_resolution": "point",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Spain",
+            "admin_id": "583.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Munchen",
+            "geometry": {
+                "latitude": 48.13641000000007,
+                "longitude": 11.577540000000054
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-411815",
+            "province": "Bayern",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "24.03.2020",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11873.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Michigan",
+            "administrativeAreaLevel2": "Wayne County",
+            "locality": "Wayne County",
+            "geometry": {
+                "latitude": 42.2844327,
+                "longitude": -83.287789
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "005-5341",
+            "province": "Michigan",
+            "geo_resolution": "admin2",
+            "date_confirmation": "18.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "9139.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hubei",
+            "administrativeAreaLevel2": "Huanggang City",
+            "locality": "Huanggang City",
+            "geometry": {
+                "latitude": 30.71988,
+                "longitude": 115.3378
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://wjw.hubei.gov.cn/fbjd/dtyw/202002/t20200204_2018742.shtml"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-2-14422",
+            "province": "Hubei",
+            "geo_resolution": "admin2",
+            "date_confirmation": "03.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "China",
+            "admin_id": "4363.0"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 60.0,
+                "end": 79.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "administrativeAreaLevel1": "Hamburg",
+            "administrativeAreaLevel2": "Hamburg",
+            "locality": "Hamburg",
+            "geometry": {
+                "latitude": 53.54661,
+                "longitude": 10.02072
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0?page=4344"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-390526",
+            "province": "Hamburg",
+            "geo_resolution": "admin2",
+            "date_onset_symptoms": "02.04.2020",
+            "date_confirmation": "02.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "3952.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Munchen",
+            "geometry": {
+                "latitude": 48.13641000000007,
+                "longitude": 11.577540000000054
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-411927",
+            "province": "Bayern",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "27.03.2020",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11873.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-503169",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-06T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-06T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-486724",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "06.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Western",
+            "administrativeAreaLevel2": "Saint Petersburg",
+            "locality": "Saint Petersburg",
+            "geometry": {
+                "latitude": 59.9311,
+                "longitude": 30.3609
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-08T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-509378",
+            "province": "North Western",
+            "geo_resolution": "admin2",
+            "date_confirmation": "08.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "7726.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 80.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Tirschenreuth",
+            "geometry": {
+                "latitude": 49.89956103600008,
+                "longitude": 12.200041080000062
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-14T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-100545",
+            "province": "Bayern",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "14.03.2020",
+            "date_confirmation": "27.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11556.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "France",
+            "administrativeAreaLevel1": "Normandy",
+            "geometry": {
+                "latitude": 48.8799,
+                "longitude": 0.1713
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://www.santepubliquefrance.fr/maladies-et-traumatismes/maladies-et-infections-respiratoires/infection-a-coronavirus/articles/infection-au-nouveau-coronavirus-sars-cov-2-covid-19-france-et-monde"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-32545",
+            "province": "Normandy",
+            "geo_resolution": "admin1",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "France",
+            "admin_id": "669.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Piemonte",
+            "administrativeAreaLevel2": "Cuneo",
+            "locality": "Cuneo",
+            "geometry": {
+                "latitude": 44.47886,
+                "longitude": 7.593507000000002
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-04T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200404.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-257796",
+            "province": "Piemonte",
+            "geo_resolution": "admin2",
+            "date_confirmation": "04.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "2549.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hunan",
+            "administrativeAreaLevel2": "Shaoyang City",
+            "locality": "Shaoyang City",
+            "geometry": {
+                "latitude": 26.91525,
+                "longitude": 110.8759
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-01T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-01T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://wjw.hunan.gov.cn/wjw/xxgk/gzdt/zyxw_1/202002/t20200202_11167499.html"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-5378",
+            "province": "Hunan",
+            "geo_resolution": "admin2",
+            "date_confirmation": "01.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "China",
+            "admin_id": "8030.0",
+            "travel_history_binary": "True"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 20.0,
+                "end": 29.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Hainaut",
+            "geometry": {
+                "latitude": 50.46958109700007,
+                "longitude": 3.9595308820000237
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-09T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-88636",
+            "province": "Wallonia",
+            "geo_resolution": "point",
+            "date_confirmation": "09.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11420.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Western",
+            "administrativeAreaLevel2": "Murmansk Oblast",
+            "locality": "Murmansk Oblast",
+            "geometry": {
+                "latitude": 67.8443,
+                "longitude": 35.0884
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-456578",
+            "province": "North Western",
+            "geo_resolution": "admin2",
+            "date_confirmation": "03.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6401.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Breisgau-Hochschwarzwald",
+            "geometry": {
+                "latitude": 47.924874977000066,
+                "longitude": 7.925899284000025
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-20T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-72191",
+            "province": "Baden-Wurttemberg",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "20.03.2020",
+            "date_confirmation": "24.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11859.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-373893",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "27.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Ludwigsburg",
+            "geometry": {
+                "latitude": 48.89417000000003,
+                "longitude": 9.191860000000077
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-24T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-403465",
+            "province": "Baden-Wurttemberg",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "24.03.2020",
+            "date_confirmation": "02.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11846.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 70.0,
+                "end": 79.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Oost Vlaanderen",
+            "geometry": {
+                "latitude": 51.035848489000045,
+                "longitude": 3.8154783380000485
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-71457",
+            "province": "Flanders",
+            "geo_resolution": "point",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11425.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 70.0,
+                "end": 79.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Namur",
+            "geometry": {
+                "latitude": 50.465730000000065,
+                "longitude": 4.861820000000023
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-03T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-82039",
+            "province": "Wallonia",
+            "geo_resolution": "point",
+            "date_confirmation": "03.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11424.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 80.0,
+                "end": 89.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Namur",
+            "geometry": {
+                "latitude": 50.465730000000065,
+                "longitude": 4.861820000000023
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-56985",
+            "province": "Wallonia",
+            "geo_resolution": "point",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11424.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Spain",
+            "administrativeAreaLevel1": "Catalonia",
+            "geometry": {
+                "latitude": 41.80377410000001,
+                "longitude": 1.530937
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-7105",
+            "province": "Catalonia",
+            "geo_resolution": "admin1",
+            "date_confirmation": "21.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Spain",
+            "admin_id": "354.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 90.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Brussels",
+            "geometry": {
+                "latitude": 50.844390000000026,
+                "longitude": 4.356090000000052
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-02T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-80066",
+            "province": "Brussels",
+            "geo_resolution": "point",
+            "date_confirmation": "02.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11419.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United Kingdom",
+            "administrativeAreaLevel1": "Wales",
+            "administrativeAreaLevel2": "Cardiff and Vale",
+            "locality": "Cardiff and Vale",
+            "geometry": {
+                "latitude": 51.506759,
+                "longitude": -3.190244
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-25T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://covid19-phwstatement.nhs.wales/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-47946",
+            "province": "Wales",
+            "geo_resolution": "admin2",
+            "date_confirmation": "25.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United Kingdom",
+            "admin_id": "1963.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 60.0,
+                "end": 79.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Recklinghausen",
+            "geometry": {
+                "latitude": 51.613600000000076,
+                "longitude": 7.193260000000067
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-16T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-36369",
+            "province": "Nordrhein-Westfalen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "23.03.2020",
+            "date_confirmation": "16.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11764.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "locality": "Trieste",
+            "geometry": {
+                "latitude": 45.65757000000008,
+                "longitude": 13.772690000000068
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200319.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-176018",
+            "province": "Friuli Venezia Giulia",
+            "geo_resolution": "point",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "10797.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Main-Kinzig-Kreis",
+            "geometry": {
+                "latitude": 50.24388802900006,
+                "longitude": 9.285990463000076
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-22T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-48030",
+            "province": "Hessen",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "22.03.2020",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11794.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Bergamo",
+            "locality": "Bergamo",
+            "geometry": {
+                "latitude": 45.79841,
+                "longitude": 9.79008
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-09T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200309.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-148228",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "09.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "1530.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Abruzzo",
+            "administrativeAreaLevel2": "Teramo",
+            "locality": "Teramo",
+            "geometry": {
+                "latitude": 42.64614,
+                "longitude": 13.7265
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-26T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200326.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-211673",
+            "province": "Abruzzo",
+            "geo_resolution": "admin2",
+            "date_confirmation": "26.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "8584.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 50.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Limburg",
+            "geometry": {
+                "latitude": 50.991423310000066,
+                "longitude": 5.429156289000048
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-86147",
+            "province": "Flanders",
+            "geo_resolution": "point",
+            "date_confirmation": "07.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11422.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "United States",
+            "administrativeAreaLevel1": "Washington",
+            "administrativeAreaLevel2": "Pierce County",
+            "locality": "Pierce County",
+            "geometry": {
+                "latitude": 47.0235763,
+                "longitude": -122.10213
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-02-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-02-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://www.doh.wa.gov/Emergencies/Coronavirus"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-6432",
+            "province": "Washington",
+            "geo_resolution": "admin2",
+            "date_confirmation": "19.02.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "United States",
+            "admin_id": "7026.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-494807",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "07.05.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Canada",
+            "administrativeAreaLevel1": "British Columbia",
+            "locality": "Vancouver",
+            "geometry": {
+                "latitude": 49.25,
+                "longitude": -123.1
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-19T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://www.bccdc.ca/about/news-stories/stories/2020/information-on-novel-coronavirus"
+            }
+        ],
+        "importedCase": {
+            "ID": "005-7081",
+            "province": "British Columbia",
+            "geo_resolution": "point",
+            "date_confirmation": "19.03.2020",
+            "chronic_disease_binary": "False",
+            "location": "Vancouver",
+            "country_new": "Canada",
+            "admin_id": "8912.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "South Africa",
+            "geometry": {
+                "latitude": -29.122,
+                "longitude": 25.03147
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-27T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "other": "github.com/dsfsi/covid19za"
+            }
+        ],
+        "importedCase": {
+            "ID": "001-20428",
+            "geo_resolution": "admin0",
+            "date_confirmation": "27.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "South Africa",
+            "admin_id": "207.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "Central",
+            "administrativeAreaLevel2": "Moscow",
+            "locality": "Moscow",
+            "geometry": {
+                "latitude": 55.7558,
+                "longitude": 37.6173
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-05T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-295634",
+            "province": "Central",
+            "geo_resolution": "admin2",
+            "date_confirmation": "05.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "India",
+            "geometry": {
+                "latitude": 23.79775953100005,
+                "longitude": 87.98640557800007
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-14T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "Hospitalized"
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "CB"
+        },
+        "notes": "Details awaited",
+        "sources": [
+            {
+                "other": "mohfw.gov.in"
+            }
+        ],
+        "importedCase": {
+            "ID": "002-31631",
+            "province": "West Bengal",
+            "geo_resolution": "point",
+            "date_confirmation": "14.04.2020",
+            "chronic_disease_binary": "False",
+            "outcome": "Hospitalized",
+            "country_new": "India",
+            "admin_id": "11155.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "China",
+            "administrativeAreaLevel1": "Hubei",
+            "administrativeAreaLevel2": "Xiaogan City",
+            "locality": "Xiaogan City",
+            "geometry": {
+                "latitude": 31.12046,
+                "longitude": 113.8795
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-01-28T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-01-28T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "http://news.163.com/special/epidemic/?spssid=7283291fcdba1d8c2d13ee3da2cfb760&spsw=7&spss=other#map_block"
+            }
+        ],
+        "importedCase": {
+            "ID": "000-2-2416",
+            "province": "Hubei",
+            "geo_resolution": "admin2",
+            "date_confirmation": "28.01.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "China",
+            "admin_id": "9519.0"
+        }
+    },
+    {
+        "location": {
+            "country": "Austria",
+            "administrativeAreaLevel1": "Carinthia",
+            "geometry": {
+                "latitude": 46.7222,
+                "longitude": 14.1806
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-23T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://www.sozialministerium.at/Informationen-zum-Coronavirus/Neuartiges-Coronavirus-(2019-nCov).html"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-29716",
+            "province": "Carinthia",
+            "geo_resolution": "admin1",
+            "date_confirmation": "23.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Austria",
+            "admin_id": "346.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Italy",
+            "administrativeAreaLevel1": "Lombardia",
+            "administrativeAreaLevel2": "Milano",
+            "locality": "Milano",
+            "geometry": {
+                "latitude": 45.46589,
+                "longitude": 9.121072
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-10T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "url": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200410.csv"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-281268",
+            "province": "Lombardia",
+            "geo_resolution": "admin2",
+            "date_confirmation": "10.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Italy",
+            "admin_id": "6195.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "location": {
+            "country": "Russia",
+            "administrativeAreaLevel1": "North Caucasian",
+            "administrativeAreaLevel2": "Chechnya",
+            "locality": "Chechnya",
+            "geometry": {
+                "latitude": 43.4023,
+                "longitude": 45.7187
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-15T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-15T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0,
+            "moderator": "TR"
+        },
+        "sources": [
+            {
+                "other": "stopcoronavirus.rf"
+            }
+        ],
+        "importedCase": {
+            "ID": "007-314362",
+            "province": "North Caucasian",
+            "geo_resolution": "admin2",
+            "date_confirmation": "15.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Russia",
+            "admin_id": "2159.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 50.0,
+                "end": 59.0
+            },
+            "sex": "Female"
+        },
+        "location": {
+            "country": "Belgium",
+            "locality": "Limburg",
+            "geometry": {
+                "latitude": 50.991423310000066,
+                "longitude": 5.429156289000048
+            }
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-07T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "sources": [
+            {
+                "url": "https://epistat.wiv-isp.be/Covid/"
+            }
+        ],
+        "importedCase": {
+            "ID": "003-86142",
+            "province": "Flanders",
+            "geo_resolution": "point",
+            "date_confirmation": "07.04.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Belgium",
+            "admin_id": "11422.0",
+            "travel_history_binary": "False"
+        }
+    },
+    {
+        "demographics": {
+            "ageRange": {
+                "start": 35.0,
+                "end": 59.0
+            },
+            "sex": "Male"
+        },
+        "location": {
+            "country": "Germany",
+            "locality": "Breisgau-Hochschwarzwald",
+            "geometry": {
+                "latitude": 47.924874977000066,
+                "longitude": 7.925899284000025
+            }
+        },
+        "events": [
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-13T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-18T00:00:00Z"
+                    }
+                }
+            }
+        ],
+        "revisionMetadata": {
+            "id": 0
+        },
+        "importedCase": {
+            "ID": "007-72165",
+            "province": "Baden-Wurttemberg",
+            "geo_resolution": "point",
+            "date_onset_symptoms": "13.03.2020",
+            "date_confirmation": "18.03.2020",
+            "chronic_disease_binary": "False",
+            "country_new": "Germany",
+            "admin_id": "11859.0",
+            "travel_history_binary": "False"
+        }
+    }
 ]

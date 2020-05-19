@@ -401,7 +401,7 @@ def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
     return [{
         'name': 'sars-cov-2',
         'sequenceSources': sources
-    }] if source else None
+    }] if sources else None
 
 
 def convert_outbreak_specifics(id: str, reported_market_exposure: str,
