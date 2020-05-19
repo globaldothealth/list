@@ -235,9 +235,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
     except ValueError as e:
         warn(id, 'demographics.sex', age, e)
 
-    demographics['species'] = 'Homo sapien'
-
-    return demographics
+    return demographics or None
 
 
 def convert_location(id: str, country: str, adminL1: str,
