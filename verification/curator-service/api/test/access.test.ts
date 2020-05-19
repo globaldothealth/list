@@ -148,4 +148,61 @@ describe('access control middleware', () => {
     expect(next).toHaveBeenCalled();
     expect(res.sendStatus).not.toHaveBeenCalled();
   });
+
+  it('has an internal server error if there is no access control for a route', () => {
+    const user = {
+      role: 'curator',
+    };
+    const url = '/sources';
+    const method = 'DELETE';
+    const rbacConfig = {};
+    const req = {
+      user,
+      method,
+      url,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    };
+    const next = jest.fn();
+
+    const access = accessControl(rbacConfig);
+
+    access(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.sendStatus).toHaveBeenCalledWith(500);
+  });
+
+  it('has an internal server error if multiple configurations match a route', () => {
+    const user = {
+      role: 'curator',
+    };
+    const url = '/sources';
+    const method = 'DELETE';
+    const rbacConfig = {
+      '^/sources$': {
+        'DELETE': ['admin'],
+      },
+      '.*': {
+        'DELETE': ['admin'],
+      },
+    };
+    const req = {
+      user,
+      method,
+      url,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    };
+    const next = jest.fn();
+
+    const access = accessControl(rbacConfig);
+
+    access(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.sendStatus).toHaveBeenCalledWith(500);
+  });
 });
