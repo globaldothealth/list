@@ -45,6 +45,7 @@ app.use('/api', apiRouter);
         console.log('Connected to the database!');
     } catch (e) {
         console.error('Failed to connect to the database. :(', e);
+        process.exit(1);
     }
 })();
 

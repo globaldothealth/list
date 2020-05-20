@@ -43,6 +43,7 @@ mongoose
     })
     .catch((e) => {
         console.error('Failed to connect to DB', e);
+        process.exit(1);
     });
 
 // Configure authentication.
