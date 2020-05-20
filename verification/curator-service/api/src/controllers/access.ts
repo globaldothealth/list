@@ -1,4 +1,4 @@
-import { curry } from 'ramda';
+import { curry, intersection } from 'ramda';
 
 const accessControl = (
   config: Object,
@@ -22,7 +22,7 @@ const accessControl = (
       }
     }
     const expectedRoles  = methodRoleMap[method];
-    if (expectedRoles.indexOf(req.user.role) !== -1) {
+    if (intersection(expectedRoles, req.user.roles).length > 0) {
       next();
     } else {
       res.sendStatus(403);
