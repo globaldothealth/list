@@ -22,8 +22,17 @@ describe('User schema', () => {
             name: 'test source',
             email: 'foo@bar.com',
             googleID: 'baz',
-            role: 'admin',
+            roles: ['admin'],
         }).validateSync();
         expect(errors).toBeUndefined();
+    });
+    it('should restrict roles to values in the enum', () => {
+        const errors = new User({
+            name: 'test source',
+            email: 'foo@bar.com',
+            googleID: 'baz',
+            roles: ['brigadier'],
+        }).validateSync();
+        expect(errors).toBeDefined();
     });
 });

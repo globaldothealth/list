@@ -14,8 +14,8 @@ const userSchema = new mongoose.Schema({
         // supporting more identity platforms.
         required: 'User must be logged-in with Google',
     },
-    role: {
-        type: String,
+    roles: {
+        type: [String],
         enum: [
             'reader',
             'curator',
