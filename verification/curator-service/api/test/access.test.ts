@@ -1,6 +1,23 @@
 import mustHaveRoles from '../src/controllers/access';
 
 describe('access control middleware', () => {
+  it('rejects any call without a user', () => {
+    const url = '/sources';
+    const method = 'GET';
+    const req = {
+      url,
+      method,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    }
+    const next = jest.fn();
+
+    mustHaveRoles(['curator'])(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.sendStatus).toHaveBeenCalledWith(403);
+  });
   it('rejects a call for which the user is not in the correct role', () => {
     const user = {
       roles: ['reader'],
