@@ -58,11 +58,12 @@ class App extends React.Component<{}, User> {
                         <Route path="/sources">
                             <Sources />
                         </Route>
-                        <Route path="/profile">
-                            <Profile user={this.state} />
-                        </Route>
+                        {this.state.email &&
+                            (<Route path="/profile">
+                                <Profile user={this.state} />
+                            </Route>)}
                         <Route exact path="/">
-                            <Home />
+                            <Home user={this.state} />
                         </Route>
                     </Switch>
                 </div>
@@ -79,21 +80,29 @@ function Sources(): JSX.Element {
     return <SourceTable />;
 }
 
-function Home(): JSX.Element {
-    return (
-        <nav>
-            <Link to="/cases">Linelist</Link>
-            <br />
-            <Link to="/sources">Sources</Link>
-            <br />
-            <Link to="/profile">Profile</Link>
-            <br />
-            <Link to="/privacy-policy">Privacy policy</Link>
-            <br />
-            <Link to="/terms">Terms of service</Link>
-            <br />
-        </nav>
-    );
+interface HomeProps {
+    user: User;
+}
+class Home extends React.Component<HomeProps, {}> {
+    render(): JSX.Element {
+        return (
+            <nav>
+                <Link to="/cases">Linelist</Link>
+                <br />
+                <Link to="/sources">Sources</Link>
+                <br />
+                {this.props.user.email &&
+                    (<div>
+                        <Link to="/profile">Profile</Link>
+                        <br />
+                    </div>)}
+                <Link to="/privacy-policy">Privacy policy</Link>
+                <br />
+                <Link to="/terms">Terms of service</Link>
+                <br />
+            </nav>
+        )
+    };
 }
 
 export default App;
