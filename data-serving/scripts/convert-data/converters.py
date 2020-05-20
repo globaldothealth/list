@@ -11,7 +11,7 @@ which row failed to convert.
 
 import pandas as pd
 from parsers import (parse_age, parse_bool, parse_date,
-                     parse_latitude, parse_location, parse_longitude,
+                     parse_latitude, parse_list, parse_location, parse_longitude,
                      parse_range, parse_sex, parse_string_list)
 from pandas import Series
 from typing import Any, Callable, Dict, List
@@ -235,9 +235,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
     except ValueError as e:
         warn(id, 'demographics.sex', age, e)
 
-    demographics['species'] = 'Homo sapien'
-
-    return demographics
+    return demographics or None
 
 
 def convert_location(id: str, country: str, adminL1: str,
@@ -358,10 +356,10 @@ def convert_notes_field(notes_fields: [str]) -> str:
     return notes or None
 
 
-def convert_source_field(source: str) -> Dict[str, str]:
+def convert_sources_field(source: str) -> Dict[str, str]:
     '''
-    Converts the source field to a new source object that has either a URL or
-    an unknown reference type.
+    Converts the source field to a new source representation that's a list of
+    objects with either a URL or an unknown reference type.
 
     Returns:
       None: When the input is empty.
@@ -375,11 +373,13 @@ def convert_source_field(source: str) -> Dict[str, str]:
     if pd.isna(source):
         return None
 
-    return {
+    sources = parse_list(source, ',')
+
+    return [{
         'url': source
     } if is_url(source) else {
         'other': str(source)
-    }
+    } for source in sources]
 
 
 def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
@@ -397,15 +397,11 @@ def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
           }
         }]
     '''
-    cov_pathogen = {
-        'name': 'sars-cov-2'
-    }
-
-    source = convert_source_field(sequence)
-    if source:
-        cov_pathogen['sequenceSource'] = source
-
-    return [cov_pathogen]
+    sources = convert_sources_field(sequence)
+    return [{
+        'name': 'sars-cov-2',
+        'sequenceSources': sources
+    }] if sources else None
 
 
 def convert_outbreak_specifics(id: str, reported_market_exposure: str,
