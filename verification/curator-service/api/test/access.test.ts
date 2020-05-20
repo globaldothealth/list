@@ -17,7 +17,7 @@ describe('access control middleware', () => {
     };
     const next = jest.fn();
 
-    mustHaveRoles(['curator'], req, res, next);
+    mustHaveRoles(['curator'])(req, res, next);
 
     expect(next).not.toHaveBeenCalled();
     expect(res.sendStatus).toHaveBeenCalledWith(403);
@@ -39,7 +39,7 @@ describe('access control middleware', () => {
     };
     const next = jest.fn();
 
-    mustHaveRoles(['curator'], req, res, next);
+    mustHaveRoles(['curator'])(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(res.sendStatus).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('access control middleware', () => {
     };
     const next = jest.fn();
 
-    mustHaveRoles(['curator'], req, res, next);
+    mustHaveRoles(['curator'])(req, res, next);
 
     expect(next).not.toHaveBeenCalled();
     expect(res.sendStatus).toHaveBeenCalledWith(403);
@@ -83,7 +83,7 @@ describe('access control middleware', () => {
     };
     const next = jest.fn();
 
-    mustHaveRoles(['admin'], req, res, next);
+    mustHaveRoles(['admin'])(req, res, next);
 
     expect(next).toHaveBeenCalled();
     expect(res.sendStatus).not.toHaveBeenCalled();
