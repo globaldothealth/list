@@ -53,7 +53,17 @@ describe('validate', () => {
         });
     });
 
-    it('a fully specified automation is valid', async () => {
+    it('a fully specified automation with parser is valid', async () => {
         return new Automation(fullModel).validate();
+    });
+
+    it('a fully specified automation with regexParsing is valid', async () => {
+        const justRegexParsing = {
+            ...fullModel,
+            regexParsing: regexParsingModel,
+        };
+        delete justRegexParsing.parser;
+
+        return new Automation(justRegexParsing).validate();
     });
 });
