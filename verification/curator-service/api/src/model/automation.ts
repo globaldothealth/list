@@ -4,7 +4,7 @@ import { RegexParsingDocument, regexParsingSchema } from './regex-parsing';
 import { ScheduleDocument, scheduleSchema } from './schedule';
 
 export const automationParsingValidator = {
-    validator: function (automation: AutomationDocument): boolean {
+    validator: (automation: AutomationDocument): boolean => {
         return (
             (automation.parser != null || automation.regexParsing != null) &&
             !(automation.parser != null && automation.regexParsing != null)
