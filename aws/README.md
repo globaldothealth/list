@@ -6,6 +6,12 @@ This directory contains the configuration files for the production infrastructur
 
 Install `eksctl` and `kubectl` to interact with Amazon EKS and the Kubernetes control plane.
 
+To configure kubectl to talk to the epid cluster, do:
+
+```
+aws eks --region us-east-1 update-kubeconfig --name epid
+```
+
 ## Kubernetes setup
 
 Our cluster can be seen on the [AWS console](https://console.aws.amazon.com/eks/home?region=us-east-1#/clusters) but that console is pretty much useless as it shows no information on the cluster nodes.
