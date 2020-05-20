@@ -3,6 +3,9 @@
 # Log file for conversion warnings
 convert_data.log
 
+# Cypress generates videos, do not store them in revision history.
+*.mp4
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
