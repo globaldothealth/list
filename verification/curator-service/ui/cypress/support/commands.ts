@@ -23,9 +23,11 @@ export function addCase(country: string, notes: string, sourceUrl: string): void
                 },
             ],
             notes: notes,
-            source: {
-                url: sourceUrl,
-            },
+            sources: [
+                {
+                    url: sourceUrl,
+                },
+            ],
             revisionMetadata: {
                 date: new Date().toJSON(),
                 id: 0,
