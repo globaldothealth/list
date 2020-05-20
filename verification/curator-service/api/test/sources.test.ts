@@ -130,10 +130,16 @@ describe('PUT', () => {
 
 describe('POST', () => {
     it('should return the created source', async () => {
-        request(app)
+        const source = {
+            name: 'some name',
+            origin: { url: 'http://what.ever' },
+        };
+        const res = await request(app)
             .post('/api/sources')
-            .send({ name: 'some name', origin: { url: 'http://what.ever' } })
+            .send(source)
+            .expect('Content-Type', /json/)
             .expect(201);
+        expect(res.body.name).toEqual(source.name);
     });
     it('should not create invalid source', async () => {
         const res = await request(app).post('/api/sources').expect(422);

@@ -1,0 +1,35 @@
+name: Integration Tests CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/integration-tests.yml"
+      - "dev/docker-compose.yml"
+      - "verification/curator-service/**"
+      - "data-serving/data-service/**"
+      - "data-serving/samples/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - ".github/workflows/integration-tests.yml"
+      - "dev/docker-compose.yml"
+      - "verification/curator-service/**"
+      - "data-serving/data-service/**"
+      - "data-serving/samples/**"
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build stack
+        run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
+      - name: Cypress integration tests
+        run: |
+          npm ci
+          npm run cypress-run
+        working-directory: verification/curator-service/ui
+        env:
+          CI: true

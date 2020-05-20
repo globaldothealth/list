@@ -91,8 +91,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        const source = await Source.create(req.body);
-        res.location(`/sources/${source.id}`);
+        const source = new Source(req.body);
+        const result = await source.save();
+        res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);

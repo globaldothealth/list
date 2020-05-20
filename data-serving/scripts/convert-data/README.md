@@ -42,8 +42,7 @@ The following fields are lossy:
 
 > **Open question:** Where on the ROC curve do we want to be? Are we optimizing for precision or recall?
 
-The following fields are *not* lossy, although they require conversion to a new type, because their data is properly
-normalized in the source (as of writing):
+The following fields are *not* lossy, although they require conversion to a new type:
 
 - `sex`
 - `outbreakSpecifics.livesInWuhan`
@@ -73,8 +72,8 @@ normalized in the source (as of writing):
 - Use Sheets or GitHub history to infer `revision.date`.
 
 - De-duplicate events populated from the original outcome field with the others; ex. in some cases we have
-  `events[name="deathOrDischarge"]`, from the `date_death_or_discharge` field, plus `events[name="death"]` from the
-  `outcome` field.
+  `events[name="deathOrDischarge"]`, from the `date_death_or_discharge` field, plus `events[name="death"]`
+  from the `outcome` field.
 
 - Manually review `symptoms` and `chronicDisease` fields to confirm that we're supporting all possible list delimiters
   (currently colon and comma).

@@ -1,25 +1,46 @@
 import { Case } from '../../src/model/case';
-import fullCase from './data/case.full.json';
-import minimalCase from './data/case.minimal.json';
+import { Error } from 'mongoose';
+import fullModel from './data/case.full.json';
+import minimalEvent from './data/event.minimal.json';
+import minimalModel from './data/case.minimal.json';
 
 describe('validate', () => {
-    it('minimal model should be valid', async () => {
-        const c = new Case(minimalCase);
-
-        return c.validate();
-    });
-    it('fully-specified model should be valid', async () => {
-        const c = new Case(fullCase);
-
-        return c.validate();
-    });
-
-    it('incomplete model should be invalid', async () => {
-        const c = new Case({});
-
-        return c.validate((e) => {
-            expect(e.errors).not.toBe({});
+    it('model without sources is invalid', async () => {
+        return new Case({ ...minimalModel, sources: [] }).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
         });
     });
-    // TODO: Add more validation tests once the schema is more stable.
+
+    it('model without events is invalid', async () => {
+        return new Case({ ...minimalModel, events: [] }).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('model without confirmed event is invalid', async () => {
+        const notConfirmedEvent = { ...minimalEvent, name: 'not-confirmed' };
+        return new Case({
+            ...minimalModel,
+            events: [notConfirmedEvent],
+        }).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('model without revision metadata is invalid', async () => {
+        const noRevisionmetadata = { ...minimalModel };
+        delete noRevisionmetadata.revisionMetadata;
+
+        return new Case(noRevisionmetadata).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('minimal model is valid', async () => {
+        return new Case(minimalModel).validate();
+    });
+
+    it('fully-specified model is valid', async () => {
+        return new Case(fullModel).validate();
+    });
 });
