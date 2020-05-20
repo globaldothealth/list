@@ -16,8 +16,12 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        // Note: not required as assuming no defined role === no permission
-    }
+        enum: [
+            'reader',
+            'curator',
+            'admin',
+        ],
+    },
 });
 
 export type UserDocument = mongoose.Document & {
