@@ -1,9 +1,13 @@
 {
   "extends": "../../common/tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist" /* Redirect output structure to the directory. */
+    "outDir": "dist", /* Redirect output structure to the directory. */
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "**/*.test.ts"
+  ],
+  "exclude": [
+    "node_modules",
   ]
 }
