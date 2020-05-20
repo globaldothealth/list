@@ -233,4 +233,33 @@ describe('access control middleware', () => {
     expect(next).toHaveBeenCalled();
     expect(res.sendStatus).not.toHaveBeenCalled();
   });
+
+  it('uses the GET roles to decide who can perform a HEAD request', () => {
+    const user = {
+      roles: ['curator'],
+    };
+    const url = '/sources';
+    const method = 'HEAD';
+    const rbacConfig = {
+      [url]: {
+        'GET': ['curator'],
+      },
+    };
+    const req = { 
+      user,
+      url,
+      method,
+    };
+    const res = {
+      sendStatus: jest.fn(),
+    };
+    const next = jest.fn();
+
+    const access = accessControl(rbacConfig);
+
+    access(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+    expect(res.sendStatus).not.toHaveBeenCalled();
+  });
 });
