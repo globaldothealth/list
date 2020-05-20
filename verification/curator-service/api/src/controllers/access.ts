@@ -1,33 +1,12 @@
-import { curry, intersection } from 'ramda';
+import { intersection } from 'ramda';
+import { NextFunction } from 'express';
 
-const accessControl = (
-  config: Object,
-) => (
-  curry((config, req, res, next) => {
-    const method = req.method === 'HEAD' ? 'GET' : req.method; // HEAD and GET have the same visibility
-    let methodRoleMap : { [index: string] : Array<string> };
-    if (config[req.url]) {
-      methodRoleMap = config[req.url];
-    } else {
-      const keys = Object.getOwnPropertyNames(config).filter((prop) => (
-        req.url.match(prop)
-      ));
-      if (keys.length === 1) {
-        // exactly one configuration found, use that
-        methodRoleMap = config[keys[0]];
-      } else {
-        // zero or 2+ configurations found, either way it's bad
-        res.sendStatus(500);
-        return;
-      }
-    }
-    const expectedRoles  = methodRoleMap[method];
-    if (intersection(expectedRoles, req.user.roles).length > 0) {
-      next();
-    } else {
-      res.sendStatus(403);
-    }
-  })(config)
-);
+const mustHaveRoles = (roles: Array<string>, req: any, res: any, next: NextFunction) => {
+  if (intersection(roles, req.user.roles).length > 0) {
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
 
-export default accessControl;
+export default mustHaveRoles;
