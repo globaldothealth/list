@@ -9,7 +9,6 @@ import React from 'react';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -27,32 +26,16 @@ const styles = (theme: Theme) =>
     });
 
 interface User {
+    name: string;
     email: string;
 }
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
-class EpidNavbar extends React.Component<Props, User> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            email: '',
-        };
-    }
-
-    componentDidMount(): void {
-        axios
-            .get<User>('/auth/profile')
-            .then((resp) => {
-                this.setState({ email: resp.data.email });
-            })
-            .catch((e) => {
-                this.setState({ email: '' });
-                console.error(e);
-            });
-    }
-
+class EpidNavbar extends React.Component<Props, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -72,23 +55,23 @@ class EpidNavbar extends React.Component<Props, User> {
                         <Typography variant="h6" className={classes.title}>
                             epid
                         </Typography>
-                        {this.state.email ? (
+                        {this.props.user.email ? (
                             <Button
                                 variant="contained"
                                 color="primary"
                                 href="/auth/logout"
                             >
-                                Logout {this.state.email}
+                                Logout {this.props.user.email}
                             </Button>
                         ) : (
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                href={process.env.REACT_APP_LOGIN_URL}
-                            >
-                                Login
-                            </Button>
-                        )}
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    href={process.env.REACT_APP_LOGIN_URL}
+                                >
+                                    Login
+                                </Button>
+                            )}
                     </Toolbar>
                 </AppBar>
             </div>
