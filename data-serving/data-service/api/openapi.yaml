@@ -51,10 +51,6 @@ components:
   schemas:
     Case:
       type: object
-      properties:
-        id:
-          type: string
-          description: The case ID.
 servers:
   - url: "http://localhost:3000"
     description: Local server.
