@@ -50,12 +50,17 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "@types/swagger-ui-express": "^4.1.2",
+    "@types/yamljs": "^0.2.31",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "envalid": "^6.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.5.0",
     "mongodb": "^3.5.7",
-    "mongoose": "^5.9.15"
+    "mongoose": "^5.9.15",
+    "swagger": "^0.7.5",
+    "swagger-ui-express": "^4.1.4",
+    "yamljs": "^0.3.0"
   }
 }
