@@ -30,7 +30,7 @@ apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
 app.use('/api', apiRouter);
 
 // API documentation.
-const swaggerDocument = YAML.load('./api/dataserver.api.yaml');
+const swaggerDocument = YAML.load('./api/openapi.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 (async (): Promise<void> => {
