@@ -9,7 +9,7 @@ info:
     name: MIT
   version: 1.0.0
 paths:
-  "/cases/{id}":
+  "/api/cases/{id}":
     summary: Line-list cases
     get:
       summary: Gets a specific case
@@ -19,6 +19,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
           description: The case ID
       responses:
         "200":
@@ -29,12 +30,12 @@ paths:
                 $ref: "#/components/schemas/Case"
         "400":
           description: Malformed request.
-        "422":
-          description: Unprocessable entity.
         "401":
           description: Unauthorized.
         "404":
           description: Case not found.
+        "422":
+          description: Unprocessable entity.
       tags:
         - reader
         - curator
