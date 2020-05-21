@@ -5,6 +5,7 @@ import LinelistTable from './LinelistTable';
 import React from 'react';
 import SourceTable from './SourceTable';
 import Profile from './Profile';
+import Users from './Users';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import axios from 'axios';
@@ -62,6 +63,9 @@ class App extends React.Component<{}, User> {
                             (<Route path="/profile">
                                 <Profile user={this.state} />
                             </Route>)}
+                        <Route path="/users">
+                            <Users />
+                        </Route>
                         <Route exact path="/">
                             <Home user={this.state} />
                         </Route>
@@ -96,6 +100,8 @@ class Home extends React.Component<HomeProps, {}> {
                         <Link to="/profile">Profile</Link>
                         <br />
                     </div>)}
+                <Link to="/users">Manage users</Link>
+                <br />
                 <Link to="/privacy-policy">Privacy policy</Link>
                 <br />
                 <Link to="/terms">Terms of service</Link>
