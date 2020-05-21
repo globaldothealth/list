@@ -1,6 +1,7 @@
 import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
+import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
@@ -32,6 +33,12 @@ app.use('/api', apiRouter);
 // API documentation.
 const swaggerDocument = YAML.load('./api/openapi.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// API validation.
+new OpenApiValidator({
+    apiSpec: './api/openapi.yaml',
+    validateResponses: true,
+}).install(app);
 
 (async (): Promise<void> => {
     try {
