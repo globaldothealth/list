@@ -28,7 +28,7 @@ export type UserDocument = mongoose.Document & {
     googleID: string;
     name: string;
     email: string;
-    role: string;
+    roles: [string];
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
