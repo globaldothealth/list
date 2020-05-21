@@ -2,36 +2,38 @@ openapi: 3.0.3
 info:
   title: EPID data service
   description: Server for CRUD operations on EPID line-list data
-  termsOfService: 'https://www.healthmap.org/about/termsofuse/'
+  termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
     email: info@healthmap.org
   license:
     name: MIT
   version: 1.0.0
 paths:
-  /api/cases/{id}:
+  "/cases/{id}":
     summary: Line-list cases
     get:
       summary: Gets a specific case
-      parameters: 
-        - in: path
-          name: id
+      parameters:
+        - name: id
+          in: path
           required: true
           schema:
             type: string
           description: The case ID
       responses:
-        '200':
+        "200":
           description: Case found.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Case'
-        '400':
-          description: Bad request.
-        '401':
+                $ref: "#/components/schemas/Case"
+        "400":
+          description: Malformed request.
+        "422":
+          description: Unprocessable entity.
+        "401":
           description: Unauthorized.
-        '404':
+        "404":
           description: Case not found.
       tags:
         - reader
@@ -52,3 +54,6 @@ components:
         id:
           type: string
           description: The case ID.
+servers:
+  - url: "http://localhost:3000"
+    description: Local server.
