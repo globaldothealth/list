@@ -1,5 +1,15 @@
 import AWS from 'aws-sdk';
 
+/**
+ * Client to interact with the AWS CloudWatch Events API.
+ *
+ * This class instantiates the connection to AWS on construction. All
+ * connection configuration (including mocking) should occur on the AWS object
+ * before construction.
+ *
+ * For examples on using the CloudWatch API, see:
+ *   https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/cloudwatch-examples.html
+ */
 export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
     constructor(awsRegion: string) {
@@ -9,6 +19,12 @@ export default class AwsEventsClient {
         });
     }
 
+    /**
+     * Proxies a PutRule request to the AWS CloudWatch API.
+     *
+     * For the full API definition, see:
+     *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutRule.html
+     */
     putRule = async (
         ruleName: string,
         scheduleExpression: string,
