@@ -44,7 +44,7 @@ test('lists users', async () => {
     const instance = wrapper.instance();
     await instance.componentDidMount();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/users');
-    expect(wrapper.text().includes('Alice Smith')).toBe(true);
-    expect(wrapper.text().includes('Bob Smith')).toBe(true);
-    expect(wrapper.text().includes('Carol Smith')).toBe(false);
+    expect(wrapper.text()).toContain('Alice Smith');
+    expect(wrapper.text()).toContain('Bob Smith');
+    expect(wrapper.text()).not.toContain('Carol Smith');
 });

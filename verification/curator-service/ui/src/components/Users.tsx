@@ -17,7 +17,7 @@ interface UsersState {
     users: User[];
 }
 
-class Users extends React.Component<{}, UsersState> {
+export default class Users extends React.Component<{}, UsersState> {
     constructor(props: {}) {
         super(props);
         this.state = { users: [] };
@@ -34,6 +34,7 @@ class Users extends React.Component<{}, UsersState> {
                 console.error(e);
             });
     }
+
     render(): JSX.Element {
         return (
             <div>
@@ -43,5 +44,3 @@ class Users extends React.Component<{}, UsersState> {
         )
     }
 }
-
-export default Users;

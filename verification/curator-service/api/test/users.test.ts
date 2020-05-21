@@ -4,11 +4,9 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-// Needs to create a new DB so it does not intefere with local logins
-const mongod = new MongoMemoryServer();
-
 beforeAll(async () => {
-    const uri = await mongod.getConnectionString();
+    // Needs to create a new DB so it does not intefere with local logins
+    const uri = await (new MongoMemoryServer()).getConnectionString();
     return mongoose.connect(
         uri,
         {
