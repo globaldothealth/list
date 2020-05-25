@@ -1,6 +1,7 @@
 # This dockerfile builds the curator API service and its UI in a single container.
 # The UI is served as a static resource from the curator API service express server.
-FROM node:12
+# Security best practices are followed and a trimmed down image is used for production serving.
+FROM node:12 as builder
 
 # Build the curator service.
 WORKDIR /usr/src/app/verification/curator-service/api
@@ -31,9 +32,27 @@ COPY verification/curator-service/ui/. .
 ENV REACT_APP_LOGIN_URL /auth/google
 RUN npm run-script build
 
-# Go back to curator service
-WORKDIR /usr/src/app/verification/curator-service/api
+
+# Multi-staged build, use a trimmed down version of node for prod.
+FROM node:alpine as prod
+
+# No need to run as root.
+USER node
+
+# Run with node env set to production.
+ENV NODE_ENV production
+
+# Set up a working directory to run our app from.
+WORKDIR /usr/src/app/
+
+# Copy compiled app from previous stage.
+COPY --from=builder /usr/src/app/verification/curator-service/api/node_modules ./node_modules
+COPY --from=builder /usr/src/app/verification/curator-service/api/dist ./dist
+COPY --from=builder /usr/src/app/verification/curator-service/ui/build ./fe
 # Set environment variable to serve static files from built UI.
-ENV STATIC_DIR /usr/src/app/verification/curator-service/ui/build
-# Start service.
-CMD [ "npm", "start" ]
+ENV STATIC_DIR /usr/src/app/fe
+ENV AFTER_LOGIN_REDIRECT_URL /
+
+# Start service, do not use npm start instead invoke node directly
+# to avoid wrapping the process uselessly and correctly catch SIGTERM and SIGINT.
+CMD [ "node", "dist/server.js" ]

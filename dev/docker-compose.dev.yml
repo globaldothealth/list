@@ -1,17 +1,17 @@
 version: "3.7"
 services:
   curator:
-    command: "npm run-script dev"
+    command: "npm run dev"
     volumes:
       - ../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src
     environment:
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
   data:
-    command: "npm run-script dev"
+    command: "npm run dev"
     volumes:
       - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
   curatorui:
-    command: "npm run-script start-noenv"
+    command: "npm run start-noenv"
     volumes:
       - ../verification/curator-service/ui/src:/usr/src/app/verification/curator-service/ui/src
     environment:
