@@ -27,7 +27,9 @@ jobs:
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d
       - name: Cypress integration tests
-        run: npm run cypress-run
+        run: |
+          npm ci
+          npm run cypress-run
         working-directory: verification/curator-service/ui
         env:
           CI: true
