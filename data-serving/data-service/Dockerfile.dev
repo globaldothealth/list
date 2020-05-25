@@ -1,3 +1,4 @@
+# Docker file for data service used during development.
 FROM node:12
 
 # Create app directory
