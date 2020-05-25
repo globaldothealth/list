@@ -26,7 +26,7 @@ services:
     data:
         build:
             context: ../.
-            dockerfile: data-serving/data-service/Dockerfile
+            dockerfile: data-serving/data-service/Dockerfile.dev
         init: true
         ports:
             - "3000:3000"
