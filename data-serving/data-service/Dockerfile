@@ -26,6 +26,9 @@ RUN npm run-script build
 # Expose service on port 3000.
 EXPOSE 3000
 
+# Specify a command for up to this step.
+CMD [ "npm", "start" ]
+
 # Multi-staged build, we don't need a full node image to run the app.
 FROM node:alpine as prod
 

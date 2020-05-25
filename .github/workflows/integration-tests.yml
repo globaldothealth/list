@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build stack
-        run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d
+        run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
       - name: Cypress integration tests
         run: |
           npm ci
