@@ -18,8 +18,7 @@ spec:
     spec:
       containers:
         - name: data
-          # TODO: Change to new docker hub org repo.
-          image: docker.io/attwad/epiddata:latest
+          image: docker.io/healthmapidha/dataservice:latest
           ports:
             - containerPort: 3000
           env:

@@ -18,8 +18,7 @@ spec:
     spec:
       containers:
         - name: curator
-          # TODO: Change to new docker hub org repo.
-          image: docker.io/attwad/epidcurator:latest
+          image: docker.io/healthmapidha/curatorservice:latest
           ports:
             - containerPort: 3001
           env:
