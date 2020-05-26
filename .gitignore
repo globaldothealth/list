@@ -6,6 +6,9 @@ convert_data.log
 # Cypress generates videos, do not store them in revision history.
 *.mp4
 
+# Secrets for kubernetes.
+kustomization.yaml
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 
