@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import AwsEventsClient from '../clients/aws-events-client';
-import { ScheduleDocument } from '../model/schedule';
 import { Source } from '../model/source';
 
 export default class SourcesController {
@@ -101,16 +100,13 @@ export default class SourcesController {
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const source = new Source(req.body);
-            source.validateSync();
+            await source.validate();
             // TODO: Support full schedule creation.
             const createdRuleArn = await this.awsEventsClient.putRule(
                 `${source.name}_Rule`,
                 'rate(1 hour)',
             );
-            const finalSource = {
-                ...source,
-                automation: { schedule: { awsRuleArn: createdRuleArn } },
-            };
+            source.set('automation.schedule.awsRuleArn', createdRuleArn);
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
