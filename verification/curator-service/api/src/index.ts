@@ -67,6 +67,9 @@ authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
     env.GOOGLE_OAUTH_CLIENT_SECRET,
 );
+if (env.ENABLE_LOCAL_AUTH) {
+    authController.configureLocalAuth();
+}
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
