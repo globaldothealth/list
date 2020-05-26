@@ -3,6 +3,9 @@
 # Log file for conversion warnings
 convert_data.log
 
+# Cypress generates videos, do not store them in revision history.
+*.mp4
+
 # Secrets for kubernetes.
 kustomization.yaml
 

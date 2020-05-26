@@ -1,0 +1,3 @@
+{
+    "awsRuleArn": "arn:aws:events:region:id:rule/name"
+}

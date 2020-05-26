@@ -14,12 +14,21 @@ const userSchema = new mongoose.Schema({
         // supporting more identity platforms.
         required: 'User must be logged-in with Google',
     },
+    roles: {
+        type: [String],
+        enum: [
+            'reader',
+            'curator',
+            'admin',
+        ],
+    },
 });
 
 export type UserDocument = mongoose.Document & {
     googleID: string;
     name: string;
     email: string;
+    roles: [string];
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
