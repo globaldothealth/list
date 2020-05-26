@@ -18,11 +18,15 @@ const styles = (theme: Theme) =>
         email: {
             marginTop: theme.spacing(2),
         },
+        roles: {
+            marginTop: theme.spacing(2),
+        },
     });
 
 interface User {
     name: string;
     email: string;
+    roles: string[];
 }
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
@@ -48,6 +52,11 @@ class Profile extends React.Component<Props, {}> {
                 {this.props.user.email && (
                     <div className={classes.email}>
                         {this.props.user.email}
+                    </div>)}
+
+                {this.props.user.roles && (
+                    <div className={classes.roles}>
+                        {this.props.user.roles.join(', ')}
                     </div>)}
             </div>
         );
