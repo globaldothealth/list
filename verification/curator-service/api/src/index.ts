@@ -86,6 +86,7 @@ apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 
 apiRouter.get('/users', usersController.list);
+apiRouter.patch('/users/:googleID', usersController.updateRoles);
 
 apiRouter.get('/cases', casesController.list);
 apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);

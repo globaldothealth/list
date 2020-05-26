@@ -44,3 +44,33 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 };
+
+/**
+ * Update a single user's roles.
+ */
+export const updateRoles = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await User.findOneAndUpdate(
+            { googleID: req.params.googleID },
+            { roles: req.body.roles },
+            {
+                // Return the udpated object.
+                new: true,
+                runValidators: true,
+            });
+        if (!user) {
+            res.status(404).json(
+                `user with googleID ${req.params.googleID} could not be found`,
+            );
+            return;
+        }
+        res.json(user);
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
+        return;
+    }
+};
