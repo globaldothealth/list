@@ -31,7 +31,9 @@ export const mustHaveAnyRole = (requiredRoles: Set<string>) => {
         ) {
             next();
         } else {
-            res.sendStatus(403);
+            res.status(403).json(
+                `access is restricted to users with ${requiredRoles} roles`,
+            );
         }
     };
 };
