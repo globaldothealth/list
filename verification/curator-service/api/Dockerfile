@@ -14,7 +14,7 @@ COPY verification/curator-service/api/. .
 # Bundle common files
 COPY common/* ../../../common/
 # Build the app
-RUN npm run-script build
+RUN npm run build
 # Expose service on port 3001.
 EXPOSE 3001
 # Start the service.

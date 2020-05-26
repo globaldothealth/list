@@ -21,7 +21,7 @@ COPY data-serving/data-service/. .
 COPY common/* ../../common/
 
 # Build the app
-RUN npm run-script build
+RUN npm run build
 
 # Expose service on port 3000.
 EXPOSE 3000
@@ -30,7 +30,7 @@ EXPOSE 3000
 CMD [ "npm", "start" ]
 
 # Multi-staged build, we don't need a full node image to run the app.
-FROM node:alpine as prod
+FROM node:12-alpine as prod
 
 # No need to run as root.
 USER node

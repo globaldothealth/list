@@ -16,7 +16,7 @@ COPY verification/curator-service/api/. .
 # Bundle common files
 COPY common/* ../../../common/
 # Build the app
-RUN npm run-script build
+RUN npm run build
 # Expose service on port 3001.
 EXPOSE 3001
 
@@ -30,7 +30,7 @@ RUN npm ci
 COPY verification/curator-service/ui/. .
 # Build the app.
 ENV REACT_APP_LOGIN_URL /auth/google
-RUN npm run-script build
+RUN npm run build
 
 
 # Multi-staged build, use a trimmed down version of node for prod.
