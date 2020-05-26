@@ -1,63 +1,10 @@
 import mongoose from 'mongoose';
+import {
+    AutomationDocument,
+    automationParsingValidator,
+    automationSchema,
+} from './automation';
 import { OriginDocument, originSchema } from './origin';
-
-interface Field {
-    name: string;
-    regex: string;
-}
-
-const fieldSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: 'Enter a dotted.field.name',
-    },
-    regex: {
-        type: String,
-        required: 'Enter a field extraction regex',
-    },
-});
-
-interface RegexParsing {
-    fields: [Field];
-}
-
-const regexParsingSchema = new mongoose.Schema({
-    fields: [fieldSchema],
-});
-
-interface Parser {
-    awsLambdaArn: string;
-}
-
-const parserSchema = new mongoose.Schema({
-    awsLambdaArn: {
-        type: String,
-        required: 'Enter a parser AWS Lambda ARN',
-    },
-});
-
-interface Schedule {
-    awsRuleArn: string;
-}
-
-const scheduleSchema = new mongoose.Schema({
-    awsRuleArn: {
-        type: String,
-        required: 'Enter a CloudWatch schedule rule AWS Lambda ARN',
-    },
-});
-
-interface Automation {
-    parser: Parser;
-    schedule: Schedule;
-    regexParsing: RegexParsing;
-}
-
-const automationSchema = new mongoose.Schema({
-    parser: parserSchema,
-    schedule: scheduleSchema,
-    regexParsing: regexParsingSchema,
-});
 
 const sourceSchema = new mongoose.Schema({
     name: {
@@ -69,14 +16,17 @@ const sourceSchema = new mongoose.Schema({
         required: 'Enter an origin',
     },
     format: String,
-    automation: automationSchema,
+    automation: {
+        type: automationSchema,
+        validate: automationParsingValidator,
+    },
 });
 
 type SourceDocument = mongoose.Document & {
     name: string;
     origin: OriginDocument;
     format: string;
-    automation: Automation;
+    automation: AutomationDocument;
 };
 
 export const Source = mongoose.model<SourceDocument>('Source', sourceSchema);

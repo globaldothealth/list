@@ -13,7 +13,7 @@ export const mustBeAuthenticated = (
     res: Response,
     next: NextFunction,
 ): void => {
-    if (req.user) {
+    if (req.isAuthenticated()) {
         next();
         return;
     }
@@ -55,6 +55,31 @@ export class AuthController {
             mustBeAuthenticated,
             (req: Request, res: Response): void => {
                 res.json(req.user);
+            },
+        );
+    }
+
+    // configureLocalAuth will get or create the user present in the request.
+    configureLocalAuth(): void {
+        console.log('Configuring local auth for tests');
+        // /register creates a user if necessary and log them in.
+        this.router.post(
+            '/register',
+            async (req: Request, res: Response): Promise<void> => {
+                const user = await User.create({
+                    name: req.body.name,
+                    email: req.body.email,
+                    // Necessary to pass mongoose validation.
+                    googleID: 42,
+                });
+                req.login(user, (err: Error) => {
+                    if (!err) {
+                        res.json(user);
+                        return;
+                    }
+                    console.log(err);
+                    res.sendStatus(500);
+                });
             },
         );
     }
