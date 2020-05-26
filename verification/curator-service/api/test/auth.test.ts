@@ -1,6 +1,7 @@
 import app from '../src/index';
 import mongoose from 'mongoose';
 import request from 'supertest';
+import supertest from 'supertest';
 
 beforeAll(() => {
     return mongoose.connect(
@@ -35,6 +36,21 @@ describe('auth', () => {
     it('handles redirect from google', (done) => {
         // Redirects to consent screen because not authenticated.
         request(app).get('/auth/google/redirect').expect(302, done);
+    });
+});
+
+describe('local auth', () => {
+    it('can access authenticated pages', async () => {
+        // Create a user.
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-user',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-user/);
+        request.get('/auth/profile').expect(200, /test-user/);
     });
 });
 

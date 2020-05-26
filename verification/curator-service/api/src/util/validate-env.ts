@@ -9,6 +9,7 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     AFTER_LOGIN_REDIRECT_URL: string;
     STATIC_DIR: string;
+    AUTH_STRATEGY: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -43,6 +44,11 @@ export default function validateEnv(): Readonly<{
         STATIC_DIR: str({
             desc: 'directory to serve static files from',
             devDefault: '',
+        }),
+        AUTH_STRATEGY: str({
+            desc: 'authentication strategy to use, local or oauth',
+            devDefault: 'local',
+            default: 'oauth',
         }),
     });
 }
