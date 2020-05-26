@@ -1,4 +1,5 @@
 import * as sourcesController from './controllers/sources';
+import * as usersController from './controllers/users';
 
 import { Request, Response } from 'express';
 
@@ -43,6 +44,7 @@ mongoose
     })
     .catch((e) => {
         console.error('Failed to connect to DB', e);
+        process.exit(1);
     });
 
 // Configure authentication.
@@ -65,6 +67,9 @@ authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
     env.GOOGLE_OAUTH_CLIENT_SECRET,
 );
+if (env.ENABLE_LOCAL_AUTH) {
+    authController.configureLocalAuth();
+}
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
@@ -79,6 +84,9 @@ apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
 apiRouter.post('/sources', sourcesController.create);
 apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
+
+apiRouter.get('/users', usersController.list);
+apiRouter.put('/users/:id', usersController.updateRoles);
 
 apiRouter.get('/cases', casesController.list);
 apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
