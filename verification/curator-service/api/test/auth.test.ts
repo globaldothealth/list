@@ -93,7 +93,6 @@ describe('mustHaveAnyRole', () => {
         request(localApp).get('/mustbeadmin').expect(403, done);
     });
     it('errors when role does not match', async () => {
-        // Create a user.
         const request = supertest.agent(localApp);
         await request
             .post('/auth/register')
@@ -106,7 +105,6 @@ describe('mustHaveAnyRole', () => {
         request.get('/mustbeadmin').expect(403);
     });
     it('passes with proper roles', async () => {
-        // Create a user.
         const request = supertest.agent(localApp);
         await request
             .post('/auth/register')
@@ -119,7 +117,6 @@ describe('mustHaveAnyRole', () => {
         request.get('/mustbeadmin').expect(200);
     });
     it('errors when user has no roles', async () => {
-        // Create a user.
         const request = supertest.agent(localApp);
         await request
             .post('/auth/register')
