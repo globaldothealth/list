@@ -56,7 +56,7 @@ class Profile extends React.Component<Props, {}> {
 
                 {this.props.user.roles && (
                     <div className={classes.roles}>
-                        {this.props.user.roles.map(role => `${role}, `)}
+                        {this.props.user.roles.join(', ')}
                     </div>)}
             </div>
         );
