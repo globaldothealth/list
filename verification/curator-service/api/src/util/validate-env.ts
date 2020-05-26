@@ -9,7 +9,7 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     AFTER_LOGIN_REDIRECT_URL: string;
     STATIC_DIR: string;
-    AUTH_STRATEGY: string;
+    ENABLE_LOCAL_AUTH: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -42,13 +42,13 @@ export default function validateEnv(): Readonly<{
             devDefault: 'http://localhost:3002/',
         }),
         STATIC_DIR: str({
-            desc: 'directory to serve static files from',
+            desc: 'Directory to serve static files from',
             devDefault: '',
         }),
-        AUTH_STRATEGY: str({
-            desc: 'authentication strategy to use, local or oauth',
-            devDefault: 'local',
-            default: 'oauth',
+        ENABLE_LOCAL_AUTH: str({
+            desc: 'Whether to enable local auth strategy for testing',
+            devDefault: 'yes-for-testing',
+            default: '',
         }),
     });
 }
