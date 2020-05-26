@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import { AssertionError } from 'assert';
 
 /**
  * Client to interact with the AWS CloudWatch Events API.
@@ -51,6 +52,9 @@ export default class AwsEventsClient {
 
     private assertString(input: string | undefined): asserts input is string {
         if (typeof input === 'string') return;
-        else throw new Error('AWS PutRule response missing RuleArn.');
+        else
+            throw new AssertionError({
+                message: 'AWS PutRule response missing RuleArn.',
+            });
     }
 }
