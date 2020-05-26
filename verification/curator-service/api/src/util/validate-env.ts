@@ -1,6 +1,9 @@
 import { CleanEnv, cleanEnv, port, str, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
+    AWS_ACCESS_KEY_ID: string;
+    AWS_SECRET_ACCESS_KEY: string;
+    AWS_SERVICE_REGION: string;
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
     PORT: number;
@@ -9,12 +12,27 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     AFTER_LOGIN_REDIRECT_URL: string;
     STATIC_DIR: string;
+    ENABLE_LOCAL_AUTH: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
+        AWS_ACCESS_KEY_ID: str({
+            desc: 'ID for AWS access key credential',
+            docs:
+                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+        }),
+        AWS_SECRET_ACCESS_KEY: str({
+            desc: 'Secret for AWS access key credential',
+            docs:
+                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+        }),
+        AWS_SERVICE_REGION: str({
+            desc: 'AWS region in which to interact with services/resources',
+            default: 'us-east-1',
+        }),
         DATASERVER_URL: url({
             desc: 'URL at which to make requests to the data-service API',
             devDefault: 'http://localhost:3000',
@@ -41,8 +59,13 @@ export default function validateEnv(): Readonly<{
             devDefault: 'http://localhost:3002/',
         }),
         STATIC_DIR: str({
-            desc: 'directory to serve static files from',
+            desc: 'Directory to serve static files from',
             devDefault: '',
+        }),
+        ENABLE_LOCAL_AUTH: str({
+            desc: 'Whether to enable local auth strategy for testing',
+            devDefault: 'yes-for-testing',
+            default: '',
         }),
     });
 }
