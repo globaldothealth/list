@@ -1,6 +1,7 @@
 {
-  "watch": ["src"],
+  "watch": [
+    "src"
+  ],
   "ext": "ts",
-  "ignore": ["src/**/*.spec.ts"],
-  "exec": "tsc && node ./dist/server.js"
+  "exec": "tsc -p tsconfig.build.json && node ./dist/server.js"
 }

@@ -6,9 +6,11 @@ describe('User schema', () => {
             name: 'test source',
             email: 'foo@bar.com',
             googleID: 'baz',
+            roles: ['admin', 'reader'],
         }).validateSync();
         expect(errors).toBeUndefined();
     });
+
     it('should fail validation if user is invalid', () => {
         const errors = new User({}).validateSync();
         expect(errors).toBeDefined();
@@ -16,5 +18,16 @@ describe('User schema', () => {
         expect(errors?.toString()).toMatch(
             'User must be logged-in with Google',
         );
+    });
+
+    it('should restrict roles to values in the enum', () => {
+        const errors = new User({
+            name: 'test source',
+            email: 'foo@bar.com',
+            googleID: 'baz',
+            roles: ['brigadier'],
+        }).validateSync();
+        expect(errors).toBeDefined();
+        expect(errors?.toString()).toContain('brigadier');
     });
 });
