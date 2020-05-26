@@ -1,6 +1,15 @@
+import * as core from 'express-serve-static-core';
+
+import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
+import { Request, Response } from 'express';
+
 import app from '../src/index';
+import bodyParser from 'body-parser';
+import express from 'express';
 import mongoose from 'mongoose';
+import passport from 'passport';
 import request from 'supertest';
+import supertest from 'supertest';
 
 beforeAll(() => {
     return mongoose.connect(
@@ -38,8 +47,84 @@ describe('auth', () => {
     });
 });
 
+describe('local auth', () => {
+    it('can access authenticated pages', async () => {
+        // Create a user.
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-user',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-user/);
+        request.get('/auth/profile').expect(200, /test-user/);
+    });
+});
+
 describe('profile', () => {
     it('returns 403 when not authenticated', (done) => {
         request(app).get('/auth/profile').expect(403, done);
+    });
+});
+
+describe('mustHaveAnyRole', () => {
+    // Declaring a local app for this test not to depend on index.ts mappings.
+    let localApp: core.Express;
+    beforeAll(() => {
+        // Setup a fake server.
+        localApp = express();
+        localApp.use(bodyParser.json());
+        const authController = new AuthController('/redirect-after-login');
+        authController.configurePassport('foo', 'bar');
+        authController.configureLocalAuth();
+        localApp.use(passport.initialize());
+        localApp.use(passport.session());
+        localApp.use('/auth', authController.router);
+        localApp.get(
+            '/mustbeadmin',
+            mustHaveAnyRole(new Set(['admin'])),
+            (_req: Request, res: Response) => {
+                res.sendStatus(200);
+            },
+        );
+    });
+    it('errors on unauthenticated request', (done) => {
+        request(localApp).get('/mustbeadmin').expect(403, done);
+    });
+    it('errors when role does not match', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-curator/);
+        request.get('/mustbeadmin').expect(403);
+    });
+    it('passes with proper roles', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator-admin',
+                email: 'foo@bar.com',
+                roles: ['curator', 'admin'],
+            })
+            .expect(200, /test-curator/);
+        request.get('/mustbeadmin').expect(200);
+    });
+    it('errors when user has no roles', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+            })
+            .expect(200, /test-curator/);
+        request.get('/mustbeadmin').expect(403);
     });
 });

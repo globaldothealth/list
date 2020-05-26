@@ -1,0 +1,3 @@
+{
+    "awsLambdaArn": "arn:aws:lambda:region:id:function:name"
+}
