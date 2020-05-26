@@ -1,16 +1,14 @@
-import mongoose from 'mongoose';
 import { ParserDocument, parserSchema } from './parser';
 import { RegexParsingDocument, regexParsingSchema } from './regex-parsing';
 import { ScheduleDocument, scheduleSchema } from './schedule';
 
+import mongoose from 'mongoose';
+
 export const automationParsingValidator = {
     validator: (automation: AutomationDocument): boolean => {
-        return (
-            (automation.parser != null || automation.regexParsing != null) &&
-            !(automation.parser != null && automation.regexParsing != null)
-        );
+        return !(automation.parser != null && automation.regexParsing != null);
     },
-    message: 'Exactly one of either parser or regexParsing must be supplied.',
+    message: 'At most one of parser or regexParsing may be supplied.',
 };
 
 export const automationSchema = new mongoose.Schema({
