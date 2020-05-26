@@ -11,6 +11,7 @@ interface User {
     googleID: string;
     name: string;
     email: string;
+    roles: string[];
 }
 
 interface UsersState {
@@ -39,7 +40,9 @@ export default class Users extends React.Component<{}, UsersState> {
         return (
             <div>
                 {this.state.users.map(user =>
-                    <div key={user.googleID}>{user.name}</div>)}
+                    <div key={user.googleID}>
+                        {user.name}: {user.roles?.join(', ')}
+                    </div>)}
             </div>
         )
     }
