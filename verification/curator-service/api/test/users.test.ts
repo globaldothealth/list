@@ -31,6 +31,7 @@ describe('GET', () => {
             name: 'Alice Smith',
             email: 'foo@bar.com',
             googleID: 'testGoogleID',
+            roles: ['curator', 'admin'],
         }).save();
         const res = await request(app)
             .get('/api/users')
@@ -48,6 +49,7 @@ describe('GET', () => {
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
+                roles: ['reader'],
             }).save();
         }
         // Fetch first page.
