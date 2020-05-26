@@ -24,6 +24,7 @@ const theme = createMuiTheme({
 interface User {
     name: string;
     email: string;
+    roles: string[];
 }
 
 class App extends React.Component<{}, User> {
@@ -32,6 +33,7 @@ class App extends React.Component<{}, User> {
         this.state = {
             name: '',
             email: '',
+            roles: [],
         };
     }
 
@@ -39,10 +41,14 @@ class App extends React.Component<{}, User> {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
-                this.setState({ name: resp.data.name, email: resp.data.email });
+                this.setState({
+                    name: resp.data.name,
+                    email: resp.data.email,
+                    roles: resp.data.roles,
+                });
             })
             .catch((e) => {
-                this.setState({ name: '', email: '' });
+                this.setState({ name: '', email: '', roles: [], });
                 console.error(e);
             });
     }

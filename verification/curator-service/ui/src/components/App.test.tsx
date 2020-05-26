@@ -13,7 +13,7 @@ beforeEach(() => {
 
 it('renders without crashing when logged in', () => {
     const axiosResponse = {
-        data: { name: 'Alice Smith', email: 'foo@bar.com' },
+        data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
         status: 200,
         statusText: 'Forbidden',
         config: {},

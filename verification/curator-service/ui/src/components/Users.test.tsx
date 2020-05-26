@@ -21,11 +21,13 @@ test('lists users', async () => {
             googleID: 'testGoogleID',
             name: 'Alice Smith',
             email: 'foo@bar.com',
+            roles: ['admin, reader'],
         },
         {
             googleID: 'testGoogleID2',
             name: 'Bob Smith',
-            email: 'foo2@bar.com'
+            email: 'foo2@bar.com',
+            roles: ['curator'],
         }
     ];
     const axiosResponse = {
@@ -44,7 +46,7 @@ test('lists users', async () => {
     const instance = wrapper.instance();
     await instance.componentDidMount();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/users');
-    expect(wrapper.text()).toContain('Alice Smith');
-    expect(wrapper.text()).toContain('Bob Smith');
+    expect(wrapper.text()).toContain('Alice Smith: admin, reader');
+    expect(wrapper.text()).toContain('Bob Smith: curator');
     expect(wrapper.text()).not.toContain('Carol Smith');
 });
