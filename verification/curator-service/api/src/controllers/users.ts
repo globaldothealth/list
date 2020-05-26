@@ -60,7 +60,7 @@ export const updateRoles = async (req: Request, res: Response): Promise<void> =>
             });
         if (!user) {
             res.status(404).json(
-                `user with googleID ${req.params.googleID} could not be found`,
+                `user with id ${req.params.id} could not be found`,
             );
             return;
         }
