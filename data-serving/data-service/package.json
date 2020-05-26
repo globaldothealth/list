@@ -61,7 +61,6 @@
     "express-validator": "^6.5.0",
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.15",
-    "swagger": "^0.7.5",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
   }
