@@ -91,14 +91,15 @@ apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL);
-apiRouter.get('/users', usersController.list);
-apiRouter.put('/users/:id', usersController.updateRoles);
-
 apiRouter.get('/cases', casesController.list);
 apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
 apiRouter.post('/cases', casesController.create);
 apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
 apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
+
+// Configure users controller.
+apiRouter.get('/users', usersController.list);
+apiRouter.put('/users/:id', usersController.updateRoles);
 
 app.use('/api', apiRouter);
 
