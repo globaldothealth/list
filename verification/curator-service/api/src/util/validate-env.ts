@@ -21,11 +21,13 @@ export default function validateEnv(): Readonly<{
     return cleanEnv(process.env, {
         AWS_ACCESS_KEY_ID: str({
             desc: 'ID for AWS access key credential',
+            devDefault: 'fakeAccessKeyId',
             docs:
                 'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
         }),
         AWS_SECRET_ACCESS_KEY: str({
             desc: 'Secret for AWS access key credential',
+            devDefault: 'fakeSecretKey',
             docs:
                 'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
         }),
