@@ -91,7 +91,7 @@ describe('GET', () => {
     });
 });
 
-describe('PATCH', () => {
+describe('PUT', () => {
     it("should update a user's roles", async () => {
         const user = await new User({
             name: 'Alice Smith',
@@ -100,7 +100,7 @@ describe('PATCH', () => {
             roles: ['reader'],
         }).save();
         const res = await request(app)
-            .patch(`/api/users/${user.googleID}`)
+            .put(`/api/users/${user.id}`)
             .send({ roles: ['admin', 'curator'] })
             .expect(200)
             .expect('Content-Type', /json/);
@@ -111,7 +111,7 @@ describe('PATCH', () => {
     });
     it('cannot update an inexistent user', (done) => {
         request(app)
-            .patch('/api/users/424242424242424242424242')
+            .put('/api/users/424242424242424242424242')
             .expect(404, done);
     });
     it('should not update to an invalid user', async () => {
@@ -122,7 +122,7 @@ describe('PATCH', () => {
             roles: ['admin'],
         }).save();
         const res = await request(app)
-            .patch(`/api/users/${user.googleID}`)
+            .put(`/api/users/${user.id}`)
             .send({ roles: ['invalidRole'] })
             .expect(422);
         expect(res.body).toContain('Validation failed');

@@ -50,8 +50,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  */
 export const updateRoles = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = await User.findOneAndUpdate(
-            { googleID: req.params.googleID },
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
             { roles: req.body.roles },
             {
                 // Return the udpated object.
