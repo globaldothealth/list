@@ -1,4 +1,7 @@
-FROM node:12
+# Docker file for data service.
+# Follows multi-staged build where "dev" can be used for development
+# and "prod" follows security best-practices and uses a trimmed down image.
+FROM node:12 as dev
 
 # Create app directory
 WORKDIR /usr/src/app/data-serving/data-service
@@ -18,10 +21,30 @@ COPY data-serving/data-service/. .
 COPY common/* ../../common/
 
 # Build the app
-RUN npm run-script build
+RUN npm run build
 
 # Expose service on port 3000.
 EXPOSE 3000
 
-# Start service.
+# Specify a command for up to this step.
 CMD [ "npm", "start" ]
+
+# Multi-staged build, we don't need a full node image to run the app.
+FROM node:12-alpine as prod
+
+# No need to run as root.
+USER node
+
+# Run with node env set to production.
+ENV NODE_ENV production
+
+WORKDIR /usr/src/app/
+
+# Copy compiled app from previous stage.
+COPY --from=dev /usr/src/app/data-serving/data-service/node_modules ./node_modules
+COPY --from=dev /usr/src/app/data-serving/data-service/api ./api
+COPY --from=dev /usr/src/app/data-serving/data-service/dist ./dist
+
+# Start service, do not use npm start instead invoke node directly
+# to avoid wrapping the process uselessly and correctly catch SIGTERM and SIGINT.
+CMD [ "node", "dist/server.js" ]

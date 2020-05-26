@@ -7,10 +7,10 @@
     "format": "PDF",
     "automation": {
         "parser": {
-            "awsLambdaArn": "arn-parser"
+            "awsLambdaArn": "arn:aws:lambda:region:id:function:name"
         },
         "schedule": {
-            "awsRuleArn": "arn-rule"
+            "awsRuleArn": "arn:aws:events:region:id:rule/name"
         }
     }
 }
