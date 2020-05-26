@@ -21,12 +21,12 @@ export const mustBeAuthenticated = (
 };
 
 // mustHaveAnyRole is an express middleware that checks that the currently logged-in user has any of the given roles.
-export const mustHaveAnyRole = (roles: Set<string>) => {
+export const mustHaveAnyRole = (requiredRoles: Set<string>) => {
     return (req: Request, res: Response, next: NextFunction): void => {
         if (
             req.isAuthenticated() &&
             (req.user as UserDocument).roles?.filter((r: string) =>
-                roles.has(r),
+                requiredRoles.has(r),
             ).length > 0
         ) {
             next();
