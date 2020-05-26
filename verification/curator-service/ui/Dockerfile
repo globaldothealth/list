@@ -10,7 +10,5 @@ RUN npm ci
 COPY verification/curator-service/ui/. .
 # Bundle common files
 COPY common/* ../../../common/
-# Build the app.
-#RUN npm run-script build
 # Start the service.
 CMD [ "npm", "start" ]
