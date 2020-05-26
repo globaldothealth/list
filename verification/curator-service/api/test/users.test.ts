@@ -90,3 +90,43 @@ describe('GET', () => {
         request(app).get('/api/users?page=1&limit=-2').expect(422, done);
     });
 });
+
+describe('PUT', () => {
+    it("should update a user's roles", async () => {
+        const user = await new User({
+            name: 'Alice Smith',
+            email: 'foo@bar.com',
+            googleID: `testGoogleID`,
+            roles: ['reader'],
+        }).save();
+        const res = await request(app)
+            .put(`/api/users/${user.id}`)
+            .send({ roles: ['admin', 'curator'] })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.roles).toEqual(['admin', 'curator']);
+        // Check stuff that didn't change.
+        expect(res.body.email).toEqual('foo@bar.com');
+    });
+    it('cannot update an inexistent user', (done) => {
+        request(app)
+            .put('/api/users/424242424242424242424242')
+            .expect(404, done);
+    });
+    it('should not update to an invalid user', async () => {
+        const user = await new User({
+            name: 'Alice Smith',
+            email: 'foo@bar.com',
+            googleID: `testGoogleID`,
+            roles: ['admin'],
+        }).save();
+        const res = await request(app)
+            .put(`/api/users/${user.id}`)
+            .send({ roles: ['invalidRole'] })
+            .expect(422);
+        expect(res.body).toContain('Validation failed');
+        expect(res.body).toContain('invalidRole');
+    });
+});
+
