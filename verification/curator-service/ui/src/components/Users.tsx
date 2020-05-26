@@ -41,7 +41,7 @@ export default class Users extends React.Component<{}, UsersState> {
             <div>
                 {this.state.users.map(user =>
                     <div key={user.googleID}>
-                        {user.name}: {user.roles?.map(role => `${role}, `)}
+                        {user.name}: {user.roles?.join(', ')}
                     </div>)}
             </div>
         )
