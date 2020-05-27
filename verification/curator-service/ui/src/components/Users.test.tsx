@@ -102,6 +102,7 @@ test('updates roles on selection', async () => {
 
     // Check roles are updated
     expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', { 'roles': ['admin', 'reader', 'curator'] });
     expect(await findByText('Alice Smith')).toBeInTheDocument();
     expect(await findByText('admin')).toBeInTheDocument();
     expect(await findByText('reader')).toBeInTheDocument();
