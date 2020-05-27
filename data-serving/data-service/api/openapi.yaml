@@ -7,50 +7,48 @@ info:
     email: info@healthmap.org
   license:
     name: MIT
+    url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
 paths:
-  "/api/cases/{id}":
-    summary: Line-list cases
+  /cases/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The case ID
+        required: true
+        schema:
+          type: string
+          format: uuid
     get:
       summary: Gets a specific case
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: The case ID
       responses:
         "200":
-          description: Case found.
+          description: OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Case"
         "400":
-          description: Malformed request.
+          $ref: "#/components/responses/400"
         "401":
-          description: Unauthorized.
+          $ref: "#/components/responses/401"
         "404":
-          description: Case not found.
+          $ref: "#/components/responses/404"
         "422":
-          description: Unprocessable entity.
-      tags:
-        - reader
-        - curator
-        - admin
-tags:
-  - name: reader
-    description: An operation that can be executed by a reader.
-  - name: curator
-    description: An operation that can be executed by a curator.
-  - name: admin
-    description: An operation that can be executed by an admin.
+          $ref: "#/components/responses/422"
 components:
   schemas:
     Case:
       type: object
+  responses:
+    "400":
+      description: Malformed request
+    "401":
+      description: Unauthorized
+    "404":
+      description: Not found
+    "422":
+      description: Unprocessable entity
 servers:
-  - url: "http://localhost:3000"
-    description: Local server.
+  - url: "http://localhost:3000/api"
+    description: Local server
