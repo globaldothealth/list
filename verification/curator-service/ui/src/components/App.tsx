@@ -22,6 +22,7 @@ const theme = createMuiTheme({
 });
 
 interface User {
+    _id: string;
     name: string;
     email: string;
     roles: string[];
@@ -31,6 +32,7 @@ class App extends React.Component<{}, User> {
     constructor(props: {}) {
         super(props);
         this.state = {
+            _id: '',
             name: '',
             email: '',
             roles: [],
@@ -42,13 +44,14 @@ class App extends React.Component<{}, User> {
             .get<User>('/auth/profile')
             .then((resp) => {
                 this.setState({
+                    _id: resp.data._id,
                     name: resp.data.name,
                     email: resp.data.email,
                     roles: resp.data.roles,
                 });
             })
             .catch((e) => {
-                this.setState({ name: '', email: '', roles: [], });
+                this.setState({ _id: '', name: '', email: '', roles: [], });
                 console.error(e);
             });
     }

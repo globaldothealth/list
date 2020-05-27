@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
 import {
     AutomationDocument,
     automationParsingValidator,
     automationSchema,
 } from './automation';
 import { OriginDocument, originSchema } from './origin';
+
+import mongoose from 'mongoose';
 
 const sourceSchema = new mongoose.Schema({
     name: {

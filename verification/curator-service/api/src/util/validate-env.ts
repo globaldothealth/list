@@ -1,6 +1,9 @@
 import { CleanEnv, cleanEnv, port, str, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
+    AWS_ACCESS_KEY_ID: string;
+    AWS_SECRET_ACCESS_KEY: string;
+    AWS_SERVICE_REGION: string;
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
     PORT: number;
@@ -16,6 +19,22 @@ export default function validateEnv(): Readonly<{
         // eslint-disable-next-line indent
     } {
     return cleanEnv(process.env, {
+        AWS_ACCESS_KEY_ID: str({
+            desc: 'ID for AWS access key credential',
+            devDefault: 'fakeAccessKeyId',
+            docs:
+                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+        }),
+        AWS_SECRET_ACCESS_KEY: str({
+            desc: 'Secret for AWS access key credential',
+            devDefault: 'fakeSecretKey',
+            docs:
+                'https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html',
+        }),
+        AWS_SERVICE_REGION: str({
+            desc: 'AWS region in which to interact with services/resources',
+            default: 'us-east-1',
+        }),
         DATASERVER_URL: url({
             desc: 'URL at which to make requests to the data-service API',
             devDefault: 'http://localhost:3000',
