@@ -1,12 +1,7 @@
 import Users from './Users';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, fireEvent, within } from '@testing-library/react';
 import axios from 'axios';
-import { shallow } from 'enzyme';
-import { configure } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
-
-configure({ adapter: new Adapter() });
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -18,12 +13,14 @@ beforeEach(() => {
 test('lists users', async () => {
     const users = [
         {
+            _id: 'abc123',
             googleID: 'testGoogleID',
             name: 'Alice Smith',
             email: 'foo@bar.com',
-            roles: ['admin, reader'],
+            roles: ['admin', 'reader'],
         },
         {
+            _id: 'abc321',
             googleID: 'testGoogleID2',
             name: 'Bob Smith',
             email: 'foo2@bar.com',
@@ -40,13 +37,74 @@ test('lists users', async () => {
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockImplementation(() => Promise.resolve(axiosResponse));
-    // Need to use shallow to wait for the component to mount.
-    var wrapper = shallow(<Users />);
-    const instance = wrapper.instance();
-    await instance.componentDidMount();
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users');
-    expect(wrapper.text()).toContain('Alice Smith: admin, reader');
-    expect(wrapper.text()).toContain('Bob Smith: curator');
-    expect(wrapper.text()).not.toContain('Carol Smith');
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const { queryByText, findByText } = render(<Users />);
+    expect(await findByText('Alice Smith')).toBeInTheDocument();
+    expect(await findByText('Bob Smith')).toBeInTheDocument();
+    expect(queryByText('Carol Smith')).not.toBeInTheDocument();
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/');
+});
+
+test('updates roles on selection', async () => {
+    const users = [
+        {
+            _id: 'abc123',
+            googleID: 'testGoogleID',
+            name: 'Alice Smith',
+            email: 'foo@bar.com',
+            roles: ['admin', 'reader'],
+        }
+    ];
+    const axiosResponse = {
+        data: {
+            users: users,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    // Shows initial roles
+    const { queryByText, findByText, getByRole } = render(<Users />);
+    expect(await findByText('Alice Smith')).toBeInTheDocument();
+    expect(await findByText('admin')).toBeInTheDocument();
+    expect(await findByText('reader')).toBeInTheDocument();
+    expect(queryByText('curator')).not.toBeInTheDocument();
+
+    // Select new role
+    const updatedUsers = [
+        {
+            _id: 'abc123',
+            googleID: 'testGoogleID',
+            name: 'Alice Smith',
+            email: 'foo@bar.com',
+            roles: ['admin', 'reader', 'curator'],
+        }
+    ];
+    const axiosPutResponse = {
+        data: {
+            users: updatedUsers,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.put.mockResolvedValueOnce(axiosPutResponse);
+    fireEvent.mouseDown(getByRole('button'));
+    const listbox = within(getByRole('listbox'));
+    fireEvent.click(listbox.getByText(/curator/i));
+    fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
+
+    // Check roles are updated
+    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', { 'roles': ['admin', 'reader', 'curator'] });
+    expect(await findByText('Alice Smith')).toBeInTheDocument();
+    expect(await findByText('admin')).toBeInTheDocument();
+    expect(await findByText('reader')).toBeInTheDocument();
+    expect(await findByText('curator')).toBeInTheDocument();
 });

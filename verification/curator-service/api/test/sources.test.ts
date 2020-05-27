@@ -3,6 +3,15 @@ import app from '../src/index';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
+jest.mock('../src/clients/aws-events-client', () => {
+    const mockPutRule = jest
+        .fn()
+        .mockResolvedValue('arn:aws:events:fake:event:rule/name');
+    return jest.fn().mockImplementation(() => {
+        return { putRule: mockPutRule };
+    });
+});
+
 beforeAll(() => {
     return mongoose.connect(
         // This is provided by jest-mongodb.
@@ -131,7 +140,7 @@ describe('PUT', () => {
 describe('POST', () => {
     it('should return the created source', async () => {
         const source = {
-            name: 'some name',
+            name: 'some_name',
             origin: { url: 'http://what.ever' },
         };
         const res = await request(app)

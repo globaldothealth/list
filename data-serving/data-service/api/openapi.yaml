@@ -7,50 +7,127 @@ info:
     email: info@healthmap.org
   license:
     name: MIT
+    url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
 paths:
-  "/api/cases/{id}":
-    summary: Line-list cases
+  /cases:
     get:
-      summary: Gets a specific case
+      summary: Lists cases
+      operationId: listCases
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: page
+          in: query
+          description: The pages of cases to skip before starting to collect the result set
+          required: false
           schema:
-            type: string
-            format: uuid
-          description: The case ID
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         "200":
-          description: Case found.
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    post:
+      summary: Creates a new case
+      operationId: createCase
+      requestBody:
+        description: Case to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "201":
+          description: Created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Case"
         "400":
-          description: Malformed request.
+          $ref: "#/components/responses/400"
         "401":
-          description: Unauthorized.
-        "404":
-          description: Case not found.
+          $ref: "#/components/responses/401"
         "422":
-          description: Unprocessable entity.
-      tags:
-        - reader
-        - curator
-        - admin
-tags:
-  - name: reader
-    description: An operation that can be executed by a reader.
-  - name: curator
-    description: An operation that can be executed by a curator.
-  - name: admin
-    description: An operation that can be executed by an admin.
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The case ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Gets a specific case
+      operationId: getCase
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     Case:
+      description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
+      allOf:
+        - $ref: "#/components/schemas/NewCase"
+        - type: object
+    CaseArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
+    NewCase:
+      description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
+  responses:
+    "400":
+      description: Malformed request
+    "401":
+      description: Unauthorized
+    "404":
+      description: Not found
+    "422":
+      description: Unprocessable entity
+    "500":
+      description: Internal server error
 servers:
-  - url: "http://localhost:3000"
-    description: Local server.
+  - url: http://localhost:3000/api
+    description: Local server

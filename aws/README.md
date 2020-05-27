@@ -101,3 +101,11 @@ To get a list of existing secrets, you can do `kubectl get secrets`.
 ### Namespaces
 
 For simplicity we are currently in the default namespace, it will be a good idea to move to a more specific namespace in the future if the cluster becomes more complex (with dev, preprod, prod envs for example).
+
+## Docker-hub
+
+Images used in deployments are pulled from docker hub where automated builds have been set-up.
+
+Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
+
+Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo.

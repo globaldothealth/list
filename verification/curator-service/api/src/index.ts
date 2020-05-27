@@ -1,10 +1,11 @@
-import * as sourcesController from './controllers/sources';
 import * as usersController from './controllers/users';
 
 import { Request, Response } from 'express';
 
 import { AuthController } from './controllers/auth';
+import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
+import SourcesController from './controllers/sources';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -74,25 +75,31 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
 
-// Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL);
+// Configure connection to AWS services.
+const awsEventsClient = new AwsEventsClient(env.AWS_SERVICE_REGION);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
+
+// Configure sources controller.
+const sourcesController = new SourcesController(awsEventsClient);
 apiRouter.get('/sources', sourcesController.list);
 apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
 apiRouter.post('/sources', sourcesController.create);
 apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 
-apiRouter.get('/users', usersController.list);
-apiRouter.put('/users/:id', usersController.updateRoles);
-
+// Configure cases controller proxying to data service.
+const casesController = new CasesController(env.DATASERVER_URL);
 apiRouter.get('/cases', casesController.list);
 apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
 apiRouter.post('/cases', casesController.create);
 apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
 apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
+
+// Configure users controller.
+apiRouter.get('/users', usersController.list);
+apiRouter.put('/users/:id', usersController.updateRoles);
 
 app.use('/api', apiRouter);
 
