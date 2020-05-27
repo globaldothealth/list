@@ -1,0 +1,1 @@
+db.users.updateOne({email: email}, {$set: {roles: roles}});
