@@ -82,6 +82,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: '^[a-f\d]{24}$'
     get:
       summary: Gets a specific case
       operationId: getCase
