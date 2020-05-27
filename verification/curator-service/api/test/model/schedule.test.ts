@@ -25,6 +25,24 @@ describe('validate', () => {
         });
     });
 
+    it('a schedule without an AWS schedule expression is invalid', async () => {
+        const missingExpression = { ...fullModel };
+        delete missingExpression.awsScheduleExpression;
+
+        return new Schedule(missingExpression).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('a schedule with a misformated AWS schedule expression is invalid', async () => {
+        const badSchedule = { ...fullModel };
+        badSchedule.awsScheduleExpression = 'rate(1 hour';
+
+        return new Schedule(badSchedule).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
     it('a fully specified schedule is valid', async () => {
         return new Schedule(fullModel).validate();
     });
