@@ -1,5 +1,6 @@
 {
     "schedule": {
-        "awsRuleArn": "arn:aws:events:region:id:rule/name"
+        "awsRuleArn": "arn:aws:events:region:id:rule/name",
+        "awsScheduleExpression": "cron(0 10 * * ? *)"
     }
 }
