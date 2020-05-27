@@ -16,7 +16,7 @@ describe('validate', () => {
         });
     });
 
-    it('a schedule with a misformated AWS rule ARN is invalid', async () => {
+    it('a schedule with a misformatted AWS rule ARN is invalid', async () => {
         const badArn = { ...fullModel };
         badArn.awsRuleArn = 'invalid:arn:aws:events:region:rule/field';
 
@@ -34,7 +34,7 @@ describe('validate', () => {
         });
     });
 
-    it('a schedule with a misformated AWS schedule expression is invalid', async () => {
+    it('a schedule with a misformatted AWS schedule expression is invalid', async () => {
         const badSchedule = { ...fullModel };
         badSchedule.awsScheduleExpression = 'rate(1 hour';
 
