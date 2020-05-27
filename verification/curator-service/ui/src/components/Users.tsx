@@ -33,13 +33,13 @@ const styles = () =>
             width: '100%',
         },
         headerCell: {
-            height: '50px',
+            height: '3.5em',
             textAlign: 'start',
             width: '50%',
         },
         cell: {
             fontWeight: 'normal',
-            height: '50px',
+            height: '3.5em',
             textAlign: 'start',
             width: '50%',
         },
@@ -69,24 +69,19 @@ class Users extends React.Component<Props, UsersState> {
             });
     }
 
-    updateRoles(event: React.ChangeEvent<{ value: unknown }>, updatedUser: User): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const response = axios.put(
-                this.state.url + updatedUser._id,
-                { roles: event.target.value },
-            );
-            response.then(() => {
-                let updatedUsers = this.state.users.slice();
-                (updatedUsers.find(
-                    (user: User) => user._id === updatedUser._id) as User)
-                    .roles = event.target.value as string[];
-                this.setState({ users: updatedUsers });
-                resolve();
-            }).catch((e) => {
-                reject(e);
-            });
+    updateRoles(event: React.ChangeEvent<{ value: string[] }>, updatedUser: User): void {
+        axios.put(
+            this.state.url + updatedUser._id,
+            { roles: event.target.value },
+        ).then(() => {
+            let updatedUsers = this.state.users.slice();
+            (updatedUsers.find(
+                (user: User) => user._id === updatedUser._id) as User)
+                .roles = event.target.value;
+            this.setState({ users: updatedUsers });
+        }).catch((e) => {
+            console.error(e);
         });
-
     }
 
     render(): JSX.Element {
@@ -109,7 +104,8 @@ class Users extends React.Component<Props, UsersState> {
                                         <Select
                                             multiple
                                             value={user.roles}
-                                            onChange={(event) => this.updateRoles(event, user)}
+                                            onChange={(event) =>
+                                                this.updateRoles(event as React.ChangeEvent<{ value: string[] }>, user)}
                                             renderValue={selected => (
                                                 <div>
                                                     {(selected as string[]).map(value => (
