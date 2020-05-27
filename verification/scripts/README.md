@@ -19,3 +19,6 @@ And verify the roles have been applied:
 mongo "mongodb://user:pass@some-connection-string/somedb" \
   --eval 'db.users.find({email: "some-email@foo.bar"})'
 ```
+
+NOTE: For localhost (during dev) the DB connection string is "mongodb://localhost:27017/covid19" but for the atlas DB you have to use a proper connection string as the data service or curator services are doing on AWS.
+You can go to the web atlas console and generate creds for you, they'll also show you the connection string to use those creds you just created.
