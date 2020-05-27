@@ -101,12 +101,14 @@ export default class SourcesController {
         try {
             const source = new Source(req.body);
             await source.validate();
-            // TODO: Support full schedule creation.
-            const createdRuleArn = await this.awsEventsClient.putRule(
-                `${source.name}_Rule`,
-                'rate(1 hour)',
-            );
-            source.set('automation.schedule.awsRuleArn', createdRuleArn);
+            if (source.automation?.schedule) {
+                // TODO: Support full schedule creation.
+                const createdRuleArn = await this.awsEventsClient.putRule(
+                    `${source.name}_Rule`,
+                    source.automation.schedule.awsScheduleExpression,
+                );
+                source.set('automation.schedule.awsRuleArn', createdRuleArn);
+            }
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
