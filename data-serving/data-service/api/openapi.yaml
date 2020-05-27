@@ -10,6 +10,44 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
 paths:
+  /cases:
+    get:
+      summary: Lists cases
+      parameters:
+        - name: page
+          in: query
+          description: The pages of cases to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
   /cases/{id}:
     parameters:
       - name: id
@@ -40,6 +78,10 @@ components:
   schemas:
     Case:
       type: object
+    CaseArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
   responses:
     "400":
       description: Malformed request
