@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 describe('Linelist table', function () {
     beforeEach(() => {
-        cy.task('clearDB', {});
+        cy.task('clearCasesDB', {});
         cy.login();
     });
 

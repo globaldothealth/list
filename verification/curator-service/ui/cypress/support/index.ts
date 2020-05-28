@@ -9,6 +9,6 @@ before(() => {
 
 // After all tests have run, seed database with initial data.
 after(() => {
-    cy.task('clearDB', {});
+    cy.task('clearCasesDB', {});
     cy.exec('npm run import-case-data');
 });
