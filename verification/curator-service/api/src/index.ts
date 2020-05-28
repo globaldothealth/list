@@ -83,10 +83,14 @@ const apiRouter = express.Router();
 
 // Configure sources controller.
 const sourcesController = new SourcesController(awsEventsClient);
-apiRouter.get('/sources', mustHaveAnyRole(['curator']), sourcesController.list);
+apiRouter.get(
+    '/sources',
+    mustHaveAnyRole(['reader', 'curator']),
+    sourcesController.list,
+);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['curator']),
+    mustHaveAnyRole(['reader', 'curator']),
     sourcesController.get,
 );
 apiRouter.post(

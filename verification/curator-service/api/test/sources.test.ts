@@ -33,11 +33,13 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
-beforeEach(() => {
-    return Source.deleteMany({});
+beforeEach(async () => {
+    await Source.deleteMany({});
+    await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
-afterEach(async () => {
+afterAll(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
 });
@@ -49,6 +51,12 @@ beforeEach(async () => {
         .post('/auth/register')
         .send({ ...baseUser, ...{ roles: ['curator'] } })
         .expect(200);
+});
+
+describe('unauthenticated access', () => {
+    it('should be denied', (done) => {
+        supertest.agent(app).get('/api/sources').expect(403, done);
+    });
 });
 
 describe('GET', () => {
