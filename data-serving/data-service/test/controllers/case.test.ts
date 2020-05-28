@@ -156,8 +156,7 @@ describe('DELETE', () => {
 
         return await request(app)
             .delete(`/api/cases/${c._id}`)
-            .expect('Content-Type', /json/)
-            .expect(200);
+            .expect(204);
     });
     it('delete absent item should return 404 NOT FOUND', () => {
         return request(app)
