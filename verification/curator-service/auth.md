@@ -24,7 +24,7 @@ Here are the permissions granted to each roles:
 - Curator
   - CRUD cases and ingestion sources
 - Reader
-  - Read-only access to cases
+  - Read-only access to cases and sources
 
 ## Unit-testing
 
