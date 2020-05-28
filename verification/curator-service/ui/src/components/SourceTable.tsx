@@ -1,10 +1,11 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
+
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
-import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 
 interface ListResponse {
     sources: Source[];
@@ -31,13 +32,14 @@ interface Parser {
 }
 
 interface Schedule {
-    awsRuleArn: string;
+    awsRuleArn?: string;
+    awsScheduleExpression: string;
 }
 
 interface Automation {
-    parser: Parser;
+    parser?: Parser;
     schedule: Schedule;
-    regexParsing: RegexParsing;
+    regexParsing?: RegexParsing;
 }
 
 interface Source {
@@ -59,6 +61,10 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+    // automation
+    // schedule
+    awsRuleArn?: string;
+    awsScheduleRateHours?: number;
 }
 
 // Return type isn't meaningful.
@@ -131,7 +137,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             ) {
                 return reject();
             }
-            const newSource = this.createSourceFromRowData(newRowData);
+            const newSource = this.updateSourceFromRowData(newRowData);
             this.setState({ error: '' });
             const response = axios.put(
                 this.state.url + oldRowData._id,
@@ -145,13 +151,51 @@ class SourceTable extends React.Component<Props, SourceTableState> {
     }
 
     createSourceFromRowData(rowData: TableRow): Source {
-        return {
+        const createdSource: Source = {
             _id: rowData._id,
             name: rowData.name,
             origin: {
                 url: rowData.url,
             },
         };
+        if (rowData.awsScheduleRateHours) {
+            const hoursString =
+                rowData.awsScheduleRateHours > 1 ? 'hours' : 'hour';
+            createdSource.automation = {
+                schedule: {
+                    awsScheduleExpression: `rate(${rowData.awsScheduleRateHours} ${hoursString})`,
+                },
+            };
+        }
+        return createdSource;
+    }
+
+    updateSourceFromRowData(rowData: TableRow): Source {
+        const updatedSource: Source = {
+            _id: rowData._id,
+            name: rowData.name,
+            origin: {
+                url: rowData.url,
+            },
+        };
+        // Both fields are required for a valid automation field in an update.
+        // This is validated elsewhere.
+        if (rowData.awsRuleArn && rowData.awsScheduleRateHours) {
+            updatedSource.automation = {
+                schedule: {
+                    awsRuleArn: rowData.awsRuleArn,
+                    awsScheduleExpression: this.scheduleExpressionFromHours(
+                        rowData.awsScheduleRateHours,
+                    ),
+                },
+            };
+        }
+        return updatedSource;
+    }
+
+    scheduleExpressionFromHours(numHours: number): string {
+        const hoursString = numHours > 1 ? 'hours' : 'hour';
+        return `rate(${numHours} ${hoursString})`;
     }
 
     validateRequired(field: string): boolean {
