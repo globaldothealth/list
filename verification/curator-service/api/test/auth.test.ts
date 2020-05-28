@@ -83,7 +83,7 @@ describe('mustHaveAnyRole', () => {
         localApp.use('/auth', authController.router);
         localApp.get(
             '/mustbeadmin',
-            mustHaveAnyRole(new Set(['admin'])),
+            mustHaveAnyRole(['admin']),
             (_req: Request, res: Response) => {
                 res.sendStatus(200);
             },

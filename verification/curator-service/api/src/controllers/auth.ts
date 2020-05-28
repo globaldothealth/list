@@ -21,12 +21,13 @@ export const mustBeAuthenticated = (
 };
 
 // mustHaveAnyRole is an express middleware that checks that the currently logged-in user has any of the given roles.
-export const mustHaveAnyRole = (requiredRoles: Set<string>) => {
+export const mustHaveAnyRole = (requiredRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {
+        const requiredSet = new Set(requiredRoles);
         if (
             req.isAuthenticated() &&
             (req.user as UserDocument).roles?.filter((r: string) =>
-                requiredRoles.has(r),
+                requiredSet.has(r),
             ).length > 0
         ) {
             next();
@@ -89,6 +90,7 @@ export class AuthController {
                     email: req.body.email,
                     // Necessary to pass mongoose validation.
                     googleID: 42,
+                    roles: req.body.roles,
                 });
                 req.login(user, (err: Error) => {
                     if (!err) {
