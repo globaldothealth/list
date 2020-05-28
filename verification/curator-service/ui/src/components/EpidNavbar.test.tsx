@@ -9,7 +9,9 @@ test('renders epid brand', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
+                <EpidNavbar
+                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
+                />
             </MemoryRouter>,
         );
     });
@@ -31,7 +33,9 @@ test('renders logout button when passed user information', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
+                <EpidNavbar
+                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
+                />
             </MemoryRouter>,
         );
     });
@@ -43,7 +47,9 @@ test('redirects to home on click', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
+                <EpidNavbar
+                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
+                />
             </MemoryRouter>,
         );
     });
