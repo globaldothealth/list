@@ -3,6 +3,7 @@ import * as core from 'express-serve-static-core';
 import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
 import { Request, Response } from 'express';
 
+import { User } from '../src/model/user';
 import app from '../src/index';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -26,6 +27,10 @@ beforeAll(() => {
 
 afterAll(() => {
     return mongoose.disconnect();
+});
+
+beforeEach(async () => {
+    await User.deleteMany({});
 });
 
 describe('auth', () => {

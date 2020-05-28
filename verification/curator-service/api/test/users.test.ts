@@ -1,14 +1,15 @@
+import * as baseUser from './users/base.json';
+
 import { User } from '../src/model/user';
 import app from '../src/index';
 import mongoose from 'mongoose';
-import request from 'supertest';
-const { MongoMemoryServer } = require('mongodb-memory-server');
+import supertest from 'supertest';
 
-beforeAll(async () => {
-    // Needs to create a new DB so it does not intefere with local logins
-    const uri = await (new MongoMemoryServer()).getConnectionString();
+beforeAll(() => {
     return mongoose.connect(
-        uri,
+        // This is provided by jest-mongodb.
+        // The `else testurl` is to appease Typescript.
+        process.env.MONGO_URL || 'testurl',
         {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -21,30 +22,32 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
-beforeEach(async () => {
+afterEach(async () => {
     await User.deleteMany({});
 });
 
 describe('GET', () => {
+    let adminRequest: any;
+    beforeEach(async () => {
+        adminRequest = supertest.agent(app);
+        await adminRequest
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200);
+    });
     it('list should return 200', async () => {
-        const user = await new User({
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            googleID: 'testGoogleID',
-            roles: ['curator', 'admin'],
-        }).save();
-        const res = await request(app)
+        const res = await adminRequest
             .get('/api/users')
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body.users).toHaveLength(1);
-        expect(res.body.users[0].googleID).toEqual(user.googleID);
+        expect(res.body.users[0].roles).toEqual(['admin']);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });
 
     it('list should paginate', async () => {
-        for (const i of Array.from(Array(15).keys())) {
+        for (const i of Array.from(Array(14).keys())) {
             await new User({
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
@@ -52,8 +55,8 @@ describe('GET', () => {
                 roles: ['reader'],
             }).save();
         }
-        // Fetch first page.
-        let res = await request(app)
+        // Fetch first page as an admin.
+        let res = await adminRequest
             .get('/api/users?page=1&limit=10')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -62,7 +65,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toEqual(2);
 
         // Fetch second page.
-        res = await request(app)
+        res = await adminRequest
             .get(`/api/users?page=${res.body.nextPage}&limit=10`)
             .expect(200)
             .expect('Content-Type', /json/);
@@ -72,7 +75,7 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
 
         // Fetch inexistant page.
-        res = await request(app)
+        res = await adminRequest
             .get('/api/users?page=42&limit=10')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -82,51 +85,54 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
 
-    it('rejects negative page param', (done) => {
-        request(app).get('/api/users?page=-7').expect(422, done);
+    it('rejects negative page param', async () => {
+        await adminRequest.get('/api/users?page=-7').expect(422);
     });
 
-    it('rejects negative limit param', (done) => {
-        request(app).get('/api/users?page=1&limit=-2').expect(422, done);
+    it('rejects negative limit param', async () => {
+        await adminRequest.get('/api/users?page=1&limit=-2').expect(422);
     });
 });
 
 describe('PUT', () => {
-    it("should update a user's roles", async () => {
-        const user = await new User({
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            googleID: `testGoogleID`,
-            roles: ['reader'],
-        }).save();
-        const res = await request(app)
-            .put(`/api/users/${user.id}`)
+    it('should update a user\'s roles', async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200, /admin/)
+            .expect('Content-Type', /json/);
+        const res = await request
+            .put(`/api/users/${userRes.body._id}`)
             .send({ roles: ['admin', 'curator'] })
-            .expect(200)
+            .expect(200, /curator/)
             .expect('Content-Type', /json/);
         // Check what changed.
         expect(res.body.roles).toEqual(['admin', 'curator']);
         // Check stuff that didn't change.
-        expect(res.body.email).toEqual('foo@bar.com');
+        expect(res.body.email).toEqual(userRes.body.email);
     });
-    it('cannot update an inexistent user', (done) => {
-        request(app)
-            .put('/api/users/424242424242424242424242')
-            .expect(404, done);
+    it('cannot update an inexistent user', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        await request.put('/api/users/424242424242424242424242').expect(404);
     });
-    it('should not update to an invalid user', async () => {
-        const user = await new User({
-            name: 'Alice Smith',
-            email: 'foo@bar.com',
-            googleID: `testGoogleID`,
-            roles: ['admin'],
-        }).save();
-        const res = await request(app)
-            .put(`/api/users/${user.id}`)
+    it('should not update to an invalid role', async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        const res = await request
+            .put(`/api/users/${userRes.body._id}`)
             .send({ roles: ['invalidRole'] })
             .expect(422);
         expect(res.body).toContain('Validation failed');
         expect(res.body).toContain('invalidRole');
     });
 });
-

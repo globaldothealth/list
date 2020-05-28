@@ -1,5 +1,6 @@
 import * as baseUser from './users/base.json';
 
+import { User } from '../src/model/user';
 import app from '../src/index';
 import axios from 'axios';
 import mongoose from 'mongoose';
@@ -27,6 +28,10 @@ beforeAll(() => {
 
 afterAll(() => {
     return mongoose.disconnect();
+});
+
+afterEach(async () => {
+    await User.deleteMany({});
 });
 
 const emptyAxiosResponse = {

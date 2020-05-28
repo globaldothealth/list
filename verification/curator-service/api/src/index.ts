@@ -89,8 +89,12 @@ apiRouter.post('/sources', sourcesController.create);
 apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
 apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 
-apiRouter.get('/users', usersController.list);
-apiRouter.put('/users/:id', usersController.updateRoles);
+apiRouter.get('/users', mustHaveAnyRole(['admin']), usersController.list);
+apiRouter.put(
+    '/users/:id',
+    mustHaveAnyRole(['admin']),
+    usersController.updateRoles,
+);
 
 apiRouter.get('/cases', mustHaveAnyRole(['reader']), casesController.list);
 apiRouter.get(
