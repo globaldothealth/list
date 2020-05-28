@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom/extend-expect';
 
-import SourceTable from './SourceTable';
-import React from 'react';
-import axios from 'axios';
 import { fireEvent, render } from '@testing-library/react';
+
+import React from 'react';
+import SourceTable from './SourceTable';
+import axios from 'axios';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -16,24 +17,26 @@ afterEach(() => {
 });
 
 it('loads and displays sources', async () => {
+    const sourceId = 'abc123';
+    const originUrl = 'origin url';
+    const awsRuleArn = 'arn:aws:events:a:b:rule/c';
+    const awsScheduleExpression = 'rate(2 hours)';
     const sources = [
         {
-            _id: 'abc123',
-            name: 'source name',
+            _id: sourceId,
+            name: 'source_name',
             format: 'format',
             origin: {
-                url: 'origin url',
+                url: originUrl,
                 license: 'origin license',
             },
             automation: {
                 parser: {
-                    awsLambdaArn: 'lambda arn',
+                    awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
                 },
                 schedule: {
-                    awsRuleArn: 'rule arn',
-                },
-                regexParsing: {
-                    fields: [{ name: 'field name', regex: 'field regexp' }],
+                    awsRuleArn: awsRuleArn,
+                    awsScheduleExpression: awsScheduleExpression,
                 },
             },
         },
@@ -52,12 +55,21 @@ it('loads and displays sources', async () => {
 
     const { findByText } = render(<SourceTable />);
 
+    // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
     );
-    const items = await findByText(/abc123/);
-    expect(items).toBeInTheDocument();
+
+    // Verify display content.
+    expect(await findByText(new RegExp(sourceId))).toBeInTheDocument();
+    expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
+    expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
+    expect(
+        await findByText(
+            new RegExp(awsScheduleExpression.replace(/(?=[()])/g, '\\')),
+        ),
+    ).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
@@ -65,7 +77,7 @@ it('API errors are displayed', async () => {
     const sources = [
         {
             _id: 'abc123',
-            name: 'source name',
+            name: 'source_name',
             format: 'format',
             origin: {
                 url: 'origin url',
@@ -73,10 +85,11 @@ it('API errors are displayed', async () => {
             },
             automation: {
                 parser: {
-                    awsLambdaArn: 'lambda arn',
+                    awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
                 },
                 schedule: {
-                    awsRuleArn: 'rule arn',
+                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                    awsScheduleExpression: 'rate(2 hours)',
                 },
             },
         },
@@ -112,7 +125,7 @@ it('can delete a row', async () => {
     const sources = [
         {
             _id: 'abc123',
-            name: 'source name',
+            name: 'source_name',
             format: 'format',
             origin: {
                 url: 'origin url',
@@ -120,13 +133,11 @@ it('can delete a row', async () => {
             },
             automation: {
                 parser: {
-                    awsLambdaArn: 'lambda arn',
+                    awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
                 },
                 schedule: {
-                    awsRuleArn: 'rule arn',
-                },
-                regexParsing: {
-                    fields: [{ name: 'field name', regex: 'field regexp' }],
+                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                    awsScheduleExpression: 'rate(2 hours)',
                 },
             },
         },
@@ -194,7 +205,7 @@ it('can add a row', async () => {
     const axiosGetResponse = {
         data: {
             sources: [],
-            total: 15,
+            total: 0,
         },
         status: 200,
         statusText: 'OK',
@@ -212,7 +223,7 @@ it('can add a row', async () => {
     // Add a row
     const newSource = {
         _id: 'abc123',
-        name: 'source name',
+        name: 'source_name',
         format: 'format',
         origin: {
             url: 'origin url',
@@ -220,10 +231,11 @@ it('can add a row', async () => {
         },
         automation: {
             parser: {
-                awsLambdaArn: 'lambda arn',
+                awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
             },
             schedule: {
-                awsRuleArn: 'rule arn',
+                awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                awsScheduleExpression: 'rate(2 hours)',
             },
         },
     };
@@ -239,7 +251,7 @@ it('can add a row', async () => {
     const axiosGetAfterAddResponse = {
         data: {
             sources: [newSource],
-            total: 15,
+            total: 1,
         },
         status: 200,
         statusText: 'OK',
@@ -265,7 +277,7 @@ it('can edit a row', async () => {
     const sources = [
         {
             _id: 'abc123',
-            name: 'source name',
+            name: 'source_name',
             format: 'format',
             origin: {
                 url: 'origin url',
@@ -306,7 +318,7 @@ it('can edit a row', async () => {
     const editedSources = [
         {
             _id: 'abc123',
-            name: 'source name',
+            name: 'source_name',
             format: 'format',
             origin: {
                 url: 'new origin url',
