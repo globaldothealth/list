@@ -19,6 +19,8 @@ services:
             - mongo
             - data
         environment:
+            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY"
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
             DATASERVER_URL: "http://data:3000"
             GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
