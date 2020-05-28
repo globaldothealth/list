@@ -95,7 +95,7 @@ describe('GET', () => {
 });
 
 describe('PUT', () => {
-    it('should update a user\'s roles', async () => {
+    it('should update roles', async () => {
         const request = supertest.agent(app);
         const userRes = await request
             .post('/auth/register')

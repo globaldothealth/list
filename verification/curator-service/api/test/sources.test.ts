@@ -1,7 +1,10 @@
+import * as baseUser from './users/base.json';
+
 import { Source } from '../src/model/source';
+import { User } from '../src/model/user';
 import app from '../src/index';
 import mongoose from 'mongoose';
-import request from 'supertest';
+import supertest from 'supertest';
 
 beforeAll(() => {
     return mongoose.connect(
@@ -24,13 +27,26 @@ beforeEach(() => {
     return Source.deleteMany({});
 });
 
+afterEach(async () => {
+    await User.deleteMany({});
+});
+
+let curatorRequest: any;
+beforeEach(async () => {
+    curatorRequest = supertest.agent(app);
+    await curatorRequest
+        .post('/auth/register')
+        .send({ ...baseUser, ...{ roles: ['curator'] } })
+        .expect(200);
+});
+
 describe('GET', () => {
     it('list should return 200', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await request(app)
+        const res = await curatorRequest
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -47,7 +63,7 @@ describe('GET', () => {
             }).save();
         }
         // Fetch first page.
-        let res = await request(app)
+        let res = await curatorRequest
             .get('/api/sources?page=1&limit=10')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -56,7 +72,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toEqual(2);
 
         // Fetch second page.
-        res = await request(app)
+        res = await curatorRequest
             .get(`/api/sources?page=${res.body.nextPage}&limit=10`)
             .expect(200)
             .expect('Content-Type', /json/);
@@ -66,7 +82,7 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
 
         // Fetch inexistant page.
-        res = await request(app)
+        res = await curatorRequest
             .get('/api/sources?page=42&limit=10')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -76,17 +92,17 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
     it('rejects negative page param', (done) => {
-        request(app).get('/api/sources?page=-7').expect(422, done);
+        curatorRequest.get('/api/sources?page=-7').expect(422, done);
     });
     it('rejects negative limit param', (done) => {
-        request(app).get('/api/sources?page=1&limit=-2').expect(422, done);
+        curatorRequest.get('/api/sources?page=1&limit=-2').expect(422, done);
     });
     it('one existing item should return 200', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await request(app)
+        const res = await curatorRequest
             .get(`/api/sources/${source.id}`)
             .expect(200)
             .expect('Content-Type', /json/);
@@ -100,7 +116,7 @@ describe('PUT', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await request(app)
+        const res = await curatorRequest
             .put(`/api/sources/${source.id}`)
             .send({ name: 'new name' })
             .expect(200)
@@ -111,7 +127,7 @@ describe('PUT', () => {
         expect(res.body.origin.url).toEqual('http://foo.bar');
     });
     it('cannot update an inexistent source', (done) => {
-        request(app)
+        curatorRequest
             .put('/api/sources/424242424242424242424242')
             .expect(404, done);
     });
@@ -120,7 +136,7 @@ describe('PUT', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await request(app)
+        const res = await curatorRequest
             .put(`/api/sources/${source.id}`)
             .send({ name: '' })
             .expect(422);
@@ -134,7 +150,7 @@ describe('POST', () => {
             name: 'some name',
             origin: { url: 'http://what.ever' },
         };
-        const res = await request(app)
+        const res = await curatorRequest
             .post('/api/sources')
             .send(source)
             .expect('Content-Type', /json/)
@@ -142,7 +158,7 @@ describe('POST', () => {
         expect(res.body.name).toEqual(source.name);
     });
     it('should not create invalid source', async () => {
-        const res = await request(app).post('/api/sources').expect(422);
+        const res = await curatorRequest.post('/api/sources').expect(422);
         expect(res.body).toMatch('Enter a name');
     });
 });
@@ -153,14 +169,14 @@ describe('DELETE', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await request(app)
+        const res = await curatorRequest
             .delete(`/api/sources/${source.id}`)
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body._id).toEqual(source.id);
     });
     it('should not be able to delete a non existent source', (done) => {
-        request(app)
+        curatorRequest
             .delete('/api/sources/424242424242424242424242')
             .expect(404, done);
     });
