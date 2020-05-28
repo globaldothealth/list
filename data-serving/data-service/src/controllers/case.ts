@@ -134,5 +134,5 @@ export const del = async (req: Request, res: Response): Promise<void> => {
         res.status(404).send(`Case with ID ${req.params.id} not found.`);
         return;
     }
-    res.json(c);
+    res.status(204).end();
 };

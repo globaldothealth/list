@@ -25,7 +25,7 @@ test('lists users', async () => {
             name: 'Bob Smith',
             email: 'foo2@bar.com',
             roles: ['curator'],
-        }
+        },
     ];
     const axiosResponse = {
         data: {
@@ -54,7 +54,7 @@ test('updates roles on selection', async () => {
             name: 'Alice Smith',
             email: 'foo@bar.com',
             roles: ['admin', 'reader'],
-        }
+        },
     ];
     const axiosResponse = {
         data: {
@@ -83,7 +83,7 @@ test('updates roles on selection', async () => {
             name: 'Alice Smith',
             email: 'foo@bar.com',
             roles: ['admin', 'reader', 'curator'],
-        }
+        },
     ];
     const axiosPutResponse = {
         data: {
@@ -102,7 +102,9 @@ test('updates roles on selection', async () => {
 
     // Check roles are updated
     expect(mockedAxios.put).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', { 'roles': ['admin', 'reader', 'curator'] });
+    expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', {
+        roles: ['admin', 'reader', 'curator'],
+    });
     expect(await findByText('Alice Smith')).toBeInTheDocument();
     expect(await findByText('admin')).toBeInTheDocument();
     expect(await findByText('reader')).toBeInTheDocument();
