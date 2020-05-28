@@ -6,11 +6,8 @@ declare global {
                 notes: string,
                 sourceUrl: string,
             ) => void;
-<<<<<<< HEAD
             login: () => void;
-=======
             addSource: (name: string, url: string) => void;
->>>>>>> master
         }
     }
 }
@@ -58,7 +55,7 @@ export function login(): void {
             name: 'superuser',
             email: 'superuser@test.com',
             roles: ['admin', 'curator', 'reader'],
-        }
+        },
     });
 }
 

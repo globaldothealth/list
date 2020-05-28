@@ -40,6 +40,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+    await Source.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
 });
