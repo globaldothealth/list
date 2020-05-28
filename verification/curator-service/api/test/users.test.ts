@@ -28,7 +28,7 @@ beforeEach(async () => {
     await Session.deleteMany({});
 });
 
-afterEach(async () => {
+afterAll(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
 });

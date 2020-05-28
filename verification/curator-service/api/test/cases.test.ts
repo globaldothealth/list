@@ -31,7 +31,12 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
-afterEach(async () => {
+beforeEach(async () => {
+    await User.deleteMany({});
+    await Session.deleteMany({});
+});
+
+afterAll(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
 });

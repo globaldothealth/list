@@ -29,7 +29,7 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
-beforeEach(async () => {
+afterEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
 });

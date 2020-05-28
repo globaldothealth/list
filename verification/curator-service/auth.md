@@ -28,7 +28,7 @@ Here are the permissions granted to each roles:
 
 ## Unit-testing
 
-Out "unit-tests" are more like integration tests really because `supertest` takes in an express app and we usually pass it our main app as defined in `index.ts`.
+Our "unit-tests" are more like integration tests really because `supertest` takes in an express app and we usually pass it our main app as defined in `index.ts`.
 That means the express HTTP handlers are protected with our authorization middleware and requests have to be properly authenticated.
 
 To that end we expose a `/auth/register` handler that accepts POST requests with a user in its body and will create that user in mongo, then set the proper cookies in the request that can then be used to query the other HTTP handlers.

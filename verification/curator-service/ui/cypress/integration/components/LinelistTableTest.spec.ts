@@ -2,15 +2,7 @@
 describe('Linelist table', function () {
     beforeEach(() => {
         cy.task('clearDB', {});
-        cy.request({
-            url: '/auth/register',
-            method: 'POST',
-            body: {
-                name: 'superuser',
-                email: 'superuser@test.com',
-                roles: ['admin', 'curator', 'reader'],
-            },
-        });
+        cy.login();
     });
 
     it('Can add a case', function () {
