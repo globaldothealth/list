@@ -214,7 +214,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         type="text"
                                         size="small"
                                         fullWidth
-                                        placeholder="URL"
+                                        placeholder="Name"
                                         error={
                                             !this.validateRequired(props.value)
                                         }
