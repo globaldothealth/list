@@ -2,6 +2,7 @@
   "extends": "../../../common/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist", /* Redirect output structure to the directory. */
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*",

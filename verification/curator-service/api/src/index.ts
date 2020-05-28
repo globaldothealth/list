@@ -1,9 +1,13 @@
 import * as sourcesController from './controllers/sources';
 import * as usersController from './controllers/users';
 
+import {
+    AuthController,
+    mustBeAuthenticated,
+    mustHaveAnyRole,
+} from './controllers/auth';
 import { Request, Response } from 'express';
 
-import { AuthController } from './controllers/auth';
 import CasesController from './controllers/cases';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -88,11 +92,23 @@ apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
 apiRouter.get('/users', usersController.list);
 apiRouter.put('/users/:id', usersController.updateRoles);
 
-apiRouter.get('/cases', casesController.list);
-apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
-apiRouter.post('/cases', casesController.create);
-apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
-apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
+apiRouter.get('/cases', mustHaveAnyRole(['reader']), casesController.list);
+apiRouter.get(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['reader']),
+    casesController.get,
+);
+apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
+apiRouter.put(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.update,
+);
+apiRouter.delete(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.del,
+);
 
 app.use('/api', apiRouter);
 
