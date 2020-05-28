@@ -43,7 +43,15 @@ const emptyAxiosResponse = {
 };
 
 describe('Cases', () => {
-    it('denies access to non readers/curators', async () => {
+    let curatorRequest: any;
+    beforeEach(async () => {
+        curatorRequest = supertest.agent(app);
+        await curatorRequest
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['reader', 'curator'] } })
+            .expect(200);
+    });
+    it('denies access to non readers', async () => {
         await supertest
             .agent(app)
             .get('/api/cases?limit=10&page=1&filter=')
@@ -52,12 +60,7 @@ describe('Cases', () => {
     });
     it('proxies list calls', async () => {
         mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['reader'] } })
-            .expect(200);
-        await request
+        await curatorRequest
             .get('/api/cases?limit=10&page=1&filter=')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -69,12 +72,7 @@ describe('Cases', () => {
 
     it('proxies get calls', async () => {
         mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['reader'] } })
-            .expect(200);
-        await request
+        await curatorRequest
             .get('/api/cases/5e99f21a1c9d440000ceb088')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -86,12 +84,7 @@ describe('Cases', () => {
 
     it('proxies update calls', async () => {
         mockedAxios.put.mockResolvedValueOnce(emptyAxiosResponse);
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['curator'] } })
-            .expect(200);
-        await request
+        await curatorRequest
             .put('/api/cases/5e99f21a1c9d440000ceb088')
             .send({ age: '42' })
             .expect(200)
@@ -107,12 +100,7 @@ describe('Cases', () => {
 
     it('proxies delete calls', async () => {
         mockedAxios.delete.mockResolvedValueOnce(emptyAxiosResponse);
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['curator'] } })
-            .expect(200);
-        await request
+        await curatorRequest
             .delete('/api/cases/5e99f21a1c9d440000ceb088')
             .expect(200)
             .expect('Content-Type', /json/);
@@ -124,12 +112,7 @@ describe('Cases', () => {
 
     it('proxies create calls', async () => {
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['curator'] } })
-            .expect(200);
-        await request
+        await curatorRequest
             .post('/api/cases')
             .send({ age: '42' })
             .expect(200)

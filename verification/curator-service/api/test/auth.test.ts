@@ -93,6 +93,13 @@ describe('mustHaveAnyRole', () => {
                 res.sendStatus(200);
             },
         );
+        localApp.get(
+            '/tworoles',
+            mustHaveAnyRole(['admin', 'curator']),
+            (_req: Request, res: Response) => {
+                res.sendStatus(200);
+            },
+        );
     });
     it('errors on unauthenticated request', (done) => {
         request(localApp).get('/mustbeadmin').expect(403, done);
@@ -120,6 +127,18 @@ describe('mustHaveAnyRole', () => {
             })
             .expect(200, /test-curator/);
         request.get('/mustbeadmin').expect(200);
+    });
+    it('passes with multiple roles specified', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-curator/);
+        request.get('/tworoles').expect(200);
     });
     it('errors when user has no roles', async () => {
         const request = supertest.agent(localApp);
