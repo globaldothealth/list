@@ -1,7 +1,8 @@
 import * as baseUser from './users/base.json';
 
+import { Session, User } from '../src/model/user';
+
 import { Source } from '../src/model/source';
-import { User } from '../src/model/user';
 import app from '../src/index';
 import mongoose from 'mongoose';
 import supertest from 'supertest';
@@ -38,6 +39,7 @@ beforeEach(() => {
 
 afterEach(async () => {
     await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
 let curatorRequest: any;

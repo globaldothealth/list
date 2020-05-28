@@ -1,6 +1,7 @@
 import * as baseUser from './users/base.json';
 
-import { User } from '../src/model/user';
+import { Session, User } from '../src/model/user';
+
 import app from '../src/index';
 import mongoose from 'mongoose';
 import supertest from 'supertest';
@@ -24,6 +25,7 @@ afterAll(() => {
 
 afterEach(async () => {
     await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
 describe('GET', () => {

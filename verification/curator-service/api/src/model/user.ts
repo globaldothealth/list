@@ -28,3 +28,8 @@ export type UserDocument = mongoose.Document & {
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
+
+export const Session = mongoose.model<mongoose.Document>(
+    'Session',
+    new mongoose.Schema({}),
+);

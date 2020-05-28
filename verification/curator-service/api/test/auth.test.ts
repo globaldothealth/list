@@ -2,8 +2,8 @@ import * as core from 'express-serve-static-core';
 
 import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
 import { Request, Response } from 'express';
+import { Session, User } from '../src/model/user';
 
-import { User } from '../src/model/user';
 import app from '../src/index';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -31,6 +31,7 @@ afterAll(() => {
 
 beforeEach(async () => {
     await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
 describe('auth', () => {
