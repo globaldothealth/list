@@ -64,7 +64,7 @@ interface TableRow {
     // automation
     // schedule
     awsRuleArn?: string;
-    awsScheduleRateHours?: number;
+    awsScheduleExpression?: string;
 }
 
 // Return type isn't meaningful.
@@ -94,7 +94,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             if (
                 !(
                     this.validateRequired(rowData.name) &&
-                    this.validateRequired(rowData.url)
+                    this.validateRequired(rowData.url) &&
+                    this.validateAutomationFields(rowData)
                 )
             ) {
                 return reject();
@@ -132,7 +133,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             if (
                 !(
                     this.validateRequired(newRowData.name) &&
-                    this.validateRequired(newRowData.url)
+                    this.validateRequired(newRowData.url) &&
+                    this.validateAutomationFields(newRowData)
                 )
             ) {
                 return reject();
@@ -151,54 +153,48 @@ class SourceTable extends React.Component<Props, SourceTableState> {
     }
 
     createSourceFromRowData(rowData: TableRow): Source {
-        const createdSource: Source = {
+        return {
             _id: rowData._id,
             name: rowData.name,
             origin: {
                 url: rowData.url,
             },
+            automation: rowData.awsScheduleExpression
+                ? {
+                      schedule: {
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
+                : undefined,
         };
-        if (rowData.awsScheduleRateHours) {
-            const hoursString =
-                rowData.awsScheduleRateHours > 1 ? 'hours' : 'hour';
-            createdSource.automation = {
-                schedule: {
-                    awsScheduleExpression: `rate(${rowData.awsScheduleRateHours} ${hoursString})`,
-                },
-            };
-        }
-        return createdSource;
     }
 
     updateSourceFromRowData(rowData: TableRow): Source {
-        const updatedSource: Source = {
+        return {
             _id: rowData._id,
             name: rowData.name,
             origin: {
                 url: rowData.url,
             },
+            automation: rowData.awsScheduleExpression
+                ? {
+                      schedule: {
+                          awsRuleArn: rowData.awsRuleArn,
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
+                : undefined,
         };
-        // Both fields are required for a valid automation field in an update.
-        // This is validated elsewhere.
-        if (rowData.awsRuleArn && rowData.awsScheduleRateHours) {
-            updatedSource.automation = {
-                schedule: {
-                    awsRuleArn: rowData.awsRuleArn,
-                    awsScheduleExpression: this.scheduleExpressionFromHours(
-                        rowData.awsScheduleRateHours,
-                    ),
-                },
-            };
-        }
-        return updatedSource;
     }
 
-    scheduleExpressionFromHours(numHours: number): string {
-        const hoursString = numHours > 1 ? 'hours' : 'hour';
-        return `rate(${numHours} ${hoursString})`;
+    validateAutomationFields(rowData: TableRow): boolean {
+        return (
+            !rowData.awsRuleArn ||
+            this.validateRequired(rowData.awsScheduleExpression)
+        );
     }
 
-    validateRequired(field: string): boolean {
+    validateRequired(field: string | undefined): boolean {
         return field?.trim() !== '';
     }
 
@@ -258,6 +254,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     />
                                 ),
                             },
+                            {
+                                title: 'AWS Schedule Expression',
+                                field: 'awsScheduleExpression',
+                            },
+                            {
+                                title: 'AWS Rule ARN',
+                                field: 'awsRuleArn',
+                                editable: 'never',
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -277,6 +282,12 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 _id: s._id,
                                                 name: s.name,
                                                 url: s.origin.url,
+                                                awsRuleArn:
+                                                    s.automation?.schedule
+                                                        ?.awsRuleArn,
+                                                awsScheduleExpression:
+                                                    s.automation?.schedule
+                                                        ?.awsScheduleExpression,
                                             });
                                         }
                                         resolve({
