@@ -107,10 +107,14 @@ apiRouter.delete(
 
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL);
-apiRouter.get('/cases', mustHaveAnyRole(['reader']), casesController.list);
+apiRouter.get(
+    '/cases',
+    mustHaveAnyRole(['reader', 'curator']),
+    casesController.list,
+);
 apiRouter.get(
     '/cases/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['reader']),
+    mustHaveAnyRole(['reader', 'curator']),
     casesController.get,
 );
 apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
