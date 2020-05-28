@@ -113,12 +113,13 @@ export class AuthController {
             // Find the user based on its id in the cookie.
             User.findById(id)
                 .then((user) => {
-                    if (user) {
-                        done(null, user);
-                    } else {
-                        console.error('User not fetched');
-                        done(new Error('User could not be found'), undefined);
-                    }
+                    // Invalidate session when user cannot be found.
+                    // This means an cookie pointing to an invalid user was sent to us.
+                    // Cf. https://github.com/jaredhanson/passport/issues/6#issuecomment-4857287
+                    // This doesn't work however for now as per, if you hit this bug, you have to manually clear the cookies.
+                    // Cf https://github.com/jaredhanson/passport/issues/776
+                    done(null, user || undefined);
+                    return;
                 })
                 .catch((e) => {
                     console.error('Failed to get user:', e);
