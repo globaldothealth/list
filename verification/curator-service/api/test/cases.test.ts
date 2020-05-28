@@ -1,6 +1,7 @@
 import * as baseUser from './users/base.json';
 
-import { User } from '../src/model/user';
+import { Session, User } from '../src/model/user';
+
 import app from '../src/index';
 import axios from 'axios';
 import mongoose from 'mongoose';
@@ -32,6 +33,7 @@ afterAll(() => {
 
 afterEach(async () => {
     await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
 const emptyAxiosResponse = {
