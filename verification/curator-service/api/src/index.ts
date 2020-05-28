@@ -83,11 +83,27 @@ const casesController = new CasesController(env.DATASERVER_URL);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
-apiRouter.get('/sources', sourcesController.list);
-apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
-apiRouter.post('/sources', sourcesController.create);
-apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
-apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
+apiRouter.get('/sources', mustHaveAnyRole(['curator']), sourcesController.list);
+apiRouter.get(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.get,
+);
+apiRouter.post(
+    '/sources',
+    mustHaveAnyRole(['curator']),
+    sourcesController.create,
+);
+apiRouter.put(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.update,
+);
+apiRouter.delete(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.del,
+);
 
 apiRouter.get('/users', mustHaveAnyRole(['admin']), usersController.list);
 apiRouter.put(
