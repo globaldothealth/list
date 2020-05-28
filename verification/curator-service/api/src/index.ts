@@ -1,14 +1,11 @@
-import * as sourcesController from './controllers/sources';
 import * as usersController from './controllers/users';
 
-import {
-    AuthController,
-    mustBeAuthenticated,
-    mustHaveAnyRole,
-} from './controllers/auth';
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
 
+import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
+import SourcesController from './controllers/sources';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -78,11 +75,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
 
-// Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL);
+// Configure connection to AWS services.
+const awsEventsClient = new AwsEventsClient(env.AWS_SERVICE_REGION);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
+
+// Configure sources controller.
+const sourcesController = new SourcesController(awsEventsClient);
 apiRouter.get('/sources', mustHaveAnyRole(['curator']), sourcesController.list);
 apiRouter.get(
     '/sources/:id([a-z0-9]{24})',
@@ -105,13 +105,8 @@ apiRouter.delete(
     sourcesController.del,
 );
 
-apiRouter.get('/users', mustHaveAnyRole(['admin']), usersController.list);
-apiRouter.put(
-    '/users/:id',
-    mustHaveAnyRole(['admin']),
-    usersController.updateRoles,
-);
-
+// Configure cases controller proxying to data service.
+const casesController = new CasesController(env.DATASERVER_URL);
 apiRouter.get('/cases', mustHaveAnyRole(['reader']), casesController.list);
 apiRouter.get(
     '/cases/:id([a-z0-9]{24})',
@@ -129,6 +124,10 @@ apiRouter.delete(
     mustHaveAnyRole(['curator']),
     casesController.del,
 );
+
+// Configure users controller.
+apiRouter.get('/users', usersController.list);
+apiRouter.put('/users/:id', usersController.updateRoles);
 
 app.use('/api', apiRouter);
 

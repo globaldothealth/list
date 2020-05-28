@@ -16,11 +16,29 @@ describe('validate', () => {
         });
     });
 
-    it('a schedule with a misformated AWS rule ARN is invalid', async () => {
+    it('a schedule with a misformatted AWS rule ARN is invalid', async () => {
         const badArn = { ...fullModel };
         badArn.awsRuleArn = 'invalid:arn:aws:events:region:rule/field';
 
         return new Schedule(badArn).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('a schedule without an AWS schedule expression is invalid', async () => {
+        const missingExpression = { ...fullModel };
+        delete missingExpression.awsScheduleExpression;
+
+        return new Schedule(missingExpression).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
+    it('a schedule with a misformatted AWS schedule expression is invalid', async () => {
+        const badSchedule = { ...fullModel };
+        badSchedule.awsScheduleExpression = 'rate(1 hour';
+
+        return new Schedule(badSchedule).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
