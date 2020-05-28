@@ -6,17 +6,18 @@ const url = 'mongodb://localhost:27017/';
 module.exports = (on: any, config: any) => {
     on('task', {
         clearDB() {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 MongoClient.connect(
                     url,
                     { useUnifiedTopology: true },
-                    function (error, db) {
-                        if (error) throw error;
+                    async (error, db) => {
+                        if (error) reject(error);
                         const covid19db = db.db('covid19');
-                        covid19db.collection('cases').deleteMany({});
+                        await covid19db.collection('cases').deleteMany({});
+                        db.close();
+                        resolve(null);
                     },
                 );
-                resolve(null);
             });
         },
     });
