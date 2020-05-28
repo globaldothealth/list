@@ -18,13 +18,14 @@ afterEach(() => {
 
 it('loads and displays sources', async () => {
     const sourceId = 'abc123';
+    const sourceName = 'source_name';
     const originUrl = 'origin url';
     const awsRuleArn = 'arn:aws:events:a:b:rule/c';
     const awsScheduleExpression = 'rate(2 hours)';
     const sources = [
         {
             _id: sourceId,
-            name: 'source_name',
+            name: sourceName,
             format: 'format',
             origin: {
                 url: originUrl,
@@ -63,6 +64,7 @@ it('loads and displays sources', async () => {
 
     // Verify display content.
     expect(await findByText(new RegExp(sourceId))).toBeInTheDocument();
+    expect(await findByText(new RegExp(sourceName))).toBeInTheDocument();
     expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
     expect(
