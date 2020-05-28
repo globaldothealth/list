@@ -2,18 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: data
+  name: data-dev
   labels:
     environment: dev
     app: data
 spec:
   selector:
     matchLabels:
+      environment: dev
       app: data
   replicas: 1
   template:
     metadata:
       labels:
+        environment: dev
         app: data
     spec:
       containers:
@@ -25,7 +27,45 @@ spec:
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: data-878ckgc42b
+                  name: data-dev-ddhhd4mmhf
+                  key: db_connection_string
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-prod
+  labels:
+    environment: prod
+    app: data
+spec:
+  selector:
+    matchLabels:
+      environment: prod
+      app: data
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        environment: prod
+        app: data
+    spec:
+      containers:
+        - name: data
+          image: docker.io/healthmapidha/dataservice:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: data-prod-84t6gt4hhc
                   key: db_connection_string
           resources:
             requests:
@@ -38,10 +78,24 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: data
+  name: data-dev
 spec:
   selector:
     app: data
+    environment: dev
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-prod
+spec:
+  selector:
+    app: data
+    environment: prod
   ports:
     - protocol: TCP
       port: 80

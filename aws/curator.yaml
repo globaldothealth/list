@@ -2,18 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: curator
+  name: curator-dev
   labels:
     environment: dev
     app: curator
 spec:
   selector:
     matchLabels:
+      environment: dev
       app: curator
   replicas: 1
   template:
     metadata:
       labels:
+        environment: dev
         app: curator
     spec:
       containers:
@@ -23,27 +25,102 @@ spec:
             - containerPort: 3001
           env:
             - name: DATASERVER_URL
-              value: "http://data"
+              value: "http://data-dev"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-kkhd8mbt65
+                  name: curator-dev-287t4897k8
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-kkhd8mbt65
+                  name: curator-dev-287t4897k8
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-kkhd8mbt65
+                  name: curator-dev-287t4897k8
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-kkhd8mbt65
+                  name: curator-dev-287t4897k8
                   key: google_oauth_client_id
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-287t4897k8
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-287t4897k8
+                  key: aws_secret_access_key
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curator-prod
+  labels:
+    environment: prod
+    app: curator
+spec:
+  selector:
+    matchLabels:
+      environment: prod
+      app: curator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        environment: prod
+        app: curator
+    spec:
+      containers:
+        - name: curator
+          image: docker.io/healthmapidha/curatorservice:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: DATASERVER_URL
+              value: "http://data-prod"
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: db_connection_string
+            - name: SESSION_COOKIE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: session_cookie_key
+            - name: GOOGLE_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: google_oauth_client_secret
+            - name: GOOGLE_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: google_oauth_client_id
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-ktf295kbg4
+                  key: aws_secret_access_key
           resources:
             requests:
               memory: "256Mi"
@@ -55,10 +132,24 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: curator
+  name: curator-dev
 spec:
   selector:
     app: curator
+    environment: dev
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: curator-prod
+spec:
+  selector:
+    app: curator
+    environment: dev
   ports:
     - protocol: TCP
       port: 80
