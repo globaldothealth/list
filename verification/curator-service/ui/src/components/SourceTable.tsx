@@ -156,7 +156,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      * Creates a source from the provided table row data.
      *
      * For new sources, an AWS rule ARN won't be defined (instead, it's created
-     * by the server upon receiveing the create request). A schedule expression
+     * by the server upon receiving the create request). A schedule expression
      * may be supplied, and indicates the intent to create a corresponding AWS
      * scheduled event rule to automate source ingestion.
      */
