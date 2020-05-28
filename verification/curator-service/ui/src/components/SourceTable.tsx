@@ -152,6 +152,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         });
     }
 
+    /**
+     * Creates a source from the provided table row data.
+     *
+     * For new sources, an AWS rule ARN won't be defined (instead, it's created
+     * by the server upon receiveing the create request). A schedule expression
+     * may be supplied, and indicates the intent to create a corresponding AWS
+     * scheduled event rule to automate source ingestion.
+     */
     createSourceFromRowData(rowData: TableRow): Source {
         return {
             _id: rowData._id,
@@ -161,14 +169,20 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                      schedule: {
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
+                    schedule: {
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
                 : undefined,
         };
     }
 
+    /**
+     * Updates a source from the provided table row data.
+     *
+     * Unlike for creation, an AWS rule ARN may be supplied alongside a
+     * schedule expression.
+     */
     updateSourceFromRowData(rowData: TableRow): Source {
         return {
             _id: rowData._id,
@@ -178,15 +192,22 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                      schedule: {
-                          awsRuleArn: rowData.awsRuleArn,
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
+                    schedule: {
+                        awsRuleArn: rowData.awsRuleArn,
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
                 : undefined,
         };
     }
 
+    /**
+     * Validates fields comprising the source.automation object.
+     *
+     * Rule ARN isn't necessarily present, because it isn't supplied in create
+     * requests. It might be present for updates, and if so, the schedule
+     * expression field must be present.
+     */
     validateAutomationFields(rowData: TableRow): boolean {
         return (
             !rowData.awsRuleArn ||
