@@ -88,11 +88,30 @@ paths:
       operationId: getCase
       responses:
         "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Case"
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      summary: Updates a specific case
+      operationId: updateCase
+      requestBody:
+        description: Case to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Case"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -132,6 +151,12 @@ components:
       description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
   responses:
+    "200Case":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
     "400":
       description: Malformed request
     "401":
