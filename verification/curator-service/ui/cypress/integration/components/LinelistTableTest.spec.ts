@@ -2,7 +2,16 @@
 describe('Linelist table', function () {
     beforeEach(() => {
         cy.task('clearDB', {});
-    })
+        cy.request({
+            url: '/auth/register',
+            method: 'POST',
+            body: {
+                name: 'superuser',
+                email: 'superuser@test.com',
+                roles: ['admin', 'curator', 'reader'],
+            },
+        });
+    });
 
     it('Can add a case', function () {
         cy.visit('/cases');
@@ -17,7 +26,7 @@ describe('Linelist table', function () {
         cy.get('button[title="Save"]').click();
 
         cy.contains('test notes');
-    })
+    });
 
     it('Can edit a case', function () {
         cy.addCase('France', 'some notes', 'www.example.com');
@@ -30,7 +39,7 @@ describe('Linelist table', function () {
 
         cy.contains('some notes').should('not.exist');
         cy.contains('edited notes');
-    })
+    });
 
     it('Can delete a case', function () {
         cy.addCase('France', 'some notes', 'www.example.com');
@@ -41,5 +50,5 @@ describe('Linelist table', function () {
         cy.get('button[title="Save"]').click();
 
         cy.contains('some notes').should('not.exist');
-    })
-}) 
+    });
+});
