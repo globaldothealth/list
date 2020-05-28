@@ -23,6 +23,11 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
+beforeEach(async () => {
+    await User.deleteMany({});
+    await Session.deleteMany({});
+});
+
 afterEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
