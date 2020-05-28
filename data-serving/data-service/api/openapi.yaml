@@ -36,11 +36,7 @@ paths:
             default: 10
       responses:
         "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaseArray"
+          $ref: "#/components/responses/200CaseArray"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -61,11 +57,7 @@ paths:
               $ref: "#/components/schemas/NewCase"
       responses:
         "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Case"
+          $ref: "#/components/responses/201Case"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -153,6 +145,18 @@ components:
   responses:
     "200Case":
       description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
+    "200CaseArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseArray"
+    "201Case":
+      description: Created
       content:
         application/json:
           schema:
