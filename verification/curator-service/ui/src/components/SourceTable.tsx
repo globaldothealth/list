@@ -61,8 +61,7 @@ interface TableRow {
     name: string;
     // origin
     url: string;
-    // automation
-    // schedule
+    // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
 }
