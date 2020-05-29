@@ -6,10 +6,12 @@ This directory contains the configuration files for the production infrastructur
 
 Install `eksctl` and `kubectl` to interact with Amazon EKS and the Kubernetes control plane.
 
-To configure kubectl to talk to the epid cluster, do:
+You can learn more about `eksctl` [here](https://eksctl.io/).
 
-```
-aws eks --region us-east-1 update-kubeconfig --name epid
+To configure kubectl to talk to the healthmapidha cluster, do:
+
+```shell
+aws eks --region us-east-1 update-kubeconfig --name healthmapidha
 ```
 
 ## Kubernetes setup
@@ -21,37 +23,41 @@ You can also list them with `eksctl get cluster`.
 The cluster was originally created with the command:
 
 ```shell
-eksctl create cluster --name=epid --region=us-east-1 --fargate --version=1.16
+eksctl create cluster --name=healthmapidha --region=us-east-1 --fargate --version=1.16
 ```
 
 The basic deployment/pods/services configuration looks like:
 
 ```
 kubectl get deployments
-NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-curator   2/2     2            2           79m
-data      2/2     2            2           117m
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+curator-dev    1/1     1            1           19h
+curator-prod   1/1     1            1           19h
+data-dev       1/1     1            1           19h
+data-prod      1/1     1            1           19h
 
 kubectl get pods
-NAME                       READY   STATUS    RESTARTS   AGE
-curator-58969b66f4-f6cps   1/1     Running   0          18m
-curator-58969b66f4-vhtqz   1/1     Running   0          14m
-data-6d699fcbcc-jbg4j      1/1     Running   0          102m
-data-6d699fcbcc-tc2fm      1/1     Running   0          26m
+NAME                           READY   STATUS    RESTARTS   AGE
+curator-dev-69d6f94954-qrc2v   1/1     Running   0          14m
+curator-prod-dfb49646-qz5zp    1/1     Running   0          14m
+data-dev-6f686ffdb6-jt6tl      1/1     Running   0          14m
+data-prod-bd57576d8-p8wp4      1/1     Running   0          14m
 
 kubectl get services
-NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-curator      ClusterIP   10.100.15.14    <none>        80/TCP     40m
-data         ClusterIP   10.100.105.54   <none>        80/TCP     21m
-kubernetes   ClusterIP   10.100.0.1      <none>        443/TCP    86m
+NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+curator-dev    ClusterIP   10.100.116.43    <none>        80/TCP    19h
+curator-prod   ClusterIP   10.100.66.95     <none>        80/TCP    19h
+data-dev       ClusterIP   10.100.108.137   <none>        80/TCP    19h
+data-prod      ClusterIP   10.100.71.150    <none>        80/TCP    19h
+kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   20h
 ```
 
 
-We use a deployment file for the data-service and for the curator-service, check out data.yaml and TODO:curator.yaml.
+We use a deployment file for the data-service and for the curator-service, check out data.yaml and curator.yaml.
 
 To update the deployments use:
 
-```
+```shell
 kubectl apply -f data.yaml -f curator.yaml
 ```
 
@@ -83,24 +89,39 @@ Deployments require secrets to connect to MongoDB for example or set up OAuth, w
 
 When you want to generate a new secret, follow the [official instructions](https://kubernetes.io/docs/concepts/configuration/secret/) using a kustomization.yaml file that looks like this:
 
-```
+```yaml
 secretGenerator:
-  - name: data
+  - name: data-dev
     literals:
       - some_secret_for_data=foo
-  - name: curator
+  - name: curator-dev
     literals:
       - some_secret_for_curator=bar
+      - another_secret_for_curator=baz
+  - name: data-prod
+    literals:
+      - some_secret_for_data=foo
+  - name: curator-prod
+    literals:
+      - some_secret_for_curator=foo
       - another_secret_for_curator=baz
 ```
 
 Apply with `kubectl apply -k .`.
 
+If you generated a new secret, you need to set it in the appropriate deployment files.
+
 To get a list of existing secrets, you can do `kubectl get secrets`.
 
-### Namespaces
+## Labels
 
-For simplicity we are currently in the default namespace, it will be a good idea to move to a more specific namespace in the future if the cluster becomes more complex (with dev, preprod, prod envs for example).
+We use labels to differentiate between prod and dev instances of the containers.
+
+Curator service has the labels `app=curator` and `environment=prod|dev`.
+
+Data service has the labels `app=data` and `environment=prod|dev`.
+
+Services exposed contain the environment in their names to avoid mistakenly taking to a different service, for example use `http://data-dev` to talk to dev data service and `http://data-prod` to talk to the prod data service.
 
 ## Docker-hub
 
@@ -108,4 +129,42 @@ Images used in deployments are pulled from docker hub where automated builds hav
 
 Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
 
-Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo.
+Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo. More specialized tags are described below.
+
+## Releases
+
+We follow [semantic versioning](https://semver.org/) which is basically:
+
+    Given a version number MAJOR.MINOR.PATCH, increment the:
+
+    MAJOR version when you make incompatible API changes,
+    MINOR version when you add functionality in a backwards compatible manner, and
+    PATCH version when you make backwards compatible bug fixes.
+
+Docker-hub has automated builds setup that extract the semantic version from tags in the master branch.
+
+To push a new release of the curator service:
+
+Tag master with the `curator-0.1.2` tag:
+
+`git tag curator-0.1.2`
+
+the push it to the repo:
+
+`git push origin curator-0.1.2`
+
+Docker hub will automatically build the image: `docker.io/healthmapidha/curatorservice:0.1.2`.
+
+This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
+
+To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
+
+You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/open-covid-data/healthmap-gdo-temp/releases).
+
+### Rollback
+
+Just change the image tag referenced in the deployment file to an earlier version and apply the change.
+
+### Deleting a release
+
+If for some reason you need to delete a tag, you can do it with `git tag -d curator-1.2.3` then `git push origin :refs/tags/curator-0.1.2` to delete it remotely.
