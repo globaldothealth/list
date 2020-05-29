@@ -2,7 +2,7 @@
 
 ## Authentication
 
-Users are currently authenticated using passport.JS's Google OAuth strategy.
+Users are currently authenticated using [passport.js's Google OAuth strategy](http://www.passportjs.org/packages/passport-google-oauth20/).
 
 ## Authorization
 
