@@ -2,6 +2,7 @@
 describe('Linelist table', function () {
     beforeEach(() => {
         cy.task('clearCasesDB', {});
+        cy.login();
     });
 
     it('Can add a case', function () {

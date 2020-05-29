@@ -2,6 +2,7 @@
 describe('Sources table', function () {
     beforeEach(() => {
         cy.task('clearSourcesDB', {});
+        cy.login();
     });
 
     it('Can add a source', function () {
