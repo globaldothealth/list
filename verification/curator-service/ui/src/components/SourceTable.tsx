@@ -1,10 +1,11 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
+
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
-import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 
 interface ListResponse {
     sources: Source[];
@@ -31,13 +32,14 @@ interface Parser {
 }
 
 interface Schedule {
-    awsRuleArn: string;
+    awsRuleArn?: string;
+    awsScheduleExpression: string;
 }
 
 interface Automation {
-    parser: Parser;
+    parser?: Parser;
     schedule: Schedule;
-    regexParsing: RegexParsing;
+    regexParsing?: RegexParsing;
 }
 
 interface Source {
@@ -59,6 +61,9 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+    // automation.schedule
+    awsRuleArn?: string;
+    awsScheduleExpression?: string;
 }
 
 // Return type isn't meaningful.
@@ -88,7 +93,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             if (
                 !(
                     this.validateRequired(rowData.name) &&
-                    this.validateRequired(rowData.url)
+                    this.validateRequired(rowData.url) &&
+                    this.validateAutomationFields(rowData)
                 )
             ) {
                 return reject();
@@ -126,12 +132,13 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             if (
                 !(
                     this.validateRequired(newRowData.name) &&
-                    this.validateRequired(newRowData.url)
+                    this.validateRequired(newRowData.url) &&
+                    this.validateAutomationFields(newRowData)
                 )
             ) {
                 return reject();
             }
-            const newSource = this.createSourceFromRowData(newRowData);
+            const newSource = this.updateSourceFromRowData(newRowData);
             this.setState({ error: '' });
             const response = axios.put(
                 this.state.url + oldRowData._id,
@@ -144,6 +151,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         });
     }
 
+    /**
+     * Creates a source from the provided table row data.
+     *
+     * For new sources, an AWS rule ARN won't be defined (instead, it's created
+     * by the server upon receiving the create request). A schedule expression
+     * may be supplied, and indicates the intent to create a corresponding AWS
+     * scheduled event rule to automate source ingestion.
+     */
     createSourceFromRowData(rowData: TableRow): Source {
         return {
             _id: rowData._id,
@@ -151,10 +166,55 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
+            automation: rowData.awsScheduleExpression
+                ? {
+                    schedule: {
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
+                : undefined,
         };
     }
 
-    validateRequired(field: string): boolean {
+    /**
+     * Updates a source from the provided table row data.
+     *
+     * Unlike for creation, an AWS rule ARN may be supplied alongside a
+     * schedule expression.
+     */
+    updateSourceFromRowData(rowData: TableRow): Source {
+        return {
+            _id: rowData._id,
+            name: rowData.name,
+            origin: {
+                url: rowData.url,
+            },
+            automation: rowData.awsScheduleExpression
+                ? {
+                    schedule: {
+                        awsRuleArn: rowData.awsRuleArn,
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
+                : undefined,
+        };
+    }
+
+    /**
+     * Validates fields comprising the source.automation object.
+     *
+     * Rule ARN isn't necessarily present, because it isn't supplied in create
+     * requests. It might be present for updates, and if so, the schedule
+     * expression field must be present.
+     */
+    validateAutomationFields(rowData: TableRow): boolean {
+        return (
+            !rowData.awsRuleArn ||
+            this.validateRequired(rowData.awsScheduleExpression)
+        );
+    }
+
+    validateRequired(field: string | undefined): boolean {
         return field?.trim() !== '';
     }
 
@@ -214,6 +274,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     />
                                 ),
                             },
+                            {
+                                title: 'AWS Schedule Expression',
+                                field: 'awsScheduleExpression',
+                            },
+                            {
+                                title: 'AWS Rule ARN',
+                                field: 'awsRuleArn',
+                                editable: 'never',
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -233,6 +302,12 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 _id: s._id,
                                                 name: s.name,
                                                 url: s.origin.url,
+                                                awsRuleArn:
+                                                    s.automation?.schedule
+                                                        ?.awsRuleArn,
+                                                awsScheduleExpression:
+                                                    s.automation?.schedule
+                                                        ?.awsScheduleExpression,
                                             });
                                         }
                                         resolve({
