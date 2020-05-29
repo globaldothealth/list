@@ -107,8 +107,9 @@ class Home extends React.Component<HomeProps, {}> {
     render(): JSX.Element {
         return (
             <div>
-                {!this.props.user.email && <div>Login to access Epid</div>}
-                {this.props.user.email && (
+                {!this.props.user.email ? (
+                    <div>Login to access Epid</div>
+                ) : (
                     <nav>
                         {this.hasAnyRole(['curator', 'reader']) && (
                             <div>
