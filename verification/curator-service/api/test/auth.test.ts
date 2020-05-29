@@ -2,6 +2,7 @@ import * as core from 'express-serve-static-core';
 
 import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
 import { Request, Response } from 'express';
+import { Session, User } from '../src/model/user';
 
 import app from '../src/index';
 import bodyParser from 'body-parser';
@@ -26,6 +27,11 @@ beforeAll(() => {
 
 afterAll(() => {
     return mongoose.disconnect();
+});
+
+afterEach(async () => {
+    await User.deleteMany({});
+    await Session.deleteMany({});
 });
 
 describe('auth', () => {
@@ -83,7 +89,14 @@ describe('mustHaveAnyRole', () => {
         localApp.use('/auth', authController.router);
         localApp.get(
             '/mustbeadmin',
-            mustHaveAnyRole(new Set(['admin'])),
+            mustHaveAnyRole(['admin']),
+            (_req: Request, res: Response) => {
+                res.sendStatus(200);
+            },
+        );
+        localApp.get(
+            '/tworoles',
+            mustHaveAnyRole(['admin', 'curator']),
             (_req: Request, res: Response) => {
                 res.sendStatus(200);
             },
@@ -115,6 +128,18 @@ describe('mustHaveAnyRole', () => {
             })
             .expect(200, /test-curator/);
         request.get('/mustbeadmin').expect(200);
+    });
+    it('passes with multiple roles specified', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-curator/);
+        request.get('/tworoles').expect(200);
     });
     it('errors when user has no roles', async () => {
         const request = supertest.agent(localApp);

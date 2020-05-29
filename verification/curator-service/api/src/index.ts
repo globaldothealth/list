@@ -1,8 +1,8 @@
 import * as usersController from './controllers/users';
 
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
 
-import { AuthController } from './controllers/auth';
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
 import SourcesController from './controllers/sources';
@@ -83,19 +83,55 @@ const apiRouter = express.Router();
 
 // Configure sources controller.
 const sourcesController = new SourcesController(awsEventsClient);
-apiRouter.get('/sources', sourcesController.list);
-apiRouter.get('/sources/:id([a-z0-9]{24})', sourcesController.get);
-apiRouter.post('/sources', sourcesController.create);
-apiRouter.put('/sources/:id([a-z0-9]{24})', sourcesController.update);
-apiRouter.delete('/sources/:id([a-z0-9]{24})', sourcesController.del);
+apiRouter.get(
+    '/sources',
+    mustHaveAnyRole(['reader', 'curator']),
+    sourcesController.list,
+);
+apiRouter.get(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['reader', 'curator']),
+    sourcesController.get,
+);
+apiRouter.post(
+    '/sources',
+    mustHaveAnyRole(['curator']),
+    sourcesController.create,
+);
+apiRouter.put(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.update,
+);
+apiRouter.delete(
+    '/sources/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    sourcesController.del,
+);
 
 // Configure cases controller proxying to data service.
 const casesController = new CasesController(env.DATASERVER_URL);
-apiRouter.get('/cases', casesController.list);
-apiRouter.get('/cases/:id([a-z0-9]{24})', casesController.get);
-apiRouter.post('/cases', casesController.create);
-apiRouter.put('/cases/:id([a-z0-9]{24})', casesController.update);
-apiRouter.delete('/cases/:id([a-z0-9]{24})', casesController.del);
+apiRouter.get(
+    '/cases',
+    mustHaveAnyRole(['reader', 'curator']),
+    casesController.list,
+);
+apiRouter.get(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['reader', 'curator']),
+    casesController.get,
+);
+apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
+apiRouter.put(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.update,
+);
+apiRouter.delete(
+    '/cases/:id([a-z0-9]{24})',
+    mustHaveAnyRole(['curator']),
+    casesController.del,
+);
 
 // Configure users controller.
 apiRouter.get('/users', usersController.list);

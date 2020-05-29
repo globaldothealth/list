@@ -1,12 +1,22 @@
 declare global {
     namespace Cypress {
         interface Chainable {
-            addCase: (country: string, notes: string, sourceUrl: string) => void
+            addCase: (
+                country: string,
+                notes: string,
+                sourceUrl: string,
+            ) => void;
+            login: () => void;
+            addSource: (name: string, url: string) => void;
         }
     }
 }
 
-export function addCase(country: string, notes: string, sourceUrl: string): void {
+export function addCase(
+    country: string,
+    notes: string,
+    sourceUrl: string,
+): void {
     cy.request({
         method: 'POST',
         url: '/api/cases',
@@ -34,7 +44,34 @@ export function addCase(country: string, notes: string, sourceUrl: string): void
                 moderator: 'test',
             },
         },
-    })
+    });
+}
+
+export function login(): void {
+    cy.request({
+        method: 'POST',
+        url: '/auth/register',
+        body: {
+            name: 'superuser',
+            email: 'superuser@test.com',
+            roles: ['admin', 'curator', 'reader'],
+        },
+    });
+}
+
+export function addSource(name: string, url: string): void {
+    cy.request({
+        method: 'POST',
+        url: '/api/sources',
+        body: {
+            name: name,
+            origin: {
+                url: url,
+            },
+        },
+    });
 }
 
 Cypress.Commands.add('addCase', addCase);
+Cypress.Commands.add('login', login);
+Cypress.Commands.add('addSource', addSource);

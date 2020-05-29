@@ -51,7 +51,7 @@ class App extends React.Component<{}, User> {
                 });
             })
             .catch((e) => {
-                this.setState({ _id: '', name: '', email: '', roles: [], });
+                this.setState({ _id: '', name: '', email: '', roles: [] });
                 console.error(e);
             });
     }
@@ -68,10 +68,11 @@ class App extends React.Component<{}, User> {
                         <Route path="/sources">
                             <Sources />
                         </Route>
-                        {this.state.email &&
-                            (<Route path="/profile">
+                        {this.state.email && (
+                            <Route path="/profile">
                                 <Profile user={this.state} />
-                            </Route>)}
+                            </Route>
+                        )}
                         <Route path="/users">
                             <Users />
                         </Route>
@@ -104,11 +105,12 @@ class Home extends React.Component<HomeProps, {}> {
                 <br />
                 <Link to="/sources">Sources</Link>
                 <br />
-                {this.props.user.email &&
-                    (<div>
+                {this.props.user.email && (
+                    <div>
                         <Link to="/profile">Profile</Link>
                         <br />
-                    </div>)}
+                    </div>
+                )}
                 <Link to="/users">Manage users</Link>
                 <br />
                 <Link to="/privacy-policy">Privacy policy</Link>
@@ -116,8 +118,8 @@ class Home extends React.Component<HomeProps, {}> {
                 <Link to="/terms">Terms of service</Link>
                 <br />
             </nav>
-        )
-    };
+        );
+    }
 }
 
 export default App;

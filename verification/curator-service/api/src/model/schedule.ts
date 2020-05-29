@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
 export const scheduleSchema = new mongoose.Schema({
+    // Non-required for now. This is semantically required in the data layer,
+    // but until we can replace Mongoose validation of API requests with
+    // something like OpenAPI spec validation, this must be non-required to
+    // facilitate validating create requests (which don't yet have an ARN).
     awsRuleArn: {
         type: String,
-        required: 'Enter a CloudWatch schedule rule AWS Lambda ARN',
         match: [/^arn\:aws\:events\:.+\:.+\:rule\/.+/],
     },
     awsScheduleExpression: {

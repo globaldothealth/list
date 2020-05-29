@@ -42,22 +42,22 @@ class Profile extends React.Component<Props, {}> {
                 {!this.props.user.email && (
                     <div className={classes.login}>
                         Login required to view this page
-                    </div>)}
+                    </div>
+                )}
 
                 {this.props.user.name && (
-                    <div className={classes.name}>
-                        {this.props.user.name}
-                    </div>)}
+                    <div className={classes.name}>{this.props.user.name}</div>
+                )}
 
                 {this.props.user.email && (
-                    <div className={classes.email}>
-                        {this.props.user.email}
-                    </div>)}
+                    <div className={classes.email}>{this.props.user.email}</div>
+                )}
 
                 {this.props.user.roles && (
                     <div className={classes.roles}>
                         {this.props.user.roles.join(', ')}
-                    </div>)}
+                    </div>
+                )}
             </div>
         );
     }
