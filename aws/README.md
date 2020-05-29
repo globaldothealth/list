@@ -30,22 +30,26 @@ The basic deployment/pods/services configuration looks like:
 
 ```
 kubectl get deployments
-NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-curator   2/2     2            2           79m
-data      2/2     2            2           117m
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+curator-dev    1/1     1            1           19h
+curator-prod   1/1     1            1           19h
+data-dev       1/1     1            1           19h
+data-prod      1/1     1            1           19h
 
 kubectl get pods
-NAME                       READY   STATUS    RESTARTS   AGE
-curator-58969b66f4-f6cps   1/1     Running   0          18m
-curator-58969b66f4-vhtqz   1/1     Running   0          14m
-data-6d699fcbcc-jbg4j      1/1     Running   0          102m
-data-6d699fcbcc-tc2fm      1/1     Running   0          26m
+NAME                           READY   STATUS    RESTARTS   AGE
+curator-dev-69d6f94954-qrc2v   1/1     Running   0          14m
+curator-prod-dfb49646-qz5zp    1/1     Running   0          14m
+data-dev-6f686ffdb6-jt6tl      1/1     Running   0          14m
+data-prod-bd57576d8-p8wp4      1/1     Running   0          14m
 
 kubectl get services
-NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-curator      ClusterIP   10.100.15.14    <none>        80/TCP     40m
-data         ClusterIP   10.100.105.54   <none>        80/TCP     21m
-kubernetes   ClusterIP   10.100.0.1      <none>        443/TCP    86m
+NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+curator-dev    ClusterIP   10.100.116.43    <none>        80/TCP    19h
+curator-prod   ClusterIP   10.100.66.95     <none>        80/TCP    19h
+data-dev       ClusterIP   10.100.108.137   <none>        80/TCP    19h
+data-prod      ClusterIP   10.100.71.150    <none>        80/TCP    19h
+kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   20h
 ```
 
 
