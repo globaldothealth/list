@@ -76,7 +76,7 @@ export default class SourcesController {
                 return;
             }
             await source.set(req.body).validate();
-            await this.updateSourceAwsProperties(req, source);
+            await this.updateSourceAwsProperties(source);
             const result = await source.save();
             res.json(result);
         } catch (err) {
@@ -90,7 +90,6 @@ export default class SourcesController {
     };
 
     private async updateSourceAwsProperties(
-        req: Request,
         source: SourceDocument,
     ): Promise<void> {
         if (source.isModified('automation.schedule.awsScheduleExpression')) {
