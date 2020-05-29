@@ -7,6 +7,8 @@ This directory contains the docker compose file to run an isolated environment o
 **Important** running the full stack correctly requires having access to a few secrets: you should have a .env file at the top of your repository (where you run the `docker-compose` command) that looks like this:
 
 ```
+AWS_ACCESS_KEY_ID=<AWS access key ID>
+AWS_SECRET_ACCESS_KEY=<AWS secret access key to authenticate AWS API calls>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 ```
