@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:latest
+          image: docker.io/healthmapidha/dataservice:0.0.1
           ports:
             - containerPort: 3000
           env:
@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:latest
+          image: docker.io/healthmapidha/dataservice:0.0.1
           ports:
             - containerPort: 3000
           env:
