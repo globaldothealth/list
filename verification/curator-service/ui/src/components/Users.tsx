@@ -103,10 +103,19 @@ class Users extends React.Component<Props, UsersState> {
                     <tbody>
                         {this.state.users.map((user) => (
                             <tr key={user._id}>
-                                <th className={classes.cell}>{user.name}</th>
-                                <th className={classes.cell}>
+                                <th
+                                    className={classes.cell}
+                                    data-testid={user.name}
+                                >
+                                    {user.name}
+                                </th>
+                                <th
+                                    className={classes.cell}
+                                    data-testid={`${user.name}-roles`}
+                                >
                                     <FormControl>
                                         <Select
+                                            data-testid={`${user.name}-select-roles`}
                                             multiple
                                             value={user.roles}
                                             onChange={(event) =>
