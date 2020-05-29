@@ -14,7 +14,6 @@ interface ListResponse {
 
 interface User {
     _id: string;
-    googleID: string;
     name: string;
     email: string;
     roles: string[];
@@ -49,7 +48,14 @@ const styles = () =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+    onUserChange: () => void;
+}
+
+interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
+    'data-testid'?: string;
+}
 
 class Users extends React.Component<Props, UsersState> {
     constructor(props: Props) {
@@ -83,6 +89,9 @@ class Users extends React.Component<Props, UsersState> {
                     (user: User) => user._id === updatedUser._id,
                 ) as User).roles = event.target.value;
                 this.setState({ users: updatedUsers });
+                if (updatedUser._id === this.props.user._id) {
+                    this.props.onUserChange();
+                }
             })
             .catch((e) => {
                 console.error(e);
@@ -116,6 +125,11 @@ class Users extends React.Component<Props, UsersState> {
                                     <FormControl>
                                         <Select
                                             data-testid={`${user.name}-select-roles`}
+                                            SelectDisplayProps={
+                                                {
+                                                    'data-testid': `${user.name}-select-roles-button`,
+                                                } as UsersSelectDisplayProps
+                                            }
                                             multiple
                                             value={user.roles}
                                             onChange={(event) =>
