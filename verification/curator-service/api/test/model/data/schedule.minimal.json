@@ -1,0 +1,3 @@
+{
+    "awsScheduleExpression": "rate(1 hour)"
+}

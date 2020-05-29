@@ -36,11 +36,7 @@ paths:
             default: 10
       responses:
         "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaseArray"
+          $ref: "#/components/responses/200CaseArray"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -61,11 +57,7 @@ paths:
               $ref: "#/components/schemas/NewCase"
       responses:
         "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Case"
+          $ref: "#/components/responses/201Case"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -82,17 +74,13 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
+          pattern: '^[a-f\d]{24}$'
     get:
       summary: Gets a specific case
       operationId: getCase
       responses:
         "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Case"
+          $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -101,6 +89,43 @@ paths:
           $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      summary: Updates a specific case
+      operationId: updateCase
+      requestBody:
+        description: Case to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Case"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      summary: Deletes a specific case
+      operationId: deleteCase
+      responses:
+        "204":
+          description: Case deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
 components:
@@ -118,6 +143,24 @@ components:
       description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
   responses:
+    "200Case":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
+    "200CaseArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseArray"
+    "201Case":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
     "400":
       description: Malformed request
     "401":

@@ -48,7 +48,10 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 /**
  * Update a single user's roles.
  */
-export const updateRoles = async (req: Request, res: Response): Promise<void> => {
+export const updateRoles = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
     try {
         const user = await User.findByIdAndUpdate(
             req.params.id,
@@ -57,7 +60,8 @@ export const updateRoles = async (req: Request, res: Response): Promise<void> =>
                 // Return the udpated object.
                 new: true,
                 runValidators: true,
-            });
+            },
+        );
         if (!user) {
             res.status(404).json(
                 `user with id ${req.params.id} could not be found`,
