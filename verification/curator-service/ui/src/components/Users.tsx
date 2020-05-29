@@ -53,6 +53,10 @@ interface Props extends WithStyles<typeof styles> {
     onUserChange: () => void;
 }
 
+interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
+    'data-testid'?: string;
+}
+
 class Users extends React.Component<Props, UsersState> {
     constructor(props: Props) {
         super(props);
@@ -121,6 +125,11 @@ class Users extends React.Component<Props, UsersState> {
                                     <FormControl>
                                         <Select
                                             data-testid={`${user.name}-select-roles`}
+                                            SelectDisplayProps={
+                                                {
+                                                    'data-testid': `${user.name}-select-roles-button`,
+                                                } as UsersSelectDisplayProps
+                                            }
                                             multiple
                                             value={user.roles}
                                             onChange={(event) =>
