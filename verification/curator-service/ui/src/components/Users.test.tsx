@@ -70,7 +70,7 @@ test('updates roles on selection', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Shows initial roles
-    const { queryByText, findByText, getByRole } = render(
+    const { getByTestId, queryByText, findByText, getByRole } = render(
         <Users user={emptyUser} onUserChange={() => { }} />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
@@ -97,7 +97,7 @@ test('updates roles on selection', async () => {
         headers: {},
     };
     mockedAxios.put.mockResolvedValueOnce(axiosPutResponse);
-    fireEvent.mouseDown(getByRole('button'));
+    fireEvent.mouseDown(getByTestId('Alice Smith-select-roles-button'));
     const listbox = within(getByRole('listbox'));
     fireEvent.click(listbox.getByText(/curator/i));
     fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
@@ -115,8 +115,7 @@ test('updates roles on selection', async () => {
 
 test('calls callback when user is changed', async () => {
     let functionCalledCounter = 0;
-    const user =
-    {
+    const user = {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
@@ -134,13 +133,17 @@ test('calls callback when user is changed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText, getByRole } = render(
-        <Users user={user} onUserChange={() => { functionCalledCounter++; }} />,
+    const { getByTestId, findByText, getByRole } = render(
+        <Users
+            user={user}
+            onUserChange={() => {
+                functionCalledCounter++;
+            }}
+        />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
 
-    const updatedUser =
-    {
+    const updatedUser = {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
@@ -159,7 +162,7 @@ test('calls callback when user is changed', async () => {
     expect(functionCalledCounter).toBe(0);
 
     // Select new role
-    fireEvent.mouseDown(getByRole('button'));
+    fireEvent.mouseDown(getByTestId('Alice Smith-select-roles-button'));
     const listbox = within(getByRole('listbox'));
     fireEvent.click(listbox.getByText(/curator/i));
     fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
@@ -172,8 +175,7 @@ test('calls callback when user is changed', async () => {
 
 test('callback not called when other users are changed', async () => {
     let functionCalledCounter = 0;
-    const user =
-    {
+    const user = {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
@@ -191,13 +193,17 @@ test('callback not called when other users are changed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText, getByRole } = render(
-        <Users user={emptyUser} onUserChange={() => { functionCalledCounter++; }} />,
+    const { getByTestId, findByText, getByRole } = render(
+        <Users
+            user={emptyUser}
+            onUserChange={() => {
+                functionCalledCounter++;
+            }}
+        />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
 
-    const updatedUser =
-    {
+    const updatedUser = {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
@@ -216,7 +222,7 @@ test('callback not called when other users are changed', async () => {
     expect(functionCalledCounter).toBe(0);
 
     // Select new role
-    fireEvent.mouseDown(getByRole('button'));
+    fireEvent.mouseDown(getByTestId('Alice Smith-select-roles-button'));
     const listbox = within(getByRole('listbox'));
     fireEvent.click(listbox.getByText(/curator/i));
     fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
