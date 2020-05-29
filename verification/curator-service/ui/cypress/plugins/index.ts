@@ -44,6 +44,7 @@ module.exports = (on: any, config: any) => {
                         if (error) reject(error);
                         const covid19db = db.db('covid19');
                         await covid19db.collection('users').deleteMany({});
+                        await covid19db.collection('sessions').deleteMany({});
                         db.close();
                         resolve(null);
                     },

@@ -16,7 +16,7 @@ describe('EpidNavbar', function () {
     });
 
     it('Navbar with logged in user', function () {
-        cy.login('Alice Smith', 'alice@test.com', []);
+        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
         cy.visit('/');
 
         cy.contains('Logout alice@test.com');
