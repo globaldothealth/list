@@ -40,6 +40,9 @@ class App extends React.Component<{}, User> {
     }
 
     componentDidMount(): void {
+        this.getUser();
+    }
+    getUser() {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -55,6 +58,7 @@ class App extends React.Component<{}, User> {
                 console.error(e);
             });
     }
+
     hasAnyRole(requiredRoles: string[]) {
         return this.state.roles?.some((r: string) => requiredRoles.includes(r));
     }
@@ -82,7 +86,10 @@ class App extends React.Component<{}, User> {
                         )}
                         {this.hasAnyRole(['admin']) && (
                             <Route path="/users">
-                                <Users />
+                                <Users
+                                    user={this.state}
+                                    onUserChange={() => this.getUser()}
+                                />
                             </Route>
                         )}
                         <Route exact path="/">
