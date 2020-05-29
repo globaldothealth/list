@@ -125,4 +125,42 @@ Images used in deployments are pulled from docker hub where automated builds hav
 
 Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
 
-Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo.
+Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo. More specialized tags are described below.
+
+## Releases
+
+We follow [semantic versioning](https://semver.org/) which is basically:
+
+    Given a version number MAJOR.MINOR.PATCH, increment the:
+
+    MAJOR version when you make incompatible API changes,
+    MINOR version when you add functionality in a backwards compatible manner, and
+    PATCH version when you make backwards compatible bug fixes.
+
+Docker-hub has automated builds setup that extract the semantic version from tags in the master branch.
+
+To push a new release of the curator service:
+
+Tag master with the `curator-0.1.2` tag:
+
+`git tag curator-0.1.2`
+
+the push it to the repo:
+
+`git push origin curator-0.1.2`
+
+Docker hub will automatically build the image: `docker.io/healthmapidha/curatorservice:0.1.2`.
+
+This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
+
+To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
+
+You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/open-covid-data/healthmap-gdo-temp/releases).
+
+### Rollback
+
+Just change the image tag referenced in the deployment file to an earlier version and apply the change.
+
+### Deleting a release
+
+If for some reason you need to delete a tag, you can do it with `git tag -d curator-1.2.3` then `git push origin :refs/tags/curator-0.1.2` to delete it remotely.
