@@ -6,6 +6,7 @@ declare global {
                 notes: string,
                 sourceUrl: string,
             ) => void;
+            login: () => void;
             addSource: (name: string, url: string) => void;
         }
     }
@@ -46,6 +47,18 @@ export function addCase(
     });
 }
 
+export function login(): void {
+    cy.request({
+        method: 'POST',
+        url: '/auth/register',
+        body: {
+            name: 'superuser',
+            email: 'superuser@test.com',
+            roles: ['admin', 'curator', 'reader'],
+        },
+    });
+}
+
 export function addSource(name: string, url: string): void {
     cy.request({
         method: 'POST',
@@ -60,4 +73,5 @@ export function addSource(name: string, url: string): void {
 }
 
 Cypress.Commands.add('addCase', addCase);
+Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);

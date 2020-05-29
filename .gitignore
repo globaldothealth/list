@@ -4,7 +4,8 @@
 convert_data.log
 
 # Cypress generates videos, do not store them in revision history.
-*.mp4
+**/cypress/**/*.mp4
+**/cypress/**/*.png
 
 # Secrets for kubernetes.
 kustomization.yaml

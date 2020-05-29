@@ -4,6 +4,7 @@ import './commands';
 // applies the schema and adds any indexes.
 before(() => {
     cy.exec('npm run init-case-db');
+    Cypress.Cookies.debug(true, { verbose: false });
 });
 
 // After all tests have run, seed database with initial data.
