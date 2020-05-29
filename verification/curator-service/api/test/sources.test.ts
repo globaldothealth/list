@@ -193,6 +193,19 @@ describe('POST', () => {
             .expect(201);
         expect(res.body.name).toEqual(source.name);
     });
+    it('should create an AWS rule if provided schedule expression', async () => {
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever' },
+            automation: { schedule: { awsScheduleExpression: 'rate(1 hour)' } },
+        };
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
+    });
     it('should not create invalid source', async () => {
         const res = await curatorRequest.post('/api/sources').expect(422);
         expect(res.body).toMatch('Enter a name');
