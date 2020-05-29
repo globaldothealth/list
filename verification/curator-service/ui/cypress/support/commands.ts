@@ -47,14 +47,14 @@ export function addCase(
     });
 }
 
-export function login(): void {
+export function login(name?: string, email?: string, roles?: string[]): void {
     cy.request({
         method: 'POST',
         url: '/auth/register',
         body: {
-            name: 'superuser',
-            email: 'superuser@test.com',
-            roles: ['admin', 'curator', 'reader'],
+            name: name ?? 'superuser',
+            email: email ?? 'superuser@test.com',
+            roles: roles ?? ['admin', 'curator', 'reader'],
         },
     });
 }

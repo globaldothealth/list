@@ -35,5 +35,20 @@ module.exports = (on: any, config: any) => {
                 );
             });
         },
+        clearUsersDB() {
+            return new Promise((resolve, reject) => {
+                MongoClient.connect(
+                    url,
+                    { useUnifiedTopology: true },
+                    async (error, db) => {
+                        if (error) reject(error);
+                        const covid19db = db.db('covid19');
+                        await covid19db.collection('users').deleteMany({});
+                        db.close();
+                        resolve(null);
+                    },
+                );
+            });
+        },
     });
 };
