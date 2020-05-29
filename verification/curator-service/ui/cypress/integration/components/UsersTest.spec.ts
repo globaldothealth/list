@@ -5,12 +5,12 @@ describe('Manage users page', function () {
     });
 
     it('Displays roles for users', function () {
-        cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.login({
             name: 'Bob',
             email: 'bob@test.com',
             roles: ['curator', 'reader'],
         });
+        cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
 
         cy.contains('Alice');
@@ -30,12 +30,12 @@ describe('Manage users page', function () {
     });
 
     it('Can change a users roles', function () {
-        cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.login({
             name: 'Bob',
             email: 'bob@test.com',
             roles: ['curator', 'reader'],
         });
+        cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
         cy.contains('Bob');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
