@@ -55,6 +55,9 @@ class App extends React.Component<{}, User> {
                 console.error(e);
             });
     }
+    hasAnyRole(requiredRoles: string[]) {
+        return this.state.roles?.some((r: string) => requiredRoles.includes(r));
+    }
 
     render(): JSX.Element {
         return (
@@ -62,20 +65,26 @@ class App extends React.Component<{}, User> {
                 <div className="App">
                     <EpidNavbar user={this.state} />
                     <Switch>
-                        <Route path="/cases">
-                            <Linelist />
-                        </Route>
-                        <Route path="/sources">
-                            <Sources />
-                        </Route>
+                        {this.hasAnyRole(['curator', 'reader']) && (
+                            <Route path="/cases">
+                                <LinelistTable />
+                            </Route>
+                        )}
+                        {this.hasAnyRole(['curator', 'reader']) && (
+                            <Route path="/sources">
+                                <SourceTable />
+                            </Route>
+                        )}
                         {this.state.email && (
                             <Route path="/profile">
                                 <Profile user={this.state} />
                             </Route>
                         )}
-                        <Route path="/users">
-                            <Users />
-                        </Route>
+                        {this.hasAnyRole(['admin']) && (
+                            <Route path="/users">
+                                <Users />
+                            </Route>
+                        )}
                         <Route exact path="/">
                             <Home user={this.state} />
                         </Route>
@@ -86,38 +95,44 @@ class App extends React.Component<{}, User> {
     }
 }
 
-function Linelist(): JSX.Element {
-    return <LinelistTable />;
-}
-
-function Sources(): JSX.Element {
-    return <SourceTable />;
-}
-
 interface HomeProps {
     user: User;
 }
 class Home extends React.Component<HomeProps, {}> {
+    hasAnyRole(requiredRoles: string[]) {
+        return this.props.user.roles?.some((r: string) =>
+            requiredRoles.includes(r),
+        );
+    }
     render(): JSX.Element {
         return (
-            <nav>
-                <Link to="/cases">Linelist</Link>
-                <br />
-                <Link to="/sources">Sources</Link>
-                <br />
-                {this.props.user.email && (
-                    <div>
-                        <Link to="/profile">Profile</Link>
-                        <br />
-                    </div>
+            <div>
+                {!this.props.user.email ? (
+                    <div>Login to access Epid</div>
+                ) : (
+                    <nav>
+                        {this.hasAnyRole(['curator', 'reader']) && (
+                            <div>
+                                <Link to="/cases">Linelist</Link>
+                            </div>
+                        )}
+                        {this.hasAnyRole(['curator', 'reader']) && (
+                            <div>
+                                <Link to="/sources">Sources</Link>
+                            </div>
+                        )}
+                        <div>
+                            <Link to="/profile">Profile</Link>
+                            <br />
+                        </div>
+                        {this.hasAnyRole(['admin']) && (
+                            <div>
+                                <Link to="/users">Manage users</Link>
+                            </div>
+                        )}
+                    </nav>
                 )}
-                <Link to="/users">Manage users</Link>
-                <br />
-                <Link to="/privacy-policy">Privacy policy</Link>
-                <br />
-                <Link to="/terms">Terms of service</Link>
-                <br />
-            </nav>
+            </div>
         );
     }
 }
