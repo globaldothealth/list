@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
+import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
-import { Source } from '../model/source';
 
 export default class SourcesController {
     constructor(private readonly awsEventsClient: AwsEventsClient) {}
@@ -68,22 +68,17 @@ export default class SourcesController {
      */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const source = await Source.findByIdAndUpdate(
-                req.params.id,
-                req.body,
-                {
-                    // Return the udpated object.
-                    new: true,
-                    runValidators: true,
-                },
-            );
+            const source = await Source.findById(req.params.id);
             if (!source) {
                 res.status(404).json(
                     `source with id ${req.params.id} could not be found`,
                 );
                 return;
             }
-            res.json(source);
+            await source.set(req.body).validate();
+            await this.updateSourceAwsProperties(req, source);
+            const result = await source.save();
+            res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err.message);
@@ -94,6 +89,19 @@ export default class SourcesController {
         }
     };
 
+    private async updateSourceAwsProperties(
+        req: Request,
+        source: SourceDocument,
+    ): Promise<void> {
+        if (source.isModified('automation.schedule.awsScheduleExpression')) {
+            const awsRuleArn = await this.awsEventsClient.putRule(
+                source._id,
+                source.automation.schedule.awsScheduleExpression,
+            );
+            source.set('automation.schedule.awsRuleArn', awsRuleArn);
+        }
+    }
+
     /**
      * Create a single source.
      */
@@ -102,9 +110,8 @@ export default class SourcesController {
             const source = new Source(req.body);
             await source.validate();
             if (source.automation?.schedule) {
-                // TODO: Support full schedule creation.
                 const createdRuleArn = await this.awsEventsClient.putRule(
-                    `${source.name}_Rule`,
+                    source._id,
                     source.automation.schedule.awsScheduleExpression,
                 );
                 source.set('automation.schedule.awsRuleArn', createdRuleArn);
