@@ -94,7 +94,7 @@ export default class SourcesController {
     ): Promise<void> {
         if (source.isModified('automation.schedule.awsScheduleExpression')) {
             const awsRuleArn = await this.awsEventsClient.putRule(
-                source._id,
+                source._id.toString(),
                 source.automation.schedule.awsScheduleExpression,
             );
             source.set('automation.schedule.awsRuleArn', awsRuleArn);
@@ -110,7 +110,7 @@ export default class SourcesController {
             await source.validate();
             if (source.automation?.schedule) {
                 const createdRuleArn = await this.awsEventsClient.putRule(
-                    source._id,
+                    source._id.toString(),
                     source.automation.schedule.awsScheduleExpression,
                 );
                 source.set('automation.schedule.awsRuleArn', createdRuleArn);
