@@ -256,10 +256,6 @@ def parse_location_list(value: Any) -> [Dict[str, Any]]:
         separator = ';'
     if ':' in value:
         separator = ':'
-    if ' and ' in value:
-        separator = ' and '
-    if value.count(',') > 1:
-        separator = ','
 
     locations = parse_list(value, separator) if separator else [value]
     return [parse_location(l) for l in locations if l]

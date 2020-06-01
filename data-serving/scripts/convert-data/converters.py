@@ -481,6 +481,9 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
     if not date_range:
         return [{'location': l} for l in location_list if l]
 
+    # We believe it will be useful to have dates associated with each travel
+    # location, but in the existing data, travel history only has one (or no)
+    # date associated with the entire field.
     return [{'dateRange': date_range, 'location': l} for l in location_list if l]
 
 
