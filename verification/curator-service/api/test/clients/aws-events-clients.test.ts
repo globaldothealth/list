@@ -37,9 +37,9 @@ describe('putRule', () => {
         const client = new AwsEventsClient('us-east-1');
 
         expect.assertions(1);
-        return client
-            .putRule('awsErrorRule', 'rate(1 hour)')
-            .catch((e) => expect(e).toEqual(expectedError));
+        return expect(
+            client.putRule('awsErrorRule', 'rate(1 hour)'),
+        ).rejects.toThrow(expectedError);
     });
     it('throws error if AWS response somehow lacks RuleArn', async () => {
         AWSMock.mock(
@@ -52,8 +52,35 @@ describe('putRule', () => {
         const client = new AwsEventsClient('us-east-1');
 
         expect.assertions(1);
-        return client
-            .putRule('noResponseArnRule', 'rate(1 hour)')
-            .catch((e) => expect(e.message).toContain('missing RuleArn'));
+        return expect(
+            client.putRule('noResponseArnRule', 'rate(1 hour'),
+        ).rejects.toThrow('missing RuleArn');
+    });
+});
+
+describe('deleteRule', () => {
+    it('deletes the AWS CloudWatch Event rule via the SDK', async () => {
+        const deleteRuleSpy = jest.fn().mockResolvedValueOnce({});
+        AWSMock.mock('CloudWatchEvents', 'deleteRule', deleteRuleSpy);
+        const client = new AwsEventsClient('us-east-1');
+
+        await expect(client.deleteRule('passingRule')).resolves.not.toThrow();
+        expect(deleteRuleSpy).toHaveBeenCalledTimes(1);
+    });
+    it('throws errors from AWS', async () => {
+        const expectedError = new Error('AWS error');
+        AWSMock.mock(
+            'CloudWatchEvents',
+            'deleteRule',
+            (params: any, callback: Function) => {
+                callback(expectedError, null);
+            },
+        );
+        const client = new AwsEventsClient('us-east-1');
+
+        expect.assertions(1);
+        return expect(client.deleteRule('awsErrorRule')).rejects.toThrow(
+            expectedError,
+        );
     });
 });
