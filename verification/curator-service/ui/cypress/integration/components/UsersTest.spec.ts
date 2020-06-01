@@ -65,4 +65,23 @@ describe('Manage users page', function () {
             .contains('reader')
             .should('not.exist');
     });
+
+    it('Updated roles propagate to other pages', function () {
+        cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
+        cy.visit('/users');
+
+        // Select new role
+        cy.get('div[data-testid="Alice-select-roles"]').click();
+        cy.get('li[data-value="reader"]').click();
+        // Close popup
+        cy.get('ul').type('{esc}');
+
+        // Home page has reader links
+        cy.visit('/');
+        cy.contains('Linelist');
+
+        // Profile page is updated
+        cy.visit('/profile');
+        cy.contains('admin, reader');
+    });
 });
