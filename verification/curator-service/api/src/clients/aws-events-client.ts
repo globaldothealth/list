@@ -57,4 +57,24 @@ export default class AwsEventsClient {
                 message: 'AWS PutRule response missing RuleArn.',
             });
     }
+
+    /**
+     * Proxies a DeleteRule request to the AWS CloudWatch API.
+     *
+     * For the full API definition, see:
+     *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteRule.html
+     */
+    deleteRule = async (ruleName: string): Promise<void> => {
+        try {
+            await this.cloudWatchEventsClient
+                .deleteRule({ Name: ruleName })
+                .promise();
+        } catch (err) {
+            console.warn(
+                `Unable to delete AWS CloudWatch Events rule with:
+                name: ${ruleName}`,
+            );
+            throw err;
+        }
+    };
 }
