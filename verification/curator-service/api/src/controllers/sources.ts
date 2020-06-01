@@ -89,15 +89,30 @@ export default class SourcesController {
         }
     };
 
+    /**
+     * Performs updates on AWS assets corresponding to the provided source,
+     * based on the content of the update operation.
+     *
+     * Note that, because Mongoose document validation is currently used for all
+     * of our APIs, the condition in which a field is updated to be empty is
+     * unreachable.
+     *
+     * TODO: Allow deleting schema-validated fields in update operations.
+     */
     private async updateSourceAwsProperties(
         source: SourceDocument,
     ): Promise<void> {
         if (source.isModified('automation.schedule.awsScheduleExpression')) {
-            const awsRuleArn = await this.awsEventsClient.putRule(
-                source._id.toString(),
-                source.automation.schedule.awsScheduleExpression,
-            );
-            source.set('automation.schedule.awsRuleArn', awsRuleArn);
+            if (source.automation?.schedule?.awsScheduleExpression) {
+                const awsRuleArn = await this.awsEventsClient.putRule(
+                    source._id.toString(),
+                    source.automation.schedule.awsScheduleExpression,
+                );
+                source.set('automation.schedule.awsRuleArn', awsRuleArn);
+            } else {
+                await this.awsEventsClient.deleteRule(source._id.toString());
+                source.set('automation.schedule', undefined);
+            }
         }
     }
 
