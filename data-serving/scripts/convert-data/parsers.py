@@ -13,14 +13,14 @@
   '''
 
 import re
-import pycountry
 import pandas as pd
 import numbers
 import math
 import datetime
 from typing import Any, Callable, Dict, List, Tuple
-from constants import LOCATIONS, VALID_SEXES
+from constants import VALID_SEXES
 from utils import trim_string_list
+from geocode_util import lookup_location
 
 
 def parse_list(value: Any, separator: str) -> List[str]:
@@ -166,7 +166,7 @@ def parse_date(value: str) -> datetime:
         return datetime.datetime.strptime(value, '%m.%d.%Y')
 
 
-def parse_location(value: Any) -> Dict[str, Any]:
+def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
     '''
     Parses a location from a string.
 
@@ -191,52 +191,42 @@ def parse_location(value: Any) -> Dict[str, Any]:
           'administrativeAreaLevel2': str,
           'locality': str,
           'geometry': {
-          'latitude': float,
-          'longitude': float
+            'latitude': float,
+            'longitude': float
           }
         }
     '''
     if pd.isna(value) or value.lower() in ['no', 'none', 'unknown']:
-        return None
+        raise ValueError('boolean value is not a valid location')
     if type(value) is not str:
         raise ValueError('location is not a string')
 
-    # Remove common prefixes 'travelled to' and 'traveled to' and lowercase it.
-    normalized_location = re.sub(
-        r'(travelled|traveled)\sto\s(the\s*)?',
-        '', value.lower())
+    # Parse the location string into tokens (e.g. city, province, country) and
+    # try to find a match with the geocoder.
+    geocode_result = lookup_location(geocoder, parse_list(value.lower(), ','))
 
-    # First try to look up the location in a hard-coded map that accounts for
-    # most popular locations that the lookup (below) misses.
-    location = LOCATIONS.get(normalized_location)
-    if location is not None:
-        return location
+    if geocode_result is None:
+        raise ValueError('no geocode found for location')
 
-    # Next, attempt to look up the location in a countries database.
-    try:
-        country = pycountry.countries.lookup(normalized_location)
-        return {
-            'country': country.name
+    result = {
+        'country': geocode_result.country_new,
+        'geometry': {
+            'latitude': geocode_result.lat,
+            'longitude': geocode_result.lng
         }
-    except LookupError:
-        pass
-
-    # If the format is ${CITY}, ${COUNTRY}, we want to keep the more specific
-    # piece. If not, look it up as is. We do this split after checking for the
-    # country to avoid false positives in the case where it's actually a
-    # comma-separated list of countries ("China, Brazil")
-    normalized_subdivision = parse_list(normalized_location, ',')[0]
-
-    # Well, if it's not a country, maybe it's a subdivision. And if not, it will
-    # throw!
-    subdivision = pycountry.subdivisions.lookup(normalized_subdivision)
-    return {
-        'administrativeAreaLevel1': subdivision.name,
-        'country': subdivision.country.name
     }
 
+    if geocode_result.admin1:
+        result['administrativeAreaLevel1'] = geocode_result.admin1
+    if geocode_result.admin2:
+        result['administrativeAreaLevel2'] = geocode_result.admin2
+    if geocode_result.admin3 or geocode_result.location:
+        result['locality'] = geocode_result.admin3 or geocode_result.location
 
-def parse_location_list(value: Any) -> [Dict[str, Any]]:
+    return result
+
+
+def parse_location_list(geocoder: Any, value: Any) -> [Dict[str, Any]]:
     '''
     Parses one or more locations from a string.
 
@@ -246,7 +236,7 @@ def parse_location_list(value: Any) -> [Dict[str, Any]]:
 
     Returns:
       None: When the input value is empty or a string indicating n/a.
-      [Dict[str, Any]]: When the value is present and successfully parsed. 
+      [Dict[str, Any]]: When the value is present and successfully parsed.
         A list of dictionaries containing the location data.
     '''
     separator = None
@@ -258,7 +248,7 @@ def parse_location_list(value: Any) -> [Dict[str, Any]]:
         separator = ':'
 
     locations = parse_list(value, separator) if separator else [value]
-    return [parse_location(l) for l in locations if l]
+    return [parse_location(geocoder, l) for l in locations if l]
 
 
 def parse_sex(value: Any) -> str:

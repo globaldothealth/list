@@ -444,8 +444,8 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
     return outbreak_specifics or None
 
 
-def convert_travel_history(id: str, dates: str, location: str) -> Dict[
-        str, Any]:
+def convert_travel_history(geocoder: Any, id: str, dates: str,
+                           location: str) -> Dict[str, Any]:
     '''
     Converts the travel history date and location fields to a new travelHistory
     object.
@@ -464,7 +464,7 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
     '''
     location_list = None
     try:
-        location_list = parse_location_list(location)
+        location_list = parse_location_list(geocoder, location)
     except (LookupError, ValueError) as e:
         warn(id, 'travelHistory.location', location, e)
 
