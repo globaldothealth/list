@@ -11,8 +11,8 @@ which row failed to convert.
 
 import pandas as pd
 from parsers import (parse_age, parse_bool, parse_date,
-                     parse_latitude, parse_list, parse_location, parse_longitude,
-                     parse_range, parse_sex, parse_string_list)
+                     parse_latitude, parse_list, parse_location_list,
+                     parse_longitude, parse_range, parse_sex, parse_string_list)
 from pandas import Series
 from typing import Any, Callable, Dict, List
 from utils import format_iso_8601_date, is_url, warn
@@ -129,7 +129,7 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
 
     Returns:
       None: When the input value is empty.
-      Dict[str, str]: When the values are present and succesfully parsed. The
+      Dict[str, str]: When the values are present and successfully parsed. The
         dictionary is in the format:
         {
           'name': str,
@@ -462,28 +462,29 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
           'dateRange': {...}
         }
     '''
-    travel_history = {}
-
+    location_list = None
     try:
-        parsed_location = parse_location(location)
-        if parsed_location:
-            travel_history['location'] = parsed_location
+        location_list = parse_location_list(location)
     except (LookupError, ValueError) as e:
         warn(id, 'travelHistory.location', location, e)
 
-    # It's invalid to have dates without a location; only convert the rest of
-    # the field (i.e. the dates) if location was successfully parsed.
-    if not travel_history.get('location'):
-        return None
-
+    date_range = None
     try:
         date_range = convert_date_range(dates)
-        if date_range:
-            travel_history['dateRange'] = date_range
-    except (TypeError, ValueError) as e:
-        warn(id, 'travelHistory.dateRange', dates, e)
+    except (ValueError) as e:
+        warn(id, 'travelHistory.dateRange', location, e)
 
-    return [travel_history] if travel_history else None
+    if not location_list and not date_range:
+        return None
+    if not location_list:
+        return [{'dateRange': date_range}]
+    if not date_range:
+        return [{'location': l} for l in location_list if l]
+
+    # We believe it will be useful to have dates associated with each travel
+    # location, but in the existing data, travel history only has one (or no)
+    # date associated with the entire field.
+    return [{'dateRange': date_range, 'location': l} for l in location_list if l]
 
 
 def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:

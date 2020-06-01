@@ -168,8 +168,7 @@ def parse_date(value: str) -> datetime:
 
 def parse_location(value: Any) -> Dict[str, Any]:
     '''
-    Parses a location from a string. Locations are dictionaries of location
-    properties in the format:
+    Parses a location from a string.
 
     Parameters:
         value: Value representing a location, expected to be in the format:
@@ -197,12 +196,10 @@ def parse_location(value: Any) -> Dict[str, Any]:
           }
         }
     '''
-    if pd.isna(value) or value.lower() in ['no', 'none']:
+    if pd.isna(value) or value.lower() in ['no', 'none', 'unknown']:
         return None
     if type(value) is not str:
         raise ValueError('location is not a string')
-    if ';' in value or ':' in value or value.count(',') > 1:
-        raise ValueError('location is a list')
 
     # Remove common prefixes 'travelled to' and 'traveled to' and lowercase it.
     normalized_location = re.sub(
@@ -237,6 +234,31 @@ def parse_location(value: Any) -> Dict[str, Any]:
         'administrativeAreaLevel1': subdivision.name,
         'country': subdivision.country.name
     }
+
+
+def parse_location_list(value: Any) -> [Dict[str, Any]]:
+    '''
+    Parses one or more locations from a string.
+
+    Parameters:
+        value: Value representing a location or a delimiter-separated list of
+          locations.
+
+    Returns:
+      None: When the input value is empty or a string indicating n/a.
+      [Dict[str, Any]]: When the value is present and successfully parsed. 
+        A list of dictionaries containing the location data.
+    '''
+    separator = None
+    if pd.isna(value):
+        return None
+    if ';' in value:
+        separator = ';'
+    if ':' in value:
+        separator = ':'
+
+    locations = parse_list(value, separator) if separator else [value]
+    return [parse_location(l) for l in locations if l]
 
 
 def parse_sex(value: Any) -> str:
