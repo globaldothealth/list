@@ -94,8 +94,9 @@ export default class SourcesController {
      * based on the content of the update operation.
      *
      * Note that, because Mongoose document validation is currently used for all
-     * of our APIs, the condition in which a field is updated to be empty is
-     * unreachable.
+     * of our APIs, and we're performing partial updates (as opposed to
+     * overwrites) by default, the condition in which a validated field is
+     * updated to be empty is unreachable.
      *
      * TODO: Allow deleting schema-validated fields in update operations.
      */
