@@ -1,3 +1,7 @@
+// These must be at the top of the file; jest hoists jest.mock() calls to the
+// top of the file, and these must be defined prior to such calls.
+const mockDeleteRule = jest.fn().mockResolvedValue({});
+
 import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
@@ -12,7 +16,7 @@ jest.mock('../src/clients/aws-events-client', () => {
         .fn()
         .mockResolvedValue('arn:aws:events:fake:event:rule/name');
     return jest.fn().mockImplementation(() => {
-        return { putRule: mockPutRule };
+        return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
 });
 
@@ -188,12 +192,19 @@ describe('DELETE', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            automation: {
+                schedule: {
+                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                    awsScheduleExpression: 'rate(1 hour)',
+                },
+            },
         }).save();
         const res = await curatorRequest
             .delete(`/api/sources/${source.id}`)
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body._id).toEqual(source.id);
+        expect(mockDeleteRule).toHaveBeenCalledWith(source._id.toString());
     });
     it('should not be able to delete a non existent source', (done) => {
         curatorRequest
