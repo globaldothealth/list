@@ -146,6 +146,22 @@ describe('PUT', () => {
         // Check stuff that didn't change.
         expect(res.body.origin.url).toEqual('http://foo.bar');
     });
+    it('should create an AWS rule if provided schedule expression', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+        }).save();
+        const res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                automation: {
+                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
+    });
     it('cannot update an inexistent source', (done) => {
         curatorRequest
             .put('/api/sources/424242424242424242424242')
@@ -176,6 +192,19 @@ describe('POST', () => {
             .expect('Content-Type', /json/)
             .expect(201);
         expect(res.body.name).toEqual(source.name);
+    });
+    it('should create an AWS rule if provided schedule expression', async () => {
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever' },
+            automation: { schedule: { awsScheduleExpression: 'rate(1 hour)' } },
+        };
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
     });
     it('should not create invalid source', async () => {
         const res = await curatorRequest.post('/api/sources').expect(422);
