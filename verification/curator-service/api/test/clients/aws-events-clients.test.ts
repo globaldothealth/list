@@ -57,3 +57,30 @@ describe('putRule', () => {
             .catch((e) => expect(e.message).toContain('missing RuleArn'));
     });
 });
+
+describe('deleteRule', () => {
+    it('deletes the AWS CloudWatch Event rule via the SDK', async () => {
+        const deleteRuleSpy = jest.fn().mockResolvedValueOnce({});
+        AWSMock.mock('CloudWatchEvents', 'deleteRule', deleteRuleSpy);
+        const client = new AwsEventsClient('us-east-1');
+
+        await expect(client.deleteRule('passingRule')).resolves.not.toThrow();
+        expect(deleteRuleSpy).toHaveBeenCalledTimes(1);
+    });
+    it('throws errors from AWS', async () => {
+        const expectedError = new Error('AWS error');
+        AWSMock.mock(
+            'CloudWatchEvents',
+            'deleteRule',
+            (params: any, callback: Function) => {
+                callback(expectedError, null);
+            },
+        );
+        const client = new AwsEventsClient('us-east-1');
+
+        expect.assertions(1);
+        return client
+            .deleteRule('awsErrorRule')
+            .catch((e) => expect(e).toEqual(expectedError));
+    });
+});
