@@ -124,11 +124,15 @@ export default class SourcesController {
      * Delete a single source.
      */
     del = async (req: Request, res: Response): Promise<void> => {
-        const source = await Source.findByIdAndDelete(req.params.id);
+        const source = await Source.findById(req.params.id);
         if (!source) {
             res.sendStatus(404);
             return;
         }
+        if (source.automation?.schedule?.awsRuleArn) {
+            await this.awsEventsClient.deleteRule(source._id.toString());
+        }
+        source.remove();
         res.json(source);
         return;
     };
