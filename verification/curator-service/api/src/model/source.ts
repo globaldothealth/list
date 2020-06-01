@@ -23,7 +23,7 @@ const sourceSchema = new mongoose.Schema({
     },
 });
 
-type SourceDocument = mongoose.Document & {
+export type SourceDocument = mongoose.Document & {
     name: string;
     origin: OriginDocument;
     format: string;
