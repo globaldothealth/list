@@ -1,6 +1,9 @@
 // These must be at the top of the file; jest hoists jest.mock() calls to the
 // top of the file, and these must be defined prior to such calls.
 const mockDeleteRule = jest.fn().mockResolvedValue({});
+const mockPutRule = jest
+    .fn()
+    .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 
 import * as baseUser from './users/base.json';
 
@@ -12,9 +15,6 @@ import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 jest.mock('../src/clients/aws-events-client', () => {
-    const mockPutRule = jest
-        .fn()
-        .mockResolvedValue('arn:aws:events:fake:event:rule/name');
     return jest.fn().mockImplementation(() => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
@@ -38,6 +38,8 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
+    mockDeleteRule.mockClear();
+    mockPutRule.mockClear();
     await Source.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
@@ -149,22 +151,28 @@ describe('PUT', () => {
         expect(res.body.name).toEqual('new name');
         // Check stuff that didn't change.
         expect(res.body.origin.url).toEqual('http://foo.bar');
+        expect(mockPutRule).not.toHaveBeenCalled();
     });
     it('should create an AWS rule if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
+        const scheduleExpression = 'rate(1 hour)';
         const res = await curatorRequest
             .put(`/api/sources/${source.id}`)
             .send({
                 automation: {
-                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
+                    schedule: { awsScheduleExpression: scheduleExpression },
                 },
             })
             .expect(200)
             .expect('Content-Type', /json/);
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
+        expect(mockPutRule).toHaveBeenCalledWith(
+            source._id.toString(),
+            scheduleExpression,
+        );
     });
     it('cannot update an inexistent source', (done) => {
         curatorRequest
@@ -196,12 +204,16 @@ describe('POST', () => {
             .expect('Content-Type', /json/)
             .expect(201);
         expect(res.body.name).toEqual(source.name);
+        expect(mockPutRule).not.toHaveBeenCalled();
     });
     it('should create an AWS rule if provided schedule expression', async () => {
+        const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
             origin: { url: 'http://what.ever' },
-            automation: { schedule: { awsScheduleExpression: 'rate(1 hour)' } },
+            automation: {
+                schedule: { awsScheduleExpression: scheduleExpression },
+            },
         };
         const res = await curatorRequest
             .post('/api/sources')
@@ -209,6 +221,10 @@ describe('POST', () => {
             .expect('Content-Type', /json/)
             .expect(201);
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
+        expect(mockPutRule).toHaveBeenCalledWith(
+            res.body._id,
+            scheduleExpression,
+        );
     });
     it('should not create invalid source', async () => {
         const res = await curatorRequest.post('/api/sources').expect(422);
@@ -221,6 +237,18 @@ describe('DELETE', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+        }).save();
+        const res = await curatorRequest
+            .delete(`/api/sources/${source.id}`)
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body._id).toEqual(source.id);
+        expect(mockDeleteRule).not.toHaveBeenCalled();
+    });
+    it('should delete corresponding AWS rule if source contains ruleArn', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
             automation: {
                 schedule: {
                     awsRuleArn: 'arn:aws:events:a:b:rule/c',
@@ -228,11 +256,7 @@ describe('DELETE', () => {
                 },
             },
         }).save();
-        const res = await curatorRequest
-            .delete(`/api/sources/${source.id}`)
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(res.body._id).toEqual(source.id);
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(200);
         expect(mockDeleteRule).toHaveBeenCalledWith(source._id.toString());
     });
     it('should not be able to delete a non existent source', (done) => {
