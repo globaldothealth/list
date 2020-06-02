@@ -196,8 +196,6 @@ def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
           }
         }
     '''
-    if pd.isna(value) or value.lower() in ['no', 'none', 'unknown']:
-        raise ValueError('boolean value is not a valid location')
     if type(value) is not str:
         raise ValueError('location is not a string')
 
