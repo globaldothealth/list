@@ -31,32 +31,31 @@ def lookup_location(geocoder: Any, location_tokens: [str]) -> Any:
           admin1: str
         }
     '''
-    normalized_tokens = [COMMON_LOCATION_ABBREVIATIONS[l.lower()]
-                         if l.lower() in COMMON_LOCATION_ABBREVIATIONS else l
+    normalized_tokens = [COMMON_LOCATION_ABBREVIATIONS.get(l.lower(), l)
                          for l in location_tokens]
 
-    if normalized_tokens == []:
-        return None
+    if not normalized_tokens:
+        raise ValueError('No location tokens')
+    if len(normalized_tokens) > 3:
+        raise ValueError('Too many tokens in location')
+
     if len(normalized_tokens) == 1:
         # A location of a single token, which may be a country, city, county,
         # etc. Ex. "Paris", "China", "FL"
         return lookup_single_part_location(geocoder, normalized_tokens[0])
-    if len(normalized_tokens) == 2:
+    elif len(normalized_tokens) == 2:
         # A two-part location, which may be (county, country), (city, county),
         # or (city, country) pairs. Ex. "Paris, France", "Hubei, China",
         # "Boston, MA"
         return lookup_two_part_location(
             geocoder, normalized_tokens[0],
             normalized_tokens[1])
-    if len(normalized_tokens) == 3:
-        # A three-part location, presumed to including city, county, and
-        # country.
+    else:
+        # A three-part location, presumed to include city, county, and country.
         return geocoder.geocode(
             normalized_tokens[0],  # city
             normalized_tokens[1],  # county
             normalized_tokens[2])  # country
-
-    raise ValueError('Too many tokens in location')
 
 
 def lookup_two_part_location(
