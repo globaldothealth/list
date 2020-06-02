@@ -40,21 +40,22 @@ def lookup_location(geocoder: Any, location_tokens: [str]) -> Any:
         raise ValueError('Too many tokens in location')
 
     if len(normalized_tokens) == 1:
-        # A location of a single token, which may be a country, city, county,
+        # A location of a single token, which may be a country, city, province,
         # etc. Ex. "Paris", "China", "FL"
         return lookup_single_part_location(geocoder, normalized_tokens[0])
     elif len(normalized_tokens) == 2:
-        # A two-part location, which may be (county, country), (city, county),
-        # or (city, country) pairs. Ex. "Paris, France", "Hubei, China",
-        # "Boston, MA"
+        # A two-part location, which may be (province, country), (city,
+        # province), or (city, country) pairs. Ex. "Paris, France", "Hubei,
+        # China", "Boston, MA"
         return lookup_two_part_location(
             geocoder, normalized_tokens[0],
             normalized_tokens[1])
     else:
-        # A three-part location, presumed to include city, county, and country.
+        # A three-part location, presumed to include city, province, and
+        # country.
         return geocoder.geocode(
             normalized_tokens[0],  # city
-            normalized_tokens[1],  # county
+            normalized_tokens[1],  # province
             normalized_tokens[2])  # country
 
 
@@ -64,14 +65,14 @@ def lookup_two_part_location(
     '''
     Attempts to match the two location tokens against known locations,
     trying two-token pairs from broadest to most specific resolution. First we
-    check if it's a province and county pair; then city and country; then city
+    check if it's a province and province pair; then city and country; then city
     and province.
 
     Parameters:
         higher_res_location_token: The token representing the more specific part
           of the location, e.g. city vs. country.
         lower_res_location_token: The token representing the broader part of the
-          location, e.g. county vs. city.
+          location, e.g. province vs. city.
 
     Returns:
       None: When no geocoding match is found.
@@ -118,8 +119,7 @@ def lookup_two_part_location(
 def lookup_single_part_location(geocoder: Any, value: str) -> Any:
     '''
     Attempts to match the location token against known locations, beginning from
-    lowest resolution and moving to higher resolutions if no match is found. No
-    Paris, TX matches for "Paris" over here.
+    lowest resolution and moving to higher resolutions if no match is found.
 
     Returns:
       None: When no geocoding match is found.
@@ -196,4 +196,4 @@ def lookup(geocoder: Any, predicate: Callable[[str], bool]) -> Any:
     if len(matches) > 1:
         raise ValueError(f'Too many possible geocode matches: {matches}')
 
-    return matches[0] if len(matches) == 1 else None
+    return next(iter(matches), None)
