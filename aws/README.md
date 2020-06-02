@@ -45,11 +45,16 @@ data-prod-bd57576d8-p8wp4      1/1     Running   0          14m
 
 kubectl get services
 NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
-curator-dev    ClusterIP   10.100.116.43    <none>        80/TCP    19h
-curator-prod   ClusterIP   10.100.66.95     <none>        80/TCP    19h
-data-dev       ClusterIP   10.100.108.137   <none>        80/TCP    19h
-data-prod      ClusterIP   10.100.71.150    <none>        80/TCP    19h
-kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   20h
+curator-dev    NodePort    10.100.116.43    <none>        80:32119/TCP   4d21h
+curator-prod   NodePort    10.100.66.95     <none>        80:32085/TCP   4d21h
+data-dev       ClusterIP   10.100.108.137   <none>        80/TCP         4d22h
+data-prod      ClusterIP   10.100.71.150    <none>        80/TCP         4d22h
+kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP        4d22h
+
+kubectl get ingress
+NAME           HOSTS   ADDRESS                                                                  PORTS   AGE
+curator-dev    *       51cfaa79-default-curatorde-771d-764651811.us-east-1.elb.amazonaws.com    80      3h18m
+curator-prod   *       51cfaa79-default-curatorpr-5c7d-1665373250.us-east-1.elb.amazonaws.com   80      121m
 ```
 
 
@@ -167,7 +172,7 @@ Dev instances of curator and data services are using the `latest` image tag, tha
 
 ```shell
 kubectl rollout restart deployment/curator-dev
-kubectl rollout restart deployment/curator-prod
+kubectl rollout restart deployment/data-dev
 ```
 
 ### Rollback
@@ -198,6 +203,8 @@ The setup was done following a mix of articles:
 - https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/walkthrough/echoserver/
 - https://aws.amazon.com/blogs/containers/using-alb-ingress-controller-with-amazon-eks-on-fargate/
 
+
+A one-time set-up is required the first time you create an ALB on the cluster:
 
 ```shell
 $ eksctl utils associate-iam-oidc-provider \
@@ -257,3 +264,9 @@ eksctl create iamserviceaccount \
 ```
 
 We created our cluster with eksctl so the subnets are automatically tagged correctly for auto-discovery by the ALB controller.
+
+You can now run the controller and setup the ingresses:
+
+```
+kubectl apply -f alb-ingress.controller.yaml -f curator-ingress.yaml
+```
