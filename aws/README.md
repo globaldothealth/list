@@ -161,6 +161,15 @@ To push a new release of the data service, follow the same procedure but change 
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/open-covid-data/healthmap-gdo-temp/releases).
 
+### `Latest` image tag for dev
+
+Dev instances of curator and data services are using the `latest` image tag, that's not best practice but is okay while we work on other features. The latest image is fetched when a deployment is updated, to update dev to the `latest` image built by docker-hub, do:
+
+```shell
+kubectl rollout restart deployment/curator-dev
+kubectl rollout restart deployment/curator-prod
+```
+
 ### Rollback
 
 Just change the image tag referenced in the deployment file to an earlier version and apply the change.
