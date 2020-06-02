@@ -77,9 +77,8 @@ def lookup_two_part_location(
         lower_res_location_token: str) -> [Geocode]:
     '''
     Attempts to match the two location tokens against known locations,
-    trying two-token pairs from broadest to most specific resolution. First we
-    check if it's a province and province pair; then city and country; then city
-    and province.
+    trying two-token pairs, including (country, province), (city, country), and
+    (city, province).
 
     Parameters:
         higher_res_location_token: The token representing the more specific part
@@ -111,8 +110,8 @@ def lookup_two_part_location(
 
 def lookup_single_part_location(geocoder: Any, value: str) -> [Geocode]:
     '''
-    Attempts to match the location token against known locations, beginning from
-    lowest resolution and moving to higher resolutions if no match is found.
+    Attempts to match the location token against known locations, ranging from
+    country to specific point locations.
 
     Returns:
       [Geocode] A list of possible geocode matches.
@@ -130,7 +129,7 @@ def lookup_single_part_location(geocoder: Any, value: str) -> [Geocode]:
         # admin3
         lookup(geocoder, lambda location: value ==
                location.admin3.lower() and location.geo_resolution == 'admin3'),
-        # location
+        # point location
         lookup(geocoder, lambda location: value ==
                location.location.lower() and location.geo_resolution == 'point')
     ]
@@ -139,10 +138,9 @@ def lookup_single_part_location(geocoder: Any, value: str) -> [Geocode]:
 
 def lookup(geocoder: Any, predicate: Callable[[str], bool]) -> [Geocode]:
     '''
-    Finds a single geocode match given a predicate. The predicate could, for
-    example, require that the result match a given string and a given
-    resolution. If more than one match is found for the predicate, an error is
-    thrown.
+    Finds a geocode match given a predicate. The predicate could, for example,
+    require that the result match a given string and a given geographical
+    resolution.
 
     Returns:
       [Geocode] A list of possible geocode matches.
