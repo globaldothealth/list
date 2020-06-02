@@ -79,8 +79,7 @@ def extract_csv(repo_path: str) -> str:
     latest_data_gzip.extract(DATA_CSV_FILENAME)
     latest_data_gzip.close()
 
-    return os.path.join(
-        repo_path, DATA_REPO_PATH, DATA_CSV_FILENAME)
+    return DATA_CSV_FILENAME
 
 
 def read_csv(infile: str) -> DataFrame:
