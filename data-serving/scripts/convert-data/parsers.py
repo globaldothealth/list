@@ -203,9 +203,6 @@ def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
     # try to find a match with the geocoder.
     geocode_result = lookup_location(geocoder, parse_list(value.lower(), ','))
 
-    if geocode_result is None:
-        raise ValueError('no geocode found for location')
-
     result = {
         'country': geocode_result.country_new,
         'geometry': {
