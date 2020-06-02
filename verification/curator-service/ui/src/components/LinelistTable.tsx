@@ -69,6 +69,13 @@ interface TableRow {
     notes: string;
 }
 
+interface User {
+    _id: string;
+    name: string;
+    email: string;
+    roles: string[];
+}
+
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = (theme: Theme) =>
@@ -80,7 +87,9 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     constructor(props: Props) {
@@ -115,11 +124,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     },
                 },
             ],
-            // TODO: Replace data below with real values
             revisionMetadata: {
-                date: '2020-04-23T04:00:00.000Z',
+                date: new Date().toISOString(),
+                // TODO: change this id value. The current field is required to
+                // be an int, which we'll want to change in the finalized schema.
                 id: 0,
-                moderator: 'abc123',
+                moderator: this.props.user.email,
             },
         };
     }
@@ -275,7 +285,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                    c.sources.length > 0
+                                                        c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });
