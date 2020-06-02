@@ -9,6 +9,13 @@ import axios from 'axios';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+const user = {
+    _id: 'testUser',
+    name: 'Alice Smith',
+    email: 'foo@bar.com',
+    roles: ['admin', 'curator'],
+};
+
 afterEach(() => {
     mockedAxios.get.mockClear();
     mockedAxios.delete.mockClear();
@@ -54,7 +61,7 @@ it('loads and displays cases', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<LinelistTable />);
+    const { findByText } = render(<LinelistTable user={user} />);
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -102,7 +109,7 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<LinelistTable />);
+    const { getByText, findByText } = render(<LinelistTable user={user} />);
 
     // Throw error on add request.
     mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
@@ -156,7 +163,9 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<LinelistTable />);
+    const { getByText, findByText, queryByText } = render(
+        <LinelistTable user={user} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
@@ -215,7 +224,9 @@ it('can add a row', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
-    const { getByText, findByText, queryByText } = render(<LinelistTable />);
+    const { getByText, findByText, queryByText } = render(
+        <LinelistTable user={user} />,
+    );
 
     // Check table is empty on load
     const row = queryByText(/abc123/);
@@ -318,7 +329,9 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<LinelistTable />);
+    const { getByText, findByText, queryByText } = render(
+        <LinelistTable user={user} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
