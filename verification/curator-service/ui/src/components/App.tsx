@@ -71,7 +71,7 @@ class App extends React.Component<{}, User> {
                     <Switch>
                         {this.hasAnyRole(['curator', 'reader']) && (
                             <Route path="/cases">
-                                <LinelistTable />
+                                <LinelistTable user={this.state} />
                             </Route>
                         )}
                         {this.hasAnyRole(['curator', 'reader']) && (
