@@ -40,24 +40,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Load the geocoder.
-    geocoder_path = os.path.join(args.ncov2019_path, GEOCODER_REPO_PATH)
-    geocodes_path = os.path.join(geocoder_path, GEOCODER_DB_FILENAME)
-    f, path, desc = imp.find_module(GEOCODER_MODULE, [geocoder_path])
-    geocoder_module = imp.load_module(GEOCODER_MODULE, f, path, desc)
-    geocoder = geocoder_module.CSVGeocoder(geocodes_path, lambda x: None)
-
-    # Load the case data.
-    gzip_path = os.path.join(
-        args.ncov2019_path, DATA_REPO_PATH,
-        DATA_GZIP_FILENAME)
-    csv_path = os.path.join(
-        args.ncov2019_path, DATA_REPO_PATH, DATA_CSV_FILENAME)
-
-    print('Unzipping', gzip_path)
-    latest_data_gzip = tarfile.open(gzip_path)
-    latest_data_gzip.extract(DATA_CSV_FILENAME)
-    latest_data_gzip.close()
+    csv_path = extract_csv(args.ncov2019_path)
 
     print('Reading data from', csv_path)
     original_cases = read_csv(csv_path)
@@ -70,12 +53,34 @@ def main():
             f'{original_rows} to {original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
+    geocoder = load_geocoder(args.ncov2019_path)
     converted_cases = convert(original_cases, geocoder)
 
     print('Writing results to', args.outfile.name)
     write_json(converted_cases, args.outfile)
 
     print('Great success! 🎉')
+
+
+def load_geocoder(repo_path: str) -> Any:
+    geocoder_path = os.path.join(repo_path, GEOCODER_REPO_PATH)
+    geocodes_path = os.path.join(geocoder_path, GEOCODER_DB_FILENAME)
+    f, path, desc = imp.find_module(GEOCODER_MODULE, [geocoder_path])
+    geocoder_module = imp.load_module(GEOCODER_MODULE, f, path, desc)
+    return geocoder_module.CSVGeocoder(geocodes_path, lambda x: None)
+
+
+def extract_csv(repo_path: str) -> str:
+    gzip_path = os.path.join(
+        repo_path, DATA_REPO_PATH,
+        DATA_GZIP_FILENAME)
+    print('Unzipping', gzip_path)
+    latest_data_gzip = tarfile.open(gzip_path)
+    latest_data_gzip.extract(DATA_CSV_FILENAME)
+    latest_data_gzip.close()
+
+    return os.path.join(
+        repo_path, DATA_REPO_PATH, DATA_CSV_FILENAME)
 
 
 def read_csv(infile: str) -> DataFrame:
