@@ -171,7 +171,32 @@ describe('PUT', () => {
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
             source._id.toString(),
+            source.toAwsRuleDescription(),
             scheduleExpression,
+        );
+    });
+    it('should update AWS rule description on source rename', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+            automation: {
+                schedule: {
+                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                    awsScheduleExpression: 'rate(1 hour)',
+                },
+            },
+        }).save();
+        const newName = 'name2';
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                name: newName,
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockPutRule).toHaveBeenCalledWith(
+            source._id.toString(),
+            source.set('name', newName).toAwsRuleDescription(),
         );
     });
     it('cannot update an inexistent source', (done) => {
@@ -223,6 +248,7 @@ describe('POST', () => {
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
             res.body._id,
+            new Source(source).toAwsRuleDescription(),
             scheduleExpression,
         );
     });
