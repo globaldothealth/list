@@ -8,15 +8,15 @@ This directory contains scripts for converting, ingesting, and otherwise munging
 schema-compliant json format.
 
 ```console
-python3 convert_data.py --infile="latestdata.csv" [--outfile="cases.json"]
+python3 convert_data.py --ncov2019_path=/path/to/nCoV2019 [--sample_rate=.1] [--outfile=cases.json]
 ```
 
 Logs will be written to `convert_data.log`.
 
 ### Current stats
 
-- 99.2% of rows from the CSV file convert entirely successfully to JSON. For those with errors, only the failed fields
-  are ommitted.
+- 99.8% of rows from the CSV file convert entirely successfully to JSON. For those with errors, only the failed fields
+  are omitted.
 - 100% of rows from `cases.json` validate and import successfully into mongodb.
 
 ### Lossy fields
@@ -50,11 +50,6 @@ The following fields are *not* lossy, although they require conversion to a new 
 - `events[name='admissionHospital']`, `events[name='confirmed']`, `events[name='deathOrDischarge']`
 
 ### Future improvements
-
-- Add geocoding for `travelHistory.location` -- specifically, adding lat/long where locations are present.
-
-- Improve parsing of the `travelHistory.location` field. We lose ~40% of the data as of today because it's highly
-  unstructured.
 
 - Improve disambiguation of `travelHistory.location`. For example, if the person lives in Florida and has traveled to
   Georgia, it's more likely to be the state than the country.

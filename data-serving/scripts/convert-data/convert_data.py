@@ -6,6 +6,7 @@ schema.
 import argparse
 import csv
 import logging
+import imp
 import json
 import pandas as pd
 import sys
@@ -16,7 +17,11 @@ from converters import (
     convert_outbreak_specifics, convert_travel_history)
 from pandas import DataFrame
 from typing import Any
-from constants import LOSSLESS_FIELDS
+from constants import (
+    DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
+    GEOCODER_MODULE, GEOCODER_REPO_PATH, LOSSLESS_FIELDS)
+import tarfile
+import os
 
 
 def main():
@@ -26,7 +31,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='Convert CSV line-list data into json compliant with the '
         'MongoDB schema.')
-    parser.add_argument('--infile', type=argparse.FileType('r'))
+    parser.add_argument('--ncov2019_path', type=str, required=True)
     parser.add_argument('--outfile',
                         nargs='?',
                         type=argparse.FileType('w', encoding='UTF-8'),
@@ -35,8 +40,10 @@ def main():
 
     args = parser.parse_args()
 
-    print('Reading data from', args.infile.name)
-    original_cases = read_csv(args.infile)
+    csv_path = extract_csv(args.ncov2019_path)
+
+    print('Reading data from', csv_path)
+    original_cases = read_csv(csv_path)
 
     if args.sample_rate < 1.0:
         original_rows = original_cases.shape[0]
@@ -46,7 +53,8 @@ def main():
             f'{original_rows} to {original_cases.shape[0]} rows')
 
     print('Converting data to new schema')
-    converted_cases = convert(original_cases)
+    geocoder = load_geocoder(args.ncov2019_path)
+    converted_cases = convert(original_cases, geocoder)
 
     print('Writing results to', args.outfile.name)
     write_json(converted_cases, args.outfile)
@@ -54,11 +62,31 @@ def main():
     print('Great success! 🎉')
 
 
+def load_geocoder(repo_path: str) -> Any:
+    geocoder_path = os.path.join(repo_path, GEOCODER_REPO_PATH)
+    geocodes_path = os.path.join(geocoder_path, GEOCODER_DB_FILENAME)
+    f, path, desc = imp.find_module(GEOCODER_MODULE, [geocoder_path])
+    geocoder_module = imp.load_module(GEOCODER_MODULE, f, path, desc)
+    return geocoder_module.CSVGeocoder(geocodes_path, lambda x: None)
+
+
+def extract_csv(repo_path: str) -> str:
+    gzip_path = os.path.join(
+        repo_path, DATA_REPO_PATH,
+        DATA_GZIP_FILENAME)
+    print('Unzipping', gzip_path)
+    latest_data_gzip = tarfile.open(gzip_path)
+    latest_data_gzip.extract(DATA_CSV_FILENAME)
+    latest_data_gzip.close()
+
+    return DATA_CSV_FILENAME
+
+
 def read_csv(infile: str) -> DataFrame:
     return pd.read_csv(infile, header=0, low_memory=False, encoding='utf-8')
 
 
-def convert(df_import: DataFrame) -> DataFrame:
+def convert(df_import: DataFrame, geocoder: Any) -> DataFrame:
     # Operate on a separate output dataframe so we don't clobber or mutate the
     # original data.
     df_export = pd.DataFrame(columns={})
@@ -130,7 +158,7 @@ def convert(df_import: DataFrame) -> DataFrame:
 
     # Generate new travel history column.
     df_export['travelHistory'] = df_import.apply(lambda x: convert_travel_history(
-        x['ID'], x['travel_history_dates'], x['travel_history_location']), axis=1)
+        geocoder, x['ID'], x['travel_history_dates'], x['travel_history_location']), axis=1)
 
     # Archive the original fields.
     df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
