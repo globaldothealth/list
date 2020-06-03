@@ -179,9 +179,6 @@
         "items": {
           "bsonType": "object",
           "additionalProperties": false,
-          "required": [
-            "location"
-          ],
           "properties": {
             "_id": {
               "bsonType": "objectId"

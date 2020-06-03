@@ -1,12 +1,14 @@
 declare let args: SetupDatabaseParameters;
 
 interface SetupDatabaseParameters {
+    connectionString: string;
     databaseName: string;
     collectionName: string;
     schemaPath: string;
 }
 
 const setupDatabase = async ({
+    connectionString,
     databaseName,
     collectionName,
     schemaPath,
@@ -16,7 +18,7 @@ const setupDatabase = async ({
         print(`Read schema from ${schemaPath}`);
 
         // Connect to the default MongoDb instance.
-        const connection: Connection = new Mongo();
+        const connection: Connection = new Mongo(connectionString);
         print(`Connected to instance at ${connection['host']}`);
 
         // Get or create the database. (If it doesn't exist, it will be created.)
