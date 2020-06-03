@@ -154,7 +154,7 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
             'dateRange': convert_date_range(dates)
         }
     except ValueError as e:
-        warn(id, f'event[name="{name}"]', dates, e)
+        warn(id, name, f'event[name="{name}"]', dates, e)
 
 
 def convert_events(id: str, event_dates: Dict[str, Any],
@@ -226,14 +226,14 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
         if converted_age is not None:
             demographics['ageRange'] = converted_age
     except ValueError as e:
-        warn(id, 'demographics.ageRange', age, e)
+        warn(id, 'age', 'demographics.ageRange', age, e)
 
     try:
         parsed_sex = parse_sex(sex)
         if parsed_sex:
             demographics['sex'] = parsed_sex
     except ValueError as e:
-        warn(id, 'demographics.sex', age, e)
+        warn(id, 'sex', 'demographics.sex', age, e)
 
     return demographics or None
 
@@ -281,14 +281,14 @@ def convert_location(id: str, country: str, adminL1: str,
         if parsed_latitude is not None:
             geometry['latitude'] = parsed_latitude
     except ValueError as e:
-        warn(id, 'location.latitude', latitude, e)
+        warn(id, 'latitude', 'location.latitude', latitude, e)
 
     try:
         parsed_longitude = parse_longitude(longitude)
         if parsed_longitude is not None:
             geometry['longitude'] = parsed_longitude
     except ValueError as e:
-        warn(id, 'location.longitude', longitude, e)
+        warn(id, 'longitude', 'location.longitude', longitude, e)
 
     if geometry:
         location['geometry'] = geometry
@@ -319,7 +319,7 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
         string_list = parse_string_list(value)
         return {'provided': string_list} if string_list else None
     except ValueError as e:
-        warn(id, 'field_name.provided', value, e)
+        warn(id, field_name, f'{field_name}.provided', value, e)
 
 
 def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
@@ -431,7 +431,8 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
             outbreak_specifics['reportedMarketExposure'] = normalized
     except ValueError as e:
         warn(
-            id, 'outbreakSpecifics.reportedMarketExposure',
+            id, 'reported_market_exposure',
+            'outbreakSpecifics.reportedMarketExposure',
             reported_market_exposure, e)
 
     try:
@@ -439,7 +440,9 @@ def convert_outbreak_specifics(id: str, reported_market_exposure: str,
         if normalized is not None:
             outbreak_specifics['livesInWuhan'] = normalized
     except ValueError as e:
-        warn(id, 'outbreakSpecifics.livesInWuhan', lives_in_wuhan, e)
+        warn(
+            id, 'lives_in_wuhan', 'outbreakSpecifics.livesInWuhan',
+            lives_in_wuhan, e)
 
     return outbreak_specifics or None
 
@@ -466,13 +469,13 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
     try:
         location_list = parse_location_list(geocoder, location)
     except (LookupError, ValueError) as e:
-        warn(id, 'travelHistory.location', location, e)
+        warn(id, 'travel_history_location', 'travelHistory.location', location, e)
 
     date_range = None
     try:
         date_range = convert_date_range(dates)
     except (ValueError) as e:
-        warn(id, 'travelHistory.dateRange', location, e)
+        warn(id, 'travel_history_dates', 'travelHistory.dateRange', location, e)
 
     if not location_list and not date_range:
         return None
