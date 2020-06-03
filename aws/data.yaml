@@ -23,6 +23,12 @@ spec:
           image: docker.io/healthmapidha/dataservice:0.0.3
           ports:
             - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
           env:
             - name: DB_CONNECTION_STRING
               valueFrom:
@@ -61,6 +67,12 @@ spec:
           image: docker.io/healthmapidha/dataservice:0.0.3
           ports:
             - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
           env:
             - name: DB_CONNECTION_STRING
               valueFrom:

@@ -23,6 +23,12 @@ spec:
           image: docker.io/healthmapidha/curatorservice:0.0.3
           ports:
             - containerPort: 3001
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 10
           env:
             - name: DATASERVER_URL
               value: "http://data-dev"
@@ -88,6 +94,12 @@ spec:
           image: docker.io/healthmapidha/curatorservice:0.0.3
           ports:
             - containerPort: 3001
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 10
           env:
             - name: DATASERVER_URL
               value: "http://data-prod"
