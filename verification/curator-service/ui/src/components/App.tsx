@@ -80,11 +80,9 @@ class App extends React.Component<{}, User> {
                                 <SourceTable />
                             </Route>
                         )}
-                        {this.hasAnyRole(['reader']) && (
-                            <Route path="/charts/cumulative">
-                                <CumulativeCharts />
-                            </Route>
-                        )}
+                        <Route path="/charts/cumulative">
+                            <CumulativeCharts />
+                        </Route>
                         {this.state.email && (
                             <Route path="/profile">
                                 <Profile user={this.state} />
@@ -123,35 +121,33 @@ class Home extends React.Component<HomeProps, {}> {
                 {!this.props.user.email ? (
                     <div>Login to access Epid</div>
                 ) : (
-                    <nav>
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <div>
-                                <Link to="/cases">Linelist</Link>
-                            </div>
-                        )}
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <div>
-                                <Link to="/sources">Sources</Link>
-                            </div>
-                        )}
-                        {this.hasAnyRole(['reader']) && (
+                        <nav>
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/cases">Linelist</Link>
+                                </div>
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/sources">Sources</Link>
+                                </div>
+                            )}
                             <div>
                                 <Link to="/charts/cumulative">
                                     Cumulative charts
                                 </Link>
                             </div>
-                        )}
-                        <div>
-                            <Link to="/profile">Profile</Link>
-                            <br />
-                        </div>
-                        {this.hasAnyRole(['admin']) && (
                             <div>
-                                <Link to="/users">Manage users</Link>
+                                <Link to="/profile">Profile</Link>
+                                <br />
                             </div>
-                        )}
-                    </nav>
-                )}
+                            {this.hasAnyRole(['admin']) && (
+                                <div>
+                                    <Link to="/users">Manage users</Link>
+                                </div>
+                            )}
+                        </nav>
+                    )}
             </div>
         );
     }
