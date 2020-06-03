@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
 import AwsEventsClient from '../../src/clients/aws-events-client';
 
-const fakeRetrievalFunctionArn = 'fakeArn';
+let client: AwsEventsClient;
 const deleteRuleSpy = jest.fn().mockResolvedValueOnce({});
 const putRuleSpy = jest.fn().mockResolvedValue({ RuleArn: 'ruleArn' });
 const putTargetsSpy = jest.fn().mockResolvedValue({
@@ -27,6 +27,7 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'putRule', putRuleSpy);
     AWSMock.mock('CloudWatchEvents', 'putTargets', putTargetsSpy);
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
+    client = new AwsEventsClient('us-east-1', 'fakeArn');
 });
 
 afterEach(() => {
@@ -37,10 +38,6 @@ describe('putRule', () => {
     it('returns subject AWS CloudWatch Events rule ARN', async () => {
         const expectedArn = 'expectedArn';
         putRuleSpy.mockResolvedValueOnce({ RuleArn: expectedArn });
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         const ruleArn = await client.putRule(
             'passingRule',
@@ -51,11 +48,6 @@ describe('putRule', () => {
         expect(putRuleSpy).toHaveBeenCalledTimes(1);
     });
     it('creates a target for the rule if targetId is provided', async () => {
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
-
         await client.putRule(
             'passingRule',
             'description',
@@ -65,21 +57,12 @@ describe('putRule', () => {
         expect(putTargetsSpy).toHaveBeenCalledTimes(1);
     });
     it('does not mutate rule targets if targetId not provided', async () => {
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
-
         await client.putRule('passingRule', 'description', 'rate(1 hour)');
         expect(putTargetsSpy).not.toHaveBeenCalled();
     });
     it('throws errors from AWS putRule call', async () => {
         const expectedError = new Error('AWS error');
         putRuleSpy.mockRejectedValueOnce(expectedError);
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         expect.assertions(1);
         return expect(
@@ -89,10 +72,6 @@ describe('putRule', () => {
     it('throws errors from AWS putTargets call', async () => {
         const expectedError = new Error('AWS error');
         putTargetsSpy.mockRejectedValueOnce(expectedError);
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         expect.assertions(1);
         return expect(
@@ -106,10 +85,6 @@ describe('putRule', () => {
     });
     it('throws error if PutRuleResponse somehow lacks RuleArn', async () => {
         putRuleSpy.mockResolvedValueOnce({});
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         expect.assertions(1);
         return expect(
@@ -120,11 +95,6 @@ describe('putRule', () => {
 
 describe('deleteRule', () => {
     it('deletes the AWS CloudWatch Event rule and target via the SDK', async () => {
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
-
         await expect(
             client.deleteRule('passingRuleName', 'targetId'),
         ).resolves.not.toThrow();
@@ -134,10 +104,6 @@ describe('deleteRule', () => {
     it('throws errors from AWS removeTargets call', async () => {
         const expectedError = new Error('AWS error');
         removeTargetsSpy.mockRejectedValueOnce(expectedError);
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         expect.assertions(1);
         return expect(
@@ -147,10 +113,6 @@ describe('deleteRule', () => {
     it('throws errors from AWS deleteRule call', async () => {
         const expectedError = new Error('AWS error');
         deleteRuleSpy.mockRejectedValueOnce(expectedError);
-        const client = new AwsEventsClient(
-            'us-east-1',
-            fakeRetrievalFunctionArn,
-        );
 
         expect.assertions(1);
         return expect(
