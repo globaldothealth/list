@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:0.0.3
+          image: docker.io/healthmapidha/curatorservice:latest
           ports:
             - containerPort: 3001
           env:
@@ -133,6 +133,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: curator-dev
+  annotations:
+    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
@@ -141,16 +143,20 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3001
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: curator-prod
+  annotations:
+    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
-    environment: dev
+    environment: prod
   ports:
     - protocol: TCP
       port: 80
       targetPort: 3001
+  type: NodePort
