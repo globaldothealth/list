@@ -39,5 +39,5 @@ def format_iso_8601_date(value: datetime) -> str:
 def log_error(
         id: str, old_field_name: str, new_field_name: str, value: str,
         error: Exception) -> None:
-    logging.error('\t%s\t%s\t%s\t%s\t%s', id, old_field_name,
+    logging.error('%s\t%s\t%s\t%s\t%s', id, old_field_name,
                   new_field_name, value, error)

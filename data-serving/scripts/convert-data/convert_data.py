@@ -25,8 +25,9 @@ import os
 
 
 def main():
-    logging.basicConfig(filename='convert_data.log',
-                        filemode='w', level=logging.ERROR)
+    logging.basicConfig(filename='conversion_errors.tsv',
+                        filemode='w', level=logging.ERROR,
+                        format='%(message)s')
 
     parser = argparse.ArgumentParser(
         description='Convert CSV line-list data into json compliant with the '
