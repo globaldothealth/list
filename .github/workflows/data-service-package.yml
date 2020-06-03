@@ -1,8 +1,8 @@
 name: Data Service Github Packages Push
 
 on:
-  # TODO: Change to push to master once confirmed working.
-  pull_request:
+  push:
+    branches: [master]
     paths:
       - ".github/workflows/data-service-package.yml"
       - "data-serving/data-service/**"
