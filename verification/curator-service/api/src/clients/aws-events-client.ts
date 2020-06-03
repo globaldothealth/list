@@ -28,11 +28,13 @@ export default class AwsEventsClient {
      */
     putRule = async (
         ruleName: string,
-        scheduleExpression: string,
+        description: string,
+        scheduleExpression?: string,
     ): Promise<string> => {
         const params = {
             Name: ruleName,
             ScheduleExpression: scheduleExpression,
+            Description: description,
         };
         try {
             const response = await this.cloudWatchEventsClient
