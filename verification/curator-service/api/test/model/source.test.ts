@@ -21,3 +21,10 @@ describe('validate', () => {
         expect(errors?.toString()).toMatch('Enter an origin');
     });
 });
+
+describe('custom instance methods', () => {
+    it('toAwsRuleDescription returns formatted rule name', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsRuleDescription()).toContain(s.name);
+    });
+});
