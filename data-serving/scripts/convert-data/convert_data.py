@@ -113,10 +113,26 @@ def convert(df_import: DataFrame, geocoder: Any) -> DataFrame:
     # Generate new events column.
     df_export['events'] = df_import.apply(
         lambda x: convert_events(x['ID'], {
-            'onsetSymptoms': x['date_onset_symptoms'],
-            'admissionHospital': x['date_admission_hospital'],
-            'confirmed': x['date_confirmation'],
-            'deathOrDischarge': x['date_death_or_discharge']
+            (
+                x['date_onset_symptoms'],
+                'date_onset_symptoms',
+                'onsetSymptoms'
+            ),
+            (
+                x['date_admission_hospital'],
+                'date_admission_hospital',
+                'admissionHospital'
+            ),
+            (
+                x['date_confirmation'],
+                'date_confirmation',
+                'confirmed'
+            ),
+            (
+                x['date_death_or_discharge'],
+                'date_death_or_discharge',
+                'deathOrDischarge'
+            )
         }, x['outcome']), axis=1)
 
     # Generate new symptoms column.
