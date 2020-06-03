@@ -52,7 +52,7 @@ export default class AwsEventsClient {
                         {
                             Arn: this.retrievalFunctionArn,
                             Id: `${targetId}_Target`,
-                            Input: `{ targetId: "${targetId}"}`,
+                            Input: `{ sourceId: "${targetId}"}`,
                         },
                     ],
                 };
