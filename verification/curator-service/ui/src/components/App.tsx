@@ -3,6 +3,7 @@ import { Link, Route, Switch } from 'react-router-dom';
 import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
 import React from 'react';
+import CumulativeCharts from './CumulativeCharts';
 import SourceTable from './SourceTable';
 import Profile from './Profile';
 import Users from './Users';
@@ -79,6 +80,9 @@ class App extends React.Component<{}, User> {
                                 <SourceTable />
                             </Route>
                         )}
+                        <Route path="/charts/cumulative">
+                            <CumulativeCharts />
+                        </Route>
                         {this.state.email && (
                             <Route path="/profile">
                                 <Profile user={this.state} />
@@ -128,6 +132,11 @@ class Home extends React.Component<HomeProps, {}> {
                                 <Link to="/sources">Sources</Link>
                             </div>
                         )}
+                        <div>
+                            <Link to="/charts/cumulative">
+                                Cumulative charts
+                            </Link>
+                        </div>
                         <div>
                             <Link to="/profile">Profile</Link>
                             <br />
