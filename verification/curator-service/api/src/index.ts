@@ -139,6 +139,20 @@ apiRouter.put('/users/:id', usersController.updateRoles);
 
 app.use('/api', apiRouter);
 
+// Basic health check handler.
+app.get('/health', (req: Request, res: Response) => {
+    // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
+    // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
+    if (mongoose.connection.readyState == 1) {
+        res.sendStatus(200);
+        return;
+    }
+    // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
+    // couldn't determine if the backend was healthy or not but honestly
+    // this is simple enough that it makes sense.
+    return res.sendStatus(503);
+});
+
 // Serve static UI content if static directory was specified.
 if (env.STATIC_DIR) {
     console.log('Serving static files from', env.STATIC_DIR);

@@ -24,3 +24,9 @@ describe('GET /random-url', () => {
         request(app).get('/random-url').expect(404, done);
     });
 });
+
+describe('GET /health', () => {
+    it('should be healthy when connected', (done) => {
+        request(app).get('/health').expect(200, done);
+    });
+});
