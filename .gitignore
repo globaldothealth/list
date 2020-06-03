@@ -1,7 +1,7 @@
 # Local AWS testing and deployment artifacts.
 .aws
 # Log file for conversion warnings
-convert_data.log
+conversion_errors.tsv
 
 # Cypress generates videos, do not store them in revision history.
 **/cypress/**/*.mp4
