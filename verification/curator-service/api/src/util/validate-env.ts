@@ -7,6 +7,7 @@ export default function validateEnv(): Readonly<{
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
     PORT: number;
+    GLOBAL_RETRIEVAL_FUNCTION_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
     SESSION_COOKIE_KEY: string;
@@ -44,6 +45,11 @@ export default function validateEnv(): Readonly<{
             devDefault: 'mongodb://localhost:27017/covid19',
         }),
         PORT: port({ default: 3001 }),
+        GLOBAL_RETRIEVAL_FUNCTION_ARN: str({
+            desc: 'AWS ARN for the global source retrieval Lambda function',
+            default:
+                'arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-RetrievalFunction-1CEVOE6F2OOIV',
+        }),
         GOOGLE_OAUTH_CLIENT_ID: str({
             desc: 'OAuth client ID from the Google developer console',
             devDefault: 'replace to enable auth',
