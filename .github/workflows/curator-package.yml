@@ -4,6 +4,7 @@ on:
   # TODO: Change to push to master once confirmed working.
   pull_request:
     paths:
+      - ".github/workflows/curator-package.yml"
       - "verification/curator-service/**"
 
 jobs:
