@@ -116,7 +116,7 @@ def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
     })
 
 
-def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
+def convert_event(id: str, dates: Any, field_name: str, event_name: str) -> Dict[str, Any]:
     '''
     Converts a single event date column to the new event object with a name and
     range of dates.
@@ -150,11 +150,11 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
 
     try:
         return {
-            'name': str(name),
+            'name': str(event_name),
             'dateRange': convert_date_range(dates)
         }
     except ValueError as e:
-        log_error(id, name, f'event[name="{name}"]', dates, e)
+        log_error(id, field_name, f'event[name="{event_name}"]', dates, e)
 
 
 def convert_events(id: str, event_dates: Dict[str, Any],
@@ -184,7 +184,7 @@ def convert_events(id: str, event_dates: Dict[str, Any],
         where the date strings are ISO 8601 date representations.
     '''
     events = list(map(lambda i: convert_event(
-        id, i[0], i[1]), event_dates.items()))
+        id, i[0], i[1], i[2]), event_dates))
 
     # The old data model had an outcome string, which will become an event in
     # the new data model, but it won't have a date associated with it.
