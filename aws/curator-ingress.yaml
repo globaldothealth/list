@@ -1,3 +1,6 @@
+# Ingress defines how load balancers should forward traffic
+# from the internet traffic to the cluster.
+# https://kubernetes.io/docs/concepts/services-networking/ingress/
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
