@@ -4,6 +4,8 @@ import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
 import React from 'react';
 import CumulativeCharts from './CumulativeCharts';
+import FreshnessCharts from './FreshnessCharts';
+import CompletenessCharts from './CompletenessCharts';
 import SourceTable from './SourceTable';
 import Profile from './Profile';
 import Users from './Users';
@@ -83,6 +85,12 @@ class App extends React.Component<{}, User> {
                         <Route path="/charts/cumulative">
                             <CumulativeCharts />
                         </Route>
+                        <Route path="/charts/freshness">
+                            <FreshnessCharts />
+                        </Route>
+                        <Route path="/charts/completeness">
+                            <CompletenessCharts />
+                        </Route>
                         {this.state.email && (
                             <Route path="/profile">
                                 <Profile user={this.state} />
@@ -135,6 +143,14 @@ class Home extends React.Component<HomeProps, {}> {
                         <div>
                             <Link to="/charts/cumulative">
                                 Cumulative charts
+                            </Link>
+                        </div>
+                        <div>
+                            <Link to="/charts/freshness">Freshness charts</Link>
+                        </div>
+                        <div>
+                            <Link to="/charts/completeness">
+                                Completeness charts
                             </Link>
                         </div>
                         <div>
