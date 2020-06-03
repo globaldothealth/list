@@ -22,7 +22,11 @@ describe('putRule', () => {
         );
         const client = new AwsEventsClient('us-east-1');
 
-        const ruleArn = await client.putRule('passingRule', 'rate(1 hour)');
+        const ruleArn = await client.putRule(
+            'passingRule',
+            'description',
+            'rate(1 hour)',
+        );
         expect(ruleArn).toEqual(expectedArn);
     });
     it('throws errors from AWS', async () => {
@@ -38,7 +42,7 @@ describe('putRule', () => {
 
         expect.assertions(1);
         return expect(
-            client.putRule('awsErrorRule', 'rate(1 hour)'),
+            client.putRule('awsErrorRule', 'description', 'rate(1 hour)'),
         ).rejects.toThrow(expectedError);
     });
     it('throws error if AWS response somehow lacks RuleArn', async () => {
@@ -53,7 +57,7 @@ describe('putRule', () => {
 
         expect.assertions(1);
         return expect(
-            client.putRule('noResponseArnRule', 'rate(1 hour'),
+            client.putRule('noResponseArnRule', 'description', 'rate(1 hour'),
         ).rejects.toThrow('missing RuleArn');
     });
 });
