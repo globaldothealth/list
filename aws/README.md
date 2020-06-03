@@ -128,11 +128,11 @@ Data service has the labels `app=data` and `environment=prod|dev`.
 
 Services exposed contain the environment in their names to avoid mistakenly taking to a different service, for example use `http://data-dev` to talk to dev data service and `http://data-prod` to talk to the prod data service.
 
-## Docker-hub
+## Docker images
 
-Images used in deployments are pulled from docker hub where automated builds have been set-up.
+Images used in deployments are pulled from the [github docker image registry](https://github.com/open-covid-data/healthmap-gdo-temp/packages) where images are automatically built and pushed upon merge in the master branch.
 
-Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
+Check out the repos for the [curator service](https://github.com/open-covid-data/healthmap-gdo-temp/packages/253391) and [data service](https://github.com/open-covid-data/healthmap-gdo-temp/packages/253413).
 
 Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo. More specialized tags are described below.
 
@@ -146,8 +146,6 @@ We follow [semantic versioning](https://semver.org/) which is basically:
     MINOR version when you add functionality in a backwards compatible manner, and
     PATCH version when you make backwards compatible bug fixes.
 
-Docker-hub has automated builds setup that extract the semantic version from tags in the master branch.
-
 To push a new release of the curator service:
 
 Tag master with the `curator-0.1.2` tag:
@@ -158,7 +156,7 @@ the push it to the repo:
 
 `git push origin curator-0.1.2`
 
-Docker hub will automatically build the image: `docker.io/healthmapidha/curatorservice:0.1.2`.
+[Github](https://github.com/open-covid-data/healthmap-gdo-temp/blob/master/.github/workflows/data-service-package.yml) [actions](https://github.com/open-covid-data/healthmap-gdo-temp/blob/master/.github/workflows/curator-package.yml) will automatically build the image: `docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/curatorservice:curator-0.1.2`.
 
 This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
 
@@ -168,7 +166,7 @@ You can list the existing tags/versions with `git tag` or on the [github repo](h
 
 ### `Latest` image tag for dev
 
-Dev instances of curator and data services are using the `latest` image tag, that's not best practice but is okay while we work on other features. The latest image is fetched when a deployment is updated, to update dev to the `latest` image built by docker-hub, do:
+Dev instances of curator and data services are using the `latest` image tag, that's not best practice but is okay while we work on other features. The latest image is fetched when a deployment is updated, to update dev to the `latest` image built by the github action, do:
 
 ```shell
 kubectl rollout restart deployment/curator-dev
