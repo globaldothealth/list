@@ -45,11 +45,16 @@ data-prod-bd57576d8-p8wp4      1/1     Running   0          14m
 
 kubectl get services
 NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
-curator-dev    ClusterIP   10.100.116.43    <none>        80/TCP    19h
-curator-prod   ClusterIP   10.100.66.95     <none>        80/TCP    19h
-data-dev       ClusterIP   10.100.108.137   <none>        80/TCP    19h
-data-prod      ClusterIP   10.100.71.150    <none>        80/TCP    19h
-kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   20h
+curator-dev    NodePort    10.100.116.43    <none>        80:32119/TCP   4d21h
+curator-prod   NodePort    10.100.66.95     <none>        80:32085/TCP   4d21h
+data-dev       ClusterIP   10.100.108.137   <none>        80/TCP         4d22h
+data-prod      ClusterIP   10.100.71.150    <none>        80/TCP         4d22h
+kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP        4d22h
+
+kubectl get ingress
+NAME           HOSTS   ADDRESS                                                                  PORTS   AGE
+curator-dev    *       51cfaa79-default-curatorde-771d-764651811.us-east-1.elb.amazonaws.com    80      3h18m
+curator-prod   *       51cfaa79-default-curatorpr-5c7d-1665373250.us-east-1.elb.amazonaws.com   80      121m
 ```
 
 
@@ -161,6 +166,15 @@ To push a new release of the data service, follow the same procedure but change 
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/open-covid-data/healthmap-gdo-temp/releases).
 
+### `Latest` image tag for dev
+
+Dev instances of curator and data services are using the `latest` image tag, that's not best practice but is okay while we work on other features. The latest image is fetched when a deployment is updated, to update dev to the `latest` image built by docker-hub, do:
+
+```shell
+kubectl rollout restart deployment/curator-dev
+kubectl rollout restart deployment/data-dev
+```
+
 ### Rollback
 
 Just change the image tag referenced in the deployment file to an earlier version and apply the change.
@@ -168,3 +182,91 @@ Just change the image tag referenced in the deployment file to an earlier versio
 ### Deleting a release
 
 If for some reason you need to delete a tag, you can do it with `git tag -d curator-1.2.3` then `git push origin :refs/tags/curator-0.1.2` to delete it remotely.
+
+## Ingress / Application load balancer
+
+Curator services are exposed here:
+
+- [dev](http://51cfaa79-default-curatorde-771d-764651811.us-east-1.elb.amazonaws.com/)
+- [prod](http://51cfaa79-default-curatorpr-5c7d-1665373250.us-east-1.elb.amazonaws.com)
+
+TODO: Apply `external-dns` to configs once we know where we'll run those.
+
+TODO: Map port 443 in ingress configs for HTTPS support.
+
+This section unfortunately involves quite a few sequential command-line executions for properly setting-up IAM.
+
+The setup was done following a mix of articles:
+
+- https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html
+- https://aws.amazon.com/premiumsupport/knowledge-center/eks-alb-ingress-controller-fargate/
+- https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/walkthrough/echoserver/
+- https://aws.amazon.com/blogs/containers/using-alb-ingress-controller-with-amazon-eks-on-fargate/
+
+
+A one-time set-up is required the first time you create an ALB on the cluster:
+
+```shell
+$ eksctl utils associate-iam-oidc-provider \
+    --region us-east-1 \
+    --cluster healthmapidha \
+    --approve
+[ℹ]  eksctl version 0.19.0
+[ℹ]  using region us-east-1
+[ℹ]  will create IAM Open ID Connect provider for cluster "healthmapidha" in "us-east-1"
+[✔]  created IAM Open ID Connect provider for cluster "healthmapidha" in "us-east-1"
+```
+
+```shell
+$ kubectl apply -f rbac-role.yaml
+clusterrole.rbac.authorization.k8s.io/alb-ingress-controller created
+clusterrolebinding.rbac.authorization.k8s.io/alb-ingress-controller created
+serviceaccount/alb-ingress-controller created
+```
+
+```shell
+curl -o alb-ingress-iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/master/docs/examples/iam-policy.json
+aws iam create-policy --policy-name ALBIngressControllerIAMPolicy --policy-document file://alb-ingress-iam-policy.json
+```
+
+Output looks like:
+```json
+{
+    "Policy": {
+        "PolicyName": "ALBIngressControllerIAMPolicy",
+        "PolicyId": "ANPAY5MYD7EJNLANRK5BI",
+        "Arn": "arn:aws:iam::612888738066:policy/ALBIngressControllerIAMPolicy",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2020-06-02T08:36:54+00:00",
+        "UpdateDate": "2020-06-02T08:36:54+00:00"
+    }
+}
+```
+
+The ALB needs to run with its own service account, to create one do:
+
+```shell
+CLUSTER_NAME=healthmapidha
+STACK_NAME=eksctl-$CLUSTER_NAME-cluster
+VPC_ID=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" | jq -r '[.Stacks[0].Outputs[] | {key: .OutputKey, value: .OutputValue}] | from_entries' | jq -r '.VPC')
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
+eksctl create iamserviceaccount \
+--name alb-ingress-controller \
+--namespace kube-system \
+--cluster $CLUSTER_NAME \
+--attach-policy-arn arn:aws:iam::$AWS_ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy \
+--approve \
+--override-existing-serviceaccounts
+```
+
+We created our cluster with eksctl so the subnets are automatically tagged correctly for auto-discovery by the ALB controller.
+
+You can now run the controller and setup the ingresses:
+
+```
+kubectl apply -f alb-ingress.controller.yaml -f curator-ingress.yaml
+```
