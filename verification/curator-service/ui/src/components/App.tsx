@@ -121,33 +121,33 @@ class Home extends React.Component<HomeProps, {}> {
                 {!this.props.user.email ? (
                     <div>Login to access Epid</div>
                 ) : (
-                        <nav>
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <div>
-                                    <Link to="/cases">Linelist</Link>
-                                </div>
-                            )}
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <div>
-                                    <Link to="/sources">Sources</Link>
-                                </div>
-                            )}
+                    <nav>
+                        {this.hasAnyRole(['curator', 'reader']) && (
                             <div>
-                                <Link to="/charts/cumulative">
-                                    Cumulative charts
-                                </Link>
+                                <Link to="/cases">Linelist</Link>
                             </div>
+                        )}
+                        {this.hasAnyRole(['curator', 'reader']) && (
                             <div>
-                                <Link to="/profile">Profile</Link>
-                                <br />
+                                <Link to="/sources">Sources</Link>
                             </div>
-                            {this.hasAnyRole(['admin']) && (
-                                <div>
-                                    <Link to="/users">Manage users</Link>
-                                </div>
-                            )}
-                        </nav>
-                    )}
+                        )}
+                        <div>
+                            <Link to="/charts/cumulative">
+                                Cumulative charts
+                            </Link>
+                        </div>
+                        <div>
+                            <Link to="/profile">Profile</Link>
+                            <br />
+                        </div>
+                        {this.hasAnyRole(['admin']) && (
+                            <div>
+                                <Link to="/users">Manage users</Link>
+                            </div>
+                        )}
+                    </nav>
+                )}
             </div>
         );
     }

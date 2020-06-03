@@ -57,22 +57,22 @@ class CumulativeCharts extends React.Component<Props, {}> {
             height: '400px',
         });
 
-        await totalNumberCasesChart.render(
+        totalNumberCasesChart.render(
             document.getElementById('totalNumberCasesChart') as HTMLElement,
         );
-        await tabularCasesChart.render(
+        tabularCasesChart.render(
             document.getElementById('tabularCasesChart') as HTMLElement,
         );
-        await countBySexChart.render(
+        countBySexChart.render(
             document.getElementById('countBySexChart') as HTMLElement,
         );
-        await geospatialChart.render(
+        geospatialChart.render(
             document.getElementById('geospatialChart') as HTMLElement,
         );
-        await ageSexChart.render(
+        ageSexChart.render(
             document.getElementById('ageSexChart') as HTMLElement,
         );
-        await geospatialTravelHistoryChart.render(
+        geospatialTravelHistoryChart.render(
             document.getElementById(
                 'geospatialTravelHistoryChart',
             ) as HTMLElement,
