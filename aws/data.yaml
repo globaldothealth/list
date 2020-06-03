@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:latest
+          image: docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/dataservice:latest
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:0.0.3
+          image: docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/dataservice:sha-946b540
           ports:
             - containerPort: 3000
           livenessProbe:

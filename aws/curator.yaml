@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:latest
+          image: docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/curatorservice:latest
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -91,7 +91,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:0.0.3
+          image: docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/curatorservice:sha-946b540
           ports:
             - containerPort: 3001
           livenessProbe:
