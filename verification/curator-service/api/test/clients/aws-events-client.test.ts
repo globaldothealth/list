@@ -64,7 +64,6 @@ describe('putRule', () => {
         const expectedError = new Error('AWS error');
         putRuleSpy.mockRejectedValueOnce(expectedError);
 
-        expect.assertions(1);
         return expect(
             client.putRule('awsErrorRule', 'description', 'rate(1 hour)'),
         ).rejects.toThrow(expectedError);
@@ -73,7 +72,6 @@ describe('putRule', () => {
         const expectedError = new Error('AWS error');
         putTargetsSpy.mockRejectedValueOnce(expectedError);
 
-        expect.assertions(1);
         return expect(
             client.putRule(
                 'ruleName',
@@ -86,7 +84,6 @@ describe('putRule', () => {
     it('throws error if PutRuleResponse somehow lacks RuleArn', async () => {
         putRuleSpy.mockResolvedValueOnce({});
 
-        expect.assertions(1);
         return expect(
             client.putRule('noResponseArnRule', 'description', 'rate(1 hour'),
         ).rejects.toThrow('missing RuleArn');
@@ -105,7 +102,6 @@ describe('deleteRule', () => {
         const expectedError = new Error('AWS error');
         removeTargetsSpy.mockRejectedValueOnce(expectedError);
 
-        expect.assertions(1);
         return expect(
             client.deleteRule('awsErrorRuleName', 'targetId'),
         ).rejects.toThrow(expectedError);
@@ -114,7 +110,6 @@ describe('deleteRule', () => {
         const expectedError = new Error('AWS error');
         deleteRuleSpy.mockRejectedValueOnce(expectedError);
 
-        expect.assertions(1);
         return expect(
             client.deleteRule('awsErrorRuleName', 'targetId'),
         ).rejects.toThrow(expectedError);
