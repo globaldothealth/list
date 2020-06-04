@@ -269,11 +269,7 @@ describe('DELETE', () => {
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
         }).save();
-        const res = await curatorRequest
-            .delete(`/api/sources/${source.id}`)
-            .expect(200)
-            .expect('Content-Type', /json/);
-        expect(res.body._id).toEqual(source.id);
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
     it('should delete corresponding AWS rule and target if source contains ruleArn', async () => {
@@ -287,7 +283,7 @@ describe('DELETE', () => {
                 },
             },
         }).save();
-        await curatorRequest.delete(`/api/sources/${source.id}`).expect(200);
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).toHaveBeenCalledWith(
             source.toAwsRuleName(),
             source.toAwsRuleTargetId(),

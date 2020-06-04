@@ -52,6 +52,9 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "@types/multer": "^1.4.3",
+    "@types/swagger-ui-express": "^4.1.2",
+    "@types/yamljs": "^0.2.31",
     "aws-sdk": "^2.680.0",
     "axios": "^0.19.2",
     "connect-mongo": "^3.2.0",
@@ -59,9 +62,12 @@
     "dotenv": "^8.2.0",
     "envalid": "^6.0.1",
     "express": "^4.17.1",
+    "express-openapi-validator": "^3.14.1",
     "express-session": "^1.17.1",
     "mongoose": "^5.9.15",
     "passport": "^0.4.1",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "swagger-ui-express": "^4.1.4",
+    "yamljs": "^0.3.0"
   }
 }
