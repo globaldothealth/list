@@ -183,12 +183,12 @@ paths:
       summary: Updates a specific user's roles
       operationId: updateUser
       requestBody:
-        description: User to update
+        description: New roles for the user
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/Roles"
       responses:
         "200":
           $ref: "#/components/responses/200User"
@@ -223,6 +223,10 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/User"
+    Roles:
+      type: array
+      items:
+        type: string
   responses:
     "200Source":
       description: OK
