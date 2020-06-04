@@ -106,13 +106,18 @@ export default class SourcesController {
         if (source.isModified('automation.schedule.awsScheduleExpression')) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
-                    source._id.toString(),
+                    source.toAwsRuleName(),
                     source.toAwsRuleDescription(),
                     source.automation.schedule.awsScheduleExpression,
+                    source.toAwsRuleTargetId(),
+                    source._id.toString(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
             } else {
-                await this.awsEventsClient.deleteRule(source._id.toString());
+                await this.awsEventsClient.deleteRule(
+                    source.toAwsRuleName(),
+                    source.toAwsRuleTargetId(),
+                );
                 source.set('automation.schedule', undefined);
             }
         } else if (
@@ -120,7 +125,7 @@ export default class SourcesController {
             source.automation?.schedule?.awsRuleArn
         ) {
             await this.awsEventsClient.putRule(
-                source._id.toString(),
+                source.toAwsRuleName(),
                 source.toAwsRuleDescription(),
             );
         }
@@ -135,9 +140,11 @@ export default class SourcesController {
             await source.validate();
             if (source.automation?.schedule) {
                 const createdRuleArn = await this.awsEventsClient.putRule(
-                    source._id.toString(),
+                    source.toAwsRuleName(),
                     source.toAwsRuleDescription(),
                     source.automation.schedule.awsScheduleExpression,
+                    source.toAwsRuleTargetId(),
+                    source._id.toString(),
                 );
                 source.set('automation.schedule.awsRuleArn', createdRuleArn);
             }
@@ -162,7 +169,10 @@ export default class SourcesController {
             return;
         }
         if (source.automation?.schedule?.awsRuleArn) {
-            await this.awsEventsClient.deleteRule(source._id.toString());
+            await this.awsEventsClient.deleteRule(
+                source.toAwsRuleName(),
+                source.toAwsRuleTargetId(),
+            );
         }
         source.remove();
         res.json(source);
