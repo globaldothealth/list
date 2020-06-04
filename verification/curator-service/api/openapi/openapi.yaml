@@ -1,0 +1,273 @@
+openapi: 3.0.3
+info:
+  title: EPID curator service API
+  description: Server for CRUD operations on EPID data
+  termsOfService: "https://www.healthmap.org/about/termsofuse/"
+  contact:
+    email: info@healthmap.org
+  license:
+    name: MIT
+    url: "https://opensource.org/licenses/MIT"
+  version: 1.0.0
+paths:
+  /sources:
+    get:
+      tags: [Source]
+      summary: Lists sources
+      operationId: listSources
+      parameters:
+        - name: page
+          in: query
+          description: The pages of sources to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of sources to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          $ref: "#/components/responses/200SourceArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    post:
+      tags: [Source]
+      summary: Creates a new source
+      operationId: createSource
+      requestBody:
+        description: Source to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewSource"
+      responses:
+        "201":
+          $ref: "#/components/responses/201Source"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The source ID
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    get:
+      tags: [Source]
+      summary: Gets a specific source
+      operationId: getSource
+      responses:
+        "200":
+          $ref: "#/components/responses/200Source"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      tags: [Source]
+      summary: Updates a specific source
+      operationId: updateSource
+      requestBody:
+        description: Source to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Source"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Source"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      tags: [Source]
+      summary: Deletes a specific source
+      operationId: deleteSource
+      responses:
+        "204":
+          description: Source deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+  /users:
+    get:
+      tags: [User]
+      summary: Lists users
+      operationId: listUsers
+      parameters:
+        - name: page
+          in: query
+          description: The pages of users to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of users to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          $ref: "#/components/responses/200UserArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The user ID
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    put:
+      tags: [User]
+      summary: Updates a specific user's roles
+      operationId: updateUser
+      requestBody:
+        description: New roles for the user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Roles"
+      responses:
+        "200":
+          $ref: "#/components/responses/200User"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+components:
+  schemas:
+    Source:
+      description: A complete source; a superset of "#/components/schemas/NewSource" with server-added fields
+      allOf:
+        - $ref: "#/components/schemas/NewSource"
+        - type: object
+    SourceArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/Source"
+    NewSource:
+      description: The subset of "#/components/schemas/Source" required to create the entity
+      type: object
+    User:
+      description: An EPID user
+      type: object
+    UserArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
+    Roles:
+      type: array
+      items:
+        type: string
+  responses:
+    "200Source":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Source"
+    "200SourceArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SourceArray"
+    "201Source":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Source"
+    "200User":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    "200UserArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserArray"
+    "400":
+      description: Malformed request
+    "401":
+      description: Unauthorized
+    "404":
+      description: Not found
+    "422":
+      description: Unprocessable entity
+    "500":
+      description: Internal server error
+servers:
+  - url: http://localhost:3001/api
+    description: Local server
