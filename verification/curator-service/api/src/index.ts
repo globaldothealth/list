@@ -1,6 +1,7 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
+import { OpenApiValidator } from 'express-openapi-validator';
 import { Request, Response } from 'express';
 
 import AwsEventsClient from './clients/aws-events-client';
@@ -15,7 +16,9 @@ import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
 import session from 'express-session';
+import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import YAML from 'yamljs';
 
 const app = express();
 app.use(bodyParser.json());
@@ -152,6 +155,16 @@ app.get('/health', (req: Request, res: Response) => {
     // this is simple enough that it makes sense.
     return res.sendStatus(503);
 });
+
+// API documentation.
+const swaggerDocument = YAML.load('./openapi/openapi.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// API validation.
+new OpenApiValidator({
+    apiSpec: './openapi/openapi.yaml',
+    validateResponses: true,
+}).install(app);
 
 // Serve static UI content if static directory was specified.
 if (env.STATIC_DIR) {
