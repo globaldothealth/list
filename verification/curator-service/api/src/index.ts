@@ -76,7 +76,10 @@ app.use(passport.session());
 app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
-const awsEventsClient = new AwsEventsClient(env.AWS_SERVICE_REGION);
+const awsEventsClient = new AwsEventsClient(
+    env.AWS_SERVICE_REGION,
+    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
