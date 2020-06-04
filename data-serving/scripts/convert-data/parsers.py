@@ -18,7 +18,7 @@ import numbers
 import math
 import datetime
 from typing import Any, Callable, Dict, List, Tuple
-from constants import VALID_SEXES
+from constants import COMMON_LOCATION_ABBREVIATIONS, VALID_SEXES
 from utils import trim_string_list
 from geocode_util import lookup_location
 
@@ -201,7 +201,10 @@ def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
 
     # Parse the location string into tokens (e.g. city, province, country) and
     # try to find a match with the geocoder.
-    geocode_result = lookup_location(geocoder, parse_list(value.lower(), ','))
+    geocode_result = lookup_location(
+        geocoder, COMMON_LOCATION_ABBREVIATIONS, parse_list(
+            value.lower(),
+            ','))
 
     result = {
         'country': geocode_result.country_new,
