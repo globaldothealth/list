@@ -1,30 +1,27 @@
-from typing import Any, Callable, Dict, Optional, NewType, Union
-from constants import COMMON_LOCATION_ABBREVIATIONS
-
-'''
-Location data of the form:
-        {
-          lat: float
-          lng: float
-          geo_resolution: str
-          country_new: str
-          admin_id: int
-          location: str
-          admin3: str
-          admin2: str
-          admin1: str
-        }
-'''
-Geocode = NewType('Geocode', Dict[str, Union[str, int, float]])
+from typing import Any, Callable, Dict, Optional, NamedTuple, NewType, Tuple, Union
 
 
-def lookup_location(geocoder: Any, location_tokens: [str]) -> Geocode:
+class Geocode(NamedTuple):
+    lat: float
+    lng: float
+    geo_resolution: str
+    country_new: str
+    admin_id: int
+    location: str
+    admin3: str
+    admin2: str
+    admin1: str
+
+
+def lookup_location(
+        geocoder: Any, location_cache: Dict[Tuple, Tuple],
+        location_tokens: [str]) -> Geocode:
     '''
     Attempts to match the provided location tokens against known locations using
     the provided geocoder.
 
     Parameters:
-        location_tokens: One or more tokens representing a location, which 
+        location_tokens: One or more tokens representing a location, which
           may represent a part or whole of a location of any resolution.
           Examples: ['NY'], ['Paris, France'], ['Wuhan City, Hubei, China'],
           ['China']
@@ -35,16 +32,24 @@ def lookup_location(geocoder: Any, location_tokens: [str]) -> Geocode:
     Returns:
       Geocode
     '''
-    normalized_tokens = [COMMON_LOCATION_ABBREVIATIONS.get(l.lower(), l)
-                         for l in location_tokens]
+    normalized_tokens = [l.lower() for l in location_tokens]
 
     if not normalized_tokens:
         raise ValueError('No location tokens')
     if len(normalized_tokens) > 3:
         raise ValueError('Too many tokens in location')
 
+    # If that token is a common abbreviation, geocode it using the full
+    # location we have cached. Otherwise, look it up by its token.
+    cached_location = location_cache.get(tuple(normalized_tokens))
+
     matches = []
-    if len(normalized_tokens) == 1:
+    if cached_location:
+        match = geocoder.geocode(
+            cached_location[0] or '', cached_location[1] or '',
+            cached_location[2] or '')
+        matches = [match] if match else []
+    elif len(normalized_tokens) == 1:
         # A location of a single token, which may be a country, city, province,
         # etc. Ex. "Paris", "China", "FL"
         matches = lookup_single_part_location(geocoder, normalized_tokens[0])
@@ -58,16 +63,17 @@ def lookup_location(geocoder: Any, location_tokens: [str]) -> Geocode:
     else:
         # A three-part location, presumed to include city, province, and
         # country.
-        matches = geocoder.geocode(
+        match = geocoder.geocode(
             normalized_tokens[0],  # city
             normalized_tokens[1],  # province
             normalized_tokens[2])  # country
+        matches = [match] if match else []
 
     if not matches:
-        raise ValueError('no geocode found for location string')
+        raise ValueError('No geocode found for location string')
     elif len(matches) > 1:
         raise ValueError(
-            f'ambiguous location string; matches multiple geocodes: {matches}')
+            f'Ambiguous location string; matches multiple geocodes: {matches}')
     else:
         return matches[0]
 
