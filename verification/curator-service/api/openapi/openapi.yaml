@@ -12,6 +12,7 @@ info:
 paths:
   /sources:
     get:
+      tags: [Source]
       summary: Lists sources
       operationId: listSources
       parameters:
@@ -46,6 +47,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     post:
+      tags: [Source]
       summary: Creates a new source
       operationId: createSource
       requestBody:
@@ -76,6 +78,7 @@ paths:
           type: string
           pattern: '^[a-f\d]{24}$'
     get:
+      tags: [Source]
       summary: Gets a specific source
       operationId: getSource
       responses:
@@ -92,6 +95,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     put:
+      tags: [Source]
       summary: Updates a specific source
       operationId: updateSource
       requestBody:
@@ -115,6 +119,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     delete:
+      tags: [Source]
       summary: Deletes a specific source
       operationId: deleteSource
       responses:
@@ -130,6 +135,7 @@ paths:
           $ref: "#/components/responses/500"
   /users:
     get:
+      tags: [User]
       summary: Lists users
       operationId: listUsers
       parameters:
@@ -173,6 +179,7 @@ paths:
           type: string
           pattern: '^[a-f\d]{24}$'
     put:
+      tags: [User]
       summary: Updates a specific user's roles
       operationId: updateUser
       requestBody:
