@@ -47,12 +47,13 @@ describe('putRule', () => {
         expect(ruleArn).toEqual(expectedArn);
         expect(putRuleSpy).toHaveBeenCalledTimes(1);
     });
-    it('creates a target for the rule if targetId is provided', async () => {
+    it('creates a target for the rule if targetId and sourceId provided', async () => {
         await client.putRule(
             'passingRule',
             'description',
             'rate(1 hour)',
             'targetId',
+            'sourceId',
         );
         expect(putTargetsSpy).toHaveBeenCalledTimes(1);
     });
@@ -78,6 +79,7 @@ describe('putRule', () => {
                 'description',
                 'rate(1 hour)',
                 'awsErrorTargetId',
+                'sourceId',
             ),
         ).rejects.toThrow(expectedError);
     });

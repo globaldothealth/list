@@ -153,7 +153,7 @@ describe('PUT', () => {
         expect(res.body.origin.url).toEqual('http://foo.bar');
         expect(mockPutRule).not.toHaveBeenCalled();
     });
-    it('should create an AWS rule if provided schedule expression', async () => {
+    it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
@@ -170,9 +170,11 @@ describe('PUT', () => {
             .expect('Content-Type', /json/);
         expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
-            source._id.toString(),
+            source.toAwsRuleName(),
             source.toAwsRuleDescription(),
             scheduleExpression,
+            source.toAwsRuleTargetId(),
+            source._id.toString(),
         );
     });
     it('should update AWS rule description on source rename', async () => {
@@ -231,7 +233,7 @@ describe('POST', () => {
         expect(res.body.name).toEqual(source.name);
         expect(mockPutRule).not.toHaveBeenCalled();
     });
-    it('should create an AWS rule if provided schedule expression', async () => {
+    it('should create an AWS rule with target if provided schedule expression', async () => {
         const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
@@ -245,11 +247,14 @@ describe('POST', () => {
             .send(source)
             .expect('Content-Type', /json/)
             .expect(201);
-        expect(res.body.automation.schedule.awsRuleArn).toBeDefined();
+        const createdSource = new Source(res.body);
+        expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
         expect(mockPutRule).toHaveBeenCalledWith(
-            res.body._id,
-            new Source(source).toAwsRuleDescription(),
+            createdSource.toAwsRuleName(),
+            createdSource.toAwsRuleDescription(),
             scheduleExpression,
+            createdSource.toAwsRuleTargetId(),
+            createdSource._id.toString(),
         );
     });
     it('should not create invalid source', async () => {
@@ -267,7 +272,7 @@ describe('DELETE', () => {
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
-    it('should delete corresponding AWS rule if source contains ruleArn', async () => {
+    it('should delete corresponding AWS rule and target if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
@@ -279,7 +284,10 @@ describe('DELETE', () => {
             },
         }).save();
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
-        expect(mockDeleteRule).toHaveBeenCalledWith(source._id.toString());
+        expect(mockDeleteRule).toHaveBeenCalledWith(
+            source.toAwsRuleName(),
+            source.toAwsRuleTargetId(),
+        );
     });
     it('should not be able to delete a non existent source', (done) => {
         curatorRequest
