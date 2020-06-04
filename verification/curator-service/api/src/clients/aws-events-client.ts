@@ -34,6 +34,7 @@ export default class AwsEventsClient {
         description: string,
         scheduleExpression?: string,
         targetId?: string,
+        sourceId?: string,
     ): Promise<string> => {
         try {
             const putRuleParams = {
@@ -45,14 +46,14 @@ export default class AwsEventsClient {
                 .putRule(putRuleParams)
                 .promise();
             this.assertString(response.RuleArn);
-            if (targetId) {
+            if (targetId && sourceId) {
                 const putTargetsParams = {
                     Rule: ruleName,
                     Targets: [
                         {
                             Arn: this.retrievalFunctionArn,
-                            Id: `${targetId}_Target`,
-                            Input: `{ sourceId: "${targetId}"}`,
+                            Id: targetId,
+                            Input: JSON.stringify({ sourceId: sourceId }),
                         },
                     ],
                 };
