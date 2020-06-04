@@ -4,7 +4,7 @@ import { Source, SourceDocument } from '../model/source';
 import AwsEventsClient from '../clients/aws-events-client';
 
 export default class SourcesController {
-    constructor(private readonly awsEventsClient: AwsEventsClient) {}
+    constructor(private readonly awsEventsClient: AwsEventsClient) { }
 
     /**
      * List the sources.
@@ -165,7 +165,7 @@ export default class SourcesController {
             await this.awsEventsClient.deleteRule(source._id.toString());
         }
         source.remove();
-        res.json(source);
+        res.status(204).end();
         return;
     };
 }
