@@ -11,7 +11,7 @@ schema-compliant json format.
 python3 convert_data.py --ncov2019_path=/path/to/nCoV2019 [--sample_rate=.1] [--outfile=cases.json]
 ```
 
-Logs will be written to `convert_data.log`.
+Errors will be written to `conversion_errors.tsv`.
 
 ### Current stats
 
