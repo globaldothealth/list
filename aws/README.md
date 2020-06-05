@@ -194,7 +194,7 @@ It allows getting real-time resource usage of pods and nodes using `kubectl top 
 
 ## Ingress / Application load balancer
 
-We use the kubernetes-maintained nginx ingress controller, it was installed with:
+We use the [kubernetes-maintained nginx ingress controller](https://kubernetes.github.io/ingress-nginx/), it was installed with:
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-0.32.0/deploy/static/provider/aws/deploy.yaml
