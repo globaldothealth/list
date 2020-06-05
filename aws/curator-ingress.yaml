@@ -6,9 +6,10 @@ kind: Ingress
 metadata:
   name: curator
   annotations:
+    # Makes this ingress discovered by the nginx ingress controller.
     kubernetes.io/ingress.class: "nginx"
-    # TODO: switch to prod once confirmed working.
-    cert-manager.io/issuer: "letsencrypt-staging"
+    # Use this issuer defined in letsencrypt.yaml to get certs automatically.
+    cert-manager.io/issuer: "letsencrypt-prod"
 spec:
   tls:
     - hosts:
