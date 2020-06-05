@@ -7,7 +7,7 @@ spec:
   acme:
     # Let's Encrypt will use this to contact you about expiring
     # certificates, and issues related to your account.
-    email: timothe@google.com
+    email: healthmap@gmail.com
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # Secret resource that will be used to store the account's private key.
@@ -27,7 +27,7 @@ spec:
   acme:
     # Let's Encrypt will use this to contact you about expiring
     # certificates, and issues related to your account.
-    email: timothe@google.com
+    email: healthmap@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       # Secret resource that will be used to store the account's private key.
