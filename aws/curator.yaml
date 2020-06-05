@@ -20,8 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          # TODO: latest is broken due to openapi.
-          image: docker.io/healthmapidha/curatorservice:0.0.4
+          image: docker.io/healthmapidha/curatorservice:latest
           ports:
             - containerPort: 3001
           livenessProbe:
