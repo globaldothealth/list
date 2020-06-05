@@ -1,6 +1,11 @@
 # healthmap-gdo-temp
 To-be-renamed project repository for the HealthMap/GDO open epidemiology collaboration.
 
+## Frontends
+
+- [dev](https://dev-curator.ghdsi.org)
+- [prod](https://curator.ghdsi.org)
+
 ## CI/CD status
 
 ![Curator API Node.js CI](https://github.com/open-covid-data/healthmap-gdo-temp/workflows/Curator%20API%20Node.js%20CI/badge.svg)
