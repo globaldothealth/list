@@ -4,9 +4,13 @@ on:
   push:
     branches: [master]
     paths: ["/data-serving/scripts/convert-data/**"]
+  # TODO: Remove this once we have a webhook that triggers the update.
+  schedule:
+    # Every day at 5AM (data is typically pushed a little after 4AM UTC).
+    - cron: "* 5 * * *"
 
 jobs:
-  update-case-data:
+  update-case-data-prod:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,4 +38,4 @@ jobs:
         run: python -m pip install --upgrade pandas
 
       - name: Run update script
-        run: ./data-serving/scripts/data-pipeline/run_pipeline.sh -r .1 -m mongodb+srv://khmoran:P07EMKHI6Hk5kbhi@covid19-map-cluster01-sc7u9.mongodb.net
+        run: ./data-serving/scripts/data-pipeline/run_pipeline.sh -m mongodb+srv://${{ secrets.MONGODB_USER }}:${{ secrets.MONGODB_PASS }}@covid19-map-cluster01-sc7u9.mongodb.net
