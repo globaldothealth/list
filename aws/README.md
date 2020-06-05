@@ -68,6 +68,10 @@ To update the deployments use:
 kubectl apply -f data.yaml -f curator.yaml
 ```
 
+## Getting access to the cluster
+
+Ask an admin to run `kubectl edit -n kube-system configmap/aws-auth` and add the appropriate user there. Instructions can be found in the [official docs](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html).
+
 ### Addressing
 
 The EKS cluster has kube-dns running by default which enables pods to talk together easily.
