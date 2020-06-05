@@ -47,6 +47,7 @@ WORKDIR /usr/src/app/
 
 # Copy compiled app from previous stage.
 COPY --from=builder /usr/src/app/verification/curator-service/api/node_modules ./node_modules
+COPY --from=builder /usr/src/app/verification/curator-service/api/openapi ./openapi
 COPY --from=builder /usr/src/app/verification/curator-service/api/dist ./dist
 COPY --from=builder /usr/src/app/verification/curator-service/ui/build ./fe
 # Set environment variable to serve static files from built UI.
