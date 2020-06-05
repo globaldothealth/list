@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, NamedTuple, NewType, Tuple, Union
+from typing import Any, Callable, Dict, NamedTuple, Tuple
 
 
 class Geocode(NamedTuple):

@@ -9,11 +9,9 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-import pandas as pd
 from parsers import (parse_age, parse_bool, parse_date,
                      parse_latitude, parse_list, parse_location_list,
                      parse_longitude, parse_range, parse_sex, parse_string_list)
-from pandas import Series
 from typing import Any, Callable, Dict, List
 from utils import format_iso_8601_date, is_url, log_error
 
@@ -145,7 +143,7 @@ def convert_event(id: str, dates: Any, field_name: str, event_name: str) -> Dict
         where the date strings are ISO 8601 date representations.
 
     '''
-    if pd.isna(dates):
+    if not dates:
         return None
 
     try:
@@ -188,7 +186,7 @@ def convert_events(id: str, event_dates: Dict[str, Any],
 
     # The old data model had an outcome string, which will become an event in
     # the new data model, but it won't have a date associated with it.
-    if pd.notna(outcome):
+    if outcome:
         events.append({'name': str(outcome)})
 
     # Filter out None values.
@@ -262,16 +260,16 @@ def convert_location(id: str, country: str, adminL1: str,
     '''
     location = {}
 
-    if pd.notna(country):
+    if country:
         location['country'] = str(country)
 
-    if pd.notna(adminL1):
+    if adminL1:
         location['administrativeAreaLevel1'] = str(adminL1)
 
-    if pd.notna(adminL2):
+    if adminL2:
         location['administrativeAreaLevel2'] = str(adminL2)
 
-    if pd.notna(locality):
+    if locality:
         location['locality'] = str(locality)
 
     geometry = {}
@@ -339,7 +337,7 @@ def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
         'id': 0
     }
 
-    if pd.notna(data_moderator_initials):
+    if data_moderator_initials:
         revision_metadata['moderator'] = str(data_moderator_initials)
 
     return revision_metadata
@@ -352,7 +350,7 @@ def convert_notes_field(notes_fields: [str]) -> str:
     Returns:
       str: Always.
     '''
-    notes = '; '.join([x for x in notes_fields if pd.notna(x)])
+    notes = '; '.join([x for x in notes_fields if x])
     return notes or None
 
 
@@ -370,7 +368,7 @@ def convert_sources_field(source: str) -> Dict[str, str]:
           'other': str
         }
     '''
-    if pd.isna(source):
+    if not source:
         return None
 
     sources = parse_list(source, ',')
@@ -492,7 +490,7 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
     return [{'dateRange': date_range, 'location': l} for l in location_list if l]
 
 
-def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
+def convert_imported_case(values_to_archive: Dict[str, Any]) -> Dict[str, Any]:
     '''
     Converts original field names and values to the importedCase archival
     object.
@@ -501,5 +499,4 @@ def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
       Dict[str, Any]: Always. Dictionary keys are the names of the original
         fields, and the values are the values of the original fields.
     '''
-    return {k: str(v) for k, v in values_to_archive.iteritems()
-            if pd.notna(v)}
+    return {k: str(v) for k, v in values_to_archive.items() if v}
