@@ -20,7 +20,8 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:latest
+          # TODO: latest is broken due to openapi.
+          image: docker.io/healthmapidha/curatorservice:0.0.4
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -67,8 +68,8 @@ spec:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -138,37 +139,29 @@ spec:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: curator-dev
-  annotations:
-    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
     environment: dev
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 3001
-  type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: curator-prod
-  annotations:
-    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
     environment: prod
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 3001
-  type: NodePort
