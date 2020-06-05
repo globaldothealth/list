@@ -231,3 +231,5 @@ kubectl apply -f letsencrypt.yaml
 ```
 
 The nginx ingress is annotated with the corresponding `cert-manager.io/issuer` annotation so that certs are automatically requested for the hosts specified in the ingress config.
+
+You can check the certs with `kubectl get|describe certificates`.
