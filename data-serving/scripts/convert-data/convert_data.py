@@ -60,6 +60,9 @@ def main():
     print('Writing results to', args.outfile.name)
     write_json(converted_cases, args.outfile)
 
+    # Clean up the CSV file we unzipped.
+    os.remove(csv_path)
+
     print('Great success! 🎉')
 
 
