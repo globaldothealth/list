@@ -14,6 +14,8 @@ To configure kubectl to talk to the ghdsi cluster, do:
 aws eks --region us-east-1 update-kubeconfig --name ghdsi
 ```
 
+If you have multiple contexts in your kubeconfig, you can list them with `kubectl config get-contexts` and use the one you want with: `kubectl config use-context <context name>`.
+
 ## Kubernetes setup
 
 Our cluster can be seen on the [AWS console](https://console.aws.amazon.com/eks/home?region=us-east-1#/clusters) but that console is pretty much useless as it shows no information on the cluster nodes.
@@ -51,7 +53,6 @@ data-dev       ClusterIP   10.100.204.152   <none>        80/TCP    3h7m
 data-prod      ClusterIP   10.100.59.189    <none>        80/TCP    3h7m
 kubernetes     ClusterIP   10.100.0.1       <none>        443/TCP   3h25m
 
-kubectl get ingress
 kubectl get ingress
 NAME                        HOSTS                                     ADDRESS                                                                         PORTS     AGE
 cm-acme-http-solver-k9bzb   curator.ghdsi.org                         ad9f94057436541e5a5d6b4f9b2deec0-1e4e71b2092ca07c.elb.us-east-1.amazonaws.com   80        31s
