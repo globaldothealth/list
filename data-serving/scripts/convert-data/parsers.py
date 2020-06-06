@@ -13,7 +13,6 @@
   '''
 
 import re
-import pandas as pd
 import numbers
 import math
 import datetime
@@ -53,7 +52,7 @@ def parse_bool(value: Any) -> bool:
       None: When the input value is empty or a string indicating n/a.
       bool: When the value is present and successfully parsed.
     '''
-    if pd.isna(value) or value == 'na':
+    if value is None or value == 'na':
         return None
 
     # Throw an error if the value can't be converted to a boolean.
@@ -79,7 +78,7 @@ def parse_range(
     Returns:
       Tuple[Any, Any]: Always. The tuple is in the format (start, end).
     '''
-    if pd.isna(value):
+    if not value:
         return (None, None)
 
     # First check if the value is represented as a range.
@@ -120,7 +119,7 @@ def parse_age(value: Any) -> float:
       None: When the value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     if type(value) is str:
@@ -156,7 +155,7 @@ def parse_date(value: str) -> datetime:
       None: When the value is empty.
       datetime: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     try:
@@ -238,7 +237,7 @@ def parse_location_list(geocoder: Any, value: Any) -> [Dict[str, Any]]:
         A list of dictionaries containing the location data.
     '''
     separator = None
-    if pd.isna(value):
+    if not value:
         return None
     if ';' in value:
         separator = ';'
@@ -262,7 +261,7 @@ def parse_sex(value: Any) -> str:
       None: When the input value is empty or a string indicating n/a.
       str: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     if str(value).lower() not in VALID_SEXES:
@@ -284,7 +283,7 @@ def parse_latitude(value: Any) -> float:
       None: When the input value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     latitude = float(value)
@@ -308,7 +307,7 @@ def parse_longitude(value: Any) -> float:
       None: When the input value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     longitude = float(value)
@@ -333,7 +332,7 @@ def parse_string_list(value: Any) -> List[str]:
       None: When the input value is empty.
       List[str]: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
     if type(value) is not str:
         raise ValueError('not a string')

@@ -18,11 +18,13 @@ GEOCODER_REPO_PATH = 'code/sheet_cleaner/geocoding'
 
 # TODO(khmoran): Include 'outcome' once the curator UI transitions to using the
 # new events-based outcome field.
-LOSSLESS_FIELDS = [
-    'additional_information', 'admin1', 'admin2', 'age', 'chronic_disease',
-    'city', 'country', 'data_moderator_initials', 'date_death_or_discharge',
-    'latitude', 'lives_in_Wuhan', 'longitude', 'notes_for_discussion',
-    'sequence_available', 'sex', 'source', 'symptoms']
+LOSSY_FIELDS = [
+    'ID', 'province', 'geo_resolution', 'date_onset_symptoms',
+    'date_admission_hospital', 'date_confirmation', 'travel_history_dates',
+    'travel_history_location', 'reported_market_exposure',
+    'chronic_disease_binary', 'outcome', 'location', 'admin3', 'country_new',
+    'admin_id', 'travel_history_binary'
+]
 
 '''
 Mappings from location shorthands to tuples of their full location data, i.e.

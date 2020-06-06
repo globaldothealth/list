@@ -7,19 +7,18 @@ import argparse
 import csv
 import logging
 import imp
+import itertools
 import json
-import pandas as pd
-import sys
+import progressbar
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
     convert_imported_case, convert_location, convert_revision_metadata_field,
     convert_notes_field, convert_sources_field, convert_pathogens_field,
     convert_outbreak_specifics, convert_travel_history)
-from pandas import DataFrame
 from typing import Any
 from constants import (
     DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
-    GEOCODER_MODULE, GEOCODER_REPO_PATH, LOSSLESS_FIELDS)
+    GEOCODER_MODULE, GEOCODER_REPO_PATH, LOSSY_FIELDS)
 import tarfile
 import os
 
@@ -33,32 +32,19 @@ def main():
         description='Convert CSV line-list data into json compliant with the '
         'MongoDB schema.')
     parser.add_argument('--ncov2019_path', type=str, required=True)
-    parser.add_argument('--outfile',
-                        nargs='?',
-                        type=argparse.FileType('w', encoding='UTF-8'),
-                        default=sys.stdout)
+    parser.add_argument('--outfile', type=str, required=True)
     parser.add_argument('--sample_rate', default=1.0, type=float)
 
     args = parser.parse_args()
 
     csv_path = extract_csv(args.ncov2019_path)
+    num_cases = len(open(csv_path).readlines())
+    num_to_convert = int(args.sample_rate*num_cases)
+    print(f'Converting {num_to_convert} / {num_cases} cases from {csv_path}')
 
-    print('Reading data from', csv_path)
-    original_cases = read_csv(csv_path)
-
-    if args.sample_rate < 1.0:
-        original_rows = original_cases.shape[0]
-        original_cases = original_cases.sample(frac=args.sample_rate)
-        print(
-            f'Downsampling to {args.sample_rate*100}% of cases from '
-            f'{original_rows} to {original_cases.shape[0]} rows')
-
-    print('Converting data to new schema')
-    geocoder = load_geocoder(args.ncov2019_path)
-    converted_cases = convert(original_cases, geocoder)
-
-    print('Writing results to', args.outfile.name)
-    write_json(converted_cases, args.outfile)
+    print('Converting data to new schema and writing to', args.outfile)
+    convert(csv_path, args.outfile, load_geocoder(
+        args.ncov2019_path), args.sample_rate, num_to_convert)
 
     # Clean up the CSV file we unzipped.
     os.remove(csv_path)
@@ -86,110 +72,105 @@ def extract_csv(repo_path: str) -> str:
     return DATA_CSV_FILENAME
 
 
-def read_csv(infile: str) -> DataFrame:
-    return pd.read_csv(infile, header=0, low_memory=False, encoding='utf-8')
+def convert(infile: str, outfile: str, geocoder: Any,
+            sample_rate: int, num_to_convert: int) -> None:
+    conversion_interval = int(1/sample_rate)
+    bar = progressbar.ProgressBar(
+        maxval=num_to_convert,
+        widgets=[progressbar.Bar('=', '[', ']'),
+                 ' ', progressbar.Percentage()])
+    bar.start()
 
+    with open(outfile, mode='w') as f:
+        f.write('[')
+        with open(infile, newline='') as csvfile:
+            csvreader = csv.DictReader(csvfile)
+            for i, csv_case in enumerate(itertools.islice(
+                    csvreader, None, None, conversion_interval)):
+                bar.update(i)
+                if i != 0:
+                    f.write(',')
 
-def convert(df_import: DataFrame, geocoder: Any) -> DataFrame:
-    # Operate on a separate output dataframe so we don't clobber or mutate the
-    # original data.
-    df_export = pd.DataFrame(columns={})
+                json_case = {}
 
-    # Generate new demographics column.
-    df_export['demographics'] = df_import.apply(lambda x: convert_demographics(
-        x['ID'], x['age'], x['sex']), axis=1)
+                json_case['demographics'] = convert_demographics(
+                    csv_case['ID'], csv_case['age'], csv_case['sex'])
 
-    # Generate new location column.
-    df_export['location'] = df_import.apply(
-        lambda
-        x:
-        convert_location(
-            x['ID'],
-            x['country'],
-            x['admin1'],
-            x['admin2'],
-            x['city'],
-            x['latitude'],
-            x['longitude']),
-        axis=1)
+                json_case['location'] = convert_location(
+                    csv_case['ID'],
+                    csv_case['country'],
+                    csv_case['admin1'],
+                    csv_case['admin2'],
+                    csv_case['city'],
+                    csv_case['latitude'],
+                    csv_case['longitude'])
 
-    # Generate new events column.
-    df_export['events'] = df_import.apply(
-        lambda x: convert_events(x['ID'], {
-            (
-                x['date_onset_symptoms'],
-                'date_onset_symptoms',
-                'onsetSymptoms'
-            ),
-            (
-                x['date_admission_hospital'],
-                'date_admission_hospital',
-                'admissionHospital'
-            ),
-            (
-                x['date_confirmation'],
-                'date_confirmation',
-                'confirmed'
-            ),
-            (
-                x['date_death_or_discharge'],
-                'date_death_or_discharge',
-                'deathOrDischarge'
-            )
-        }, x['outcome']), axis=1)
+                json_case['events'] = convert_events(csv_case['ID'], {
+                    (
+                        csv_case['date_onset_symptoms'],
+                        'date_onset_symptoms',
+                        'onsetSymptoms'
+                    ),
+                    (
+                        csv_case['date_admission_hospital'],
+                        'date_admission_hospital',
+                        'admissionHospital'
+                    ),
+                    (
+                        csv_case['date_confirmation'],
+                        'date_confirmation',
+                        'confirmed'
+                    ),
+                    (
+                        csv_case['date_death_or_discharge'],
+                        'date_death_or_discharge',
+                        'deathOrDischarge'
+                    )
+                }, csv_case['outcome'])
 
-    # Generate new symptoms column.
-    df_export['symptoms'] = df_import.apply(
-        lambda x: convert_dictionary_field(
-            x['ID'],
-            'symptoms',
-            x['symptoms']),
-        axis=1)
+                json_case['symptoms'] = convert_dictionary_field(
+                    csv_case['ID'],
+                    'symptoms',
+                    csv_case['symptoms'])
 
-    # Generate new chronic disease column.
-    df_export['chronicDisease'] = df_import.apply(
-        lambda x: convert_dictionary_field(
-            x['ID'],
-            'chronicDisease',
-            x['chronic_disease']),
-        axis=1)
+                json_case['chronicDisease'] = convert_dictionary_field(
+                    csv_case['ID'],
+                    'chronicDisease',
+                    csv_case['chronic_disease'])
 
-    # Generate new revision metadata column.
-    df_export['revisionMetadata'] = df_import.apply(
-        lambda x: convert_revision_metadata_field(
-            x['data_moderator_initials']
-        ), axis=1)
+                json_case['revisionMetadata'] = convert_revision_metadata_field(
+                    csv_case['data_moderator_initials'])
 
-    # Generate new notes column.
-    df_export['notes'] = df_import.apply(lambda x: convert_notes_field(
-        [x['notes_for_discussion'], x['additional_information']]), axis=1)
+                json_case['notes'] = convert_notes_field(
+                    [csv_case['notes_for_discussion'],
+                     csv_case['additional_information']])
 
-    # Generate new source column.
-    df_export['sources'] = df_import.apply(lambda x: convert_sources_field(
-        x['source']), axis=1)
+                json_case['sources'] = convert_sources_field(
+                    csv_case['source'])
 
-    # Generate new pathogens column.
-    df_export['pathogens'] = df_import.apply(lambda x: convert_pathogens_field(
-        x['sequence_available']), axis=1)
+                json_case['pathogens'] = convert_pathogens_field(
+                    csv_case['sequence_available'])
 
-    # Generate new outbreak specifics column.
-    df_export['outbreakSpecifics'] = df_import.apply(lambda x: convert_outbreak_specifics(
-        x['ID'], x['reported_market_exposure'], x['lives_in_Wuhan']), axis=1)
+                json_case['outbreakSpecifics'] = convert_outbreak_specifics(
+                    csv_case['ID'], csv_case['reported_market_exposure'], csv_case['lives_in_Wuhan'])
 
-    # Generate new travel history column.
-    df_export['travelHistory'] = df_import.apply(lambda x: convert_travel_history(
-        geocoder, x['ID'], x['travel_history_dates'], x['travel_history_location']), axis=1)
+                json_case['travelHistory'] = convert_travel_history(
+                    geocoder, csv_case['ID'],
+                    csv_case['travel_history_dates'],
+                    csv_case['travel_history_location'])
 
-    # Archive the original fields.
-    df_export['importedCase'] = df_import.apply(lambda x: convert_imported_case(
-        x.drop(LOSSLESS_FIELDS)), axis=1)
+                # Archive the original fields.
+                json_case['importedCase'] = convert_imported_case(
+                    {k: csv_case[k] for k in LOSSY_FIELDS})
 
-    return df_export
+                f.write(
+                    json.dumps(
+                        {k: v for k, v in json_case.items() if v},
+                        indent=2))
 
-
-def write_json(cases: DataFrame, outfile: str) -> None:
-    json.dump([row.dropna().to_dict()
-               for index, row in cases.iterrows()], outfile, indent=2)
+        # Close the json array.
+        bar.finish()
+        f.write(']')
 
 
 if __name__ == '__main__':
