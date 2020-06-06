@@ -35,7 +35,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install Python dependencies
-        run: python -m pip install --upgrade pandas
+        run: python -m pip install --upgrade progressbar
 
       - name: Run update script
         run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m ${{ secrets.DB_CONNECTION_URL }}
