@@ -20,10 +20,10 @@ GEOCODER_REPO_PATH = 'code/sheet_cleaner/geocoding'
 # new events-based outcome field.
 LOSSY_FIELDS = [
     'ID', 'province', 'geo_resolution', 'date_onset_symptoms',
-    'date_admission_hospital', 'date_confirmation', 'symptoms',
-    'travel_history_dates', 'travel_history_location',
-    'reported_market_exposure', 'chronic_disease_binary', 'outcome', 'location',
-    'admin3', 'country_new', 'admin_id', 'travel_history_binary'
+    'date_admission_hospital', 'date_confirmation', 'travel_history_dates',
+    'travel_history_location', 'reported_market_exposure',
+    'chronic_disease_binary', 'outcome', 'location', 'admin3', 'country_new',
+    'admin_id', 'travel_history_binary'
 ]
 
 '''
