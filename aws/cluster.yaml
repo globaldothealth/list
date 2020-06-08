@@ -1,0 +1,21 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ghdsi
+  region: us-east-1
+  version: "1.16"
+# us-east-1e used by default is apparently full
+# and cluster creation fails, these were suggested
+# by the eksctl instead.
+availabilityZones: ["us-east-1a", "us-east-1b"]
+
+managedNodeGroups:
+  - name: managed-worker-ng
+    minSize: 2
+    maxSize: 5
+    desiredCapacity: 2
+    instanceType: t3.small
+    labels: { role: worker }
+    tags:
+      nodegroup-role: worker
