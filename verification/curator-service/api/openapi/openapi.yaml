@@ -202,6 +202,18 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /users/roles:
+    get:
+      tags: [User]
+      summary: Lists roles available to users
+      operationId: listUserRoles
+      responses:
+        "200":
+          $ref: "#/components/responses/200Roles"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     Source:
@@ -258,6 +270,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UserArray"
+    "200Roles":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Roles"
     "400":
       description: Malformed request
     "401":

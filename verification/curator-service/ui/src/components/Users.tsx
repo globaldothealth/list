@@ -19,10 +19,9 @@ interface User {
     roles: string[];
 }
 
-const availableRoles = ['admin', 'reader', 'curator'];
-
 interface UsersState {
     users: User[];
+    availableRoles: string[];
     url: string;
 }
 
@@ -60,7 +59,7 @@ interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
 class Users extends React.Component<Props, UsersState> {
     constructor(props: Props) {
         super(props);
-        this.state = { users: [], url: '/api/users/' };
+        this.state = { users: [], availableRoles: [], url: '/api/users/' };
     }
 
     componentDidMount(): void {
@@ -71,6 +70,15 @@ class Users extends React.Component<Props, UsersState> {
             })
             .catch((e) => {
                 this.setState({ users: [] });
+                console.error(e);
+            });
+        axios
+            .get(this.state.url + 'roles')
+            .then((resp) => {
+                this.setState({ availableRoles: resp.data.roles });
+            })
+            .catch((e) => {
+                this.setState({ availableRoles: [] });
                 console.error(e);
             });
     }
@@ -156,14 +164,16 @@ class Users extends React.Component<Props, UsersState> {
                                                 </div>
                                             )}
                                         >
-                                            {availableRoles.map((role) => (
-                                                <MenuItem
-                                                    key={role}
-                                                    value={role}
-                                                >
-                                                    {role}
-                                                </MenuItem>
-                                            ))}
+                                            {this.state.availableRoles.map(
+                                                (role) => (
+                                                    <MenuItem
+                                                        key={role}
+                                                        value={role}
+                                                    >
+                                                        {role}
+                                                    </MenuItem>
+                                                ),
+                                            )}
                                         </Select>
                                     </FormControl>
                                 </th>
