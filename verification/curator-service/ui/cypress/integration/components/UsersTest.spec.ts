@@ -54,6 +54,7 @@ describe('Manage users page', function () {
         cy.get('th[data-testid="Bob-roles"]')
             .contains('reader')
             .should('not.exist');
+        //TODO: remove this comment
 
         // Roles are maintained on refresh
         cy.visit('/users');
