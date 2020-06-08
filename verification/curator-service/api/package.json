@@ -52,6 +52,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "@types/csurf": "^1.9.36",
     "@types/multer": "^1.4.3",
     "@types/swagger-ui-express": "^4.1.2",
     "@types/yamljs": "^0.2.31",
@@ -59,6 +60,7 @@
     "axios": "^0.19.2",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.5",
+    "csurf": "^1.11.0",
     "dotenv": "^8.2.0",
     "envalid": "^6.0.1",
     "express": "^4.17.1",
