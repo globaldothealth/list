@@ -142,6 +142,7 @@ apiRouter.delete(
 // Configure users controller.
 apiRouter.get('/users', usersController.list);
 apiRouter.put('/users/:id', usersController.updateRoles);
+apiRouter.get('/users/roles', usersController.listRoles);
 
 app.use('/api', apiRouter);
 
