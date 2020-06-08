@@ -6,7 +6,7 @@ schema.
 import argparse
 import csv
 import logging
-import imp
+from importlib import machinery
 import itertools
 import json
 import progressbar
@@ -55,8 +55,8 @@ def main():
 def load_geocoder(repo_path: str) -> Any:
     geocoder_path = os.path.join(repo_path, GEOCODER_REPO_PATH)
     geocodes_path = os.path.join(geocoder_path, GEOCODER_DB_FILENAME)
-    f, path, desc = imp.find_module(GEOCODER_MODULE, [geocoder_path])
-    geocoder_module = imp.load_module(GEOCODER_MODULE, f, path, desc)
+    spec = machinery.PathFinder().find_spec(GEOCODER_MODULE, [geocoder_path])
+    geocoder_module = spec.loader.load_module()
     return geocoder_module.CSVGeocoder(geocodes_path, lambda x: None)
 
 
