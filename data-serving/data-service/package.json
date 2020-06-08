@@ -17,7 +17,7 @@
     "test": "jest --clearCache && jest --forceExit --coverage --verbose --detectOpenHandles",
     "test-watch": "jest --clearCache && jest --verbose --detectOpenHandles --watch",
     "test-watch-all": "jest --clearCache && jest --coverage --verbose --detectOpenHandles --watchAll",
-    "test-silent": "jest --forceExit --silent --detectOpenHandles"
+    "test-silent": "jest --clearCache && jest --forceExit --silent --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
