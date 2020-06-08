@@ -2,11 +2,15 @@ name: Update case data
 
 on:
   push:
+    # Update the data when the conversion script changes.
     branches: [master]
     paths: ["/data-serving/scripts/convert-data/**"]
-  # TODO: Remove this once we have a webhook that triggers the update.
+  repository_dispatch:
+    # Update the data on a signal that the input data has changed.
+    types: [latest-data-push]
   schedule:
-    # Every day at 5AM (data is typically pushed a little after 4AM UTC).
+    # TODO: Remove this once we've verified that repository_dispatch is working.
+    # Every day at 5AM UTC (data is typically pushed a little after 4AM UTC).
     - cron: "* 5 * * *"
 
 jobs:
