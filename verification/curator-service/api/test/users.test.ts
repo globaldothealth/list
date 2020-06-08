@@ -42,6 +42,15 @@ describe('GET', () => {
             .send({ ...baseUser, ...{ roles: ['admin'] } })
             .expect(200);
     });
+
+    it('list roles should return roles', async () => {
+        const res = await adminRequest
+            .get('/api/users/roles')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.roles).toEqual(['admin', 'curator', 'reader']);
+    });
+
     it('list should return 200', async () => {
         const res = await adminRequest
             .get('/api/users')
