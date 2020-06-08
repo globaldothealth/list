@@ -25,6 +25,13 @@ export const mustBeAuthenticated = (
     res.sendStatus(403);
 };
 
+const userHasRequiredRole = (
+    user: UserDocument,
+    requiredRoles: Set<string>,
+): boolean => {
+    return user.roles?.filter((r: string) => requiredRoles.has(r)).length > 0;
+};
+
 /**
  * Express middleware that checks to see if there's an authenticated principal
  * that has any of the specified roles.
@@ -38,9 +45,7 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
         const requiredSet = new Set(requiredRoles);
         if (
             req.isAuthenticated() &&
-            (req.user as UserDocument).roles?.filter((r: string) =>
-                requiredSet.has(r),
-            ).length > 0
+            userHasRequiredRole(req.user as UserDocument, requiredSet)
         ) {
             return next();
         } else {
@@ -49,9 +54,7 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     return next(err);
                 } else if (
                     user &&
-                    (user as UserDocument).roles?.filter((r: string) =>
-                        requiredSet.has(r),
-                    ).length > 0
+                    userHasRequiredRole(user as UserDocument, requiredSet)
                 ) {
                     return next();
                 } else {
