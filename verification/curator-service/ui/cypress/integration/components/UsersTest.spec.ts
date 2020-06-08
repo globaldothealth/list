@@ -37,8 +37,8 @@ describe('Manage users page', function () {
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
-        cy.contains('Bob');
-        console.log('in here');
+        cy.contains('Bob').then(() =>
+            console.log('in here'));
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('reader');
         cy.get('th[data-testid="Bob-roles"]')
@@ -50,9 +50,9 @@ describe('Manage users page', function () {
         cy.get('li[data-value="admin"]').click();
         cy.get('li[data-value="reader"]').click();
         // Close popup
-        cy.get('ul').type('{esc}');
+        cy.get('ul').type('{esc}').then(() =>
+            console.log('in here 2'));
 
-        console.log('in here 2');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('admin');
         cy.get('th[data-testid="Bob-roles"]')
@@ -60,8 +60,8 @@ describe('Manage users page', function () {
             .should('not.exist');
 
         // Roles are maintained on refresh
-        cy.visit('/users');
-        console.log('in here 3');
+        cy.visit('/users').then(() =>
+            console.log('in here 3'));
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('admin');
         cy.get('th[data-testid="Bob-roles"]')
