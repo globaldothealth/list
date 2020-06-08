@@ -1,8 +1,14 @@
+import {
+    Strategy as GoogleStrategy,
+    Profile,
+    VerifyCallback,
+} from 'passport-google-oauth20';
 import { NextFunction, Request, Response } from 'express';
-import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { User, UserDocument } from '../model/user';
 
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import { Router } from 'express';
+import axios from 'axios';
 import passport from 'passport';
 
 // mustBeAuthenticated is a middleware that checks that the user making the call is
@@ -14,13 +20,19 @@ export const mustBeAuthenticated = (
     next: NextFunction,
 ): void => {
     if (req.isAuthenticated()) {
-        next();
-        return;
+        return next();
     }
     res.sendStatus(403);
 };
 
-// mustHaveAnyRole is an express middleware that checks that the currently logged-in user has any of the given roles.
+/**
+ * Express middleware that checks to see if there's an authenticated principal
+ * that has any of the specified roles.
+ *
+ * This middleware first checks if there's a session with an authenticated
+ * user. Then, if there isn't, it attempts to authenticate the request via an
+ * HTTP bearer token.
+ */
 export const mustHaveAnyRole = (requiredRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {
         const requiredSet = new Set(requiredRoles);
@@ -30,11 +42,24 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                 requiredSet.has(r),
             ).length > 0
         ) {
-            next();
+            return next();
         } else {
-            res.status(403).json(
-                `access is restricted to users with ${requiredRoles} roles`,
-            );
+            passport.authenticate('bearer', (err, user) => {
+                if (err) {
+                    return next(err);
+                } else if (
+                    user &&
+                    (user as UserDocument).roles?.filter((r: string) =>
+                        requiredSet.has(r),
+                    ).length > 0
+                ) {
+                    return next();
+                } else {
+                    res.status(403).json(
+                        `access is restricted to users with ${requiredRoles} roles`,
+                    );
+                }
+            })(req, res, next);
         }
     };
 };
@@ -129,7 +154,7 @@ export class AuthController {
 
         // Configure passport to use google OAuth.
         passport.use(
-            new Strategy(
+            new GoogleStrategy(
                 {
                     clientID: clientID,
                     clientSecret: clientSecret,
@@ -158,6 +183,37 @@ export class AuthController {
                     } catch (e) {
                         // Catch any error and end our authentication session with it.
                         cb(e, null);
+                    }
+                },
+            ),
+        );
+
+        // Configure passport to accept HTTP bearer tokens.
+        passport.use(
+            new BearerStrategy(
+                async (token: string, done: Function): Promise<void> => {
+                    try {
+                        const response = await axios.get(
+                            `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,
+                        );
+                        const email = response.data.email;
+                        if (!email) {
+                            return done(
+                                null,
+                                false,
+                                'Supplied bearer token must be scoped for "email"',
+                            );
+                        }
+                        let user = await User.findOne({ email: email });
+                        if (!user) {
+                            user = await User.create({
+                                email: email,
+                                token: token,
+                            });
+                        }
+                        return done(null, user);
+                    } catch (e) {
+                        return done(e);
                     }
                 },
             ),
