@@ -38,6 +38,7 @@ describe('Manage users page', function () {
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
         cy.contains('Bob');
+        console.log('in here');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('reader');
         cy.get('th[data-testid="Bob-roles"]')
@@ -51,6 +52,7 @@ describe('Manage users page', function () {
         // Close popup
         cy.get('ul').type('{esc}');
 
+        console.log('in here 2');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('admin');
         cy.get('th[data-testid="Bob-roles"]')
@@ -59,6 +61,7 @@ describe('Manage users page', function () {
 
         // Roles are maintained on refresh
         cy.visit('/users');
+        console.log('in here 3');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('admin');
         cy.get('th[data-testid="Bob-roles"]')
