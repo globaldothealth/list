@@ -27,6 +27,23 @@ LOSSY_FIELDS = [
 ]
 
 '''
+A mapping from the source's sheet id to its name. The source of truth is at
+https://github.com/beoutbreakprepared/nCoV2019/blob/master/code/sheet_cleaner/CONFIG.
+'''
+SHEET_ID_NAME_MAP = {
+    '000-1': 'outside_Hubei',
+    '000-2': 'Hubei',
+    '001': 'Africa_COVID19_line_list',
+    '002': 'Asia_Oceania_COVID19_line_list',
+    '003': 'Europe_COVID19_line_list',
+    '004': 'LATAM_COVID19_line_list',
+    '005': 'North_America_COVID19_line_list',
+    '006': 'North_America_COVID19_line_list',
+    '007': 'Europe_COVID19_line_list-2',
+    '008': 'Europe-3'
+}
+
+'''
 Mappings from location shorthands to tuples of their full location data, i.e.
 (city, province, country), with None when a given specificity is not present.
 '''
