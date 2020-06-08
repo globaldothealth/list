@@ -37,8 +37,7 @@ describe('Manage users page', function () {
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
-        cy.contains('Bob').then(() =>
-            console.log('in here'));
+        cy.contains('Bob');
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('reader');
         cy.get('th[data-testid="Bob-roles"]')
@@ -49,24 +48,20 @@ describe('Manage users page', function () {
         cy.get('div[data-testid="Bob-select-roles"]').click();
         cy.get('li[data-value="admin"]').click();
         cy.get('li[data-value="reader"]').click();
-        // Close popup
-        cy.get('ul').type('{esc}').then(() =>
-            console.log('in here 2'));
 
-        // cy.get('th[data-testid="Bob-roles"]').contains('curator');
-        // cy.get('th[data-testid="Bob-roles"]').contains('admin');
-        // cy.get('th[data-testid="Bob-roles"]')
-        //     .contains('reader')
-        //     .should('not.exist');
+        cy.get('th[data-testid="Bob-roles"]').contains('curator');
+        cy.get('th[data-testid="Bob-roles"]').contains('admin');
+        cy.get('th[data-testid="Bob-roles"]')
+            .contains('reader')
+            .should('not.exist');
 
         // Roles are maintained on refresh
-        // cy.visit('/users').then(() =>
-        //     console.log('in here 3'));
-        // cy.get('th[data-testid="Bob-roles"]').contains('curator');
-        // cy.get('th[data-testid="Bob-roles"]').contains('admin');
-        // cy.get('th[data-testid="Bob-roles"]')
-        //     .contains('reader')
-        //     .should('not.exist');
+        cy.visit('/users');
+        cy.get('th[data-testid="Bob-roles"]').contains('curator');
+        cy.get('th[data-testid="Bob-roles"]').contains('admin');
+        cy.get('th[data-testid="Bob-roles"]')
+            .contains('reader')
+            .should('not.exist');
     });
 
     it('Updated roles propagate to other pages', function () {
@@ -76,8 +71,6 @@ describe('Manage users page', function () {
         // Select new role
         cy.get('div[data-testid="Alice-select-roles"]').click();
         cy.get('li[data-value="reader"]').click();
-        // Close popup
-        cy.get('ul').type('{esc}');
 
         // Home page has reader links
         cy.visit('/');
