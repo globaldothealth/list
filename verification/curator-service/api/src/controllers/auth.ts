@@ -29,7 +29,7 @@ const userHasRequiredRole = (
     user: UserDocument,
     requiredRoles: Set<string>,
 ): boolean => {
-    return user.roles?.filter((r: string) => requiredRoles.has(r)).length > 0;
+    return user.roles?.some((r: string) => requiredRoles.has(r));
 };
 
 /**
@@ -211,7 +211,6 @@ export class AuthController {
                         if (!user) {
                             user = await User.create({
                                 email: email,
-                                token: token,
                             });
                         }
                         return done(null, user);
