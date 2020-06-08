@@ -37,7 +37,14 @@ test('lists users', async () => {
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    mockedAxios.get.mockImplementation((url) => {
+        if (url === '/api/users/roles') {
+            return Promise.resolve({
+                data: { roles: ['admin', 'curator', 'reader'] },
+            });
+        }
+        return Promise.resolve(axiosResponse);
+    });
 
     const { queryByText, findByText } = render(
         <Users user={emptyUser} onUserChange={() => { }} />,
@@ -67,7 +74,14 @@ test('updates roles on selection', async () => {
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    mockedAxios.get.mockImplementation((url) => {
+        if (url === '/api/users/roles') {
+            return Promise.resolve({
+                data: { roles: ['admin', 'curator', 'reader'] },
+            });
+        }
+        return Promise.resolve(axiosResponse);
+    });
 
     // Shows initial roles
     const { getByTestId, queryByText, findByText, getByRole } = render(
@@ -131,7 +145,14 @@ test('calls callback when user is changed', async () => {
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    mockedAxios.get.mockImplementation((url) => {
+        if (url === '/api/users/roles') {
+            return Promise.resolve({
+                data: { roles: ['admin', 'curator', 'reader'] },
+            });
+        }
+        return Promise.resolve(axiosResponse);
+    });
 
     const { getByTestId, findByText, getByRole } = render(
         <Users
@@ -191,7 +212,14 @@ test('callback not called when other users are changed', async () => {
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    mockedAxios.get.mockImplementation((url) => {
+        if (url === '/api/users/roles') {
+            return Promise.resolve({
+                data: { roles: ['admin', 'curator', 'reader'] },
+            });
+        }
+        return Promise.resolve(axiosResponse);
+    });
 
     const { getByTestId, findByText, getByRole } = render(
         <Users

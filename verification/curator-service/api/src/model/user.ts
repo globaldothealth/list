@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+export const userRoles = ['admin', 'curator', 'reader'];
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,7 +18,7 @@ const userSchema = new mongoose.Schema({
     },
     roles: {
         type: [String],
-        enum: ['reader', 'curator', 'admin'],
+        enum: userRoles,
     },
 });
 
