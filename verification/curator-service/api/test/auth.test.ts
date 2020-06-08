@@ -5,12 +5,16 @@ import { Request, Response } from 'express';
 import { Session, User } from '../src/model/user';
 
 import app from '../src/index';
+import axios from 'axios';
 import bodyParser from 'body-parser';
 import express from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 beforeAll(() => {
     return mongoose.connect(
@@ -32,6 +36,7 @@ afterAll(() => {
 afterEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    jest.clearAllMocks();
 });
 
 describe('auth', () => {
@@ -65,6 +70,61 @@ describe('local auth', () => {
             })
             .expect(200, /test-user/);
         request.get('/auth/profile').expect(200, /test-user/);
+    });
+});
+
+describe('bearer token auth', () => {
+    it('200s given properly scoped bearer token', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-user',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-user/);
+        await request.get('/auth/logout').expect(302);
+        mockedAxios.get.mockResolvedValueOnce({
+            data: { email: 'foo@bar.com' },
+        });
+        await request
+            .get('/api/sources?access_token=mF_9.B5f-4.1JqM')
+            .expect(200);
+    });
+    it('403s if token not scoped for email', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-user',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-user/);
+        await request.get('/auth/logout').expect(302);
+        mockedAxios.get.mockResolvedValueOnce({
+            data: { name: 'my name' },
+        });
+        await request
+            .get('/api/sources?access_token=mF_9.B5f-4.1JqM')
+            .expect(403);
+    });
+    it('500s if issue verifying token', async () => {
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-user',
+                email: 'foo@bar.com',
+                roles: ['curator'],
+            })
+            .expect(200, /test-user/);
+        await request.get('/auth/logout').expect(302);
+        mockedAxios.get.mockRejectedValueOnce('Oops!');
+        await request
+            .get('/api/sources?access_token=mF_9.B5f-4.1JqM')
+            .expect(500);
     });
 });
 
@@ -140,6 +200,24 @@ describe('mustHaveAnyRole', () => {
             })
             .expect(200, /test-curator/);
         request.get('/tworoles').expect(200);
+    });
+    it('passes if bearer token has role if no user session', async () => {
+        const request = supertest.agent(localApp);
+        await request
+            .post('/auth/register')
+            .send({
+                name: 'test-curator-admin',
+                email: 'foo@bar.com',
+                roles: ['curator', 'admin'],
+            })
+            .expect(200, /test-curator/);
+        await request.get('/auth/logout').expect(302);
+        mockedAxios.get.mockResolvedValueOnce({
+            data: { email: 'foo@bar.com' },
+        });
+        await request
+            .get('/mustbeadmin?access_token=mF_9.B5f-4.1JqM')
+            .expect(200);
     });
     it('errors when user has no roles', async () => {
         const request = supertest.agent(localApp);
