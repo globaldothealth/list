@@ -66,7 +66,7 @@ describe('Manage users page', function () {
         cy.get('th[data-testid="Bob-roles"]')
             .contains('reader')
             .should('not.exist');
-    });//hiya
+    });
 
     it('Updated roles propagate to other pages', function () {
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
