@@ -15,9 +15,6 @@ describe('User schema', () => {
         const errors = new User({}).validateSync();
         expect(errors).toBeDefined();
         expect(errors?.toString()).toMatch('User must have an email');
-        expect(errors?.toString()).toMatch(
-            'User must be logged-in with Google',
-        );
     });
 
     it('should restrict roles to values in the enum', () => {

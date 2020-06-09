@@ -34,6 +34,7 @@
     "@types/node": "^13.13.8",
     "@types/passport": "^1.0.3",
     "@types/passport-google-oauth20": "^2.0.3",
+    "@types/passport-http-bearer": "^1.0.35",
     "@types/supertest": "^2.0.9",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
@@ -69,6 +70,7 @@
     "mongoose": "^5.9.15",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
+    "passport-http-bearer": "^1.0.1",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
   }
