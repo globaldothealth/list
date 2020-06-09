@@ -1,12 +1,13 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import { OpenApiValidator } from 'express-openapi-validator';
 import { Request, Response } from 'express';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
+import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
+import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -18,7 +19,6 @@ import path from 'path';
 import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import YAML from 'yamljs';
 
 const app = express();
 app.use(bodyParser.json());
@@ -64,6 +64,10 @@ app.use(
             mongooseConnection: mongoose.connection,
             secret: env.SESSION_COOKIE_KEY,
         }),
+        cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        },
     }),
 );
 const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
