@@ -1,17 +1,18 @@
 import { Link, Route, Switch } from 'react-router-dom';
 
-import EpidNavbar from './EpidNavbar';
-import LinelistTable from './LinelistTable';
-import React from 'react';
-import CumulativeCharts from './CumulativeCharts';
-import FreshnessCharts from './FreshnessCharts';
+import Axios from 'axios';
 import CompletenessCharts from './CompletenessCharts';
-import SourceTable from './SourceTable';
+import CumulativeCharts from './CumulativeCharts';
+import EpidNavbar from './EpidNavbar';
+import FreshnessCharts from './FreshnessCharts';
+import LinelistTable from './LinelistTable';
 import Profile from './Profile';
-import Users from './Users';
+import React from 'react';
+import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { createMuiTheme } from '@material-ui/core/styles';
+import Users from './Users';
 import axios from 'axios';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
     palette: {
@@ -29,6 +30,7 @@ interface User {
     name: string;
     email: string;
     roles: string[];
+    csrfToken: string;
 }
 
 class App extends React.Component<{}, User> {
@@ -39,13 +41,14 @@ class App extends React.Component<{}, User> {
             name: '',
             email: '',
             roles: [],
+            csrfToken: '',
         };
     }
 
     componentDidMount(): void {
         this.getUser();
     }
-    getUser() {
+    getUser(): void {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -55,6 +58,10 @@ class App extends React.Component<{}, User> {
                     email: resp.data.email,
                     roles: resp.data.roles,
                 });
+                // Avoid having to pass a token to each form on the app
+                // by specifying a default used throughout the app.
+                Axios.defaults.headers.common['X-CSRF-TOKEN'] =
+                    resp.data.csrfToken;
             })
             .catch((e) => {
                 this.setState({ _id: '', name: '', email: '', roles: [] });
@@ -62,7 +69,7 @@ class App extends React.Component<{}, User> {
             });
     }
 
-    hasAnyRole(requiredRoles: string[]) {
+    hasAnyRole(requiredRoles: string[]): boolean {
         return this.state.roles?.some((r: string) => requiredRoles.includes(r));
     }
 
@@ -118,7 +125,7 @@ interface HomeProps {
     user: User;
 }
 class Home extends React.Component<HomeProps, {}> {
-    hasAnyRole(requiredRoles: string[]) {
+    hasAnyRole(requiredRoles: string[]): boolean {
         return this.props.user.roles?.some((r: string) =>
             requiredRoles.includes(r),
         );
@@ -129,41 +136,41 @@ class Home extends React.Component<HomeProps, {}> {
                 {!this.props.user.email ? (
                     <div>Login to access Epid</div>
                 ) : (
-                    <nav>
-                        {this.hasAnyRole(['curator', 'reader']) && (
+                        <nav>
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/cases">Linelist</Link>
+                                </div>
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/sources">Sources</Link>
+                                </div>
+                            )}
                             <div>
-                                <Link to="/cases">Linelist</Link>
-                            </div>
-                        )}
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <div>
-                                <Link to="/sources">Sources</Link>
-                            </div>
-                        )}
-                        <div>
-                            <Link to="/charts/cumulative">
-                                Cumulative charts
+                                <Link to="/charts/cumulative">
+                                    Cumulative charts
                             </Link>
-                        </div>
-                        <div>
-                            <Link to="/charts/freshness">Freshness charts</Link>
-                        </div>
-                        <div>
-                            <Link to="/charts/completeness">
-                                Completeness charts
-                            </Link>
-                        </div>
-                        <div>
-                            <Link to="/profile">Profile</Link>
-                            <br />
-                        </div>
-                        {this.hasAnyRole(['admin']) && (
-                            <div>
-                                <Link to="/users">Manage users</Link>
                             </div>
-                        )}
-                    </nav>
-                )}
+                            <div>
+                                <Link to="/charts/freshness">Freshness charts</Link>
+                            </div>
+                            <div>
+                                <Link to="/charts/completeness">
+                                    Completeness charts
+                            </Link>
+                            </div>
+                            <div>
+                                <Link to="/profile">Profile</Link>
+                                <br />
+                            </div>
+                            {this.hasAnyRole(['admin']) && (
+                                <div>
+                                    <Link to="/users">Manage users</Link>
+                                </div>
+                            )}
+                        </nav>
+                    )}
             </div>
         );
     }
