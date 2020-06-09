@@ -95,6 +95,7 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     requests_mock.get(content_url, json={"data": "yes"})
     retrieval.retrieve_content(source_id, content_url, format)
     assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.json", "r") as f:
         assert json.load(f)["data"] == "yes"
 
