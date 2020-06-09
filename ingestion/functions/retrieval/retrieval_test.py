@@ -4,6 +4,7 @@ import os
 import pytest
 
 from moto import mock_s3
+from unittest.mock import MagicMock
 
 
 @pytest.fixture()
@@ -41,36 +42,95 @@ def invalid_event():
 
 
 @mock_s3
-def test_persist_supplied_source_id_to_s3(valid_event, requests_mock, s3):
+def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    expected_s3_bucket = retrieval.OUTPUT_BUCKET
-    s3.create_bucket(Bucket=expected_s3_bucket)
-    requests_mock.get("http://checkip.amazonaws.com/", text="111.1.1.1")
+    retrieval.obtain_api_credentials = MagicMock(name="obtain_api_credentials")
+    s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
+    source_api_url = "http://foo.bar/"
+    origin_url = "http://bar.baz/"
+    os.environ["SOURCE_API_URL"] = source_api_url
+    requests_mock.get(
+        f"{source_api_url}/{valid_event['sourceId']}",
+        json={"origin": {"url": origin_url}})
+    requests_mock.get(origin_url, json={"data": "yes"})
 
     response = retrieval.lambda_handler(valid_event, "")
 
-    assert response["bucket"] == expected_s3_bucket
-    assert str.startswith(response["key"], valid_event["sourceId"])
-    assert s3.list_objects_v2(Bucket=expected_s3_bucket)['KeyCount'] == 1
+    expected_api_endpoint = f"{source_api_url}/{valid_event['sourceId']}"
+    assert requests_mock.request_history[0].url == expected_api_endpoint
+    assert requests_mock.request_history[1].url == origin_url
+    assert response["bucket"] == retrieval.OUTPUT_BUCKET
+    assert valid_event["sourceId"] in response["key"]
+
+
+def test_extract_source_id_returns_id_field(valid_event):
+    from retrieval import retrieval
+    assert retrieval.extract_source_id(valid_event) == valid_event["sourceId"]
+
+
+def test_extract_source_id_raises_error_if_event_lacks_id(invalid_event):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    with pytest.raises(ValueError, match=retrieval.SOURCE_ID_FIELD):
+        retrieval.extract_source_id(invalid_event)
+
+
+def test_get_source_details_returns_url_and_json_format(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_api_url = "http://foo.bar"
+    source_id = "id"
+    content_url = "http://bar.baz"
+    os.environ["SOURCE_API_URL"] = source_api_url
+    requests_mock.get(f"{source_api_url}/{source_id}",
+                      json={"origin": {"url": content_url}})
+    result = retrieval.get_source_details(source_id, {})
+    assert result[0] == content_url
+    assert result[1] == "JSON"
+
+
+def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    format = "JSON"
+    requests_mock.get(content_url, json={"data": "yes"})
+    retrieval.retrieve_content(source_id, content_url, format)
+    assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open("/tmp/content.json", "r") as f:
+        assert json.load(f)["data"] == "yes"
+
+
+def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    requests_mock.get(content_url, json={"data": "yes"})
+    result = retrieval.retrieve_content(source_id, content_url, "JSON")
+    assert "/tmp/" in result[0]
+    assert source_id in result[1]
+
+
+def test_retrieve_content_raises_error_for_non_json_format(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    bad_format = "CSV"
+    content_url = "http://foo.bar/"
+    requests_mock.get(content_url)
+    with pytest.raises(ValueError, match=bad_format):
+        retrieval.retrieve_content("id", content_url, bad_format)
 
 
 @mock_s3
-def test_s3_object_contains_machine_ip(valid_event, requests_mock, s3):
+def test_upload_to_s3_writes_indicated_file_to_key(s3):
     from retrieval import retrieval  # Import locally to avoid superseding mock
+    local_file = "/tmp/data.txt"
+    expected_data = "This is data."
+    with open(local_file, "w") as f:
+        f.write(expected_data)
     expected_s3_bucket = retrieval.OUTPUT_BUCKET
     s3.create_bucket(Bucket=expected_s3_bucket)
-    expected_ip = "111.1.1.1"
-    requests_mock.get("http://checkip.amazonaws.com/", text=expected_ip)
-
-    response = retrieval.lambda_handler(valid_event, "")
-
+    expected_s3_key = "objectkey"
+    retrieval.upload_to_s3(local_file, expected_s3_key)
     actual_object = s3.get_object(
-        Bucket=expected_s3_bucket, Key=response["key"])
-    actual_ip = actual_object['Body'].read().decode("utf-8")
-    assert actual_ip == expected_ip
-
-
-def test_error_for_event_without_source_id(invalid_event, requests_mock):
-    from retrieval import retrieval  # Import locally to avoid superseding mock
-    with pytest.raises(ValueError, match=retrieval.SOURCE_ID_FIELD):
-        retrieval.lambda_handler(invalid_event, "")
+        Bucket=expected_s3_bucket, Key=expected_s3_key)
+    s3_data = actual_object['Body'].read().decode("utf-8")
+    assert s3_data == expected_data

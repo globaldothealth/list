@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Lambda functions for epid ingestion
 
+Parameters:
+  SourceApiUrl:
+    Type: String
+    Description: Address at which to retrieve source details
+    Default: "http://localhost:3001/api/sources"
+
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -21,6 +27,10 @@ Resources:
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
       Timeout: 10 # Seconds
+      Environment:
+        Variables:
+          SOURCE_API_URL:
+            Ref: SourceApiUrl
 
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
