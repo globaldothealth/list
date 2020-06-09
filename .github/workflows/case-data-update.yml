@@ -11,7 +11,7 @@ on:
   schedule:
     # TODO: Remove this once we've verified that repository_dispatch is working.
     # Every day at 5AM UTC (data is typically pushed a little after 4AM UTC).
-    - cron: "* 5 * * *"
+    - cron: "0 5 * * *"
 
 jobs:
   update-case-data-prod:
