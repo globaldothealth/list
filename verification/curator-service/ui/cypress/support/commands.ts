@@ -66,16 +66,7 @@ export function login(opts: {
             email: opts?.email ?? 'superuser@test.com',
             roles: opts?.roles ?? ['admin', 'curator', 'reader'],
         },
-    })
-        .request({
-            // Always call /auth/profile after being logged in to get proper csrf token.
-            // The real app will do it to show the navbar properly but tests shouldn't have to
-            // wait for that.{
-            method: 'GET',
-            url: '/auth/profile',
-        })
-        .getCookies()
-        .then((cookies) => console.log(cookies));
+    });
 }
 
 export function addSource(name: string, url: string): void {
