@@ -1,6 +1,6 @@
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
-import React, { useState } from 'react';
+import React from 'react';
 import { Select, TextField } from 'formik-material-ui';
 
 import FormControl from '@material-ui/core/FormControl';
