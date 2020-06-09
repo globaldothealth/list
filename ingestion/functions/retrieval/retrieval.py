@@ -70,7 +70,8 @@ def retrieve_content(source_id, url, source_format):
         data = None
         extension = None
         print(f"Downloading {source_format} content from {url}")
-        r = requests.get(url)
+        headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
+        r = requests.get(url, headers=headers)
         if source_format == "JSON":
             data = json.dumps(r.json(), indent=4)
             extension = "json"
