@@ -56,9 +56,9 @@ def get_source_details(source_id, api_headers):
         source_api_endpoint = f"{os.environ['SOURCE_API_URL']}/{source_id}"
         print(f"Requesting source configuration from {source_api_endpoint}")
         r = requests.get(source_api_endpoint, headers=api_headers)
-        print(f"Received source API response: {r.json()}")
-        json = r.json()
-        return json["origin"]["url"], "JSON"
+        api_json = r.json()
+        print(f"Received source API response: {api_json}")
+        return api_json["origin"]["url"], "JSON"
     except Exception as e:
         print(e)
         raise e
