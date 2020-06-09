@@ -2,6 +2,7 @@ import { Link, Route, Switch } from 'react-router-dom';
 
 import EpidNavbar from './EpidNavbar';
 import LinelistTable from './LinelistTable';
+import NewCaseForm from './NewCaseForm';
 import React from 'react';
 import CumulativeCharts from './CumulativeCharts';
 import FreshnessCharts from './FreshnessCharts';
@@ -73,8 +74,13 @@ class App extends React.Component<{}, User> {
                     <EpidNavbar user={this.state} />
                     <Switch>
                         {this.hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/cases">
+                            <Route exact path="/cases">
                                 <LinelistTable user={this.state} />
+                            </Route>
+                        )}
+                        {this.hasAnyRole(['curator']) && (
+                            <Route path="/cases/new">
+                                <NewCaseForm user={this.state} />
                             </Route>
                         )}
                         {this.hasAnyRole(['curator', 'reader']) && (
@@ -133,6 +139,11 @@ class Home extends React.Component<HomeProps, {}> {
                         {this.hasAnyRole(['curator', 'reader']) && (
                             <div>
                                 <Link to="/cases">Linelist</Link>
+                            </div>
+                        )}
+                        {this.hasAnyRole(['curator']) && (
+                            <div>
+                                <Link to="/cases/new">Enter new case</Link>
                             </div>
                         )}
                         {this.hasAnyRole(['curator', 'reader']) && (
