@@ -45,9 +45,13 @@ describe('Manage users page', function () {
             .should('not.exist');
 
         // Select new roles
+        cy.server();
+        cy.route('PUT', '/api/users/*').as('updateUser');
         cy.get('div[data-testid="Bob-select-roles"]').click();
         cy.get('li[data-value="admin"]').click();
+        cy.wait('@updateUser');
         cy.get('li[data-value="reader"]').click();
+        cy.wait('@updateUser');
 
         cy.get('th[data-testid="Bob-roles"]').contains('curator');
         cy.get('th[data-testid="Bob-roles"]').contains('admin');
@@ -69,8 +73,11 @@ describe('Manage users page', function () {
         cy.visit('/users');
 
         // Select new role
+        cy.server();
+        cy.route('PUT', '/api/users/*').as('updateUser');
         cy.get('div[data-testid="Alice-select-roles"]').click();
         cy.get('li[data-value="reader"]').click();
+        cy.wait('@updateUser');
 
         // Home page has reader links
         cy.visit('/');
