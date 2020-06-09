@@ -1,7 +1,7 @@
 import * as core from 'express-serve-static-core';
 
 import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Session, User } from '../src/model/user';
 
 import app from '../src/index';
@@ -81,12 +81,17 @@ describe('mustHaveAnyRole', () => {
         // Setup a fake server.
         localApp = express();
         localApp.use(bodyParser.json());
-        const authController = new AuthController('/redirect-after-login');
+        const authController = new AuthController(
+            '/redirect-after-login',
+            (req: Request, res: Response, next: NextFunction) => {
+                next();
+            },
+        );
         authController.configurePassport('foo', 'bar');
-        authController.configureLocalAuth();
         localApp.use(passport.initialize());
         localApp.use(passport.session());
         localApp.use('/auth', authController.router);
+        localApp.post('/auth/register', authController.registerUserTestHandler);
         localApp.get(
             '/mustbeadmin',
             mustHaveAnyRole(['admin']),

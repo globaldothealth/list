@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { User, userRoles } from '../model/user';
 
 /**
@@ -85,4 +84,3 @@ export const updateRoles = async (
 export const listRoles = (req: Request, res: Response): void => {
     res.json({ roles: userRoles });
 };
-

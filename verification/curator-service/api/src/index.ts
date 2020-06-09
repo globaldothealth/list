@@ -1,14 +1,16 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import { OpenApiValidator } from 'express-openapi-validator';
 import { Request, Response } from 'express';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
+import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
+import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import csurf from 'csurf';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongo from 'connect-mongo';
@@ -18,7 +20,6 @@ import path from 'path';
 import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import YAML from 'yamljs';
 
 const app = express();
 app.use(bodyParser.json());
@@ -66,16 +67,24 @@ app.use(
         }),
     }),
 );
-const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
+// CSRF protection middleware for API calls.
+const csrf = csurf({
+    cookie: {
+        key: '_csrf-epid',
+        secure: process.env.NODE_ENV === 'production',
+    },
+});
+const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL, csrf);
 authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
     env.GOOGLE_OAUTH_CLIENT_SECRET,
 );
-if (env.ENABLE_LOCAL_AUTH) {
-    authController.configureLocalAuth();
-}
 app.use(passport.initialize());
 app.use(passport.session());
+// Allow user registration when applicable.
+if (env.ENABLE_LOCAL_AUTH) {
+    app.post('/auth/register', authController.registerUserTestHandler);
+}
 app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
@@ -86,6 +95,11 @@ const awsEventsClient = new AwsEventsClient(
 
 // Configure curator API routes.
 const apiRouter = express.Router();
+// Configure CSRF protection outside of unit test environment.
+// Avoid setting-it up in unit tests (jest sets that env variable) to keep them simple.
+if (process.env.NODE_ENV !== 'test') {
+    apiRouter.use(csrf);
+}
 
 // Configure sources controller.
 const sourcesController = new SourcesController(awsEventsClient);

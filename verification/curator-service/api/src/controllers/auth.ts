@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { User, UserDocument } from '../model/user';
 
@@ -41,7 +41,10 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
 
 export class AuthController {
     public router: Router;
-    constructor(private readonly afterLoginRedirURL: string) {
+    constructor(
+        private readonly afterLoginRedirURL: string,
+        csrfMiddleware: RequestHandler,
+    ) {
         this.router = Router();
 
         this.router.get(
@@ -72,37 +75,41 @@ export class AuthController {
         this.router.get(
             '/profile',
             mustBeAuthenticated,
+            csrfMiddleware,
             (req: Request, res: Response): void => {
-                res.json(req.user);
+                const user = req.user as UserDocument;
+                res.json({
+                    name: user.name,
+                    email: user.email,
+                    roles: user.roles,
+                    csrfToken: req.csrfToken(),
+                });
             },
         );
     }
 
-    // configureLocalAuth will get or create the user present in the request.
-    configureLocalAuth(): void {
-        console.log('Configuring local auth for tests');
-        // /register creates a user if necessary and log them in.
-        this.router.post(
-            '/register',
-            async (req: Request, res: Response): Promise<void> => {
-                const user = await User.create({
-                    name: req.body.name,
-                    email: req.body.email,
-                    // Necessary to pass mongoose validation.
-                    googleID: 42,
-                    roles: req.body.roles,
-                });
-                req.login(user, (err: Error) => {
-                    if (!err) {
-                        res.json(user);
-                        return;
-                    }
-                    console.log(err);
-                    res.sendStatus(500);
-                });
-            },
-        );
-    }
+    // /registerUserTestHandler creates a user if necessary and log them in.
+    registerUserTestHandler = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        const user = await User.create({
+            name: req.body.name,
+            email: req.body.email,
+            // Necessary to pass mongoose validation.
+            googleID: 42,
+            roles: req.body.roles,
+        });
+        req.login(user, (err: Error) => {
+            if (!err) {
+                res.json(user);
+                return;
+            }
+            console.log(err);
+            res.sendStatus(500);
+        });
+    };
+
     configurePassport(clientID: string, clientSecret: string): void {
         passport.serializeUser<UserDocument, string>((user, done) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
