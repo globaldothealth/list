@@ -1,17 +1,17 @@
 import { Link, Route, Switch } from 'react-router-dom';
 
-import EpidNavbar from './EpidNavbar';
-import LinelistTable from './LinelistTable';
-import React from 'react';
+import CompletenessCharts from './CompletenessCharts';
 import CumulativeCharts from './CumulativeCharts';
 import FreshnessCharts from './FreshnessCharts';
-import CompletenessCharts from './CompletenessCharts';
-import SourceTable from './SourceTable';
+import LinelistTable from './LinelistTable';
+import Navbar from './Navbar';
 import Profile from './Profile';
-import Users from './Users';
+import React from 'react';
+import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { createMuiTheme } from '@material-ui/core/styles';
+import Users from './Users';
 import axios from 'axios';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
     palette: {
@@ -70,7 +70,7 @@ class App extends React.Component<{}, User> {
         return (
             <ThemeProvider theme={theme}>
                 <div className="App">
-                    <EpidNavbar user={this.state} />
+                    <Navbar user={this.state} />
                     <Switch>
                         {this.hasAnyRole(['curator', 'reader']) && (
                             <Route path="/cases">
@@ -127,43 +127,43 @@ class Home extends React.Component<HomeProps, {}> {
         return (
             <div>
                 {!this.props.user.email ? (
-                    <div>Login to access Epid</div>
+                    <div>Login to access Global Health Curator Portal</div>
                 ) : (
-                    <nav>
-                        {this.hasAnyRole(['curator', 'reader']) && (
+                        <nav>
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/cases">Linelist</Link>
+                                </div>
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/sources">Sources</Link>
+                                </div>
+                            )}
                             <div>
-                                <Link to="/cases">Linelist</Link>
-                            </div>
-                        )}
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <div>
-                                <Link to="/sources">Sources</Link>
-                            </div>
-                        )}
-                        <div>
-                            <Link to="/charts/cumulative">
-                                Cumulative charts
+                                <Link to="/charts/cumulative">
+                                    Cumulative charts
                             </Link>
-                        </div>
-                        <div>
-                            <Link to="/charts/freshness">Freshness charts</Link>
-                        </div>
-                        <div>
-                            <Link to="/charts/completeness">
-                                Completeness charts
-                            </Link>
-                        </div>
-                        <div>
-                            <Link to="/profile">Profile</Link>
-                            <br />
-                        </div>
-                        {this.hasAnyRole(['admin']) && (
-                            <div>
-                                <Link to="/users">Manage users</Link>
                             </div>
-                        )}
-                    </nav>
-                )}
+                            <div>
+                                <Link to="/charts/freshness">Freshness charts</Link>
+                            </div>
+                            <div>
+                                <Link to="/charts/completeness">
+                                    Completeness charts
+                            </Link>
+                            </div>
+                            <div>
+                                <Link to="/profile">Profile</Link>
+                                <br />
+                            </div>
+                            {this.hasAnyRole(['admin']) && (
+                                <div>
+                                    <Link to="/users">Manage users</Link>
+                                </div>
+                            )}
+                        </nav>
+                    )}
             </div>
         );
     }

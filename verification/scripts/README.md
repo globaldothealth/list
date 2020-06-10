@@ -1,6 +1,6 @@
 # Verification scripts
 
-This directory contains various scripts to manage the verification part of the epid system.
+This directory contains various scripts to manage the verification part of the Global Health system.
 
 ## Bootstrapping admin roles
 
