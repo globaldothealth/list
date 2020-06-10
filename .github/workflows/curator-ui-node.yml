@@ -29,7 +29,12 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm test
+          npm run test-and-coverage
         working-directory: verification/curator-service/ui
         env:
           CI: true
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: verification/curator-service/ui/coverage/coverage-final.json
+          fail_ci_if_error: true
