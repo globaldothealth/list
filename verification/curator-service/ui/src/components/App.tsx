@@ -140,6 +140,7 @@ class Home extends React.Component<HomeProps, {}> {
                             <a
                                 href="https://covid-19.ghdsi.org/"
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 Covid-19 Map
                             </a>
