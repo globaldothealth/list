@@ -1,6 +1,6 @@
 # Production infrastructure
 
-This directory contains the configuration files for the production infrastructure of the epid project.
+This directory contains the configuration files for the production infrastructure of the Global Health project.
 
 ## One-time setup
 

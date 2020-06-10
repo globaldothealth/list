@@ -35,7 +35,7 @@ interface Props extends WithStyles<typeof styles> {
     user: User;
 }
 
-class EpidNavbar extends React.Component<Props, {}> {
+class Navbar extends React.Component<Props, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -53,7 +53,7 @@ class EpidNavbar extends React.Component<Props, {}> {
                             </IconButton>
                         </Link>
                         <Typography variant="h6" className={classes.title}>
-                            epid
+                            Global Health Curator Portal
                         </Typography>
                         {this.props.user.email ? (
                             <Button
@@ -64,14 +64,14 @@ class EpidNavbar extends React.Component<Props, {}> {
                                 Logout {this.props.user.email}
                             </Button>
                         ) : (
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                href={process.env.REACT_APP_LOGIN_URL}
-                            >
-                                Login
-                            </Button>
-                        )}
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    href={process.env.REACT_APP_LOGIN_URL}
+                                >
+                                    Login
+                                </Button>
+                            )}
                     </Toolbar>
                 </AppBar>
             </div>
@@ -79,4 +79,4 @@ class EpidNavbar extends React.Component<Props, {}> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(EpidNavbar);
+export default withStyles(styles, { withTheme: true })(Navbar);
