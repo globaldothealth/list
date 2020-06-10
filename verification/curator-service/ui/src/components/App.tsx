@@ -1,5 +1,6 @@
 import { Link, Route, Switch } from 'react-router-dom';
 
+import NewCaseForm from './NewCaseForm';
 import CompletenessCharts from './CompletenessCharts';
 import CumulativeCharts from './CumulativeCharts';
 import FreshnessCharts from './FreshnessCharts';
@@ -73,8 +74,13 @@ class App extends React.Component<{}, User> {
                     <Navbar user={this.state} />
                     <Switch>
                         {this.hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/cases">
+                            <Route exact path="/cases">
                                 <LinelistTable user={this.state} />
+                            </Route>
+                        )}
+                        {this.hasAnyRole(['curator']) && (
+                            <Route path="/cases/new">
+                                <NewCaseForm user={this.state} />
                             </Route>
                         )}
                         {this.hasAnyRole(['curator', 'reader']) && (
@@ -145,18 +151,24 @@ class Home extends React.Component<HomeProps, {}> {
                                     Cumulative charts
                             </Link>
                             </div>
-                            <div>
-                                <Link to="/charts/freshness">Freshness charts</Link>
-                            </div>
-                            <div>
-                                <Link to="/charts/completeness">
-                                    Completeness charts
-                            </Link>
-                            </div>
-                            <div>
-                                <Link to="/profile">Profile</Link>
-                                <br />
-                            </div>
+                            {this.hasAnyRole(['curator']) && (
+                                <div>
+                                    <Link to="/cases/new">Enter new case</Link>
+                                </div>
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <div>
+                                    <Link to="/charts/freshness">Freshness charts</Link>
+                                </div>
+                                <div>
+                                    <Link to="/charts/completeness">
+                                        Completeness charts
+                                    </Link>
+                                </div>
+                                <div>
+                                    <Link to="/profile">Profile</Link>
+                                    <br />
+                                </div>
                             {this.hasAnyRole(['admin']) && (
                                 <div>
                                     <Link to="/users">Manage users</Link>
