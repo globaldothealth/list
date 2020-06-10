@@ -138,7 +138,7 @@ class Home extends React.Component<HomeProps, {}> {
                     <nav>
                         <div>
                             <a
-                                href="https://covid-19.ghdsi.org/"
+                                href="http://covid-19.ghdsi.org/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
