@@ -40,6 +40,7 @@
     "import-case-data": "cd ../../../data-serving/data-service && npm run import-data",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "react-scripts test",
+    "test-and-coverage": "react-scripts test --coverage --watchAll=false",
     "test-silent": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "cypress-open": "cypress open",
