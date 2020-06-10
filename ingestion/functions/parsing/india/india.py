@@ -49,9 +49,9 @@ def convert_date(raw_date):
 
 
 def convert_sex(raw_sex):
-    if raw_sex is "M":
+    if raw_sex == "M":
         return "Male"
-    if raw_sex is "F":
+    if raw_sex == "F":
         return "Female"
     return None
 
