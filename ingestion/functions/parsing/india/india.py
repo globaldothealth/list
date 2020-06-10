@@ -101,7 +101,7 @@ def parse_cases(raw_data_file):
                     },
                     "sex": convert_sex(entry["gender"])
                 }
-            } for entry in cases['raw_data'] if entry["agebracket"]]
+            } for entry in cases["raw_data"] if entry["agebracket"]]
 
 
 def write_to_server(cases, headers):
@@ -171,5 +171,5 @@ def lambda_handler(event, context):
     raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
     case_data = parse_cases(raw_data_file)
     api_creds = obtain_api_credentials()
-    count_success, count_error = write_to_server(case_data[:20], api_creds)
+    count_success, count_error = write_to_server(case_data, api_creds)
     return {"count_success": count_success, "count_error": count_error}

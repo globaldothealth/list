@@ -100,7 +100,7 @@ def test_lambda_handler_e2e(input_event, sample_data, requests_mock, s3):
 
 
 def test_extract_s3_path_returns_bucket_and_key(input_event):
-    from india import india
+    from india import india  # Import locally to avoid superseding mock
     assert india.extract_s3_path(input_event) == (
         input_event[india.S3_BUCKET_FIELD],
         input_event[india.S3_KEY_FIELD])
@@ -167,7 +167,7 @@ def test_write_to_server_returns_error_count_for_each_failed_write(
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
     requests_mock.register_uri(
-        'POST', source_api_url, exc=requests.exceptions.ConnectTimeout),
+        "POST", source_api_url, exc=requests.exceptions.ConnectTimeout),
 
     count_success, count_error = india.write_to_server([_PARSED_CASE], {})
     assert requests_mock.request_history[0].url == full_source_url
