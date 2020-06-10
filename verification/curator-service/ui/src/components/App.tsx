@@ -136,6 +136,15 @@ class Home extends React.Component<HomeProps, {}> {
                     <div>Login to access Global Health Curator Portal</div>
                 ) : (
                     <nav>
+                        <div>
+                            <a
+                                href="https://covid-19.ghdsi.org/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Covid-19 Map
+                            </a>
+                        </div>
                         {this.hasAnyRole(['curator', 'reader']) && (
                             <div>
                                 <Link to="/cases">Linelist</Link>
