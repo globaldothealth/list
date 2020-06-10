@@ -168,10 +168,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                    schedule: {
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
+                      schedule: {
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
                 : undefined,
         };
     }
@@ -191,11 +191,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                    schedule: {
-                        awsRuleArn: rowData.awsRuleArn,
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
+                      schedule: {
+                          awsRuleArn: rowData.awsRuleArn,
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
                 : undefined,
         };
     }

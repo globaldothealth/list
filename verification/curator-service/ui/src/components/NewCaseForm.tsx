@@ -34,7 +34,7 @@ interface FormValues {
 export default class NewCaseForm extends React.Component<
     Props,
     NewCaseFormState
-    > {
+> {
     constructor(props: Props) {
         super(props);
         this.state = {
