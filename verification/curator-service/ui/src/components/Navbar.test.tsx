@@ -1,28 +1,26 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 
-import EpidNavbar from './EpidNavbar';
 import { MemoryRouter } from 'react-router-dom';
+import Navbar from './Navbar';
 import React from 'react';
 import { createMemoryHistory } from 'history';
 
-test('renders epid brand', async () => {
+test('renders brand', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar
-                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
-                />
+                <Navbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
             </MemoryRouter>,
         );
     });
-    expect(screen.getByText(/epid/i)).toBeInTheDocument();
+    expect(screen.getByText(/Global Health/i)).toBeInTheDocument();
 });
 
 test('renders login button when not passed user information', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar user={{ name: '', email: '' }} />
+                <Navbar user={{ name: '', email: '' }} />
             </MemoryRouter>,
         );
     });
@@ -33,9 +31,7 @@ test('renders logout button when passed user information', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar
-                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
-                />
+                <Navbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
             </MemoryRouter>,
         );
     });
@@ -47,9 +43,7 @@ test('redirects to home on click', async () => {
     await act(async () => {
         render(
             <MemoryRouter>
-                <EpidNavbar
-                    user={{ name: 'Alice Smith', email: 'foo@bar.com' }}
-                />
+                <Navbar user={{ name: 'Alice Smith', email: 'foo@bar.com' }} />
             </MemoryRouter>,
         );
     });

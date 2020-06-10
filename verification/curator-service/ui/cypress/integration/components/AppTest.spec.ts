@@ -3,7 +3,7 @@ describe('App', function () {
     it('Homepage with logged out user', function () {
         cy.visit('/');
 
-        cy.contains('Login to access Epid');
+        cy.contains('Login to access Global Health Curator Portal');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Cumulative charts').should('not.exist');

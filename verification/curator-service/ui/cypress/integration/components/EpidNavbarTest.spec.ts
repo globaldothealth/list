@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-describe('EpidNavbar', function () {
+describe('Navbar', function () {
     it('Home button takes user to home page', function () {
         cy.login();
         cy.visit('/cases');
