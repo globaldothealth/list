@@ -33,3 +33,8 @@ jobs:
         working-directory: data-serving/data-service
         env:
           CI: true
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: data-serving/data-service/coverage/coverage-final.json
+          fail_ci_if_error: true
