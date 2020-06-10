@@ -33,3 +33,8 @@ jobs:
         working-directory: verification/curator-service/api
         env:
           CI: true
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: verification/curator-service/api/coverage-final.json
+          fail_ci_if_error: true
