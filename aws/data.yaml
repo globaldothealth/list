@@ -1,4 +1,4 @@
-# Kubernetes deployment file for the epid service on AWS.
+# Kubernetes deployment file for the Global Health service on AWS.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
