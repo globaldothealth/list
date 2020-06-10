@@ -27,7 +27,7 @@ def extract_source_id(event):
 
 def obtain_api_credentials():
     """
-    Creates HTTP headers credentialed for access to the EPID Source API.
+    Creates HTTP headers credentialed for access to the Global Health Source API.
     """
     try:
         local_creds_file = "/tmp/creds.json"
