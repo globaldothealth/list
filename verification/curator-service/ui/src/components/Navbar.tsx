@@ -64,14 +64,14 @@ class Navbar extends React.Component<Props, {}> {
                                 Logout {this.props.user.email}
                             </Button>
                         ) : (
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    href={process.env.REACT_APP_LOGIN_URL}
-                                >
-                                    Login
-                                </Button>
-                            )}
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                href={process.env.REACT_APP_LOGIN_URL}
+                            >
+                                Login
+                            </Button>
+                        )}
                     </Toolbar>
                 </AppBar>
             </div>

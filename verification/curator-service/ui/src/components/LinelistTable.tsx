@@ -285,7 +285,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                        c.sources.length > 0
+                                                    c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });
