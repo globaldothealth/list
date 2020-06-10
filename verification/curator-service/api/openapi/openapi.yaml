@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: EPID curator service API
-  description: Server for CRUD operations on EPID data
+  title: Global Health curator service API
+  description: Server for CRUD operations on Global Health data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
     email: info@healthmap.org
@@ -229,7 +229,7 @@ components:
       description: The subset of "#/components/schemas/Source" required to create the entity
       type: object
     User:
-      description: An EPID user
+      description: A user
       type: object
     UserArray:
       type: array

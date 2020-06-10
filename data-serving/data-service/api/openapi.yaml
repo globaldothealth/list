@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: EPID data service
-  description: Server for CRUD operations on EPID line-list data
+  title: Global Health data service
+  description: Server for CRUD operations on Global Health line-list data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
     email: info@healthmap.org

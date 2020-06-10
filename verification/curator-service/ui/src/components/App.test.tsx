@@ -27,7 +27,7 @@ it('renders without crashing when logged in', () => {
         </MemoryRouter>,
         div,
     );
-    expect(div.textContent).toContain('epid');
+    expect(div.textContent).toContain('Global Health');
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
 });
@@ -48,7 +48,7 @@ it('renders without crashing when logged out', () => {
         </MemoryRouter>,
         div,
     );
-    expect(div.textContent).toContain('epid');
+    expect(div.textContent).toContain('Global Health');
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
 });
