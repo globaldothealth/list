@@ -212,8 +212,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
             'end': {
               '$date': str
             },
-          'sex': str,
-          'species': str
+          'sex': str
         }
 
     '''

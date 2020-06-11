@@ -39,13 +39,18 @@
             "enum": [
               "Male",
               "Female",
-              "Other"
+              "Other",
+              "Unknown"
             ]
           },
-          "species": {
-            "enum": [
-              "Homo sapien"
-            ]
+          "profession": {
+            "bsonType": "string"
+          },
+          "nationality": {
+            "bsonType": "string"
+          },
+          "ethnicity": {
+            "bsonType": "string"
           }
         }
       },

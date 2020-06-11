@@ -154,9 +154,7 @@ describe('DELETE', () => {
         const c = new Case(minimalCase);
         await c.save();
 
-        return await request(app)
-            .delete(`/api/cases/${c._id}`)
-            .expect(204);
+        return await request(app).delete(`/api/cases/${c._id}`).expect(204);
     });
     it('delete absent item should return 404 NOT FOUND', () => {
         return request(app)

@@ -113,13 +113,19 @@ Fields that can't be converted include:
 
 We are backfilling fields including:
 
-- `demographics.species`: We are assuming that all reported cases have been in humans thus far, but are leaving the
-  option open for other species in future cases.
-
-- `revision.id` and `revision.notes`: We are treating each record as if it's on its first revision. It would be
-  extremely labor-intensive to reconstruct revision history from the source data, but it will baked into the new system.
+- `revision.id`: We are treating each record as if it's on its first revision. It would be extremely labor-intensive to
+  reconstruct revision history from the source data, but it will baked into the new system.
 
 > **Open question:** Do we want to backfill data or leave those fields empty for imported data?
+
+### Non-backfilled fields
+
+Some fields in the new schema cannot be backfilled because they are not present in the data we're converting, including:
+
+- `demographics.profession`
+- `demographics.nationality`
+- `demographics.ethnicity`
+- `revision.notes`
 
 ### Original fields archive
 
