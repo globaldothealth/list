@@ -64,7 +64,7 @@ const sess: SessionOptions = {
         secret: env.SESSION_COOKIE_KEY,
     }),
     cookie: {
-        sameSite: true,
+        sameSite: 'strict',
     },
 };
 if (process.env.NODE_ENV === 'production') {
