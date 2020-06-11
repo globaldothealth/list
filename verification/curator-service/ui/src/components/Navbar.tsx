@@ -40,7 +40,7 @@ class Navbar extends React.Component<Props, {}> {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
-                <AppBar position="static">
+                <AppBar position="fixed">
                     <Toolbar>
                         <Link to="/">
                             <IconButton
