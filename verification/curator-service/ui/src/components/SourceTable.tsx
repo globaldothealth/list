@@ -159,7 +159,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      * For new sources, an AWS rule ARN won't be defined (instead, it's created
      * by the server upon receiving the create request). A schedule expression
      * may be supplied, and indicates the intent to create a corresponding AWS
-     * scheduled event rule to automate source ingestion.
+     * scheduled event rule to automate source ingestion. If a schedule
+     * expression is supplied, it's also possible that a parser Lambda ARN is
+     * supplied.
      */
     createSourceFromRowData(rowData: TableRow): Source {
         return {
@@ -187,7 +189,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      * Updates a source from the provided table row data.
      *
      * Unlike for creation, an AWS rule ARN may be supplied alongside a
-     * schedule expression.
+     * schedule expression (and optionally, a parser Lambda ARN).
      */
     updateSourceFromRowData(rowData: TableRow): Source {
         return {
@@ -217,7 +219,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      *
      * Rule ARN isn't necessarily present, because it isn't supplied in create
      * requests. It might be present for updates, and if so, the schedule
-     * expression field must be present.
+     * expression field must be present. Likewise, if parser Lambda ARN is
+     * present, the schedule expression field must be present.
      */
     validateAutomationFields(rowData: TableRow): boolean {
         return (
