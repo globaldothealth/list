@@ -202,7 +202,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 ? {
                     parser: rowData.awsLambdaArn
                         ? {
-                            awsLambdaArn: rowData.awsLambdaArn || '',
+                            awsLambdaArn: rowData.awsLambdaArn,
                         }
                         : undefined,
                     schedule: {
