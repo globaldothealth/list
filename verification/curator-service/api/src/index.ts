@@ -2,6 +2,7 @@ import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
+import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
@@ -16,7 +17,6 @@ import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
-import session from 'express-session';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 
@@ -51,25 +51,29 @@ mongoose
         process.exit(1);
     });
 
-// Configure authentication.
-app.use(cookieParser());
 // Store session info in MongoDB.
 const MongoStore = mongo(session);
-app.use(
-    session({
+// Configure authentication.
+app.use(cookieParser());
+const sess: SessionOptions = {
+    secret: env.SESSION_COOKIE_KEY,
+    resave: true,
+    saveUninitialized: true,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
         secret: env.SESSION_COOKIE_KEY,
-        resave: true,
-        saveUninitialized: true,
-        store: new MongoStore({
-            mongooseConnection: mongoose.connection,
-            secret: env.SESSION_COOKIE_KEY,
-        }),
-        cookie: {
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-        },
     }),
-);
+    cookie: {
+        sameSite: true,
+    },
+};
+if (process.env.NODE_ENV === 'production') {
+    if (sess.cookie) {
+        app.set('trust proxy', 1); // trust first proxy
+        sess.cookie.secure = true;
+    }
+}
+app.use(session(sess));
 const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
 authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
