@@ -13,6 +13,7 @@ SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 SOURCE_ID_FIELD = "sourceId"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
+lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
 
 
@@ -53,12 +54,15 @@ def get_source_details(source_id, api_headers):
     Retrieves the content URL and format associated with the provided source ID.
     """
     try:
-        source_api_endpoint = f"{os.environ['SOURCE_API_URL']}/{source_id}"
+        source_api_endpoint = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}"
         print(f"Requesting source configuration from {source_api_endpoint}")
         r = requests.get(source_api_endpoint, headers=api_headers)
         api_json = r.json()
         print(f"Received source API response: {api_json}")
-        return api_json["origin"]["url"], "JSON"
+        return api_json["origin"]["url"], "JSON", api_json.get(
+            "automation", {}).get(
+            "parser", {}).get(
+            "awsLambdaArn", "")
     except Exception as e:
         print(e)
         raise e
@@ -105,6 +109,19 @@ def upload_to_s3(file_name, s3_object_key):
         raise e
 
 
+def invoke_parser(parser_arn, s3_object_key):
+    payload = {"s3Bucket": OUTPUT_BUCKET, "s3Key": s3_object_key}
+    print(f"Invoking parser (ARN: {parser_arn}")
+    response = lambda_client.invoke(
+        FunctionName=parser_arn,
+        InvocationType='Event',
+        Payload=json.dumps(payload))
+    if "StatusCode" not in response or response["StatusCode"] != 202:
+        error_message = f"Parser invocation unsuccessful. Response: {response}"
+        print(error_message)
+        raise Exception(error_message)
+
+
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
 
@@ -131,7 +148,9 @@ def lambda_handler(event, context):
 
     source_id = extract_source_id(event)
     auth_headers = obtain_api_credentials()
-    url, source_format = get_source_details(source_id, auth_headers)
+    url, source_format, parser_arn = get_source_details(source_id, auth_headers)
     file_name, s3_object_key = retrieve_content(source_id, url, source_format)
     upload_to_s3(file_name, s3_object_key)
+    if parser_arn:
+        invoke_parser(parser_arn, s3_object_key)
     return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}

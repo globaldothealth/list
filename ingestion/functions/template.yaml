@@ -6,7 +6,7 @@ Parameters:
   SourceApiUrl:
     Type: String
     Description: Address at which to retrieve source details
-    Default: "http://localhost:3001/api/sources"
+    Default: "http://localhost:3001/api"
 
 Resources:
   RawSourcesBucket:
@@ -19,14 +19,30 @@ Resources:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
       Runtime: python3.6
-      Description: Retrieve the executing machine IP
+      Description: Retrieve raw source content
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
-      Timeout: 10 # Seconds
+      Timeout: 60 # Seconds
+      Environment:
+        Variables:
+          SOURCE_API_URL:
+            Ref: SourceApiUrl
+  IndiaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/india/
+      Handler: india.lambda_handler
+      Runtime: python3.6
+      Description: Parse case data for India
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 60 # Seconds
       Environment:
         Variables:
           SOURCE_API_URL:
