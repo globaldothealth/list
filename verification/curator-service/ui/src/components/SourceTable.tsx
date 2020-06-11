@@ -61,6 +61,8 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+    // automation.parser
+    awsLambdaArn?: string;
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
@@ -168,10 +170,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                      schedule: {
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
+                    parser: rowData.awsLambdaArn
+                        ? {
+                            awsLambdaArn: rowData.awsLambdaArn,
+                        }
+                        : undefined,
+                    schedule: {
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
                 : undefined,
         };
     }
@@ -191,11 +198,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                      schedule: {
-                          awsRuleArn: rowData.awsRuleArn,
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
+                    parser: rowData.awsLambdaArn
+                        ? {
+                            awsLambdaArn: rowData.awsLambdaArn || '',
+                        }
+                        : undefined,
+                    schedule: {
+                        awsRuleArn: rowData.awsRuleArn,
+                        awsScheduleExpression: rowData.awsScheduleExpression,
+                    },
+                }
                 : undefined,
         };
     }
@@ -209,7 +221,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      */
     validateAutomationFields(rowData: TableRow): boolean {
         return (
-            !rowData.awsRuleArn ||
+            (!rowData.awsRuleArn && !rowData.awsLambdaArn) ||
             this.validateRequired(rowData.awsScheduleExpression)
         );
     }
@@ -283,6 +295,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 field: 'awsRuleArn',
                                 editable: 'never',
                             },
+                            {
+                                title: 'AWS Parser ARN',
+                                field: 'awsLambdaArn',
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -302,6 +318,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 _id: s._id,
                                                 name: s.name,
                                                 url: s.origin.url,
+                                                awsLambdaArn:
+                                                    s.automation?.parser
+                                                        ?.awsLambdaArn,
                                                 awsRuleArn:
                                                     s.automation?.schedule
                                                         ?.awsRuleArn,
