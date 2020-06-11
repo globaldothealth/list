@@ -13,7 +13,7 @@ SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 SOURCE_ID_FIELD = "sourceId"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
-lambda_client = boto3.client("lambda")
+lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
 
 
