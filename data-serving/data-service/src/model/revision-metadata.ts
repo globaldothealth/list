@@ -1,30 +1,48 @@
 import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 
+const editMetadataSchema = new mongoose.Schema({
+    curator: {
+        type: String,
+        required: true,
+    },
+    date: {
+        ...dateFieldInfo,
+        required: true,
+    },
+    notes: String,
+});
+
 export const revisionMetadataSchema = new mongoose.Schema({
-    id: {
+    revisionNumber: {
         type: Number,
         min: 0,
         validate: {
             validator: Number.isInteger,
             message: '{VALUE} is not an integer value',
         },
-        required: 'Enter a revision id',
+        required: true,
     },
-    moderator: {
-        type: String,
-        required: 'Enter a revision moderator id',
+    creationMetadata: {
+        type: editMetadataSchema,
+        required: true,
     },
-    date: {
-        ...dateFieldInfo,
-        required: 'Enter a revision date',
+    updateMetadata: {
+        type: editMetadataSchema,
+        required: function (this: RevisionMetadataDocument): boolean {
+                return this.revisionNumber > 0;
+            },
     },
-    notes: String,
 });
 
-export type RevisionMetadataDocument = mongoose.Document & {
-    id: number;
-    moderator: string;
+type EditMetadataDocument = mongoose.Document & {
+    curator: string;
     date: Date;
     notes: string;
+};
+
+export type RevisionMetadataDocument = mongoose.Document & {
+    revisionNumber: number;
+    creationMetadata: EditMetadataDocument;
+    updateMetadata: EditMetadataDocument;
 };

@@ -1,6 +1,5 @@
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
-import React from 'react';
 import { Select, TextField } from 'formik-material-ui';
 import { withStyles } from '@material-ui/core';
 import { Theme, createStyles } from '@material-ui/core/styles';
@@ -9,6 +8,7 @@ import { WithStyles } from '@material-ui/core/styles/withStyles';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import React from 'react';
 import axios from 'axios';
 
 interface User {
@@ -78,9 +78,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 ],
                 notes: values.notes,
                 revisionMetadata: {
-                    id: 0,
-                    moderator: this.props.user.email,
-                    date: new Date().toISOString(),
+                    revisionNumber: 0,
+                    creationMetadata: {
+                        curator: this.props.user.email,
+                        date: new Date().toISOString(),
+                    }
                 },
             });
             this.setState({ errorMessage: '' });

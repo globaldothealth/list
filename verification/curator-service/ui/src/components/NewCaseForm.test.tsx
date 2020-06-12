@@ -58,9 +58,11 @@ it('submits case ok', async () => {
             country: '',
         },
         revisionMetadata: {
-            date: expect.any(String),
-            id: 0,
-            moderator: 'foo@bar.com',
+            revisionNumber: 0,
+            creationMetadata: {
+                curator: 'foo@bar.com',
+                date: expect.any(String),
+            },
         },
         sources: [
             {

@@ -131,11 +131,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             ],
             revisionMetadata: {
-                date: new Date().toISOString(),
-                // TODO: change this id value. The current field is required to
-                // be an int, which we'll want to change in the finalized schema.
-                id: 0,
-                moderator: this.props.user.email,
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: this.props.user.email,
+                    date: new Date().toISOString(),
+                }
             },
         };
     }
@@ -307,7 +307,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                    c.sources.length > 0
+                                                        c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });

@@ -12,9 +12,11 @@ from unittest.mock import MagicMock
 _PARSED_CASE = (
     {
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "auto",
-            "date": date.today().strftime("%m/%d/%Y")
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "auto",
+                "date": date.today().strftime("%m/%d/%Y")
+            }
         },
         "sources": [
             {

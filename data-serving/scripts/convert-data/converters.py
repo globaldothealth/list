@@ -333,11 +333,13 @@ def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
         }
     '''
     revision_metadata = {
-        'id': 0
+        'revisionNumber': 0
     }
 
     if data_moderator_initials:
-        revision_metadata['moderator'] = str(data_moderator_initials)
+        revision_metadata['creationMetadata'] = {
+            'curator': str(data_moderator_initials)
+        }
 
     return revision_metadata
 
