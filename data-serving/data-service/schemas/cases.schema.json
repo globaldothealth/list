@@ -332,23 +332,50 @@
         "bsonType": "object",
         "additionalProperties": false,
         "required": [
-          "id"
+          "revisionNumber"
         ],
         "properties": {
           "_id": {
             "bsonType": "objectId"
           },
-          "id": {
+          "revisionNumber": {
             "bsonType": "int"
           },
-          "moderator": {
-            "bsonType": "string"
+          "creationMetadata": {
+            "bsonType": "object",
+            "additionalProperties": false,
+            "properties": {
+              "_id": {
+                "bsonType": "objectId"
+              },
+              "curator": {
+                "bsonType": "string"
+              },
+              "date": {
+                "bsonType": "date"
+              },
+              "notes": {
+                "bsonType": "string"
+              }
+            }
           },
-          "date": {
-            "bsonType": "date"
-          },
-          "notes": {
-            "bsonType": "string"
+          "updateMetadata": {
+            "bsonType": "object",
+            "additionalProperties": false,
+            "properties": {
+              "_id": {
+                "bsonType": "objectId"
+              },
+              "curator": {
+                "bsonType": "string"
+              },
+              "date": {
+                "bsonType": "date"
+              },
+              "notes": {
+                "bsonType": "string"
+              }
+            }
           }
         }
       },

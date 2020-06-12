@@ -123,10 +123,17 @@
     ],
     "notes": "Contact of a confirmed case at work.",
     "revisionMetadata": {
-        "id": 0,
-        "moderator": "abc123",
-        "date": "2020-01-03",
-        "notes": "initial data entry"
+        "revisionNumber": 1,
+        "creationMetadata": {
+            "curator": "abc123",
+            "date": "2020-01-03",
+            "notes": "initial data entry"
+        },
+        "updateMetadata": {
+            "curator": "xyz789",
+            "date": "2020-01-13",
+            "notes": "fix source error"
+        }
     },
     "importedCase": {
         "ID": "xyz",
