@@ -312,19 +312,25 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
-                        editable={{
-                            onRowAdd: (
-                                newRowData: TableRow,
-                            ): Promise<unknown> => this.addCase(newRowData),
-                            onRowUpdate: (
-                                newRowData: TableRow,
-                                oldRowData: TableRow | undefined,
-                            ): Promise<unknown> =>
-                                this.editCase(newRowData, oldRowData),
-                            onRowDelete: (
-                                rowData: TableRow,
-                            ): Promise<unknown> => this.deleteCase(rowData),
-                        }}
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowAdd: (
+                                          newRowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.addCase(newRowData),
+                                      onRowUpdate: (
+                                          newRowData: TableRow,
+                                          oldRowData: TableRow | undefined,
+                                      ): Promise<unknown> =>
+                                          this.editCase(newRowData, oldRowData),
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteCase(rowData),
+                                  }
+                                : undefined
+                        }
                     />
                 </Paper>
                 {this.state.error && (

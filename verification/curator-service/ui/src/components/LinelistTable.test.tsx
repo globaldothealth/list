@@ -9,7 +9,7 @@ import axios from 'axios';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const user = {
+const curator = {
     _id: 'testUser',
     name: 'Alice Smith',
     email: 'foo@bar.com',
@@ -61,7 +61,7 @@ it('loads and displays cases', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<LinelistTable user={user} />);
+    const { findByText } = render(<LinelistTable user={curator} />);
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -109,7 +109,7 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<LinelistTable user={user} />);
+    const { getByText, findByText } = render(<LinelistTable user={curator} />);
 
     // Throw error on add request.
     mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
@@ -164,7 +164,7 @@ it('can delete a row', async () => {
 
     // Load table
     const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={user} />,
+        <LinelistTable user={curator} />,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -225,7 +225,7 @@ it('can add a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={user} />,
+        <LinelistTable user={curator} />,
     );
 
     // Check table is empty on load
@@ -330,7 +330,7 @@ it('can edit a row', async () => {
 
     // Load table
     const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={user} />,
+        <LinelistTable user={curator} />,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -399,4 +399,68 @@ it('can edit a row', async () => {
     expect(oldRow).not.toBeInTheDocument();
     const editedRow = await findByText('some edited notes');
     expect(editedRow).toBeInTheDocument();
+});
+
+it('cannot edit data as a reader only', async () => {
+    const cases = [
+        {
+            _id: 'abc123',
+            importedCase: {
+                outcome: 'Recovered',
+            },
+            location: {
+                country: 'France',
+            },
+            events: [
+                {
+                    name: 'confirmed',
+                    dateRange: {
+                        start: new Date().toJSON(),
+                    },
+                },
+            ],
+            notes: 'some notes',
+            sources: [
+                {
+                    url: 'http://foo.bar',
+                },
+            ],
+        },
+    ];
+    const axiosGetResponse = {
+        data: {
+            cases: cases,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+    // Load table
+    const { findByText, queryByText } = render(
+        <LinelistTable
+            user={{
+                _id: 'testUser',
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['reader'],
+            }}
+        />,
+    );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=10&page=1&filter=',
+    );
+    const row = await findByText(/abc123/);
+    expect(row).toBeInTheDocument();
+
+    const deleteButton = queryByText(/delete_outline/);
+    expect(deleteButton).not.toBeInTheDocument();
+    const addButton = queryByText(/add_box/);
+    expect(addButton).not.toBeInTheDocument();
+    const editButton = queryByText(/edit/);
+    expect(editButton).not.toBeInTheDocument();
 });
