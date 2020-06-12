@@ -14,9 +14,11 @@
         }
     ],
     "revisionMetadata": {
-        "id": 0,
-        "moderator": "abc",
-        "date": "2020-01-03T05:00:00Z"
+        "revisionNumber": 0,
+        "creationMetadata": {
+            "curator": "abc123",
+            "date": "2020-01-03"
+        }
     },
     "location": {
         "country": "China"

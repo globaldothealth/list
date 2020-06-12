@@ -72,9 +72,11 @@ def parse_cases(raw_data_file):
         return [
             {
                 "revisionMetadata": {
-                    "id": 0,
-                    "moderator": "auto",
-                    "date": date.today().strftime("%m/%d/%Y")
+                    "revisionNumber": 0,
+                    "creationMetadata": {
+                        "curator": "auto",
+                        "date": date.today().strftime("%m/%d/%Y")
+                    }
                 },
                 "sources": [
                     {
