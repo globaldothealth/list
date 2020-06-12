@@ -285,7 +285,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                        c.sources.length > 0
+                                                    c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });
@@ -316,22 +316,22 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             onRowAdd:
                                 this.props.user.roles.indexOf('curator') !== -1
                                     ? (
-                                        newRowData: TableRow,
-                                    ): Promise<unknown> =>
-                                        this.addCase(newRowData)
+                                          newRowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.addCase(newRowData)
                                     : undefined,
                             onRowUpdate:
                                 this.props.user.roles.indexOf('curator') !== -1
                                     ? (
-                                        newRowData: TableRow,
-                                        oldRowData: TableRow | undefined,
-                                    ): Promise<unknown> =>
-                                        this.editCase(newRowData, oldRowData)
+                                          newRowData: TableRow,
+                                          oldRowData: TableRow | undefined,
+                                      ): Promise<unknown> =>
+                                          this.editCase(newRowData, oldRowData)
                                     : undefined,
                             onRowDelete:
                                 this.props.user.roles.indexOf('curator') !== -1
                                     ? (rowData: TableRow): Promise<unknown> =>
-                                        this.deleteCase(rowData)
+                                          this.deleteCase(rowData)
                                     : undefined,
                         }}
                     />
