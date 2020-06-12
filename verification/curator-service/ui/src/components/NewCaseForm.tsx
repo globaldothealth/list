@@ -12,6 +12,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
+import Scroll from 'react-scroll';
 import axios from 'axios';
 
 interface User {
@@ -89,7 +90,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     creationMetadata: {
                         curator: this.props.user.email,
                         date: new Date().toISOString(),
-                    }
+                    },
                 },
             });
             this.setState({ errorMessage: '' });
@@ -123,6 +124,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         );
     }
 
+    scrollTo(name: string): void {
+        Scroll.scroller.scrollTo(name, {
+            duration: 100,
+            smooth: true,
+            offset: -64, // Account for header height
+        });
+    }
+
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -139,31 +148,48 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 {({ submitForm, isSubmitting, values }): JSX.Element => (
                     <div className={classes.container}>
                         <nav className={classes.tableOfContents}>
-                            <div className={classes.tableOfContentsRow}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('demographics')
+                                }
+                            >
                                 {this.tableOfContentsIcon(
                                     values.sex !== undefined,
                                 )}
                                 Demographics
                             </div>
-                            <div className={classes.tableOfContentsRow}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('location')}
+                            >
                                 {this.tableOfContentsIcon(
                                     values.country.trim() !== '',
                                 )}
                                 Location
                             </div>
-                            <div className={classes.tableOfContentsRow}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('events')}
+                            >
                                 {this.tableOfContentsIcon(
                                     values.confirmedDate !== '',
                                 )}
                                 Events
                             </div>
-                            <div className={classes.tableOfContentsRow}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('source')}
+                            >
                                 {this.tableOfContentsIcon(
                                     values.sourceUrl.trim() !== '',
                                 )}
                                 Source
                             </div>
-                            <div className={classes.tableOfContentsRow}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('notes')}
+                            >
                                 {this.tableOfContentsIcon(
                                     values.notes.trim() !== '',
                                 )}
@@ -172,65 +198,78 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
-                                <fieldset>
-                                    <legend>Demographics</legend>
-                                    <FormControl>
-                                        <InputLabel htmlFor="sex">
-                                            Sex
+                                <Scroll.Element name="demographics">
+                                    <fieldset>
+                                        <legend>Demographics</legend>
+                                        <FormControl>
+                                            <InputLabel htmlFor="sex">
+                                                Sex
+                                            </InputLabel>
+                                            <Field
+                                                as="select"
+                                                name="sex"
+                                                type="text"
+                                                component={Select}
+                                            >
+                                                <MenuItem
+                                                    value={undefined}
+                                                ></MenuItem>
+                                                <MenuItem value={'Female'}>
+                                                    Female
+                                                </MenuItem>
+                                                <MenuItem value={'Male'}>
+                                                    Male
+                                                </MenuItem>
+                                            </Field>
+                                        </FormControl>
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="location">
+                                    <fieldset>
+                                        <legend>Location</legend>
+                                        <Field
+                                            label="Country"
+                                            name="country"
+                                            type="text"
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="events">
+                                    <fieldset>
+                                        <legend>Events</legend>
+                                        <InputLabel htmlFor="confirmedDate">
+                                            Date confirmed
                                         </InputLabel>
                                         <Field
-                                            as="select"
-                                            name="sex"
+                                            name="confirmedDate"
+                                            type="date"
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="source">
+                                    <fieldset>
+                                        <legend>Source</legend>
+                                        <Field
+                                            label="Source URL"
+                                            name="sourceUrl"
                                             type="text"
-                                            component={Select}
-                                        >
-                                            <MenuItem
-                                                value={undefined}
-                                            ></MenuItem>
-                                            <MenuItem value={'Female'}>
-                                                Female
-                                            </MenuItem>
-                                            <MenuItem value={'Male'}>
-                                                Male
-                                            </MenuItem>
-                                        </Field>
-                                    </FormControl>
-                                </fieldset>
-                                <fieldset>
-                                    <legend>Location</legend>
-                                    <Field
-                                        label="Country"
-                                        name="country"
-                                        type="text"
-                                        component={TextField}
-                                    />
-                                </fieldset>
-                                <fieldset>
-                                    <legend>Events</legend>
-                                    <InputLabel htmlFor="confirmedDate">
-                                        Date confirmed
-                                    </InputLabel>
-                                    <Field name="confirmedDate" type="date" />
-                                </fieldset>
-                                <fieldset>
-                                    <legend>Source</legend>
-                                    <Field
-                                        label="Source URL"
-                                        name="sourceUrl"
-                                        type="text"
-                                        placeholder="https://..."
-                                        component={TextField}
-                                    />
-                                </fieldset>
-                                <fieldset>
-                                    <legend>Notes</legend>
-                                    <Field
-                                        label="Notes"
-                                        name="notes"
-                                        type="text"
-                                        component={TextField}
-                                    />
-                                </fieldset>
+                                            placeholder="https://..."
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="notes">
+                                    <fieldset>
+                                        <legend>Notes</legend>
+                                        <Field
+                                            label="Notes"
+                                            name="notes"
+                                            type="text"
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
                                 {isSubmitting && <LinearProgress />}
                                 <br />
                                 <Button
