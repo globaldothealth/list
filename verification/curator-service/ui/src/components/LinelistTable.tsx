@@ -285,7 +285,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                    c.sources.length > 0
+                                                        c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });
@@ -313,17 +313,26 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
                         editable={{
-                            onRowAdd: (
-                                newRowData: TableRow,
-                            ): Promise<unknown> => this.addCase(newRowData),
-                            onRowUpdate: (
-                                newRowData: TableRow,
-                                oldRowData: TableRow | undefined,
-                            ): Promise<unknown> =>
-                                this.editCase(newRowData, oldRowData),
-                            onRowDelete: (
-                                rowData: TableRow,
-                            ): Promise<unknown> => this.deleteCase(rowData),
+                            onRowAdd:
+                                this.props.user.roles.indexOf('curator') !== -1
+                                    ? (
+                                        newRowData: TableRow,
+                                    ): Promise<unknown> =>
+                                        this.addCase(newRowData)
+                                    : undefined,
+                            onRowUpdate:
+                                this.props.user.roles.indexOf('curator') !== -1
+                                    ? (
+                                        newRowData: TableRow,
+                                        oldRowData: TableRow | undefined,
+                                    ): Promise<unknown> =>
+                                        this.editCase(newRowData, oldRowData)
+                                    : undefined,
+                            onRowDelete:
+                                this.props.user.roles.indexOf('curator') !== -1
+                                    ? (rowData: TableRow): Promise<unknown> =>
+                                        this.deleteCase(rowData)
+                                    : undefined,
                         }}
                     />
                 </Paper>
