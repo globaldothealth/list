@@ -3,14 +3,14 @@ import { AddPermissionRequest } from 'aws-sdk/clients/lambda';
 import assertString from '../util/assert-string';
 
 /**
- * Client to interact with the AWS CloudWatch Events API.
+ * Client to interact with the AWS Lambda API.
  *
  * This class instantiates the connection to AWS on construction. All
  * connection configuration (including mocking) should occur on the AWS object
  * before construction.
  *
- * For examples on using the CloudWatch API, see:
- *   https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/cloudwatch-examples.html
+ * For examples on using the Lambda API, see:
+ *   https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/lambda-examples.html
  */
 export default class AwsLambdaClient {
     private readonly lambdaClient: AWS.Lambda;
