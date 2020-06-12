@@ -19,11 +19,11 @@ afterEach(() => {
 });
 
 it('renders form', () => {
-    const { getByText } = render(<NewCaseForm user={user} />);
+    const { getByText, getAllByText } = render(<NewCaseForm user={user} />);
     expect(getByText(/Submit case/i)).toBeInTheDocument();
-    expect(getByText(/Demographics/i)).toBeInTheDocument();
-    expect(getByText(/Location/i)).toBeInTheDocument();
-    expect(getByText(/Events/i)).toBeInTheDocument();
+    expect(getAllByText(/Demographics/i)).toHaveLength(2);
+    expect(getAllByText(/Location/i)).toHaveLength(2);
+    expect(getAllByText(/Events/i)).toHaveLength(2);
     expect(getByText(/Source URL/i)).toBeInTheDocument();
 });
 
