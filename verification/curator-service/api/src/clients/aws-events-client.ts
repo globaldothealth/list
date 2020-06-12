@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import { AssertionError } from 'assert';
+import assertString from '../util/assert-string';
 
 /**
  * Client to interact with the AWS CloudWatch Events API.
@@ -45,7 +45,10 @@ export default class AwsEventsClient {
             const response = await this.cloudWatchEventsClient
                 .putRule(putRuleParams)
                 .promise();
-            this.assertString(response.RuleArn);
+            assertString(
+                response.RuleArn,
+                'AWS PutRule response missing RuleArn.',
+            );
             if (targetId && sourceId) {
                 const putTargetsParams = {
                     Rule: ruleName,
@@ -71,14 +74,6 @@ export default class AwsEventsClient {
             throw err;
         }
     };
-
-    private assertString(input: string | undefined): asserts input is string {
-        if (typeof input === 'string') return;
-        else
-            throw new AssertionError({
-                message: 'AWS PutRule response missing RuleArn.',
-            });
-    }
 
     /**
      * Proxies a DeleteRule request to the AWS CloudWatch API.
