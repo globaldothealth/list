@@ -2,9 +2,14 @@ import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
+import AwsLambdaClient from '../clients/aws-lambda-client';
 
 export default class SourcesController {
-    constructor(private readonly awsEventsClient: AwsEventsClient) { }
+    constructor(
+        private readonly awsEventsClient: AwsEventsClient,
+        private readonly awsLambdaClient: AwsLambdaClient,
+        private readonly retrievalFunctionArn: string,
+    ) {}
 
     /**
      * List the sources.
@@ -138,19 +143,11 @@ export default class SourcesController {
         try {
             const source = new Source(req.body);
             await source.validate();
-            if (source.automation?.schedule) {
-                const createdRuleArn = await this.awsEventsClient.putRule(
-                    source.toAwsRuleName(),
-                    source.toAwsRuleDescription(),
-                    source.automation.schedule.awsScheduleExpression,
-                    source.toAwsRuleTargetId(),
-                    source._id.toString(),
-                );
-                source.set('automation.schedule.awsRuleArn', createdRuleArn);
-            }
+            await this.createSourceAwsProperties(source);
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
+            console.log(err);
             if (err.name === 'ValidationError') {
                 res.status(422).json(err.message);
                 return;
@@ -158,6 +155,35 @@ export default class SourcesController {
             res.status(500).json(err.message);
         }
     };
+
+    /**
+     * Performs creation of AWS assets corresponding to the provided source,
+     * based on the content of the create operation.
+     *
+     * If an automation schedule is present, a CloudWatch scheduled rule will
+     * be created with a target of the global retrieval function. A resource-
+     * based permission will be added to the global retrieval function such
+     * that it can be invoked by the rule.
+     */
+    private async createSourceAwsProperties(
+        source: SourceDocument,
+    ): Promise<void> {
+        if (source.automation?.schedule) {
+            const createdRuleArn = await this.awsEventsClient.putRule(
+                source.toAwsRuleName(),
+                source.toAwsRuleDescription(),
+                source.automation.schedule.awsScheduleExpression,
+                source.toAwsRuleTargetId(),
+                source._id.toString(),
+            );
+            source.set('automation.schedule.awsRuleArn', createdRuleArn);
+            await this.awsLambdaClient.addInvokeFromEventPermission(
+                createdRuleArn,
+                this.retrievalFunctionArn,
+                source.toAwsRuleName(),
+            );
+        }
+    }
 
     /**
      * Delete a single source.
