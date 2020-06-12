@@ -39,9 +39,11 @@ export function addCase(
                 },
             ],
             revisionMetadata: {
-                date: new Date().toJSON(),
-                id: 0,
-                moderator: 'test',
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'test',
+                    date: new Date().toJSON(),
+                }
             },
         },
     });

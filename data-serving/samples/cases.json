@@ -176,16 +176,25 @@
         ],
         "notes": "Contact of a confirmed case at work.",
         "revisionMetadata": {
-            "id": {
-                "$numberInt": "0"
+            "revisionNumber": 1,
+            "creationMetadata": {
+                "curator": "abc123",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                },
+                "notes": "initial data entry"
             },
-            "moderator": "abc123",
-            "date": {
-                "$date": {
-                    "$numberLong": "1587614400000"
-                }
-            },
-            "notes": "initial data entry"
+            "updateMetadata": {
+                "curator": "xyz789",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587814400000"
+                    }
+                },
+                "notes": "fix source error"
+            }
         },
         "importedCase": {
             "ID": "idk",
@@ -222,8 +231,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -266,7 +277,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -325,7 +336,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-96587",
@@ -363,7 +374,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -423,7 +434,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-19007",
@@ -462,8 +473,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -506,8 +519,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -555,7 +570,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -597,7 +612,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -640,8 +655,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -684,8 +701,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -745,7 +764,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -787,7 +806,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -828,8 +847,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -872,8 +893,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -916,8 +939,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -960,8 +985,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1002,7 +1029,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1061,7 +1088,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-43612",
@@ -1098,7 +1125,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1139,7 +1166,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1180,7 +1207,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1239,7 +1266,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-38568",
@@ -1282,7 +1309,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1324,8 +1351,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1368,8 +1397,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1412,8 +1443,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1472,7 +1505,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-44084",
@@ -1511,8 +1544,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1560,7 +1595,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1619,7 +1654,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-412234",
@@ -1656,7 +1691,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1699,8 +1734,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1741,7 +1778,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -1782,7 +1819,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "004-12633",
@@ -1819,8 +1856,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1863,8 +1902,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -1923,7 +1964,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-52178",
@@ -1962,8 +2003,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2003,7 +2046,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2045,8 +2088,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2087,7 +2132,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2130,8 +2175,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2174,8 +2221,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2218,8 +2267,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2262,7 +2313,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2320,7 +2371,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-423045",
@@ -2356,7 +2407,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2400,7 +2451,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2443,7 +2494,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2502,7 +2553,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-34746",
@@ -2539,8 +2590,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2581,7 +2634,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2623,8 +2676,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2665,7 +2720,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2708,8 +2763,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2752,8 +2809,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2793,8 +2852,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -2853,7 +2914,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-411815",
@@ -2892,7 +2953,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "005-5341",
@@ -2930,7 +2991,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -2990,7 +3051,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3050,7 +3111,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-411927",
@@ -3089,8 +3150,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3133,8 +3196,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3177,8 +3242,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3236,7 +3303,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-100545",
@@ -3273,8 +3340,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3317,8 +3386,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3361,7 +3432,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3409,7 +3480,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3452,8 +3523,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3512,7 +3585,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-72191",
@@ -3551,8 +3624,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -3611,7 +3686,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-403465",
@@ -3655,7 +3730,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3703,7 +3778,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3751,7 +3826,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3792,7 +3867,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3839,7 +3914,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3882,7 +3957,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -3941,7 +4016,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-36369",
@@ -3978,8 +4053,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4038,7 +4115,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-48030",
@@ -4077,8 +4154,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4121,8 +4200,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4170,7 +4251,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4213,7 +4294,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4256,8 +4337,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4299,7 +4382,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4340,7 +4423,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4382,8 +4465,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4426,8 +4511,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "CB"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "notes": "Details awaited",
         "sources": [
@@ -4472,7 +4559,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4512,8 +4599,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4556,8 +4645,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4600,8 +4691,10 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0,
-            "moderator": "TR"
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR"
+            }
         },
         "sources": [
             {
@@ -4649,7 +4742,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "sources": [
             {
@@ -4708,7 +4801,7 @@
             }
         ],
         "revisionMetadata": {
-            "id": 0
+            "revisionNumber": 0
         },
         "importedCase": {
             "ID": "007-72165",

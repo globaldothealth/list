@@ -56,7 +56,7 @@ The following fields are *not* lossy, although they require conversion to a new 
 - Clean up the source data in the case of obvious errors in the logs, e.g. ages in the thousands or dates with one too
   many or too few digits.
 
-- Use Sheets or GitHub history to infer `revision.date`.
+- Use Sheets or GitHub history to infer `revisionMetadata.date`.
 
 - De-duplicate events populated from the original outcome field with the others; ex. in some cases we have
   `events[name="deathOrDischarge"]`, from the `date_death_or_discharge` field, plus `events[name="death"]`
@@ -117,8 +117,8 @@ Fields that are not carrying over to the new schema, though they will be include
 
 We are backfilling fields including:
 
-- `revision.id`: We are treating each record as if it's on its first revision. It would be extremely labor-intensive to
-  reconstruct revision history from the source data, but it will baked into the new system.
+- `revisionMetadata.revisionNumber`: We are treating each record as if it's on its first revision. It would be extremely
+  labor-intensive to reconstruct revision history from the source data, but it will baked into the new system.
 
 > **Open question:** Do we want to backfill data or leave those fields empty for imported data?
 

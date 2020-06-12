@@ -1,0 +1,13 @@
+{
+    "revisionNumber": 1,
+    "creationMetadata": {
+        "curator": "abc@email.com",
+        "date": "2020-01-10",
+        "notes": "Initial entry"
+    },
+    "updateMetadata": {
+        "curator": "xyz@email.com",
+        "date": "2020-01-15",
+        "notes": "Fix source error"
+    }
+}
