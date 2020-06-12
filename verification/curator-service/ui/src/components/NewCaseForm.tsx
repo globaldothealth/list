@@ -190,10 +190,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     Submit case
                                 </Button>
                                 {this.state.errorMessage && (
-                                    <h3>
-                                        {' '}
-                                        {this.state.errorMessage as string}{' '}
-                                    </h3>
+                                    <h3>{this.state.errorMessage as string}</h3>
                                 )}
                             </Form>
                         )}
