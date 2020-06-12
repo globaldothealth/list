@@ -10,7 +10,9 @@
                 }
             },
             "sex": "Female",
-            "species": "Homo sapien"
+            "profession": "Horse trainer",
+            "nationality": "Swedish",
+            "ethnicity": "Other"
         },
         "location": {
             "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
