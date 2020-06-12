@@ -27,17 +27,15 @@ export default class AwsLambdaClient {
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/lambda/latest/dg/API_AddPermission.html
      */
-    addPermission = async (
-        action: string,
+    addInvokeFromEventPermission = async (
         sourceArn: string,
         functionArn: string,
-        principal: string,
         statementId: string,
     ): Promise<string> => {
         const addPermissionParams: AddPermissionRequest = {
             FunctionName: functionArn,
-            Action: action,
-            Principal: principal,
+            Action: 'lamba:InvokeFunction',
+            Principal: 'events.amazonaws.com',
             SourceArn: sourceArn,
             StatementId: statementId,
         };
