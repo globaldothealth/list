@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
+import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
@@ -91,12 +92,17 @@ const awsEventsClient = new AwsEventsClient(
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
     env.AWS_SERVICE_REGION,
 );
+const awsLambdaClient = new AwsLambdaClient(env.AWS_SERVICE_REGION);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
 
 // Configure sources controller.
-const sourcesController = new SourcesController(awsEventsClient);
+const sourcesController = new SourcesController(
+    awsEventsClient,
+    awsLambdaClient,
+    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+);
 apiRouter.get(
     '/sources',
     mustHaveAnyRole(['reader', 'curator']),
