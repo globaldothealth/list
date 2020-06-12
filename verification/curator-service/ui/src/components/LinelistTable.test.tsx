@@ -32,6 +32,8 @@ it('loads and displays cases', async () => {
             },
             location: {
                 country: 'France',
+                administrativeAreaLevel1: 'some admin 1',
+                administrativeAreaLevel2: 'some admin 2',
             },
             events: [
                 {
@@ -69,6 +71,10 @@ it('loads and displays cases', async () => {
     );
     const items = await findByText(/abc123/);
     expect(items).toBeInTheDocument();
+    const admin1 = await findByText(/some admin 1/);
+    expect(admin1).toBeInTheDocument();
+    const admin2 = await findByText(/some admin 2/);
+    expect(admin2).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
