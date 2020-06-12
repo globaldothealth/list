@@ -312,28 +312,25 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
-                        editable={{
-                            onRowAdd:
-                                this.props.user.roles.indexOf('curator') !== -1
-                                    ? (
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowAdd: (
                                           newRowData: TableRow,
                                       ): Promise<unknown> =>
-                                          this.addCase(newRowData)
-                                    : undefined,
-                            onRowUpdate:
-                                this.props.user.roles.indexOf('curator') !== -1
-                                    ? (
+                                          this.addCase(newRowData),
+                                      onRowUpdate: (
                                           newRowData: TableRow,
                                           oldRowData: TableRow | undefined,
                                       ): Promise<unknown> =>
-                                          this.editCase(newRowData, oldRowData)
-                                    : undefined,
-                            onRowDelete:
-                                this.props.user.roles.indexOf('curator') !== -1
-                                    ? (rowData: TableRow): Promise<unknown> =>
-                                          this.deleteCase(rowData)
-                                    : undefined,
-                        }}
+                                          this.editCase(newRowData, oldRowData),
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteCase(rowData),
+                                  }
+                                : undefined
+                        }
                     />
                 </Paper>
                 {this.state.error && (

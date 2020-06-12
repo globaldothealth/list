@@ -459,4 +459,8 @@ it('cannot edit data as a reader only', async () => {
 
     const deleteButton = queryByText(/delete_outline/);
     expect(deleteButton).not.toBeInTheDocument();
+    const addButton = queryByText(/add_box/);
+    expect(addButton).not.toBeInTheDocument();
+    const editButton = queryByText(/edit/);
+    expect(editButton).not.toBeInTheDocument();
 });
