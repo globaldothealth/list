@@ -16,14 +16,14 @@ GEOCODER_MODULE = 'csv_geocoder'
 ''' The path to the geocoding script in the nCoV2019 repo. '''
 GEOCODER_REPO_PATH = 'code/sheet_cleaner/geocoding'
 
-# TODO(khmoran): Include 'outcome' once the curator UI transitions to using the
+# TODO(khmoran): Exclude 'outcome' once the curator UI transitions to using the
 # new events-based outcome field.
 LOSSY_FIELDS = [
     'ID', 'province', 'geo_resolution', 'date_onset_symptoms',
     'date_admission_hospital', 'date_confirmation', 'travel_history_dates',
     'travel_history_location', 'reported_market_exposure',
     'chronic_disease_binary', 'outcome', 'location', 'admin3', 'country_new',
-    'admin_id', 'travel_history_binary'
+    'admin_id', 'travel_history_binary', 'lives_in_Wuhan'
 ]
 
 '''

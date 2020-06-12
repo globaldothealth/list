@@ -160,10 +160,6 @@
                 "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
             }
         ],
-        "outbreakSpecifics": {
-            "livesInWuhan": false,
-            "reportedMarketExposure": true
-        },
         "pathogens": [
             {
                 "name": "sars-cov-2",
@@ -196,7 +192,9 @@
             "geo_resolution": "admin_2",
             "chronic_disease_binary": "true",
             "outcome": "discharge 2/12",
-            "admin_id": "291"
+            "admin_id": "291",
+            "lives_in_Wuhan": "false",
+            "reported_market_exposure": "true"
         }
     },
     {
