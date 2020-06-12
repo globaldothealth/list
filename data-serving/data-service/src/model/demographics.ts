@@ -7,10 +7,6 @@ export enum Sex {
     Other = 'Other',
 }
 
-export enum Species {
-    HomoSapien = 'Homo sapien',
-}
-
 export const demographicsSchema = new mongoose.Schema({
     ageRange: {
         start: {
@@ -24,18 +20,20 @@ export const demographicsSchema = new mongoose.Schema({
             max: 300,
         },
     },
-    species: {
-        type: String,
-        enum: Object.values(Species),
-    },
     sex: {
         type: String,
         enum: Object.values(Sex),
     },
+    // TODO: The below 3 fields should be data dictionaries.
+    profession: String,
+    nationality: String,
+    ethnicity: String,
 });
 
 export type DemographicsDocument = mongoose.Document & {
     ageRange: Range<number>;
     sex: Sex;
-    species: Species;
+    profession: string;
+    nationality: string;
+    ethnicity: string;
 };

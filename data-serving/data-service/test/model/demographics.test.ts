@@ -50,19 +50,10 @@ describe('validate', () => {
         });
     });
 
-    it('an unknown species name is invalid', async () => {
-        return new Demographics({
-            ...fullModel,
-            ...{ species: 'Felis catus' },
-        }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
     it('an unknown sex is invalid', async () => {
         return new Demographics({
             ...fullModel,
-            ...{ sex: 'Also felis catus' },
+            ...{ sex: 'Some free text' },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
