@@ -39,7 +39,6 @@ describe('addPermission', () => {
         expect(result).toEqual(expectedStatement);
         expect(addPermissionSpy).toHaveBeenCalledTimes(1);
     });
-
     it('throws errors from AWS addPermission call', async () => {
         const expectedError = new Error('AWS error');
         addPermissionSpy.mockRejectedValueOnce(expectedError);
