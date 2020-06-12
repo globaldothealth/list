@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 const editMetadataSchema = new mongoose.Schema({
     curator: {
         type: String,
-        required: 'Enter a revision moderator id',
+        required: true,
     },
     date: {
         ...dateFieldInfo,
-        required: 'Enter a revision date',
+        required: true,
     },
     notes: String,
 });
@@ -21,20 +21,17 @@ export const revisionMetadataSchema = new mongoose.Schema({
             validator: Number.isInteger,
             message: '{VALUE} is not an integer value',
         },
-        required: 'Enter a revision id',
+        required: true,
     },
     creationMetadata: {
         type: editMetadataSchema,
-        required: 'Enter creation metadata',
+        required: true,
     },
     updateMetadata: {
         type: editMetadataSchema,
-        required: [
-            function (this: RevisionMetadataDocument): boolean {
-                return this.revisionNumber > 0 && !this.updateMetadata;
+        required: function (this: RevisionMetadataDocument): boolean {
+                return this.revisionNumber > 0;
             },
-            'Enter update metadata',
-        ],
     },
 });
 
