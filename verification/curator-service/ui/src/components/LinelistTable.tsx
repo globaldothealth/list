@@ -33,6 +33,8 @@ interface Demographics {
 
 interface Location {
     country: string;
+    administrativeAreaLevel1: string;
+    administrativeAreaLevel2: string;
 }
 
 interface Source {
@@ -63,6 +65,8 @@ interface TableRow {
     sex: string;
     age: string;
     country: string;
+    adminArea1: string;
+    adminArea2: string;
     confirmedDate: Date | null;
     // sources
     sourceUrl: string | null;
@@ -115,6 +119,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             ],
             location: {
                 country: rowData.country,
+                administrativeAreaLevel1: rowData.adminArea1,
+                administrativeAreaLevel2: rowData.adminArea2,
             },
             events: [
                 {
@@ -217,6 +223,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
+                                title: 'Admin area 1',
+                                field: 'adminArea1',
+                                filtering: false,
+                            },
+                            {
+                                title: 'Admin area 2',
+                                field: 'adminArea2',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Confirmed date',
                                 field: 'confirmedDate',
                                 filtering: false,
@@ -279,6 +295,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 sex: c.demographics?.sex,
                                                 age: c.demographics?.age,
                                                 country: c.location.country,
+                                                adminArea1:
+                                                    c.location
+                                                        ?.administrativeAreaLevel1,
+                                                adminArea2:
+                                                    c.location
+                                                        ?.administrativeAreaLevel2,
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,
@@ -308,6 +330,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             // https://docs.mongodb.com/manual/text-search/
                             search: false,
                             filtering: true,
+                            sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                             padding: 'dense',
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
