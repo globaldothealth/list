@@ -1,6 +1,7 @@
-import Users from './Users';
+import { fireEvent, render, within } from '@testing-library/react';
+
 import React from 'react';
-import { render, fireEvent, within } from '@testing-library/react';
+import Users from './Users';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -37,7 +38,7 @@ test('lists users', async () => {
         },
         {
             _id: 'abc321',
-            name: 'Bob Smith',
+            name: '',
             email: 'foo2@bar.com',
             roles: ['curator'],
         },
@@ -58,7 +59,9 @@ test('lists users', async () => {
         <Users user={emptyUser} onUserChange={() => {}} />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
-    expect(await findByText('Bob Smith')).toBeInTheDocument();
+    expect(await findByText('foo@bar.com')).toBeInTheDocument();
+    expect(await findByText('Name not provided')).toBeInTheDocument();
+    expect(await findByText('foo2@bar.com')).toBeInTheDocument();
     expect(queryByText('Carol Smith')).not.toBeInTheDocument();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/');
 });
