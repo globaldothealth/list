@@ -2,10 +2,6 @@ import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
 import { LocationDocument, locationSchema } from './location';
-import {
-    OutbreakSpecificsDocument,
-    outbreakSpecificsSchema,
-} from './outbreak-specifics';
 import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
     RevisionMetadataDocument,
@@ -37,7 +33,6 @@ const caseSchema = new mongoose.Schema(
             required: 'Must include revision metadata',
         },
         notes: String,
-        outbreakSpecifics: outbreakSpecificsSchema,
         pathogens: [pathogenSchema],
         sources: {
             type: [sourceSchema],
@@ -75,7 +70,6 @@ type CaseDocument = mongoose.Document & {
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
-    outbreakSpecifics: OutbreakSpecificsDocument;
     pathogens: [PathogenDocument];
     sources: [SourceDocument];
     symptoms: DictionaryDocument;

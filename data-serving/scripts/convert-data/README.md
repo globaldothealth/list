@@ -31,8 +31,6 @@ The following fields are lossy:
 
 - `demographics.ageRange`: Some values are too large to be ages. Ex. row `002-23162` with age value `2073`.
 - `events[name='onsetSymptoms']`: Some values are in an invalid format, ex. row `000-1-20073` with value `08.03.20202`
-- `outbreakSpecifics.reportedMarketExposure`: Some values are not bools, ex. row `000-1-13167` has value
-  `exposed to people who come back from wuhan`
 - `travelHistory.location`: This field is highly unstructured, and includes lists of locations, free-form text, and
   locations of all (unmarked) granularity.
 - `travelHistory.dateRange`: As with `events[name='onsetSymptoms']`, the date format varies.
@@ -45,21 +43,15 @@ The following fields are lossy:
 The following fields are *not* lossy, although they require conversion to a new type:
 
 - `sex`
-- `outbreakSpecifics.livesInWuhan`
 - `location.geometry.latitude`, `location.geometry.longitude`
 - `events[name='admissionHospital']`, `events[name='confirmed']`, `events[name='deathOrDischarge']`
 
 ### Future improvements
 
-- Improve disambiguation of `travelHistory.location`. For example, if the person lives in Florida and has traveled to
-  Georgia, it's more likely to be the state than the country.
-
 - Add validation logic to all dates to ensure that they are between 12/2019 and today.
 
 - If a date fails to parse/validate in the `mm/dd/yy` format, attempt to parse it in other formats, including
   `dd/mm/yy`, `mm.dd.yy`, and `dd.mm.yy`.
-
-- Take free-form text from `outbreakSpecifics.reportedMarketExposure` and add it to the notes field.
 
 - Clean up the source data in the case of obvious errors in the logs, e.g. ages in the thousands or dates with one too
   many or too few digits.
@@ -108,6 +100,18 @@ Fields that can't be converted include:
 
 - `source.id` and `pathogens.sequenceSource.id`: Sources may have ids to link them to the new `sources` collection; it's
   possible that we may be able to backfill this later once that dataset is developed and we can cross-reference by URL.
+
+Fields that are not carrying over to the new schema, though they will be included in `importedCase`:
+
+- Fields that were relevant early on in the outbreak, but aren't tracked any longer: `lives_in_Wuhan`,
+  `reported_market_exposure`
+
+- Fields supplanted by new values: `ID`
+
+- Non-normalized or redunant location fields, including `province`, `geo_resolution`, `location`, `admin3`,
+  `country_new`, `admin_id`
+  
+- Fields whose values can be imputed from other fields: `geo_resolution`, `chronic_disease_binary`
 
 ### Backfilled fields
 

@@ -281,21 +281,6 @@
           }
         }
       },
-      "outbreakSpecifics": {
-        "bsonType": "object",
-        "additionalProperties": false,
-        "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "livesInWuhan": {
-            "bsonType": "bool"
-          },
-          "reportedMarketExposure": {
-            "bsonType": "bool"
-          }
-        }
-      },
       "pathogens": {
         "bsonType": "array",
         "uniqueItems": true,
@@ -420,6 +405,9 @@
             "bsonType": "string"
           },
           "travel_history_binary": {
+            "bsonType": "string"
+          },
+          "lives_in_Wuhan": {
             "bsonType": "string"
           }
         }
