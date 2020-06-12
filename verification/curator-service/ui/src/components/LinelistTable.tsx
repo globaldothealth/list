@@ -297,12 +297,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 country: c.location.country,
                                                 adminArea1:
                                                     c.location
-                                                        ?.administrativeAreaLevel1 ||
-                                                    '',
+                                                        ?.administrativeAreaLevel1,
                                                 adminArea2:
                                                     c.location
-                                                        ?.administrativeAreaLevel2 ||
-                                                    '',
+                                                        ?.administrativeAreaLevel2,
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,
