@@ -1,10 +1,11 @@
-import React from 'react';
-import axios from 'axios';
-import { createStyles, WithStyles, withStyles } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import { WithStyles, createStyles, withStyles } from '@material-ui/core';
+
 import Chip from '@material-ui/core/Chip';
 import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import React from 'react';
+import Select from '@material-ui/core/Select';
+import axios from 'axios';
 
 interface ListResponse {
     users: User[];
@@ -113,7 +114,8 @@ class Users extends React.Component<Props, UsersState> {
                 <table className={classes.table}>
                     <thead>
                         <tr>
-                            <th className={classes.headerCell}>User</th>
+                            <th className={classes.headerCell}>Name</th>
+                            <th className={classes.headerCell}>Email</th>
                             <th className={classes.headerCell}>Roles</th>
                         </tr>
                     </thead>
@@ -124,7 +126,13 @@ class Users extends React.Component<Props, UsersState> {
                                     className={classes.cell}
                                     data-testid={user.name}
                                 >
-                                    {user.name}
+                                    {user.name || 'Name not provided'}
+                                </th>
+                                <th
+                                    className={classes.cell}
+                                    data-testid={user.email}
+                                >
+                                    {user.email}
                                 </th>
                                 <th
                                     className={classes.cell}
