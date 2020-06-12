@@ -1,11 +1,12 @@
 import { Link, Route, Switch } from 'react-router-dom';
 
-import NewCaseForm from './NewCaseForm';
 import CompletenessCharts from './CompletenessCharts';
+import { CssBaseline } from '@material-ui/core';
 import CumulativeCharts from './CumulativeCharts';
 import FreshnessCharts from './FreshnessCharts';
 import LinelistTable from './LinelistTable';
 import Navbar from './Navbar';
+import NewCaseForm from './NewCaseForm';
 import Profile from './Profile';
 import React from 'react';
 import SourceTable from './SourceTable';
@@ -58,7 +59,7 @@ class App extends React.Component<Props, User> {
     componentDidMount(): void {
         this.getUser();
     }
-    getUser() {
+    getUser(): void {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -75,7 +76,7 @@ class App extends React.Component<Props, User> {
             });
     }
 
-    hasAnyRole(requiredRoles: string[]) {
+    hasAnyRole(requiredRoles: string[]): boolean {
         return this.state.roles?.some((r: string) => requiredRoles.includes(r));
     }
 
@@ -83,6 +84,7 @@ class App extends React.Component<Props, User> {
         const { classes } = this.props;
         return (
             <ThemeProvider theme={theme}>
+                <CssBaseline />
                 <div className="App">
                     <Navbar user={this.state} />
                     <div className={classes.page}>
@@ -139,7 +141,7 @@ interface HomeProps {
     user: User;
 }
 class Home extends React.Component<HomeProps, {}> {
-    hasAnyRole(requiredRoles: string[]) {
+    hasAnyRole(requiredRoles: string[]): boolean {
         return this.props.user.roles?.some((r: string) =>
             requiredRoles.includes(r),
         );
