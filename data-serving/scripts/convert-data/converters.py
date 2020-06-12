@@ -402,49 +402,6 @@ def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
     }] if sources else None
 
 
-def convert_outbreak_specifics(id: str, reported_market_exposure: str,
-                               lives_in_wuhan: str) -> Dict[str, bool]:
-    '''
-    Converts the covid-19-specific fields into a new outbreakSpecifics
-    object.
-
-    Parameters:
-      id: The id of the input row for logging a failed conversion.
-
-    Returns:
-      None: When the input is empty.
-      Dict[str, bool]: When the input is nonempty. The dictionary is in the
-        format:
-        {
-          'reportedMarketExposure': bool,
-          'livesInWuhan': bool
-        }
-    '''
-
-    outbreak_specifics = {}
-
-    try:
-        normalized = parse_bool(reported_market_exposure)
-        if normalized is not None:
-            outbreak_specifics['reportedMarketExposure'] = normalized
-    except ValueError as e:
-        log_error(
-            id, 'reported_market_exposure',
-            'outbreakSpecifics.reportedMarketExposure',
-            reported_market_exposure, e)
-
-    try:
-        normalized = parse_bool(lives_in_wuhan)
-        if normalized is not None:
-            outbreak_specifics['livesInWuhan'] = normalized
-    except ValueError as e:
-        log_error(
-            id, 'lives_in_wuhan', 'outbreakSpecifics.livesInWuhan',
-            lives_in_wuhan, e)
-
-    return outbreak_specifics or None
-
-
 def convert_travel_history(geocoder: Any, id: str, dates: str,
                            location: str) -> Dict[str, Any]:
     '''
