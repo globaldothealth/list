@@ -440,7 +440,7 @@ it('cannot edit data as a reader only', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(
+    const { findByText, queryByText } = render(
         <LinelistTable
             user={{
                 _id: 'testUser',
