@@ -13,6 +13,9 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import Users from './Users';
 import axios from 'axios';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core';
+import { createStyles } from '@material-ui/core/styles';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 
 const theme = createMuiTheme({
     palette: {
@@ -25,6 +28,15 @@ const theme = createMuiTheme({
     },
 });
 
+const styles = () =>
+    createStyles({
+        page: {
+            paddingTop: '70px',
+        },
+    });
+
+type Props = WithStyles<typeof styles>;
+
 interface User {
     _id: string;
     name: string;
@@ -32,8 +44,8 @@ interface User {
     roles: string[];
 }
 
-class App extends React.Component<{}, User> {
-    constructor(props: {}) {
+class App extends React.Component<Props, User> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             _id: '',
@@ -68,52 +80,55 @@ class App extends React.Component<{}, User> {
     }
 
     render(): JSX.Element {
+        const { classes } = this.props;
         return (
             <ThemeProvider theme={theme}>
                 <div className="App">
                     <Navbar user={this.state} />
-                    <Switch>
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <Route exact path="/cases">
-                                <LinelistTable user={this.state} />
+                    <div className={classes.page}>
+                        <Switch>
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route exact path="/cases">
+                                    <LinelistTable user={this.state} />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/new">
+                                    <NewCaseForm user={this.state} />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route path="/sources">
+                                    <SourceTable />
+                                </Route>
+                            )}
+                            <Route path="/charts/cumulative">
+                                <CumulativeCharts />
                             </Route>
-                        )}
-                        {this.hasAnyRole(['curator']) && (
-                            <Route path="/cases/new">
-                                <NewCaseForm user={this.state} />
+                            <Route path="/charts/freshness">
+                                <FreshnessCharts />
                             </Route>
-                        )}
-                        {this.hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/sources">
-                                <SourceTable />
+                            <Route path="/charts/completeness">
+                                <CompletenessCharts />
                             </Route>
-                        )}
-                        <Route path="/charts/cumulative">
-                            <CumulativeCharts />
-                        </Route>
-                        <Route path="/charts/freshness">
-                            <FreshnessCharts />
-                        </Route>
-                        <Route path="/charts/completeness">
-                            <CompletenessCharts />
-                        </Route>
-                        {this.state.email && (
-                            <Route path="/profile">
-                                <Profile user={this.state} />
+                            {this.state.email && (
+                                <Route path="/profile">
+                                    <Profile user={this.state} />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['admin']) && (
+                                <Route path="/users">
+                                    <Users
+                                        user={this.state}
+                                        onUserChange={() => this.getUser()}
+                                    />
+                                </Route>
+                            )}
+                            <Route exact path="/">
+                                <Home user={this.state} />
                             </Route>
-                        )}
-                        {this.hasAnyRole(['admin']) && (
-                            <Route path="/users">
-                                <Users
-                                    user={this.state}
-                                    onUserChange={() => this.getUser()}
-                                />
-                            </Route>
-                        )}
-                        <Route exact path="/">
-                            <Home user={this.state} />
-                        </Route>
-                    </Switch>
+                        </Switch>
+                    </div>
                 </div>
             </ThemeProvider>
         );
@@ -189,4 +204,4 @@ class Home extends React.Component<HomeProps, {}> {
     }
 }
 
-export default App;
+export default withStyles(styles, {})(App);
