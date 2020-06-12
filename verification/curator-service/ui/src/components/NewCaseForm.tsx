@@ -1,3 +1,4 @@
+import { green, grey } from '@material-ui/core/colors';
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
@@ -5,6 +6,8 @@ import { withStyles } from '@material-ui/core';
 import { Theme, createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -25,6 +28,10 @@ const styles = (theme: Theme) =>
         },
         tableOfContents: {
             position: 'fixed',
+        },
+        tableOfContentsRow: {
+            alignItems: 'center',
+            display: 'flex',
         },
         form: {
             paddingLeft: '15em',
@@ -97,29 +104,73 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         }
     }
 
+    tableOfContentsIcon(isChecked: boolean): JSX.Element {
+        return isChecked ? (
+            <CheckCircleIcon
+                data-testid="check-icon"
+                style={{
+                    color: green[500],
+                    margin: '0.25em 0.5em',
+                }}
+            ></CheckCircleIcon>
+        ) : (
+            <RadioButtonUncheckedIcon
+                style={{
+                    color: grey[500],
+                    margin: '0.25em 0.5em',
+                }}
+            ></RadioButtonUncheckedIcon>
+        );
+    }
+
     render(): JSX.Element {
         const { classes } = this.props;
         return (
-            <div className={classes.container}>
-                <nav className={classes.tableOfContents}>
-                    <div>Demographics</div>
-                    <div>Location</div>
-                    <div>Events</div>
-                    <div>Source</div>
-                    <div>Notes</div>
-                </nav>
-                <div className={classes.form}>
-                    <Formik
-                        initialValues={{
-                            sex: undefined,
-                            country: '',
-                            confirmedDate: '',
-                            sourceUrl: '',
-                            notes: '',
-                        }}
-                        onSubmit={(values, errors) => this.submitCase(values)}
-                    >
-                        {({ submitForm, isSubmitting }) => (
+            <Formik
+                initialValues={{
+                    sex: undefined,
+                    country: '',
+                    confirmedDate: '',
+                    sourceUrl: '',
+                    notes: '',
+                }}
+                onSubmit={(values, errors) => this.submitCase(values)}
+            >
+                {({ submitForm, isSubmitting, values }): JSX.Element => (
+                    <div className={classes.container}>
+                        <nav className={classes.tableOfContents}>
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.sex !== undefined,
+                                )}
+                                Demographics
+                            </div>
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.country.trim() !== '',
+                                )}
+                                Location
+                            </div>
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.confirmedDate !== '',
+                                )}
+                                Events
+                            </div>
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.sourceUrl.trim() !== '',
+                                )}
+                                Source
+                            </div>
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.notes.trim() !== '',
+                                )}
+                                Notes
+                            </div>
+                        </nav>
+                        <div className={classes.form}>
                             <Form>
                                 <fieldset>
                                     <legend>Demographics</legend>
@@ -195,10 +246,10 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     <h3>{this.state.errorMessage as string}</h3>
                                 )}
                             </Form>
-                        )}
-                    </Formik>
-                </div>
-            </div>
+                        </div>
+                    </div>
+                )}
+            </Formik>
         );
     }
 }

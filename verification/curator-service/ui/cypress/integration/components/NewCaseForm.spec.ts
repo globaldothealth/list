@@ -40,4 +40,11 @@ describe('New case form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
     });
+
+    it('Shows checkbox on field completion', function () {
+        cy.visit('/cases/new');
+        cy.get('svg[data-testid="check-icon"]').should('not.exist');
+        cy.get('input[name="country"]').clear().type('France');
+        cy.get('svg[data-testid="check-icon"]').should('exist');
+    });
 });
