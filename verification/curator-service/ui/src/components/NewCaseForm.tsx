@@ -105,6 +105,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     tableOfContentsIcon(isChecked: boolean): JSX.Element {
         return isChecked ? (
             <CheckCircleIcon
+                data-testid="check-icon"
                 style={{
                     color: green[500],
                     margin: '0.25em 0.5em',
