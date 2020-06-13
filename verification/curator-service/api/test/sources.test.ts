@@ -183,6 +183,7 @@ describe('PUT', () => {
             source.toAwsRuleName(),
             source.toAwsRuleDescription(),
             scheduleExpression,
+            expect.any(String),
             source.toAwsRuleTargetId(),
             source._id.toString(),
         );
@@ -264,6 +265,7 @@ describe('POST', () => {
             createdSource.toAwsRuleName(),
             createdSource.toAwsRuleDescription(),
             scheduleExpression,
+            expect.any(String),
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
         );

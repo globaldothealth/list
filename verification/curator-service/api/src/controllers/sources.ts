@@ -114,6 +114,7 @@ export default class SourcesController {
                     source.toAwsRuleName(),
                     source.toAwsRuleDescription(),
                     source.automation.schedule.awsScheduleExpression,
+                    this.retrievalFunctionArn,
                     source.toAwsRuleTargetId(),
                     source._id.toString(),
                 );
@@ -147,7 +148,6 @@ export default class SourcesController {
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
-            console.log(err);
             if (err.name === 'ValidationError') {
                 res.status(422).json(err.message);
                 return;
@@ -173,6 +173,7 @@ export default class SourcesController {
                 source.toAwsRuleName(),
                 source.toAwsRuleDescription(),
                 source.automation.schedule.awsScheduleExpression,
+                this.retrievalFunctionArn,
                 source.toAwsRuleTargetId(),
                 source._id.toString(),
             );
