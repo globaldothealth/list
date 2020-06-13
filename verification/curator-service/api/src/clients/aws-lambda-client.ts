@@ -34,7 +34,7 @@ export default class AwsLambdaClient {
     ): Promise<string> => {
         const addPermissionParams: AddPermissionRequest = {
             FunctionName: functionArn,
-            Action: 'lamba:InvokeFunction',
+            Action: 'lambda:InvokeFunction',
             Principal: 'events.amazonaws.com',
             SourceArn: sourceArn,
             StatementId: statementId,
