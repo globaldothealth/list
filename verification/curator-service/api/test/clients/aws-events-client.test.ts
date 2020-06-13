@@ -27,7 +27,7 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'putRule', putRuleSpy);
     AWSMock.mock('CloudWatchEvents', 'putTargets', putTargetsSpy);
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
-    client = new AwsEventsClient('fakeArn', 'us-east-1');
+    client = new AwsEventsClient('us-east-1');
 });
 
 afterEach(() => {
