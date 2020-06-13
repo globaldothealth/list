@@ -13,10 +13,7 @@ import assertString from '../util/assert-string';
  */
 export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
-    constructor(
-        private readonly retrievalFunctionArn: string,
-        awsRegion: string,
-    ) {
+    constructor(awsRegion: string) {
         AWS.config.update({ region: awsRegion });
         this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
             apiVersion: '2015-10-07',
@@ -33,6 +30,7 @@ export default class AwsEventsClient {
         ruleName: string,
         description: string,
         scheduleExpression?: string,
+        targetArn?: string,
         targetId?: string,
         sourceId?: string,
     ): Promise<string> => {
@@ -49,12 +47,12 @@ export default class AwsEventsClient {
                 response.RuleArn,
                 'AWS PutRule response missing RuleArn.',
             );
-            if (targetId && sourceId) {
+            if (targetArn && targetId && sourceId) {
                 const putTargetsParams = {
                     Rule: ruleName,
                     Targets: [
                         {
-                            Arn: this.retrievalFunctionArn,
+                            Arn: targetArn,
                             Id: targetId,
                             Input: JSON.stringify({ sourceId: sourceId }),
                         },
