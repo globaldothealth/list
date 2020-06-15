@@ -6,6 +6,15 @@ The Mapbox specific implementation in `mapbox.ts` should only be used when injec
 
 This is to be able to easily swap to another geocoding service if needs be.
 
+## When and where does geocoding happen?
+
+If a new case is submitted or an existing case is edited and no lat/lng is provided, the curator service will attempt to geocode the request's `location.query` field.
+It will return a list of `GeocodeResult` as defined in `geocoder.ts`.
+
+Maximum 5 results will be returned in order of relevance, as such they are suitable for autocompleting the `location.query` field in the UI as well.
+
+TODO: Describe new `/api/suggest/location` API for location autocomplete when implemented.
+
 ## Mapbox specificities
 
 You can play with the Mapbox geocoding API freely at [this URL](https://docs.mapbox.com/search-playground/).
