@@ -47,4 +47,13 @@ describe('New case form', function () {
         cy.get('input[name="country"]').clear().type('France');
         cy.get('svg[data-testid="check-icon"]').should('exist');
     });
+
+    it('Shows error icon on field submission error', function () {
+        cy.visit('/cases/new');
+        cy.get('svg[data-testid="error-icon"]').should('not.exist');
+        cy.get('svg[data-testid="check-icon"]').should('not.exist');
+        cy.get('input[name="confirmedDate"]').clear().type('2020/02/31');
+        cy.get('svg[data-testid="error-icon"]').should('exist');
+        cy.get('svg[data-testid="check-icon"]').should('not.exist');
+    });
 });

@@ -51,7 +51,7 @@ it('submits case ok', async () => {
         events: {
             name: 'confirmed',
             dateRange: {
-                start: '',
+                start: null,
             },
         },
         location: {

@@ -1,19 +1,23 @@
-import { green, grey } from '@material-ui/core/colors';
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
-import { withStyles } from '@material-ui/core';
 import { Theme, createStyles } from '@material-ui/core/styles';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
+import { green, grey, red } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import DateFnsUtils from '@date-io/date-fns';
+import ErrorIcon from '@material-ui/icons/Error';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { withStyles } from '@material-ui/core';
 
 interface User {
     _id: string;
@@ -51,7 +55,7 @@ interface NewCaseFormState {
 interface FormValues {
     sex?: string;
     country: string;
-    confirmedDate: string;
+    confirmedDate: string | null;
     sourceUrl: string;
     notes: string;
 }
@@ -105,8 +109,19 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         }
     }
 
-    tableOfContentsIcon(isChecked: boolean): JSX.Element {
-        return isChecked ? (
+    tableOfContentsIcon(opts: {
+        isChecked: boolean;
+        hasError: boolean;
+    }): JSX.Element {
+        return opts.hasError ? (
+            <ErrorIcon
+                data-testid="error-icon"
+                style={{
+                    color: red[500],
+                    margin: '0.25em 0.5em',
+                }}
+            ></ErrorIcon>
+        ) : opts.isChecked ? (
             <CheckCircleIcon
                 data-testid="check-icon"
                 style={{
@@ -139,13 +154,18 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 initialValues={{
                     sex: undefined,
                     country: '',
-                    confirmedDate: '',
+                    confirmedDate: null,
                     sourceUrl: '',
                     notes: '',
                 }}
                 onSubmit={(values, errors) => this.submitCase(values)}
             >
-                {({ submitForm, isSubmitting, values }): JSX.Element => (
+                {({
+                    submitForm,
+                    isSubmitting,
+                    values,
+                    errors,
+                }): JSX.Element => (
                     <div className={classes.container}>
                         <nav className={classes.tableOfContents}>
                             <div
@@ -154,45 +174,51 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     this.scrollTo('demographics')
                                 }
                             >
-                                {this.tableOfContentsIcon(
-                                    values.sex !== undefined,
-                                )}
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sex !== undefined,
+                                    hasError: errors.sex !== undefined,
+                                })}
                                 Demographics
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('location')}
                             >
-                                {this.tableOfContentsIcon(
-                                    values.country.trim() !== '',
-                                )}
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.country.trim() !== '',
+                                    hasError: errors.country !== undefined,
+                                })}
                                 Location
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('events')}
                             >
-                                {this.tableOfContentsIcon(
-                                    values.confirmedDate !== '',
-                                )}
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.confirmedDate !== null,
+                                    hasError:
+                                        errors.confirmedDate !== undefined,
+                                })}
                                 Events
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
-                                {this.tableOfContentsIcon(
-                                    values.sourceUrl.trim() !== '',
-                                )}
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sourceUrl.trim() !== '',
+                                    hasError: errors.sourceUrl !== undefined,
+                                })}
                                 Source
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('notes')}
                             >
-                                {this.tableOfContentsIcon(
-                                    values.notes.trim() !== '',
-                                )}
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.notes.trim() !== '',
+                                    hasError: errors.notes !== undefined,
+                                })}
                                 Notes
                             </div>
                         </nav>
@@ -238,13 +264,18 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Scroll.Element name="events">
                                     <fieldset>
                                         <legend>Events</legend>
-                                        <InputLabel htmlFor="confirmedDate">
-                                            Date confirmed
-                                        </InputLabel>
-                                        <Field
-                                            name="confirmedDate"
-                                            type="date"
-                                        />
+                                        <MuiPickersUtilsProvider
+                                            utils={DateFnsUtils}
+                                        >
+                                            <Field
+                                                name="confirmedDate"
+                                                label="Date confirmed"
+                                                format="yyyy/MM/dd"
+                                                maxDate={new Date()}
+                                                minDate={new Date('2019/12/01')}
+                                                component={KeyboardDatePicker}
+                                            />
+                                        </MuiPickersUtilsProvider>
                                     </fieldset>
                                 </Scroll.Element>
                                 <Scroll.Element name="source">
