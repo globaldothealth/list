@@ -88,8 +88,11 @@ app.use(passport.session());
 app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
-const awsEventsClient = new AwsEventsClient(env.AWS_SERVICE_REGION);
 const awsLambdaClient = new AwsLambdaClient(env.AWS_SERVICE_REGION);
+const awsEventsClient = new AwsEventsClient(
+    env.AWS_SERVICE_REGION,
+    awsLambdaClient,
+);
 
 // Configure curator API routes.
 const apiRouter = express.Router();
@@ -97,7 +100,6 @@ const apiRouter = express.Router();
 // Configure sources controller.
 const sourcesController = new SourcesController(
     awsEventsClient,
-    awsLambdaClient,
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
 );
 apiRouter.get(
