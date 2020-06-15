@@ -83,8 +83,8 @@ export default function validateEnv(): Readonly<{
         }),
         MAPBOX_PERMANENT_GEOCODE: str({
             desc: 'Whether to use the permanent geocode endpoint',
-            devDefault: 'true',
-            default: '',
+            devDefault: '',
+            default: 'true',
         }),
     });
 }
