@@ -14,6 +14,7 @@ export default function validateEnv(): Readonly<{
     AFTER_LOGIN_REDIRECT_URL: string;
     STATIC_DIR: string;
     ENABLE_LOCAL_AUTH: string;
+    MAPBOX_TOKEN: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
