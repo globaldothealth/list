@@ -53,6 +53,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "@mapbox/mapbox-sdk": "github:mapbox/mapbox-sdk-js",
     "@types/multer": "^1.4.3",
     "@types/swagger-ui-express": "^4.1.2",
     "@types/yamljs": "^0.2.31",
