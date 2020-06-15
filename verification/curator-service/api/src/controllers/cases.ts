@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { Geocoder } from '../geocoding/geocoder';
 import axios from 'axios';
 
 /**
@@ -7,7 +8,10 @@ import axios from 'axios';
  * It handles CRUD operations from curators.
  */
 export default class CasesController {
-    constructor(private readonly dataServerURL: string) {}
+    constructor(
+        private readonly dataServerURL: string,
+        private readonly geocoder: Geocoder,
+    ) {}
 
     list = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -59,6 +63,7 @@ export default class CasesController {
     };
 
     create = async (req: Request, res: Response): Promise<void> => {
+        // TODO: Geocode if no lat/lng provided.
         try {
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,

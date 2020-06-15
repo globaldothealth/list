@@ -6,7 +6,7 @@ import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
-import { Geocoder } from './geocoding/mapbox';
+import Geocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import YAML from 'yamljs';

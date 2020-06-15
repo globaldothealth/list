@@ -1,4 +1,5 @@
 import Geocoding, {
+    GeocodeFeature,
     GeocodeMode,
     GeocodeResponse,
     GeocodeService,
@@ -7,7 +8,19 @@ import Geocoding, {
 import { GeocodeResult } from './geocoder';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
-export class Geocoder {
+function getFeatureTypeFromContext(
+    context: GeocodeFeature[],
+    type: string,
+): string {
+    for (const f of context) {
+        if (f.id.startsWith(type)) {
+            return f.text;
+        }
+    }
+    return '';
+}
+
+export default class Geocoder {
     private geocodeService: GeocodeService;
     constructor(accessToken: string, private readonly endpoint: GeocodeMode) {
         this.geocodeService = Geocoding({
@@ -25,19 +38,36 @@ export class Geocoder {
                     limit: 5,
                 })
                 .send();
-            console.log('Geocode response:', resp);
             const features = (resp.body as GeocodeResponse).features;
             if (features.length == 0) {
-                throw Error('no geocode result');
+                return [];
             }
             return features.map((feature) => {
                 return {
-                    lng: feature.center[0],
-                    lat: feature.center[1],
+                    geometry: {
+                        longitude: feature.center[0],
+                        latitude: feature.center[1],
+                    },
+                    administrativeAreaLevel1: getFeatureTypeFromContext(
+                        [feature, ...feature.context],
+                        'region',
+                    ),
+                    administrativeAreaLevel2: getFeatureTypeFromContext(
+                        [feature, ...feature.context],
+                        'district',
+                    ),
+                    country: getFeatureTypeFromContext(
+                        [feature, ...feature.context],
+                        'country',
+                    ),
+                    locality: getFeatureTypeFromContext(
+                        [feature, ...feature.context],
+                        'locality',
+                    ),
+                    text: feature.text,
                 };
             });
         } catch (e) {
-            console.error('geocoding:', e);
             throw e;
         }
     }
