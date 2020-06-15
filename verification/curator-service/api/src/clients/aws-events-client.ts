@@ -99,16 +99,14 @@ export default class AwsEventsClient {
         sourceId: string,
     ): Promise<void> => {
         try {
-            if (targetId) {
-                const removeTargetsParams = {
-                    Rule: ruleName,
-                    Ids: [targetId],
-                };
-                await this.cloudWatchEventsClient
-                    .removeTargets(removeTargetsParams)
-                    .promise();
-                await this.lambdaClient.removePermission(targetArn, sourceId);
-            }
+            const removeTargetsParams = {
+                Rule: ruleName,
+                Ids: [targetId],
+            };
+            await this.cloudWatchEventsClient
+                .removeTargets(removeTargetsParams)
+                .promise();
+            await this.lambdaClient.removePermission(targetArn, sourceId);
             const deleteRuleParams = { Name: ruleName };
             await this.cloudWatchEventsClient
                 .deleteRule(deleteRuleParams)
