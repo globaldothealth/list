@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
@@ -42,6 +44,19 @@ const styles = (theme: Theme) =>
             paddingLeft: '15em',
             width: '60%',
         },
+        fieldRow: {
+            marginBottom: '2em',
+        },
+        ageRow: {
+            alignItems: 'baseline',
+            display: 'flex',
+        },
+        ageField: {
+            width: '8em',
+        },
+        ageSeparator: {
+            margin: '0 2em',
+        },
     });
 
 interface Props extends WithStyles<typeof styles> {
@@ -54,12 +69,51 @@ interface NewCaseFormState {
 
 interface FormValues {
     sex?: string;
+    minAge?: number;
+    maxAge?: number;
+    age?: number;
     country: string;
     confirmedDate: string | null;
     sourceUrl: string;
     notes: string;
 }
 
+const NewCaseValidation = Yup.object().shape(
+    {
+        minAge: Yup.number()
+            .positive('Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('maxAge', {
+                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                then: Yup.number().required('Must enter minimum age in range'),
+            }),
+        maxAge: Yup.number()
+            .positive('Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('minAge', {
+                is: (minAge) => minAge !== undefined && minAge !== '',
+                then: Yup.number().required('Must enter maximum age in range'),
+            }),
+        age: Yup.number()
+            .positive('Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('minAge', {
+                is: (minAge) => minAge !== undefined && minAge !== '',
+                then: Yup.number().oneOf(
+                    [undefined],
+                    'Cannot enter age and age range',
+                ),
+            })
+            .when('maxAge', {
+                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                then: Yup.number().oneOf(
+                    [undefined],
+                    'Cannot enter age and age range',
+                ),
+            }),
+    },
+    [['maxAge', 'minAge']],
+);
 class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     constructor(props: Props) {
         super(props);
@@ -69,10 +123,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 
     async submitCase(values: FormValues): Promise<void> {
+        const ageRange = values.age
+            ? { start: values.age as number, end: values.age as number }
+            : { start: values.minAge as number, end: values.maxAge as number };
         try {
             await axios.post('/api/cases', {
                 demographics: {
                     sex: values.sex,
+                    ageRange: ageRange,
                 },
                 location: {
                     country: values.country,
@@ -153,12 +211,16 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             <Formik
                 initialValues={{
                     sex: undefined,
+                    minAge: undefined,
+                    maxAge: undefined,
+                    age: undefined,
                     country: '',
                     confirmedDate: null,
                     sourceUrl: '',
                     notes: '',
                 }}
-                onSubmit={(values, errors) => this.submitCase(values)}
+                validationSchema={NewCaseValidation}
+                onSubmit={(values) => this.submitCase(values)}
             >
                 {({
                     submitForm,
@@ -175,8 +237,19 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 }
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.sex !== undefined,
-                                    hasError: errors.sex !== undefined,
+                                    isChecked:
+                                        values.sex !== undefined ||
+                                        (values.age !== undefined &&
+                                            values.age !== '') ||
+                                        (values.minAge !== undefined &&
+                                            values.minAge !== '' &&
+                                            values.maxAge !== undefined &&
+                                            values.maxAge !== ''),
+                                    hasError:
+                                        errors.sex !== undefined ||
+                                        errors.minAge !== undefined ||
+                                        errors.maxAge !== undefined ||
+                                        errors.age !== undefined,
                                 })}
                                 Demographics
                             </div>
@@ -228,26 +301,61 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     <fieldset>
                                         <legend>Demographics</legend>
                                         <FormControl>
-                                            <InputLabel htmlFor="sex">
-                                                Sex
-                                            </InputLabel>
-                                            <Field
-                                                as="select"
-                                                name="sex"
-                                                type="text"
-                                                component={Select}
-                                            >
-                                                <MenuItem
-                                                    value={undefined}
-                                                ></MenuItem>
-                                                <MenuItem value={'Female'}>
-                                                    Female
-                                                </MenuItem>
-                                                <MenuItem value={'Male'}>
-                                                    Male
-                                                </MenuItem>
-                                            </Field>
+                                            <div className={classes.fieldRow}>
+                                                <InputLabel htmlFor="sex">
+                                                    Sex
+                                                </InputLabel>
+                                                <Field
+                                                    as="select"
+                                                    name="sex"
+                                                    type="text"
+                                                    component={Select}
+                                                >
+                                                    <MenuItem
+                                                        value={undefined}
+                                                    ></MenuItem>
+                                                    <MenuItem value={'Female'}>
+                                                        Female
+                                                    </MenuItem>
+                                                    <MenuItem value={'Male'}>
+                                                        Male
+                                                    </MenuItem>
+                                                </Field>
+                                            </div>
                                         </FormControl>
+                                        <div className={classes.ageRow}>
+                                            <Field
+                                                className={classes.ageField}
+                                                name="minAge"
+                                                type="number"
+                                                label="Min age"
+                                                component={TextField}
+                                            ></Field>
+                                            <span
+                                                className={classes.ageSeparator}
+                                            >
+                                                to
+                                            </span>
+                                            <Field
+                                                className={classes.ageField}
+                                                name="maxAge"
+                                                type="number"
+                                                label="Max age"
+                                                component={TextField}
+                                            ></Field>
+                                            <span
+                                                className={classes.ageSeparator}
+                                            >
+                                                or
+                                            </span>
+                                            <Field
+                                                className={classes.ageField}
+                                                name="age"
+                                                type="number"
+                                                label="Age"
+                                                component={TextField}
+                                            ></Field>
+                                        </div>
                                     </fieldset>
                                 </Scroll.Element>
                                 <Scroll.Element name="location">
