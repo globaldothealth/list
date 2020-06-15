@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import AwsLambdaClient from './aws-lambda-client';
 import assertString from '../util/assert-string';
 
 /**
@@ -13,7 +14,10 @@ import assertString from '../util/assert-string';
  */
 export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
-    constructor(awsRegion: string) {
+    constructor(
+        awsRegion: string,
+        private readonly lambdaClient: AwsLambdaClient,
+    ) {
         AWS.config.update({ region: awsRegion });
         this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
             apiVersion: '2015-10-07',
@@ -22,6 +26,9 @@ export default class AwsEventsClient {
 
     /**
      * Proxies a PutRule request to the AWS CloudWatch API.
+     *
+     * If Lambda target details are specified, creates a target and applies a
+     * permission to the target resource-based policy to allow invocation.
      *
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutRule.html
@@ -61,6 +68,11 @@ export default class AwsEventsClient {
                 await this.cloudWatchEventsClient
                     .putTargets(putTargetsParams)
                     .promise();
+                await this.lambdaClient.addInvokeFromEventPermission(
+                    response.RuleArn,
+                    targetArn,
+                    sourceId,
+                );
             }
             return response.RuleArn;
         } catch (err) {
