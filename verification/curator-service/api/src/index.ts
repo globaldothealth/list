@@ -6,7 +6,9 @@ import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
-import Geocoder from './geocoding/mapbox';
+import FakeGeocoder from './geocoding/fake';
+import { Geocoder } from './geocoding/geocoder';
+import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import YAML from 'yamljs';
@@ -124,16 +126,25 @@ apiRouter.delete(
     sourcesController.del,
 );
 
-// Configure cases controller proxying to data service.
-const casesController = new CasesController(
-    env.DATASERVER_URL,
-    new Geocoder(
+let geocoder: Geocoder;
+if (env.MAPBOX_TOKEN !== '') {
+    console.log('Using mapbox geocoder');
+    geocoder = new MapboxGeocoder(
         env.MAPBOX_TOKEN,
         env.MAPBOX_PERMANENT_GEOCODE
             ? 'mapbox.places-permanent'
             : 'mapbox.places',
-    ),
-);
+    );
+} else {
+    console.log('Using fake geocoder');
+    const fakeGeocoder = new FakeGeocoder();
+    apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+    apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+    geocoder = fakeGeocoder;
+}
+
+// Configure cases controller proxying to data service.
+const casesController = new CasesController(env.DATASERVER_URL, geocoder);
 apiRouter.get(
     '/cases',
     mustHaveAnyRole(['reader', 'curator']),

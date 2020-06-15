@@ -20,7 +20,7 @@ function getFeatureTypeFromContext(
     return '';
 }
 
-export default class Geocoder {
+export default class MapboxGeocoder {
     private geocodeService: GeocodeService;
     constructor(accessToken: string, private readonly endpoint: GeocodeMode) {
         this.geocodeService = Geocoding({

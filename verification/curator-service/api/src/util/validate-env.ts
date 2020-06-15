@@ -79,7 +79,7 @@ export default function validateEnv(): Readonly<{
         }),
         MAPBOX_TOKEN: str({
             desc: 'Mapbox token to use for geocoding',
-            devDefault: 'set to enable geocoding in dev',
+            devDefault: '',
         }),
         MAPBOX_PERMANENT_GEOCODE: str({
             desc: 'Whether to use the permanent geocode endpoint',
