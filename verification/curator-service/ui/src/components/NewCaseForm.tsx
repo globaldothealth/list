@@ -1,23 +1,23 @@
-import { green, grey, red } from '@material-ui/core/colors';
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { withStyles } from '@material-ui/core';
 import { Theme, createStyles } from '@material-ui/core/styles';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
+import { green, grey, red } from '@material-ui/core/colors';
 
-import ErrorIcon from '@material-ui/icons/Error';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import DateFnsUtils from '@date-io/date-fns';
+import ErrorIcon from '@material-ui/icons/Error';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { withStyles } from '@material-ui/core';
 
 interface User {
     _id: string;
