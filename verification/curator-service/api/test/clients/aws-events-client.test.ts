@@ -27,7 +27,7 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'putRule', putRuleSpy);
     AWSMock.mock('CloudWatchEvents', 'putTargets', putTargetsSpy);
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
-    client = new AwsEventsClient('fakeArn', 'us-east-1');
+    client = new AwsEventsClient('us-east-1');
 });
 
 afterEach(() => {
@@ -52,12 +52,13 @@ describe('putRule', () => {
             'passingRule',
             'description',
             'rate(1 hour)',
+            'targetArn',
             'targetId',
             'sourceId',
         );
         expect(putTargetsSpy).toHaveBeenCalledTimes(1);
     });
-    it('does not mutate rule targets if targetId not provided', async () => {
+    it('does not mutate rule targets if target details not provided', async () => {
         await client.putRule('passingRule', 'description', 'rate(1 hour)');
         expect(putTargetsSpy).not.toHaveBeenCalled();
     });
@@ -78,6 +79,7 @@ describe('putRule', () => {
                 'ruleName',
                 'description',
                 'rate(1 hour)',
+                'targetArn',
                 'awsErrorTargetId',
                 'sourceId',
             ),
