@@ -1,5 +1,6 @@
 // These must be at the top of the file; jest hoists jest.mock() calls to the
 // top of the file, and these must be defined prior to such calls.
+const mockAddInvokeFromEventPermission = jest.fn().mockResolvedValue({});
 const mockDeleteRule = jest.fn().mockResolvedValue({});
 const mockPutRule = jest
     .fn()
@@ -20,6 +21,14 @@ jest.mock('../src/clients/aws-events-client', () => {
     });
 });
 jest.mock('../src/geocoding/mapbox');
+
+jest.mock('../src/clients/aws-lambda-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return {
+            addInvokeFromEventPermission: mockAddInvokeFromEventPermission,
+        };
+    });
+});
 
 beforeAll(() => {
     return mongoose.connect(
@@ -173,6 +182,7 @@ describe('PUT', () => {
             source.toAwsRuleName(),
             source.toAwsRuleDescription(),
             scheduleExpression,
+            expect.any(String),
             source.toAwsRuleTargetId(),
             source._id.toString(),
         );
@@ -232,8 +242,9 @@ describe('POST', () => {
             .expect(201);
         expect(res.body.name).toEqual(source.name);
         expect(mockPutRule).not.toHaveBeenCalled();
+        expect(mockAddInvokeFromEventPermission).not.toHaveBeenCalled();
     });
-    it('should create an AWS rule with target if provided schedule expression', async () => {
+    it('should create a permissioned AWS rule with target if provided schedule expression', async () => {
         const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
@@ -253,8 +264,14 @@ describe('POST', () => {
             createdSource.toAwsRuleName(),
             createdSource.toAwsRuleDescription(),
             scheduleExpression,
+            expect.any(String),
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
+        );
+        expect(mockAddInvokeFromEventPermission).toHaveBeenCalledWith(
+            createdSource.automation.schedule.awsRuleArn,
+            expect.any(String),
+            createdSource.toAwsRuleName(),
         );
     });
     it('should not create invalid source', async () => {

@@ -21,18 +21,16 @@ afterEach(() => {
     AWSMock.restore('Lambda');
 });
 
-describe('addPermission', () => {
+describe('addInvokeFromEventPermission', () => {
     it('returns permission statement from AWS', async () => {
         const expectedStatement = 'expectedStatement';
         addPermissionSpy.mockResolvedValueOnce({
             Statement: expectedStatement,
         });
 
-        const result = await client.addPermission(
-            'action',
+        const result = await client.addInvokeFromEventPermission(
             'sourceArn',
             'functionArn',
-            'principal',
             'statementId',
         );
 
@@ -44,11 +42,9 @@ describe('addPermission', () => {
         addPermissionSpy.mockRejectedValueOnce(expectedError);
 
         return expect(
-            client.addPermission(
-                'action',
+            client.addInvokeFromEventPermission(
                 'sourceArn',
                 'functionArn',
-                'principal',
                 'statementId',
             ),
         ).rejects.toThrow(expectedError);
@@ -57,11 +53,9 @@ describe('addPermission', () => {
         addPermissionSpy.mockResolvedValueOnce({});
 
         return expect(
-            client.addPermission(
-                'action',
+            client.addInvokeFromEventPermission(
                 'sourceArn',
                 'functionArn',
-                'principal',
                 'statementId',
             ),
         ).rejects.toThrow('missing Statement');
