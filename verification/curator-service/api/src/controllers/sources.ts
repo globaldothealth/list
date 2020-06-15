@@ -81,7 +81,7 @@ export default class SourcesController {
                 return;
             }
             await source.set(req.body).validate();
-            await this.updateSourceAwsProperties(source);
+            await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
             res.json(result);
         } catch (err) {
@@ -105,7 +105,7 @@ export default class SourcesController {
      *
      * TODO: Allow deleting schema-validated fields in update operations.
      */
-    private async updateSourceAwsProperties(
+    private async updateAutomationScheduleAwsResources(
         source: SourceDocument,
     ): Promise<void> {
         if (source.isModified('automation.schedule.awsScheduleExpression')) {
@@ -144,7 +144,7 @@ export default class SourcesController {
         try {
             const source = new Source(req.body);
             await source.validate();
-            await this.createSourceAwsProperties(source);
+            await this.createAutomationScheduleAwsResources(source);
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
@@ -165,7 +165,7 @@ export default class SourcesController {
      * based permission will be added to the global retrieval function such
      * that it can be invoked by the rule.
      */
-    private async createSourceAwsProperties(
+    private async createAutomationScheduleAwsResources(
         source: SourceDocument,
     ): Promise<void> {
         if (source.automation?.schedule) {
