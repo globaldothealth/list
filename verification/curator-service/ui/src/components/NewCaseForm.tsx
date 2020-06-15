@@ -2,19 +2,15 @@ import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 import { Theme, createStyles } from '@material-ui/core/styles';
-import { green, grey, red } from '@material-ui/core/colors';
+import { green, grey } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import DateFnsUtils from '@date-io/date-fns';
-import ErrorIcon from '@material-ui/icons/Error';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
-import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { withStyles } from '@material-ui/core';
@@ -54,8 +50,8 @@ interface NewCaseFormState {
 
 interface FormValues {
     sex?: string;
-    country: string;
-    confirmedDate: string | null;
+    locationQuery: string;
+    confirmedDate: string;
     sourceUrl: string;
     notes: string;
 }
@@ -75,7 +71,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     sex: values.sex,
                 },
                 location: {
-                    country: values.country,
+                    query: values.locationQuery,
                 },
                 events: {
                     name: 'confirmed',
@@ -153,8 +149,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             <Formik
                 initialValues={{
                     sex: undefined,
-                    country: '',
-                    confirmedDate: null,
+                    locationQuery: '',
+                    confirmedDate: '',
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -180,14 +176,10 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 })}
                                 Demographics
                             </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('location')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.country.trim() !== '',
-                                    hasError: errors.country !== undefined,
-                                })}
+                            <div className={classes.tableOfContentsRow}>
+                                {this.tableOfContentsIcon(
+                                    values.locationQuery.trim() !== '',
+                                )}
                                 Location
                             </div>
                             <div
@@ -267,40 +259,53 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         <MuiPickersUtilsProvider
                                             utils={DateFnsUtils}
                                         >
-                                            <Field
-                                                name="confirmedDate"
-                                                label="Date confirmed"
-                                                format="yyyy/MM/dd"
-                                                maxDate={new Date()}
-                                                minDate={new Date('2019/12/01')}
-                                                component={KeyboardDatePicker}
-                                            />
-                                        </MuiPickersUtilsProvider>
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="source">
-                                    <fieldset>
-                                        <legend>Source</legend>
-                                        <Field
-                                            label="Source URL"
-                                            name="sourceUrl"
-                                            type="text"
-                                            placeholder="https://..."
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="notes">
-                                    <fieldset>
-                                        <legend>Notes</legend>
-                                        <Field
-                                            label="Notes"
-                                            name="notes"
-                                            type="text"
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
+                                            <MenuItem
+                                                value={undefined}
+                                            ></MenuItem>
+                                            <MenuItem value={'Female'}>
+                                                Female
+                                            </MenuItem>
+                                            <MenuItem value={'Male'}>
+                                                Male
+                                            </MenuItem>
+                                        </Field>
+                                    </FormControl>
+                                </fieldset>
+                                <fieldset>
+                                    <legend>Location</legend>
+                                    <Field
+                                        label="Query"
+                                        name="locationQuery"
+                                        type="text"
+                                        component={TextField}
+                                    />
+                                </fieldset>
+                                <fieldset>
+                                    <legend>Events</legend>
+                                    <InputLabel htmlFor="confirmedDate">
+                                        Date confirmed
+                                    </InputLabel>
+                                    <Field name="confirmedDate" type="date" />
+                                </fieldset>
+                                <fieldset>
+                                    <legend>Source</legend>
+                                    <Field
+                                        label="Source URL"
+                                        name="sourceUrl"
+                                        type="text"
+                                        placeholder="https://..."
+                                        component={TextField}
+                                    />
+                                </fieldset>
+                                <fieldset>
+                                    <legend>Notes</legend>
+                                    <Field
+                                        label="Notes"
+                                        name="notes"
+                                        type="text"
+                                        component={TextField}
+                                    />
+                                </fieldset>
                                 {isSubmitting && <LinearProgress />}
                                 <br />
                                 <Button
