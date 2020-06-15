@@ -94,7 +94,7 @@ main() {
     convert_data
     setup_db
     import_data
-    cleanup
+    #cleanup
 
     print 'Fin!'
 }

@@ -61,9 +61,6 @@
           "_id": {
             "bsonType": "objectId"
           },
-          "id": {
-            "bsonType": "string"
-          },
           "country": {
             "bsonType": "string"
           },
@@ -73,8 +70,20 @@
           "administrativeAreaLevel2": {
             "bsonType": "string"
           },
-          "locality": {
+          "administrativeAreaLevel3": {
             "bsonType": "string"
+          },
+          "place": {
+            "bsonType": "string"
+          },
+          "geoResolution": {
+            "enum": [
+              "Point",
+              "Admin3",
+              "Admin2",
+              "Admin1",
+              "Admin0"
+            ]
           },
           "geometry": {
             "bsonType": "object",
@@ -195,9 +204,6 @@
                 "_id": {
                   "bsonType": "objectId"
                 },
-                "id": {
-                  "bsonType": "string"
-                },
                 "country": {
                   "bsonType": "string"
                 },
@@ -207,8 +213,20 @@
                 "administrativeAreaLevel2": {
                   "bsonType": "string"
                 },
-                "locality": {
+                "administrativeAreaLevel3": {
                   "bsonType": "string"
+                },
+                "place": {
+                  "bsonType": "string"
+                },
+                "geoResolution": {
+                  "enum": [
+                    "Point",
+                    "Admin3",
+                    "Admin2",
+                    "Admin1",
+                    "Admin0"
+                  ]
                 },
                 "geometry": {
                   "bsonType": "object",
@@ -389,7 +407,13 @@
           "ID": {
             "bsonType": "string"
           },
+          "city": {
+            "bsonType": "string"
+          },
           "province": {
+            "bsonType": "string"
+          },
+          "country": {
             "bsonType": "string"
           },
           "geo_resolution": {
@@ -420,12 +444,6 @@
             "bsonType": "string"
           },
           "location": {
-            "bsonType": "string"
-          },
-          "admin3": {
-            "bsonType": "string"
-          },
-          "country_new": {
             "bsonType": "string"
           },
           "admin_id": {

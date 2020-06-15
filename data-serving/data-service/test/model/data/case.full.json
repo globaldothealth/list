@@ -10,11 +10,10 @@
         "ethnicity": "Other"
     },
     "location": {
-        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
         "country": "France",
         "administrativeAreaLevel1": "Île-de-France",
         "administrativeAreaLevel2": "Paris",
-        "locality": "Paris",
+        "geoResolution": "Admin2",
         "geometry": {
             "latitude": 2.3522219,
             "longitude": 48.85661400000001
@@ -84,10 +83,11 @@
     "travelHistory": [
         {
             "location": {
-                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
                 "country": "China",
                 "administrativeAreaLevel1": "Hubei",
-                "locality": "Wuhan",
+                "administrativeAreaLevel2": "Wuhan City",
+                "administrativeAreaLevel3": "Wuchang District",
+                "geoResolution": "Admin3",
                 "geometry": {
                     "latitude": 30.592849,
                     "longitude": 114.305539

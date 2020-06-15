@@ -17,7 +17,8 @@ import numbers
 import math
 import datetime
 from typing import Any, Callable, Dict, List, Tuple
-from constants import COMMON_LOCATION_ABBREVIATIONS, VALID_SEXES
+from constants import (COMMON_LOCATION_ABBREVIATIONS,
+                       VALID_GEO_RESOLUTIONS, VALID_SEXES)
 from utils import trim_string_list
 from geocode_util import lookup_location
 
@@ -217,8 +218,13 @@ def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
         result['administrativeAreaLevel1'] = geocode_result.admin1
     if geocode_result.admin2:
         result['administrativeAreaLevel2'] = geocode_result.admin2
-    if geocode_result.admin3 or geocode_result.location:
-        result['locality'] = geocode_result.admin3 or geocode_result.location
+    if geocode_result.admin3:
+        result['administrativeAreaLevel3'] = geocode_result.admin3
+    if geocode_result.location:
+        result['place'] = geocode_result.location
+    if geocode_result.geo_resolution:
+        result['geoResolution'] = parse_geo_resolution(
+            geocode_result.geo_resolution)
 
     return result
 
@@ -316,6 +322,29 @@ def parse_longitude(value: Any) -> float:
         raise ValueError('longitude outside of valid range')
 
     return longitude
+
+
+def parse_geo_resolution(value: Any) -> str:
+    '''
+    Parses a geo resolution enum value from the input.
+
+    Parameters:
+      value: Value representing a geo resolution, expected to be one of "place",
+        "adminAreaL1", "adminAreaL2", or "country."
+
+    Raises:
+      ValueError: The value is not in the geo resolution enum.
+    Returns:
+      None: When the input value is empty or a string indicating n/a.
+      str: When the value is present and successfully parsed.
+    '''
+    if not value:
+        return None
+
+    if str(value).lower() not in VALID_GEO_RESOLUTIONS:
+        raise ValueError('geo resolution not in enum')
+
+    return str(value).capitalize()
 
 
 def parse_string_list(value: Any) -> List[str]:

@@ -121,6 +121,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 country: rowData.country,
                 administrativeAreaLevel1: rowData.adminArea1,
                 administrativeAreaLevel2: rowData.adminArea2,
+                // TODO: Infer the geo resolution from the location.
+                geoResolution: 'Admin2',
             },
             events: [
                 {
@@ -135,7 +137,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 creationMetadata: {
                     curator: this.props.user.email,
                     date: new Date().toISOString(),
-                }
+                },
             },
         };
     }
@@ -307,7 +309,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
-                                                        c.sources.length > 0
+                                                    c.sources.length > 0
                                                         ? c.sources[0].url
                                                         : null,
                                             });
