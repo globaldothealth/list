@@ -75,5 +75,9 @@ export default function validateEnv(): Readonly<{
             devDefault: 'yes-for-testing',
             default: '',
         }),
+        MAPBOX_TOKEN: str({
+            desc: 'mapbox token to use for geocoding',
+            devDefault: 'change to enable mapbox geocoding',
+        }),
     });
 }
