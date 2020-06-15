@@ -15,6 +15,7 @@ export default function validateEnv(): Readonly<{
     STATIC_DIR: string;
     ENABLE_LOCAL_AUTH: string;
     MAPBOX_TOKEN: string;
+    MAPBOX_PERMANENT_GEOCODE: string;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -77,8 +78,13 @@ export default function validateEnv(): Readonly<{
             default: '',
         }),
         MAPBOX_TOKEN: str({
-            desc: 'mapbox token to use for geocoding',
-            devDefault: 'change to enable mapbox geocoding',
+            desc: 'Mapbox token to use for geocoding',
+            devDefault: 'set to enable geocoding in dev',
+        }),
+        MAPBOX_PERMANENT_GEOCODE: str({
+            desc: 'Whether to use the permanent geocode endpoint',
+            devDefault: 'true',
+            default: '',
         }),
     });
 }

@@ -6,6 +6,7 @@ import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import CasesController from './controllers/cases';
+import { Geocoder } from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import YAML from 'yamljs';
@@ -124,7 +125,15 @@ apiRouter.delete(
 );
 
 // Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL);
+const casesController = new CasesController(
+    env.DATASERVER_URL,
+    new Geocoder(
+        env.MAPBOX_TOKEN,
+        env.MAPBOX_PERMANENT_GEOCODE
+            ? 'mapbox.places-permanent'
+            : 'mapbox.places',
+    ),
+);
 apiRouter.get(
     '/cases',
     mustHaveAnyRole(['reader', 'curator']),
