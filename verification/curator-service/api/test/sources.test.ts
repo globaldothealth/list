@@ -19,6 +19,7 @@ jest.mock('../src/clients/aws-events-client', () => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
 });
+jest.mock('../src/geocoding/mapbox');
 
 beforeAll(() => {
     return mongoose.connect(
@@ -38,8 +39,7 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
-    mockDeleteRule.mockClear();
-    mockPutRule.mockClear();
+    jest.clearAllMocks();
     await Source.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
