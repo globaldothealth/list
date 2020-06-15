@@ -56,6 +56,7 @@ it('submits case ok', async () => {
         },
         location: {
             country: '',
+            geoResolution: 'Admin0',
         },
         revisionMetadata: {
             revisionNumber: 0,

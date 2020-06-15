@@ -19,12 +19,11 @@ GEOCODER_REPO_PATH = 'code/sheet_cleaner/geocoding'
 # TODO(khmoran): Exclude 'outcome' once the curator UI transitions to using the
 # new events-based outcome field.
 LOSSY_FIELDS = [
-    'ID', 'province', 'geo_resolution', 'date_onset_symptoms',
+    'ID', 'city', 'province', 'country', 'date_onset_symptoms',
     'date_admission_hospital', 'date_confirmation', 'travel_history_dates',
     'travel_history_location', 'reported_market_exposure',
-    'chronic_disease_binary', 'outcome', 'location', 'admin3', 'country_new',
-    'admin_id', 'travel_history_binary', 'lives_in_Wuhan'
-]
+    'chronic_disease_binary', 'outcome', 'admin_id', 'travel_history_binary',
+    'lives_in_Wuhan']
 
 '''
 A mapping from the source's sheet id to its name. The source of truth is at
@@ -115,3 +114,8 @@ COMMON_LOCATION_ABBREVIATIONS = {
 
 ''' Valid values for sex field. '''
 VALID_SEXES = ['female', 'male', 'other']
+
+''' Value values for geographical resolution. '''
+VALID_GEO_RESOLUTIONS = {
+    'point', 'admin3', 'admin2', 'admin1', 'admin0'
+}

@@ -14,24 +14,45 @@ describe('validate', () => {
         });
     });
 
+    it('a location without a geo resolution is invalid', async () => {
+        return new Location({ country: 'United States' }).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
     it('a location with only country is valid', async () => {
-        return new Location({ country: 'United States' }).validate();
+        return new Location({
+            country: 'United States',
+            geoResolution: 'Admin0',
+        }).validate();
     });
 
     it('a location with only administrativeAreaLevel1 is valid', async () => {
         return new Location({
             administrativeAreaLevel1: 'New York',
+            geoResolution: 'Admin1',
         }).validate();
     });
 
     it('a location with only administrativeAreaLevel2 is valid', async () => {
         return new Location({
             administrativeAreaLevel2: 'Kings County',
+            geoResolution: 'Admin2',
         }).validate();
     });
 
-    it('a location with only locality is valid', async () => {
-        return new Location({ locality: 'Brooklyn' }).validate();
+    it('a location with only administrativeAreaLevel3 is valid', async () => {
+        return new Location({
+            administrativeAreaLevel3: 'Brooklyn',
+            geoResolution: 'Admin3',
+        }).validate();
+    });
+
+    it('a location with only place is valid', async () => {
+        return new Location({
+            place: 'Kings County Hospital Center',
+            geoResolution: 'Point',
+        }).validate();
     });
 
     it('a latitude without a longitude is invalid', async () => {

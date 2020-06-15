@@ -21,6 +21,7 @@
         }
     },
     "location": {
-        "country": "China"
+        "country": "China",
+        "geoResolution": "Admin0"
     }
 }

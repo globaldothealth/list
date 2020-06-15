@@ -76,6 +76,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 },
                 location: {
                     country: values.country,
+                    // TODO: Infer the geo resolution from the location.
+                    geoResolution: 'Admin0',
                 },
                 events: {
                     name: 'confirmed',

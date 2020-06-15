@@ -34,6 +34,8 @@ it('loads and displays cases', async () => {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
                 administrativeAreaLevel2: 'some admin 2',
+                // TODO: Infer the geo resolution from the location.
+                geoResolution: 'Admin2',
             },
             events: [
                 {
@@ -86,6 +88,7 @@ it('API errors are displayed', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Admin0',
             },
             events: [
                 {
@@ -139,6 +142,7 @@ it('can delete a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Admin0',
             },
             events: [
                 {
@@ -246,6 +250,7 @@ it('can add a row', async () => {
         },
         location: {
             country: 'France',
+            geoResolution: 'Admin0',
         },
         events: [
             {
@@ -305,6 +310,7 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Admin0',
             },
             events: [
                 {
@@ -354,6 +360,7 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Admin0',
             },
             events: [
                 {
@@ -416,6 +423,7 @@ it('cannot edit data as a reader only', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Admin0',
             },
             events: [
                 {

@@ -1,5 +1,13 @@
 import mongoose from 'mongoose';
 
+export enum GeoResolution {
+    Point = 'Point', // Lat/long coordinates
+    Admin3 = 'Admin3', // ~City
+    Admin2 = 'Admin2', // ~County
+    Admin1 = 'Admin1', // ~Province
+    Admin0 = 'Admin0', // Country
+}
+
 const fieldRequiredValidator = [
     function (this: LocationDocument): boolean {
         return (
@@ -7,15 +15,15 @@ const fieldRequiredValidator = [
             this.country == null &&
             this.administrativeAreaLevel1 == null &&
             this.administrativeAreaLevel2 == null &&
-            this.locality == null
+            this.administrativeAreaLevel3 == null &&
+            this.place == null
         );
     },
     'One of country, administrativeAreaLevel1, administrativeAreaLevel2, ' +
-        'or locality is required',
+        'administrativeAreaLevel3, or place is required',
 ];
 
 export const locationSchema = new mongoose.Schema({
-    id: String,
     country: {
         type: String,
         required: fieldRequiredValidator,
@@ -28,9 +36,18 @@ export const locationSchema = new mongoose.Schema({
         type: String,
         required: fieldRequiredValidator,
     },
-    locality: {
+    administrativeAreaLevel3: {
         type: String,
         required: fieldRequiredValidator,
+    },
+    place: {
+        type: String,
+        required: fieldRequiredValidator,
+    },
+    geoResolution: {
+        type: String,
+        enum: Object.values(GeoResolution),
+        required: true,
     },
     geometry: {
         latitude: {
@@ -70,10 +87,11 @@ interface Geometry {
 }
 
 export type LocationDocument = mongoose.Document & {
-    id: string;
     country: string;
     administrativeAreaLevel1: string;
     administrativeAreaLevel2: string;
-    locality: string;
+    administrativeAreaLevel3: string;
+    place: string;
+    geoResolution: GeoResolution;
     geometry: Geometry;
 };
