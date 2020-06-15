@@ -124,8 +124,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
 
     async submitCase(values: FormValues): Promise<void> {
         const ageRange = values.age
-            ? { start: values.age as number, end: values.age as number }
-            : { start: values.minAge as number, end: values.maxAge as number };
+            ? { start: values.age, end: values.age }
+            : { start: values.minAge, end: values.maxAge };
         try {
             await axios.post('/api/cases', {
                 demographics: {
