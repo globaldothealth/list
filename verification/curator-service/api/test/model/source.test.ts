@@ -23,6 +23,10 @@ describe('validate', () => {
 });
 
 describe('custom instance methods', () => {
+    it('toAwsStatementId returns formatted source ID', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsStatementId()).toContain(s._id);
+    });
     it('toAwsRuleDescription returns formatted source name', () => {
         const s = new Source(minimalSource);
         expect(s.toAwsRuleDescription()).toContain(s.name);

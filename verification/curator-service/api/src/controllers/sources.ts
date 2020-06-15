@@ -115,12 +115,15 @@ export default class SourcesController {
                     this.retrievalFunctionArn,
                     source.toAwsRuleTargetId(),
                     source._id.toString(),
+                    source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
                     source.toAwsRuleTargetId(),
+                    this.retrievalFunctionArn,
+                    source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
             }
@@ -174,6 +177,7 @@ export default class SourcesController {
                 this.retrievalFunctionArn,
                 source.toAwsRuleTargetId(),
                 source._id.toString(),
+                source.toAwsStatementId(),
             );
             source.set('automation.schedule.awsRuleArn', createdRuleArn);
         }
@@ -192,6 +196,8 @@ export default class SourcesController {
             await this.awsEventsClient.deleteRule(
                 source.toAwsRuleName(),
                 source.toAwsRuleTargetId(),
+                this.retrievalFunctionArn,
+                source.toAwsStatementId(),
             );
         }
         source.remove();
