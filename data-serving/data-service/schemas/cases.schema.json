@@ -24,12 +24,12 @@
                 "bsonType": "objectId"
               },
               "start": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -1,
                 "maximum": 300
               },
               "end": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -1,
                 "maximum": 300
               }

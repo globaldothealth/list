@@ -11,6 +11,7 @@ describe('New case form', function () {
 
         cy.visit('/cases/new');
         cy.get('input[name="country"]').clear().type('France');
+        cy.get('input[name="age"]').clear().type('21');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
         cy.get('input[name="notes"]').clear().type('test notes');
