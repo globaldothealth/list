@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import AwsLambdaClient from './aws-lambda-client';
 import assertString from '../util/assert-string';
 
 /**
@@ -13,7 +14,10 @@ import assertString from '../util/assert-string';
  */
 export default class AwsEventsClient {
     private readonly cloudWatchEventsClient: AWS.CloudWatchEvents;
-    constructor(awsRegion: string) {
+    constructor(
+        awsRegion: string,
+        private readonly lambdaClient: AwsLambdaClient,
+    ) {
         AWS.config.update({ region: awsRegion });
         this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
             apiVersion: '2015-10-07',
@@ -22,6 +26,9 @@ export default class AwsEventsClient {
 
     /**
      * Proxies a PutRule request to the AWS CloudWatch API.
+     *
+     * If Lambda target details are specified, creates a target and applies a
+     * permission to the target resource-based policy to allow invocation.
      *
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutRule.html
@@ -33,6 +40,7 @@ export default class AwsEventsClient {
         targetArn?: string,
         targetId?: string,
         sourceId?: string,
+        statementId?: string,
     ): Promise<string> => {
         try {
             const putRuleParams = {
@@ -47,7 +55,7 @@ export default class AwsEventsClient {
                 response.RuleArn,
                 'AWS PutRule response missing RuleArn.',
             );
-            if (targetArn && targetId && sourceId) {
+            if (targetArn && targetId && sourceId && statementId) {
                 const putTargetsParams = {
                     Rule: ruleName,
                     Targets: [
@@ -61,6 +69,11 @@ export default class AwsEventsClient {
                 await this.cloudWatchEventsClient
                     .putTargets(putTargetsParams)
                     .promise();
+                await this.lambdaClient.addInvokeFromEventPermission(
+                    response.RuleArn,
+                    targetArn,
+                    statementId,
+                );
             }
             return response.RuleArn;
         } catch (err) {
@@ -79,17 +92,21 @@ export default class AwsEventsClient {
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteRule.html
      */
-    deleteRule = async (ruleName: string, targetId?: string): Promise<void> => {
+    deleteRule = async (
+        ruleName: string,
+        targetId: string,
+        targetArn: string,
+        sourceId: string,
+    ): Promise<void> => {
         try {
-            if (targetId) {
-                const removeTargetsParams = {
-                    Rule: ruleName,
-                    Ids: [targetId],
-                };
-                await this.cloudWatchEventsClient
-                    .removeTargets(removeTargetsParams)
-                    .promise();
-            }
+            const removeTargetsParams = {
+                Rule: ruleName,
+                Ids: [targetId],
+            };
+            await this.cloudWatchEventsClient
+                .removeTargets(removeTargetsParams)
+                .promise();
+            await this.lambdaClient.removePermission(targetArn, sourceId);
             const deleteRuleParams = { Name: ruleName };
             await this.cloudWatchEventsClient
                 .deleteRule(deleteRuleParams)

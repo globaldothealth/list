@@ -47,6 +47,11 @@ it('submits case ok', async () => {
     expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases', {
         demographics: {
             sex: undefined,
+            ageRange: {
+                start: undefined,
+                end: undefined,
+            },
+            ethnicity: undefined,
         },
         events: {
             name: 'confirmed',

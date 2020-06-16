@@ -10,6 +10,25 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
 paths:
+  /suggest/locations:
+    get:
+      tags: [Location]
+      summary: Suggest locations
+      operationId: suggestLocation
+      parameters:
+      - name: q
+        in: query
+        description: Prefix text to suggest locations from.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/200LocationArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
   /sources:
     get:
       tags: [Source]
@@ -239,6 +258,14 @@ components:
       type: array
       items:
         type: string
+    Location:
+      description: A geo location
+      type: object
+    LocationArray:
+      description: A list of geo locations
+      type: array
+      items:
+        $ref: "#components/schemas/Location"
   responses:
     "200Source":
       description: OK
@@ -276,6 +303,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Roles"
+    "200LocationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationArray"
     "400":
       description: Malformed request
     "401":
