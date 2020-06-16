@@ -20,6 +20,7 @@
             "administrativeAreaLevel2": "Paris",
             "administrativeAreaLevel3": "Paris",
             "geoResolution": "Admin3",
+            "name": "Paris",
             "geometry": {
                 "latitude": {
                     "$numberDouble": "2.3522219"
