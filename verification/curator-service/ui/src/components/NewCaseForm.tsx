@@ -60,6 +60,12 @@ interface FormValues {
     ethnicity?: string;
     country: string;
     confirmedDate: string | null;
+    onsetSymptomsDate: string | null;
+    firstClinicalConsultationDate: string | null;
+    selfIsolationDate: string | null;
+    hospitalAdmissionDate: string | null;
+    icuAdmissionDate: string | null;
+    outcomeDate: string | null;
     sourceUrl: string;
     notes: string;
 }
@@ -123,12 +129,57 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 location: {
                     country: values.country,
                 },
-                events: {
-                    name: 'confirmed',
-                    dateRange: {
-                        start: values.confirmedDate,
+                events: [
+                    {
+                        name: 'confirmed',
+                        dateRange: {
+                            start: values.confirmedDate,
+                            end: values.confirmedDate,
+                        },
                     },
-                },
+                    {
+                        name: 'onsetSymptoms',
+                        dateRange: {
+                            start: values.onsetSymptomsDate,
+                            end: values.onsetSymptomsDate,
+                        },
+                    },
+                    {
+                        name: 'firstClinicalConsultation',
+                        dateRange: {
+                            start: values.firstClinicalConsultationDate,
+                            end: values.firstClinicalConsultationDate,
+                        },
+                    },
+                    {
+                        name: 'selfIsolation',
+                        dateRange: {
+                            start: values.selfIsolationDate,
+                            end: values.selfIsolationDate,
+                        },
+                    },
+                    {
+                        name: 'hospitalAdmission',
+                        dateRange: {
+                            start: values.hospitalAdmissionDate,
+                            end: values.hospitalAdmissionDate,
+                        },
+                    },
+                    {
+                        name: 'icuAdmission',
+                        dateRange: {
+                            start: values.icuAdmissionDate,
+                            end: values.icuAdmissionDate,
+                        },
+                    },
+                    {
+                        name: 'outcome',
+                        dateRange: {
+                            start: values.outcomeDate,
+                            end: values.outcomeDate,
+                        },
+                    },
+                ],
                 sources: [
                     {
                         url: values.sourceUrl,
@@ -205,6 +256,12 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: undefined,
                     country: '',
                     confirmedDate: null,
+                    onsetSymptomsDate: null,
+                    firstClinicalConsultationDate: null,
+                    selfIsolationDate: null,
+                    hospitalAdmissionDate: null,
+                    icuAdmissionDate: null,
+                    outcomeDate: null,
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -259,9 +316,27 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 onClick={(): void => this.scrollTo('events')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.confirmedDate !== null,
+                                    isChecked:
+                                        values.confirmedDate !== null ||
+                                        values.onsetSymptomsDate !== null ||
+                                        values.firstClinicalConsultationDate !==
+                                            null ||
+                                        values.selfIsolationDate !== null ||
+                                        values.hospitalAdmissionDate !== null ||
+                                        values.icuAdmissionDate !== null ||
+                                        values.outcomeDate !== null,
                                     hasError:
-                                        errors.confirmedDate !== undefined,
+                                        errors.confirmedDate !== undefined ||
+                                        errors.onsetSymptomsDate !==
+                                            undefined ||
+                                        errors.firstClinicalConsultationDate !==
+                                            undefined ||
+                                        errors.selfIsolationDate !==
+                                            undefined ||
+                                        errors.hospitalAdmissionDate !==
+                                            undefined ||
+                                        errors.icuAdmissionDate !== undefined ||
+                                        errors.outcomeDate !== undefined,
                                 })}
                                 Events
                             </div>
