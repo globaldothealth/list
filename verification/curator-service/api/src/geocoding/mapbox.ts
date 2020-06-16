@@ -39,9 +39,6 @@ export default class MapboxGeocoder {
                 })
                 .send();
             const features = (resp.body as GeocodeResponse).features;
-            if (features.length == 0) {
-                return [];
-            }
             return features.map((feature) => {
                 return {
                     geometry: {
