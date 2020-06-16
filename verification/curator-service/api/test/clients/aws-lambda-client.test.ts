@@ -6,6 +6,7 @@ let client: AwsLambdaClient;
 const addPermissionSpy = jest
     .fn()
     .mockResolvedValue({ Statement: 'statement' });
+const removePermissionSpy = jest.fn().mockResolvedValue({});
 
 beforeAll(() => {
     AWSMock.setSDKInstance(AWS);
@@ -13,7 +14,9 @@ beforeAll(() => {
 
 beforeEach(() => {
     addPermissionSpy.mockClear();
+    removePermissionSpy.mockClear();
     AWSMock.mock('Lambda', 'addPermission', addPermissionSpy);
+    AWSMock.mock('Lambda', 'removePermission', removePermissionSpy);
     client = new AwsLambdaClient('us-east-1');
 });
 
@@ -59,5 +62,22 @@ describe('addInvokeFromEventPermission', () => {
                 'statementId',
             ),
         ).rejects.toThrow('missing Statement');
+    });
+});
+
+describe('removePermission', () => {
+    it('deletes the permission via the SDK', async () => {
+        await expect(
+            client.removePermission('functionName', 'statementId'),
+        ).resolves.not.toThrow();
+        expect(removePermissionSpy).toHaveBeenCalledTimes(1);
+    });
+    it('throws errors from AWS removePermission call', async () => {
+        const expectedError = new Error('AWS error');
+        removePermissionSpy.mockRejectedValueOnce(expectedError);
+
+        return expect(
+            client.removePermission('functionName', 'statementId'),
+        ).rejects.toThrow(expectedError);
     });
 });

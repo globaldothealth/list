@@ -40,6 +40,7 @@ export default class AwsEventsClient {
         targetArn?: string,
         targetId?: string,
         sourceId?: string,
+        statementId?: string,
     ): Promise<string> => {
         try {
             const putRuleParams = {
@@ -54,7 +55,7 @@ export default class AwsEventsClient {
                 response.RuleArn,
                 'AWS PutRule response missing RuleArn.',
             );
-            if (targetArn && targetId && sourceId) {
+            if (targetArn && targetId && sourceId && statementId) {
                 const putTargetsParams = {
                     Rule: ruleName,
                     Targets: [
@@ -71,7 +72,7 @@ export default class AwsEventsClient {
                 await this.lambdaClient.addInvokeFromEventPermission(
                     response.RuleArn,
                     targetArn,
-                    sourceId,
+                    statementId,
                 );
             }
             return response.RuleArn;
@@ -91,17 +92,21 @@ export default class AwsEventsClient {
      * For the full API definition, see:
      *   https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DeleteRule.html
      */
-    deleteRule = async (ruleName: string, targetId?: string): Promise<void> => {
+    deleteRule = async (
+        ruleName: string,
+        targetId: string,
+        targetArn: string,
+        sourceId: string,
+    ): Promise<void> => {
         try {
-            if (targetId) {
-                const removeTargetsParams = {
-                    Rule: ruleName,
-                    Ids: [targetId],
-                };
-                await this.cloudWatchEventsClient
-                    .removeTargets(removeTargetsParams)
-                    .promise();
-            }
+            const removeTargetsParams = {
+                Rule: ruleName,
+                Ids: [targetId],
+            };
+            await this.cloudWatchEventsClient
+                .removeTargets(removeTargetsParams)
+                .promise();
+            await this.lambdaClient.removePermission(targetArn, sourceId);
             const deleteRuleParams = { Name: ruleName };
             await this.cloudWatchEventsClient
                 .deleteRule(deleteRuleParams)
