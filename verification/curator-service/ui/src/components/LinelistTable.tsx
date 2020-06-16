@@ -28,7 +28,11 @@ interface Event {
 
 interface Demographics {
     sex: string;
-    age: string;
+    ageRange: {
+        start: number;
+        end: number;
+    };
+    ethnicity: string;
 }
 
 interface Location {
@@ -63,7 +67,8 @@ interface TableRow {
     id: string;
     // demographics
     sex: string;
-    age: string;
+    age: number;
+    ethnicity: string;
     country: string;
     adminArea1: string;
     adminArea2: string;
@@ -110,6 +115,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         return {
             demographics: {
                 sex: rowData.sex,
+                age: {
+                    start: rowData.age,
+                },
+                ethnicity: rowData.ethnicity,
             },
             notes: rowData.notes,
             sources: [
@@ -220,6 +229,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 type: 'numeric',
                             },
                             {
+                                title: 'Ethnicity',
+                                field: 'ethnicity',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Country',
                                 field: 'country',
                                 filtering: false,
@@ -295,7 +309,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             flattenedCases.push({
                                                 id: c._id,
                                                 sex: c.demographics?.sex,
-                                                age: c.demographics?.age,
+                                                // TODO: show full age range
+                                                age:
+                                                    c.demographics?.ageRange
+                                                        ?.start,
+                                                ethnicity:
+                                                    c.demographics?.ethnicity,
                                                 country: c.location.country,
                                                 adminArea1:
                                                     c.location

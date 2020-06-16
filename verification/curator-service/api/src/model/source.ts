@@ -23,6 +23,9 @@ const sourceSchema = new mongoose.Schema({
     },
 });
 
+sourceSchema.methods.toAwsStatementId = function (): string {
+    return this._id.toString();
+};
 sourceSchema.methods.toAwsRuleDescription = function (): string {
     return `Scheduled ingestion rule for source: ${this.name}`;
 };
@@ -42,6 +45,7 @@ export type SourceDocument = mongoose.Document & {
     format: string;
     automation: AutomationDocument;
 
+    toAwsStatementId(): string;
     toAwsRuleDescription(): string;
     toAwsRuleName(): string;
     toAwsRuleTargetId(): string;
