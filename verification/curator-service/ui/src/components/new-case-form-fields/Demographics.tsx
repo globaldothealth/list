@@ -44,6 +44,7 @@ const ethnicityValues = [
     'White',
     'Other',
 ];
+
 class Demographics extends React.Component<Props, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
