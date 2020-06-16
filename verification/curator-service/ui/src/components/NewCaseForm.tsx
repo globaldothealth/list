@@ -81,21 +81,21 @@ interface FormValues {
 const NewCaseValidation = Yup.object().shape(
     {
         minAge: Yup.number()
-            .positive('Age must be between 0 and 120')
+            .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('maxAge', {
                 is: (maxAge) => maxAge !== undefined && maxAge !== '',
                 then: Yup.number().required('Must enter minimum age in range'),
             }),
         maxAge: Yup.number()
-            .positive('Age must be between 0 and 120')
+            .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('minAge', {
                 is: (minAge) => minAge !== undefined && minAge !== '',
                 then: Yup.number().required('Must enter maximum age in range'),
             }),
         age: Yup.number()
-            .positive('Age must be between 0 and 120')
+            .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('minAge', {
                 is: (minAge) => minAge !== undefined && minAge !== '',
