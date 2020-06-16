@@ -117,5 +117,9 @@ VALID_SEXES = ['female', 'male', 'other']
 
 ''' Value values for geographical resolution. '''
 VALID_GEO_RESOLUTIONS = {
-    'point', 'admin3', 'admin2', 'admin1', 'admin0'
+    'point': 'point',
+    'admin3': 'admin3',
+    'admin2': 'admin2',
+    'admin1': 'admin1',
+    'admin0': 'country'
 }

@@ -341,10 +341,11 @@ def parse_geo_resolution(value: Any) -> str:
     if not value:
         return None
 
-    if str(value).lower() not in VALID_GEO_RESOLUTIONS:
+    geo_resolution = VALID_GEO_RESOLUTIONS.get(str(value).lower())
+    if not geo_resolution:
         raise ValueError('geo resolution not in enum')
 
-    return str(value).capitalize()
+    return geo_resolution.capitalize()
 
 
 def parse_string_list(value: Any) -> List[str]:
