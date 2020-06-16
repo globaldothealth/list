@@ -88,7 +88,7 @@ it('API errors are displayed', async () => {
             },
             location: {
                 country: 'France',
-                geoResolution: 'Admin0',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -142,7 +142,7 @@ it('can delete a row', async () => {
             },
             location: {
                 country: 'France',
-                geoResolution: 'Admin0',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -250,7 +250,7 @@ it('can add a row', async () => {
         },
         location: {
             country: 'France',
-            geoResolution: 'Admin0',
+            geoResolution: 'Country',
         },
         events: [
             {
@@ -310,7 +310,7 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
-                geoResolution: 'Admin0',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -360,7 +360,7 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
-                geoResolution: 'Admin0',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -423,7 +423,7 @@ it('cannot edit data as a reader only', async () => {
             },
             location: {
                 country: 'France',
-                geoResolution: 'Admin0',
+                geoResolution: 'Country',
             },
             events: [
                 {

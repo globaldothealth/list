@@ -7,7 +7,7 @@ export enum GeoResolution {
     Admin3 = 'Admin3',
     Admin2 = 'Admin2',
     Admin1 = 'Admin1',
-    Admin0 = 'Admin0',
+    Country = 'Country',
 }
 
 const fieldRequiredValidator = [

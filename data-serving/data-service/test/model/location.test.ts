@@ -23,7 +23,7 @@ describe('validate', () => {
     it('a location with only country is valid', async () => {
         return new Location({
             country: 'United States',
-            geoResolution: 'Admin0',
+            geoResolution: 'Country',
         }).validate();
     });
 

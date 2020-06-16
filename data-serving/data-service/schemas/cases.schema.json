@@ -82,7 +82,7 @@
               "Admin3",
               "Admin2",
               "Admin1",
-              "Admin0"
+              "Country"
             ]
           },
           "geometry": {
@@ -225,7 +225,7 @@
                     "Admin3",
                     "Admin2",
                     "Admin1",
-                    "Admin0"
+                    "Country"
                   ]
                 },
                 "geometry": {
