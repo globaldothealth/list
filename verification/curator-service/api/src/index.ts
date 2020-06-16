@@ -180,7 +180,7 @@ apiRouter.get('/suggest/locations', (req: Request, res: Response): void => {
 
 // API documentation.
 const swaggerDocument = YAML.load('./openapi/openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {}));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // API validation.
 new OpenApiValidator({
