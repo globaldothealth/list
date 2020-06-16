@@ -176,6 +176,7 @@ describe('PUT', () => {
             expect.any(String),
             source.toAwsRuleTargetId(),
             source._id.toString(),
+            source.toAwsStatementId(),
         );
     });
     it('should update AWS rule description on source rename', async () => {
@@ -257,6 +258,7 @@ describe('POST', () => {
             expect.any(String),
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
+            createdSource.toAwsStatementId(),
         );
     });
     it('should not create invalid source', async () => {
@@ -274,7 +276,7 @@ describe('DELETE', () => {
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
-    it('should delete corresponding AWS rule and target if source contains ruleArn', async () => {
+    it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
@@ -289,6 +291,8 @@ describe('DELETE', () => {
         expect(mockDeleteRule).toHaveBeenCalledWith(
             source.toAwsRuleName(),
             source.toAwsRuleTargetId(),
+            expect.any(String),
+            source.toAwsStatementId(),
         );
     });
     it('should not be able to delete a non existent source', (done) => {

@@ -11,6 +11,7 @@ const putTargetsSpy = jest.fn().mockResolvedValue({
     FailedEntries: [],
     FailedEntryCount: 0,
 });
+const removePermissionSpy = jest.fn().mockResolvedValue({});
 const removeTargetsSpy = jest.fn().mockResolvedValue({
     FailedEntries: [],
     FailedEntryCount: 0,
@@ -20,6 +21,7 @@ jest.mock('../../src/clients/aws-lambda-client', () => {
     return jest.fn().mockImplementation(() => {
         return {
             addInvokeFromEventPermission: addInvokeFromEventPermissionSpy,
+            removePermission: removePermissionSpy,
         };
     });
 });
@@ -33,6 +35,7 @@ beforeEach(() => {
     deleteRuleSpy.mockClear();
     putRuleSpy.mockClear();
     putTargetsSpy.mockClear();
+    removePermissionSpy.mockClear();
     removeTargetsSpy.mockClear();
     AWSMock.mock('CloudWatchEvents', 'deleteRule', deleteRuleSpy);
     AWSMock.mock('CloudWatchEvents', 'putRule', putRuleSpy);
@@ -66,6 +69,7 @@ describe('putRule', () => {
             'targetArn',
             'targetId',
             'sourceId',
+            'statementId',
         );
         expect(putTargetsSpy).toHaveBeenCalledTimes(1);
         expect(addInvokeFromEventPermissionSpy).toHaveBeenCalledTimes(1);
@@ -94,6 +98,7 @@ describe('putRule', () => {
                 'targetArn',
                 'awsErrorTargetId',
                 'sourceId',
+                'statementId',
             ),
         ).rejects.toThrow(expectedError);
     });
@@ -109,6 +114,7 @@ describe('putRule', () => {
                 'targetArn',
                 'awsErrorTargetId',
                 'sourceId',
+                'statementId',
             ),
         ).rejects.toThrow(expectedError);
     });
@@ -122,19 +128,30 @@ describe('putRule', () => {
 });
 
 describe('deleteRule', () => {
-    it('deletes the AWS CloudWatch Event rule and target via the SDK', async () => {
+    it('deletes the AWS CloudWatch Event rule, target, and permission via the SDK', async () => {
         await expect(
-            client.deleteRule('passingRuleName', 'targetId'),
+            client.deleteRule(
+                'passingRuleName',
+                'targetId',
+                'targetArn',
+                'sourceId',
+            ),
         ).resolves.not.toThrow();
         expect(deleteRuleSpy).toHaveBeenCalledTimes(1);
         expect(removeTargetsSpy).toHaveBeenCalledTimes(1);
+        expect(removePermissionSpy).toHaveBeenCalledTimes(1);
     });
     it('throws errors from AWS removeTargets call', async () => {
         const expectedError = new Error('AWS error');
         removeTargetsSpy.mockRejectedValueOnce(expectedError);
 
         return expect(
-            client.deleteRule('awsErrorRuleName', 'targetId'),
+            client.deleteRule(
+                'awsErrorRuleName',
+                'targetId',
+                'targetArn',
+                'sourceId',
+            ),
         ).rejects.toThrow(expectedError);
     });
     it('throws errors from AWS deleteRule call', async () => {
@@ -142,7 +159,25 @@ describe('deleteRule', () => {
         deleteRuleSpy.mockRejectedValueOnce(expectedError);
 
         return expect(
-            client.deleteRule('awsErrorRuleName', 'targetId'),
+            client.deleteRule(
+                'awsErrorRuleName',
+                'targetId',
+                'targetArn',
+                'sourceId',
+            ),
+        ).rejects.toThrow(expectedError);
+    });
+    it('throws errors from lambda client', async () => {
+        const expectedError = new Error('AWS error');
+        removePermissionSpy.mockRejectedValueOnce(expectedError);
+
+        return expect(
+            client.deleteRule(
+                'awsErrorRuleName',
+                'targetId',
+                'targetArn',
+                'sourceId',
+            ),
         ).rejects.toThrow(expectedError);
     });
 });
