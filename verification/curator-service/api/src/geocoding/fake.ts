@@ -10,10 +10,7 @@ export default class FakeGeocoder {
     }
     async geocode(query: string): Promise<GeocodeResult[]> {
         const entry = this.entries.get(query);
-        if (entry) {
-            return [entry];
-        }
-        return [];
+        return entry ? [entry] : [];
     }
 
     seed = (req: Request, res: Response): void => {
