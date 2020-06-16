@@ -1,5 +1,9 @@
+import {
+    AddPermissionRequest,
+    RemovePermissionRequest,
+} from 'aws-sdk/clients/lambda';
+
 import AWS from 'aws-sdk';
-import { AddPermissionRequest } from 'aws-sdk/clients/lambda';
 import assertString from '../util/assert-string';
 
 /**
@@ -47,5 +51,18 @@ export default class AwsLambdaClient {
             'AWS AddPermission response missing Statement.',
         );
         return response.Statement;
+    };
+
+    removePermission = async (
+        functionArn: string,
+        statementId: string,
+    ): Promise<void> => {
+        const removePermissionParams: RemovePermissionRequest = {
+            FunctionName: functionArn,
+            StatementId: statementId,
+        };
+        await this.lambdaClient
+            .removePermission(removePermissionParams)
+            .promise();
     };
 }
