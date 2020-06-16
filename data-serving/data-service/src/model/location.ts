@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 
+// See https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country
+// for an explanation of each level of resolution.
 export enum GeoResolution {
-    Point = 'Point', // Lat/long coordinates
-    Admin3 = 'Admin3', // ~City
-    Admin2 = 'Admin2', // ~County
-    Admin1 = 'Admin1', // ~Province
-    Admin0 = 'Admin0', // Country
+    Point = 'Point',
+    Admin3 = 'Admin3',
+    Admin2 = 'Admin2',
+    Admin1 = 'Admin1',
+    Admin0 = 'Admin0',
 }
 
 const fieldRequiredValidator = [
