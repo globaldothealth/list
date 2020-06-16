@@ -29,4 +29,4 @@ Check-out their [documentation](https://docs.mapbox.com/api/search/) as well.
 
 In order to be able to use the `mapbox.places-permanent` endpoint that is needed for storing the results as per Mapbox usage policy, you need to set the right secret token in the `MAPBOX_TOKEN` environment variable.
 
-If the `MAPBOX_PERMANENT_GEOCODE` environment variable isn't set, the geocoder will default to the `mapbox.places` endpoint instead which is useful during development.
+If the `MAPBOX_PERMANENT_GEOCODE` environment variable doesn't parse as `true` (cf. `src/util/validate-env.ts`), the geocoder will default to the `mapbox.places` endpoint instead which is useful during development.
