@@ -76,6 +76,9 @@
           "place": {
             "bsonType": "string"
           },
+          "name": {
+            "bsonType": "string"
+          },
           "geoResolution": {
             "enum": [
               "Point",
@@ -217,6 +220,9 @@
                   "bsonType": "string"
                 },
                 "place": {
+                  "bsonType": "string"
+                },
+                "name": {
                   "bsonType": "string"
                 },
                 "geoResolution": {

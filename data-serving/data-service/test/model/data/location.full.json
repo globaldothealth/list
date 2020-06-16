@@ -5,6 +5,7 @@
     "administrativeAreaLevel3": "Brooklyn",
     "place": "Kings County Hospital Center",
     "geoResolution": "Point",
+    "name": "Kings County Hospital Center",
     "geometry": {
         "latitude": 40.6809611,
         "longitude": -73.9740028

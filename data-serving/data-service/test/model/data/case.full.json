@@ -13,6 +13,7 @@
         "country": "France",
         "administrativeAreaLevel1": "Île-de-France",
         "administrativeAreaLevel2": "Paris",
+        "name": "Wuhan",
         "geoResolution": "Admin2",
         "geometry": {
             "latitude": 2.3522219,
@@ -87,6 +88,7 @@
                 "administrativeAreaLevel1": "Hubei",
                 "administrativeAreaLevel2": "Wuhan City",
                 "administrativeAreaLevel3": "Wuchang District",
+                "name": "Wuhan",
                 "geoResolution": "Admin3",
                 "geometry": {
                     "latitude": 30.592849,
