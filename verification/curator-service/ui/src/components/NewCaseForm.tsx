@@ -2,23 +2,21 @@ import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
-import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import DateFnsUtils from '@date-io/date-fns';
+import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import Events from './new-case-form-fields/Events';
+import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
+import Source from './new-case-form-fields/Source';
+import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 
 interface User {
@@ -28,7 +26,7 @@ interface User {
     roles: string[];
 }
 
-const styles = (theme: Theme) =>
+const styles = () =>
     createStyles({
         container: {
             display: 'flex',
@@ -43,22 +41,6 @@ const styles = (theme: Theme) =>
         form: {
             paddingLeft: '15em',
             width: '60%',
-        },
-        fieldRow: {
-            marginBottom: '2em',
-        },
-        ageRow: {
-            alignItems: 'baseline',
-            display: 'flex',
-        },
-        ageField: {
-            width: '8em',
-        },
-        ageSeparator: {
-            margin: '0 2em',
-        },
-        select: {
-            width: '8em',
         },
     });
 
@@ -119,18 +101,6 @@ const NewCaseValidation = Yup.object().shape(
     [['maxAge', 'minAge']],
 );
 
-// TODO: get values from DB.
-const sexValues = [undefined, 'Male', 'Female'];
-
-const ethnicityValues = [
-    undefined,
-    'Asian',
-    'Black',
-    'Latino',
-    'Multi-race',
-    'White',
-    'Other',
-];
 class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     constructor(props: Props) {
         super(props);
@@ -318,104 +288,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
-                                <Scroll.Element name="demographics">
-                                    <fieldset>
-                                        <legend>Demographics</legend>
-                                        <FormControl>
-                                            <div className={classes.fieldRow}>
-                                                <InputLabel htmlFor="sex">
-                                                    Sex
-                                                </InputLabel>
-                                                <Field
-                                                    as="select"
-                                                    name="sex"
-                                                    type="text"
-                                                    data-testid="sex"
-                                                    className={classes.select}
-                                                    component={Select}
-                                                >
-                                                    {sexValues.map((sex) => (
-                                                        <MenuItem
-                                                            key={
-                                                                sex ??
-                                                                'undefined'
-                                                            }
-                                                            value={sex}
-                                                        >
-                                                            {sex}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Field>
-                                            </div>
-                                        </FormControl>
-                                        <div
-                                            className={`${classes.fieldRow} ${classes.ageRow}`}
-                                        >
-                                            <Field
-                                                className={classes.ageField}
-                                                name="minAge"
-                                                type="number"
-                                                label="Min age"
-                                                component={TextField}
-                                            ></Field>
-                                            <span
-                                                className={classes.ageSeparator}
-                                            >
-                                                to
-                                            </span>
-                                            <Field
-                                                className={classes.ageField}
-                                                name="maxAge"
-                                                type="number"
-                                                label="Max age"
-                                                component={TextField}
-                                            ></Field>
-                                            <span
-                                                className={classes.ageSeparator}
-                                            >
-                                                or
-                                            </span>
-                                            <Field
-                                                className={classes.ageField}
-                                                name="age"
-                                                type="number"
-                                                label="Age"
-                                                component={TextField}
-                                            ></Field>
-                                        </div>
-                                        <div>
-                                            <FormControl>
-                                                <InputLabel htmlFor="ethnicity">
-                                                    Ethnicity
-                                                </InputLabel>
-                                                <Field
-                                                    as="select"
-                                                    name="ethnicity"
-                                                    type="text"
-                                                    data-testid="ethnicity"
-                                                    className={classes.select}
-                                                    component={Select}
-                                                >
-                                                    {ethnicityValues.map(
-                                                        (ethnicity) => (
-                                                            <MenuItem
-                                                                key={
-                                                                    ethnicity ??
-                                                                    'undefined'
-                                                                }
-                                                                value={
-                                                                    ethnicity
-                                                                }
-                                                            >
-                                                                {ethnicity}
-                                                            </MenuItem>
-                                                        ),
-                                                    )}
-                                                </Field>
-                                            </FormControl>
-                                        </div>
-                                    </fieldset>
-                                </Scroll.Element>
+                                <Demographics></Demographics>
                                 <Scroll.Element name="location">
                                     <fieldset>
                                         <legend>Location</legend>
@@ -427,46 +300,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         />
                                     </fieldset>
                                 </Scroll.Element>
-                                <Scroll.Element name="events">
-                                    <fieldset>
-                                        <legend>Events</legend>
-                                        <MuiPickersUtilsProvider
-                                            utils={DateFnsUtils}
-                                        >
-                                            <Field
-                                                name="confirmedDate"
-                                                label="Date confirmed"
-                                                format="yyyy/MM/dd"
-                                                maxDate={new Date()}
-                                                minDate={new Date('2019/12/01')}
-                                                component={KeyboardDatePicker}
-                                            />
-                                        </MuiPickersUtilsProvider>
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="source">
-                                    <fieldset>
-                                        <legend>Source</legend>
-                                        <Field
-                                            label="Source URL"
-                                            name="sourceUrl"
-                                            type="text"
-                                            placeholder="https://..."
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="notes">
-                                    <fieldset>
-                                        <legend>Notes</legend>
-                                        <Field
-                                            label="Notes"
-                                            name="notes"
-                                            type="text"
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
+                                <Events></Events>
+                                <Source></Source>
+                                <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}
                                 <br />
                                 <Button
@@ -490,4 +326,4 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(NewCaseForm);
+export default withStyles(styles)(NewCaseForm);
