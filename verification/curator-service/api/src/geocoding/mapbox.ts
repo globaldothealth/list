@@ -8,6 +8,8 @@ import Geocoding, {
 import { GeocodeResult } from './geocoder';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
+// getFeatureTypeFromContext will return the feature 'text' field if it is of the provided type.
+// The types in the context fields are a prefix of the ID. E.g 'region.foo' will be a feature of type 'region'.
 function getFeatureTypeFromContext(
     context: GeocodeFeature[],
     type: string,

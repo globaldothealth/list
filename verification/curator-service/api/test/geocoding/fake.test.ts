@@ -32,6 +32,7 @@ describe('FakeGeocoder', () => {
                 text: 'Lyon',
             })
             .expect(200, done);
+        // TODO: Check for seeded geocode once we can query them.
     });
     it('can clear geocodes', (done) => {
         request(app).post('/api/geocode/clear').expect(200, done);
