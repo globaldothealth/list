@@ -173,6 +173,11 @@ app.get('/health', (req: Request, res: Response) => {
     return res.sendStatus(503);
 });
 
+// TODO: implement.
+apiRouter.get('/suggest/locations', (req: Request, res: Response): void => {
+    res.json([]);
+});
+
 // API documentation.
 const swaggerDocument = YAML.load('./openapi/openapi.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
