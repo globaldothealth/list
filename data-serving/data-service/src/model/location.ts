@@ -17,12 +17,11 @@ const fieldRequiredValidator = [
             this.country == null &&
             this.administrativeAreaLevel1 == null &&
             this.administrativeAreaLevel2 == null &&
-            this.administrativeAreaLevel3 == null &&
-            this.place == null
+            this.administrativeAreaLevel3 == null
         );
     },
     'One of country, administrativeAreaLevel1, administrativeAreaLevel2, ' +
-        'administrativeAreaLevel3, or place is required',
+        'or administrativeAreaLevel3 is required',
 ];
 
 export const locationSchema = new mongoose.Schema({
@@ -42,10 +41,7 @@ export const locationSchema = new mongoose.Schema({
         type: String,
         required: fieldRequiredValidator,
     },
-    place: {
-        type: String,
-        required: fieldRequiredValidator,
-    },
+    place: String,
     geoResolution: {
         type: String,
         enum: Object.values(GeoResolution),

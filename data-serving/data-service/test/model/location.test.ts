@@ -48,13 +48,6 @@ describe('validate', () => {
         }).validate();
     });
 
-    it('a location with only place is valid', async () => {
-        return new Location({
-            place: 'Kings County Hospital Center',
-            geoResolution: 'Point',
-        }).validate();
-    });
-
     it('a latitude without a longitude is invalid', async () => {
         return new Location({
             ...minimalModel,
