@@ -51,6 +51,7 @@ it('submits case ok', async () => {
                 start: undefined,
                 end: undefined,
             },
+            ethnicity: undefined,
         },
         events: {
             name: 'confirmed',

@@ -57,6 +57,9 @@ const styles = (theme: Theme) =>
         ageSeparator: {
             margin: '0 2em',
         },
+        select: {
+            width: '8em',
+        },
     });
 
 interface Props extends WithStyles<typeof styles> {
@@ -72,6 +75,7 @@ interface FormValues {
     minAge?: number;
     maxAge?: number;
     age?: number;
+    ethnicity?: string;
     country: string;
     confirmedDate: string | null;
     sourceUrl: string;
@@ -114,6 +118,19 @@ const NewCaseValidation = Yup.object().shape(
     },
     [['maxAge', 'minAge']],
 );
+
+// TODO: get values from DB.
+const sexValues = [undefined, 'Male', 'Female'];
+
+const ethnicityValues = [
+    undefined,
+    'Asian',
+    'Black',
+    'Latino',
+    'Multi-race',
+    'White',
+    'Other',
+];
 class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     constructor(props: Props) {
         super(props);
@@ -131,6 +148,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 demographics: {
                     sex: values.sex,
                     ageRange: ageRange,
+                    ethnicity: values.ethnicity,
                 },
                 location: {
                     country: values.country,
@@ -214,6 +232,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     minAge: undefined,
                     maxAge: undefined,
                     age: undefined,
+                    ethnicity: undefined,
                     country: '',
                     confirmedDate: null,
                     sourceUrl: '',
@@ -244,12 +263,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         (values.minAge !== undefined &&
                                             values.minAge !== '' &&
                                             values.maxAge !== undefined &&
-                                            values.maxAge !== ''),
+                                            values.maxAge !== '') ||
+                                        values.ethnicity !== undefined,
                                     hasError:
                                         errors.sex !== undefined ||
                                         errors.minAge !== undefined ||
                                         errors.maxAge !== undefined ||
-                                        errors.age !== undefined,
+                                        errors.age !== undefined ||
+                                        errors.ethnicity !== undefined,
                                 })}
                                 Demographics
                             </div>
@@ -309,21 +330,27 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                                     as="select"
                                                     name="sex"
                                                     type="text"
+                                                    data-testid="sex"
+                                                    className={classes.select}
                                                     component={Select}
                                                 >
-                                                    <MenuItem
-                                                        value={undefined}
-                                                    ></MenuItem>
-                                                    <MenuItem value={'Female'}>
-                                                        Female
-                                                    </MenuItem>
-                                                    <MenuItem value={'Male'}>
-                                                        Male
-                                                    </MenuItem>
+                                                    {sexValues.map((sex) => (
+                                                        <MenuItem
+                                                            key={
+                                                                sex ??
+                                                                'undefined'
+                                                            }
+                                                            value={sex}
+                                                        >
+                                                            {sex}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Field>
                                             </div>
                                         </FormControl>
-                                        <div className={classes.ageRow}>
+                                        <div
+                                            className={`${classes.fieldRow} ${classes.ageRow}`}
+                                        >
                                             <Field
                                                 className={classes.ageField}
                                                 name="minAge"
@@ -355,6 +382,37 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                                 label="Age"
                                                 component={TextField}
                                             ></Field>
+                                        </div>
+                                        <div>
+                                            <FormControl>
+                                                <InputLabel htmlFor="ethnicity">
+                                                    Ethnicity
+                                                </InputLabel>
+                                                <Field
+                                                    as="select"
+                                                    name="ethnicity"
+                                                    type="text"
+                                                    data-testid="ethnicity"
+                                                    className={classes.select}
+                                                    component={Select}
+                                                >
+                                                    {ethnicityValues.map(
+                                                        (ethnicity) => (
+                                                            <MenuItem
+                                                                key={
+                                                                    ethnicity ??
+                                                                    'undefined'
+                                                                }
+                                                                value={
+                                                                    ethnicity
+                                                                }
+                                                            >
+                                                                {ethnicity}
+                                                            </MenuItem>
+                                                        ),
+                                                    )}
+                                                </Field>
+                                            </FormControl>
                                         </div>
                                     </fieldset>
                                 </Scroll.Element>
