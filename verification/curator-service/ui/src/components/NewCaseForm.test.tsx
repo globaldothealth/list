@@ -44,38 +44,6 @@ it('submits case ok', async () => {
         fireEvent.click(getByText(/Submit case/));
     });
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases', {
-        demographics: {
-            sex: undefined,
-            ageRange: {
-                start: undefined,
-                end: undefined,
-            },
-            ethnicity: undefined,
-        },
-        events: {
-            name: 'confirmed',
-            dateRange: {
-                start: null,
-            },
-        },
-        location: {
-            country: '',
-        },
-        revisionMetadata: {
-            revisionNumber: 0,
-            creationMetadata: {
-                curator: 'foo@bar.com',
-                date: expect.any(String),
-            },
-        },
-        sources: [
-            {
-                url: '',
-            },
-        ],
-        notes: '',
-    });
 });
 
 it('submits case not ok', async () => {
