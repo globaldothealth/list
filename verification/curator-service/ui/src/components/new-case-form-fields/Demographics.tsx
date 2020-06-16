@@ -1,5 +1,6 @@
 import { Select, TextField } from 'formik-material-ui';
 
+import { Autocomplete } from '@material-ui/lab';
 import { Field } from 'formik';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -7,6 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 
@@ -123,10 +125,71 @@ class Demographics extends React.Component<Props, {}> {
                             </Field>
                         </FormControl>
                     </div>
+                    <Nationality />
                 </fieldset>
             </Scroll.Element>
         );
     }
+}
+
+// Autocomplete for nationality.
+// Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
+function Nationality(): JSX.Element {
+    const [open, setOpen] = React.useState(false);
+    const [options, setOptions] = React.useState<string[]>([]);
+    const loading = open && options.length === 0;
+
+    React.useEffect(() => {
+        let active = true;
+
+        if (!loading) {
+            return undefined;
+        }
+
+        (async (): Promise<void> => {
+            const resp = await axios.get<string>(
+                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt',
+            );
+            const nationalities = resp.data.split('\n');
+
+            if (active) {
+                setOptions(nationalities);
+            }
+        })();
+
+        return (): void => {
+            active = false;
+        };
+    }, [loading]);
+
+    React.useEffect(() => {
+        if (!open) {
+            setOptions([]);
+        }
+    }, [open]);
+
+    return (
+        <Autocomplete
+            itemType="string"
+            open={open}
+            onOpen={(): void => {
+                setOpen(true);
+            }}
+            onClose={(): void => {
+                setOpen(false);
+            }}
+            options={options}
+            loading={loading}
+            renderInput={(params): JSX.Element => (
+                <Field
+                    {...params}
+                    name="nationality"
+                    label="Nationality"
+                    component={TextField}
+                ></Field>
+            )}
+        />
+    );
 }
 
 export default withStyles(styles)(Demographics);
