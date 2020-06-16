@@ -5,7 +5,7 @@ export interface GeocodeResult {
         longitude: number;
     };
     country: string;
-    // First administrative division (regions in the US, Länder in Germany, ...).
+    // First administrative division (state in the US, Länder in Germany, ...).
     administrativeAreaLevel1: string | undefined;
     // Second administrative division (county in the US, departments in France, ...).
     administrativeAreaLevel2: string | undefined;
