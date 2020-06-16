@@ -23,7 +23,7 @@ export function addCase(
         body: {
             location: {
                 country: country,
-                geoResolution: 'Country'
+                geoResolution: 'Country',
             },
             events: [
                 {
