@@ -1,6 +1,5 @@
 // These must be at the top of the file; jest hoists jest.mock() calls to the
 // top of the file, and these must be defined prior to such calls.
-const mockAddInvokeFromEventPermission = jest.fn().mockResolvedValue({});
 const mockDeleteRule = jest.fn().mockResolvedValue({});
 const mockPutRule = jest
     .fn()
@@ -18,14 +17,6 @@ import supertest from 'supertest';
 jest.mock('../src/clients/aws-events-client', () => {
     return jest.fn().mockImplementation(() => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
-    });
-});
-
-jest.mock('../src/clients/aws-lambda-client', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            addInvokeFromEventPermission: mockAddInvokeFromEventPermission,
-        };
     });
 });
 
@@ -47,7 +38,6 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
-    mockAddInvokeFromEventPermission.mockClear();
     mockDeleteRule.mockClear();
     mockPutRule.mockClear();
     await Source.deleteMany({});
@@ -243,9 +233,8 @@ describe('POST', () => {
             .expect(201);
         expect(res.body.name).toEqual(source.name);
         expect(mockPutRule).not.toHaveBeenCalled();
-        expect(mockAddInvokeFromEventPermission).not.toHaveBeenCalled();
     });
-    it('should create a permissioned AWS rule with target if provided schedule expression', async () => {
+    it('should create an AWS rule with target if provided schedule expression', async () => {
         const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
@@ -268,11 +257,6 @@ describe('POST', () => {
             expect.any(String),
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
-        );
-        expect(mockAddInvokeFromEventPermission).toHaveBeenCalledWith(
-            createdSource.automation.schedule.awsRuleArn,
-            expect.any(String),
-            createdSource.toAwsRuleName(),
         );
     });
     it('should not create invalid source', async () => {
