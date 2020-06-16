@@ -172,15 +172,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                    parser: rowData.awsLambdaArn
-                        ? {
-                            awsLambdaArn: rowData.awsLambdaArn,
-                        }
-                        : undefined,
-                    schedule: {
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
+                      parser: rowData.awsLambdaArn
+                          ? {
+                                awsLambdaArn: rowData.awsLambdaArn,
+                            }
+                          : undefined,
+                      schedule: {
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
                 : undefined,
         };
     }
@@ -200,16 +200,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             },
             automation: rowData.awsScheduleExpression
                 ? {
-                    parser: rowData.awsLambdaArn
-                        ? {
-                            awsLambdaArn: rowData.awsLambdaArn,
-                        }
-                        : undefined,
-                    schedule: {
-                        awsRuleArn: rowData.awsRuleArn,
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
+                      parser: rowData.awsLambdaArn
+                          ? {
+                                awsLambdaArn: rowData.awsLambdaArn,
+                            }
+                          : undefined,
+                      schedule: {
+                          awsRuleArn: rowData.awsRuleArn,
+                          awsScheduleExpression: rowData.awsScheduleExpression,
+                      },
+                  }
                 : undefined,
         };
     }

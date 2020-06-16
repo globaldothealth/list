@@ -132,13 +132,13 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 }}
             ></CheckCircleIcon>
         ) : (
-                    <RadioButtonUncheckedIcon
-                        style={{
-                            color: grey[500],
-                            margin: '0.25em 0.5em',
-                        }}
-                    ></RadioButtonUncheckedIcon>
-                );
+            <RadioButtonUncheckedIcon
+                style={{
+                    color: grey[500],
+                    margin: '0.25em 0.5em',
+                }}
+            ></RadioButtonUncheckedIcon>
+        );
     }
 
     scrollTo(name: string): void {
@@ -168,159 +168,159 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     values,
                     errors,
                 }): JSX.Element => (
-                        <div className={classes.container}>
-                            <nav className={classes.tableOfContents}>
-                                <div
-                                    className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('demographics')
-                                    }
-                                >
-                                    {this.tableOfContentsIcon({
-                                        isChecked: values.sex !== undefined,
-                                        hasError: errors.sex !== undefined,
-                                    })}
+                    <div className={classes.container}>
+                        <nav className={classes.tableOfContents}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('demographics')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sex !== undefined,
+                                    hasError: errors.sex !== undefined,
+                                })}
                                 Demographics
                             </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('location')}
-                                >
-                                    {this.tableOfContentsIcon({
-                                        isChecked: values.country.trim() !== '',
-                                        hasError: errors.country !== undefined,
-                                    })}
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('location')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.country.trim() !== '',
+                                    hasError: errors.country !== undefined,
+                                })}
                                 Location
                             </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('events')}
-                                >
-                                    {this.tableOfContentsIcon({
-                                        isChecked: values.confirmedDate !== null,
-                                        hasError:
-                                            errors.confirmedDate !== undefined,
-                                    })}
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('events')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.confirmedDate !== null,
+                                    hasError:
+                                        errors.confirmedDate !== undefined,
+                                })}
                                 Events
                             </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('source')}
-                                >
-                                    {this.tableOfContentsIcon({
-                                        isChecked: values.sourceUrl.trim() !== '',
-                                        hasError: errors.sourceUrl !== undefined,
-                                    })}
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('source')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sourceUrl.trim() !== '',
+                                    hasError: errors.sourceUrl !== undefined,
+                                })}
                                 Source
                             </div>
-                                <div
-                                    className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('notes')}
-                                >
-                                    {this.tableOfContentsIcon({
-                                        isChecked: values.notes.trim() !== '',
-                                        hasError: errors.notes !== undefined,
-                                    })}
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('notes')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.notes.trim() !== '',
+                                    hasError: errors.notes !== undefined,
+                                })}
                                 Notes
                             </div>
-                            </nav>
-                            <div className={classes.form}>
-                                <Form>
-                                    <Scroll.Element name="demographics">
-                                        <fieldset>
-                                            <legend>Demographics</legend>
-                                            <FormControl>
-                                                <InputLabel htmlFor="sex">
-                                                    Sex
+                        </nav>
+                        <div className={classes.form}>
+                            <Form>
+                                <Scroll.Element name="demographics">
+                                    <fieldset>
+                                        <legend>Demographics</legend>
+                                        <FormControl>
+                                            <InputLabel htmlFor="sex">
+                                                Sex
                                             </InputLabel>
-                                                <Field
-                                                    as="select"
-                                                    name="sex"
-                                                    type="text"
-                                                    component={Select}
-                                                >
-                                                    <MenuItem
-                                                        value={undefined}
-                                                    ></MenuItem>
-                                                    <MenuItem value={'Female'}>
-                                                        Female
-                                                </MenuItem>
-                                                    <MenuItem value={'Male'}>
-                                                        Male
-                                                </MenuItem>
-                                                </Field>
-                                            </FormControl>
-                                        </fieldset>
-                                    </Scroll.Element>
-                                    <Scroll.Element name="location">
-                                        <fieldset>
-                                            <legend>Location</legend>
                                             <Field
-                                                label="Country"
-                                                name="country"
+                                                as="select"
+                                                name="sex"
                                                 type="text"
-                                                component={TextField}
-                                            />
-                                        </fieldset>
-                                    </Scroll.Element>
-                                    <Scroll.Element name="events">
-                                        <fieldset>
-                                            <legend>Events</legend>
-                                            <MuiPickersUtilsProvider
-                                                utils={DateFnsUtils}
+                                                component={Select}
                                             >
-                                                <Field
-                                                    name="confirmedDate"
-                                                    label="Date confirmed"
-                                                    format="yyyy/MM/dd"
-                                                    maxDate={new Date()}
-                                                    minDate={new Date('2019/12/01')}
-                                                    component={KeyboardDatePicker}
-                                                />
-                                            </MuiPickersUtilsProvider>
-                                        </fieldset>
-                                    </Scroll.Element>
-                                    <Scroll.Element name="source">
-                                        <fieldset>
-                                            <legend>Source</legend>
+                                                <MenuItem
+                                                    value={undefined}
+                                                ></MenuItem>
+                                                <MenuItem value={'Female'}>
+                                                    Female
+                                                </MenuItem>
+                                                <MenuItem value={'Male'}>
+                                                    Male
+                                                </MenuItem>
+                                            </Field>
+                                        </FormControl>
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="location">
+                                    <fieldset>
+                                        <legend>Location</legend>
+                                        <Field
+                                            label="Country"
+                                            name="country"
+                                            type="text"
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="events">
+                                    <fieldset>
+                                        <legend>Events</legend>
+                                        <MuiPickersUtilsProvider
+                                            utils={DateFnsUtils}
+                                        >
                                             <Field
-                                                label="Source URL"
-                                                name="sourceUrl"
-                                                type="text"
-                                                placeholder="https://..."
-                                                component={TextField}
+                                                name="confirmedDate"
+                                                label="Date confirmed"
+                                                format="yyyy/MM/dd"
+                                                maxDate={new Date()}
+                                                minDate={new Date('2019/12/01')}
+                                                component={KeyboardDatePicker}
                                             />
-                                        </fieldset>
-                                    </Scroll.Element>
-                                    <Scroll.Element name="notes">
-                                        <fieldset>
-                                            <legend>Notes</legend>
-                                            <Field
-                                                label="Notes"
-                                                name="notes"
-                                                type="text"
-                                                component={TextField}
-                                            />
-                                        </fieldset>
-                                    </Scroll.Element>
-                                    {isSubmitting && <LinearProgress />}
-                                    <br />
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        data-testid="submit"
-                                        disabled={isSubmitting}
-                                        onClick={submitForm}
-                                    >
-                                        Submit case
+                                        </MuiPickersUtilsProvider>
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="source">
+                                    <fieldset>
+                                        <legend>Source</legend>
+                                        <Field
+                                            label="Source URL"
+                                            name="sourceUrl"
+                                            type="text"
+                                            placeholder="https://..."
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                <Scroll.Element name="notes">
+                                    <fieldset>
+                                        <legend>Notes</legend>
+                                        <Field
+                                            label="Notes"
+                                            name="notes"
+                                            type="text"
+                                            component={TextField}
+                                        />
+                                    </fieldset>
+                                </Scroll.Element>
+                                {isSubmitting && <LinearProgress />}
+                                <br />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    Submit case
                                 </Button>
-                                    {this.state.errorMessage && (
-                                        <h3>{this.state.errorMessage as string}</h3>
-                                    )}
-                                </Form>
-                            </div>
+                                {this.state.errorMessage && (
+                                    <h3>{this.state.errorMessage as string}</h3>
+                                )}
+                            </Form>
                         </div>
-                    )}
+                    </div>
+                )}
             </Formik>
         );
     }
