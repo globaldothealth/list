@@ -2,12 +2,10 @@ import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
-import AwsLambdaClient from '../clients/aws-lambda-client';
 
 export default class SourcesController {
     constructor(
         private readonly awsEventsClient: AwsEventsClient,
-        private readonly awsLambdaClient: AwsLambdaClient,
         private readonly retrievalFunctionArn: string,
     ) {}
 
@@ -117,12 +115,15 @@ export default class SourcesController {
                     this.retrievalFunctionArn,
                     source.toAwsRuleTargetId(),
                     source._id.toString(),
+                    source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
                     source.toAwsRuleTargetId(),
+                    this.retrievalFunctionArn,
+                    source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
             }
@@ -176,13 +177,9 @@ export default class SourcesController {
                 this.retrievalFunctionArn,
                 source.toAwsRuleTargetId(),
                 source._id.toString(),
+                source.toAwsStatementId(),
             );
             source.set('automation.schedule.awsRuleArn', createdRuleArn);
-            await this.awsLambdaClient.addInvokeFromEventPermission(
-                createdRuleArn,
-                this.retrievalFunctionArn,
-                source.toAwsRuleName(),
-            );
         }
     }
 
@@ -199,6 +196,8 @@ export default class SourcesController {
             await this.awsEventsClient.deleteRule(
                 source.toAwsRuleName(),
                 source.toAwsRuleTargetId(),
+                this.retrievalFunctionArn,
+                source.toAwsStatementId(),
             );
         }
         source.remove();

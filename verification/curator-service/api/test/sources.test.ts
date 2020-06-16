@@ -1,6 +1,5 @@
 // These must be at the top of the file; jest hoists jest.mock() calls to the
 // top of the file, and these must be defined prior to such calls.
-const mockAddInvokeFromEventPermission = jest.fn().mockResolvedValue({});
 const mockDeleteRule = jest.fn().mockResolvedValue({});
 const mockPutRule = jest
     .fn()
@@ -21,14 +20,6 @@ jest.mock('../src/clients/aws-events-client', () => {
     });
 });
 jest.mock('../src/geocoding/mapbox');
-
-jest.mock('../src/clients/aws-lambda-client', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            addInvokeFromEventPermission: mockAddInvokeFromEventPermission,
-        };
-    });
-});
 
 beforeAll(() => {
     return mongoose.connect(
@@ -185,6 +176,7 @@ describe('PUT', () => {
             expect.any(String),
             source.toAwsRuleTargetId(),
             source._id.toString(),
+            source.toAwsStatementId(),
         );
     });
     it('should update AWS rule description on source rename', async () => {
@@ -242,9 +234,8 @@ describe('POST', () => {
             .expect(201);
         expect(res.body.name).toEqual(source.name);
         expect(mockPutRule).not.toHaveBeenCalled();
-        expect(mockAddInvokeFromEventPermission).not.toHaveBeenCalled();
     });
-    it('should create a permissioned AWS rule with target if provided schedule expression', async () => {
+    it('should create an AWS rule with target if provided schedule expression', async () => {
         const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
@@ -267,11 +258,7 @@ describe('POST', () => {
             expect.any(String),
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
-        );
-        expect(mockAddInvokeFromEventPermission).toHaveBeenCalledWith(
-            createdSource.automation.schedule.awsRuleArn,
-            expect.any(String),
-            createdSource.toAwsRuleName(),
+            createdSource.toAwsStatementId(),
         );
     });
     it('should not create invalid source', async () => {
@@ -289,7 +276,7 @@ describe('DELETE', () => {
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
     });
-    it('should delete corresponding AWS rule and target if source contains ruleArn', async () => {
+    it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
@@ -304,6 +291,8 @@ describe('DELETE', () => {
         expect(mockDeleteRule).toHaveBeenCalledWith(
             source.toAwsRuleName(),
             source.toAwsRuleTargetId(),
+            expect.any(String),
+            source.toAwsStatementId(),
         );
     });
     it('should not be able to delete a non existent source', (done) => {
