@@ -32,7 +32,13 @@ const styles = () =>
         },
     });
 
-type Props = WithStyles<typeof styles>;
+interface DemographicsProps extends WithStyles<typeof styles> {
+    setFieldValue: (
+        field: string,
+        value: any,
+        shouldValidate?: boolean | undefined,
+    ) => void;
+}
 
 // TODO: get values from DB.
 const sexValues = [undefined, 'Male', 'Female'];
@@ -47,7 +53,7 @@ const ethnicityValues = [
     'Other',
 ];
 
-class Demographics extends React.Component<Props, {}> {
+class Demographics extends React.Component<DemographicsProps, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -101,7 +107,7 @@ class Demographics extends React.Component<Props, {}> {
                             component={TextField}
                         ></Field>
                     </div>
-                    <div>
+                    <div className={classes.fieldRow}>
                         <FormControl>
                             <InputLabel htmlFor="ethnicity">
                                 Ethnicity
@@ -125,16 +131,24 @@ class Demographics extends React.Component<Props, {}> {
                             </Field>
                         </FormControl>
                     </div>
-                    <Nationality />
+                    <Nationality setFieldValue={this.props.setFieldValue} />
                 </fieldset>
             </Scroll.Element>
         );
     }
 }
 
+interface NationalityProps {
+    setFieldValue: (
+        field: string,
+        value: any,
+        shouldValidate?: boolean | undefined,
+    ) => void;
+}
+
 // Autocomplete for nationality.
 // Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
-function Nationality(): JSX.Element {
+function Nationality(props: NationalityProps): JSX.Element {
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
@@ -180,10 +194,13 @@ function Nationality(): JSX.Element {
             }}
             options={options}
             loading={loading}
+            onChange={(e, value) => {
+                props.setFieldValue('nationality', value);
+            }}
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}
-                    name="nationality"
+                    name="unused" // Adds a formik form field called unused with the value of typed inputs
                     label="Nationality"
                     component={TextField}
                 ></Field>
