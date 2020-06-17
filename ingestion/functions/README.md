@@ -121,4 +121,5 @@ sam build
 sam deploy
 ```
 
-From the base `ingestion/functions` dir.
+From the base `ingestion/functions` dir. The deployment configuration will be
+inferred from the `samconfig.toml` file. Follow the confirmation dialogues.
