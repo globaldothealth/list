@@ -17,6 +17,8 @@ describe('New case form', function () {
         cy.get('li[data-value="Asian"').click();
         cy.get('input[name="country"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
         cy.get('input[name="onsetSymptomsDate"]').clear().type('2020-01-02');
         cy.get('input[name="firstClinicalConsultationDate"]')
             .clear()
@@ -27,6 +29,8 @@ describe('New case form', function () {
             .type('2020-01-05');
         cy.get('input[name="icuAdmissionDate"]').clear().type('2020-01-06');
         cy.get('input[name="outcomeDate"]').clear().type('2020-01-07');
+        cy.get('div[data-testid="outcome"]').click();
+        cy.get('li[data-value="Recovered"').click();
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
         cy.get('input[name="notes"]').clear().type('test notes');
         cy.server();
