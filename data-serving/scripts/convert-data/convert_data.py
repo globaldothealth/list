@@ -13,8 +13,7 @@ import progressbar
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
     convert_imported_case, convert_location, convert_revision_metadata_field,
-    convert_notes_field, convert_sources_field, convert_pathogens_field,
-    convert_travel_history)
+    convert_notes_field, convert_sources_field, convert_travel_history)
 from typing import Any
 from constants import (
     DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
@@ -149,9 +148,6 @@ def convert(infile: str, outfile: str, geocoder: Any,
 
                 json_case['sources'] = convert_sources_field(
                     csv_case['source'])
-
-                json_case['pathogens'] = convert_pathogens_field(
-                    csv_case['sequence_available'])
 
                 json_case['travelHistory'] = convert_travel_history(
                     geocoder, csv_case['ID'],

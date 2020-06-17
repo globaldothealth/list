@@ -165,16 +165,12 @@
         ],
         "pathogens": [
             {
-                "name": "sars-cov-2",
-                "sequenceSources": [
-                    {
-                        "id": "ghi789"
-                    }
-                ]
+                "name": "COVID-19",
+                "id": "304"
             },
             {
-                "name": "e. coli",
-                "additionalInformation": "patient had a urinary catheter"
+                "name": "Pneumonia",
+                "id": "104"
             }
         ],
         "notes": "Contact of a confirmed case at work.",
