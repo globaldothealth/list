@@ -106,7 +106,7 @@
                 "weakness"
             ]
         },
-        "chronicDisease": {
+        "preexistingConditions": {
             "provided": [
                 "hypertension",
                 "type 2 diabetes",
