@@ -9,7 +9,7 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-from parsers import (parse_age, parse_bool, parse_date,
+from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
                      parse_longitude, parse_range, parse_sex, parse_string_list)
 from typing import Any, Callable, Dict, List
@@ -235,9 +235,9 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
     return demographics or None
 
 
-def convert_location(id: str, country: str, adminL1: str,
-                     adminL2: str, locality: str, latitude: float,
-                     longitude: float) -> Dict[str, Any]:
+def convert_location(id: str, location: str, admin3: str, admin2: str,
+                     admin1: str, country: str, geo_resolution: str,
+                     latitude: float, longitude: float) -> Dict[str, Any]:
     '''
     Converts location fields to a location object.
 
@@ -250,26 +250,31 @@ def convert_location(id: str, country: str, adminL1: str,
           'country': str,
           'administrativeAreaLevel1': str,
           'administrativeAreaLevel2': str,
-          'locality': str,
+          'administrativeAreaLevel3': str,
+          'place': str,
+          'geo_resolution': str,
           'geometry': {
-          'latitude': float,
-          'longitude': float
+            'latitude': float,
+            'longitude': float
           }
         }
     '''
     location = {}
 
+    if location:
+        location['place'] = str(location)
+
+    if admin3:
+        location['administrativeAreaLevel3'] = str(admin3)
+
+    if admin2:
+        location['administrativeAreaLevel2'] = str(admin2)
+
+    if admin1:
+        location['administrativeAreaLevel1'] = str(admin1)
+
     if country:
         location['country'] = str(country)
-
-    if adminL1:
-        location['administrativeAreaLevel1'] = str(adminL1)
-
-    if adminL2:
-        location['administrativeAreaLevel2'] = str(adminL2)
-
-    if locality:
-        location['locality'] = str(locality)
 
     geometry = {}
 
@@ -289,6 +294,14 @@ def convert_location(id: str, country: str, adminL1: str,
 
     if geometry:
         location['geometry'] = geometry
+
+    try:
+        parsed_geo_resolution = parse_geo_resolution(geo_resolution)
+        if parsed_longitude is not None:
+            location['geoResolution'] = parsed_geo_resolution
+    except ValueError as e:
+        log_error(id, 'geo_resolution',
+                  'location.geoResolution', geo_resolution, e)
 
     return location
 
@@ -379,28 +392,6 @@ def convert_sources_field(source: str) -> Dict[str, str]:
     } if is_url(source) else {
         'other': str(source)
     } for source in sources]
-
-
-def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
-    '''
-    Converts the sequence field to an array of pathogens that may have sequence
-    source data.
-
-    Returns:
-      List[Dict[str, Any]]: Always. The output is in the format:
-        [{
-          'name': str,
-          'sequenceSource': {
-            'url': str,
-            'other': str
-          }
-        }]
-    '''
-    sources = convert_sources_field(sequence)
-    return [{
-        'name': 'sars-cov-2',
-        'sequenceSources': sources
-    }] if sources else None
 
 
 def convert_travel_history(geocoder: Any, id: str, dates: str,

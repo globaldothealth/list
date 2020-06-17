@@ -1,4 +1,4 @@
-import { CleanEnv, cleanEnv, port, str, url } from 'envalid';
+import { CleanEnv, bool, cleanEnv, port, str, url } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     AWS_ACCESS_KEY_ID: string;
@@ -13,7 +13,10 @@ export default function validateEnv(): Readonly<{
     SESSION_COOKIE_KEY: string;
     AFTER_LOGIN_REDIRECT_URL: string;
     STATIC_DIR: string;
-    ENABLE_LOCAL_AUTH: string;
+    ENABLE_LOCAL_AUTH: boolean;
+    MAPBOX_TOKEN: string;
+    MAPBOX_PERMANENT_GEOCODE: boolean;
+    ENABLE_FAKE_GEOCODER: boolean;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -70,10 +73,24 @@ export default function validateEnv(): Readonly<{
             desc: 'Directory to serve static files from',
             devDefault: '',
         }),
-        ENABLE_LOCAL_AUTH: str({
+        ENABLE_LOCAL_AUTH: bool({
             desc: 'Whether to enable local auth strategy for testing',
-            devDefault: 'yes-for-testing',
-            default: '',
+            devDefault: true,
+            default: false,
+        }),
+        MAPBOX_TOKEN: str({
+            desc: 'Mapbox token to use for geocoding',
+            devDefault: '',
+        }),
+        MAPBOX_PERMANENT_GEOCODE: bool({
+            desc: 'Whether to use the permanent geocode endpoint',
+            devDefault: false,
+            default: true,
+        }),
+        ENABLE_FAKE_GEOCODER: bool({
+            desc: 'Whether to enable the fake seedable geocoder',
+            devDefault: true,
+            default: false,
         }),
     });
 }

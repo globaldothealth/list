@@ -22,7 +22,7 @@ it('renders form', () => {
     const { getByText, getAllByText } = render(<NewCaseForm user={user} />);
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
-    expect(getAllByText(/Location/i)).toHaveLength(2);
+    expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(2);
     expect(getByText(/Source URL/i)).toBeInTheDocument();
     expect(getByText(/Nationality/i)).toBeInTheDocument();
@@ -45,39 +45,6 @@ it('submits case ok', async () => {
         fireEvent.click(getByText(/Submit case/));
     });
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.post).toHaveBeenCalledWith('/api/cases', {
-        demographics: {
-            sex: undefined,
-            ageRange: {
-                start: undefined,
-                end: undefined,
-            },
-            ethnicity: undefined,
-            nationality: undefined,
-        },
-        events: {
-            name: 'confirmed',
-            dateRange: {
-                start: null,
-            },
-        },
-        location: {
-            country: '',
-        },
-        revisionMetadata: {
-            revisionNumber: 0,
-            creationMetadata: {
-                curator: 'foo@bar.com',
-                date: expect.any(String),
-            },
-        },
-        sources: [
-            {
-                url: '',
-            },
-        ],
-        notes: '',
-    });
 });
 
 it('submits case not ok', async () => {

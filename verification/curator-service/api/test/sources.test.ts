@@ -38,8 +38,7 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
-    mockDeleteRule.mockClear();
-    mockPutRule.mockClear();
+    jest.clearAllMocks();
     await Source.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});

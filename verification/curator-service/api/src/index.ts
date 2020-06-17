@@ -7,6 +7,10 @@ import session, { SessionOptions } from 'express-session';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
+import FakeGeocoder from './geocoding/fake';
+import GeocodeSuggester from './geocoding/suggest';
+import { Geocoder } from './geocoding/geocoder';
+import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import YAML from 'yamljs';
@@ -128,8 +132,30 @@ apiRouter.delete(
     sourcesController.del,
 );
 
+// Chain geocoders so that during dev/integration tests we can use the fake one.
+// It might also just be useful to have various geocoders plugged-in at some point.
+const geocoders = new Array<Geocoder>();
+if (env.ENABLE_FAKE_GEOCODER) {
+    console.log('Using fake geocoder');
+    const fakeGeocoder = new FakeGeocoder();
+    apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+    apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+    geocoders.push(fakeGeocoder);
+}
+if (env.MAPBOX_TOKEN !== '') {
+    console.log('Using mapbox geocoder');
+    geocoders.push(
+        new MapboxGeocoder(
+            env.MAPBOX_TOKEN,
+            env.MAPBOX_PERMANENT_GEOCODE
+                ? 'mapbox.places-permanent'
+                : 'mapbox.places',
+        ),
+    );
+}
+
 // Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL);
+const casesController = new CasesController(env.DATASERVER_URL, geocoders);
 apiRouter.get(
     '/cases',
     mustHaveAnyRole(['reader', 'curator']),
@@ -157,6 +183,14 @@ apiRouter.get('/users', usersController.list);
 apiRouter.put('/users/:id', usersController.updateRoles);
 apiRouter.get('/users/roles', usersController.listRoles);
 
+// Suggest locations based on the request's "q" query param.
+const geocodeSuggester = new GeocodeSuggester(geocoders);
+apiRouter.get(
+    '/geocode/suggest',
+    mustHaveAnyRole(['curator']),
+    geocodeSuggester.suggest,
+);
+
 app.use('/api', apiRouter);
 
 // Basic health check handler.
@@ -171,11 +205,6 @@ app.get('/health', (req: Request, res: Response) => {
     // couldn't determine if the backend was healthy or not but honestly
     // this is simple enough that it makes sense.
     return res.sendStatus(503);
-});
-
-// TODO: implement.
-apiRouter.get('/suggest/locations', (req: Request, res: Response): void => {
-    res.json([]);
 });
 
 // API documentation.
