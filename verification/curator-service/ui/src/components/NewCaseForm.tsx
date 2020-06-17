@@ -60,6 +60,14 @@ interface FormValues {
     ethnicity?: string;
     locationQuery: string;
     confirmedDate: string | null;
+    methodOfConfirmation?: string;
+    onsetSymptomsDate: string | null;
+    firstClinicalConsultationDate: string | null;
+    selfIsolationDate: string | null;
+    hospitalAdmissionDate: string | null;
+    icuAdmissionDate: string | null;
+    outcomeDate: string | null;
+    outcome?: string;
     sourceUrl: string;
     notes: string;
 }
@@ -123,12 +131,59 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 location: {
                     query: values.locationQuery,
                 },
-                events: {
-                    name: 'confirmed',
-                    dateRange: {
-                        start: values.confirmedDate,
+                events: [
+                    {
+                        name: 'confirmed',
+                        dateRange: {
+                            start: values.confirmedDate,
+                            end: values.confirmedDate,
+                        },
+                        value: values.methodOfConfirmation,
                     },
-                },
+                    {
+                        name: 'onsetSymptoms',
+                        dateRange: {
+                            start: values.onsetSymptomsDate,
+                            end: values.onsetSymptomsDate,
+                        },
+                    },
+                    {
+                        name: 'firstClinicalConsultation',
+                        dateRange: {
+                            start: values.firstClinicalConsultationDate,
+                            end: values.firstClinicalConsultationDate,
+                        },
+                    },
+                    {
+                        name: 'selfIsolation',
+                        dateRange: {
+                            start: values.selfIsolationDate,
+                            end: values.selfIsolationDate,
+                        },
+                    },
+                    {
+                        name: 'hospitalAdmission',
+                        dateRange: {
+                            start: values.hospitalAdmissionDate,
+                            end: values.hospitalAdmissionDate,
+                        },
+                    },
+                    {
+                        name: 'icuAdmission',
+                        dateRange: {
+                            start: values.icuAdmissionDate,
+                            end: values.icuAdmissionDate,
+                        },
+                    },
+                    {
+                        name: 'outcome',
+                        dateRange: {
+                            start: values.outcomeDate,
+                            end: values.outcomeDate,
+                        },
+                        value: values.outcome,
+                    },
+                ],
                 sources: [
                     {
                         url: values.sourceUrl,
@@ -205,6 +260,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: undefined,
                     locationQuery: '',
                     confirmedDate: null,
+                    methodOfConfirmation: undefined,
+                    onsetSymptomsDate: null,
+                    firstClinicalConsultationDate: null,
+                    selfIsolationDate: null,
+                    hospitalAdmissionDate: null,
+                    icuAdmissionDate: null,
+                    outcomeDate: null,
+                    outcome: undefined,
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -261,9 +324,33 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 onClick={(): void => this.scrollTo('events')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.confirmedDate !== null,
+                                    isChecked:
+                                        values.confirmedDate !== null ||
+                                        values.methodOfConfirmation !==
+                                            undefined ||
+                                        values.onsetSymptomsDate !== null ||
+                                        values.firstClinicalConsultationDate !==
+                                            null ||
+                                        values.selfIsolationDate !== null ||
+                                        values.hospitalAdmissionDate !== null ||
+                                        values.icuAdmissionDate !== null ||
+                                        values.outcomeDate !== null ||
+                                        values.outcome !== undefined,
                                     hasError:
-                                        errors.confirmedDate !== undefined,
+                                        errors.confirmedDate !== undefined ||
+                                        errors.methodOfConfirmation !==
+                                            undefined ||
+                                        errors.onsetSymptomsDate !==
+                                            undefined ||
+                                        errors.firstClinicalConsultationDate !==
+                                            undefined ||
+                                        errors.selfIsolationDate !==
+                                            undefined ||
+                                        errors.hospitalAdmissionDate !==
+                                            undefined ||
+                                        errors.icuAdmissionDate !== undefined ||
+                                        errors.outcomeDate !== undefined ||
+                                        errors.outcome !== undefined,
                                 })}
                                 Events
                             </div>
