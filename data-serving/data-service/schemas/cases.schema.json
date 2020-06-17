@@ -275,7 +275,12 @@
               }
             },
             "purpose": {
-              "bsonType": "string"
+              "enum": [
+                "Business",
+                "Leisure",
+                "Family",
+                "Other"
+              ]
             },
             "additionalInformation": {
               "bsonType": "string"
