@@ -10,7 +10,7 @@ export interface GeocodeResult {
     // Second administrative division (county in the US, departments in France, ...).
     administrativeAreaLevel2: string | undefined;
     // Third administrative division (cities usually).
-    administrativeAreaLevel2: string | undefined;
+    administrativeAreaLevel3: string | undefined;
     // A precise location, such as an establishment or POI.
     place: string | undefined;
     // Human readable place name.

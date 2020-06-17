@@ -15,7 +15,7 @@ export default class FakeGeocoder {
 
     seed = (req: Request, res: Response): void => {
         const body = req.body as GeocodeResult;
-        this.entries.set(body.text, body);
+        this.entries.set(body.name, body);
         res.sendStatus(200);
     };
 
