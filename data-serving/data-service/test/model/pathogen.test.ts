@@ -16,6 +16,15 @@ describe('validate', () => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
+    
+    it('a pathogen without an id is invalid', async () => {
+        const missingId = { ...minimalModel };
+        delete missingId.id;
+
+        return new Pathogen(missingId).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
 
     it('a minimal pathogen is valid', async () => {
         return new Pathogen(minimalModel).validate();

@@ -5,14 +5,15 @@ import mongoose from 'mongoose';
 export const pathogenSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: 'Enter a pathogen name',
+        required: true,
     },
-    sequenceSources: [sourceSchema],
-    additionalInformation: String,
+    id: {
+        type: String,
+        required: true,
+    },
 });
 
 export type PathogenDocument = mongoose.Document & {
     name: string;
-    sequenceSources: [SourceDocument];
-    additionalInformation: string;
+    id: string;
 };
