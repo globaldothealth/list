@@ -1,22 +1,22 @@
+import * as Yup from 'yup';
+
 import { Button, LinearProgress } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
-import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import DateFnsUtils from '@date-io/date-fns';
+import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import Events from './new-case-form-fields/Events';
+import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
+import Source from './new-case-form-fields/Source';
+import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 
 interface User {
@@ -26,7 +26,7 @@ interface User {
     roles: string[];
 }
 
-const styles = (theme: Theme) =>
+const styles = () =>
     createStyles({
         container: {
             display: 'flex',
@@ -54,11 +54,52 @@ interface NewCaseFormState {
 
 interface FormValues {
     sex?: string;
+    minAge?: number;
+    maxAge?: number;
+    age?: number;
+    ethnicity?: string;
     country: string;
     confirmedDate: string | null;
     sourceUrl: string;
     notes: string;
 }
+
+const NewCaseValidation = Yup.object().shape(
+    {
+        minAge: Yup.number()
+            .min(0, 'Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('maxAge', {
+                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                then: Yup.number().required('Must enter minimum age in range'),
+            }),
+        maxAge: Yup.number()
+            .min(0, 'Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('minAge', {
+                is: (minAge) => minAge !== undefined && minAge !== '',
+                then: Yup.number().required('Must enter maximum age in range'),
+            }),
+        age: Yup.number()
+            .min(0, 'Age must be between 0 and 120')
+            .max(120, 'Age must be between 0 and 120')
+            .when('minAge', {
+                is: (minAge) => minAge !== undefined && minAge !== '',
+                then: Yup.number().oneOf(
+                    [undefined],
+                    'Cannot enter age and age range',
+                ),
+            })
+            .when('maxAge', {
+                is: (maxAge) => maxAge !== undefined && maxAge !== '',
+                then: Yup.number().oneOf(
+                    [undefined],
+                    'Cannot enter age and age range',
+                ),
+            }),
+    },
+    [['maxAge', 'minAge']],
+);
 
 class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     constructor(props: Props) {
@@ -69,13 +110,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 
     async submitCase(values: FormValues): Promise<void> {
+        const ageRange = values.age
+            ? { start: values.age, end: values.age }
+            : { start: values.minAge, end: values.maxAge };
         try {
             await axios.post('/api/cases', {
                 demographics: {
                     sex: values.sex,
+                    ageRange: ageRange,
+                    ethnicity: values.ethnicity,
                 },
                 location: {
                     country: values.country,
+                    // TODO: Infer the geo resolution from the location.
+                    geoResolution: 'Country',
                 },
                 events: {
                     name: 'confirmed',
@@ -153,12 +201,17 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             <Formik
                 initialValues={{
                     sex: undefined,
+                    minAge: undefined,
+                    maxAge: undefined,
+                    age: undefined,
+                    ethnicity: undefined,
                     country: '',
                     confirmedDate: null,
                     sourceUrl: '',
                     notes: '',
                 }}
-                onSubmit={(values, errors) => this.submitCase(values)}
+                validationSchema={NewCaseValidation}
+                onSubmit={(values) => this.submitCase(values)}
             >
                 {({
                     submitForm,
@@ -175,8 +228,21 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 }
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.sex !== undefined,
-                                    hasError: errors.sex !== undefined,
+                                    isChecked:
+                                        values.sex !== undefined ||
+                                        (values.age !== undefined &&
+                                            values.age !== '') ||
+                                        (values.minAge !== undefined &&
+                                            values.minAge !== '' &&
+                                            values.maxAge !== undefined &&
+                                            values.maxAge !== '') ||
+                                        values.ethnicity !== undefined,
+                                    hasError:
+                                        errors.sex !== undefined ||
+                                        errors.minAge !== undefined ||
+                                        errors.maxAge !== undefined ||
+                                        errors.age !== undefined ||
+                                        errors.ethnicity !== undefined,
                                 })}
                                 Demographics
                             </div>
@@ -224,32 +290,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
-                                <Scroll.Element name="demographics">
-                                    <fieldset>
-                                        <legend>Demographics</legend>
-                                        <FormControl>
-                                            <InputLabel htmlFor="sex">
-                                                Sex
-                                            </InputLabel>
-                                            <Field
-                                                as="select"
-                                                name="sex"
-                                                type="text"
-                                                component={Select}
-                                            >
-                                                <MenuItem
-                                                    value={undefined}
-                                                ></MenuItem>
-                                                <MenuItem value={'Female'}>
-                                                    Female
-                                                </MenuItem>
-                                                <MenuItem value={'Male'}>
-                                                    Male
-                                                </MenuItem>
-                                            </Field>
-                                        </FormControl>
-                                    </fieldset>
-                                </Scroll.Element>
+                                <Demographics></Demographics>
                                 <Scroll.Element name="location">
                                     <fieldset>
                                         <legend>Location</legend>
@@ -261,46 +302,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         />
                                     </fieldset>
                                 </Scroll.Element>
-                                <Scroll.Element name="events">
-                                    <fieldset>
-                                        <legend>Events</legend>
-                                        <MuiPickersUtilsProvider
-                                            utils={DateFnsUtils}
-                                        >
-                                            <Field
-                                                name="confirmedDate"
-                                                label="Date confirmed"
-                                                format="yyyy/MM/dd"
-                                                maxDate={new Date()}
-                                                minDate={new Date('2019/12/01')}
-                                                component={KeyboardDatePicker}
-                                            />
-                                        </MuiPickersUtilsProvider>
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="source">
-                                    <fieldset>
-                                        <legend>Source</legend>
-                                        <Field
-                                            label="Source URL"
-                                            name="sourceUrl"
-                                            type="text"
-                                            placeholder="https://..."
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
-                                <Scroll.Element name="notes">
-                                    <fieldset>
-                                        <legend>Notes</legend>
-                                        <Field
-                                            label="Notes"
-                                            name="notes"
-                                            type="text"
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
+                                <Events></Events>
+                                <Source></Source>
+                                <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}
                                 <br />
                                 <Button
@@ -324,4 +328,4 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(NewCaseForm);
+export default withStyles(styles)(NewCaseForm);

@@ -35,3 +35,12 @@ describe('GET /health', () => {
         request(app).get('/health').expect(200, done);
     });
 });
+
+describe('location', () => {
+    it('should be suggested', (done) => {
+        request(app)
+            .get('/api/suggest/locations')
+            .query({ q: 'some prefix' })
+            .expect(200, done);
+    });
+});

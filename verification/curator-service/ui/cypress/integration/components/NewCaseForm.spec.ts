@@ -10,6 +10,11 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
+        cy.get('div[data-testid="sex"]').click();
+        cy.get('li[data-value="Female"').click();
+        cy.get('input[name="age"]').clear().type('21');
+        cy.get('div[data-testid="ethnicity"]').click();
+        cy.get('li[data-value="Asian"').click();
         cy.get('input[name="country"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
@@ -21,7 +26,11 @@ describe('New case form', function () {
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
+        cy.contains('Female');
+        cy.contains('21');
+        cy.contains('Asian');
         cy.contains('France');
+        cy.contains('1/1/2020');
         cy.contains('www.example.com');
         cy.contains('test notes');
     });
