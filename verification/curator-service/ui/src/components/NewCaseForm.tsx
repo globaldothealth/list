@@ -60,12 +60,14 @@ interface FormValues {
     ethnicity?: string;
     country: string;
     confirmedDate: string | null;
+    methodOfConfirmation?: string;
     onsetSymptomsDate: string | null;
     firstClinicalConsultationDate: string | null;
     selfIsolationDate: string | null;
     hospitalAdmissionDate: string | null;
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
+    outcome?: string;
     sourceUrl: string;
     notes: string;
 }
@@ -138,6 +140,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             start: values.confirmedDate,
                             end: values.confirmedDate,
                         },
+                        value: values.methodOfConfirmation,
                     },
                     {
                         name: 'onsetSymptoms',
@@ -180,6 +183,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             start: values.outcomeDate,
                             end: values.outcomeDate,
                         },
+                        value: values.outcome,
                     },
                 ],
                 sources: [
@@ -258,12 +262,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: undefined,
                     country: '',
                     confirmedDate: null,
+                    methodOfConfirmation: undefined,
                     onsetSymptomsDate: null,
                     firstClinicalConsultationDate: null,
                     selfIsolationDate: null,
                     hospitalAdmissionDate: null,
                     icuAdmissionDate: null,
                     outcomeDate: null,
+                    outcome: undefined,
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -320,15 +326,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 {this.tableOfContentsIcon({
                                     isChecked:
                                         values.confirmedDate !== null ||
+                                        values.methodOfConfirmation !==
+                                            undefined ||
                                         values.onsetSymptomsDate !== null ||
                                         values.firstClinicalConsultationDate !==
                                             null ||
                                         values.selfIsolationDate !== null ||
                                         values.hospitalAdmissionDate !== null ||
                                         values.icuAdmissionDate !== null ||
-                                        values.outcomeDate !== null,
+                                        values.outcomeDate !== null ||
+                                        values.outcome !== undefined,
                                     hasError:
                                         errors.confirmedDate !== undefined ||
+                                        errors.methodOfConfirmation !==
+                                            undefined ||
                                         errors.onsetSymptomsDate !==
                                             undefined ||
                                         errors.firstClinicalConsultationDate !==
@@ -338,7 +349,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         errors.hospitalAdmissionDate !==
                                             undefined ||
                                         errors.icuAdmissionDate !== undefined ||
-                                        errors.outcomeDate !== undefined,
+                                        errors.outcomeDate !== undefined ||
+                                        errors.outcome !== undefined,
                                 })}
                                 Events
                             </div>
