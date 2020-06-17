@@ -80,15 +80,15 @@ Fields that are being converted include:
 - `events`
 - `location`
 - `notes`
-- `pathogens`
 - `revisionMetadata`
 - `source`
 - `symptoms`
 - `travelHistory`
 
-Fields that can't be converted include:
+### Archived fields
 
-Fields that are not carrying over to the new schema, though they will be included in `importedCase`:
+Some fields can't or should not be carried over into the new schema, but will be archived under an `importedCase` field,
+including:
 
 - Fields that were relevant early on in the outbreak, but aren't tracked any longer: `lives_in_Wuhan`,
   `reported_market_exposure`
@@ -106,17 +106,18 @@ We are backfilling fields including:
 - `revisionMetadata.revisionNumber`: We are treating each record as if it's on its first revision. It would be extremely
   labor-intensive to reconstruct revision history from the source data, but it will baked into the new system.
 
-### Non-backfilled fields
+### Fields absent in the original data
 
-Some fields in the new schema cannot be backfilled because they are not present in the data we're converting, including:
+Some fields in the new schema cannot be converted because they are not present in the original data, including:
 
 - `demographics.profession`
 - `demographics.nationality`
 - `demographics.ethnicity`
+- `pathogens`
 - `revision.notes`
 - `revision.date`
+- `source.id`
 - `travelHistory.purpose`
-- `source.id` and `pathogens.sequenceSource.id`
 
 ### Original fields archive
 
