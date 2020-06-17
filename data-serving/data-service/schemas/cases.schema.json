@@ -330,7 +330,7 @@
               "bsonType": "string"
             },
             "id": {
-              "bsonType": "string"
+              "bsonType": "int"
             }
           }
         }
