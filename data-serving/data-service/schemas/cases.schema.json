@@ -126,6 +126,9 @@
             "name": {
               "bsonType": "string"
             },
+            "value": {
+              "bsonType": "string"
+            },
             "dateRange": {
               "bsonType": "object",
               "additionalProperties": false,
