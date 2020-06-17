@@ -11,13 +11,13 @@ export const demographicsSchema = new mongoose.Schema({
     ageRange: {
         start: {
             type: Number,
-            min: -1,
-            max: 300,
+            min: 0,
+            max: 120,
         },
         end: {
             type: Number,
-            min: -1,
-            max: 300,
+            min: 0,
+            max: 120,
         },
     },
     sex: {
