@@ -13,8 +13,7 @@ import progressbar
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
     convert_imported_case, convert_location, convert_revision_metadata_field,
-    convert_notes_field, convert_sources_field, convert_pathogens_field,
-    convert_travel_history)
+    convert_notes_field, convert_sources_field, convert_travel_history)
 from typing import Any
 from constants import (
     DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
@@ -98,10 +97,12 @@ def convert(infile: str, outfile: str, geocoder: Any,
 
                 json_case['location'] = convert_location(
                     csv_case['ID'],
-                    csv_case['country'],
-                    csv_case['admin1'],
+                    csv_case['location'],
+                    csv_case['admin3'],
                     csv_case['admin2'],
-                    csv_case['city'],
+                    csv_case['admin1'],
+                    csv_case['country_new'],
+                    csv_case['geo_resolution'],
                     csv_case['latitude'],
                     csv_case['longitude'])
 
@@ -133,9 +134,9 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'symptoms',
                     csv_case['symptoms'])
 
-                json_case['chronicDisease'] = convert_dictionary_field(
+                json_case['preexistingConditions'] = convert_dictionary_field(
                     csv_case['ID'],
-                    'chronicDisease',
+                    'preexistingConditions',
                     csv_case['chronic_disease'])
 
                 json_case['revisionMetadata'] = convert_revision_metadata_field(
@@ -147,9 +148,6 @@ def convert(infile: str, outfile: str, geocoder: Any,
 
                 json_case['sources'] = convert_sources_field(
                     csv_case['source'])
-
-                json_case['pathogens'] = convert_pathogens_field(
-                    csv_case['sequence_available'])
 
                 json_case['travelHistory'] = convert_travel_history(
                     geocoder, csv_case['ID'],

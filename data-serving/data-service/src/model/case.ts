@@ -15,7 +15,7 @@ import mongoose from 'mongoose';
 
 const caseSchema = new mongoose.Schema(
     {
-        chronicDisease: dictionarySchema,
+        preexistingConditions: dictionarySchema,
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
@@ -63,7 +63,7 @@ const caseSchema = new mongoose.Schema(
 
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
-    chronicDisease: DictionaryDocument;
+    preexistingConditions: DictionaryDocument;
     demographics: DemographicsDocument;
     events: [EventDocument];
     importedCase: {};

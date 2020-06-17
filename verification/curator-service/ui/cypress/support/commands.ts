@@ -8,6 +8,8 @@ declare global {
             ) => void;
             login: () => void;
             addSource: (name: string, url: string) => void;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            seedLocation: (loc: any) => void;
         }
     }
 }
@@ -23,6 +25,11 @@ export function addCase(
         body: {
             location: {
                 country: country,
+                geoResolution: 'Country',
+                geometry: {
+                    lat: 42,
+                    lng: 12,
+                },
             },
             events: [
                 {
@@ -43,7 +50,7 @@ export function addCase(
                 creationMetadata: {
                     curator: 'test',
                     date: new Date().toJSON(),
-                }
+                },
             },
         },
     });
@@ -65,6 +72,15 @@ export function login(opts: {
     });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function seedLocation(loc: any): void {
+    cy.request({
+        method: 'POST',
+        url: '/api/geocode/seed',
+        body: loc,
+    });
+}
+
 export function addSource(name: string, url: string): void {
     cy.request({
         method: 'POST',
@@ -81,3 +97,4 @@ export function addSource(name: string, url: string): void {
 Cypress.Commands.add('addCase', addCase);
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);
+Cypress.Commands.add('seedLocation', seedLocation);

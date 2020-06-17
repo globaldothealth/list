@@ -10,11 +10,11 @@
         "ethnicity": "Other"
     },
     "location": {
-        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
         "country": "France",
         "administrativeAreaLevel1": "Île-de-France",
         "administrativeAreaLevel2": "Paris",
-        "locality": "Paris",
+        "name": "Wuhan",
+        "geoResolution": "Admin2",
         "geometry": {
             "latitude": 2.3522219,
             "longitude": 48.85661400000001
@@ -30,6 +30,7 @@
         },
         {
             "name": "confirmed",
+            "value": "PCR test",
             "dateRange": {
                 "start": 1578891600000,
                 "end": 1578891600000
@@ -43,7 +44,8 @@
             }
         },
         {
-            "name": "discharged",
+            "name": "outcome",
+            "value": "Recovered",
             "dateRange": {
                 "start": "1581483600000",
                 "end": "1581483600000"
@@ -64,7 +66,7 @@
             "weakness"
         ]
     },
-    "chronicDisease": {
+    "preexistingConditions": {
         "provided": [
             "hypertension",
             "type 2 diabetes",
@@ -84,10 +86,12 @@
     "travelHistory": [
         {
             "location": {
-                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
                 "country": "China",
                 "administrativeAreaLevel1": "Hubei",
-                "locality": "Wuhan",
+                "administrativeAreaLevel2": "Wuhan City",
+                "administrativeAreaLevel3": "Wuchang District",
+                "name": "Wuhan",
+                "geoResolution": "Admin3",
                 "geometry": {
                     "latitude": 30.592849,
                     "longitude": 114.305539
@@ -109,16 +113,12 @@
     ],
     "pathogens": [
         {
-            "name": "sars-cov-2",
-            "sequenceSources": [
-                {
-                    "id": "ghi789"
-                }
-            ]
+            "name": "COVID-19",
+            "id": 304
         },
         {
-            "name": "e. coli",
-            "additionalInformation": "patient had a urinary catheter"
+            "name": "Pneumonia",
+            "id": 104
         }
     ],
     "notes": "Contact of a confirmed case at work.",
