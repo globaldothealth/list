@@ -8,7 +8,12 @@ export const pathogenSchema = new mongoose.Schema({
         required: true,
     },
     id: {
-        type: String,
+        type: Number,
+        min: 0,
+        validate: {
+            validator: Number.isInteger,
+            message: '{VALUE} is not an integer value',
+        },
         required: true,
     },
 });
