@@ -8,6 +8,12 @@ describe('New case form', function () {
     it('Can add row to linelist', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="sex"]').click();
@@ -15,7 +21,7 @@ describe('New case form', function () {
         cy.get('input[name="age"]').clear().type('21');
         cy.get('div[data-testid="ethnicity"]').click();
         cy.get('li[data-value="Asian"').click();
-        cy.get('input[name="country"]').clear().type('France');
+        cy.get('input[name="locationQuery"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
@@ -50,6 +56,8 @@ describe('New case form', function () {
     });
 
     it('Does not add row on submission error', function () {
+        // Avoid geolocation fail, the failure should happen at the data service level.
+        cy.seedLocation({ name: '' });
         cy.visit('/cases');
         cy.contains('No records to display');
 
@@ -67,7 +75,7 @@ describe('New case form', function () {
     it('Shows checkbox on field completion', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="country"]').clear().type('France');
+        cy.get('input[name="locationQuery"]').clear().type('France');
         cy.get('svg[data-testid="check-icon"]').should('exist');
     });
 

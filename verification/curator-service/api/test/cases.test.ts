@@ -1,5 +1,6 @@
 import * as baseUser from './users/base.json';
 
+import { GeocodeResult, Resolution } from '../src/geocoding/geocoder';
 import { Session, User } from '../src/model/user';
 
 import app from '../src/index';
@@ -9,7 +10,6 @@ import supertest from 'supertest';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-jest.mock('../src/geocoding/mapbox');
 
 afterEach(() => {
     jest.clearAllMocks();
@@ -58,6 +58,9 @@ describe('Cases', () => {
             .post('/auth/register')
             .send({ ...baseUser, ...{ roles: ['reader', 'curator'] } })
             .expect(200);
+    });
+    afterEach(async () => {
+        await curatorRequest.post('/api/geocode/clear').expect(200);
     });
     it('denies access to non readers', async () => {
         await supertest
@@ -118,11 +121,22 @@ describe('Cases', () => {
         );
     });
 
-    it('proxies create calls', async () => {
+    it('proxies create calls and geocode', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .post('/api/cases')
-            .send({ age: '42' })
+            .send({ age: '42', location: { query: 'Lyon' } })
             .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
@@ -130,7 +144,16 @@ describe('Cases', () => {
             'http://localhost:3000/api/cases',
             {
                 age: '42',
+                location: lyon,
             },
         );
+    });
+
+    it('returns 404 when no geocode could be found on create', async () => {
+        mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
+        await curatorRequest
+            .post('/api/cases')
+            .send({ age: '42', location: { query: 'Lyon' } })
+            .expect(404);
     });
 });

@@ -131,25 +131,30 @@ apiRouter.delete(
     sourcesController.del,
 );
 
-let geocoder: Geocoder;
-if (env.MAPBOX_TOKEN !== '') {
-    console.log('Using mapbox geocoder');
-    geocoder = new MapboxGeocoder(
-        env.MAPBOX_TOKEN,
-        env.MAPBOX_PERMANENT_GEOCODE
-            ? 'mapbox.places-permanent'
-            : 'mapbox.places',
-    );
-} else {
+// Chain geocoders so that during dev/integration tests we can use the fake one.
+// It might also just be useful to have various geocoders plugged-in at some point.
+const geocoders = new Array<Geocoder>();
+if (env.ENABLE_FAKE_GEOCODER) {
     console.log('Using fake geocoder');
     const fakeGeocoder = new FakeGeocoder();
     apiRouter.post('/geocode/seed', fakeGeocoder.seed);
     apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-    geocoder = fakeGeocoder;
+    geocoders.push(fakeGeocoder);
+}
+if (env.MAPBOX_TOKEN !== '') {
+    console.log('Using mapbox geocoder');
+    geocoders.push(
+        new MapboxGeocoder(
+            env.MAPBOX_TOKEN,
+            env.MAPBOX_PERMANENT_GEOCODE
+                ? 'mapbox.places-permanent'
+                : 'mapbox.places',
+        ),
+    );
 }
 
 // Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL, geocoder);
+const casesController = new CasesController(env.DATASERVER_URL, geocoders);
 apiRouter.get(
     '/cases',
     mustHaveAnyRole(['reader', 'curator']),

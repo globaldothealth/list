@@ -48,6 +48,7 @@ describe('geocode', () => {
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             place: '',
             name: 'Lyon',
+            geoResolution: 'Admin3',
         });
     });
     it('can return no results', async () => {

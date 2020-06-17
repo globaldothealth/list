@@ -19,7 +19,6 @@ jest.mock('../src/clients/aws-events-client', () => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
 });
-jest.mock('../src/geocoding/mapbox');
 
 beforeAll(() => {
     return mongoose.connect(

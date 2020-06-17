@@ -58,7 +58,7 @@ interface FormValues {
     maxAge?: number;
     age?: number;
     ethnicity?: string;
-    country: string;
+    locationQuery: string;
     confirmedDate: string | null;
     methodOfConfirmation?: string;
     onsetSymptomsDate: string | null;
@@ -129,9 +129,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: values.ethnicity,
                 },
                 location: {
-                    country: values.country,
-                    // TODO: Infer the geo resolution from the location.
-                    geoResolution: 'Country',
+                    query: values.locationQuery,
                 },
                 events: [
                     {
@@ -260,7 +258,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     maxAge: undefined,
                     age: undefined,
                     ethnicity: undefined,
-                    country: '',
+                    locationQuery: '',
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
                     onsetSymptomsDate: null,
@@ -314,8 +312,10 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 onClick={(): void => this.scrollTo('location')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.country.trim() !== '',
-                                    hasError: errors.country !== undefined,
+                                    isChecked:
+                                        values.locationQuery.trim() !== '',
+                                    hasError:
+                                        errors.locationQuery !== undefined,
                                 })}
                                 Location
                             </div>
@@ -382,8 +382,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     <fieldset>
                                         <legend>Location</legend>
                                         <Field
-                                            label="Country"
-                                            name="country"
+                                            label="Location"
+                                            name="locationQuery"
                                             type="text"
                                             component={TextField}
                                         />
