@@ -282,7 +282,8 @@
                 "Business",
                 "Leisure",
                 "Family",
-                "Other"
+                "Other",
+                "Unknown"
               ]
             },
             "additionalInformation": {
