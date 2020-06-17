@@ -135,9 +135,9 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'symptoms',
                     csv_case['symptoms'])
 
-                json_case['chronicDisease'] = convert_dictionary_field(
+                json_case['preexistingConditions'] = convert_dictionary_field(
                     csv_case['ID'],
-                    'chronicDisease',
+                    'preexistingConditions',
                     csv_case['chronic_disease'])
 
                 json_case['revisionMetadata'] = convert_revision_metadata_field(
