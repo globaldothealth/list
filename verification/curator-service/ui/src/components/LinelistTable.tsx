@@ -130,6 +130,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 country: rowData.country,
                 administrativeAreaLevel1: rowData.adminArea1,
                 administrativeAreaLevel2: rowData.adminArea2,
+                // TODO: Infer the geo resolution from the location.
+                geoResolution: 'Admin2',
             },
             events: [
                 {
