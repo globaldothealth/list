@@ -1,8 +1,8 @@
 import * as baseUser from './users/base.json';
 
+import { GeocodeResult, Resolution } from '../src/geocoding/geocoder';
 import { Session, User } from '../src/model/user';
 
-import { GeocodeResult } from '../src/geocoding/geocoder';
 import app from '../src/index';
 import axios from 'axios';
 import mongoose from 'mongoose';
@@ -130,6 +130,7 @@ describe('Cases', () => {
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             place: '',
             name: 'Lyon',
+            geoResolution: Resolution.Admin3,
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
