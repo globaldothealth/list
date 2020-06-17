@@ -47,6 +47,10 @@ export default class MapboxGeocoder {
                         longitude: feature.center[0],
                         latitude: feature.center[1],
                     },
+                    country: getFeatureTypeFromContext(
+                        [feature, ...feature.context],
+                        'country',
+                    ),
                     administrativeAreaLevel1: getFeatureTypeFromContext(
                         [feature, ...feature.context],
                         'region',
@@ -55,15 +59,15 @@ export default class MapboxGeocoder {
                         [feature, ...feature.context],
                         'district',
                     ),
-                    country: getFeatureTypeFromContext(
+                    administrativeAreaLevel3: getFeatureTypeFromContext(
                         [feature, ...feature.context],
-                        'country',
+                        'place',
                     ),
-                    locality: getFeatureTypeFromContext(
+                    place: getFeatureTypeFromContext(
                         [feature, ...feature.context],
-                        'locality',
+                        'poi',
                     ),
-                    text: feature.text,
+                    name: feature.text,
                 };
             });
         } catch (e) {

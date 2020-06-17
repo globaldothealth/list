@@ -43,10 +43,11 @@ describe('geocode', () => {
         expect(feats[0]).toEqual({
             administrativeAreaLevel1: 'Rhône',
             administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
-            locality: '',
-            text: 'Lyon',
+            place: '',
+            name: 'Lyon',
         });
     });
     it('can return no results', async () => {

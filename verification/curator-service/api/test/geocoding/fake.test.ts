@@ -29,7 +29,7 @@ describe('FakeGeocoder', () => {
                 administrativeAreaLevel1: 'Rhône',
                 country: 'France',
                 geometry: { latitude: 45.75889, longitude: 4.84139 },
-                text: 'Lyon',
+                name: 'Lyon',
             })
             .expect(200, done);
         // TODO: Check for seeded geocode once we can query them.
