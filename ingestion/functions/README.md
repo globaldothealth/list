@@ -109,3 +109,16 @@ Test via unit tests and manual testing prior to sending changes. A GitHub
 action
 [verifying the SAM build](../../.github/workflows/ingestion-aws-sam-build.yml)
 is run on pull requests.
+
+### Deployment
+
+Deployment is accomplished automatically via a dedicated
+[GitHub action](../../.github/workflows/ingestion-aws-sam-deploy.yml). If
+there's a need to deploy directly, run:
+
+```shell
+sam build
+sam deploy
+```
+
+From the base `ingestion/functions` dir.
