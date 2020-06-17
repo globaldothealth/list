@@ -394,28 +394,6 @@ def convert_sources_field(source: str) -> Dict[str, str]:
     } for source in sources]
 
 
-def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
-    '''
-    Converts the sequence field to an array of pathogens that may have sequence
-    source data.
-
-    Returns:
-      List[Dict[str, Any]]: Always. The output is in the format:
-        [{
-          'name': str,
-          'sequenceSource': {
-            'url': str,
-            'other': str
-          }
-        }]
-    '''
-    sources = convert_sources_field(sequence)
-    return [{
-        'name': 'sars-cov-2',
-        'sequenceSources': sources
-    }] if sources else None
-
-
 def convert_travel_history(geocoder: Any, id: str, dates: str,
                            location: str) -> Dict[str, Any]:
     '''
