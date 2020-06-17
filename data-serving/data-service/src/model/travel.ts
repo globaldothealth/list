@@ -4,9 +4,10 @@ import { LocationDocument, locationSchema } from './location';
 import mongoose from 'mongoose';
 
 export enum TravelPurpose {
+    Business = 'Business',
+    Leisure = 'Leisure',
     Family = 'Family',
-    Conference = 'Conference',
-    Work = 'Work',
+    Other = 'Other',
 }
 
 export const travelSchema = new mongoose.Schema({

@@ -23,6 +23,7 @@ export function addCase(
         body: {
             location: {
                 country: country,
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -43,7 +44,7 @@ export function addCase(
                 creationMetadata: {
                     curator: 'test',
                     date: new Date().toJSON(),
-                }
+                },
             },
         },
     });

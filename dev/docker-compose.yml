@@ -25,6 +25,7 @@ services:
             DATASERVER_URL: "http://data:3000"
             GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
             GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+            MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
         healthcheck:
             test: ["CMD", "curl", "-f", "http://curator:3001"]
             interval: 30s

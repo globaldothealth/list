@@ -98,10 +98,12 @@ def convert(infile: str, outfile: str, geocoder: Any,
 
                 json_case['location'] = convert_location(
                     csv_case['ID'],
-                    csv_case['country'],
-                    csv_case['admin1'],
+                    csv_case['location'],
+                    csv_case['admin3'],
                     csv_case['admin2'],
-                    csv_case['city'],
+                    csv_case['admin1'],
+                    csv_case['country_new'],
+                    csv_case['geo_resolution'],
                     csv_case['latitude'],
                     csv_case['longitude'])
 
@@ -133,9 +135,9 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'symptoms',
                     csv_case['symptoms'])
 
-                json_case['chronicDisease'] = convert_dictionary_field(
+                json_case['preexistingConditions'] = convert_dictionary_field(
                     csv_case['ID'],
-                    'chronicDisease',
+                    'preexistingConditions',
                     csv_case['chronic_disease'])
 
                 json_case['revisionMetadata'] = convert_revision_metadata_field(
