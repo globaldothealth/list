@@ -19,89 +19,53 @@ const styles = () =>
     });
 
 type Props = WithStyles<typeof styles>;
+
 class Events extends React.Component<Props, {}> {
-    render(): JSX.Element {
+    dateField(name: string, label: string): JSX.Element {
         const { classes } = this.props;
+        return (
+            <div className={classes.fieldRow}>
+                <Field
+                    className={classes.field}
+                    name={name}
+                    label={label}
+                    format="yyyy/MM/dd"
+                    maxDate={new Date()}
+                    minDate={new Date('2019/12/01')}
+                    component={KeyboardDatePicker}
+                />
+            </div>
+        );
+    }
+
+    render(): JSX.Element {
         return (
             <Scroll.Element name="events">
                 <fieldset>
                     <legend>Events</legend>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="confirmedDate"
-                                label="Confirmed case date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="onsetSymptomsDate"
-                                label="Onset of symptoms date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="firstClinicalConsultationDate"
-                                label="First clinical consultation date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="selfIsolationDate"
-                                label="Self isolation date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="hospitalAdmissionDate"
-                                label="Hospital admission date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <div className={classes.fieldRow}>
-                            <Field
-                                className={classes.field}
-                                name="icuAdmissionDate"
-                                label="ICU admission date"
-                                format="yyyy/MM/dd"
-                                maxDate={new Date()}
-                                minDate={new Date('2019/12/01')}
-                                component={KeyboardDatePicker}
-                            />
-                        </div>
-                        <Field
-                            className={classes.field}
-                            name="outcomeDate"
-                            label="Outcome date"
-                            format="yyyy/MM/dd"
-                            maxDate={new Date()}
-                            minDate={new Date('2019/12/01')}
-                            component={KeyboardDatePicker}
-                        />
+                        {this.dateField('confirmedDate', 'Confirmed case date')}
+                        {this.dateField(
+                            'onsetSymptomsDate',
+                            'Onset of symptoms date',
+                        )}
+                        {this.dateField(
+                            'firstClinicalConsultationDate',
+                            'First clinical consultation date',
+                        )}
+                        {this.dateField(
+                            'selfIsolationDate',
+                            'Self isolation date',
+                        )}
+                        {this.dateField(
+                            'hospitalAdmissionDate',
+                            'Hospital admission date',
+                        )}
+                        {this.dateField(
+                            'icuAdmissionDate',
+                            'ICU admission date',
+                        )}
+                        {this.dateField('outcomeDate', 'Outcome date')}
                     </MuiPickersUtilsProvider>
                 </fieldset>
             </Scroll.Element>
