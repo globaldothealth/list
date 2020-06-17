@@ -1,3 +1,4 @@
+import { GeocodeResult, Resolution } from './geocoder';
 import Geocoding, {
     GeocodeFeature,
     GeocodeMode,
@@ -5,7 +6,6 @@ import Geocoding, {
     GeocodeService,
 } from '@mapbox/mapbox-sdk/services/geocoding';
 
-import { GeocodeResult } from './geocoder';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
 // getFeatureTypeFromContext will return the feature 'text' field if it is of the provided type.
@@ -20,6 +20,27 @@ function getFeatureTypeFromContext(
         }
     }
     return '';
+}
+
+// Gets the finest resolution contained in the features.
+function getResolution(features: GeocodeFeature[]): Resolution {
+    // IDs contain the type of features in "place.someid" format.
+    const types = new Set(
+        features.map((f: GeocodeFeature): string =>
+            f.id.substring(0, f.id.indexOf('.')),
+        ),
+    );
+    // Go through each type from finest to largest and return the first match.
+    if (types.has('poi')) {
+        return Resolution.Point;
+    } else if (types.has('place')) {
+        return Resolution.Admin3;
+    } else if (types.has('district')) {
+        return Resolution.Admin2;
+    } else if (types.has('region')) {
+        return Resolution.Admin1;
+    }
+    return Resolution.Country;
 }
 
 export default class MapboxGeocoder {
@@ -69,6 +90,7 @@ export default class MapboxGeocoder {
                         'poi',
                     ),
                     name: feature.text,
+                    geoResolution: getResolution([feature, ...feature.context]),
                 };
             });
         } catch (e) {

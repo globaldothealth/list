@@ -15,6 +15,16 @@ export interface GeocodeResult {
     place: string | undefined;
     // Human readable place name.
     name: string;
+    // How granular the geocode is.
+    geoResolution: Resolution;
+}
+
+export enum Resolution {
+    Point = 'Point',
+    Admin3 = 'Admin3',
+    Admin2 = 'Admin2',
+    Admin1 = 'Admin1',
+    Country = 'Country',
 }
 
 // A geocoder can geocode queries into places.
