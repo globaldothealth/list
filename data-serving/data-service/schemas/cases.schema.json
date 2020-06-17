@@ -282,7 +282,8 @@
                 "Business",
                 "Leisure",
                 "Family",
-                "Other"
+                "Other",
+                "Unknown"
               ]
             },
             "additionalInformation": {
@@ -330,7 +331,7 @@
               "bsonType": "string"
             },
             "id": {
-              "bsonType": "string"
+              "bsonType": "int"
             }
           }
         }
