@@ -93,7 +93,7 @@ Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
 are run with the correct Python version. E.g.,
 
 ```shell
-python3.6 -m pip pytest test/my_test.py
+python3.6 -m pytest test/my_test.py
 ```
 
 Manual testing/execution uses the SAM CLI. Alongside your function, commit a
