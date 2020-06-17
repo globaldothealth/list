@@ -30,6 +30,7 @@
         },
         {
             "name": "confirmed",
+            "value": "PCR test",
             "dateRange": {
                 "start": 1578891600000,
                 "end": 1578891600000
@@ -43,7 +44,8 @@
             }
         },
         {
-            "name": "discharged",
+            "name": "outcome",
+            "value": "Recovered",
             "dateRange": {
                 "start": "1581483600000",
                 "end": "1581483600000"

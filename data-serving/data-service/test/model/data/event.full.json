@@ -1,5 +1,6 @@
 {
-    "name": "onsetSymptoms",
+    "name": "outcome",
+    "value": "Recovered",
     "dateRange": {
         "start": 1578000000000,
         "end": 1578027600000
