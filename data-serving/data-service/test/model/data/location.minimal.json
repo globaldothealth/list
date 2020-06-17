@@ -1,3 +1,4 @@
 {
-    "locality": "Brooklyn"
+    "place": "Kings County Hospital Center",
+    "geo_resolution": "Point"
 }

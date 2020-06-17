@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
 
+// See https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country
+// for an explanation of each level of resolution.
+export enum GeoResolution {
+    Point = 'Point',
+    Admin3 = 'Admin3',
+    Admin2 = 'Admin2',
+    Admin1 = 'Admin1',
+    Country = 'Country',
+}
+
 const fieldRequiredValidator = [
     function (this: LocationDocument): boolean {
         return (
@@ -7,15 +17,14 @@ const fieldRequiredValidator = [
             this.country == null &&
             this.administrativeAreaLevel1 == null &&
             this.administrativeAreaLevel2 == null &&
-            this.locality == null
+            this.administrativeAreaLevel3 == null
         );
     },
     'One of country, administrativeAreaLevel1, administrativeAreaLevel2, ' +
-        'or locality is required',
+        'or administrativeAreaLevel3 is required',
 ];
 
 export const locationSchema = new mongoose.Schema({
-    id: String,
     country: {
         type: String,
         required: fieldRequiredValidator,
@@ -28,9 +37,18 @@ export const locationSchema = new mongoose.Schema({
         type: String,
         required: fieldRequiredValidator,
     },
-    locality: {
+    administrativeAreaLevel3: {
         type: String,
         required: fieldRequiredValidator,
+    },
+    // Place represents a precise location, such as an establishment or POI.
+    place: String,
+    // A human-readable name of the location.
+    name: String,
+    geoResolution: {
+        type: String,
+        enum: Object.values(GeoResolution),
+        required: true,
     },
     geometry: {
         latitude: {
@@ -70,10 +88,12 @@ interface Geometry {
 }
 
 export type LocationDocument = mongoose.Document & {
-    id: string;
     country: string;
     administrativeAreaLevel1: string;
     administrativeAreaLevel2: string;
-    locality: string;
+    administrativeAreaLevel3: string;
+    place: string;
+    name: string;
+    geoResolution: GeoResolution;
     geometry: Geometry;
 };
