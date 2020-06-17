@@ -63,8 +63,8 @@ The following fields are *not* lossy, although they require conversion to a new 
   `events[name="deathOrDischarge"]`, from the `date_death_or_discharge` field, plus `events[name="death"]`
   from the `outcome` field.
 
-- Manually review `symptoms` and `chronicDisease` fields to confirm that we're supporting all possible list delimiters
-  (currently colon and comma).
+- Manually review `symptoms` and `preexistingConditions` fields to confirm that we're supporting all possible list
+  delimiters (currently colon and comma).
 
 ## What's included in the new schema?
 
@@ -75,7 +75,7 @@ can't be inferred from the original data.
 
 Fields that are being converted include:
 
-- `chronicDisease`
+- `preexistingConditions`
 - `demographics`
 - `events`
 - `location`

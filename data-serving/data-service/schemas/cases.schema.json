@@ -167,7 +167,7 @@
           }
         }
       },
-      "chronicDisease": {
+      "preexistingConditions": {
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
