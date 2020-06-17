@@ -8,6 +8,7 @@ import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import FakeGeocoder from './geocoding/fake';
+import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
@@ -182,6 +183,14 @@ apiRouter.get('/users', usersController.list);
 apiRouter.put('/users/:id', usersController.updateRoles);
 apiRouter.get('/users/roles', usersController.listRoles);
 
+// Suggest locations based on the request's "q" query param.
+const geocodeSuggester = new GeocodeSuggester(geocoders);
+apiRouter.get(
+    '/geocode/suggest',
+    mustHaveAnyRole(['curator']),
+    geocodeSuggester.suggest,
+);
+
 app.use('/api', apiRouter);
 
 // Basic health check handler.
@@ -196,11 +205,6 @@ app.get('/health', (req: Request, res: Response) => {
     // couldn't determine if the backend was healthy or not but honestly
     // this is simple enough that it makes sense.
     return res.sendStatus(503);
-});
-
-// TODO: implement.
-apiRouter.get('/suggest/locations', (req: Request, res: Response): void => {
-    res.json([]);
 });
 
 // API documentation.
