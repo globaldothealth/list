@@ -63,7 +63,7 @@ ls -l /usr/bin/python*
 1. Install the AWS SAM CLI, following
 [these instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 1. For each function you're planning to work with, be sure you have required
-modules install, e.g. via:
+modules installed, e.g. via:
 
 ```shell
 python3.6 -m pip install -r requirements.txt
@@ -72,3 +72,40 @@ python3.6 -m pip install -r requirements.txt
 *NB:* Be sure you're using Python 3.6, which corresponds to the runtime of
 the Lambda functions as configured in the [SAM template](./template.yaml). See
 prerequisites, to check this.
+
+### Writing and editing functions
+
+For the most part, writing functions is writing standard Python business logic.
+The primary caveat is that the business logic to be executed must be wrapped in
+the Lambda handler API. Read more about that
+[here](https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html), or
+more generally about Python Lambda development
+[here](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html).
+The points at which the Lambda integration is most apparent are in testing and
+execution of code.
+
+Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
+are run with the correct Python version. E.g.,
+
+```shell
+python3.6 -m pip pytest test/my_test.py
+```
+
+Manual testing/execution uses the SAM CLI. Alongside your function, commit a
+sample JSON input event (see the above documentation), and test the function
+locally by running:
+
+```shell
+sam build
+sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
+```
+
+Run this from the base `ingestion/functions` dir. The `MyFunction` name should
+correspond to the name of the resource as defined in the SAM `template.yaml`;
+for more information on the template, read
+[this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).
+
+Test via unit tests and manual testing prior to sending changes. A GitHub
+action
+[verifying the SAM build](../../.github/workflows/ingestion-aws-sam-build.yml)
+is run on pull requests.
