@@ -114,11 +114,11 @@
     "pathogens": [
         {
             "name": "COVID-19",
-            "id": "304"
+            "id": 304
         },
         {
             "name": "Pneumonia",
-            "id": "104"
+            "id": 104
         }
     ],
     "notes": "Contact of a confirmed case at work.",

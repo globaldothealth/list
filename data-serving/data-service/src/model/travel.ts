@@ -8,6 +8,7 @@ export enum TravelPurpose {
     Leisure = 'Leisure',
     Family = 'Family',
     Other = 'Other',
+    Unknown = 'Unknown',
 }
 
 export const travelSchema = new mongoose.Schema({
