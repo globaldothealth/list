@@ -1,7 +1,6 @@
 import app from '../src/index';
 import mongoose from 'mongoose';
 import request from 'supertest';
-jest.mock('../src/geocoding/mapbox');
 
 beforeAll(() => {
     return mongoose.connect(

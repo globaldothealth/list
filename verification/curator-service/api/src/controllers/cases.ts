@@ -63,7 +63,19 @@ export default class CasesController {
     };
 
     create = async (req: Request, res: Response): Promise<void> => {
-        // TODO: Geocode if no lat/lng provided.
+        // Geocode query if no lat lng were provided.
+        const location = req.body['location'];
+        if (!location?.lat || !location.lng) {
+            const features = await this.geocoder.geocode(location?.query);
+            if (features.length === 0) {
+                res.status(404).send(
+                    `no geolocation found for ${location?.query}`,
+                );
+                return;
+            }
+            // Currently a 1:1 match between the GeocodeResult and the data service API.
+            req.body['location'] = features[0];
+        }
         try {
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,

@@ -32,6 +32,7 @@ export default class MapboxGeocoder {
 
     async geocode(query: string): Promise<GeocodeResult[]> {
         try {
+            // TODO: Add LRU cache.
             const resp: MapiResponse = await this.geocodeService
                 .forwardGeocode({
                     mode: this.endpoint,
