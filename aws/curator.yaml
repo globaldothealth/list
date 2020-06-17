@@ -35,33 +35,38 @@ spec:
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: google_oauth_client_id
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: aws_secret_access_key
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
@@ -106,33 +111,38 @@ spec:
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: google_oauth_client_id
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-47fcd8d26k
                   key: aws_secret_access_key
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-47fcd8d26k
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
