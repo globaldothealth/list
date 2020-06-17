@@ -16,8 +16,6 @@ import supertest from 'supertest';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-jest.mock('../src/geocoding/mapbox');
-
 beforeAll(() => {
     return mongoose.connect(
         // This is provided by jest-mongodb.

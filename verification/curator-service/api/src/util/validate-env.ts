@@ -16,6 +16,7 @@ export default function validateEnv(): Readonly<{
     ENABLE_LOCAL_AUTH: boolean;
     MAPBOX_TOKEN: string;
     MAPBOX_PERMANENT_GEOCODE: boolean;
+    ENABLE_FAKE_GEOCODER: boolean;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -85,6 +86,11 @@ export default function validateEnv(): Readonly<{
             desc: 'Whether to use the permanent geocode endpoint',
             devDefault: false,
             default: true,
+        }),
+        ENABLE_FAKE_GEOCODER: bool({
+            desc: 'Whether to enable the fake seedable geocoder',
+            devDefault: true,
+            default: false,
         }),
     });
 }
