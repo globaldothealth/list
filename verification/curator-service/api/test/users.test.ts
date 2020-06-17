@@ -6,6 +6,8 @@ import app from '../src/index';
 import mongoose from 'mongoose';
 import supertest from 'supertest';
 
+jest.mock('../src/geocoding/mapbox');
+
 beforeAll(() => {
     return mongoose.connect(
         // This is provided by jest-mongodb.
@@ -26,6 +28,7 @@ afterAll(() => {
 beforeEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {
