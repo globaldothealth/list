@@ -394,7 +394,7 @@ def convert_sources_field(source: str) -> Dict[str, str]:
     } for source in sources]
 
 
-def convert_travel_history(geocoder: Any, id: str, dates: str,ne
+def convert_travel_history(geocoder: Any, id: str, dates: str,
                            location: str) -> Dict[str, Any]:
     '''
     Converts the travel history date and location fields to a new travelHistory
