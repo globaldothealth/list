@@ -33,6 +33,7 @@ interface Demographics {
         end: number;
     };
     ethnicity: string;
+    nationalities: string[];
 }
 
 interface Location {
@@ -69,6 +70,8 @@ interface TableRow {
     sex: string;
     age: number;
     ethnicity: string;
+    // Represents a list in a string e.g. Afghan, Albanian
+    nationalities: string;
     country: string;
     adminArea1: string;
     adminArea2: string;
@@ -119,6 +122,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     start: rowData.age,
                 },
                 ethnicity: rowData.ethnicity,
+                nationalities: rowData.nationalities?.split(', '),
             },
             notes: rowData.notes,
             sources: [
@@ -232,6 +236,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
+                                title: 'Nationality',
+                                field: 'nationalities',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Country',
                                 field: 'country',
                                 filtering: false,
@@ -313,6 +322,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         ?.start,
                                                 ethnicity:
                                                     c.demographics?.ethnicity,
+                                                nationalities: c.demographics?.nationalities?.join(
+                                                    ', ',
+                                                ),
                                                 country: c.location.country,
                                                 adminArea1:
                                                     c.location

@@ -58,7 +58,7 @@ interface FormValues {
     maxAge?: number;
     age?: number;
     ethnicity?: string;
-    nationality: string | null;
+    nationalities: string[];
     country: string;
     confirmedDate: string | null;
     sourceUrl: string;
@@ -120,7 +120,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     sex: values.sex,
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
-                    nationality: values.nationality,
+                    nationalities: values.nationalities,
                 },
                 location: {
                     country: values.country,
@@ -205,7 +205,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     maxAge: undefined,
                     age: undefined,
                     ethnicity: undefined,
-                    nationality: null,
+                    nationalities: [],
                     country: '',
                     confirmedDate: null,
                     sourceUrl: '',
@@ -239,14 +239,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                             values.maxAge !== undefined &&
                                             values.maxAge !== '') ||
                                         values.ethnicity !== undefined ||
-                                        values.nationality !== null,
+                                        values.nationalities.length > 0,
                                     hasError:
                                         errors.sex !== undefined ||
                                         errors.minAge !== undefined ||
                                         errors.maxAge !== undefined ||
                                         errors.age !== undefined ||
                                         errors.ethnicity !== undefined ||
-                                        errors.nationality !== undefined,
+                                        errors.nationalities !== undefined,
                                 })}
                                 Demographics
                             </div>
@@ -291,7 +291,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 })}
                                 Notes
                             </div>
-                            {console.log(values)}
                         </nav>
                         <div className={classes.form}>
                             <Form>
