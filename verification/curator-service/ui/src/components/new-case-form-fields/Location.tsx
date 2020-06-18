@@ -30,7 +30,7 @@ interface Props extends WithStyles<typeof styles> {
     location?: Location;
 }
 
-class Profile extends React.Component<Props, {}> {
+class Location extends React.Component<Props, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -86,4 +86,4 @@ class Profile extends React.Component<Props, {}> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(Profile);
+export default withStyles(styles, { withTheme: true })(Location);

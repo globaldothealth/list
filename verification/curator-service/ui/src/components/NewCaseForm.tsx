@@ -1,19 +1,19 @@
 import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
+import LocationForm from './new-case-form-fields/LocationForm';
 import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
-import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -383,17 +383,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         <div className={classes.form}>
                             <Form>
                                 <Demographics></Demographics>
-                                <Scroll.Element name="location">
-                                    <fieldset>
-                                        <legend>Location</legend>
-                                        <Field
-                                            label="Location"
-                                            name="locationQuery"
-                                            type="text"
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
+                                <LocationForm></LocationForm>
                                 <Events></Events>
                                 <Source></Source>
                                 <Notes></Notes>
