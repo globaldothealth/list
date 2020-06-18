@@ -5,27 +5,6 @@ describe('Linelist table', function () {
         cy.login();
     });
 
-    it('Can add a case', function () {
-        cy.visit('/cases');
-        cy.contains('test notes').should('not.exist');
-
-        cy.get('button[title="Add"]').click();
-        cy.get('input[placeholder="Country"]').clear().type('France');
-        cy.get('input[placeholder="Lat"]').clear().type('42');
-        cy.get('input[placeholder="Lng"]').clear().type('12');
-        cy.get('input[placeholder="Admin area 1"]').clear().type('Rhône');
-        cy.get('input[placeholder="Admin area 2"]')
-            .clear()
-            .type('Auvergne-Rhône-Alpes');
-        cy.get('input[placeholder="Notes"]').clear().type('test notes');
-        cy.get('input[placeholder="Source URL"]')
-            .clear()
-            .type('www.example.com');
-        cy.get('button[title="Save"]').click();
-
-        cy.contains('test notes');
-    });
-
     it('Can edit a case', function () {
         cy.addCase('France', 'some notes', 'www.example.com');
         cy.visit('/cases');
