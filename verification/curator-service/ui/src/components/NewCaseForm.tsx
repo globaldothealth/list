@@ -58,6 +58,7 @@ interface FormValues {
     maxAge?: number;
     age?: number;
     ethnicity?: string;
+    nationalities: string[];
     locationQuery: string;
     confirmedDate: string | null;
     methodOfConfirmation?: string;
@@ -127,6 +128,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     sex: values.sex,
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
+                    nationalities: values.nationalities,
                 },
                 location: {
                     query: values.locationQuery,
@@ -258,6 +260,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     maxAge: undefined,
                     age: undefined,
                     ethnicity: undefined,
+                    nationalities: [],
                     locationQuery: '',
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
@@ -297,13 +300,15 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                             values.minAge !== '' &&
                                             values.maxAge !== undefined &&
                                             values.maxAge !== '') ||
-                                        values.ethnicity !== undefined,
+                                        values.ethnicity !== undefined ||
+                                        values.nationalities.length > 0,
                                     hasError:
                                         errors.sex !== undefined ||
                                         errors.minAge !== undefined ||
                                         errors.maxAge !== undefined ||
                                         errors.age !== undefined ||
-                                        errors.ethnicity !== undefined,
+                                        errors.ethnicity !== undefined ||
+                                        errors.nationalities !== undefined,
                                 })}
                                 Demographics
                             </div>

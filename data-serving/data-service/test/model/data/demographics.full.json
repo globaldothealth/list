@@ -5,6 +5,6 @@
     },
     "sex": "Female",
     "profession": "Horse trainer",
-    "nationality": "Swedish",
+    "nationalities": ["American", "Swedish"],
     "ethnicity": "Other"
 }
