@@ -40,6 +40,12 @@ interface Location {
     country: string;
     administrativeAreaLevel1: string;
     administrativeAreaLevel2: string;
+    geometry: Geometry;
+}
+
+interface Geometry {
+    lat: number;
+    lng: number;
 }
 
 interface Source {
@@ -75,6 +81,8 @@ interface TableRow {
     country: string;
     adminArea1: string;
     adminArea2: string;
+    lat: number;
+    lng: number;
     confirmedDate: Date | null;
     // sources
     sourceUrl: string | null;
@@ -134,6 +142,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 country: rowData.country,
                 administrativeAreaLevel1: rowData.adminArea1,
                 administrativeAreaLevel2: rowData.adminArea2,
+                geometry: {
+                    lat: rowData.lat,
+                    lng: rowData.lng,
+                },
+                // TODO: Infer the geo resolution from the location.
+                geoResolution: 'Admin2',
             },
             events: [
                 {
@@ -256,6 +270,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
+                                title: 'Lat',
+                                field: 'lat',
+                                filtering: false,
+                            },
+                            {
+                                title: 'Lng',
+                                field: 'lng',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Confirmed date',
                                 field: 'confirmedDate',
                                 filtering: false,
@@ -332,6 +356,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 adminArea2:
                                                     c.location
                                                         ?.administrativeAreaLevel2,
+                                                lat: c.location.geometry?.lat,
+                                                lng: c.location.geometry?.lng,
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,

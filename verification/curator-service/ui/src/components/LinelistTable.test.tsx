@@ -34,6 +34,12 @@ it('loads and displays cases', async () => {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
                 administrativeAreaLevel2: 'some admin 2',
+                geometry: {
+                    lat: 42,
+                    lng: 12,
+                },
+                // TODO: Infer the geo resolution from the location.
+                geoResolution: 'Admin2',
             },
             events: [
                 {
@@ -86,6 +92,7 @@ it('API errors are displayed', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -139,6 +146,7 @@ it('can delete a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -246,6 +254,11 @@ it('can add a row', async () => {
         },
         location: {
             country: 'France',
+            geoResolution: 'Country',
+            geometry: {
+                lat: 42,
+                lng: 12,
+            },
         },
         events: [
             {
@@ -305,6 +318,11 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Country',
+                geometry: {
+                    lat: 42,
+                    lng: 12,
+                },
             },
             events: [
                 {
@@ -354,6 +372,7 @@ it('can edit a row', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Country',
             },
             events: [
                 {
@@ -416,6 +435,11 @@ it('cannot edit data as a reader only', async () => {
             },
             location: {
                 country: 'France',
+                geoResolution: 'Country',
+                geometry: {
+                    lat: 42,
+                    lng: 12,
+                },
             },
             events: [
                 {

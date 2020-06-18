@@ -26,6 +26,7 @@ afterAll(() => {
 beforeEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {

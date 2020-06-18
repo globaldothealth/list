@@ -7,10 +7,12 @@ export const eventSchema = new mongoose.Schema({
         type: String,
         required: 'Enter a name for the event',
     },
+    value: String,
     dateRange: dateRangeSchema,
 });
 
 export type EventDocument = mongoose.Document & {
     name: string;
+    value: string;
     dateRange: DateRangeDocument;
 };

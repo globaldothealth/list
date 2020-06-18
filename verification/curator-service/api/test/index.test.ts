@@ -19,6 +19,10 @@ afterAll(() => {
     return mongoose.disconnect();
 });
 
+beforeEach(() => {
+    jest.clearAllMocks();
+});
+
 describe('GET /random-url', () => {
     it('should return 404', (done) => {
         request(app).get('/random-url').expect(404, done);
@@ -28,14 +32,5 @@ describe('GET /random-url', () => {
 describe('GET /health', () => {
     it('should be healthy when connected', (done) => {
         request(app).get('/health').expect(200, done);
-    });
-});
-
-describe('location', () => {
-    it('should be suggested', (done) => {
-        request(app)
-            .get('/api/suggest/locations')
-            .query({ q: 'some prefix' })
-            .expect(200, done);
     });
 });
