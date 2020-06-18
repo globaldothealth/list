@@ -34,12 +34,12 @@ it('loads and displays cases', async () => {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
                 administrativeAreaLevel2: 'some admin 2',
+                administrativeAreaLevel3: 'some admin 3',
                 geometry: {
-                    lat: 42,
-                    lng: 12,
+                    latitude: 42,
+                    longitude: 12,
                 },
-                // TODO: Infer the geo resolution from the location.
-                geoResolution: 'Admin2',
+                geoResolution: 'Admin3',
             },
             events: [
                 {
@@ -81,6 +81,10 @@ it('loads and displays cases', async () => {
     expect(admin1).toBeInTheDocument();
     const admin2 = await findByText(/some admin 2/);
     expect(admin2).toBeInTheDocument();
+    const admin3 = await findByText(/some admin 3/);
+    expect(admin3).toBeInTheDocument();
+    const geoResolution = await findByText(/Admin3/);
+    expect(geoResolution).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
@@ -124,14 +128,17 @@ it('API errors are displayed', async () => {
 
     const { getByText, findByText } = render(<LinelistTable user={curator} />);
 
-    // Throw error on add request.
-    mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
+    const row = await findByText(/abc123/);
+    expect(row).toBeInTheDocument();
 
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
+    // Throw error on edit request.
+    mockedAxios.put.mockRejectedValueOnce(new Error('Request failed'));
+
+    const editButton = getByText(/edit/);
+    fireEvent.click(editButton);
     const confirmButton = getByText(/check/);
     fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
     expect(error).toBeInTheDocument();
@@ -225,90 +232,6 @@ it('can delete a row', async () => {
     expect(newRow).not.toBeInTheDocument();
 });
 
-it('can add a row', async () => {
-    const axiosGetResponse = {
-        data: {
-            cases: [],
-            total: 15,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
-
-    const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={curator} />,
-    );
-
-    // Check table is empty on load
-    const row = queryByText(/abc123/);
-    expect(row).not.toBeInTheDocument();
-
-    // Add a row
-    const newCase = {
-        _id: 'abc123',
-        demographics: {
-            sex: 'Female',
-        },
-        location: {
-            country: 'France',
-            geoResolution: 'Country',
-            geometry: {
-                lat: 42,
-                lng: 12,
-            },
-        },
-        events: [
-            {
-                name: 'confirmed',
-                dateRange: {
-                    start: new Date().toJSON(),
-                },
-            },
-        ],
-        notes: 'some notes',
-        sources: [
-            {
-                url: 'http://foo.bar',
-            },
-        ],
-    };
-    const axiosPostResponse = {
-        data: {
-            case: newCase,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    const axiosGetAfterAddResponse = {
-        data: {
-            cases: [newCase],
-            total: 15,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
-    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
-
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-
-    // Check table is reloaded
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = await findByText(/abc123/);
-    expect(newRow).toBeInTheDocument();
-});
-
 it('can edit a row', async () => {
     const cases = [
         {
@@ -320,8 +243,8 @@ it('can edit a row', async () => {
                 country: 'France',
                 geoResolution: 'Country',
                 geometry: {
-                    lat: 42,
-                    lng: 12,
+                    latitude: 42,
+                    longitude: 12,
                 },
             },
             events: [
@@ -382,7 +305,7 @@ it('can edit a row', async () => {
                     },
                 },
             ],
-            notes: 'some edited notes',
+            notes: 'some changed notes',
             sources: [
                 {
                     url: 'http://foo.bar',
@@ -422,7 +345,7 @@ it('can edit a row', async () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     const oldRow = queryByText('some notes');
     expect(oldRow).not.toBeInTheDocument();
-    const editedRow = await findByText('some edited notes');
+    const editedRow = await findByText('some changed notes');
     expect(editedRow).toBeInTheDocument();
 });
 
@@ -437,8 +360,8 @@ it('cannot edit data as a reader only', async () => {
                 country: 'France',
                 geoResolution: 'Country',
                 geometry: {
-                    lat: 42,
-                    lng: 12,
+                    latitude: 42,
+                    longitude: 12,
                 },
             },
             events: [
