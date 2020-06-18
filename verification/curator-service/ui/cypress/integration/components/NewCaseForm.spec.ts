@@ -25,7 +25,6 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'Afghan').click();
         cy.get('div[data-testid="nationalities"]').type('Albanian');
         cy.get('li').first().should('contain', 'Albanian').click();
-        cy.get('input[name="country"]').clear().type('France');
         cy.get('input[name="locationQuery"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
