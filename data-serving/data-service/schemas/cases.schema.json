@@ -46,8 +46,12 @@
           "profession": {
             "bsonType": "string"
           },
-          "nationality": {
-            "bsonType": "string"
+          "nationalities": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "string"
+            }
           },
           "ethnicity": {
             "bsonType": "string"

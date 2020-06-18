@@ -25,6 +25,7 @@ it('renders form', () => {
     expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(2);
     expect(getByText(/Source URL/i)).toBeInTheDocument();
+    expect(getByText(/Nationality/i)).toBeInTheDocument();
 });
 
 it('submits case ok', async () => {
