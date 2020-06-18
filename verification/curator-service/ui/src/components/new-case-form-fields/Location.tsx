@@ -51,50 +51,34 @@ class Profile extends React.Component<Props, {}> {
                     <p>
                         <Typography variant="caption">Admin area 1</Typography>
                     </p>
-                    <p>
-                        {this.props.location?.adminArea1
-                            ? this.props.location.adminArea1
-                            : 'N/A'}
-                    </p>
+                    <p>{this.props.location?.adminArea1 ?? 'N/A'}</p>
                 </div>
                 <div className={classes.column}>
                     <p>
                         <Typography variant="caption">Admin area 2</Typography>
                     </p>
-                    <p>
-                        {this.props.location?.adminArea2
-                            ? this.props.location.adminArea2
-                            : 'N/A'}
-                    </p>
+                    <p>{this.props.location?.adminArea2 ?? 'N/A'}</p>
                 </div>
                 <div className={classes.column}>
                     <p>
                         <Typography variant="caption">Admin area 3</Typography>
                     </p>
-                    <p>
-                        {this.props.location?.adminArea3
-                            ? this.props.location.adminArea3
-                            : 'N/A'}
-                    </p>
+                    <p>{this.props.location?.adminArea3 ?? 'N/A'}</p>
                 </div>
                 <div className={classes.column}>
                     <p>
                         <Typography variant="caption">Latitude</Typography>
                     </p>
-                    <p>
-                        {this.props.location?.latitude
-                            ? this.props.location.latitude.toFixed(4)
-                            : '-'}
-                    </p>
+                    <p>{this.props.location?.latitude?.toFixed(4) ?? '-'}</p>
                 </div>
                 <div className={classes.column}>
                     <p>
                         <Typography variant="caption">Longitude</Typography>
                     </p>
                     <p>
-                        {this.props.location?.longitude
-                            ? this.props.location.longitude.toFixed(4)
-                            : '-'}
+                        <p>
+                            {this.props.location?.longitude?.toFixed(4) ?? '-'}
+                        </p>
                     </p>
                 </div>
             </div>
