@@ -70,7 +70,7 @@ export default function FormikAutocomplete(
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}
-                    // Setting the name as nationalities allows any typed value
+                    // Setting the name properly allows any typed value
                     // to be set in the form values, rather than only selected
                     // dropdown values. Thus we use an unused form value here.
                     name="unused"
