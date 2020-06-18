@@ -20,6 +20,7 @@ interface Location {
     country: string;
     adminArea1?: string;
     adminArea2?: string;
+    adminArea3?: string;
     latitude: number;
     longitude: number;
 }
@@ -63,6 +64,16 @@ class Profile extends React.Component<Props, {}> {
                     <p>
                         {this.props.location?.adminArea2
                             ? this.props.location.adminArea2
+                            : 'N/A'}
+                    </p>
+                </div>
+                <div className={classes.column}>
+                    <p>
+                        <Typography variant="caption">Admin area 3</Typography>
+                    </p>
+                    <p>
+                        {this.props.location?.adminArea3
+                            ? this.props.location.adminArea3
                             : 'N/A'}
                     </p>
                 </div>
