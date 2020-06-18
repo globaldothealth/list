@@ -76,7 +76,7 @@ interface TableRow {
     sex: string;
     age: number;
     ethnicity: string;
-    // Represents a list in a string e.g. Afghan, Albanian
+    // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
     nationalities: string;
     country: string;
     adminArea1: string;

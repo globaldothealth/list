@@ -10,6 +10,7 @@ import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import { useFormikContext } from 'formik';
 import { withStyles } from '@material-ui/core';
 
 const styles = () =>
@@ -32,13 +33,7 @@ const styles = () =>
         },
     });
 
-interface DemographicsProps extends WithStyles<typeof styles> {
-    setFieldValue: (
-        field: string,
-        value: any,
-        shouldValidate?: boolean | undefined,
-    ) => void;
-}
+type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
 const sexValues = [undefined, 'Male', 'Female'];
@@ -131,27 +126,20 @@ class Demographics extends React.Component<DemographicsProps, {}> {
                             </Field>
                         </FormControl>
                     </div>
-                    <Nationality setFieldValue={this.props.setFieldValue} />
+                    <Nationality />
                 </fieldset>
             </Scroll.Element>
         );
     }
 }
 
-interface NationalityProps {
-    setFieldValue: (
-        field: string,
-        value: any,
-        shouldValidate?: boolean | undefined,
-    ) => void;
-}
-
 // Autocomplete for nationality.
 // Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
-function Nationality(props: NationalityProps): JSX.Element {
+function Nationality(): JSX.Element {
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
+    const { setFieldValue, setTouched } = useFormikContext();
 
     React.useEffect(() => {
         let active = true;
@@ -197,8 +185,9 @@ function Nationality(props: NationalityProps): JSX.Element {
             options={options}
             loading={loading}
             onChange={(_, values): void => {
-                props.setFieldValue('nationalities', values);
+                setFieldValue('nationalities', values);
             }}
+            onBlur={(): void => setTouched({ nationalities: true })}
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}
