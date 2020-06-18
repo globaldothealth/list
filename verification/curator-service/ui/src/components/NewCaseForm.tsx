@@ -279,7 +279,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             >
                 {({
                     submitForm,
-                    setFieldValue,
                     isSubmitting,
                     values,
                     errors,
@@ -383,9 +382,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
-                                <Demographics
-                                    setFieldValue={setFieldValue}
-                                ></Demographics>
+                                <Demographics></Demographics>
                                 <Scroll.Element name="location">
                                     <fieldset>
                                         <legend>Location</legend>
