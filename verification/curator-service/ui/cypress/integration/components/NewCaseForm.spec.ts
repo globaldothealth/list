@@ -15,6 +15,10 @@ describe('New case form', function () {
         cy.get('input[name="age"]').clear().type('21');
         cy.get('div[data-testid="ethnicity"]').click();
         cy.get('li[data-value="Asian"').click();
+        cy.get('div[data-testid="nationalities"]').type('Afghan');
+        cy.get('li').first().should('contain', 'Afghan').click();
+        cy.get('div[data-testid="nationalities"]').type('Albanian');
+        cy.get('li').first().should('contain', 'Albanian').click();
         cy.get('input[name="country"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
@@ -29,6 +33,7 @@ describe('New case form', function () {
         cy.contains('Female');
         cy.contains('21');
         cy.contains('Asian');
+        cy.contains('Afghan, Albanian');
         cy.contains('France');
         cy.contains('1/1/2020');
         cy.contains('www.example.com');

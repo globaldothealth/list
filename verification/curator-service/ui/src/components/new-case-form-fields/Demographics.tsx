@@ -184,6 +184,8 @@ function Nationality(props: NationalityProps): JSX.Element {
 
     return (
         <Autocomplete
+            multiple
+            filterSelectedOptions
             itemType="string"
             open={open}
             onOpen={(): void => {
@@ -194,13 +196,17 @@ function Nationality(props: NationalityProps): JSX.Element {
             }}
             options={options}
             loading={loading}
-            onChange={(e, value) => {
-                props.setFieldValue('nationality', value);
+            onChange={(_, values): void => {
+                props.setFieldValue('nationalities', values);
             }}
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}
-                    name="unused" // Adds a formik form field called unused with the value of typed inputs
+                    // Setting the name as nationalities allows any typed value
+                    // to be set in the form values, rather than only selected
+                    // dropdown values. Thus we use an unused form value here.
+                    name="unused"
+                    data-testid="nationalities"
                     label="Nationality"
                     component={TextField}
                 ></Field>
