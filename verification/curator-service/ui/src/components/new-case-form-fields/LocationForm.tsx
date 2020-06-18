@@ -16,7 +16,7 @@ const LocationForm = (): JSX.Element => {
                     type="text"
                     component={TextField}
                 />
-                <Location location={undefined}></Location>
+                <Location location={undefined} />
             </fieldset>
         </Scroll.Element>
     );

@@ -15,7 +15,7 @@ const styles = () =>
         },
     });
 
-interface Location {
+interface Loc {
     type: string;
     country: string;
     adminArea1?: string;
@@ -27,7 +27,7 @@ interface Location {
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
 interface Props extends WithStyles<typeof styles> {
-    location?: Location;
+    location?: Loc;
 }
 
 class Location extends React.Component<Props, {}> {
@@ -75,11 +75,7 @@ class Location extends React.Component<Props, {}> {
                     <p>
                         <Typography variant="caption">Longitude</Typography>
                     </p>
-                    <p>
-                        <p>
-                            {this.props.location?.longitude?.toFixed(4) ?? '-'}
-                        </p>
-                    </p>
+                    <p>{this.props.location?.longitude?.toFixed(4) ?? '-'}</p>
                 </div>
             </div>
         );
