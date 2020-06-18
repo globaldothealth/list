@@ -34,7 +34,6 @@ interface Demographics {
     };
     ethnicity: string;
     nationalities: string[];
-
     profession: string;
 }
 
