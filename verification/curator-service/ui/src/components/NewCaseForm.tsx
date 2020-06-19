@@ -268,6 +268,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     nationalities: [],
                     profession: null,
                     locationQuery: '',
+                    location: undefined,
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
                     onsetSymptomsDate: null,
@@ -326,7 +327,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked:
-                                        values.locationQuery.trim() !== '',
+                                        values.location !== null &&
+                                        values.location !== undefined,
                                     hasError:
                                         errors.locationQuery !== undefined,
                                 })}
