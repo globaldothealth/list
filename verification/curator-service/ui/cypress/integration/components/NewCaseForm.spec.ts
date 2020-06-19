@@ -8,12 +8,21 @@ describe('New case form', function () {
     it('Can add row to linelist', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
-        cy.seedLocation({
-            country: 'France',
-            geometry: { latitude: 45.75889, longitude: 4.84139 },
-            name: 'France',
-            geoResolution: 'Country',
-        });
+        for (const prefix of new Array<string>([
+            'F',
+            'Fr',
+            'Fra',
+            'Fran',
+            'Franc',
+            'France',
+        ])) {
+            cy.seedLocation({
+                country: 'France',
+                geometry: { latitude: 45.75889, longitude: 4.84139 },
+                name: prefix,
+                geoResolution: 'Country',
+            });
+        }
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="sex"]').click();
@@ -27,7 +36,10 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'Albanian').click();
         cy.get('div[data-testid="profession"]').type('Accountant');
         cy.get('li').first().should('contain', 'Accountant').click();
-        cy.get('input[name="locationQuery"]').clear().type('France');
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('France');
+        cy.contains('Country');
+        cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();

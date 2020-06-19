@@ -65,7 +65,7 @@ export default class CasesController {
     create = async (req: Request, res: Response): Promise<void> => {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
-        if (!location?.geometry?.lat || !location.geometry?.lng) {
+        if (!location?.geometry?.latitude || !location.geometry?.longitude) {
             let geocodeSuccess = false;
             try {
                 for (const geocoder of this.geocoders) {
@@ -89,6 +89,9 @@ export default class CasesController {
                 );
                 return;
             }
+        } else {
+            // Remove any query as we shouldn't store it.
+            delete location.query;
         }
         try {
             const response = await axios.post(
