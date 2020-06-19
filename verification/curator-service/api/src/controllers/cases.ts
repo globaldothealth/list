@@ -66,6 +66,12 @@ export default class CasesController {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
         if (!location?.geometry?.latitude || !location.geometry?.longitude) {
+            if (!location?.query) {
+                res.status(422).send(
+                    'location field must contain a query to geocode',
+                );
+                return;
+            }
             let geocodeSuccess = false;
             try {
                 for (const geocoder of this.geocoders) {
