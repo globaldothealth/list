@@ -5,24 +5,19 @@ describe('New case form', function () {
         cy.login();
     });
 
+    afterEach(() => {
+        cy.clearSeededLocations();
+    });
+
     it('Can add row to linelist', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
-        for (const prefix of new Array<string>([
-            'F',
-            'Fr',
-            'Fra',
-            'Fran',
-            'Franc',
-            'France',
-        ])) {
-            cy.seedLocation({
-                country: 'France',
-                geometry: { latitude: 45.75889, longitude: 4.84139 },
-                name: prefix,
-                geoResolution: 'Country',
-            });
-        }
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="sex"]').click();
@@ -79,11 +74,11 @@ describe('New case form', function () {
     });
 
     it('Does not add row on submission error', function () {
-        // Avoid geolocation fail, the failure should happen at the data service level.
+        // Avoid geolocation fail, the "Request failed" check below happen at the data service level.
         cy.seedLocation({
-            name: '',
+            name: 'France',
             geometry: { latitude: 42, longitude: 12 },
-            country: 'some country',
+            country: 'France',
             geoResolution: 'Country',
         });
         cy.visit('/cases');
@@ -91,6 +86,10 @@ describe('New case form', function () {
 
         cy.visit('/cases/new');
         cy.server();
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('France');
+        cy.contains('Country');
+        cy.get('li').first().should('contain', 'France').click();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
