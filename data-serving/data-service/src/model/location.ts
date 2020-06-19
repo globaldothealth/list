@@ -58,8 +58,9 @@ export const locationSchema = new mongoose.Schema({
             required: [
                 function (this: LocationDocument): boolean {
                     return (
-                        this.geometry.latitude == null &&
-                        this.geometry.longitude != null
+                        this != null &&
+                        this.geometry?.latitude == null &&
+                        this.geometry?.longitude != null
                     );
                 },
                 'latitude must be specified if geometry is present',
@@ -72,8 +73,9 @@ export const locationSchema = new mongoose.Schema({
             required: [
                 function (this: LocationDocument): boolean {
                     return (
-                        this.geometry.longitude == null &&
-                        this.geometry.latitude != null
+                        this != null &&
+                        this.geometry?.longitude == null &&
+                        this.geometry?.latitude != null
                     );
                 },
                 'longitude must be specified if geometry is present',
@@ -89,11 +91,11 @@ interface Geometry {
 
 export type LocationDocument = mongoose.Document & {
     country: string;
-    administrativeAreaLevel1: string;
-    administrativeAreaLevel2: string;
-    administrativeAreaLevel3: string;
-    place: string;
+    administrativeAreaLevel1?: string;
+    administrativeAreaLevel2?: string;
+    administrativeAreaLevel3?: string;
+    place?: string;
     name: string;
     geoResolution: GeoResolution;
-    geometry: Geometry;
+    geometry?: Geometry;
 };
