@@ -1,4 +1,8 @@
 {
+    "caseReference": {
+        "sourceId": "sourceId",
+        "sourceEntryId": "entryId"
+    },
     "demographics": {
         "ageRange": {
             "start": 50.0,
