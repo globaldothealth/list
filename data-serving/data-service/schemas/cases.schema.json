@@ -104,12 +104,12 @@
                 "bsonType": "objectId"
               },
               "latitude": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -90.0,
                 "maximum": 90.0
               },
               "longitude": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -180.0,
                 "maximum": 180.0
               }
@@ -253,12 +253,12 @@
                       "bsonType": "objectId"
                     },
                     "latitude": {
-                      "bsonType": "double",
+                      "bsonType": "number",
                       "minimum": -90.0,
                       "maximum": 90.0
                     },
                     "longitude": {
-                      "bsonType": "double",
+                      "bsonType": "number",
                       "minimum": -180.0,
                       "maximum": 180.0
                     }
