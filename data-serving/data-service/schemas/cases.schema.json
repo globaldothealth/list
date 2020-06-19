@@ -16,10 +16,10 @@
           "_id": {
             "bsonType": "objectId"
           },
-          "dataSourceId": {
+          "sourceId": {
             "bsonType": "string"
           },
-          "dataEntryId": {
+          "sourceEntryId": {
             "bsonType": "string"
           }
         }
