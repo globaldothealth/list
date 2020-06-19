@@ -134,28 +134,21 @@ export const update = async (req: Request, res: Response): Promise<void> => {
  */
 export const upsert = async (req: Request, res: Response): Promise<void> => {
     try {
-        const result = await Case.findOneAndUpdate(
-            {
-                'caseReference.dataSourceId':
-                    req.body.caseReference?.dataSourceId,
-                'caseReference.dataEntryId':
-                    req.body.caseReference?.dataEntryId,
-            },
-            req.body,
-            {
-                new: true,
-                rawResult: true,
-                runValidators: true,
-                upsert: true,
-            },
-        );
-        let status;
-        if (result.lastErrorObject.updatedExisting) {
-            status = 200;
+        const c = await Case.findOne({
+            'caseReference.dataSourceId': req.body.caseReference?.dataSourceId,
+            'caseReference.dataEntryId': req.body.caseReference?.dataEntryId,
+        });
+        if (c) {
+            c.set(req.body);
+            const result = await c.save();
+            res.status(200).json(result);
+            return;
         } else {
-            status = 201;
+            const c = new Case(req.body);
+            const result = await c.save();
+            res.status(201).json(result);
+            return;
         }
-        res.status(status).json(result.value);
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);
