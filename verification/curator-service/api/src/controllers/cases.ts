@@ -67,15 +67,21 @@ export default class CasesController {
         const location = req.body['location'];
         if (!location?.geometry?.lat || !location.geometry?.lng) {
             let geocodeSuccess = false;
-            for (const geocoder of this.geocoders) {
-                const features = await geocoder.geocode(location?.query);
-                if (features.length === 0) {
-                    continue;
+            try {
+                for (const geocoder of this.geocoders) {
+                    const features = await geocoder.geocode(location?.query);
+                    if (features.length === 0) {
+                        continue;
+                    }
+
+                    // Currently a 1:1 match between the GeocodeResult and the data service API.
+                    req.body['location'] = features[0];
+                    geocodeSuccess = true;
+                    break;
                 }
-                // Currently a 1:1 match between the GeocodeResult and the data service API.
-                req.body['location'] = features[0];
-                geocodeSuccess = true;
-                break;
+            } catch (e) {
+                res.status(500).send(e.message);
+                return;
             }
             if (!geocodeSuccess) {
                 res.status(404).send(
