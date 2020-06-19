@@ -1,19 +1,20 @@
 import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
+import { Loc } from './new-case-form-fields/Location';
+import LocationForm from './new-case-form-fields/LocationForm';
 import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
-import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -58,7 +59,10 @@ interface FormValues {
     maxAge?: number;
     age?: number;
     ethnicity?: string;
+    nationalities: string[];
+    profession: string | null;
     locationQuery: string;
+    location?: Loc;
     confirmedDate: string | null;
     methodOfConfirmation?: string;
     onsetSymptomsDate: string | null;
@@ -127,9 +131,12 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     sex: values.sex,
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
+                    nationalities: values.nationalities,
+                    profession: values.profession,
                 },
                 location: {
-                    query: values.locationQuery,
+                    ...values.location,
+                    ...{ query: values.locationQuery },
                 },
                 events: [
                     {
@@ -258,6 +265,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     maxAge: undefined,
                     age: undefined,
                     ethnicity: undefined,
+                    nationalities: [],
+                    profession: null,
                     locationQuery: '',
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
@@ -297,13 +306,17 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                             values.minAge !== '' &&
                                             values.maxAge !== undefined &&
                                             values.maxAge !== '') ||
-                                        values.ethnicity !== undefined,
+                                        values.ethnicity !== undefined ||
+                                        values.nationalities.length > 0 ||
+                                        values.profession !== null,
                                     hasError:
                                         errors.sex !== undefined ||
                                         errors.minAge !== undefined ||
                                         errors.maxAge !== undefined ||
                                         errors.age !== undefined ||
-                                        errors.ethnicity !== undefined,
+                                        errors.ethnicity !== undefined ||
+                                        errors.nationalities !== undefined ||
+                                        errors.profession !== undefined,
                                 })}
                                 Demographics
                             </div>
@@ -378,17 +391,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         <div className={classes.form}>
                             <Form>
                                 <Demographics></Demographics>
-                                <Scroll.Element name="location">
-                                    <fieldset>
-                                        <legend>Location</legend>
-                                        <Field
-                                            label="Location"
-                                            name="locationQuery"
-                                            type="text"
-                                            component={TextField}
-                                        />
-                                    </fieldset>
-                                </Scroll.Element>
+                                <LocationForm></LocationForm>
                                 <Events></Events>
                                 <Source></Source>
                                 <Notes></Notes>

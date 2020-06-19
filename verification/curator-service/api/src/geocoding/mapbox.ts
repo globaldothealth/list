@@ -6,6 +6,7 @@ import Geocoding, {
     GeocodeService,
 } from '@mapbox/mapbox-sdk/services/geocoding';
 
+import LRUCache from 'lru-cache';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
 // getFeatureTypeFromContext will return the feature 'text' field if it is of the provided type.
@@ -45,15 +46,23 @@ function getResolution(features: GeocodeFeature[]): Resolution {
 
 export default class MapboxGeocoder {
     private geocodeService: GeocodeService;
+    private cache: LRUCache<string, GeocodeResult[]>;
     constructor(accessToken: string, private readonly endpoint: GeocodeMode) {
         this.geocodeService = Geocoding({
             accessToken: accessToken,
         });
+        this.cache = new LRUCache<string, GeocodeResult[]>({
+            max: 500,
+        });
     }
 
     async geocode(query: string): Promise<GeocodeResult[]> {
+        query = query.trim();
+        const cachedResults = this.cache.get(query);
+        if (cachedResults) {
+            return cachedResults;
+        }
         try {
-            // TODO: Add LRU cache.
             const resp: MapiResponse = await this.geocodeService
                 .forwardGeocode({
                     mode: this.endpoint,
@@ -63,36 +72,36 @@ export default class MapboxGeocoder {
                 })
                 .send();
             const features = (resp.body as GeocodeResponse).features;
-            return features.map((feature) => {
+            const geocodes = features.map((feature) => {
+                const contexts: GeocodeFeature[] = [feature];
+                if (feature.context) {
+                    contexts.push(...feature.context);
+                }
                 return {
                     geometry: {
                         longitude: feature.center[0],
                         latitude: feature.center[1],
                     },
-                    country: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
-                        'country',
-                    ),
+                    country: getFeatureTypeFromContext(contexts, 'country'),
                     administrativeAreaLevel1: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'region',
                     ),
                     administrativeAreaLevel2: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'district',
                     ),
                     administrativeAreaLevel3: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'place',
                     ),
-                    place: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
-                        'poi',
-                    ),
+                    place: getFeatureTypeFromContext(contexts, 'poi'),
                     name: feature.text,
-                    geoResolution: getResolution([feature, ...feature.context]),
+                    geoResolution: getResolution(contexts),
                 };
             });
+            this.cache.set(query, geocodes);
+            return geocodes;
         } catch (e) {
             throw e;
         }
