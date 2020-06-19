@@ -1,0 +1,944 @@
+abdominal cramp
+abdominal discomfort
+abdominal distention
+abdominal lump
+abdominal mass
+abdominal pain
+abdominal rigidity
+abdominal swelling
+abdominal symptom
+abdominal tenderness
+abnormal behavior
+abnormal bowel sound
+abnormal chest sound
+abnormal feces
+abnormal hemistanding
+abnormal hemiwalking
+abnormal hemiwalking hemistanding
+abnormal involuntary movement
+abnormal loss of weight and underweight
+abnormal posture
+abnormal sputum
+abnormal vaginal bleeding
+abnormal weight gain
+abnormality of gait
+abortion
+abscess
+absence of knee jerk reflex
+absence seizure
+absent gag reflex
+active hyperemia
+acute arthritis
+acute cranial nerve dysfunction
+acute diarrhea
+acute dyspnea
+acute enteritis
+acute gastroenteritis
+acute meningoencephalitis
+acute mental dysfunction
+acute mesenteric lymphadenitis
+acute pain
+acute painful vision loss
+acute renal failure
+acute suppurative parotiditis
+acute weight loss
+adenopathy
+adult failure to thrive
+afebrile
+aggressive behavior
+agraphia
+alexia
+allodynia
+alteration of appetite
+alteration of consciousness
+altered mental status
+amaurosis
+amaurosis fugax
+anaphylactic shock
+anasarca
+anemia
+anisocoria
+ankle rash
+anomia
+anorexia
+anuria
+anxiety
+aphasia
+aphonia
+apnea
+areflexia
+arm weakness
+arrhythmia
+arthritis
+ascites
+asthenia
+asthenopia
+ataxia
+atonic seizure
+atrial fibrillation
+backache
+behavioral symptom
+belching
+bifrontal headache
+bleeding
+blindness
+blister
+bloating
+blood vessel infection
+bloodshot eye
+bloody sputum
+bloody stool
+blotchy red rash
+body ache
+boil
+bradycardia
+bradykinesia
+bradypnea
+brain cyst
+breakthrough pain
+breathing problems
+bronchiolitis
+bronchitis
+bronchopneumonia
+bronchopulmonary bleeding
+bruise
+bubo
+cachexia
+cardiac fibrillation
+cardiogenic shock
+cardiovascular system symptom
+cataplexy
+catatonia
+cellulitis
+cervical edema
+cervical lymphadenopathy
+change in body sensation
+change in skin color
+change in skin texture
+chest hyperemia
+chest pain
+cheyne-stokes respiration
+chills
+chronic cough
+chronic enteritis
+chronic fatigue syndrome
+chronic pain
+circling movement
+claudication
+clonic seizure
+cloudy cornea
+clubbing of fingers
+coagulopathy
+cold clammy skin
+colic
+colicky pain
+coma
+communication difficulty
+complex partial seizure
+confusion
+congested sclera
+congestion
+conjunctivitis
+conscious disturbance
+conscious proprioception
+constipation
+continuous fever
+continuous leakage of urine
+continuous profuse salivation
+contracted pupil
+convulsion
+coordination symptom
+cornea symptom
+corneal opacity
+corneal ulcers
+cough
+cough with bloody sputum
+cramp
+cranial nerve palsies
+crinkle
+cyanosis
+cyclic fever
+cytopenia
+darkening of skin
+deafness
+decreased appetite
+decreased conscious proprioception
+decreased facial sensation
+decreased flexor withdrawal reflex
+decreased jaw tone
+decreased milk production
+decreased motor response
+decreased pharyngeal tone
+decreased sucking
+decreased tongue tone
+dehydration
+delayed milestones
+delirium
+deltoid muscle weakness
+depression
+dermal abscess
+diaphoresis
+diarrhea
+diffuse rash
+digestive system symptom
+dilated pupil
+diminished gag reflex
+diminished gastro-intestinal motility
+diminished spontaneous movement
+discharge
+disorientation
+disruptions of 24-hour sleep-wake cycle
+distended loops of intestines on rectal
+disturbance of skin sensation
+disturbances of sensation of smell and taste
+disturbed vision
+dizziness
+double vision
+droopy ears
+drowsiness
+dry cough
+dry hacking cough
+dry mouth
+dry mucous membrane
+dysarthria
+dysfunctions associated with arousal from sleep
+dysfunctions associated with sleep stages
+dyspareunia
+dyspepsia
+dysphagia
+dysphonia
+dyspnea
+dyspneic enteritis
+dysuria
+ear symptom
+earache
+early satiety
+eczema
+edema
+elbow pain
+emaciation
+enanthem
+encephalitis
+endocarditis
+enlargement of lymph nodes
+enteritis
+epididymitis
+epididymorchitis
+epigastric abdominal lump
+epigastric abdominal mass
+epigastric abdominal pain
+epigastric abdominal rigidity
+epigastric abdominal swelling
+epigastric abdominal tenderness
+epigastric pelvic lump
+epigastric pelvic mass
+epigastric pelvic swelling
+epileptic seizure
+epistaxis
+eschar
+exanthema
+excess lymphocytes in cerebrospinal fluid
+excess salivation
+excessive crying of infant
+excessive tearing
+exhaustion
+exophthalmos
+expressive aphasia
+extensive ulcer
+extracellular fluid alteration
+extraocular muscles paralysis
+extravasation of urine
+extreme exhaustion
+extreme fatigue
+extreme prostration
+eye discharge
+eye strain
+eye symptom
+face hyperemia
+facial edema
+facial muscle twitching
+facial paralysis
+facial tremor
+facial weakness
+failure to thrive
+faint
+fatigue
+febrile convulsion
+feces and droppings symptom
+feeding difficulties and mismanagement
+fever
+fixed dilated pupils
+fixed pupil
+flaccid limb paralysis
+flaccid muscle tone
+flaccid paralysis
+flaccidity
+flat keratotic capsule
+flatulence
+floppy head
+fluid in pericardial sac
+flushing
+focal seizure
+fragile bones
+freezing hypokinesia
+frontal headache
+functional hyperemia
+fussy infant
+gangrene
+gas pain
+gastroenteritis
+gastrointestinal bleeding
+general symptom
+generalized abdominal lump
+generalized abdominal mass
+generalized abdominal pain
+generalized abdominal rigidity
+generalized abdominal swelling
+generalized abdominal tenderness
+generalized hyperhidrosis
+generalized pelvic lump
+generalized pelvic mass
+generalized pelvic swelling
+generalized seizure
+genitourinary hemorrhage
+giddiness
+granulomatous inflammation
+gross hematuria
+gum bleeding
+hair loss
+hallucination
+head and neck symptom
+head pressing
+head swelling
+head symptom
+headache
+heart failure
+heartburn
+hematemesis
+hematochezia
+hematogenous
+hematoma
+hematopoietic system symptom
+hematuria
+hemic and immune system symptom
+hemic system symptom
+hemiparesis
+hemistanding
+hemiwalking
+hemodynamic instability
+hemolysis
+hemolytic anemia
+hemoptysis
+hemorrhage
+hemorrhage from throat
+hemorrhage into mucous membrane
+hemorrhage into skin
+hemorrhagic diarrhea
+hemorrhagic enteritis
+hemorrhagic gastroenteritis
+hemorrhagic mediastinitis
+hemorrhagic meningitis
+hemorrhagic thoracic lymphadenitis
+hepatic abscess
+hepatic dysfunction
+hepatic necrosis
+hepatitis
+hepatomegaly
+hepatosplenomegaly
+herpetic lesion on upper lip
+hiccough
+high fever
+hilar lymphadenitis
+hind limb paralysis
+hip pain
+hoarse voice
+hoarseness
+hopping
+hunched posture
+hydrocephalus
+hyperactivity
+hyperalgesia
+hyperemia
+hyperemia of the neck
+hyperemic liver
+hyperemic spleen
+hyperesthesia
+hypergammaglobulinemia
+hyperkeratotic plaques of surface of foot
+hypermenorrhea
+hyperpigmentation
+hyperplastic alveolar nodules
+hyperpyrexia
+hyperreflexia
+hypersomnia
+hypersomnia with sleep apnea
+hyperthermia
+hyperventilation
+hypoalgesia
+hypoesthesia
+hypokinesia
+hyponatremia
+hypopyon
+hypotension
+hypotensive
+hypothermia
+hypoventilation
+hypoxemia
+icteric eyes
+icteric mucous membrane
+icteric skin
+ill-thrift
+immune system symptom
+impaired coordination
+impaired gag reflex
+impotence
+inability to comprehend speech
+inability to concentrate
+inability to feed
+inability to form words
+inability to lie flat
+inability to speak
+inability to swallow
+inability to think clearly
+incomplete bladder emptying
+incontinence without sensory awareness
+incoordination
+increased appetite
+infant symptom
+infertility
+inflamed eyes
+inflammation
+inflammation of meninges
+inflammatory low back pain
+inibility to stand
+insomnia
+insomnia with sleep apnea
+intense anxiety
+intense toxemia
+intestinal hemorrhage
+intestinal hypermotility
+intraretinal hemorrhage
+irritability
+ischemia
+ischemic necrosis of jejunum
+itching
+jaundice
+joint inflammation
+joint pain
+joint swelling
+joint symptom
+junctional tachycardia
+keratitis
+keratotic nodules of the skin
+knee pain
+lack of coordination
+lack of expected normal physiological development in childhood
+lack of normal physiological development
+lameness
+laryngitis
+laryngotracheitis
+lateroventral deviation of the head
+left lower quadrant abdominal lump
+left lower quadrant abdominal mass
+left lower quadrant abdominal pain
+left lower quadrant abdominal rigidity
+left lower quadrant abdominal swelling
+left lower quadrant abdominal tenderness
+left lower quadrant pelvic lump
+left lower quadrant pelvic mass
+left lower quadrant pelvic swelling
+left upper quadrant abdominal lump
+left upper quadrant abdominal mass
+left upper quadrant abdominal pain
+left upper quadrant abdominal rigidity
+left upper quadrant abdominal swelling
+left upper quadrant abdominal tenderness
+left upper quadrant pelvic lump
+left upper quadrant pelvic mass
+left upper quadrant pelvic swelling
+leg cramp
+leg swelling
+leg weakness
+lesions in lung
+lesions in mouth
+lesions in myocardium
+lesions in oropharynx
+lesions in pancreas
+lesions in respiratory tract
+lesions in spleen
+lesions in swim bladder
+lesions in thymus
+lethargy
+leukocytosis
+leukopenia
+light sensitivity
+lightheadedness
+limb edema
+limb weakness
+limited attention
+lip paralysis
+listlessness
+liver inflammation
+liver symptom
+localized cutaneous lesions
+localized superficial lump
+localized superficial mass
+localized superficial swelling
+loose droppings
+loss of appetite
+loss of balance
+loss of consciousness
+loss of coordination
+loss of height
+loss of tendon reflex
+loss of vision
+loss of weight
+low backache
+low birth weight
+low blood pressure
+low grade fever
+low-grade fever
+lump in chest
+lymph gland swelling
+lymphadenitis
+lymphangitis
+lymphatic system symptom
+lymphoblastoma
+lymphocytic hyperplasia
+lymphopenia
+macrocytosis
+maculopapular rash
+malaise
+male stress incontinence
+mass in chest
+massive hepatic necrosis
+massive lymphadenopathy
+mastitis
+melena
+memory impairment
+memory loss
+meningismus
+meningitis
+meningoencephalitis
+menorrhagia
+metrorrhagia
+microangiopathic hemolytic anemia
+microangiopathy
+mild bronchitis
+mild conjunctivitis
+mild encephalitis
+mild fever
+mild hypotension
+mild tetanic convulsion
+miosis
+miscarriage
+mixed incontinence (female) (male)
+moderate anemia
+moderate conjuctival injection
+motor paralysis
+motor weakness
+mouth bleeding
+mouth papules
+mouth sore
+mouth symptom
+multiple abscesses
+multiple organ failure
+multiple sites abdominal lump
+multiple sites abdominal mass
+multiple sites abdominal pain
+multiple sites abdominal rigidity
+multiple sites abdominal swelling
+multiple sites abdominal tenderness
+multiple sites pelvic lump
+multiple sites pelvic mass
+multiple sites pelvic swelling
+muscle cramp
+muscle necrosis
+muscle pain
+muscle soreness
+muscle symptom
+muscle tenderness
+muscle tightness
+muscle twitching
+muscle weakness
+muscles ache
+musculoskeletal system symptom
+mydriasis
+myocarditis
+myoclonic seizure
+nail discoloration
+nasal bleeding
+nasal congestion
+nasal discharge
+nausea
+neck pain
+neck swelling
+neck symptom
+neck weakness
+necrosis
+necrosis of jejunum
+necrotic lesion
+nephritis
+nervous system symptom
+neurologic neglect syndrome
+neurological alteration
+neurological and physiological symptom
+neurological dysfunction
+neuropathic pain
+night sweats
+nociceptive pain
+nocturia
+nocturnal enuresis
+nose symptom
+nutrition, metabolism, and development symptom
+nystagmus
+objective vertigo
+obsessive interests
+obsolete acute enteritis in newborns
+obsolete acute respiratory distress
+obsolete acute suppurative lesions
+obsolete ankle swelling
+obsolete appendicitis
+obsolete arrested moulting
+obsolete bloody diarrhea
+obsolete bloody exudate
+obsolete blurred vision
+obsolete capillary leakage
+obsolete cardiomyocyte destruction
+obsolete catarrhal enteritis
+obsolete epidermal proliferation
+obsolete excess mucus in bronchi
+obsolete excess pericardial fluid
+obsolete exophthalmia
+obsolete feather loss
+obsolete high fever
+obsolete hind limb paralysis
+obsolete lameness
+obsolete nasal discharge
+obsolete spastic paralysis
+obsolete sudden onset of fever
+obsolete transient fever
+occasional diplopia
+ocular lesion
+oliguria
+ophthalmoplegia
+opisthotonus
+orthopnea
+osteomyelitis
+otitis
+overflow incontinence
+pain
+painful lymph glands
+painful reginal lymphadenopathy
+painful respiration
+palate weakness
+pale mucous membrane
+pallor
+palpebral edema
+palpitation
+panting respiration
+papular rash
+papule
+paralysis
+paraplegia
+pareses
+paresthesia
+parotid abscess
+parotid pain
+paroxysmal tachycardia
+partial hind limb paralysis
+partial paralysis
+partial paralysis of the limbs
+Pel-Epstein fever
+pelvic lump
+pelvic mass
+pelvic swelling
+pelvic symptom
+pericardial effusion
+peripheral muscle weakness
+peritonitis
+periumbilic abdominal lump
+periumbilic abdominal mass
+periumbilic abdominal pain
+periumbilic abdominal rigidity
+periumbilic abdominal swelling
+periumbilic abdominal tenderness
+periumbilic pelvic lump
+periumbilic pelvic mass
+periumbilic pelvic swelling
+persistent lymphocytosis
+persistent vegetative state
+petechiae
+petechial hemorrhages
+phantom pain
+pharyngitis
+phlebitis
+phlegm
+photophobia
+photosensitivity
+plasmacytosis
+pleural effusion
+pleuritic chest pain
+pneumonia
+pneumonitis
+polydipsia
+polyphagia
+polyuria
+poor enunciation
+poor feeding
+portal hepatitis
+post-void dribbling
+postphlebitic ulcer
+postural instability hypokinesia
+postural reaction
+precordial pain
+premature labor
+profound weakness
+progressive emaciation
+progressive prostration
+progressive weakness
+proliferative mouth papules
+proliferative skin lesions
+proliferative tracheitis
+prolonged fever
+prolonged thrombocytopenia
+proprioception symptom
+prostate symptom
+prostatic abscess
+prostatic infection
+prostration
+proteinuria
+proximal paralysis of arm and leg
+ptosis
+pulmonary consolidation
+pulmonary edema
+pupil symptom
+purpuric rash
+pustular skin lesions
+pustule
+pyrosis
+rales
+rapid respiration
+rash
+reactive hyperemia
+receptive aphasia
+rectorrhagia
+recumbency
+reddening
+referred pain
+reflex symptom
+relapsing fever
+remittent fever
+renal abscess
+renal alteration
+renal colic
+renal failure
+renal involvement
+repetitive behavior
+reproductive system symptom
+respiratory abnormality
+respiratory distress
+respiratory failure
+respiratory paralysis
+respiratory system and chest symptom
+respiratory tract mucosa ulcer
+reticulocytosis
+retinal inflammation
+retrobulbar pain
+rhinitis
+right lower quadrant abdominal lump
+right lower quadrant abdominal mass
+right lower quadrant abdominal pain
+right lower quadrant abdominal rigidity
+right lower quadrant abdominal swelling
+right lower quadrant abdominal tenderness
+right lower quadrant pelvic lump
+right lower quadrant pelvic mass
+right lower quadrant pelvic swelling
+right upper quadrant abdominal lump
+right upper quadrant abdominal mass
+right upper quadrant abdominal pain
+right upper quadrant abdominal rigidity
+right upper quadrant abdominal swelling
+right upper quadrant abdominal tenderness
+right upper quadrant pelvic lump
+right upper quadrant pelvic mass
+right upper quadrant pelvic swelling
+rigidity hypokinesia
+ruffled feather
+runny nose
+salivary gland swelling
+salivary gland symptom
+salivation
+sclerodermoid plaques
+scrotal abscess
+seizure
+self-limiting liver inflammation
+sensation perception
+sensory disturbance
+septic shock
+septicemia
+severe abdominal cramp
+severe backache
+severe chest pain
+severe conjunctivitis
+severe diarrhea
+severe headache
+severe joint pain
+severe mastitis
+severe myalgia
+severe necrosis
+severe pneumonia
+severe temperature increase
+shakes
+shock
+short stature
+shoulder pain
+simple partial seizure
+sinus bradycardia
+sinus tachycardia
+sinusitis
+skin and integumentary tissue symptom
+skin desquamation
+skin lesion
+skin papules
+skin ulcer
+sleep apnea
+sleep disturbance
+sleep related movement disorder
+slight cough
+slight pyrexia
+slow pulse
+slowing of urinary stream
+slurred speech
+sneezing
+sore eyes
+spastic paralysis
+spasticity
+spleen abscess
+spleen hemorrhages
+spleen infiltrates
+spleen symptom
+splenomegaly
+splitting of tissues
+splitting of urinary stream
+spondylitis
+spontaneous abortion
+spontaneous ecchymoses
+sputum
+staggering gait
+steatorrhea
+sternocleidomastoid weakness
+stiff neck
+stillbirth
+stress incontinence
+stridor
+stroke
+stupor
+subconjunctival bleeding
+subjective vertigo
+sudden ataxis
+sudden onset of fever
+sudden onset of severe chills
+suppurative pneumonia
+sweaty
+swelling in chest
+swelling symptom
+swollen cervical lymphnodes
+symptom
+syncope
+syncope and collapse
+synovitis
+systemic infection
+systemic necrosis
+systemic vasculitis
+tache noire
+tachycardia
+tachypnea
+tachypnoea
+tarry droppings
+tenesmus
+terminal ileitis
+testicular pain
+tetanic convulsion
+tetany
+thick white exudate on tongue
+thirst
+throat muscle paralysis
+throat pain
+throat symptom
+thrombocytopenia
+thymus atrophy
+thymus symptom
+thyroid abscesses
+thyroid symptom
+tinnitus
+tiredness
+tonic seizure
+tonic-clonic seizure
+toothache
+torticollis
+toxemia
+tracheitis
+tracheobronchitis
+transient alteration of awareness
+transient fever
+transient paralysis of limb
+tremor
+ulcerations
+ulcerative dermal vesicles
+uncoordinated gait
+underweight
+undiagnosed cardiac murmur
+unreactive mydriasis
+upper respiratory distress
+urethral discharge
+urge incontinence
+urgency of urination
+urinary frequency
+urinary incontinence
+urinary retention
+urinary stream symptom
+urinary system symptom
+urticaria
+vaginal discharge
+vaginismus
+vascular alteration
+vascular lesions
+vascular necrosis
+vasculitis
+vein swelling
+ventricular bradycardia
+ventricular fibrillation
+ventricular tachycardia
+vertigo
+very high fever
+vesicles on feet
+vesicles on hoof corona
+vesicles on mouth
+vesicles on teats
+vesicular lesions on lip border
+visceral pain
+visible peristalsis
+vision distortion
+vision symptom
+voice disturbance
+vomiting
+wasting
+watery diarrhea
+watery ocular discharge
+weak cry
+weakness
+weariness
+weight gain
+weight loss
+wet droppings
+wheelbarrowing
+wheezing
+wobble
+wound discharge
+yellow dropping
+yellow exudate from eyes
+yellow exudate from nose
+yellow liver
+yellowish green diarrhea
