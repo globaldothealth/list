@@ -395,13 +395,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     c.location
                                                         ?.administrativeAreaLevel3,
                                                 latitude:
-                                                    c.location.geometry
+                                                    c.location?.geometry
                                                         ?.latitude,
                                                 longitude:
-                                                    c.location.geometry
+                                                    c.location?.geometry
                                                         ?.longitude,
                                                 geoResolution:
-                                                    c.location.geoResolution,
+                                                    c.location?.geoResolution,
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,
