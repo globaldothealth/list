@@ -141,56 +141,51 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 events: [
                     {
                         name: 'confirmed',
-                        dateRange: {
-                            start: values.confirmedDate,
-                            end: values.confirmedDate,
-                        },
+                        dates: values.confirmedDate,
                         value: values.methodOfConfirmation,
                     },
                     {
                         name: 'onsetSymptoms',
-                        dateRange: {
-                            start: values.onsetSymptomsDate,
-                            end: values.onsetSymptomsDate,
-                        },
+                        dates: values.onsetSymptomsDate,
+                        value: undefined,
                     },
                     {
                         name: 'firstClinicalConsultation',
-                        dateRange: {
-                            start: values.firstClinicalConsultationDate,
-                            end: values.firstClinicalConsultationDate,
-                        },
+                        dates: values.firstClinicalConsultationDate,
+                        value: undefined,
                     },
                     {
                         name: 'selfIsolation',
-                        dateRange: {
-                            start: values.selfIsolationDate,
-                            end: values.selfIsolationDate,
-                        },
+                        dates: values.selfIsolationDate,
+                        value: undefined,
                     },
                     {
                         name: 'hospitalAdmission',
-                        dateRange: {
-                            start: values.hospitalAdmissionDate,
-                            end: values.hospitalAdmissionDate,
-                        },
+                        dates: values.hospitalAdmissionDate,
+                        value: undefined,
                     },
                     {
                         name: 'icuAdmission',
-                        dateRange: {
-                            start: values.icuAdmissionDate,
-                            end: values.icuAdmissionDate,
-                        },
+                        dates: values.icuAdmissionDate,
+                        value: undefined,
                     },
                     {
                         name: 'outcome',
-                        dateRange: {
-                            start: values.outcomeDate,
-                            end: values.outcomeDate,
-                        },
-                        value: values.outcome,
+                        dates: values.outcomeDate,
+                        value: undefined,
                     },
-                ],
+                ]
+                    .filter((elem) => elem.dates !== null)
+                    .map((elem) => {
+                        return {
+                            name: elem.name,
+                            dateRange: {
+                                start: elem.dates,
+                                end: elem.dates,
+                            },
+                            value: elem.value,
+                        };
+                    }),
                 sources: [
                     {
                         url: values.sourceUrl,
