@@ -132,7 +132,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
                     nationalities: values.nationalities,
-                    profession: values.profession,
+                    profession: values.profession || undefined,
                 },
                 location: {
                     ...values.location,
