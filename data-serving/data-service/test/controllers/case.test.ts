@@ -151,15 +151,15 @@ describe('PUT', () => {
         const c = new Case(minimalCase);
         const sourceId = 'abc123';
         const entryId = 'def456';
-        c.set('caseReference.dataSourceId', sourceId);
-        c.set('caseReference.dataEntryId', entryId);
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
         await c.save();
 
         const newNotes = 'abc';
         const res = await request(app)
             .put('/api/cases')
             .send({
-                caseReference: { dataSourceId: sourceId, dataEntryId: entryId },
+                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
                 notes: newNotes,
             })
             .expect('Content-Type', /json/)
@@ -182,14 +182,14 @@ describe('PUT', () => {
         const c = new Case(minimalCase);
         const sourceId = 'abc123';
         const entryId = 'def456';
-        c.set('caseReference.dataSourceId', sourceId);
-        c.set('caseReference.dataEntryId', entryId);
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
         await c.save();
 
         return request(app)
             .put('/api/cases')
             .send({
-                caseReference: { dataSourceId: sourceId, dataEntryId: entryId },
+                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
                 location: {},
             })
             .expect(422);

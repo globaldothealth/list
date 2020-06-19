@@ -135,8 +135,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const upsert = async (req: Request, res: Response): Promise<void> => {
     try {
         const c = await Case.findOne({
-            'caseReference.dataSourceId': req.body.caseReference?.dataSourceId,
-            'caseReference.dataEntryId': req.body.caseReference?.dataEntryId,
+            'caseReference.sourceId': req.body.caseReference?.sourceId,
+            'caseReference.sourceEntryId':
+                req.body.caseReference?.sourceEntryId,
         });
         if (c) {
             c.set(req.body);
