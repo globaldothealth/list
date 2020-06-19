@@ -80,7 +80,12 @@ describe('New case form', function () {
 
     it('Does not add row on submission error', function () {
         // Avoid geolocation fail, the failure should happen at the data service level.
-        cy.seedLocation({ name: '' });
+        cy.seedLocation({
+            name: '',
+            geometry: { latitude: 42, longitude: 12 },
+            country: 'some country',
+            geoResolution: 'Country',
+        });
         cy.visit('/cases');
         cy.contains('No records to display');
 
@@ -98,7 +103,8 @@ describe('New case form', function () {
     it('Shows checkbox on field completion', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="locationQuery"]').clear().type('France');
+        cy.get('div[data-testid="sex"]').click();
+        cy.get('li[data-value="Female"').click();
         cy.get('svg[data-testid="check-icon"]').should('exist');
     });
 
