@@ -73,33 +73,31 @@ export default class MapboxGeocoder {
                 .send();
             const features = (resp.body as GeocodeResponse).features;
             const geocodes = features.map((feature) => {
+                const contexts: GeocodeFeature[] = [feature];
+                if (feature.context) {
+                    contexts.push(...feature.context);
+                }
                 return {
                     geometry: {
                         longitude: feature.center[0],
                         latitude: feature.center[1],
                     },
-                    country: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
-                        'country',
-                    ),
+                    country: getFeatureTypeFromContext(contexts, 'country'),
                     administrativeAreaLevel1: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'region',
                     ),
                     administrativeAreaLevel2: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'district',
                     ),
                     administrativeAreaLevel3: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
+                        contexts,
                         'place',
                     ),
-                    place: getFeatureTypeFromContext(
-                        [feature, ...feature.context],
-                        'poi',
-                    ),
+                    place: getFeatureTypeFromContext(contexts, 'poi'),
                     name: feature.text,
-                    geoResolution: getResolution([feature, ...feature.context]),
+                    geoResolution: getResolution(contexts),
                 };
             });
             this.cache.set(query, geocodes);

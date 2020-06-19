@@ -7,12 +7,14 @@ test('shows location when passed location information', async () => {
     render(
         <Location
             location={{
-                type: 'place',
+                geoResolution: 'place',
                 country: 'United States',
-                adminArea1: 'Hillsborough County',
-                adminArea3: 'Some city',
-                latitude: 80.45,
-                longitude: 27.9379,
+                administrativeAreaLevel1: 'Hillsborough County',
+                administrativeAreaLevel3: 'Some city',
+                geometry: {
+                    latitude: 80.45,
+                    longitude: 27.9379,
+                },
             }}
         />,
     );

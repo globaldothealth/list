@@ -25,6 +25,8 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'Afghan').click();
         cy.get('div[data-testid="nationalities"]').type('Albanian');
         cy.get('li').first().should('contain', 'Albanian').click();
+        cy.get('div[data-testid="profession"]').type('Accountant');
+        cy.get('li').first().should('contain', 'Accountant').click();
         cy.get('input[name="locationQuery"]').clear().type('France');
         cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
@@ -42,7 +44,9 @@ describe('New case form', function () {
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
-        cy.get('input[name="notes"]').clear().type('test notes');
+        cy.get('textarea[name="notes"]')
+            .clear()
+            .type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -54,10 +58,12 @@ describe('New case form', function () {
         cy.contains('21');
         cy.contains('Asian');
         cy.contains('Afghan, Albanian');
+        cy.contains('Accountant');
         cy.contains('France');
         cy.contains('1/1/2020');
         cy.contains('www.example.com');
         cy.contains('test notes');
+        cy.contains('on new line');
     });
 
     it('Does not add row on submission error', function () {
