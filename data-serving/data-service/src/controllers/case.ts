@@ -124,7 +124,13 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Upserts a case based on a compound index of { sourceId, entryId }.
+ * Upserts a case based on a compound index of
+ * caseReference.{dataSourceId, dataEntryId}.
+ *
+ * On success, the returned status code indicates whether than item was created
+ * (201) or updated (200).
+ *
+ * Handles HTTP PUT /api/cases.
  */
 export const upsert = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -143,7 +149,6 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
                 upsert: true,
             },
         );
-        console.log(result);
         let status;
         if (result.lastErrorObject.updatedExisting) {
             status = 200;
@@ -152,7 +157,6 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
         }
         res.status(status).json(result.value);
     } catch (err) {
-        console.log(err);
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);
             return;
