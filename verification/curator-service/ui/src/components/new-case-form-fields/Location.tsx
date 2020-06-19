@@ -62,7 +62,7 @@ class Location extends React.Component<Props, {}> {
                         <Typography variant="caption">Admin area 1</Typography>
                     </p>
                     <p>
-                        {this.props.location?.administrativeAreaLevel1 ?? 'N/A'}
+                        {this.props.location?.administrativeAreaLevel1 || 'N/A'}
                     </p>
                 </div>
                 <div className={classes.column}>
@@ -70,7 +70,7 @@ class Location extends React.Component<Props, {}> {
                         <Typography variant="caption">Admin area 2</Typography>
                     </p>
                     <p>
-                        {this.props.location?.administrativeAreaLevel2 ?? 'N/A'}
+                        {this.props.location?.administrativeAreaLevel2 || 'N/A'}
                     </p>
                 </div>
                 <div className={classes.column}>
@@ -78,7 +78,7 @@ class Location extends React.Component<Props, {}> {
                         <Typography variant="caption">Admin area 3</Typography>
                     </p>
                     <p>
-                        {this.props.location?.administrativeAreaLevel3 ?? 'N/A'}
+                        {this.props.location?.administrativeAreaLevel3 || 'N/A'}
                     </p>
                 </div>
                 <div className={classes.column}>
@@ -86,7 +86,7 @@ class Location extends React.Component<Props, {}> {
                         <Typography variant="caption">Latitude</Typography>
                     </p>
                     <p>
-                        {this.props.location?.geometry?.latitude?.toFixed(4) ??
+                        {this.props.location?.geometry?.latitude?.toFixed(4) ||
                             '-'}
                     </p>
                 </div>
@@ -95,7 +95,7 @@ class Location extends React.Component<Props, {}> {
                         <Typography variant="caption">Longitude</Typography>
                     </p>
                     <p>
-                        {this.props.location?.geometry?.longitude?.toFixed(4) ??
+                        {this.props.location?.geometry?.longitude?.toFixed(4) ||
                             '-'}
                     </p>
                 </div>
