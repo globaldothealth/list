@@ -121,6 +121,34 @@ describe('Cases', () => {
         );
     });
 
+    it('proxies upsert calls and geocodes', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+        mockedAxios.put.mockResolvedValueOnce(emptyAxiosResponse);
+        await curatorRequest
+            .put('/api/cases')
+            .send({ age: '42', location: { query: 'Lyon' } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.put).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases',
+            {
+                age: '42',
+                location: lyon,
+            },
+        );
+    });
+
     it('proxies create calls and geocode', async () => {
         const lyon: GeocodeResult = {
             administrativeAreaLevel1: 'Rhône',
