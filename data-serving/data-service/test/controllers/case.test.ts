@@ -175,6 +175,25 @@ describe('PUT', () => {
             .expect('Content-Type', /json/)
             .expect(201);
     });
+    it('upsert new item with invalid input should return 422', () => {
+        return request(app).put('/api/cases').send({}).expect(422);
+    });
+    it('invalid upsert present item should return 422', async () => {
+        const c = new Case(minimalCase);
+        const sourceId = 'abc123';
+        const entryId = 'def456';
+        c.set('caseReference.dataSourceId', sourceId);
+        c.set('caseReference.dataEntryId', entryId);
+        await c.save();
+
+        return request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: { dataSourceId: sourceId, dataEntryId: entryId },
+                location: {},
+            })
+            .expect(422);
+    });
 });
 
 describe('DELETE', () => {
