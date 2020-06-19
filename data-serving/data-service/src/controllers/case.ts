@@ -124,6 +124,43 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Upserts a case based on a compound index of
+ * caseReference.{dataSourceId, dataEntryId}.
+ *
+ * On success, the returned status code indicates whether than item was created
+ * (201) or updated (200).
+ *
+ * Handles HTTP PUT /api/cases.
+ */
+export const upsert = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const c = await Case.findOne({
+            'caseReference.sourceId': req.body.caseReference?.sourceId,
+            'caseReference.sourceEntryId':
+                req.body.caseReference?.sourceEntryId,
+        });
+        if (c) {
+            c.set(req.body);
+            const result = await c.save();
+            res.status(200).json(result);
+            return;
+        } else {
+            const c = new Case(req.body);
+            const result = await c.save();
+            res.status(201).json(result);
+            return;
+        }
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
  * Delete a specific case.
  *
  * Handles HTTP DELETE /api/cases/:id.

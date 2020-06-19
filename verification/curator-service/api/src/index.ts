@@ -167,6 +167,7 @@ apiRouter.get(
     casesController.get,
 );
 apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
+apiRouter.put('/cases', mustHaveAnyRole(['curator']), casesController.upsert);
 apiRouter.put(
     '/cases/:id([a-z0-9]{24})',
     mustHaveAnyRole(['curator']),
