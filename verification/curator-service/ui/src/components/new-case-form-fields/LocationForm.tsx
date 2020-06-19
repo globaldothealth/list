@@ -15,6 +15,7 @@ class LocationForm extends React.Component<{}, {}> {
                         label="Location"
                         name="locationQuery"
                         type="text"
+                        fullWidth={true}
                         component={TextField}
                     />
                     <Location location={undefined} />

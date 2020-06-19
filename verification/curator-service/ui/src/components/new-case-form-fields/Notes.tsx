@@ -13,6 +13,7 @@ export default class Notes extends React.Component<{}, {}> {
                         label="Notes"
                         name="notes"
                         type="text"
+                        multiline={true}
                         component={TextField}
                     />
                 </fieldset>

@@ -8,6 +8,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
+import { Loc } from './new-case-form-fields/Location';
 import LocationForm from './new-case-form-fields/LocationForm';
 import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
@@ -61,6 +62,7 @@ interface FormValues {
     nationalities: string[];
     profession: string | null;
     locationQuery: string;
+    location?: Loc;
     confirmedDate: string | null;
     methodOfConfirmation?: string;
     onsetSymptomsDate: string | null;
@@ -133,7 +135,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     profession: values.profession,
                 },
                 location: {
-                    query: values.locationQuery,
+                    ...values.location,
+                    ...{ query: values.locationQuery },
                 },
                 events: [
                     {
