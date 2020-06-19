@@ -15,6 +15,7 @@ import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
+import Symptoms from './new-case-form-fields/Symptoms';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -72,6 +73,7 @@ interface FormValues {
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
     outcome?: string;
+    symptoms: string[];
     sourceUrl: string;
     notes: string;
 }
@@ -191,6 +193,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         value: values.outcome,
                     },
                 ],
+                symptoms: {
+                    provided: values.symptoms,
+                },
                 sources: [
                     {
                         url: values.sourceUrl,
@@ -277,6 +282,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     icuAdmissionDate: null,
                     outcomeDate: null,
                     outcome: undefined,
+                    symptoms: [],
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -369,6 +375,16 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('symptoms')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.symptoms.length > 0,
+                                    hasError: errors.symptoms !== undefined,
+                                })}
+                                Symptoms
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
@@ -393,6 +409,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Demographics></Demographics>
                                 <LocationForm></LocationForm>
                                 <Events></Events>
+                                <Symptoms></Symptoms>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}
