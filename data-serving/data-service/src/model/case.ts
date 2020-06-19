@@ -1,3 +1,4 @@
+import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
 import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
@@ -15,7 +16,7 @@ import mongoose from 'mongoose';
 
 const caseSchema = new mongoose.Schema(
     {
-        preexistingConditions: dictionarySchema,
+        caseReference: caseReferenceSchema,
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
@@ -34,6 +35,7 @@ const caseSchema = new mongoose.Schema(
         },
         notes: String,
         pathogens: [pathogenSchema],
+        preexistingConditions: dictionarySchema,
         sources: {
             type: [sourceSchema],
             required: true,
@@ -63,7 +65,7 @@ const caseSchema = new mongoose.Schema(
 
 type CaseDocument = mongoose.Document & {
     _id: ObjectId;
-    preexistingConditions: DictionaryDocument;
+    caseReference: CaseReferenceDocument;
     demographics: DemographicsDocument;
     events: [EventDocument];
     importedCase: {};
@@ -71,6 +73,7 @@ type CaseDocument = mongoose.Document & {
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     pathogens: [PathogenDocument];
+    preexistingConditions: DictionaryDocument;
     sources: [SourceDocument];
     symptoms: DictionaryDocument;
     travelHistory: [TravelDocument];
