@@ -147,6 +147,34 @@ describe('PUT', () => {
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
+    it('upsert present item should return 200 OK', async () => {
+        const c = new Case(minimalCase);
+        const sourceId = 'abc123';
+        const entryId = 'def456';
+        c.set('caseReference.dataSourceId', sourceId);
+        c.set('caseReference.dataEntryId', entryId);
+        await c.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: { dataSourceId: sourceId, dataEntryId: entryId },
+                notes: newNotes,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.notes).toEqual(newNotes);
+        expect(await c.collection.countDocuments()).toEqual(1);
+    });
+    it('upsert new item should return 201 CREATED', async () => {
+        return request(app)
+            .put('/api/cases')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+    });
 });
 
 describe('DELETE', () => {
