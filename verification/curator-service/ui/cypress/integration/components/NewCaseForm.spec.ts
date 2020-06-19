@@ -43,6 +43,10 @@ describe('New case form', function () {
         cy.get('input[name="outcomeDate"]').clear().type('2020-01-07');
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
+        cy.get('div[data-testid="symptoms"]').type('dry cough');
+        cy.get('li').first().should('contain', 'dry cough').click();
+        cy.get('div[data-testid="symptoms"]').type('mild fever');
+        cy.get('li').first().should('contain', 'mild fever').click();
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
         cy.get('textarea[name="notes"]')
             .clear()
@@ -61,6 +65,7 @@ describe('New case form', function () {
         cy.contains('Accountant');
         cy.contains('France');
         cy.contains('1/1/2020');
+        cy.contains('dry cough, mild fever');
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');
