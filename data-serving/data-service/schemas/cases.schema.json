@@ -9,6 +9,21 @@
       "__v": {
         "bsonType": "int"
       },
+      "caseReference": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "sourceId": {
+            "bsonType": "string"
+          },
+          "sourceEntryId": {
+            "bsonType": "string"
+          }
+        }
+      },
       "demographics": {
         "bsonType": "object",
         "additionalProperties": false,

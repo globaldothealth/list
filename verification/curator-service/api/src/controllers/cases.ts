@@ -62,44 +62,33 @@ export default class CasesController {
         }
     };
 
-    create = async (req: Request, res: Response): Promise<void> => {
-        // Geocode query if no lat lng were provided.
-        const location = req.body['location'];
-        if (!location?.geometry?.latitude || !location.geometry?.longitude) {
-            if (!location?.query) {
-                res.status(422).send(
-                    'location field must contain a query to geocode',
-                );
-                return;
-            }
-            let geocodeSuccess = false;
-            try {
-                for (const geocoder of this.geocoders) {
-                    const features = await geocoder.geocode(location?.query);
-                    if (features.length === 0) {
-                        continue;
-                    }
-
-                    // Currently a 1:1 match between the GeocodeResult and the data service API.
-                    req.body['location'] = features[0];
-                    geocodeSuccess = true;
-                    break;
-                }
-            } catch (e) {
-                res.status(500).send(e.message);
-                return;
-            }
-            if (!geocodeSuccess) {
-                res.status(404).send(
-                    `no geolocation found for ${location?.query}`,
-                );
-                return;
-            }
-        } else {
-            // Remove any query as we shouldn't store it.
-            delete location.query;
+    upsert = async (req: Request, res: Response): Promise<void> => {
+        if (!(await this.geocode(req))) {
+            res.status(404).send(
+                `no geolocation found for ${req.body['location']?.query}`,
+            );
+            return;
         }
         try {
+            const response = await axios.put(
+                this.dataServerURL + '/api' + req.url,
+                req.body,
+            );
+            res.json(response.data);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send(err);
+        }
+    };
+
+    create = async (req: Request, res: Response): Promise<void> => {
+        try {
+            if (!(await this.geocode(req))) {
+                res.status(404).send(
+                    `no geolocation found for ${req.body['location']?.query}`,
+                );
+                return;
+            }
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,
                 req.body,
@@ -110,4 +99,30 @@ export default class CasesController {
             res.status(500).send(err);
         }
     };
+
+    /**
+     * Geocodes request content if no lat lng were provided.
+     *
+     * @returns {boolean} Whether lat lng were either provided or geocoded
+     */
+    private async geocode(req: Request): Promise<boolean> {
+        // Geocode query if no lat lng were provided.
+        const location = req.body['location'];
+        if (!location?.geometry?.latitude || !location.geometry?.longitude) {
+            for (const geocoder of this.geocoders) {
+                const features = await geocoder.geocode(location?.query);
+                if (features.length === 0) {
+                    continue;
+                }
+                // Currently a 1:1 match between the GeocodeResult and the data service API.
+                req.body['location'] = features[0];
+                return true;
+            }
+            return false;
+        } else {
+            // Remove any query as we shouldn't store it.
+            delete location.query;
+        }
+        return true;
+    }
 }
