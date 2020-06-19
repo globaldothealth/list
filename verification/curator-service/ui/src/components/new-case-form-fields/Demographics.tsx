@@ -1,16 +1,14 @@
 import { Select, TextField } from 'formik-material-ui';
 
-import { Autocomplete } from '@material-ui/lab';
 import { Field } from 'formik';
 import FormControl from '@material-ui/core/FormControl';
+import FormikAutocomplete from './FormikAutocomplete';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import { useFormikContext } from 'formik';
 import { withStyles } from '@material-ui/core';
 
 const styles = () =>
@@ -126,82 +124,24 @@ class Demographics extends React.Component<DemographicsProps, {}> {
                             </Field>
                         </FormControl>
                     </div>
-                    <Nationality />
+                    <div className={classes.fieldRow}>
+                        <FormikAutocomplete
+                            name="nationalities"
+                            label="Nationality"
+                            multiple={true}
+                            optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
+                        />
+                    </div>
+                    <FormikAutocomplete
+                        name="profession"
+                        label="Profession"
+                        multiple={false}
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
+                    />
                 </fieldset>
             </Scroll.Element>
         );
     }
-}
-
-// Autocomplete for nationality.
-// Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
-function Nationality(): JSX.Element {
-    const [open, setOpen] = React.useState(false);
-    const [options, setOptions] = React.useState<string[]>([]);
-    const loading = open && options.length === 0;
-    const { setFieldValue, setTouched } = useFormikContext();
-
-    React.useEffect(() => {
-        let active = true;
-
-        if (!loading) {
-            return undefined;
-        }
-
-        (async (): Promise<void> => {
-            const resp = await axios.get<string>(
-                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt',
-            );
-            const nationalities = resp.data.split('\n');
-
-            if (active) {
-                setOptions(nationalities);
-            }
-        })();
-
-        return (): void => {
-            active = false;
-        };
-    }, [loading]);
-
-    React.useEffect(() => {
-        if (!open) {
-            setOptions([]);
-        }
-    }, [open]);
-
-    return (
-        <Autocomplete
-            multiple
-            filterSelectedOptions
-            itemType="string"
-            open={open}
-            onOpen={(): void => {
-                setOpen(true);
-            }}
-            onClose={(): void => {
-                setOpen(false);
-            }}
-            options={options}
-            loading={loading}
-            onChange={(_, values): void => {
-                setFieldValue('nationalities', values);
-            }}
-            onBlur={(): void => setTouched({ nationalities: true })}
-            renderInput={(params): JSX.Element => (
-                <Field
-                    {...params}
-                    // Setting the name as nationalities allows any typed value
-                    // to be set in the form values, rather than only selected
-                    // dropdown values. Thus we use an unused form value here.
-                    name="unused"
-                    data-testid="nationalities"
-                    label="Nationality"
-                    component={TextField}
-                ></Field>
-            )}
-        />
-    );
 }
 
 export default withStyles(styles)(Demographics);
