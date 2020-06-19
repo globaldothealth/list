@@ -34,6 +34,7 @@ interface Demographics {
     };
     ethnicity: string;
     nationalities: string[];
+    profession: string;
 }
 
 interface Location {
@@ -80,6 +81,7 @@ interface TableRow {
     ethnicity: string;
     // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
     nationalities: string;
+    profession: string;
     country: string;
     adminArea1: string;
     adminArea2: string;
@@ -135,6 +137,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
                 ethnicity: rowData.ethnicity,
                 nationalities: rowData.nationalities?.split(', '),
+                profession: rowData.profession,
             },
             notes: rowData.notes,
             sources: [
@@ -259,6 +262,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
+                                title: 'Profession',
+                                field: 'profession',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Country',
                                 field: 'country',
                                 filtering: false,
@@ -374,6 +382,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 nationalities: c.demographics?.nationalities?.join(
                                                     ', ',
                                                 ),
+                                                profession:
+                                                    c.demographics?.profession,
                                                 country: c.location.country,
                                                 adminArea1:
                                                     c.location
