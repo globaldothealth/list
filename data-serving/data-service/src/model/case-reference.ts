@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 
 export const caseReferenceSchema = new mongoose.Schema({
-    dataSourceId: {
+    sourceId: {
         type: String,
         required: true,
     },
-    dataEntryId: String,
+    sourceEntryId: String,
 });
 
 export type CaseReferenceDocument = mongoose.Document & {
-    dataSourceId: string;
-    dataEntryId: string;
+    sourceId: string;
+    sourceEntryId: string;
 };

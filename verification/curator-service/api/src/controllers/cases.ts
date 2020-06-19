@@ -82,13 +82,13 @@ export default class CasesController {
     };
 
     create = async (req: Request, res: Response): Promise<void> => {
-        if (!(await this.geocode(req))) {
-            res.status(404).send(
-                `no geolocation found for ${req.body['location']?.query}`,
-            );
-            return;
-        }
         try {
+            if (!(await this.geocode(req))) {
+                res.status(404).send(
+                    `no geolocation found for ${req.body['location']?.query}`,
+                );
+                return;
+            }
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,
                 req.body,

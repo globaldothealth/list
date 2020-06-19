@@ -2,6 +2,7 @@ import { Select, TextField } from 'formik-material-ui';
 
 import { Field } from 'formik';
 import FormControl from '@material-ui/core/FormControl';
+import FormikAutocomplete from './FormikAutocomplete';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
@@ -30,7 +31,7 @@ const styles = () =>
         },
     });
 
-type Props = WithStyles<typeof styles>;
+type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
 const sexValues = [undefined, 'Male', 'Female'];
@@ -45,7 +46,7 @@ const ethnicityValues = [
     'Other',
 ];
 
-class Demographics extends React.Component<Props, {}> {
+class Demographics extends React.Component<DemographicsProps, {}> {
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -99,7 +100,7 @@ class Demographics extends React.Component<Props, {}> {
                             component={TextField}
                         ></Field>
                     </div>
-                    <div>
+                    <div className={classes.fieldRow}>
                         <FormControl>
                             <InputLabel htmlFor="ethnicity">
                                 Ethnicity
@@ -123,6 +124,20 @@ class Demographics extends React.Component<Props, {}> {
                             </Field>
                         </FormControl>
                     </div>
+                    <div className={classes.fieldRow}>
+                        <FormikAutocomplete
+                            name="nationalities"
+                            label="Nationality"
+                            multiple={true}
+                            optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
+                        />
+                    </div>
+                    <FormikAutocomplete
+                        name="profession"
+                        label="Profession"
+                        multiple={false}
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
+                    />
                 </fieldset>
             </Scroll.Element>
         );

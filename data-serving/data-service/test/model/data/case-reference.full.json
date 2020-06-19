@@ -1,4 +1,4 @@
 {
-    "dataSourceId": "sourceId",
-    "dataEntryId": "entryId"
+    "sourceId": "sourceId",
+    "sourceEntryId": "entryId"
 }

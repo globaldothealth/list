@@ -7,17 +7,21 @@ test('shows location when passed location information', async () => {
     render(
         <Location
             location={{
-                type: 'place',
+                geoResolution: 'place',
                 country: 'United States',
-                adminArea1: 'Hillsborough County',
-                latitude: 80.45,
-                longitude: 27.9379,
+                administrativeAreaLevel1: 'Hillsborough County',
+                administrativeAreaLevel3: 'Some city',
+                geometry: {
+                    latitude: 80.45,
+                    longitude: 27.9379,
+                },
             }}
         />,
     );
     expect(screen.getByText(/place/i)).toBeInTheDocument();
     expect(screen.getByText(/united States/i)).toBeInTheDocument();
     expect(screen.getByText(/Hillsborough County/i)).toBeInTheDocument();
+    expect(screen.getByText(/Some city/i)).toBeInTheDocument();
     expect(screen.getByText(/80.4500/i)).toBeInTheDocument();
     expect(screen.getByText(/27.9379/i)).toBeInTheDocument();
     expect(screen.getByText(/N\/A/i)).toBeInTheDocument();
