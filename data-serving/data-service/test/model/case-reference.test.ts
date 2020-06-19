@@ -14,9 +14,9 @@ const CaseReference = mongoose.model<CaseReferenceDocument>(
 );
 
 describe('validate', () => {
-    it('a caseReference document without dataSourceId is invalid', async () => {
+    it('a caseReference document without sourceId is invalid', async () => {
         const missingSourceId = { ...minimalModel };
-        delete missingSourceId.dataSourceId;
+        delete missingSourceId.sourceId;
 
         return new CaseReference(missingSourceId).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
