@@ -193,6 +193,11 @@
                 "notes": "fix source error"
             }
         },
+        "transmission": {
+            "route": "Vector borne",
+            "place": "Gym",
+            "linkedCases": [ "abc", "def" ]
+        },
         "importedCase": {
             "ID": "idk",
             "chronic_disease_binary": "true",
