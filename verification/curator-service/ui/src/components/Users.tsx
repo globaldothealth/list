@@ -64,8 +64,9 @@ class Users extends React.Component<Props, UsersState> {
     }
 
     componentDidMount(): void {
+        // TODO: add UI for paging through users
         axios
-            .get<ListResponse>(this.state.url)
+            .get<ListResponse>(this.state.url + '?limit=50')
             .then((resp) => {
                 this.setState({ users: resp.data.users });
             })
