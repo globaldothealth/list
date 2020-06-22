@@ -21,6 +21,7 @@ function mockGetAxios(getUsersResponse: any): void {
                     data: { roles: ['admin', 'curator', 'reader'] },
                 });
             case '/api/users/':
+            case '/api/users/?limit=50':
                 return Promise.resolve(getUsersResponse);
             default:
                 return Promise.reject();
@@ -63,7 +64,7 @@ test('lists users', async () => {
     expect(await findByText('Name not provided')).toBeInTheDocument();
     expect(await findByText('foo2@bar.com')).toBeInTheDocument();
     expect(queryByText('Carol Smith')).not.toBeInTheDocument();
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/?limit=50');
 });
 
 test('updates roles on selection', async () => {
