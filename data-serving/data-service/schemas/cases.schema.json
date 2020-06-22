@@ -73,6 +73,37 @@
           }
         }
       },
+      "genomeSequences": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": {
+          "bsonType": "object",
+          "additionalProperties": false,
+          "properties": {
+            "_id": {
+              "bsonType": "objectId"
+            },
+            "sampleCollectionDate": {
+              "bsonType": "date"
+            },
+            "repositoryUrl": {
+              "bsonType": "string"
+            },
+            "sequenceId": {
+              "bsonType": "string"
+            },
+            "sequenceName": {
+              "bsonType": "string"
+            },
+            "sequenceLength": {
+              "bsonType": "int"
+            },
+            "notes": {
+              "bsonType": "string"
+            }
+          }
+        }
+      },
       "location": {
         "bsonType": "object",
         "additionalProperties": false,
