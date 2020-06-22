@@ -152,8 +152,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     },
                     {
                         name: 'outcome',
-                        dates: values.outcomeDate,
-                        value: undefined,
+                        dates:
+                            values.outcome !== undefined
+                                ? values.outcomeDate
+                                : undefined,
+                        value: values.outcome,
                     },
                 ]
                     .filter((elem) => elem.dates !== null)
