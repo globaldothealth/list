@@ -86,7 +86,7 @@ it('loads and displays cases', async () => {
     expect(items).toBeInTheDocument();
     const admin1 = await findByText(/some admin 1/);
     expect(admin1).toBeInTheDocument();
-    const ageRange = await findByText('[1,3)');
+    const ageRange = await findByText('1-3');
     expect(ageRange).toBeInTheDocument();
     const admin2 = await findByText(/some admin 2/);
     expect(admin2).toBeInTheDocument();
