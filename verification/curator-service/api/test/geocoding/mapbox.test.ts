@@ -51,7 +51,7 @@ describe('geocode', () => {
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             place: '',
-            name: 'Lyon',
+            name: 'Lyon, Rhône, France',
             geoResolution: Resolution.Admin3,
         };
         expect(feats[0]).toEqual(wantFeature);

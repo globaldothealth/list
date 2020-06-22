@@ -1,11 +1,12 @@
 import { Field, useFormikContext } from 'formik';
 import Location, { Loc } from './Location';
+import { Typography, makeStyles } from '@material-ui/core';
 
 import { Autocomplete } from '@material-ui/lab';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
-import { Typography } from '@material-ui/core';
 import axios from 'axios';
 import throttle from 'lodash/throttle';
 
@@ -27,9 +28,21 @@ function LocationForm(): JSX.Element {
 
 export default LocationForm;
 
+const useStyles = makeStyles((theme) => ({
+    icon: {
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(2),
+    },
+    suggestion: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+}));
+
 // Place autocomplete, based on
 // https://material-ui.com/components/autocomplete/#google-maps-place
 function PlacesAutocomplete(): JSX.Element {
+    const classes = useStyles();
     const [value, setValue] = React.useState<Loc | null>(null);
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<Loc[]>([]);
@@ -115,8 +128,12 @@ function PlacesAutocomplete(): JSX.Element {
                 ></Field>
             )}
             renderOption={(option: Loc): React.ReactNode => {
-                // TODO: Provide better looking options.
-                return <Typography variant="body2">{option.name}</Typography>;
+                return (
+                    <span className={classes.suggestion}>
+                        <LocationOnIcon className={classes.icon} />
+                        <Typography variant="body2">{option.name}</Typography>
+                    </span>
+                );
             }}
         />
     );

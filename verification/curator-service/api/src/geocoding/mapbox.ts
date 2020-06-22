@@ -96,7 +96,7 @@ export default class MapboxGeocoder {
                         'place',
                     ),
                     place: getFeatureTypeFromContext(contexts, 'poi'),
-                    name: feature.text,
+                    name: feature.place_name,
                     geoResolution: getResolution(contexts),
                 };
             });
