@@ -144,6 +144,11 @@
             "notes": "fix source error"
         }
     },
+    "transmission": {
+        "route": "Vector borne",
+        "place": "Gym",
+        "linkedCaseIds": [ "abc", "def" ]
+    },
     "importedCase": {
         "ID": "xyz",
         "additional_information": "Contact of a confirmed case at work.",

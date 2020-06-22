@@ -9,6 +9,7 @@ import {
     revisionMetadataSchema,
 } from './revision-metadata';
 import { SourceDocument, sourceSchema } from './source';
+import { TransmissionDocument, transmissionSchema } from './transmission';
 import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
 import { ObjectId } from 'mongodb';
@@ -45,6 +46,7 @@ const caseSchema = new mongoose.Schema(
             },
         },
         symptoms: dictionarySchema,
+        transmission: transmissionSchema,
         travelHistory: travelHistorySchema,
     },
     {
@@ -76,6 +78,7 @@ type CaseDocument = mongoose.Document & {
     preexistingConditions: DictionaryDocument;
     sources: [SourceDocument];
     symptoms: DictionaryDocument;
+    transmission: TransmissionDocument;
     travelHistory: TravelHistoryDocument;
 };
 
