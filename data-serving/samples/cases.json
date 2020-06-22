@@ -7,7 +7,9 @@
             },
             "sex": "Female",
             "profession": "Horse trainer",
-            "nationality": "Swedish",
+            "nationalities": [
+                "Swedish"
+            ],
             "ethnicity": "Other"
         },
         "location": {
