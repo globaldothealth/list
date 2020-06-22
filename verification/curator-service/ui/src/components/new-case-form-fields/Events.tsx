@@ -6,6 +6,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { Select } from 'formik-material-ui';
@@ -86,7 +87,7 @@ const methodsOfConfirmation = [
 const outcomes = [undefined, 'Death', 'Recovered'];
 
 export default function Events(): JSX.Element {
-    const { values } = useFormikContext();
+    const { values } = useFormikContext<NewCaseFormValues>();
     return (
         <Scroll.Element name="events">
             <fieldset>
@@ -118,7 +119,7 @@ export default function Events(): JSX.Element {
                         label="Hospital admission"
                         values={yesNoUndefined}
                     ></SelectField>
-                    {(values as any).admittedToHospital === 'Yes' && (
+                    {values.admittedToHospital === 'Yes' && (
                         <DateField
                             name="hospitalAdmissionDate"
                             label="Hospital admission date"
