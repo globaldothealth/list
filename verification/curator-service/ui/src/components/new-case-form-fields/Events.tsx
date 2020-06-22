@@ -129,15 +129,17 @@ export default function Events(): JSX.Element {
                         name="icuAdmissionDate"
                         label="ICU admission date"
                     ></DateField>
-                    <DateField
-                        name="outcomeDate"
-                        label="Outcome date'"
-                    ></DateField>
                     <SelectField
                         name="outcome"
                         label="Outcome"
                         values={outcomes}
                     ></SelectField>
+                    {values.outcome !== undefined && (
+                        <DateField
+                            name="outcomeDate"
+                            label="Outcome date"
+                        ></DateField>
+                    )}
                 </MuiPickersUtilsProvider>
             </fieldset>
         </Scroll.Element>
