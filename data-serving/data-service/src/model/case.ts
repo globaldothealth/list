@@ -2,6 +2,10 @@ import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
 import { DemographicsDocument, demographicsSchema } from './demographics';
 import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
+import {
+    GenomeSequenceDocument,
+    genomeSequenceSchema,
+} from './genome-sequence';
 import { LocationDocument, locationSchema } from './location';
 import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
@@ -28,6 +32,7 @@ const caseSchema = new mongoose.Schema(
                 message: 'Must include an event with name "confirmed"',
             },
         },
+        genomeSequences: [genomeSequenceSchema],
         importedCase: {},
         location: locationSchema,
         revisionMetadata: {
@@ -70,6 +75,7 @@ type CaseDocument = mongoose.Document & {
     caseReference: CaseReferenceDocument;
     demographics: DemographicsDocument;
     events: [EventDocument];
+    genomeSequences: [GenomeSequenceDocument];
     importedCase: {};
     location: LocationDocument;
     revisionMetadata: RevisionMetadataDocument;
