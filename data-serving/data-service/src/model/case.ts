@@ -9,7 +9,7 @@ import {
     revisionMetadataSchema,
 } from './revision-metadata';
 import { SourceDocument, sourceSchema } from './source';
-import { TravelDocument, travelSchema } from './travel';
+import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
@@ -45,7 +45,7 @@ const caseSchema = new mongoose.Schema(
             },
         },
         symptoms: dictionarySchema,
-        travelHistory: [travelSchema],
+        travelHistory: travelHistorySchema,
     },
     {
         toObject: {
@@ -76,7 +76,7 @@ type CaseDocument = mongoose.Document & {
     preexistingConditions: DictionaryDocument;
     sources: [SourceDocument];
     symptoms: DictionaryDocument;
-    travelHistory: [TravelDocument];
+    travelHistory: TravelHistoryDocument;
 };
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);
