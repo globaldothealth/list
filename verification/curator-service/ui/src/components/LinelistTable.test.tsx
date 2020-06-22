@@ -38,6 +38,7 @@ it('loads and displays cases', async () => {
                 administrativeAreaLevel1: 'some admin 1',
                 administrativeAreaLevel2: 'some admin 2',
                 administrativeAreaLevel3: 'some admin 3',
+                name: 'some place name',
                 geometry: {
                     latitude: 42,
                     longitude: 12,
@@ -84,16 +85,10 @@ it('loads and displays cases', async () => {
     );
     const items = await findByText(/some notes/);
     expect(items).toBeInTheDocument();
-    const admin1 = await findByText(/some admin 1/);
-    expect(admin1).toBeInTheDocument();
+    const locationName = await findByText(/some place name/);
+    expect(locationName).toBeInTheDocument();
     const ageRange = await findByText('1-3');
     expect(ageRange).toBeInTheDocument();
-    const admin2 = await findByText(/some admin 2/);
-    expect(admin2).toBeInTheDocument();
-    const admin3 = await findByText(/some admin 3/);
-    expect(admin3).toBeInTheDocument();
-    const geoResolution = await findByText(/Admin3/);
-    expect(geoResolution).toBeInTheDocument();
 });
 
 it('redirects to new case page when + icon is clicked', async () => {
