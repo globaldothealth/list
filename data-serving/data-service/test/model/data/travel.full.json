@@ -1,4 +1,8 @@
 {
+    "dateRange": {
+        "start": "2020-01-10",
+        "end": "2020-01-17"
+    },
     "location": {
         "country": "United States",
         "administrativeAreaLevel1": "New York",
@@ -12,10 +16,6 @@
             "longitude": -73.9740028
         }
     },
-    "dateRange": {
-        "start": "2020-01-10",
-        "end": "2020-01-17"
-    },
-    "purpose": "Family",
-    "additionalInformation": "Skeletal lamping"
+    "method": "Plane",
+    "purpose": "Family"
 }

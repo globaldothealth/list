@@ -305,8 +305,17 @@
                 "Unknown"
               ]
             },
-            "additionalInformation": {
-              "bsonType": "string"
+            "method": {
+              "enum": [
+                "Bus",
+                "Car",
+                "Coach",
+                "Ferry",
+                "Plane",
+                "Train",
+                "Other",
+                "Unknown"
+              ]
             }
           }
         }
