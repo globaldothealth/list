@@ -64,7 +64,7 @@ export default function FormikAutocomplete(
             options={options}
             loading={loading}
             onChange={(_, values): void => {
-                setFieldValue(props.name, values);
+                setFieldValue(props.name, values ?? undefined);
             }}
             onBlur={(): void => setTouched({ [props.name]: true })}
             renderInput={(params): JSX.Element => (
