@@ -9,7 +9,7 @@ describe('New case form', function () {
         cy.clearSeededLocations();
     });
 
-    it('Can add row to linelist', function () {
+    it('Can add full row to linelist', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
         cy.seedLocation({
@@ -43,6 +43,8 @@ describe('New case form', function () {
             .clear()
             .type('2020-01-03');
         cy.get('input[name="selfIsolationDate"]').clear().type('2020-01-04');
+        cy.get('div[data-testid="admittedToHospital"]').click();
+        cy.get('li[data-value="Yes"').click();
         cy.get('input[name="hospitalAdmissionDate"]')
             .clear()
             .type('2020-01-05');
@@ -76,6 +78,35 @@ describe('New case form', function () {
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');
+    });
+
+    it('Can add minimal row to linelist', function () {
+        cy.visit('/cases');
+        cy.contains('No records to display');
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
+
+        cy.visit('/cases/new');
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('France');
+        cy.contains('Country');
+        cy.get('li').first().should('contain', 'France').click();
+        cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
+        cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
+        cy.server();
+        cy.route('POST', '/api/cases').as('addCase');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@addCase');
+
+        cy.visit('/cases');
+        cy.contains('No records to display').should('not.exist');
+        cy.contains('France');
+        cy.contains('1/1/2020');
+        cy.contains('www.example.com');
     });
 
     it('Does not add row on submission error', function () {

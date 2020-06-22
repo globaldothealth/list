@@ -69,6 +69,7 @@ interface FormValues {
     onsetSymptomsDate: string | null;
     firstClinicalConsultationDate: string | null;
     selfIsolationDate: string | null;
+    admittedToHospital?: string;
     hospitalAdmissionDate: string | null;
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
@@ -163,8 +164,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     },
                     {
                         name: 'hospitalAdmission',
-                        dates: values.hospitalAdmissionDate,
-                        value: undefined,
+                        dates:
+                            values.admittedToHospital === 'Yes'
+                                ? values.hospitalAdmissionDate
+                                : undefined,
+                        value: values.admittedToHospital,
                     },
                     {
                         name: 'icuAdmission',
@@ -274,6 +278,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     onsetSymptomsDate: null,
                     firstClinicalConsultationDate: null,
                     selfIsolationDate: null,
+                    admittedToHospital: undefined,
                     hospitalAdmissionDate: null,
                     icuAdmissionDate: null,
                     outcomeDate: null,
@@ -348,6 +353,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         values.firstClinicalConsultationDate !==
                                             null ||
                                         values.selfIsolationDate !== null ||
+                                        values.admittedToHospital !==
+                                            undefined ||
                                         values.hospitalAdmissionDate !== null ||
                                         values.icuAdmissionDate !== null ||
                                         values.outcomeDate !== null ||
@@ -361,6 +368,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         errors.firstClinicalConsultationDate !==
                                             undefined ||
                                         errors.selfIsolationDate !==
+                                            undefined ||
+                                        errors.admittedToHospital !==
                                             undefined ||
                                         errors.hospitalAdmissionDate !==
                                             undefined ||
