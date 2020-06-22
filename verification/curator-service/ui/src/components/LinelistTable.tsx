@@ -83,7 +83,7 @@ interface TableRow {
     id: string;
     // demographics
     sex: string;
-    age: number;
+    age: [number, number]; // start, end.
     ethnicity: string;
     // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
     nationalities: string;
@@ -141,7 +141,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             demographics: {
                 sex: rowData.sex,
                 age: {
-                    start: rowData.age,
+                    start: rowData.age[0],
+                    end: rowData.age[1],
                 },
                 ethnicity: rowData.ethnicity,
                 nationalities: rowData.nationalities?.split(', '),
@@ -245,12 +246,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     <MaterialTable
                         columns={[
                             {
-                                title: 'ID',
-                                field: 'id',
-                                filtering: false,
-                                editable: 'never',
-                            },
-                            {
                                 title: 'Sex',
                                 field: 'sex',
                                 filtering: false,
@@ -260,7 +255,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 title: 'Age',
                                 field: 'age',
                                 filtering: false,
-                                type: 'numeric',
+                                editable: 'never',
+                                render: (rowData) =>
+                                    rowData.age[0] === rowData.age[1]
+                                        ? rowData.age[0]
+                                        : `[${rowData.age[0]},${rowData.age[1]})`,
                             },
                             {
                                 title: 'Ethnicity',
@@ -389,10 +388,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             flattenedCases.push({
                                                 id: c._id,
                                                 sex: c.demographics?.sex,
-                                                // TODO: show full age range
-                                                age:
+                                                age: [
                                                     c.demographics?.ageRange
                                                         ?.start,
+                                                    c.demographics?.ageRange
+                                                        ?.end,
+                                                ],
                                                 ethnicity:
                                                     c.demographics?.ethnicity,
                                                 nationalities: c.demographics?.nationalities?.join(
@@ -452,6 +453,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             filtering: true,
                             sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                             padding: 'dense',
+                            draggable: false, // No need to be able to drag and drop headers.
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}

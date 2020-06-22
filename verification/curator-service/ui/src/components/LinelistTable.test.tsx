@@ -32,6 +32,7 @@ it('loads and displays cases', async () => {
             importedCase: {
                 outcome: 'Recovered',
             },
+            demographics: { ageRange: { start: 1, end: 3 } },
             location: {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
@@ -81,10 +82,12 @@ it('loads and displays cases', async () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
     );
-    const items = await findByText(/abc123/);
+    const items = await findByText(/some notes/);
     expect(items).toBeInTheDocument();
     const admin1 = await findByText(/some admin 1/);
     expect(admin1).toBeInTheDocument();
+    const ageRange = await findByText('[1,3)');
+    expect(ageRange).toBeInTheDocument();
     const admin2 = await findByText(/some admin 2/);
     expect(admin2).toBeInTheDocument();
     const admin3 = await findByText(/some admin 3/);
@@ -166,7 +169,7 @@ it('API errors are displayed', async () => {
         </MemoryRouter>,
     );
 
-    const row = await findByText(/abc123/);
+    const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
     // Throw error on edit request.
@@ -231,7 +234,7 @@ it('can delete a row', async () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
     );
-    const row = await findByText(/abc123/);
+    const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
     // Delete case
@@ -451,7 +454,7 @@ it('cannot edit data as a reader only', async () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
     );
-    const row = await findByText(/abc123/);
+    const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
     const deleteButton = queryByText(/delete_outline/);
