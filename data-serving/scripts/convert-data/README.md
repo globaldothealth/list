@@ -2,6 +2,14 @@
 
 This directory contains scripts for converting, ingesting, and otherwise munging line-list data.
 
+## Prerequisites
+
+Install python dependencies:
+
+```shell
+python3 -m pip install -r requirements.txt
+```
+
 ## Converting line-list data
 
 `convert_data.py` is a script to convert the line-list data from its original format, a CSV, to the new MongoDB
