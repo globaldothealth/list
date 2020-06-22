@@ -140,7 +140,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         return {
             demographics: {
                 sex: rowData.sex,
-                age: {
+                ageRange: {
                     start: rowData.age[0],
                     end: rowData.age[1],
                 },
