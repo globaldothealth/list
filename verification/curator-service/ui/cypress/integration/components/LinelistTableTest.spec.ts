@@ -5,6 +5,10 @@ describe('Linelist table', function () {
         cy.login();
     });
 
+    afterEach(() => {
+        cy.clearSeededLocations();
+    });
+
     it('Can edit a case', function () {
         cy.addCase('France', 'some notes', 'www.example.com');
         cy.visit('/cases');

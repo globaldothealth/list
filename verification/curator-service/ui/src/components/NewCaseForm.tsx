@@ -134,7 +134,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
                     nationalities: values.nationalities,
-                    profession: values.profession,
+                    profession: values.profession || undefined,
                 },
                 location: {
                     ...values.location,
@@ -143,56 +143,51 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 events: [
                     {
                         name: 'confirmed',
-                        dateRange: {
-                            start: values.confirmedDate,
-                            end: values.confirmedDate,
-                        },
+                        dates: values.confirmedDate,
                         value: values.methodOfConfirmation,
                     },
                     {
                         name: 'onsetSymptoms',
-                        dateRange: {
-                            start: values.onsetSymptomsDate,
-                            end: values.onsetSymptomsDate,
-                        },
+                        dates: values.onsetSymptomsDate,
+                        value: undefined,
                     },
                     {
                         name: 'firstClinicalConsultation',
-                        dateRange: {
-                            start: values.firstClinicalConsultationDate,
-                            end: values.firstClinicalConsultationDate,
-                        },
+                        dates: values.firstClinicalConsultationDate,
+                        value: undefined,
                     },
                     {
                         name: 'selfIsolation',
-                        dateRange: {
-                            start: values.selfIsolationDate,
-                            end: values.selfIsolationDate,
-                        },
+                        dates: values.selfIsolationDate,
+                        value: undefined,
                     },
                     {
                         name: 'hospitalAdmission',
-                        dateRange: {
-                            start: values.hospitalAdmissionDate,
-                            end: values.hospitalAdmissionDate,
-                        },
+                        dates: values.hospitalAdmissionDate,
+                        value: undefined,
                     },
                     {
                         name: 'icuAdmission',
-                        dateRange: {
-                            start: values.icuAdmissionDate,
-                            end: values.icuAdmissionDate,
-                        },
+                        dates: values.icuAdmissionDate,
+                        value: undefined,
                     },
                     {
                         name: 'outcome',
-                        dateRange: {
-                            start: values.outcomeDate,
-                            end: values.outcomeDate,
-                        },
-                        value: values.outcome,
+                        dates: values.outcomeDate,
+                        value: undefined,
                     },
-                ],
+                ]
+                    .filter((elem) => elem.dates !== null)
+                    .map((elem) => {
+                        return {
+                            name: elem.name,
+                            dateRange: {
+                                start: elem.dates,
+                                end: elem.dates,
+                            },
+                            value: elem.value,
+                        };
+                    }),
                 symptoms: {
                     provided: values.symptoms,
                 },
@@ -273,6 +268,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     nationalities: [],
                     profession: null,
                     locationQuery: '',
+                    location: undefined,
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
                     onsetSymptomsDate: null,
@@ -332,7 +328,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked:
-                                        values.locationQuery.trim() !== '',
+                                        values.location !== null &&
+                                        values.location !== undefined,
                                     hasError:
                                         errors.locationQuery !== undefined,
                                 })}

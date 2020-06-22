@@ -10,6 +10,7 @@ declare global {
             addSource: (name: string, url: string) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;
+            clearSeededLocations: () => void;
         }
     }
 }
@@ -27,8 +28,8 @@ export function addCase(
                 country: country,
                 geoResolution: 'Country',
                 geometry: {
-                    lat: 42,
-                    lng: 12,
+                    latitude: 42,
+                    longitude: 12,
                 },
             },
             events: [
@@ -81,6 +82,13 @@ export function seedLocation(loc: any): void {
     });
 }
 
+export function clearSeededLocations(): void {
+    cy.request({
+        method: 'POST',
+        url: '/api/geocode/clear',
+    });
+}
+
 export function addSource(name: string, url: string): void {
     cy.request({
         method: 'POST',
@@ -98,3 +106,4 @@ Cypress.Commands.add('addCase', addCase);
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);
 Cypress.Commands.add('seedLocation', seedLocation);
+Cypress.Commands.add('clearSeededLocations', clearSeededLocations);
