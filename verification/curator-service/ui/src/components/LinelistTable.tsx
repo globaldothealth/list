@@ -140,10 +140,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         return {
             demographics: {
                 sex: rowData.sex,
-                ageRange: {
-                    start: rowData.age[0],
-                    end: rowData.age[1],
-                },
+                ageRange: rowData.age[1]
+                    ? {
+                          start: rowData.age[0],
+                          end: rowData.age[1],
+                      }
+                    : undefined,
                 ethnicity: rowData.ethnicity,
                 nationalities: rowData.nationalities?.split(', '),
                 profession: rowData.profession,
@@ -456,6 +458,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                            actionsColumnIndex: -1,
                         }}
                         actions={
                             this.props.user.roles.includes('curator')
