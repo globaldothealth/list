@@ -16,7 +16,7 @@ describe('validate', () => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
-    
+
     it('a pathogen without an id is invalid', async () => {
         const missingId = { ...minimalModel };
         delete missingId.id;
