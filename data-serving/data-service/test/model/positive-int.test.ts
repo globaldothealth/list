@@ -2,7 +2,7 @@ import { Error } from 'mongoose';
 import mongoose from 'mongoose';
 import { positiveIntFieldInfo } from '../../src/model/positive-int';
 
-/** A fake model with a field using the date schema. */
+/** A fake model with a field using the positive int schema. */
 const FakeModel = mongoose.model(
     'FakeDocument',
     new mongoose.Schema({
