@@ -61,7 +61,7 @@ interface FormValues {
     age?: number;
     ethnicity?: string;
     nationalities: string[];
-    profession: string | null;
+    profession?: string;
     locationQuery: string;
     location?: Loc;
     confirmedDate: string | null;
@@ -134,7 +134,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ageRange: ageRange,
                     ethnicity: values.ethnicity,
                     nationalities: values.nationalities,
-                    profession: values.profession || undefined,
+                    profession: values.profession,
                 },
                 location: {
                     ...values.location,
@@ -266,7 +266,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     age: undefined,
                     ethnicity: undefined,
                     nationalities: [],
-                    profession: null,
+                    profession: undefined,
                     locationQuery: '',
                     location: undefined,
                     confirmedDate: null,
@@ -310,7 +310,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                             values.maxAge !== '') ||
                                         values.ethnicity !== undefined ||
                                         values.nationalities.length > 0 ||
-                                        values.profession !== null,
+                                        values.profession !== undefined,
                                     hasError:
                                         errors.sex !== undefined ||
                                         errors.minAge !== undefined ||
