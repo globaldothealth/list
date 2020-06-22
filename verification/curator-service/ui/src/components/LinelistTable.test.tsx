@@ -1,10 +1,12 @@
 import '@testing-library/jest-dom/extend-expect';
 
+import { MemoryRouter, Router } from 'react-router-dom';
 import { fireEvent, render } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
 import React from 'react';
 import axios from 'axios';
+import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -69,7 +71,11 @@ it('loads and displays cases', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<LinelistTable user={curator} />);
+    const { findByText } = render(
+        <MemoryRouter>
+            <LinelistTable user={curator} />
+        </MemoryRouter>,
+    );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -85,6 +91,34 @@ it('loads and displays cases', async () => {
     expect(admin3).toBeInTheDocument();
     const geoResolution = await findByText(/Admin3/);
     expect(geoResolution).toBeInTheDocument();
+});
+
+it('redirects to new case page when + icon is clicked', async () => {
+    const axiosResponse = {
+        data: {
+            cases: [],
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const history = createMemoryHistory();
+    const { getByText } = render(
+        <Router history={history}>
+            <LinelistTable user={curator} />
+        </Router>,
+    );
+
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=10&page=1&filter=',
+    );
+    fireEvent.click(getByText('add'));
+    expect(history.location.pathname).toBe('/cases/new');
 });
 
 it('API errors are displayed', async () => {
@@ -126,7 +160,11 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<LinelistTable user={curator} />);
+    const { getByText, findByText } = render(
+        <MemoryRouter>
+            <LinelistTable user={curator} />
+        </MemoryRouter>,
+    );
 
     const row = await findByText(/abc123/);
     expect(row).toBeInTheDocument();
@@ -185,7 +223,9 @@ it('can delete a row', async () => {
 
     // Load table
     const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={curator} />,
+        <MemoryRouter>
+            <LinelistTable user={curator} />
+        </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -277,7 +317,9 @@ it('can edit a row', async () => {
 
     // Load table
     const { getByText, findByText, queryByText } = render(
-        <LinelistTable user={curator} />,
+        <MemoryRouter>
+            <LinelistTable user={curator} />
+        </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -394,14 +436,16 @@ it('cannot edit data as a reader only', async () => {
 
     // Load table
     const { findByText, queryByText } = render(
-        <LinelistTable
-            user={{
-                _id: 'testUser',
-                name: 'Alice Smith',
-                email: 'foo@bar.com',
-                roles: ['reader'],
-            }}
-        />,
+        <MemoryRouter>
+            <LinelistTable
+                user={{
+                    _id: 'testUser',
+                    name: 'Alice Smith',
+                    email: 'foo@bar.com',
+                    roles: ['reader'],
+                }}
+            />
+        </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
