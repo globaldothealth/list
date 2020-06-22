@@ -1,4 +1,5 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import {
     Theme,
     WithStyles,
@@ -120,7 +121,7 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends WithStyles<typeof styles> {
+interface Props extends WithStyles<typeof styles>, RouteComponentProps {
     user: User;
 }
 
@@ -237,7 +238,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     render(): JSX.Element {
-        const { classes } = this.props;
+        const { classes, history } = this.props;
         return (
             <div>
                 <Paper>
@@ -454,6 +455,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
+                        actions={
+                            this.props.user.roles.includes('curator')
+                                ? [
+                                      {
+                                          icon: 'add',
+                                          tooltip: 'Submit new case',
+                                          isFreeAction: true,
+                                          onClick: (): void => {
+                                              history.push('/cases/new');
+                                          },
+                                      },
+                                  ]
+                                : undefined
+                        }
                         editable={
                             this.props.user.roles.includes('curator')
                                 ? {
@@ -479,4 +494,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(LinelistTable);
+export default withStyles(styles, { withTheme: true })(
+    withRouter(LinelistTable),
+);
