@@ -408,8 +408,10 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
       Dict[str, Any]: When the input is nonempty. The dictionary is in the
         format:
         {
-          'location': {...},
-          'dateRange': {...}
+          'travel': [
+            'location': {...},
+            'dateRange': {...}
+          ]
         }
     '''
     location_list = None
@@ -429,14 +431,16 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
     if not location_list and not date_range:
         return None
     if not location_list:
-        return [{'dateRange': date_range}]
+        return { 'travel': [{'dateRange': date_range}] }
     if not date_range:
-        return [{'location': l} for l in location_list if l]
+        return { 'travel': [{'location': l} for l in location_list if l] }
 
     # We believe it will be useful to have dates associated with each travel
     # location, but in the existing data, travel history only has one (or no)
     # date associated with the entire field.
-    return [{'dateRange': date_range, 'location': l} for l in location_list if l]
+    return { 'travel':
+      [{'dateRange': date_range, 'location': l} for l in location_list if l]
+    }
 
 
 def convert_imported_case(values_to_archive: Dict[str, Any]) -> Dict[str, Any]:

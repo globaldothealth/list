@@ -213,110 +213,125 @@
         }
       },
       "travelHistory": {
-        "bsonType": "array",
-        "uniqueItems": true,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
-            "location": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "travel": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
                 "_id": {
                   "bsonType": "objectId"
                 },
-                "country": {
-                  "bsonType": "string"
-                },
-                "administrativeAreaLevel1": {
-                  "bsonType": "string"
-                },
-                "administrativeAreaLevel2": {
-                  "bsonType": "string"
-                },
-                "administrativeAreaLevel3": {
-                  "bsonType": "string"
-                },
-                "place": {
-                  "bsonType": "string"
-                },
-                "name": {
-                  "bsonType": "string"
-                },
-                "geoResolution": {
-                  "enum": [
-                    "Point",
-                    "Admin3",
-                    "Admin2",
-                    "Admin1",
-                    "Country"
-                  ]
-                },
-                "geometry": {
+                "location": {
                   "bsonType": "object",
                   "additionalProperties": false,
-                  "required": [
-                    "latitude",
-                    "longitude"
-                  ],
                   "properties": {
                     "_id": {
                       "bsonType": "objectId"
                     },
-                    "latitude": {
-                      "bsonType": "number",
-                      "minimum": -90.0,
-                      "maximum": 90.0
+                    "country": {
+                      "bsonType": "string"
                     },
-                    "longitude": {
-                      "bsonType": "number",
-                      "minimum": -180.0,
-                      "maximum": 180.0
+                    "administrativeAreaLevel1": {
+                      "bsonType": "string"
+                    },
+                    "administrativeAreaLevel2": {
+                      "bsonType": "string"
+                    },
+                    "administrativeAreaLevel3": {
+                      "bsonType": "string"
+                    },
+                    "place": {
+                      "bsonType": "string"
+                    },
+                    "name": {
+                      "bsonType": "string"
+                    },
+                    "geoResolution": {
+                      "enum": [
+                        "Point",
+                        "Admin3",
+                        "Admin2",
+                        "Admin1",
+                        "Country"
+                      ]
+                    },
+                    "geometry": {
+                      "bsonType": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "latitude",
+                        "longitude"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": "objectId"
+                        },
+                        "latitude": {
+                          "bsonType": "number",
+                          "minimum": -90.0,
+                          "maximum": 90.0
+                        },
+                        "longitude": {
+                          "bsonType": "number",
+                          "minimum": -180.0,
+                          "maximum": 180.0
+                        }
+                      }
                     }
                   }
+                },
+                "dateRange": {
+                  "bsonType": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "_id": {
+                      "bsonType": "objectId"
+                    },
+                    "start": {
+                      "bsonType": "date"
+                    },
+                    "end": {
+                      "bsonType": "date"
+                    }
+                  }
+                },
+                "purpose": {
+                  "enum": [
+                    "Business",
+                    "Leisure",
+                    "Family",
+                    "Other",
+                    "Unknown"
+                  ]
+                },
+                "method": {
+                  "enum": [
+                    "Bus",
+                    "Car",
+                    "Coach",
+                    "Ferry",
+                    "Plane",
+                    "Train",
+                    "Other",
+                    "Unknown"
+                  ]
                 }
               }
-            },
-            "dateRange": {
-              "bsonType": "object",
-              "additionalProperties": false,
-              "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
-                "start": {
-                  "bsonType": "date"
-                },
-                "end": {
-                  "bsonType": "date"
-                }
-              }
-            },
-            "purpose": {
-              "enum": [
-                "Business",
-                "Leisure",
-                "Family",
-                "Other",
-                "Unknown"
-              ]
-            },
-            "method": {
-              "enum": [
-                "Bus",
-                "Car",
-                "Coach",
-                "Ferry",
-                "Plane",
-                "Train",
-                "Other",
-                "Unknown"
-              ]
             }
+          },
+          "traveledPrior30Days": {
+            "bsonType": "bool"
+          },
+          "numLocations": {
+            "bsonType": "int"
           }
         }
       },
