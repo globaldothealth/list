@@ -219,6 +219,9 @@
           "_id": {
             "bsonType": "objectId"
           },
+          "numLocations": {
+            "bsonType": "int"
+          },
           "travel": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -329,9 +332,6 @@
           },
           "traveledPrior30Days": {
             "bsonType": "bool"
-          },
-          "numLocations": {
-            "bsonType": "int"
           }
         }
       },

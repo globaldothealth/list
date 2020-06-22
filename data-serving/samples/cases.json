@@ -124,6 +124,7 @@
             ]
         },
         "travelHistory": {
+            "numLocations": 1,
             "travel": [{
                 "dateRange": {
                     "start": {
@@ -154,8 +155,7 @@
                 "method": "Plane",
                 "purpose": "Family"
             }],
-            "traveledPrior30Days": true,
-            "numLocations": 1
+            "traveledPrior30Days": true
         },
         "sources": [
             {
