@@ -19,7 +19,7 @@ export enum TravelMethod {
     Plane = 'Plane',
     Train = 'Train',
     Other = 'Other',
-    Unknown = 'Unknown'
+    Unknown = 'Unknown',
 }
 
 export const travelSchema = new mongoose.Schema({
