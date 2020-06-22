@@ -1,6 +1,7 @@
 import { SourceDocument, sourceSchema } from './source';
 
 import mongoose from 'mongoose';
+import { positiveIntFieldInfo } from './positive-int';
 
 export const pathogenSchema = new mongoose.Schema({
     name: {
@@ -8,12 +9,7 @@ export const pathogenSchema = new mongoose.Schema({
         required: true,
     },
     id: {
-        type: Number,
-        min: 0,
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value',
-        },
+        ...positiveIntFieldInfo,
         required: true,
     },
 });

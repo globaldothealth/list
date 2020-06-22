@@ -10,7 +10,7 @@ import {
 } from './revision-metadata';
 import { SourceDocument, sourceSchema } from './source';
 import { TransmissionDocument, transmissionSchema } from './transmission';
-import { TravelDocument, travelSchema } from './travel';
+import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
@@ -47,7 +47,7 @@ const caseSchema = new mongoose.Schema(
         },
         symptoms: dictionarySchema,
         transmission: transmissionSchema,
-        travelHistory: [travelSchema],
+        travelHistory: travelHistorySchema,
     },
     {
         toObject: {
@@ -79,7 +79,7 @@ type CaseDocument = mongoose.Document & {
     sources: [SourceDocument];
     symptoms: DictionaryDocument;
     transmission: TransmissionDocument;
-    travelHistory: [TravelDocument];
+    travelHistory: TravelHistoryDocument;
 };
 
 export const Case = mongoose.model<CaseDocument>('Case', caseSchema);

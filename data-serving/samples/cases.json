@@ -123,8 +123,21 @@
                 "cancer"
             ]
         },
-        "travelHistory": [
-            {
+        "travelHistory": {
+            "numLocations": 1,
+            "travel": [{
+                "dateRange": {
+                    "start": {
+                        "$date": {
+                            "$numberLong": "1576386000000"
+                        }
+                    },
+                    "end": {
+                        "$date": {
+                            "$numberLong": "1577682000000"
+                        }
+                    }
+                },
                 "location": {
                     "country": "China",
                     "administrativeAreaLevel1": "Hubei",
@@ -139,22 +152,11 @@
                         }
                     }
                 },
-                "dateRange": {
-                    "start": {
-                        "$date": {
-                            "$numberLong": "1576386000000"
-                        }
-                    },
-                    "end": {
-                        "$date": {
-                            "$numberLong": "1577682000000"
-                        }
-                    }
-                },
-                "purpose": "Family",
-                "additionalInformation": "large family gathering for holidays"
-            }
-        ],
+                "method": "Plane",
+                "purpose": "Family"
+            }],
+            "traveledPrior30Days": true
+        },
         "sources": [
             {
                 "id": "def456",

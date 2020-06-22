@@ -11,6 +11,17 @@ export enum TravelPurpose {
     Unknown = 'Unknown',
 }
 
+export enum TravelMethod {
+    Bus = 'Bus',
+    Car = 'Car',
+    Coach = 'Coach',
+    Ferry = 'Ferry',
+    Plane = 'Plane',
+    Train = 'Train',
+    Other = 'Other',
+    Unknown = 'Unknown',
+}
+
 export const travelSchema = new mongoose.Schema({
     location: locationSchema,
     dateRange: dateRangeSchema,
@@ -18,12 +29,15 @@ export const travelSchema = new mongoose.Schema({
         type: String,
         enum: Object.values(TravelPurpose),
     },
-    additionalInformation: String,
+    method: {
+        type: String,
+        enum: Object.values(TravelMethod),
+    },
 });
 
 export type TravelDocument = mongoose.Document & {
-    location: LocationDocument;
     dateRange: DateRangeDocument;
+    location: LocationDocument;
+    method: TravelMethod;
     purpose: TravelPurpose;
-    additionalInformation: string;
 };
