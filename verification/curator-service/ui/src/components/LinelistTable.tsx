@@ -55,6 +55,10 @@ interface Source {
     url: string;
 }
 
+interface Symptoms {
+    provided: string[];
+}
+
 interface Case {
     _id: string;
     importedCase: {
@@ -63,6 +67,7 @@ interface Case {
     events: Event[];
     demographics: Demographics;
     location: Location;
+    symptoms: Symptoms;
     sources: Source[];
     notes: string;
 }
@@ -90,6 +95,8 @@ interface TableRow {
     latitude: number;
     longitude: number;
     confirmedDate: Date | null;
+    // Represents a list as a comma and space separated string e.g. 'fever, cough'
+    symptoms: string;
     // sources
     sourceUrl: string | null;
     notes: string;
@@ -164,6 +171,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     },
                 },
             ],
+            symptoms: {
+                provided: rowData.symptoms?.split(', '),
+            },
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
@@ -318,6 +328,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                                 type: 'date',
                             },
+                            {
+                                title: 'Symptoms',
+                                field: 'symptoms',
+                                filtering: false,
+                            },
                             { title: 'Notes', field: 'notes' },
                             {
                                 title: 'Source URL',
@@ -405,6 +420,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,
+                                                symptoms: c.symptoms?.provided?.join(
+                                                    ', ',
+                                                ),
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&
