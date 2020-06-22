@@ -374,7 +374,7 @@
         "place": {
           "bsonType": "string"
         },
-        "linkedCases": {
+        "linkedCaseIds": {
           "bsonType": "array",
           "uniqueItems": true,
           "items": {

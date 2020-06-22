@@ -142,7 +142,7 @@
     "transmission": {
         "route": "Vector borne",
         "place": "Gym",
-        "linkedCases": [ "abc", "def" ]
+        "linkedCaseIds": [ "abc", "def" ]
     },
     "importedCase": {
         "ID": "xyz",

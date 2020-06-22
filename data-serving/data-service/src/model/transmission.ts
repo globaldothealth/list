@@ -22,11 +22,11 @@ export const transmissionSchema = new mongoose.Schema({
     // Data dictionary.
     place: String,
     // Ids of other cases of people with whom this person had contact.
-    linkedCases: [String],
+    linkedCaseIds: [String],
 });
 
 export type TransmissionDocument = mongoose.Document & {
     route: Route;
     places: string;
-    linkedCases: [string];
+    linkedCaseIds: [string];
 };
