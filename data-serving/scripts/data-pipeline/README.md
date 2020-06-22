@@ -7,6 +7,14 @@ database?
 
 This script is for you.
 
+## Prerequisites
+
+Install python dependencies:
+
+```shell
+python3 -m pip install -r requirements.txt
+```
+
 ## How to run it
 
 ```shell
