@@ -428,9 +428,6 @@
           "country": {
             "bsonType": "string"
           },
-          "geo_resolution": {
-            "bsonType": "string"
-          },
           "date_onset_symptoms": {
             "bsonType": "string"
           },

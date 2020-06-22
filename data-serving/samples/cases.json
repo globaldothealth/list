@@ -2,12 +2,8 @@
     {
         "demographics": {
             "ageRange": {
-                "start": {
-                    "$numberDouble": "50"
-                },
-                "end": {
-                    "$numberDouble": "59"
-                }
+                "start": 50,
+                "end": 59
             },
             "sex": "Female",
             "profession": "Horse trainer",
@@ -197,7 +193,6 @@
         },
         "importedCase": {
             "ID": "idk",
-            "geo_resolution": "admin_2",
             "chronic_disease_binary": "true",
             "outcome": "discharge 2/12",
             "admin_id": "291",
