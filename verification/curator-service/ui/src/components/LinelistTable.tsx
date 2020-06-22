@@ -455,16 +455,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                         }}
-                        actions={[
-                            {
-                                icon: 'add',
-                                tooltip: 'Submit new case',
-                                isFreeAction: true,
-                                onClick: (): void => {
-                                    history.push('/cases/new');
-                                },
-                            },
-                        ]}
+                        actions={
+                            this.props.user.roles.includes('curator')
+                                ? [
+                                      {
+                                          icon: 'add',
+                                          tooltip: 'Submit new case',
+                                          isFreeAction: true,
+                                          onClick: (): void => {
+                                              history.push('/cases/new');
+                                          },
+                                      },
+                                  ]
+                                : undefined
+                        }
                         editable={
                             this.props.user.roles.includes('curator')
                                 ? {
