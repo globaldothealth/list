@@ -1,5 +1,6 @@
 import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
+import { positiveIntFieldInfo } from './positive-int';
 
 const editMetadataSchema = new mongoose.Schema({
     curator: {
@@ -15,12 +16,7 @@ const editMetadataSchema = new mongoose.Schema({
 
 export const revisionMetadataSchema = new mongoose.Schema({
     revisionNumber: {
-        type: Number,
-        min: 0,
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value',
-        },
+        ...positiveIntFieldInfo,
         required: true,
     },
     creationMetadata: {
