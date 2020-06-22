@@ -8,8 +8,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
-import { Loc } from './new-case-form-fields/Location';
 import LocationForm from './new-case-form-fields/LocationForm';
+import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
 import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
@@ -52,30 +52,6 @@ interface Props extends WithStyles<typeof styles> {
 
 interface NewCaseFormState {
     errorMessage: string;
-}
-
-interface FormValues {
-    sex?: string;
-    minAge?: number;
-    maxAge?: number;
-    age?: number;
-    ethnicity?: string;
-    nationalities: string[];
-    profession?: string;
-    locationQuery: string;
-    location?: Loc;
-    confirmedDate: string | null;
-    methodOfConfirmation?: string;
-    onsetSymptomsDate: string | null;
-    firstClinicalConsultationDate: string | null;
-    selfIsolationDate: string | null;
-    hospitalAdmissionDate: string | null;
-    icuAdmissionDate: string | null;
-    outcomeDate: string | null;
-    outcome?: string;
-    symptoms: string[];
-    sourceUrl: string;
-    notes: string;
 }
 
 const NewCaseValidation = Yup.object().shape(
@@ -123,7 +99,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         };
     }
 
-    async submitCase(values: FormValues): Promise<void> {
+    async submitCase(values: NewCaseFormValues): Promise<void> {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
@@ -163,8 +139,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     },
                     {
                         name: 'hospitalAdmission',
-                        dates: values.hospitalAdmissionDate,
-                        value: undefined,
+                        dates:
+                            values.admittedToHospital === 'Yes'
+                                ? values.hospitalAdmissionDate
+                                : undefined,
+                        value: values.admittedToHospital,
                     },
                     {
                         name: 'icuAdmission',
@@ -274,6 +253,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     onsetSymptomsDate: null,
                     firstClinicalConsultationDate: null,
                     selfIsolationDate: null,
+                    admittedToHospital: undefined,
                     hospitalAdmissionDate: null,
                     icuAdmissionDate: null,
                     outcomeDate: null,
@@ -348,6 +328,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         values.firstClinicalConsultationDate !==
                                             null ||
                                         values.selfIsolationDate !== null ||
+                                        values.admittedToHospital !==
+                                            undefined ||
                                         values.hospitalAdmissionDate !== null ||
                                         values.icuAdmissionDate !== null ||
                                         values.outcomeDate !== null ||
@@ -361,6 +343,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         errors.firstClinicalConsultationDate !==
                                             undefined ||
                                         errors.selfIsolationDate !==
+                                            undefined ||
+                                        errors.admittedToHospital !==
                                             undefined ||
                                         errors.hospitalAdmissionDate !==
                                             undefined ||
