@@ -45,6 +45,7 @@ interface Location {
     administrativeAreaLevel3: string;
     geoResolution: string;
     geometry: Geometry;
+    name: string;
 }
 
 interface Geometry {
@@ -93,6 +94,7 @@ interface TableRow {
     adminArea2: string;
     adminArea3: string;
     geoResolution: string;
+    locationName: string;
     latitude: number;
     longitude: number;
     confirmedDate: Date | null;
@@ -163,6 +165,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     latitude: rowData.latitude,
                     longitude: rowData.longitude,
                 },
+                name: rowData.locationName,
                 geoResolution: rowData.geoResolution,
             },
             events: [
@@ -277,50 +280,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
+                                title: 'Location',
+                                field: 'locationName',
+                                filtering: false,
+                                editable: 'never',
+                            },
+                            {
                                 title: 'Country',
                                 field: 'country',
                                 filtering: false,
                                 editable: 'never',
-                            },
-                            {
-                                title: 'Admin area 1',
-                                field: 'adminArea1',
-                                filtering: false,
-                                editable: 'never',
-                            },
-                            {
-                                title: 'Admin area 2',
-                                field: 'adminArea2',
-                                filtering: false,
-                                editable: 'never',
-                            },
-                            {
-                                title: 'Admin area 3',
-                                field: 'adminArea3',
-                                filtering: false,
-                                editable: 'never',
-                            },
-                            {
-                                title: 'Geo resolution',
-                                field: 'geoResolution',
-                                filtering: false,
-                                editable: 'never',
-                            },
-                            {
-                                title: 'Latitude',
-                                field: 'latitude',
-                                filtering: false,
-                                editable: 'never',
-                                render: (rowData) =>
-                                    rowData.latitude?.toFixed(4) ?? '',
-                            },
-                            {
-                                title: 'Longitude',
-                                field: 'longitude',
-                                filtering: false,
-                                editable: 'never',
-                                render: (rowData) =>
-                                    rowData.longitude?.toFixed(4) ?? '',
                             },
                             {
                                 title: 'Confirmed date',
@@ -419,6 +388,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                         ?.longitude,
                                                 geoResolution:
                                                     c.location?.geoResolution,
+                                                locationName: c.location?.name,
                                                 confirmedDate: confirmedDate
                                                     ? new Date(confirmedDate)
                                                     : null,

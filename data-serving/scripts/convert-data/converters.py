@@ -253,6 +253,7 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
           'administrativeAreaLevel3': str,
           'place': str,
           'geo_resolution': str,
+          'name': str,
           'geometry': {
             'latitude': float,
             'longitude': float
@@ -294,6 +295,11 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
 
     if geometry:
         location['geometry'] = geometry
+
+    # Produce a reasonable human readable name based on admin hierarchy.
+    location['name'] = ', '.join([part for part in 
+      [admin1, admin2, admin3]
+    if part])
 
     try:
         parsed_geo_resolution = parse_geo_resolution(geo_resolution)
