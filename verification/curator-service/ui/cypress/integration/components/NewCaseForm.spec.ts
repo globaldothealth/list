@@ -79,7 +79,7 @@ describe('New case form', function () {
     });
 
     it('Does not add row on submission error', function () {
-        // Avoid geolocation fail, the "Request failed" check below happen at the data service level.
+        // Avoid geolocation fail, the "Request failed" check below happens at the data service level.
         cy.seedLocation({
             name: 'France',
             geometry: { latitude: 42, longitude: 12 },

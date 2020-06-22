@@ -15,7 +15,6 @@ interface Values {
 function LocationForm(): JSX.Element {
     const { values } = useFormikContext<Values>();
     return (
-        // TODO: suggest and pass location.
         <Scroll.Element name="location">
             <fieldset>
                 <legend>Location</legend>
@@ -65,7 +64,6 @@ function PlacesAutocomplete(): JSX.Element {
         }
 
         fetch({ q: inputValue }, (results?: Loc[]) => {
-            console.log('fetch results:', results);
             if (active) {
                 let newOptions = [] as Loc[];
 
