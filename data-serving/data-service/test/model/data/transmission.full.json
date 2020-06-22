@@ -1,0 +1,5 @@
+{
+    "route": "Vector borne",
+    "place": "Gym",
+    "linkedCaseIds": [ "abc", "def" ]
+}
