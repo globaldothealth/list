@@ -1,4 +1,5 @@
 {
+    "numLocations": 1,
     "travel": [
         {
             "dateRange": {
@@ -22,6 +23,5 @@
             "purpose": "Family"
         }
     ],
-    "traveledPrior30Days": true,
-    "numLocations": 1
+    "traveledPrior30Days": true
 }
