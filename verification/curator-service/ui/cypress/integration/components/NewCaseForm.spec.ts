@@ -49,9 +49,9 @@ describe('New case form', function () {
             .clear()
             .type('2020-01-05');
         cy.get('input[name="icuAdmissionDate"]').clear().type('2020-01-06');
-        cy.get('input[name="outcomeDate"]').clear().type('2020-01-07');
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
+        cy.get('input[name="outcomeDate"]').clear().type('2020-01-07');
         cy.get('div[data-testid="symptoms"]').type('dry cough');
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
