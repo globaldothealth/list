@@ -398,12 +398,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     c.location?.geoResolution,
                                                 locationName: c.location?.name,
                                                 confirmedDate: confirmedEvent
+                                                    ?.dateRange?.start
                                                     ? new Date(
                                                           confirmedEvent.dateRange.start,
                                                       )
                                                     : null,
                                                 confirmationMethod:
-                                                    confirmedEvent?.value || '',
+                                                    confirmedEvent?.value,
                                                 symptoms: c.symptoms?.provided?.join(
                                                     ', ',
                                                 ),
