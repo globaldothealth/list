@@ -1,14 +1,37 @@
 /* eslint-disable no-undef */
 describe('App', function () {
+    it('takes user to home page when home button is clicked', function () {
+        cy.login();
+        cy.visit('/cases');
+        cy.url().should('eq', 'http://localhost:3002/cases');
+
+        cy.get('button[aria-label="open drawer"]').click();
+        cy.get('a[href="/"]').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
+    it('shows login button when logged out', function () {
+        cy.visit('/');
+
+        cy.contains('Login');
+    });
+
+    it('shows logout button when logged in', function () {
+        cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
+        cy.visit('/');
+
+        cy.contains('Logout alice@test.com');
+    });
+
     it('Homepage with logged out user', function () {
         cy.visit('/');
 
         cy.contains('Login to access Global Health Curator Portal');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Cumulative charts').should('not.exist');
-        cy.contains('Freshness charts').should('not.exist');
-        cy.contains('Completeness charts').should('not.exist');
+        cy.contains('Cumulative charts');
+        cy.contains('Freshness charts');
+        cy.contains('Completeness charts');
         cy.contains('Profile').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
