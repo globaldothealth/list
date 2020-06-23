@@ -1,0 +1,11 @@
+Airborne infection
+Droplet infection
+Fecal–oral
+Sexual
+Oral
+Direct contact
+Vertical (Parent to child)
+Iatrogenic
+Vector borne
+Other
+Unknown
