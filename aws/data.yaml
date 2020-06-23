@@ -77,7 +77,7 @@ spec:
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: data-prod-84t6gt4hhc
+                  name: data-prod-bdh6659ckt
                   key: db_connection_string
           resources:
             requests:
