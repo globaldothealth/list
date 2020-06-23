@@ -89,7 +89,7 @@ const NewCaseValidation = Yup.object().shape(
                 ),
             }),
         transmissionLinkedCaseIds: Yup.array().of(
-            Yup.string().matches(new RegExp('[a-z0-9]{24}')),
+            Yup.string().matches(new RegExp('[a-z0-9]{24}'), 'Invalid case ID'),
         ),
     },
     [['maxAge', 'minAge']],
