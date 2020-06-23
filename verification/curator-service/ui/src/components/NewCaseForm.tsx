@@ -88,6 +88,9 @@ const NewCaseValidation = Yup.object().shape(
                     'Cannot enter age and age range',
                 ),
             }),
+        transmissionLinkedCaseIds: Yup.array().of(
+            Yup.string().matches(new RegExp('[a-z0-9]{24}')),
+        ),
     },
     [['maxAge', 'minAge']],
 );
@@ -284,6 +287,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     errors,
                 }): JSX.Element => (
                     <div className={classes.container}>
+                        {console.log(errors)}
                         <nav className={classes.tableOfContents}>
                             <div
                                 className={classes.tableOfContentsRow}

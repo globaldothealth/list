@@ -61,7 +61,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="transmissionPlace"]').click();
         cy.get('li[data-value="Factory"').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
-            'testCaseId\ntestCaseId2\n',
+            'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
         cy.get('textarea[name="notes"]')
@@ -84,7 +84,7 @@ describe('New case form', function () {
         cy.contains('dry cough, mild fever');
         cy.contains('Direct contact');
         cy.contains('Factory');
-        cy.contains('testCaseId, testCaseId2');
+        cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');
