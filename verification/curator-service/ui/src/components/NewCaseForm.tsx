@@ -200,13 +200,10 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         } catch (e) {
             console.log(e);
             if (e.response) {
-                console.log('in response:', e.response.data);
                 this.setState({ errorMessage: e.response.data });
             } else if (e.request) {
-                console.log('in request');
                 this.setState({ errorMessage: e.request });
             } else {
-                console.log('in else');
                 this.setState({ errorMessage: e.message });
             }
         }
