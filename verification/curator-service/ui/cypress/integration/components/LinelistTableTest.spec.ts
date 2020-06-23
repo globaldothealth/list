@@ -9,8 +9,26 @@ describe('Linelist table', function () {
         cy.clearSeededLocations();
     });
 
+    it('Display case properly', function () {
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'www.example.com',
+            methodOfConfirmation: 'PCR test',
+        });
+        cy.visit('/cases');
+        cy.contains('PCR test');
+        cy.contains('some notes');
+        cy.contains('France');
+        cy.contains('www.example.com');
+    });
+
     it('Can edit a case', function () {
-        cy.addCase('France', 'some notes', 'www.example.com');
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'www.example.com',
+        });
         cy.visit('/cases');
         cy.contains('some notes');
 
@@ -23,7 +41,11 @@ describe('Linelist table', function () {
     });
 
     it('Can delete a case', function () {
-        cy.addCase('France', 'some notes', 'www.example.com');
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'www.example.com',
+        });
         cy.visit('/cases');
         cy.contains('some notes');
 
