@@ -10,20 +10,22 @@ from datetime import date, datetime
 LOCAL_DATA_FILE = "/tmp/data.json"
 METADATA_BUCKET = "epid-ingestion"
 SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
+SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
+S3_KEY_PATH_SEPERATOR = "/"
 
 s3_client = boto3.client("s3")
 
 
-def extract_s3_path(event):
+def extract_event_fields(event):
     if any(field not in event for field in [S3_BUCKET_FIELD, S3_KEY_FIELD]):
         error_message = (
-            f"Required fields {S3_BUCKET_FIELD}; {S3_KEY_FIELD} not found in "
-            "input event json.")
+            f"Required fields {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
+            f"{S3_KEY_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
-    return event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
+    return event[SOURCE_URL_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
 
 
 def retrieve_raw_data_file(s3_bucket, s3_key):
@@ -56,7 +58,28 @@ def convert_sex(raw_sex):
     return None
 
 
-def parse_cases(raw_data_file):
+def convert_location(raw_entry):
+    state = raw_entry["detectedstate"]
+    district = raw_entry["detecteddistrict"]
+    city = raw_entry["detectedcity"]
+
+    query_terms = ("India",)
+    location = {"country": "India"}
+    if state:
+        location["administrativeAreaLevel1"] = state
+        query_terms = (state,) + query_terms
+    if district:
+        location["administrativeAreaLevel2"] = district
+        query_terms = (district,) + query_terms
+    if city:
+        location["administrativeAreaLevel3"] = city
+        query_terms = (city,) + query_terms
+
+    location["query"] = ", ".join(query_terms)
+    return location
+
+
+def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses GHDSI-format case data from raw API data.
 
@@ -71,6 +94,10 @@ def parse_cases(raw_data_file):
         cases = json.load(f)
         return [
             {
+                "caseReference": {
+                    "sourceId": source_id,
+                    "sourceEntryId": entry["entryid"]
+                },
                 "revisionMetadata": {
                     "revisionNumber": 0,
                     "creationMetadata": {
@@ -80,12 +107,10 @@ def parse_cases(raw_data_file):
                 },
                 "sources": [
                     {
-                        "url": "https://api.covid19india.org/raw_data6.json",
+                        "url": source_url,
                     }
                 ],
-                "location": {
-                    "country": "India"
-                },
+                "location": convert_location(entry),
                 "events": [
                     {
                         "name": "confirmed",
@@ -98,23 +123,24 @@ def parse_cases(raw_data_file):
                 ],
                 "demographics": {
                     "ageRange": {
-                        "start": int(entry["agebracket"]),
-                        "end": int(entry["agebracket"])
+                        "start": float(entry["agebracket"].split(" ", 1)[0]),
+                        "end": float(entry["agebracket"].split(" ", 1)[0])
                     },
                     "sex": convert_sex(entry["gender"])
-                }
+                },
+                "notes": entry["notes"] or None
             } for entry in cases["raw_data"] if entry["agebracket"]]
 
 
 def write_to_server(cases, headers):
     count_success = 0
     count_error = 0
-    post_api_url = f"{os.environ['SOURCE_API_URL']}/cases"
-    print(f"Sending cases to {post_api_url}")
+    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases"
+    print(f"Sending {len(cases)} cases to {put_api_url}")
     for case in cases:
         try:
-            requests.post(post_api_url, json=case,
-                          headers=headers).raise_for_status()
+            r = requests.put(put_api_url, json=case,
+                             headers=headers).raise_for_status()
             count_success += 1
         except Exception as e:
             print(e)
@@ -145,6 +171,11 @@ def obtain_api_credentials():
         raise e
 
 
+def extract_source_id(s3_key):
+    """Extracts the source ID based on the canonical object key format."""
+    return s3_key.split(S3_KEY_PATH_SEPERATOR, 1)[0]
+
+
 def lambda_handler(event, context):
     """
     Case data parsing function for the COVID19-India API.
@@ -169,9 +200,11 @@ def lambda_handler(event, context):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    s3_bucket, s3_key = extract_s3_path(event)
+    source_url, s3_bucket, s3_key = extract_event_fields(event)
     raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
-    case_data = parse_cases(raw_data_file)
+    case_data = parse_cases(
+        raw_data_file, extract_source_id(s3_key),
+        source_url)
     api_creds = obtain_api_credentials()
     count_success, count_error = write_to_server(case_data, api_creds)
     return {"count_success": count_success, "count_error": count_error}
