@@ -17,7 +17,7 @@ describe('validate', () => {
     it('an unknown route is invalid', async () => {
         return new Transmission({
             ...minimalModel,
-            ...{ route: 'Zombie bite' },
+            ...{ routes: ['Zombie bite'] },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });

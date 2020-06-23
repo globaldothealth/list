@@ -1,5 +1,5 @@
 {
-    "route": "Vector borne",
-    "place": "Gym",
+    "routes": [ "Vector borne" ],
+    "places": [ "Gym" ],
     "linkedCaseIds": [ "abc", "def" ]
 }

@@ -23,21 +23,23 @@ export enum TravelMethod {
 }
 
 export const travelSchema = new mongoose.Schema({
-    location: locationSchema,
     dateRange: dateRangeSchema,
+    location: locationSchema,
+    methods: [
+        {
+            type: String,
+            enum: Object.values(TravelMethod),
+        },
+    ],
     purpose: {
         type: String,
         enum: Object.values(TravelPurpose),
-    },
-    method: {
-        type: String,
-        enum: Object.values(TravelMethod),
     },
 });
 
 export type TravelDocument = mongoose.Document & {
     dateRange: DateRangeDocument;
     location: LocationDocument;
-    method: TravelMethod;
+    methods: [TravelMethod];
     purpose: TravelPurpose;
 };
