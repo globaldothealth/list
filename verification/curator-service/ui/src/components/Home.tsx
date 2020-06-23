@@ -12,7 +12,7 @@ export default function Home(props: Props): JSX.Element {
         </Typography>
     ) : (
         <Typography variant="body1">
-            Please Login to access the Global Health Curator Portal
+            Please login to access the Global Health Curator Portal
         </Typography>
     );
 }
