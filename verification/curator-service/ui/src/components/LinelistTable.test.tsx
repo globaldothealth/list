@@ -51,6 +51,7 @@ it('loads and displays cases', async () => {
                     dateRange: {
                         start: new Date().toJSON(),
                     },
+                    value: 'PCR test',
                 },
             ],
             notes: 'some notes',
@@ -89,6 +90,8 @@ it('loads and displays cases', async () => {
     expect(locationName).toBeInTheDocument();
     const ageRange = await findByText('1-3');
     expect(ageRange).toBeInTheDocument();
+    const confirmationMethod = await findByText('PCR test');
+    expect(confirmationMethod).toBeInTheDocument();
 });
 
 it('redirects to new case page when + icon is clicked', async () => {
