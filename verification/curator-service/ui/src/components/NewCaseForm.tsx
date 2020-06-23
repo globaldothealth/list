@@ -287,7 +287,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     errors,
                 }): JSX.Element => (
                     <div className={classes.container}>
-                        {console.log(errors)}
                         <nav className={classes.tableOfContents}>
                             <div
                                 className={classes.tableOfContentsRow}
