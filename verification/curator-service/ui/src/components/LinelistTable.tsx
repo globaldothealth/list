@@ -61,6 +61,12 @@ interface Symptoms {
     provided: string[];
 }
 
+interface Transmission {
+    route: string;
+    place: string;
+    linkedCaseIds: string[];
+}
+
 interface Case {
     _id: string;
     importedCase: {
@@ -70,6 +76,7 @@ interface Case {
     demographics: Demographics;
     location: Location;
     symptoms: Symptoms;
+    transmission: Transmission;
     sources: Source[];
     notes: string;
 }
@@ -100,6 +107,10 @@ interface TableRow {
     confirmedDate: Date | null;
     // Represents a list as a comma and space separated string e.g. 'fever, cough'
     symptoms: string;
+    transmissionRoute: string;
+    transmissionPlace: string;
+    // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
+    transmissionLinkedCaseIds: string;
     // sources
     sourceUrl: string | null;
     notes: string;
@@ -178,6 +189,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             ],
             symptoms: {
                 provided: rowData.symptoms?.split(', '),
+            },
+            transmission: {
+                route: rowData.transmissionRoute,
+                place: rowData.transmissionPlace,
+                linkedCaseIds: rowData.transmissionLinkedCaseIds?.split(', '),
             },
             revisionMetadata: {
                 revisionNumber: 0,
@@ -302,6 +318,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 field: 'symptoms',
                                 filtering: false,
                             },
+                            {
+                                title: 'Route of transmission',
+                                field: 'transmissionRoute',
+                                filtering: false,
+                                editable: 'never',
+                            },
+                            {
+                                title: 'Place of transmission',
+                                field: 'transmissionPlace',
+                                filtering: false,
+                                editable: 'never',
+                            },
+                            {
+                                title: 'Contacted case IDs',
+                                field: 'transmissionLinkedCaseIds',
+                                filtering: false,
+                            },
                             { title: 'Notes', field: 'notes' },
                             {
                                 title: 'Source URL',
@@ -393,6 +426,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ? new Date(confirmedDate)
                                                     : null,
                                                 symptoms: c.symptoms?.provided?.join(
+                                                    ', ',
+                                                ),
+                                                transmissionRoute:
+                                                    c.transmission?.route,
+                                                transmissionPlace:
+                                                    c.transmission?.place,
+                                                transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
                                                     ', ',
                                                 ),
                                                 notes: c.notes,
