@@ -9,8 +9,14 @@ from datetime import date
 from moto import mock_s3
 from unittest.mock import MagicMock
 
+_SOURCE_ID = "abc123"
+_SOURCE_URL = "https://foo.bar"
 _PARSED_CASE = (
     {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceEntryId": "48765"
+        },
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
@@ -20,11 +26,15 @@ _PARSED_CASE = (
         },
         "sources": [
             {
-                "url": "https://api.covid19india.org/raw_data6.json",
+                "url": _SOURCE_URL,
             }
         ],
         "location": {
-            "country": "India"
+            "country": "India",
+            "administrativeAreaLevel1": "Bihar",
+            "administrativeAreaLevel2": "Darbhanga",
+            "administrativeAreaLevel3": "Hanuman Nagar",
+            "query": "Hanuman Nagar, Darbhanga, Bihar, India"
         },
         "events": [
             {
@@ -42,7 +52,8 @@ _PARSED_CASE = (
                 "end": 65
             },
             "sex": "Male"
-        }
+        },
+        "notes": None
     })
 
 
@@ -92,7 +103,7 @@ def test_lambda_handler_e2e(input_event, sample_data, requests_mock, s3):
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
-    requests_mock.post(full_source_url)
+    requests_mock.put(full_source_url)
 
     response = india.lambda_handler(input_event, "")
 
@@ -101,23 +112,24 @@ def test_lambda_handler_e2e(input_event, sample_data, requests_mock, s3):
     assert response["count_error"] == 0
 
 
-def test_extract_s3_path_returns_bucket_and_key(input_event):
+def test_extract_event_fields_returns_url_bucket_and_key(input_event):
     from india import india  # Import locally to avoid superseding mock
-    assert india.extract_s3_path(input_event) == (
+    assert india.extract_event_fields(input_event) == (
+        input_event[india.SOURCE_URL_FIELD],
         input_event[india.S3_BUCKET_FIELD],
         input_event[india.S3_KEY_FIELD])
 
 
-def test_extract_s3_path_errors_if_missing_bucket_field():
+def test_extract_event_fields_errors_if_missing_bucket_field():
     from india import india  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=india.S3_BUCKET_FIELD):
-        india.extract_s3_path({india.S3_KEY_FIELD: "key"})
+        india.extract_event_fields({india.S3_KEY_FIELD: "key"})
 
 
-def test_extract_s3_path_errors_if_missing_key_field():
+def test_extract_event_fields_errors_if_missing_key_field():
     from india import india  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=india.S3_BUCKET_FIELD):
-        india.extract_s3_path({india.S3_BUCKET_FIELD: "bucket"})
+        india.extract_event_fields({india.S3_BUCKET_FIELD: "bucket"})
 
 
 @mock_s3
@@ -144,7 +156,7 @@ def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
     with open(data_file, "w") as f:
         json.dump(sample_data, f)
 
-    result, = india.parse_cases(data_file)
+    result, = india.parse_cases(data_file, _SOURCE_ID, _SOURCE_URL)
     assert result == _PARSED_CASE
 
 
@@ -154,7 +166,7 @@ def test_write_to_server_returns_success_count_for_each_entered_case(
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
-    requests_mock.post(full_source_url)
+    requests_mock.put(full_source_url)
 
     count_success, count_error = india.write_to_server([_PARSED_CASE], {})
     assert requests_mock.request_history[0].url == full_source_url
@@ -169,7 +181,7 @@ def test_write_to_server_returns_error_count_for_each_failed_write(
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
     requests_mock.register_uri(
-        "POST", source_api_url, exc=requests.exceptions.ConnectTimeout),
+        "PUT", source_api_url, exc=requests.exceptions.ConnectTimeout),
 
     count_success, count_error = india.write_to_server([_PARSED_CASE], {})
     assert requests_mock.request_history[0].url == full_source_url
