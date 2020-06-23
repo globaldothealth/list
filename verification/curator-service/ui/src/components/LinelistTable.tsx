@@ -147,6 +147,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         };
     }
 
+    splitCommaSeparated(value: string | null): string[] {
+        if (!value) return [];
+        return value
+            .split(',')
+            .map((value) => value.trim())
+            .filter((value) => value !== '');
+    }
+
     // TODO: Consider defining distinct RPC-format and UI-format Case types to
     // improve type-handling here.
     createCaseFromRowData(rowData: TableRow): unknown {
@@ -158,7 +166,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     end: rowData.age[1] ?? undefined,
                 },
                 ethnicity: rowData.ethnicity,
-                nationalities: rowData.nationalities?.split(', '),
+                nationalities: this.splitCommaSeparated(rowData.nationalities),
                 profession: rowData.profession,
             },
             notes: rowData.notes,
@@ -188,12 +196,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             ],
             symptoms: {
-                provided: rowData.symptoms?.split(', '),
+                provided: this.splitCommaSeparated(rowData.symptoms),
             },
             transmission: {
                 route: rowData.transmissionRoute,
                 place: rowData.transmissionPlace,
-                linkedCaseIds: rowData.transmissionLinkedCaseIds?.split(', '),
+                linkedCaseIds: this.splitCommaSeparated(
+                    rowData.transmissionLinkedCaseIds,
+                ),
             },
             revisionMetadata: {
                 revisionNumber: 0,
