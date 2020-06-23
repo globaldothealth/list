@@ -259,6 +259,7 @@ class App extends React.Component<Props, State> {
                                     icon: <HomeIcon />,
                                     to: '/',
                                     displayCheck: () => true,
+                                    divider: true,
                                 },
                                 {
                                     text: 'Linelist',
@@ -273,6 +274,7 @@ class App extends React.Component<Props, State> {
                                     to: '/cases/new',
                                     displayCheck: () =>
                                         this.hasAnyRole(['curator']),
+                                    divider: true,
                                 },
                                 {
                                     text: 'Sources',
@@ -280,6 +282,7 @@ class App extends React.Component<Props, State> {
                                     to: '/sources',
                                     displayCheck: () =>
                                         this.hasAnyRole(['reader', 'curator']),
+                                    divider: true,
                                 },
                                 {
                                     text: 'Cumulative charts',
@@ -298,6 +301,7 @@ class App extends React.Component<Props, State> {
                                     icon: <ShowChartIcon />,
                                     to: '/charts/completeness',
                                     displayCheck: () => true,
+                                    divider: true,
                                 },
                                 {
                                     text: 'Profile',
@@ -316,7 +320,11 @@ class App extends React.Component<Props, State> {
                             ].map(
                                 (item) =>
                                     item.displayCheck() && (
-                                        <ListItem button key={item.text}>
+                                        <ListItem
+                                            button
+                                            key={item.text}
+                                            divider={item.divider}
+                                        >
                                             <ListItemIcon>
                                                 {item.icon}
                                             </ListItemIcon>
