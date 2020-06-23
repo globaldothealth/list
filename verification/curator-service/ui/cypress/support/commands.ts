@@ -1,11 +1,12 @@
 declare global {
     namespace Cypress {
         interface Chainable {
-            addCase: (
-                country: string,
-                notes: string,
-                sourceUrl: string,
-            ) => void;
+            addCase: (opts: {
+                country: string;
+                notes: string;
+                sourceUrl: string;
+                methodOfConfirmation?: string;
+            }) => void;
             login: () => void;
             addSource: (name: string, url: string) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,17 +16,18 @@ declare global {
     }
 }
 
-export function addCase(
-    country: string,
-    notes: string,
-    sourceUrl: string,
-): void {
+export function addCase(opts: {
+    country: string;
+    notes: string;
+    sourceUrl: string;
+    methodOfConfirmation?: string;
+}): void {
     cy.request({
         method: 'POST',
         url: '/api/cases',
         body: {
             location: {
-                country: country,
+                country: opts.country,
                 geoResolution: 'Country',
                 geometry: {
                     latitude: 42,
@@ -38,13 +40,13 @@ export function addCase(
                     dateRange: {
                         start: new Date().toJSON(),
                     },
-                    value: 'PCR test',
+                    value: opts.methodOfConfirmation,
                 },
             ],
-            notes: notes,
+            notes: opts.notes,
             sources: [
                 {
-                    url: sourceUrl,
+                    url: opts.sourceUrl,
                 },
             ],
             revisionMetadata: {
