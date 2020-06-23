@@ -63,13 +63,13 @@ export default class CasesController {
     };
 
     upsert = async (req: Request, res: Response): Promise<void> => {
-        if (!(await this.geocode(req))) {
-            res.status(404).send(
-                `no geolocation found for ${req.body['location']?.query}`,
-            );
-            return;
-        }
         try {
+            if (!(await this.geocode(req))) {
+                res.status(404).send(
+                    `no geolocation found for ${req.body['location']?.query}`,
+                );
+                return;
+            }
             const response = await axios.put(
                 this.dataServerURL + '/api' + req.url,
                 req.body,
@@ -77,7 +77,7 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
-            res.status(500).send(err);
+            res.status(500).send(err.message);
         }
     };
 
@@ -96,7 +96,7 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
-            res.status(500).send(err);
+            res.status(500).send(err.message);
         }
     };
 
