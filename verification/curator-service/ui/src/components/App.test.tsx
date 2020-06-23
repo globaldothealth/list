@@ -26,7 +26,9 @@ it('renders without crashing when logged in', async () => {
             <App />
         </MemoryRouter>,
     );
-    expect(await findByText(/Global Health/i)).toBeInTheDocument();
+    expect(
+        await findByText(/Global Health/i, { selector: 'h6' }),
+    ).toBeInTheDocument();
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
     expect(await findByText(/foo@bar.com/i)).toBeInTheDocument();

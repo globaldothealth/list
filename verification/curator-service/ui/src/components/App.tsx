@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 import { Link, Route, Switch } from 'react-router-dom';
 
+import Add from '@material-ui/icons/Add';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -20,12 +21,16 @@ import FreshnessCharts from './FreshnessCharts';
 import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
+import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
+import ListIcon from '@material-ui/icons/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import NewCaseForm from './NewCaseForm';
+import PeopleIcon from '@material-ui/icons/People';
+import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
 import React from 'react';
 import ShowChartIcon from '@material-ui/icons/ShowChart';
@@ -136,6 +141,7 @@ class App extends React.Component<Props, State> {
         this.handleDrawerClose = this.handleDrawerClose.bind(this);
         this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
         this.getUser = this.getUser.bind(this);
+        this.hasAnyRole = this.hasAnyRole.bind(this);
     }
 
     componentDidMount(): void {
@@ -248,34 +254,91 @@ class App extends React.Component<Props, State> {
                         <Divider />
                         <List>
                             {[
-                                { text: 'Home', icon: <HomeIcon />, to: '/' },
+                                {
+                                    text: 'Home',
+                                    icon: <HomeIcon />,
+                                    to: '/',
+                                    displayCheck: () => true,
+                                    divider: true,
+                                },
+                                {
+                                    text: 'Linelist',
+                                    icon: <ListIcon />,
+                                    to: '/cases',
+                                    displayCheck: () =>
+                                        this.hasAnyRole(['reader', 'curator']),
+                                },
+                                {
+                                    text: 'New',
+                                    icon: <Add />,
+                                    to: '/cases/new',
+                                    displayCheck: () =>
+                                        this.hasAnyRole(['curator']),
+                                    divider: true,
+                                },
+                                {
+                                    text: 'Sources',
+                                    icon: <LinkIcon />,
+                                    to: '/sources',
+                                    displayCheck: () =>
+                                        this.hasAnyRole(['reader', 'curator']),
+                                    divider: true,
+                                },
                                 {
                                     text: 'Cumulative charts',
                                     icon: <BarChartIcon />,
                                     to: '/charts/cumulative',
+                                    displayCheck: () => true,
                                 },
                                 {
                                     text: 'Freshness charts',
                                     icon: <BubbleChartIcon />,
                                     to: '/charts/freshness',
+                                    displayCheck: () => true,
                                 },
                                 {
                                     text: 'Completeness charts',
                                     icon: <ShowChartIcon />,
                                     to: '/charts/completeness',
+                                    displayCheck: () => true,
+                                    divider: true,
                                 },
-                                // TODO: Add more items for curators and admins.
-                            ].map((item) => (
-                                <ListItem button key={item.text}>
-                                    <ListItemIcon>{item.icon}</ListItemIcon>
-                                    <Link
-                                        to={item.to}
-                                        onClick={this.handleDrawerClose}
-                                    >
-                                        <ListItemText primary={item.text} />
-                                    </Link>
-                                </ListItem>
-                            ))}
+                                {
+                                    text: 'Profile',
+                                    icon: <PersonIcon />,
+                                    to: '/profile',
+                                    displayCheck: () =>
+                                        this.state.user.email !== '',
+                                },
+                                {
+                                    text: 'Manage users',
+                                    icon: <PeopleIcon />,
+                                    to: '/users',
+                                    displayCheck: () =>
+                                        this.hasAnyRole(['admin']),
+                                },
+                            ].map(
+                                (item) =>
+                                    item.displayCheck() && (
+                                        <ListItem
+                                            button
+                                            key={item.text}
+                                            divider={item.divider}
+                                        >
+                                            <ListItemIcon>
+                                                {item.icon}
+                                            </ListItemIcon>
+                                            <Link
+                                                to={item.to}
+                                                onClick={this.handleDrawerClose}
+                                            >
+                                                <ListItemText
+                                                    primary={item.text}
+                                                />
+                                            </Link>
+                                        </ListItem>
+                                    ),
+                            )}
                         </List>
                     </Drawer>
                     <main
