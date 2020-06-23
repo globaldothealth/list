@@ -204,19 +204,20 @@
           "_id": {
             "bsonType": "objectId"
           },
-          "provided": {
+          "values": {
             "bsonType": "array",
             "uniqueItems": true,
             "items": {
               "bsonType": "string"
             }
           },
-          "imputed": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "items": {
-              "bsonType": "string"
-            }
+          "status": {
+            "enum": [
+              "Asymptomatic",
+              "Presymptomatic",
+              "Symptomatic",
+              "Unknown"
+            ]
           }
         }
       },
@@ -227,19 +228,19 @@
           "_id": {
             "bsonType": "objectId"
           },
-          "provided": {
+          "values": {
             "bsonType": "array",
             "uniqueItems": true,
             "items": {
               "bsonType": "string"
             }
           },
-          "imputed": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "items": {
-              "bsonType": "string"
-            }
+          "status": {
+            "enum": [
+              "Yes",
+              "No",
+              "Unknown"
+            ]
           }
         }
       },

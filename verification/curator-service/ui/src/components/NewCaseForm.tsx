@@ -175,7 +175,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         };
                     }),
                 symptoms: {
-                    provided: values.symptoms,
+                    values: values.symptoms,
                 },
                 transmission: {
                     route: values.transmissionRoute,
@@ -199,7 +199,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             this.setState({ errorMessage: '' });
         } catch (e) {
             if (e.response) {
-                this.setState({ errorMessage: e.response.data.message });
+                this.setState({ errorMessage: e.response.data });
             } else if (e.request) {
                 this.setState({ errorMessage: e.request });
             } else {
