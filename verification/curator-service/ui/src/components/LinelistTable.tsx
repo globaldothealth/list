@@ -25,6 +25,7 @@ interface Event {
         start: string;
         end: string;
     };
+    value: string;
 }
 
 interface Demographics {
@@ -98,6 +99,7 @@ interface TableRow {
     latitude: number;
     longitude: number;
     confirmedDate: Date | null;
+    confirmationMethod?: string;
     // Represents a list as a comma and space separated string e.g. 'fever, cough'
     symptoms: string;
     // sources
@@ -174,6 +176,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     dateRange: {
                         start: rowData.confirmedDate,
                     },
+                    value: rowData.confirmationMethod,
                 },
             ],
             symptoms: {
@@ -298,6 +301,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 type: 'date',
                             },
                             {
+                                title: 'Confirmation method',
+                                field: 'confirmationMethod',
+                                filtering: false,
+                            },
+                            {
                                 title: 'Symptoms',
                                 field: 'symptoms',
                                 filtering: false,
@@ -350,10 +358,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         const flattenedCases: TableRow[] = [];
                                         const cases = result.data.cases;
                                         for (const c of cases) {
-                                            const confirmedDate = c.events.find(
+                                            const confirmedEvent = c.events.find(
                                                 (event) =>
                                                     event.name === 'confirmed',
-                                            )?.dateRange?.start;
+                                            );
                                             flattenedCases.push({
                                                 id: c._id,
                                                 sex: c.demographics?.sex,
@@ -389,9 +397,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 geoResolution:
                                                     c.location?.geoResolution,
                                                 locationName: c.location?.name,
-                                                confirmedDate: confirmedDate
-                                                    ? new Date(confirmedDate)
+                                                confirmedDate: confirmedEvent
+                                                    ? new Date(
+                                                          confirmedEvent.dateRange.start,
+                                                      )
                                                     : null,
+                                                confirmationMethod:
+                                                    confirmedEvent?.value || '',
                                                 symptoms: c.symptoms?.provided?.join(
                                                     ', ',
                                                 ),

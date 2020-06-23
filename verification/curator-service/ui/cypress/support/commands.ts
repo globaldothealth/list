@@ -38,6 +38,7 @@ export function addCase(
                     dateRange: {
                         start: new Date().toJSON(),
                     },
+                    value: 'PCR test',
                 },
             ],
             notes: notes,

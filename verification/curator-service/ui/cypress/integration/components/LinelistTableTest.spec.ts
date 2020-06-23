@@ -9,6 +9,15 @@ describe('Linelist table', function () {
         cy.clearSeededLocations();
     });
 
+    it('Display case properly', function () {
+        cy.addCase('France', 'some notes', 'www.example.com');
+        cy.visit('/cases');
+        cy.contains('PCR test');
+        cy.contains('some notes');
+        cy.contains('France');
+        cy.contains('www.example.com');
+    });
+
     it('Can edit a case', function () {
         cy.addCase('France', 'some notes', 'www.example.com');
         cy.visit('/cases');
