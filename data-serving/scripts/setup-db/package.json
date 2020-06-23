@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "setup": "npm install && tsc && mongo --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA'}\" dist/index.js",
+    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA'}\" dist/index.js",
     "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json'}\" dist/index.js"
   },
   "repository": {
