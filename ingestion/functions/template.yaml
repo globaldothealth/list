@@ -22,8 +22,7 @@ Resources:
       Description: Retrieve raw source content
       # Function's execution role
       Policies:
-        - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambdaFullAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
       Timeout: 60 # Seconds
