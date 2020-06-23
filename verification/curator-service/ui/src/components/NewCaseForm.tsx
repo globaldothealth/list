@@ -175,7 +175,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         };
                     }),
                 symptoms: {
-                    provided: values.symptoms,
+                    values: values.symptoms,
                 },
                 transmission: {
                     route: values.transmissionRoute,

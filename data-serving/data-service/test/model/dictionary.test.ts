@@ -14,16 +14,8 @@ const Dictionary = mongoose.model<DictionaryDocument>(
 );
 
 describe('validate', () => {
-    it('a provided field with duplicate values is invalid', async () => {
-        return new Dictionary({ ...fullModel, provided: ['a', 'a'] }).validate(
-            (e) => {
-                expect(e.name).toBe(Error.ValidationError.name);
-            },
-        );
-    });
-
-    it('an imputed field with duplicate values is invalid', async () => {
-        return new Dictionary({ ...fullModel, imputed: ['a', 'a'] }).validate(
+    it('a values field with duplicate values is invalid', async () => {
+        return new Dictionary({ ...fullModel, values: ['a', 'a'] }).validate(
             (e) => {
                 expect(e.name).toBe(Error.ValidationError.name);
             },
