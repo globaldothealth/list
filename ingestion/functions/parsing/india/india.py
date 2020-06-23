@@ -19,7 +19,9 @@ s3_client = boto3.client("s3")
 
 
 def extract_event_fields(event):
-    if any(field not in event for field in [S3_BUCKET_FIELD, S3_KEY_FIELD]):
+    if any(
+            field not in event
+            for field in [SOURCE_URL_FIELD, S3_BUCKET_FIELD, S3_KEY_FIELD]):
         error_message = (
             f"Required fields {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
             f"{S3_KEY_FIELD} not found in input event json.")
