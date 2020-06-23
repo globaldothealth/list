@@ -31,6 +31,7 @@
     "formik-material-ui-pickers": "0.0.8",
     "http-proxy-middleware": "^1.0.4",
     "material-table": "^1.57.2",
+    "material-ui-chip-input": "^2.0.0-beta.2",
     "mongodb": "^3.5.7",
     "mongodb-client-encryption": "^1.0.1",
     "prettier": "^2.0.5",

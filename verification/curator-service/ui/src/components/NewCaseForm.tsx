@@ -16,6 +16,7 @@ import React from 'react';
 import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
+import Transmission from './new-case-form-fields/Transmission';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -87,6 +88,9 @@ const NewCaseValidation = Yup.object().shape(
                     'Cannot enter age and age range',
                 ),
             }),
+        transmissionLinkedCaseIds: Yup.array().of(
+            Yup.string().matches(new RegExp('[a-z0-9]{24}'), 'Invalid case ID'),
+        ),
     },
     [['maxAge', 'minAge']],
 );
@@ -172,6 +176,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     }),
                 symptoms: {
                     provided: values.symptoms,
+                },
+                transmission: {
+                    route: values.transmissionRoute,
+                    place: values.transmissionPlace,
+                    linkedCaseIds: values.transmissionLinkedCaseIds,
                 },
                 sources: [
                     {
@@ -262,6 +271,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     outcomeDate: null,
                     outcome: undefined,
                     symptoms: [],
+                    transmissionRoute: undefined,
+                    transmissionPlace: undefined,
+                    transmissionLinkedCaseIds: [],
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -275,6 +287,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     errors,
                 }): JSX.Element => (
                     <div className={classes.container}>
+                        {console.log(errors)}
                         <nav className={classes.tableOfContents}>
                             <div
                                 className={classes.tableOfContentsRow}
@@ -369,6 +382,30 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('transmission')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked:
+                                        values.transmissionRoute !==
+                                            undefined ||
+                                        values.transmissionPlace !==
+                                            undefined ||
+                                        values.transmissionLinkedCaseIds
+                                            .length > 0,
+                                    hasError:
+                                        errors.transmissionRoute !==
+                                            undefined ||
+                                        errors.transmissionPlace !==
+                                            undefined ||
+                                        errors.transmissionLinkedCaseIds !==
+                                            undefined,
+                                })}
+                                Transmission
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
@@ -394,6 +431,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <LocationForm></LocationForm>
                                 <Events></Events>
                                 <Symptoms></Symptoms>
+                                <Transmission></Transmission>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}

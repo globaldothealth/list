@@ -62,6 +62,12 @@ interface Symptoms {
     provided: string[];
 }
 
+interface Transmission {
+    route: string;
+    place: string;
+    linkedCaseIds: string[];
+}
+
 interface Case {
     _id: string;
     importedCase: {
@@ -71,6 +77,7 @@ interface Case {
     demographics: Demographics;
     location: Location;
     symptoms: Symptoms;
+    transmission: Transmission;
     sources: Source[];
     notes: string;
 }
@@ -102,6 +109,10 @@ interface TableRow {
     confirmationMethod?: string;
     // Represents a list as a comma and space separated string e.g. 'fever, cough'
     symptoms: string;
+    transmissionRoute: string;
+    transmissionPlace: string;
+    // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
+    transmissionLinkedCaseIds: string;
     // sources
     sourceUrl: string | null;
     notes: string;
@@ -138,6 +149,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         };
     }
 
+    splitCommaSeparated(value: string | null): string[] {
+        if (!value) return [];
+        return value
+            .split(',')
+            .map((value) => value.trim())
+            .filter((value) => value !== '');
+    }
+
     // TODO: Consider defining distinct RPC-format and UI-format Case types to
     // improve type-handling here.
     createCaseFromRowData(rowData: TableRow): unknown {
@@ -149,7 +168,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     end: rowData.age[1] ?? undefined,
                 },
                 ethnicity: rowData.ethnicity,
-                nationalities: rowData.nationalities?.split(', '),
+                nationalities: this.splitCommaSeparated(rowData.nationalities),
                 profession: rowData.profession,
             },
             notes: rowData.notes,
@@ -180,7 +199,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             ],
             symptoms: {
-                provided: rowData.symptoms?.split(', '),
+                provided: this.splitCommaSeparated(rowData.symptoms),
+            },
+            transmission: {
+                route: rowData.transmissionRoute,
+                place: rowData.transmissionPlace,
+                linkedCaseIds: this.splitCommaSeparated(
+                    rowData.transmissionLinkedCaseIds,
+                ),
             },
             revisionMetadata: {
                 revisionNumber: 0,
@@ -310,6 +336,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 field: 'symptoms',
                                 filtering: false,
                             },
+                            {
+                                title: 'Route of transmission',
+                                field: 'transmissionRoute',
+                                filtering: false,
+                                editable: 'never',
+                            },
+                            {
+                                title: 'Place of transmission',
+                                field: 'transmissionPlace',
+                                filtering: false,
+                                editable: 'never',
+                            },
+                            {
+                                title: 'Contacted case IDs',
+                                field: 'transmissionLinkedCaseIds',
+                                filtering: false,
+                            },
                             { title: 'Notes', field: 'notes' },
                             {
                                 title: 'Source URL',
@@ -406,6 +449,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 confirmationMethod:
                                                     confirmedEvent?.value,
                                                 symptoms: c.symptoms?.provided?.join(
+                                                    ', ',
+                                                ),
+                                                transmissionRoute:
+                                                    c.transmission?.route,
+                                                transmissionPlace:
+                                                    c.transmission?.place,
+                                                transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
                                                     ', ',
                                                 ),
                                                 notes: c.notes,
