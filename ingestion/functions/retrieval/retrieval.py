@@ -109,8 +109,9 @@ def upload_to_s3(file_name, s3_object_key):
         raise e
 
 
-def invoke_parser(parser_arn, s3_object_key):
-    payload = {"s3Bucket": OUTPUT_BUCKET, "s3Key": s3_object_key}
+def invoke_parser(parser_arn, s3_object_key, source_url):
+    payload = {"s3Bucket": OUTPUT_BUCKET,
+               "s3Key": s3_object_key, "sourceUrl": source_url}
     print(f"Invoking parser (ARN: {parser_arn}")
     response = lambda_client.invoke(
         FunctionName=parser_arn,
@@ -152,5 +153,5 @@ def lambda_handler(event, context):
     file_name, s3_object_key = retrieve_content(source_id, url, source_format)
     upload_to_s3(file_name, s3_object_key)
     if parser_arn:
-        invoke_parser(parser_arn, s3_object_key)
+        invoke_parser(parser_arn, s3_object_key, url)
     return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}
