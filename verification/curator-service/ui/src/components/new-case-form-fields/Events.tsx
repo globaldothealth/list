@@ -31,15 +31,17 @@ function DateField(props: DateFieldProps): JSX.Element {
     const classes = useStyles();
     return (
         <div className={classes.fieldRow}>
-            <Field
-                className={classes.field}
-                name={props.name}
-                label={props.label}
-                format="yyyy/MM/dd"
-                maxDate={new Date()}
-                minDate={new Date('2019/12/01')}
-                component={KeyboardDatePicker}
-            />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Field
+                    className={classes.field}
+                    name={props.name}
+                    label={props.label}
+                    format="yyyy/MM/dd"
+                    maxDate={new Date()}
+                    minDate={new Date('2019/12/01')}
+                    component={KeyboardDatePicker}
+                />
+            </MuiPickersUtilsProvider>
         </div>
     );
 }
@@ -92,55 +94,53 @@ export default function Events(): JSX.Element {
         <Scroll.Element name="events">
             <fieldset>
                 <legend>Events</legend>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <DateField
+                    name="confirmedDate"
+                    label="Confirmed case date"
+                ></DateField>
+                <SelectField
+                    name="methodOfConfirmation"
+                    label="Method of confirmation"
+                    values={methodsOfConfirmation}
+                ></SelectField>
+                <DateField
+                    name="onsetSymptomsDate"
+                    label="Onset of symptoms date"
+                ></DateField>
+                <DateField
+                    name="firstClinicalConsultationDate"
+                    label="First clinical consultation date"
+                ></DateField>
+                <DateField
+                    name="selfIsolationDate"
+                    label="Self isolation date"
+                ></DateField>
+                <SelectField
+                    name="admittedToHospital"
+                    label="Hospital admission"
+                    values={yesNoUndefined}
+                ></SelectField>
+                {values.admittedToHospital === 'Yes' && (
                     <DateField
-                        name="confirmedDate"
-                        label="Confirmed case date"
+                        name="hospitalAdmissionDate"
+                        label="Hospital admission date"
                     ></DateField>
-                    <SelectField
-                        name="methodOfConfirmation"
-                        label="Method of confirmation"
-                        values={methodsOfConfirmation}
-                    ></SelectField>
+                )}
+                <DateField
+                    name="icuAdmissionDate"
+                    label="ICU admission date"
+                ></DateField>
+                <SelectField
+                    name="outcome"
+                    label="Outcome"
+                    values={outcomes}
+                ></SelectField>
+                {values.outcome !== undefined && (
                     <DateField
-                        name="onsetSymptomsDate"
-                        label="Onset of symptoms date"
+                        name="outcomeDate"
+                        label="Outcome date"
                     ></DateField>
-                    <DateField
-                        name="firstClinicalConsultationDate"
-                        label="First clinical consultation date"
-                    ></DateField>
-                    <DateField
-                        name="selfIsolationDate"
-                        label="Self isolation date"
-                    ></DateField>
-                    <SelectField
-                        name="admittedToHospital"
-                        label="Hospital admission"
-                        values={yesNoUndefined}
-                    ></SelectField>
-                    {values.admittedToHospital === 'Yes' && (
-                        <DateField
-                            name="hospitalAdmissionDate"
-                            label="Hospital admission date"
-                        ></DateField>
-                    )}
-                    <DateField
-                        name="icuAdmissionDate"
-                        label="ICU admission date"
-                    ></DateField>
-                    <SelectField
-                        name="outcome"
-                        label="Outcome"
-                        values={outcomes}
-                    ></SelectField>
-                    {values.outcome !== undefined && (
-                        <DateField
-                            name="outcomeDate"
-                            label="Outcome date"
-                        ></DateField>
-                    )}
-                </MuiPickersUtilsProvider>
+                )}
             </fieldset>
         </Scroll.Element>
     );
