@@ -164,7 +164,7 @@
                         }
                     }
                 },
-                "method": "Plane",
+                "methods": [ "Plane" ],
                 "purpose": "Family"
             }],
             "traveledPrior30Days": true
@@ -208,8 +208,8 @@
             }
         },
         "transmission": {
-            "route": "Vector borne",
-            "place": "Gym",
+            "routes": [ "Vector borne" ],
+            "places": [ "Gym" ],
             "linkedCaseIds": [ "abc", "def" ]
         },
         "importedCase": {
