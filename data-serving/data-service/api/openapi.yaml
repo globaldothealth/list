@@ -39,8 +39,8 @@ paths:
           $ref: "#/components/responses/200CaseArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -60,8 +60,8 @@ paths:
           $ref: "#/components/responses/201Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -87,8 +87,8 @@ paths:
           $ref: "#/components/responses/201Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -110,8 +110,8 @@ paths:
           $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -133,8 +133,8 @@ paths:
           $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -149,8 +149,8 @@ paths:
           description: Case deleted
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "500":
@@ -190,8 +190,8 @@ components:
             $ref: "#/components/schemas/Case"
     "400":
       description: Malformed request
-    "401":
-      description: Unauthorized
+    "403":
+      description: Forbidden
     "404":
       description: Not found
     "422":
