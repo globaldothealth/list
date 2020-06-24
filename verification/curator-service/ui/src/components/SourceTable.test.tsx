@@ -201,8 +201,8 @@ it('can delete a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = queryByText(/abc123/);
-    expect(newRow).not.toBeInTheDocument();
+    const noRec = await findByText(/No records to display/);
+    expect(noRec).toBeInTheDocument();
 });
 
 it('can add a row', async () => {
@@ -325,7 +325,7 @@ it('can edit a row', async () => {
             name: 'source_name',
             format: 'format',
             origin: {
-                url: 'new origin url',
+                url: 'new source url',
                 license: 'origin license',
             },
             automation: {
@@ -368,8 +368,8 @@ it('can edit a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    const editedRow = await findByText('new source url');
+    expect(editedRow).toBeInTheDocument();
     const oldRow = queryByText('origin url');
     expect(oldRow).not.toBeInTheDocument();
-    const editedRow = await findByText('new origin url');
-    expect(editedRow).toBeInTheDocument();
 });

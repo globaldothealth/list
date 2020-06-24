@@ -2,25 +2,13 @@ import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
 
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
-import mongoose from 'mongoose';
 import supertest from 'supertest';
 
+let mongoServer: MongoMemoryServer;
 beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
-});
-
-afterAll(() => {
-    return mongoose.disconnect();
+    mongoServer = new MongoMemoryServer();
 });
 
 beforeEach(async () => {
@@ -32,6 +20,7 @@ beforeEach(async () => {
 afterAll(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    return mongoServer.stop();
 });
 
 describe('GET', () => {

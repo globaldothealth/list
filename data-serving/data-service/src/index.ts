@@ -59,15 +59,17 @@ new OpenApiValidator({
 
 (async (): Promise<void> => {
     try {
+        // Connect to MongoDB.
+        // MONGO_URL is provided by the in memory version of jest-mongodb.
+        // DB_CONNECTION_STRING is what we use in prod.
+        const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
         console.log(
             'Connecting to MongoDB instance',
             // Print only after username and password to not log them.
-            env.DB_CONNECTION_STRING.substring(
-                env.DB_CONNECTION_STRING.indexOf('@'),
-            ),
+            mongoURL.substring(mongoURL.indexOf('@')),
         );
 
-        await mongoose.connect(env.DB_CONNECTION_STRING, {
+        await mongoose.connect(mongoURL, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,

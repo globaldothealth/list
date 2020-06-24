@@ -59,12 +59,12 @@ interface Source {
 }
 
 interface Symptoms {
-    provided: string[];
+    values: string[];
 }
 
 interface Transmission {
-    route: string;
-    place: string;
+    routes: string[];
+    places: string[];
     linkedCaseIds: string[];
 }
 
@@ -109,8 +109,10 @@ interface TableRow {
     confirmationMethod?: string;
     // Represents a list as a comma and space separated string e.g. 'fever, cough'
     symptoms: string;
-    transmissionRoute: string;
-    transmissionPlace: string;
+    // Represents a list as a comma and space separated string e.g. 'vertical, iatrogenic'
+    transmissionRoutes: string;
+    // Represents a list as a comma and space separated string e.g. 'gym, hospital'
+    transmissionPlaces: string;
     // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
     transmissionLinkedCaseIds: string;
     // sources
@@ -199,11 +201,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             ],
             symptoms: {
-                provided: this.splitCommaSeparated(rowData.symptoms),
+                values: this.splitCommaSeparated(rowData.symptoms),
             },
             transmission: {
-                route: rowData.transmissionRoute,
-                place: rowData.transmissionPlace,
+                route: this.splitCommaSeparated(rowData.transmissionRoutes),
+                place: this.splitCommaSeparated(rowData.transmissionPlaces),
                 linkedCaseIds: this.splitCommaSeparated(
                     rowData.transmissionLinkedCaseIds,
                 ),
@@ -216,21 +218,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             },
         };
-    }
-
-    addCase(newRowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            if (!this.validateRequired(newRowData.sourceUrl)) {
-                return reject();
-            }
-            const newCase = this.createCaseFromRowData(newRowData);
-            this.setState({ error: '' });
-            const response = axios.post(this.state.url, newCase);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
     }
 
     deleteCase(rowData: TableRow): Promise<unknown> {
@@ -258,11 +245,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             }
             const newCase = this.createCaseFromRowData(newRowData);
             this.setState({ error: '' });
-            const response = axios.put(this.state.url + oldRowData.id, newCase);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
+            axios
+                .put(this.state.url + oldRowData.id, newCase)
+                .then(resolve)
+                .catch((e) => {
+                    this.setState({ error: e.toString() });
+                    reject(e);
+                });
         });
     }
 
@@ -337,14 +326,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 filtering: false,
                             },
                             {
-                                title: 'Route of transmission',
-                                field: 'transmissionRoute',
+                                title: 'Routes of transmission',
+                                field: 'transmissionRoutes',
                                 filtering: false,
                                 editable: 'never',
                             },
                             {
-                                title: 'Place of transmission',
-                                field: 'transmissionPlace',
+                                title: 'Places of transmission',
+                                field: 'transmissionPlaces',
                                 filtering: false,
                                 editable: 'never',
                             },
@@ -448,13 +437,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     : null,
                                                 confirmationMethod:
                                                     confirmedEvent?.value,
-                                                symptoms: c.symptoms?.provided?.join(
+                                                symptoms: c.symptoms?.values?.join(
                                                     ', ',
                                                 ),
-                                                transmissionRoute:
-                                                    c.transmission?.route,
-                                                transmissionPlace:
-                                                    c.transmission?.place,
+                                                transmissionRoutes: c.transmission?.routes.join(
+                                                    ', ',
+                                                ),
+                                                transmissionPlaces: c.transmission?.places.join(
+                                                    ', ',
+                                                ),
                                                 transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
                                                     ', ',
                                                 ),

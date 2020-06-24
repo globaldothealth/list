@@ -14,17 +14,14 @@ const uniqueValuesValidator = {
  * and chronic disease fields.
  */
 export const dictionarySchema = new mongoose.Schema({
-    provided: {
+    values: {
         type: [String],
         validate: uniqueValuesValidator,
     },
-    imputed: {
-        type: [String],
-        validate: uniqueValuesValidator,
-    },
+    status: String,
 });
 
 export type DictionaryDocument = mongoose.Document & {
-    provided: [string];
-    imputed: [string];
+    values: [string];
+    status: string;
 };

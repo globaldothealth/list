@@ -15,18 +15,20 @@ export enum Route {
 }
 
 export const transmissionSchema = new mongoose.Schema({
-    route: {
-        type: String,
-        enum: Object.values(Route),
-    },
-    // Data dictionary.
-    place: String,
     // Ids of other cases of people with whom this person had contact.
     linkedCaseIds: [String],
+    // Data dictionary.
+    places: [String],
+    routes: [
+        {
+            type: String,
+            enum: Object.values(Route),
+        },
+    ],
 });
 
 export type TransmissionDocument = mongoose.Document & {
-    route: Route;
-    places: string;
     linkedCaseIds: [string];
+    places: [string];
+    routes: [Route];
 };

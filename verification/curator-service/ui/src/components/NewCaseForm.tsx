@@ -43,7 +43,6 @@ const styles = () =>
         },
         form: {
             paddingLeft: '15em',
-            width: '60%',
         },
     });
 
@@ -175,11 +174,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         };
                     }),
                 symptoms: {
-                    provided: values.symptoms,
+                    values: values.symptoms,
                 },
                 transmission: {
-                    route: values.transmissionRoute,
-                    place: values.transmissionPlace,
+                    routes: values.transmissionRoutes,
+                    places: values.transmissionPlaces,
                     linkedCaseIds: values.transmissionLinkedCaseIds,
                 },
                 sources: [
@@ -271,8 +270,8 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     outcomeDate: null,
                     outcome: undefined,
                     symptoms: [],
-                    transmissionRoute: undefined,
-                    transmissionPlace: undefined,
+                    transmissionRoutes: [],
+                    transmissionPlaces: [],
                     transmissionLinkedCaseIds: [],
                     sourceUrl: '',
                     notes: '',
@@ -387,16 +386,14 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked:
-                                        values.transmissionRoute !==
-                                            undefined ||
-                                        values.transmissionPlace !==
-                                            undefined ||
+                                        values.transmissionRoutes.length > 0 ||
+                                        values.transmissionPlaces.length > 0 ||
                                         values.transmissionLinkedCaseIds
                                             .length > 0,
                                     hasError:
-                                        errors.transmissionRoute !==
+                                        errors.transmissionRoutes !==
                                             undefined ||
-                                        errors.transmissionPlace !==
+                                        errors.transmissionPlaces !==
                                             undefined ||
                                         errors.transmissionLinkedCaseIds !==
                                             undefined,

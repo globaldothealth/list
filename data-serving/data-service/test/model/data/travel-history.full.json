@@ -19,7 +19,7 @@
                     "longitude": -73.9740028
                 }
             },
-            "method": "Plane",
+            "methods": [ "Plane" ],
             "purpose": "Family"
         }
     ],

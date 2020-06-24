@@ -67,35 +67,21 @@
         }
     ],
     "symptoms": {
-        "provided": [
-            "severe pneumonia",
-            "dyspnea",
-            "weakness"
+        "values": [
+            "Severe pneumonia",
+            "Dyspnea",
+            "Weakness"
         ],
-        "imputed": [
-            "severe pneumonia",
-            "pneumonia",
-            "dyspnea",
-            "difficulty breathing",
-            "weakness"
-        ]
+        "status": "Symptomatic"
     },
     "preexistingConditions": {
-        "provided": [
-            "hypertension",
-            "type 2 diabetes",
-            "coronary heart disease",
-            "lung cancer"
+        "values": [
+            "Hypertension",
+            "Type 2 diabetes",
+            "Coronary heart disease",
+            "Lung cancer"
         ],
-        "imputed": [
-            "hypertension",
-            "type 2 diabetes",
-            "diabetes",
-            "coronary heart disease",
-            "heart disease",
-            "lung cancer",
-            "cancer"
-        ]
+        "status": "Yes"
     },
     "travelHistory": {
         "numLocations": 1,
@@ -118,7 +104,7 @@
                         "longitude": -73.9740028
                     }
                 },
-                "method": "Plane",
+                "methods": [ "Plane" ],
                 "purpose": "Family"
             }
         ],
@@ -155,8 +141,8 @@
         }
     },
     "transmission": {
-        "route": "Vector borne",
-        "place": "Gym",
+        "routes": [ "Vector borne" ],
+        "places": [ "Gym" ],
         "linkedCaseIds": [ "abc", "def" ]
     },
     "importedCase": {
