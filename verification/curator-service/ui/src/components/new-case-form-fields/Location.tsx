@@ -104,4 +104,4 @@ class Location extends React.Component<Props, {}> {
     }
 }
 
-export default withStyles(styles, { withTheme: true })(Location);
+export default withStyles(styles)(Location);
