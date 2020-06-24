@@ -19,7 +19,7 @@ function LocationForm(): JSX.Element {
         <Scroll.Element name="location">
             <fieldset>
                 <legend>Location</legend>
-                <PlacesAutocomplete />
+                <PlacesAutocomplete name="location" />
                 <Location location={values.location} />
             </fieldset>
         </Scroll.Element>
@@ -39,9 +39,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+interface PlacesAutocompleteProps {
+    name: string;
+}
+
 // Place autocomplete, based on
 // https://material-ui.com/components/autocomplete/#google-maps-place
-function PlacesAutocomplete(): JSX.Element {
+export function PlacesAutocomplete(
+    props: PlacesAutocompleteProps,
+): JSX.Element {
     const classes = useStyles();
     const [value, setValue] = React.useState<Loc | null>(null);
     const [inputValue, setInputValue] = React.useState('');
@@ -97,8 +103,6 @@ function PlacesAutocomplete(): JSX.Element {
         };
     }, [value, inputValue, fetch]);
 
-    const name = 'location';
-
     return (
         <Autocomplete
             itemType="Loc"
@@ -108,9 +112,9 @@ function PlacesAutocomplete(): JSX.Element {
             onChange={(event: any, newValue: Loc | null): void => {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
-                setFieldValue(name, newValue);
+                setFieldValue(props.name, newValue);
             }}
-            onBlur={(): void => setTouched({ [name]: true })}
+            onBlur={(): void => setTouched({ [props.name]: true })}
             onInputChange={(event, newInputValue): void => {
                 setInputValue(newInputValue);
             }}
@@ -121,7 +125,7 @@ function PlacesAutocomplete(): JSX.Element {
                     // to be set in the form values, rather than only selected
                     // dropdown values. Thus we use an unused form value here.
                     name="unused"
-                    data-testid={name}
+                    data-testid={props.name}
                     label="Location"
                     component={TextField}
                     fullWidth
