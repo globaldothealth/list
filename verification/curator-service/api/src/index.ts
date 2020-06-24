@@ -36,6 +36,8 @@ const env = validateEnv();
 app.set('port', env.PORT);
 
 // Connect to MongoDB.
+// MONGO_URL is provided by the in memory version of jest-mongodb.
+// DB_CONNECTION_STRING is what we use in prod.
 const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
 console.log(
     'Connecting to MongoDB instance',
