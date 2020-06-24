@@ -11,6 +11,7 @@ import { Link, Route, Switch } from 'react-router-dom';
 import Add from '@material-ui/icons/Add';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
+import BulkCaseForm from './BulkCaseForm';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CompletenessCharts from './CompletenessCharts';
@@ -32,6 +33,7 @@ import NewCaseForm from './NewCaseForm';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
+import Publish from '@material-ui/icons/Publish';
 import React from 'react';
 import ShowChartIcon from '@material-ui/icons/ShowChart';
 import SourceTable from './SourceTable';
@@ -258,21 +260,28 @@ class App extends React.Component<Props, State> {
                                     text: 'Home',
                                     icon: <HomeIcon />,
                                     to: '/',
-                                    displayCheck: () => true,
+                                    displayCheck: (): boolean => true,
                                     divider: true,
                                 },
                                 {
                                     text: 'Linelist',
                                     icon: <ListIcon />,
                                     to: '/cases',
-                                    displayCheck: () =>
+                                    displayCheck: (): boolean =>
                                         this.hasAnyRole(['reader', 'curator']),
                                 },
                                 {
                                     text: 'New',
                                     icon: <Add />,
                                     to: '/cases/new',
-                                    displayCheck: () =>
+                                    displayCheck: (): boolean =>
+                                        this.hasAnyRole(['curator']),
+                                },
+                                {
+                                    text: 'Bulk upload',
+                                    icon: <Publish />,
+                                    to: '/cases/bulk',
+                                    displayCheck: (): boolean =>
                                         this.hasAnyRole(['curator']),
                                     divider: true,
                                 },
@@ -280,7 +289,7 @@ class App extends React.Component<Props, State> {
                                     text: 'Sources',
                                     icon: <LinkIcon />,
                                     to: '/sources',
-                                    displayCheck: () =>
+                                    displayCheck: (): boolean =>
                                         this.hasAnyRole(['reader', 'curator']),
                                     divider: true,
                                 },
@@ -288,33 +297,33 @@ class App extends React.Component<Props, State> {
                                     text: 'Cumulative charts',
                                     icon: <BarChartIcon />,
                                     to: '/charts/cumulative',
-                                    displayCheck: () => true,
+                                    displayCheck: (): boolean => true,
                                 },
                                 {
                                     text: 'Freshness charts',
                                     icon: <BubbleChartIcon />,
                                     to: '/charts/freshness',
-                                    displayCheck: () => true,
+                                    displayCheck: (): boolean => true,
                                 },
                                 {
                                     text: 'Completeness charts',
                                     icon: <ShowChartIcon />,
                                     to: '/charts/completeness',
-                                    displayCheck: () => true,
+                                    displayCheck: (): boolean => true,
                                     divider: true,
                                 },
                                 {
                                     text: 'Profile',
                                     icon: <PersonIcon />,
                                     to: '/profile',
-                                    displayCheck: () =>
+                                    displayCheck: (): boolean =>
                                         this.state.user.email !== '',
                                 },
                                 {
                                     text: 'Manage users',
                                     icon: <PeopleIcon />,
                                     to: '/users',
-                                    displayCheck: () =>
+                                    displayCheck: (): boolean =>
                                         this.hasAnyRole(['admin']),
                                 },
                             ].map(
@@ -356,6 +365,11 @@ class App extends React.Component<Props, State> {
                             {this.hasAnyRole(['curator']) && (
                                 <Route path="/cases/new">
                                     <NewCaseForm user={this.state.user} />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/bulk">
+                                    <BulkCaseForm user={this.state.user} />
                                 </Route>
                             )}
                             {this.hasAnyRole(['curator', 'reader']) && (
