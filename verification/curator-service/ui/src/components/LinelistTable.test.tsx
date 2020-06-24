@@ -269,8 +269,8 @@ it('can delete a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = queryByText(/abc123/);
-    expect(newRow).not.toBeInTheDocument();
+    const noRec = await findByText(/No records to display/);
+    expect(noRec).toBeInTheDocument();
 });
 
 it('can edit a row', async () => {
@@ -386,10 +386,10 @@ it('can edit a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const oldRow = queryByText('some notes');
-    expect(oldRow).not.toBeInTheDocument();
     const editedRow = await findByText('some changed notes');
     expect(editedRow).toBeInTheDocument();
+    const oldRow = queryByText('some notes');
+    expect(oldRow).not.toBeInTheDocument();
 });
 
 it('cannot edit data as a reader only', async () => {
