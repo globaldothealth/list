@@ -113,3 +113,7 @@ db.cases.remove({})
 ## IDE setup
 
 If you're using VSCode, `.vscode/settings.json` contains useful default settings for working with Typescript and NodeJS.
+
+## Update of dependencies
+
+You can update all node dependencies for the services to their latest minor version by running the `dev/update_deps.sh` script.
