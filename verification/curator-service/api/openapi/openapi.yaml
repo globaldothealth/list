@@ -152,6 +152,129 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /cases:
+    get:
+      tags: [Case]
+      summary: Lists cases
+      operationId: listCases
+      parameters:
+        - name: page
+          in: query
+          description: The pages of sources to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of cases to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          $ref: "#/components/responses/200CaseArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    post:
+      tags: [Case]
+      summary: Creates a new case
+      operationId: createCase
+      requestBody:
+        description: Case to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "201":
+          $ref: "#/components/responses/201Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The case ID
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    get:
+      tags: [Case]
+      summary: Gets a specific case
+      operationId: getCase
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      tags: [Case]
+      summary: Updates a specific case
+      operationId: updateCase
+      requestBody:
+        description: Case to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Case"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      tags: [Case]
+      summary: Deletes a specific case
+      operationId: deleteCase
+      responses:
+        "204":
+          description: Case deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /users:
     get:
       tags: [User]
@@ -247,6 +370,18 @@ components:
     NewSource:
       description: The subset of "#/components/schemas/Source" required to create the entity
       type: object
+    Case:
+      description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
+      allOf:
+        - $ref: "#/components/schemas/NewCase"
+        - type: object
+    CaseArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
+    NewCase:
+      description: The subset of "#/components/schemas/Case" required to create the entity
+      type: object
     User:
       description: A user
       type: object
@@ -267,6 +402,24 @@ components:
       items:
         $ref: "#components/schemas/Location"
   responses:
+    "200Case":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
+    "200CaseArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseArray"
+    "201Case":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
     "200Source":
       description: OK
       content:
