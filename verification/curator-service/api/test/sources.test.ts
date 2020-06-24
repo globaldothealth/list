@@ -9,9 +9,9 @@ import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
 
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import app from '../src/index';
-import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 jest.mock('../src/clients/aws-events-client', () => {
@@ -19,22 +19,14 @@ jest.mock('../src/clients/aws-events-client', () => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
     });
 });
+let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
+    mongoServer = new MongoMemoryServer();
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    return mongoServer.stop();
 });
 
 beforeEach(async () => {
