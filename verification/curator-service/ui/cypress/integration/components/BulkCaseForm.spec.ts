@@ -19,7 +19,6 @@ describe('Bulk upload form', function () {
         cy.contains('Male');
         cy.contains('42');
         cy.contains('Canada');
-        cy.contains('6/22/2020');
         cy.contains('foo.bar');
     });
 
