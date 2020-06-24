@@ -180,6 +180,19 @@ describe('Cases', () => {
         );
     });
 
+    it('throws on invalid location restrictions', async () => {
+        await curatorRequest
+            .post('/api/cases')
+            .send({
+                age: '42',
+                location: {
+                    query: 'Lyon',
+                    limitToResolution: 'NotAResolution',
+                },
+            })
+            .expect(422);
+    });
+
     it('returns 404 when no geocode could be found on create', async () => {
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest

@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 
 import axios from 'axios';
 
+class InvalidParamError extends Error {}
+
 /**
  * CasesController forwards requests to the data service.
  * It handles CRUD operations from curators.
@@ -76,6 +78,10 @@ export default class CasesController {
             );
             res.json(response.data);
         } catch (err) {
+            if (err instanceof InvalidParamError) {
+                res.status(422).send(err.message);
+                return;
+            }
             console.log(err);
             res.status(500).send(err.message);
         }
@@ -95,6 +101,10 @@ export default class CasesController {
             );
             res.json(response.data);
         } catch (err) {
+            if (err instanceof InvalidParamError) {
+                res.status(422).send(err.message);
+                return;
+            }
             console.log(err);
             res.status(500).send(err.message);
         }
@@ -118,6 +128,11 @@ export default class CasesController {
                                 'limitToResolution'
                             ] as keyof typeof Resolution
                         ];
+                    if (!opts.limitToResolution) {
+                        throw new InvalidParamError(
+                            `invalid limitToResolution: ${location['limitToResolution']}`,
+                        );
+                    }
                 }
                 const features = await geocoder.geocode(location?.query, opts);
                 if (features.length === 0) {
