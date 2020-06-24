@@ -51,7 +51,7 @@ const resolutionToGeocodeQueryType = new Map<Resolution, GeocodeQueryType>([
     [Resolution.Country, 'country'],
     [Resolution.Admin1, 'region'],
     [Resolution.Admin2, 'district'],
-    [Resolution.Admin3, 'district'],
+    [Resolution.Admin3, 'place'],
     [Resolution.Point, 'poi'],
 ]);
 
