@@ -68,6 +68,14 @@ interface Transmission {
     linkedCaseIds: string[];
 }
 
+interface TravelHistory {
+    travel: Travel[];
+}
+
+interface Travel {
+    location: Location;
+}
+
 interface Case {
     _id: string;
     importedCase: {
@@ -79,6 +87,7 @@ interface Case {
     symptoms: Symptoms;
     transmission: Transmission;
     sources: Source[];
+    travelHistory: TravelHistory;
     notes: string;
 }
 
@@ -113,6 +122,7 @@ interface TableRow {
     transmissionPlace: string;
     // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
     transmissionLinkedCaseIds: string;
+    travelHistory: TravelHistory;
     // sources
     sourceUrl: string | null;
     notes: string;
@@ -208,6 +218,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     rowData.transmissionLinkedCaseIds,
                 ),
             },
+            travelHistory: rowData.travelHistory,
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
@@ -353,6 +364,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 field: 'transmissionLinkedCaseIds',
                                 filtering: false,
                             },
+                            {
+                                title: 'Travel history',
+                                field: 'travelHistory',
+                                filtering: false,
+                                editable: 'never',
+                                render: (rowData) =>
+                                    rowData.travelHistory?.travel
+                                        ?.map((travel) => travel.location.name)
+                                        ?.join(', '),
+                            },
                             { title: 'Notes', field: 'notes' },
                             {
                                 title: 'Source URL',
@@ -458,6 +479,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
                                                     ', ',
                                                 ),
+                                                travelHistory: c.travelHistory,
                                                 notes: c.notes,
                                                 sourceUrl:
                                                     c.sources &&

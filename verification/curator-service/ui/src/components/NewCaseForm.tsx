@@ -17,6 +17,7 @@ import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
+import TravelHistory from './new-case-form-fields/TravelHistory';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -118,7 +119,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 },
                 location: {
                     ...values.location,
-                    ...{ query: values.locationQuery },
                 },
                 events: [
                     {
@@ -187,6 +187,15 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         url: values.sourceUrl,
                     },
                 ],
+                travelHistory: {
+                    travel: values.travelHistory.map((travelHistory) => {
+                        return {
+                            location: {
+                                ...travelHistory,
+                            },
+                        };
+                    }),
+                },
                 notes: values.notes,
                 revisionMetadata: {
                     revisionNumber: 0,
@@ -258,7 +267,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: undefined,
                     nationalities: [],
                     profession: undefined,
-                    locationQuery: '',
                     location: undefined,
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
@@ -274,6 +282,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     transmissionRoute: undefined,
                     transmissionPlace: undefined,
                     transmissionLinkedCaseIds: [],
+                    travelHistory: [],
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -325,8 +334,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     isChecked:
                                         values.location !== null &&
                                         values.location !== undefined,
-                                    hasError:
-                                        errors.locationQuery !== undefined,
+                                    hasError: errors.location !== undefined,
                                 })}
                                 Location
                             </div>
@@ -405,6 +413,19 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('travelHistory')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.travelHistory.length > 0,
+                                    hasError:
+                                        errors.travelHistory !== undefined,
+                                })}
+                                Travel History
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
@@ -431,6 +452,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Events></Events>
                                 <Symptoms></Symptoms>
                                 <Transmission></Transmission>
+                                <TravelHistory></TravelHistory>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}
