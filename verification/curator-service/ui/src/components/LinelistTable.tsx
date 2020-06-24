@@ -59,7 +59,7 @@ interface Source {
 }
 
 interface Symptoms {
-    provided: string[];
+    values: string[];
 }
 
 interface Transmission {
@@ -201,7 +201,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             ],
             symptoms: {
-                provided: this.splitCommaSeparated(rowData.symptoms),
+                values: this.splitCommaSeparated(rowData.symptoms),
             },
             transmission: {
                 route: this.splitCommaSeparated(rowData.transmissionRoutes),
@@ -450,7 +450,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     : null,
                                                 confirmationMethod:
                                                     confirmedEvent?.value,
-                                                symptoms: c.symptoms?.provided?.join(
+                                                symptoms: c.symptoms?.values?.join(
                                                     ', ',
                                                 ),
                                                 transmissionRoutes: c.transmission?.routes.join(

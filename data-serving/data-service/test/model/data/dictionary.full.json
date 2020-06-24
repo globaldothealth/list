@@ -1,14 +1,7 @@
 {
-    "provided": [
-        "a",
-        "b",
-        "c"
+    "values": [
+        "Cough",
+        "Pneumonia"
     ],
-    "imputed": [
-        "a",
-        "aa",
-        "b",
-        "bb",
-        "c"
-    ]
+    "status": "Symptomatic"
 }
