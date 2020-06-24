@@ -1,6 +1,6 @@
+import { GeocodeOptions, Geocoder } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
-import { Geocoder } from '../geocoding/geocoder';
 import axios from 'axios';
 
 /**
@@ -110,7 +110,11 @@ export default class CasesController {
         const location = req.body['location'];
         if (!location?.geometry?.latitude || !location.geometry?.longitude) {
             for (const geocoder of this.geocoders) {
-                const features = await geocoder.geocode(location?.query);
+                const opts: GeocodeOptions = {};
+                if (location['limitToResolution']) {
+                    opts.limitToResolution = location['limitToResolution'];
+                }
+                const features = await geocoder.geocode(location?.query, opts);
                 if (features.length === 0) {
                     continue;
                 }
@@ -120,8 +124,9 @@ export default class CasesController {
             }
             return false;
         } else {
-            // Remove any query as we shouldn't store it.
+            // Remove any left over field as the schema doesn't allow unknown fields.
             delete location.query;
+            delete location.limitToResolution;
         }
         return true;
     }

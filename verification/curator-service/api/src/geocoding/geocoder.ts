@@ -27,7 +27,13 @@ export enum Resolution {
     Country = 'Country',
 }
 
+export interface GeocodeOptions {
+    // If set, will only return features with the given resolution
+    // otherwise all available resolutions can be returned.
+    limitToResolution?: Resolution;
+}
+
 // A geocoder can geocode queries into places.
 export interface Geocoder {
-    geocode(query: string): Promise<GeocodeResult[]>;
+    geocode(query: string, opts?: GeocodeOptions): Promise<GeocodeResult[]>;
 }
