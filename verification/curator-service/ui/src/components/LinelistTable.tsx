@@ -220,21 +220,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         };
     }
 
-    addCase(newRowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            if (!this.validateRequired(newRowData.sourceUrl)) {
-                return reject();
-            }
-            const newCase = this.createCaseFromRowData(newRowData);
-            this.setState({ error: '' });
-            const response = axios.post(this.state.url, newCase);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
-    }
-
     deleteCase(rowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const deleteUrl = this.state.url + rowData.id;
@@ -260,11 +245,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             }
             const newCase = this.createCaseFromRowData(newRowData);
             this.setState({ error: '' });
-            const response = axios.put(this.state.url + oldRowData.id, newCase);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
+            axios
+                .put(this.state.url + oldRowData.id, newCase)
+                .then(resolve)
+                .catch((e) => {
+                    this.setState({ error: e.toString() });
+                    reject(e);
+                });
         });
     }
 

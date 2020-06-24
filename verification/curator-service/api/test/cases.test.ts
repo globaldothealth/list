@@ -3,33 +3,25 @@ import * as baseUser from './users/base.json';
 import { GeocodeResult, Resolution } from '../src/geocoding/geocoder';
 import { Session, User } from '../src/model/user';
 
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
 import axios from 'axios';
-import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+let mongoServer: MongoMemoryServer;
 
 afterEach(() => {
     jest.clearAllMocks();
 });
 
-beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
+beforeAll(async () => {
+    mongoServer = new MongoMemoryServer();
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    await mongoServer.stop();
 });
 
 beforeEach(async () => {
