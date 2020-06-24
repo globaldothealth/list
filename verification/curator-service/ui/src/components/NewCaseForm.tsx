@@ -117,9 +117,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     nationalities: values.nationalities,
                     profession: values.profession,
                 },
-                location: {
-                    ...values.location,
-                },
+                location: values.location,
                 events: [
                     {
                         name: 'confirmed',
@@ -190,9 +188,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 travelHistory: {
                     travel: values.travelHistory.map((travelHistory) => {
                         return {
-                            location: {
-                                ...travelHistory,
-                            },
+                            location: travelHistory,
                         };
                     }),
                 },
