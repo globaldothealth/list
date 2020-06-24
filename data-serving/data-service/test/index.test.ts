@@ -1,22 +1,15 @@
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
-import mongoose from 'mongoose';
 import request from 'supertest';
 
-beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
+let mongoServer: MongoMemoryServer;
+
+beforeAll(async () => {
+    mongoServer = new MongoMemoryServer();
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    await mongoServer.stop();
 });
 
 describe('GET /random-url', () => {

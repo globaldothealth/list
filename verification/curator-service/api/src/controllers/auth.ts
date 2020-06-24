@@ -117,7 +117,7 @@ export class AuthController {
                     name: req.body.name,
                     email: req.body.email,
                     // Necessary to pass mongoose validation.
-                    googleID: 42,
+                    googleID: '42',
                     roles: req.body.roles,
                 });
                 req.login(user, (err: Error) => {
@@ -175,11 +175,12 @@ export class AuthController {
                         let user = await User.findOne({ googleID: profile.id });
                         if (!user) {
                             user = await User.create({
-                                googleID: profile.id,
+                                googleID: profile['id'],
                                 name: profile.displayName,
                                 email: (profile.emails || []).map(
                                     (v) => v.value,
                                 )[0],
+                                roles: [],
                             });
                         }
                         cb(undefined, user);
@@ -199,6 +200,8 @@ export class AuthController {
                         const response = await axios.get(
                             `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,
                         );
+                        // Response data fields can be found at
+                        // https://developers.google.com/identity/protocols/oauth2/openid-connect#an-id-tokens-payload
                         const email = response.data.email;
                         if (!email) {
                             return done(
@@ -211,6 +214,10 @@ export class AuthController {
                         if (!user) {
                             user = await User.create({
                                 email: email,
+                                googleID: response.data.sub,
+                                roles: [],
+                                // Do not care about names for bearer tokens, they are usually not humans.
+                                name: '',
                             });
                         }
                         return done(null, user);

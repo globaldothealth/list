@@ -5,10 +5,21 @@ import {
 } from '../../src/model/automation';
 
 import { Error } from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import fullModel from './data/automation.full.json';
 import minimalModel from './data/automation.minimal.json';
 import mongoose from 'mongoose';
 import regexParsingModel from './data/regex-parsing.full.json';
+
+let mongoServer: MongoMemoryServer;
+
+beforeAll(() => {
+    mongoServer = new MongoMemoryServer();
+});
+
+afterAll(async () => {
+    return mongoServer.stop();
+});
 
 const Automation = mongoose.model<AutomationDocument>(
     'Automation',
