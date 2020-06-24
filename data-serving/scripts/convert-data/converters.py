@@ -328,14 +328,14 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
       Dict[str, List[str]]: When the value is present and successfully parsed.
         The dictionary in the format:
         {
-          'provided': List[str]
+          'values': List[str]
         }
     '''
     try:
         string_list = parse_string_list(value)
-        return {'provided': string_list} if string_list else None
+        return {'values': string_list} if string_list else None
     except ValueError as e:
-        log_error(id, field_name, f'{field_name}.provided', value, e)
+        log_error(id, field_name, f'{field_name}.values', value, e)
 
 
 def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
