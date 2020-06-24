@@ -1,4 +1,4 @@
-import { GeocodeOptions, Geocoder } from '../geocoding/geocoder';
+import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
 import axios from 'axios';
@@ -112,7 +112,12 @@ export default class CasesController {
             for (const geocoder of this.geocoders) {
                 const opts: GeocodeOptions = {};
                 if (location['limitToResolution']) {
-                    opts.limitToResolution = location['limitToResolution'];
+                    opts.limitToResolution =
+                        Resolution[
+                            location[
+                                'limitToResolution'
+                            ] as keyof typeof Resolution
+                        ];
                 }
                 const features = await geocoder.geocode(location?.query, opts);
                 if (features.length === 0) {

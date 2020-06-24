@@ -99,6 +99,7 @@ export default class MapboxGeocoder {
                     req.types = [type];
                 }
             }
+            console.debug('Querying mapbox with', req);
             const resp: MapiResponse = await this.geocodeService
                 .forwardGeocode(req)
                 .send();

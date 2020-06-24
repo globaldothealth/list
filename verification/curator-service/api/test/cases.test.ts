@@ -164,7 +164,10 @@ describe('Cases', () => {
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .post('/api/cases')
-            .send({ age: '42', location: { query: 'Lyon' } })
+            .send({
+                age: '42',
+                location: { query: 'Lyon', limitToResolution: 'Admin3' },
+            })
             .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
