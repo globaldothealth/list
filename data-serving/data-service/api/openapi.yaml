@@ -66,6 +66,33 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    put:
+      summary: Upserts a case
+      description: >
+        Creates or updates a case, depending on whether the provided values for
+        the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
+        correspond to an existing case record.
+      operationId: upsertCase
+      requestBody:
+        description: Case to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "201":
+          $ref: "#/components/responses/201Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/{id}:
     parameters:
       - name: id
