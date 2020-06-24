@@ -59,8 +59,8 @@ paths:
           $ref: "#/components/responses/200SourceArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -81,8 +81,8 @@ paths:
           $ref: "#/components/responses/201Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -105,8 +105,8 @@ paths:
           $ref: "#/components/responses/200Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -129,8 +129,8 @@ paths:
           $ref: "#/components/responses/200Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -146,8 +146,8 @@ paths:
           description: Source deleted
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "500":
@@ -182,8 +182,8 @@ paths:
           $ref: "#/components/responses/200CaseArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -204,8 +204,36 @@ paths:
           $ref: "#/components/responses/201Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      tags: [Case]
+      summary: Upserts a case
+      description: >
+        Creates or updates a case, depending on whether the provided values for
+        the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
+        correspond to an existing case record.
+      operationId: upsertCase
+      requestBody:
+        description: Case to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "201":
+          $ref: "#/components/responses/201Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -228,8 +256,8 @@ paths:
           $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -252,8 +280,8 @@ paths:
           $ref: "#/components/responses/200Case"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -269,8 +297,8 @@ paths:
           description: Case deleted
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "500":
@@ -305,8 +333,8 @@ paths:
           $ref: "#/components/responses/200UserArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -336,8 +364,8 @@ paths:
           $ref: "#/components/responses/200User"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -352,8 +380,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200Roles"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
 components:
@@ -464,8 +492,8 @@ components:
             $ref: "#/components/schemas/LocationArray"
     "400":
       description: Malformed request
-    "401":
-      description: Unauthorized
+    "403":
+      description: Forbidden
     "404":
       description: Not found
     "422":
