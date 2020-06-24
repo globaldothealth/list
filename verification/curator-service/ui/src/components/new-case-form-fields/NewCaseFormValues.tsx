@@ -21,8 +21,8 @@ export default interface NewCaseFormValues {
     outcomeDate: string | null;
     outcome?: string;
     symptoms: string[];
-    transmissionRoute?: string;
-    transmissionPlace?: string;
+    transmissionRoutes: string[];
+    transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
     sourceUrl: string;
     notes: string;

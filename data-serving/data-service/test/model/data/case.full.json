@@ -118,7 +118,7 @@
                         "longitude": -73.9740028
                     }
                 },
-                "method": "Plane",
+                "methods": [ "Plane" ],
                 "purpose": "Family"
             }
         ],
@@ -155,8 +155,8 @@
         }
     },
     "transmission": {
-        "route": "Vector borne",
-        "place": "Gym",
+        "routes": [ "Vector borne" ],
+        "places": [ "Gym" ],
         "linkedCaseIds": [ "abc", "def" ]
     },
     "importedCase": {

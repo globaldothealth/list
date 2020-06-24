@@ -20,7 +20,7 @@ describe('validate', () => {
     it('an unknown travel method is invalid', async () => {
         return new Travel({
             ...fullModel,
-            ...{ method: 'Unicycle' },
+            ...{ methods: ['Unicycle'] },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
