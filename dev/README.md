@@ -37,11 +37,11 @@ GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 
 #### Permissions
 
-Give your curator service user all the permissions to access the portal and make CRUD updates:
+Give your curator service user all the permissions to access the portal and make CRUD updates. From the project root:
 
 ```shell
 mongo "mongodb://localhost:27017/covid19" --eval 'var email="<YOUR-GOOGLE-LOGIN>"; var
-roles=["admin", "curator", "reader"];' roles.js
+roles=["admin", "curator", "reader"];' verification/scripts/roles.js
 ```
 
 ### Let's run this thing!
