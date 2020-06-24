@@ -13,6 +13,7 @@ interface User {
     roles: string[];
 }
 
+// Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = () =>
     createStyles({
@@ -30,7 +31,7 @@ const styles = () =>
         },
     });
 
-interface Props extends WithStyles<typeof styles> {
+interface BulkCaseFormProps extends WithStyles<typeof styles> {
     user: User;
 }
 
@@ -38,8 +39,11 @@ interface BulkCaseFormState {
     statusMessage: string;
 }
 
-class BulkCaseForm extends React.Component<Props, BulkCaseFormState> {
-    constructor(props: Props) {
+class BulkCaseForm extends React.Component<
+    BulkCaseFormProps,
+    BulkCaseFormState
+    > {
+    constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
             statusMessage: '',
@@ -97,10 +101,8 @@ class BulkCaseForm extends React.Component<Props, BulkCaseFormState> {
                         },
                     },
                 });
-                console.log('did not error');
                 this.setState({ statusMessage: 'Success!' });
             } catch (e) {
-                console.log(e);
                 if (e.response) {
                     this.setState({ statusMessage: e.response.data });
                 } else if (e.request) {
