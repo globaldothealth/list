@@ -43,7 +43,6 @@ const styles = () =>
         },
         form: {
             paddingLeft: '15em',
-            width: '60%',
         },
     });
 
