@@ -56,10 +56,10 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
         cy.get('li').first().should('contain', 'mild fever').click();
-        cy.get('div[data-testid="transmissionRoute"]').click();
-        cy.get('li[data-value="Direct contact"').click();
-        cy.get('div[data-testid="transmissionPlace"]').click();
-        cy.get('li[data-value="Factory"').click();
+        cy.get('div[data-testid="transmissionRoutes"]').click();
+        cy.get('li').first().should('contain', 'Airborne infection').click();
+        cy.get('div[data-testid="transmissionPlaces"]').click();
+        cy.get('li').first().should('contain', 'Assisted Living').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
@@ -82,8 +82,8 @@ describe('New case form', function () {
         cy.contains('France');
         cy.contains('1/1/2020');
         cy.contains('dry cough, mild fever');
-        cy.contains('Direct contact');
-        cy.contains('Factory');
+        cy.contains('Airborne infection');
+        cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('www.example.com');
         cy.contains('test notes');
