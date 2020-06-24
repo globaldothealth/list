@@ -69,6 +69,5 @@ it('uploads case not ok', async () => {
 
     fireEvent.change(inputField);
     await wait(() => expect(mockedAxios.put).toHaveBeenCalledTimes(1));
-    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
     expect(getByText(errorMessage)).toBeDefined();
 });
