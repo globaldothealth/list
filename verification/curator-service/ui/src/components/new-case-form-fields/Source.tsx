@@ -15,6 +15,7 @@ export default class Source extends React.Component<{}, {}> {
                         type="text"
                         placeholder="https://..."
                         component={TextField}
+                        fullWidth
                     />
                 </fieldset>
             </Scroll.Element>
