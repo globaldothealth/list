@@ -39,7 +39,9 @@ SHEET_ID_NAME_MAP = {
     '005': 'North_America_COVID19_line_list',
     '006': 'North_America_COVID19_line_list',
     '007': 'Europe_COVID19_line_list-2',
-    '008': 'Europe-3'
+    '008': 'Europe-3',
+    '009': 'Hoja_1',
+    '010': 'COVID19_CO_PE_AR_20200608_1'
 }
 
 '''
@@ -47,8 +49,23 @@ Mappings from location shorthands to tuples of their full location data, i.e.
 (city, province, country), with None when a given specificity is not present.
 '''
 COMMON_LOCATION_ABBREVIATIONS = {
+    ('beijing',): (None, 'Beijing', 'China'),
+    ('beijing', 'china'): (None, 'Beijing', 'China'),
+    ('bergamo', 'lombardia', 'italy'): ('Bergamo', 'Lombardia', 'Italy'),
+    ('harbin',): ('Harbin City', 'Heilongjiang', 'China'),
+    ('lombardy', 'italy'): (None, 'Lombardia', 'Italy'),
+    ('lombardy italy',): (None, 'Lombardia', 'Italy'),
+    ('london',): ('London', 'England', 'United Kingdom'),
+    ('madrid',): (None, 'Madrid', 'Spain'),
+    ('milan',): ('Milan', 'Lombardia', 'Italy'),
+    ('milan', 'italy'): ('Milan', 'Lombardia', 'Italy'),
+    ('nanning',): ('Nanning City', 'Guangxi', 'China'),
+    ('sao paulo',): (None, 'Sao Paulo', 'Brazil'),
+    ('south tyrol',): ('Trentino-Alto Adige', 'Italy'),
+    ('south tyrol', 'italy'): ('Trentino-Alto Adige', 'Italy'),
     ('wuhan',): ('Wuhan City', 'Hubei', 'China'),
     ('wuhan', 'china'): ('Wuhan City', 'Hubei', 'China'),
+    ('xi\'an',): ('Xi\'an City', 'Shaanxi', 'China'),
     ('uk',): (None, None, 'United Kingdom'),
     ('usa',): (None, None, 'United States'),
     ('al',): (None, 'Alabama', 'United States'),
