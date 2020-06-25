@@ -44,7 +44,9 @@
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "jest": "^25.5.4",
+    "lint-staged": "^10.2.11",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
@@ -75,5 +77,15 @@
     "passport-http-bearer": "^1.0.1",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*/**/*.{js,ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }

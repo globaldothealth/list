@@ -57,7 +57,12 @@ test('lists users', async () => {
     mockGetAxios(axiosResponse);
 
     const { queryByText, findByText } = render(
-        <Users user={emptyUser} onUserChange={() => {}} />,
+        <Users
+            user={emptyUser}
+            onUserChange={(): void => {
+                // do nothing
+            }}
+        />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
     expect(await findByText('foo@bar.com')).toBeInTheDocument();
@@ -90,7 +95,12 @@ test('updates roles on selection', async () => {
 
     // Shows initial roles
     const { getByTestId, queryByText, findByText, getByRole } = render(
-        <Users user={emptyUser} onUserChange={() => {}} />,
+        <Users
+            user={emptyUser}
+            onUserChange={(): void => {
+                // do nothing
+            }}
+        />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
     expect(await findByText('admin')).toBeInTheDocument();

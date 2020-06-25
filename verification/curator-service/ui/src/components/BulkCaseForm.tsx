@@ -42,7 +42,7 @@ interface BulkCaseFormState {
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
