@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { Case } from '../model/case';
+import { Source } from '../model/source';
 
 /**
  * Get a specific case.
@@ -75,6 +76,29 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+// Finds sources with an existing URL in the request body and replace them
+// for the ones that already exist.
+// TODO: Consider calling find() with all the IDs at once if multiple sources
+// per case become the norm to avoid roundtrips to mongo.
+// TODO: Support more than just URL to fetch existing sources.
+async function fillInExistingSources(req: Request): Promise<void> {
+    const sources = req.body.sources;
+    // No sources will automatically fail at validation time.
+    if (!sources) {
+        return;
+    }
+    for (let i = 0; i < sources.length; i++) {
+        if (sources[i].id) {
+            continue;
+        }
+        const source = await Source.findOne({ url: sources[i].url });
+        // If we have an existing source with the same URL, use it.
+        if (source) {
+            req.body.sources[i] = source;
+        }
+    }
+}
+
 /**
  * Create a case.
  *
@@ -82,6 +106,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
+        await fillInExistingSources(req);
         // TODO: Don't consume req.body directly; add layer between API and
         // storage.
         const c = new Case(req.body);
@@ -104,6 +129,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
  */
 export const update = async (req: Request, res: Response): Promise<void> => {
     try {
+        await fillInExistingSources(req);
         const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true,
@@ -134,6 +160,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
  */
 export const upsert = async (req: Request, res: Response): Promise<void> => {
     try {
+        await fillInExistingSources(req);
         const c = await Case.findOne({
             'caseReference.sourceId': req.body.caseReference?.sourceId,
             'caseReference.sourceEntryId':

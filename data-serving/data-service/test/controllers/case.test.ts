@@ -1,5 +1,6 @@
 import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Source } from '../../src/model/source';
 import app from './../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
 import request from 'supertest';
@@ -10,8 +11,9 @@ beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
 });
 
-beforeEach(() => {
-    return Case.deleteMany({});
+beforeEach(async () => {
+    await Source.deleteMany({});
+    await Case.deleteMany({});
 });
 
 afterAll(async () => {
@@ -204,5 +206,46 @@ describe('DELETE', () => {
         return request(app)
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
+    });
+});
+
+describe('Sources', () => {
+    it('are created if needs be', async () => {
+        const c = await new Case(minimalCase).save();
+        expect(c.sources).toHaveLength(1);
+    });
+    it('are reused if existing on create', async () => {
+        const source = await new Source({ url: 'cdc.gov' }).save();
+        console.log('created source with id', source.id);
+        return request(app)
+            .post('/api/cases')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201, new RegExp(source.id));
+    });
+    it('are reused if existing on update', async () => {
+        const source = await new Source({ url: 'nope.gov' }).save();
+        console.log('created source with id', source.id);
+        const resp = await request(app)
+            .post('/api/cases')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(resp.body.sources).toHaveLength(1);
+        // Update the document with the new source that already exists.
+        return request(app)
+            .put(`/api/cases/${resp.body._id}`)
+            .send({ sources: [{ url: 'nope.gov' }] })
+            .expect('Content-Type', /json/)
+            .expect(200, new RegExp(source.id));
+    });
+    it('are reused if existing on upsert', async () => {
+        const source = await new Source({ url: 'cdc.gov' }).save();
+        console.log('created source with id', source.id);
+        return request(app)
+            .put('/api/cases/')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201, new RegExp(source.id));
     });
 });
