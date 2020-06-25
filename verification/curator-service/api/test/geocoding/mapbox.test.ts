@@ -42,7 +42,9 @@ describe('geocode', () => {
     it('succeeds', async () => {
         features.push(lyon);
         const geocoder = new Geocoder('token', 'mapbox.places');
-        let feats = await geocoder.geocode('some query');
+        let feats = await geocoder.geocode('some query', {
+            limitToResolution: Resolution.Admin3,
+        });
         expect(feats).toHaveLength(1);
         const wantFeature: GeocodeResult = {
             administrativeAreaLevel1: 'Rhône',
@@ -57,7 +59,9 @@ describe('geocode', () => {
         expect(feats[0]).toEqual(wantFeature);
         expect(callCount).toBe(1);
         // Call again, cache should have been hit.
-        feats = await geocoder.geocode('some query');
+        feats = await geocoder.geocode('some query', {
+            limitToResolution: Resolution.Admin3,
+        });
         expect(feats[0]).toEqual(wantFeature);
         expect(callCount).toBe(1);
     });

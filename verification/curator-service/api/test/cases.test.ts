@@ -156,7 +156,10 @@ describe('Cases', () => {
         mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .post('/api/cases')
-            .send({ age: '42', location: { query: 'Lyon' } })
+            .send({
+                age: '42',
+                location: { query: 'Lyon', limitToResolution: 'Admin3' },
+            })
             .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
@@ -167,6 +170,19 @@ describe('Cases', () => {
                 location: lyon,
             },
         );
+    });
+
+    it('throws on invalid location restrictions', async () => {
+        await curatorRequest
+            .post('/api/cases')
+            .send({
+                age: '42',
+                location: {
+                    query: 'Lyon',
+                    limitToResolution: 'NotAResolution',
+                },
+            })
+            .expect(422);
     });
 
     it('returns 404 when no geocode could be found on create', async () => {
