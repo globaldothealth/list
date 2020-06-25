@@ -20,6 +20,9 @@ module.exports = {
   },
   extends: defaultRules,
   rules: {
+        "no-bitwise": [
+            "error"
+        ],
         "indent": [
             "error",
             4
