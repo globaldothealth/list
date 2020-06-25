@@ -27,7 +27,7 @@ const caseSchema = new mongoose.Schema(
             type: [eventSchema],
             required: true,
             validate: {
-                validator: (events: [EventDocument]) =>
+                validator: (events: [EventDocument]): boolean =>
                     events.some((e) => e.name == 'confirmed'),
                 message: 'Must include an event with name "confirmed"',
             },
