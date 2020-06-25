@@ -1,7 +1,7 @@
 # Docker file for data service.
 # Follows multi-staged build where "dev" can be used for development
 # and "prod" follows security best-practices and uses a trimmed down image.
-FROM node:12 as dev
+FROM node:14 as dev
 
 # Create app directory
 WORKDIR /usr/src/app/data-serving/data-service
