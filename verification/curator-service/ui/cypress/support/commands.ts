@@ -1,4 +1,8 @@
+import 'cypress-file-upload';
+
 declare global {
+    // One-off Cypress setup.
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Cypress {
         interface Chainable {
             addCase: (opts: {

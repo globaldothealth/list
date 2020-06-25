@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "setup": "npm install && tsc && mongo --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA'}\" dist/index.js",
+    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA'}\" dist/index.js",
     "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json'}\" dist/index.js"
   },
   "repository": {
@@ -22,14 +22,14 @@
   "homepage": "https://github.com/open-covid-data/healthmap-gdo-temp#readme",
   "node_modules": [],
   "dependencies": {
-    "@types/node": "^13.13.5",
-    "@typescript-eslint/eslint-plugin": "^2.31.0",
-    "@typescript-eslint/parser": "^2.31.0",
+    "@types/node": "^13.13.12",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.0.4",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.5"
   }
 }

@@ -4,33 +4,25 @@ import { AuthController, mustHaveAnyRole } from '../src/controllers/auth';
 import { Request, Response } from 'express';
 import { Session, User } from '../src/model/user';
 
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 import express from 'express';
-import mongoose from 'mongoose';
 import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
+    mongoServer = new MongoMemoryServer();
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    return mongoServer.stop();
 });
 
 afterEach(async () => {

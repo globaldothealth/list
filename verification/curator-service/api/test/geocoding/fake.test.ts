@@ -1,24 +1,17 @@
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../../src/index';
-import mongoose from 'mongoose';
 import request from 'supertest';
 
 jest.mock('../../src/geocoding/mapbox');
 
+let mongoServer: MongoMemoryServer;
+
 beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
+    mongoServer = new MongoMemoryServer();
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    return mongoServer.stop();
 });
 
 describe('FakeGeocoder', () => {

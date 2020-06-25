@@ -8,7 +8,6 @@ export default interface NewCaseFormValues {
     ethnicity?: string;
     nationalities: string[];
     profession?: string;
-    locationQuery: string;
     location?: Loc;
     confirmedDate: string | null;
     methodOfConfirmation?: string;
@@ -21,9 +20,11 @@ export default interface NewCaseFormValues {
     outcomeDate: string | null;
     outcome?: string;
     symptoms: string[];
-    transmissionRoute?: string;
-    transmissionPlace?: string;
+    transmissionRoutes: string[];
+    transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
+    // TODO: add other travel history fields
+    travelHistory: Loc[];
     sourceUrl: string;
     notes: string;
 }

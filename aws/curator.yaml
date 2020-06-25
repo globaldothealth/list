@@ -111,37 +111,37 @@ spec:
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: google_oauth_client_id
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: aws_secret_access_key
             - name: MAPBOX_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-47fcd8d26k
+                  name: curator-prod-4mtk8mh9t2
                   key: mapbox_token
           resources:
             requests:

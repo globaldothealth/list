@@ -18,6 +18,18 @@ describe('New case form', function () {
             name: 'France',
             geoResolution: 'Country',
         });
+        cy.seedLocation({
+            country: 'Germany',
+            geometry: { latitude: 51.0968509, longitude: 5.9688274 },
+            name: 'Germany',
+            geoResolution: 'Country',
+        });
+        cy.seedLocation({
+            country: 'United Kingdom',
+            geometry: { latitude: 54.2316104, longitude: -13.4274035 },
+            name: 'United Kingdom',
+            geoResolution: 'Country',
+        });
 
         cy.visit('/cases/new');
         cy.get('div[data-testid="sex"]').click();
@@ -56,13 +68,19 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
         cy.get('li').first().should('contain', 'mild fever').click();
-        cy.get('div[data-testid="transmissionRoute"]').click();
-        cy.get('li[data-value="Direct contact"').click();
-        cy.get('div[data-testid="transmissionPlace"]').click();
-        cy.get('li[data-value="Factory"').click();
+        cy.get('div[data-testid="transmissionRoutes"]').click();
+        cy.get('li').first().should('contain', 'Airborne infection').click();
+        cy.get('div[data-testid="transmissionPlaces"]').click();
+        cy.get('li').first().should('contain', 'Assisted Living').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
+        cy.get('button[data-testid="addTravelHistory"').click();
+        cy.get('div[data-testid="travelHistory[0]"]').type('Germany');
+        cy.get('li').first().should('contain', 'Germany').click();
+        cy.get('button[data-testid="addTravelHistory"').click();
+        cy.get('div[data-testid="travelHistory[1]"]').type('United Kingdom');
+        cy.get('li').first().should('contain', 'United Kingdom').click();
         cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
         cy.get('textarea[name="notes"]')
             .clear()
@@ -82,9 +100,10 @@ describe('New case form', function () {
         cy.contains('France');
         cy.contains('1/1/2020');
         cy.contains('dry cough, mild fever');
-        cy.contains('Direct contact');
-        cy.contains('Factory');
+        cy.contains('Airborne infection');
+        cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
+        cy.contains('Germany, United Kingdom');
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');

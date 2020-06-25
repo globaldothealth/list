@@ -17,6 +17,7 @@ import Scroll from 'react-scroll';
 import Source from './new-case-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
+import TravelHistory from './new-case-form-fields/TravelHistory';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -43,7 +44,6 @@ const styles = () =>
         },
         form: {
             paddingLeft: '15em',
-            width: '60%',
         },
     });
 
@@ -116,10 +116,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     nationalities: values.nationalities,
                     profession: values.profession,
                 },
-                location: {
-                    ...values.location,
-                    ...{ query: values.locationQuery },
-                },
+                location: values.location,
                 events: [
                     {
                         name: 'confirmed',
@@ -175,11 +172,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         };
                     }),
                 symptoms: {
-                    provided: values.symptoms,
+                    values: values.symptoms,
                 },
                 transmission: {
-                    route: values.transmissionRoute,
-                    place: values.transmissionPlace,
+                    routes: values.transmissionRoutes,
+                    places: values.transmissionPlaces,
                     linkedCaseIds: values.transmissionLinkedCaseIds,
                 },
                 sources: [
@@ -187,6 +184,13 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         url: values.sourceUrl,
                     },
                 ],
+                travelHistory: {
+                    travel: values.travelHistory.map((travelHistory) => {
+                        return {
+                            location: travelHistory,
+                        };
+                    }),
+                },
                 notes: values.notes,
                 revisionMetadata: {
                     revisionNumber: 0,
@@ -258,7 +262,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     ethnicity: undefined,
                     nationalities: [],
                     profession: undefined,
-                    locationQuery: '',
                     location: undefined,
                     confirmedDate: null,
                     methodOfConfirmation: undefined,
@@ -271,9 +274,10 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     outcomeDate: null,
                     outcome: undefined,
                     symptoms: [],
-                    transmissionRoute: undefined,
-                    transmissionPlace: undefined,
+                    transmissionRoutes: [],
+                    transmissionPlaces: [],
                     transmissionLinkedCaseIds: [],
+                    travelHistory: [],
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -325,8 +329,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     isChecked:
                                         values.location !== null &&
                                         values.location !== undefined,
-                                    hasError:
-                                        errors.locationQuery !== undefined,
+                                    hasError: errors.location !== undefined,
                                 })}
                                 Location
                             </div>
@@ -387,21 +390,32 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked:
-                                        values.transmissionRoute !==
-                                            undefined ||
-                                        values.transmissionPlace !==
-                                            undefined ||
+                                        values.transmissionRoutes.length > 0 ||
+                                        values.transmissionPlaces.length > 0 ||
                                         values.transmissionLinkedCaseIds
                                             .length > 0,
                                     hasError:
-                                        errors.transmissionRoute !==
+                                        errors.transmissionRoutes !==
                                             undefined ||
-                                        errors.transmissionPlace !==
+                                        errors.transmissionPlaces !==
                                             undefined ||
                                         errors.transmissionLinkedCaseIds !==
                                             undefined,
                                 })}
                                 Transmission
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('travelHistory')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.travelHistory.length > 0,
+                                    hasError:
+                                        errors.travelHistory !== undefined,
+                                })}
+                                Travel History
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
@@ -431,6 +445,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Events></Events>
                                 <Symptoms></Symptoms>
                                 <Transmission></Transmission>
+                                <TravelHistory></TravelHistory>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}

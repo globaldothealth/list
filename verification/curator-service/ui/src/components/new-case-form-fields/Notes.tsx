@@ -15,6 +15,8 @@ export default class Notes extends React.Component<{}, {}> {
                         type="text"
                         multiline={true}
                         component={TextField}
+                        fullWidth
+                        rows="3"
                     />
                 </fieldset>
             </Scroll.Element>

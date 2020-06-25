@@ -59,8 +59,8 @@ paths:
           $ref: "#/components/responses/200SourceArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -81,8 +81,8 @@ paths:
           $ref: "#/components/responses/201Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -105,8 +105,8 @@ paths:
           $ref: "#/components/responses/200Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -129,8 +129,8 @@ paths:
           $ref: "#/components/responses/200Source"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -146,8 +146,159 @@ paths:
           description: Source deleted
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases:
+    get:
+      tags: [Case]
+      summary: Lists cases
+      operationId: listCases
+      parameters:
+        - name: page
+          in: query
+          description: The pages of sources to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of cases to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          $ref: "#/components/responses/200CaseArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    post:
+      tags: [Case]
+      summary: Creates a new case
+      operationId: createCase
+      requestBody:
+        description: Case to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "201":
+          $ref: "#/components/responses/201Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      tags: [Case]
+      summary: Upserts a case
+      description: >
+        Creates or updates a case, depending on whether the provided values for
+        the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
+        correspond to an existing case record.
+      operationId: upsertCase
+      requestBody:
+        description: Case to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCase"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "201":
+          $ref: "#/components/responses/201Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The case ID
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    get:
+      tags: [Case]
+      summary: Gets a specific case
+      operationId: getCase
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    put:
+      tags: [Case]
+      summary: Updates a specific case
+      operationId: updateCase
+      requestBody:
+        description: Case to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Case"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Case"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      tags: [Case]
+      summary: Deletes a specific case
+      operationId: deleteCase
+      responses:
+        "204":
+          description: Case deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "500":
@@ -182,8 +333,8 @@ paths:
           $ref: "#/components/responses/200UserArray"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -213,8 +364,8 @@ paths:
           $ref: "#/components/responses/200User"
         "400":
           $ref: "#/components/responses/400"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
         "422":
@@ -229,8 +380,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200Roles"
-        "401":
-          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
 components:
@@ -246,6 +397,18 @@ components:
         $ref: "#/components/schemas/Source"
     NewSource:
       description: The subset of "#/components/schemas/Source" required to create the entity
+      type: object
+    Case:
+      description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
+      allOf:
+        - $ref: "#/components/schemas/NewCase"
+        - type: object
+    CaseArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/Case"
+    NewCase:
+      description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
     User:
       description: A user
@@ -267,6 +430,24 @@ components:
       items:
         $ref: "#components/schemas/Location"
   responses:
+    "200Case":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
+    "200CaseArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseArray"
+    "201Case":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Case"
     "200Source":
       description: OK
       content:
@@ -311,8 +492,8 @@ components:
             $ref: "#/components/schemas/LocationArray"
     "400":
       description: Malformed request
-    "401":
-      description: Unauthorized
+    "403":
+      description: Forbidden
     "404":
       description: Not found
     "422":

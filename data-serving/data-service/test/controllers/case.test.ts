@@ -1,24 +1,21 @@
 import { Case } from '../../src/model/case';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
-import mongoose from 'mongoose';
 import request from 'supertest';
 
-beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        { useNewUrlParser: true, useUnifiedTopology: true },
-    );
+let mongoServer: MongoMemoryServer;
+
+beforeAll(async () => {
+    mongoServer = new MongoMemoryServer();
 });
 
 beforeEach(() => {
     return Case.deleteMany({});
 });
 
-afterAll(() => {
-    return mongoose.disconnect();
+afterAll(async () => {
+    return mongoServer.stop();
 });
 
 describe('GET', () => {
