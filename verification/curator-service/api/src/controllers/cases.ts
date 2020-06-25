@@ -1,7 +1,9 @@
+import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
-import { Geocoder } from '../geocoding/geocoder';
 import axios from 'axios';
+
+class InvalidParamError extends Error {}
 
 /**
  * CasesController forwards requests to the data service.
@@ -76,6 +78,10 @@ export default class CasesController {
             );
             res.json(response.data);
         } catch (err) {
+            if (err instanceof InvalidParamError) {
+                res.status(422).send(err.message);
+                return;
+            }
             console.log(err);
             res.status(500).send(err.message);
         }
@@ -95,6 +101,10 @@ export default class CasesController {
             );
             res.json(response.data);
         } catch (err) {
+            if (err instanceof InvalidParamError) {
+                res.status(422).send(err.message);
+                return;
+            }
             console.log(err);
             res.status(500).send(err.message);
         }
@@ -108,21 +118,35 @@ export default class CasesController {
     private async geocode(req: Request): Promise<boolean> {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
-        if (!location?.geometry?.latitude || !location.geometry?.longitude) {
-            for (const geocoder of this.geocoders) {
-                const features = await geocoder.geocode(location?.query);
-                if (features.length === 0) {
-                    continue;
-                }
-                // Currently a 1:1 match between the GeocodeResult and the data service API.
-                req.body['location'] = features[0];
-                return true;
-            }
-            return false;
-        } else {
-            // Remove any query as we shouldn't store it.
-            delete location.query;
+        if (location?.geometry?.latitude && location.geometry?.longitude) {
+            return true;
         }
-        return true;
+        if (!location?.query) {
+            throw new InvalidParamError(
+                'location.query must be specified to be able to geocode',
+            );
+        }
+        const opts: GeocodeOptions = {};
+        if (location['limitToResolution']) {
+            opts.limitToResolution =
+                Resolution[
+                    location['limitToResolution'] as keyof typeof Resolution
+                ];
+            if (!opts.limitToResolution) {
+                throw new InvalidParamError(
+                    `invalid limitToResolution: ${location['limitToResolution']}`,
+                );
+            }
+        }
+        for (const geocoder of this.geocoders) {
+            const features = await geocoder.geocode(location?.query, opts);
+            if (features.length === 0) {
+                continue;
+            }
+            // Currently a 1:1 match between the GeocodeResult and the data service API.
+            req.body['location'] = features[0];
+            return true;
+        }
+        return false;
     }
 }

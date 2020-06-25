@@ -8,6 +8,9 @@ export default class FakeGeocoder {
     constructor() {
         this.entries = new Map<string, GeocodeResult>();
     }
+    // Geocode with fake seeded locations.
+    // It ignores the options that can be passed to the geocoder and
+    // matches locations' name field with the given query.
     async geocode(query: string): Promise<GeocodeResult[]> {
         console.debug('geocoding ', query);
         const entry = this.entries.get(query);

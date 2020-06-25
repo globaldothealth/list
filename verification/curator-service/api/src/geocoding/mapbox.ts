@@ -1,7 +1,9 @@
-import { GeocodeResult, Resolution } from './geocoder';
+import { GeocodeOptions, GeocodeResult, Resolution } from './geocoder';
 import Geocoding, {
     GeocodeFeature,
     GeocodeMode,
+    GeocodeQueryType,
+    GeocodeRequest,
     GeocodeResponse,
     GeocodeService,
 } from '@mapbox/mapbox-sdk/services/geocoding';
@@ -44,6 +46,15 @@ function getResolution(features: GeocodeFeature[]): Resolution {
     return Resolution.Country;
 }
 
+// Get the mapbox types for a given Resolution.
+const resolutionToGeocodeQueryType = new Map<Resolution, GeocodeQueryType>([
+    [Resolution.Country, 'country'],
+    [Resolution.Admin1, 'region'],
+    [Resolution.Admin2, 'district'],
+    [Resolution.Admin3, 'place'],
+    [Resolution.Point, 'poi'],
+]);
+
 export default class MapboxGeocoder {
     private geocodeService: GeocodeService;
     private cache: LRUCache<string, GeocodeResult[]>;
@@ -56,20 +67,40 @@ export default class MapboxGeocoder {
         });
     }
 
-    async geocode(query: string): Promise<GeocodeResult[]> {
+    async geocode(
+        query: string,
+        opts?: GeocodeOptions,
+    ): Promise<GeocodeResult[]> {
         query = query.trim();
-        const cachedResults = this.cache.get(query);
+        const cacheKey = JSON.stringify({
+            query: query.toLowerCase(),
+            opts: opts,
+        });
+        const cachedResults = this.cache.get(cacheKey);
         if (cachedResults) {
             return cachedResults;
         }
         try {
+            const req: GeocodeRequest = {
+                mode: this.endpoint,
+                query: query,
+                language: ['en'],
+                limit: 5,
+            };
+            // Setting req.type allows to filter the top level results
+            // with features of that specific type.
+            // The context of the feature can still has other types
+            // (if you ask for a region, the context will still contain the country).
+            if (opts?.limitToResolution) {
+                const type = resolutionToGeocodeQueryType.get(
+                    opts?.limitToResolution,
+                );
+                if (type) {
+                    req.types = [type];
+                }
+            }
             const resp: MapiResponse = await this.geocodeService
-                .forwardGeocode({
-                    mode: this.endpoint,
-                    query: query,
-                    language: ['en'],
-                    limit: 5,
-                })
+                .forwardGeocode(req)
                 .send();
             const features = (resp.body as GeocodeResponse).features;
             const geocodes = features.map((feature) => {
@@ -100,7 +131,7 @@ export default class MapboxGeocoder {
                     geoResolution: getResolution(contexts),
                 };
             });
-            this.cache.set(query, geocodes);
+            this.cache.set(cacheKey, geocodes);
             return geocodes;
         } catch (e) {
             throw e;
