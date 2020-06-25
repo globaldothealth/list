@@ -185,11 +185,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     },
                 ],
                 travelHistory: {
-                    travel: values.travelHistory.map((travelHistory) => {
-                        return {
-                            location: travelHistory,
-                        };
-                    }),
+                    travel: values.travelHistory,
                 },
                 notes: values.notes,
                 revisionMetadata: {

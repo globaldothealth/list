@@ -1,5 +1,5 @@
 import ChipInput from 'material-ui-chip-input';
-import FormikAutocomplete from './FormikAutocomplete';
+import { FormikAutocomplete } from './FormikFields';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { makeStyles } from '@material-ui/core';
