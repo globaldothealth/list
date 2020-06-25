@@ -15,7 +15,7 @@ on:
 
 jobs:
   update-case-data-prod:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
@@ -40,7 +40,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install Python dependencies
-        run: python -m pip install -r ./data-serving/scripts/data-pipeline/requirements.txt
+        run: python3 -m pip install -r ./data-serving/scripts/data-pipeline/requirements.txt
 
       - name: Run update script
         run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m "${{ secrets.DB_CONNECTION_URL }}"
