@@ -118,7 +118,7 @@ export default class CasesController {
     private async geocode(req: Request): Promise<boolean> {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
-        if (location?.geometry?.latitude & location.geometry?.longitude) {
+        if (location?.geometry?.latitude && location.geometry?.longitude) {
             return true;
         }
         if (!location?.query) {

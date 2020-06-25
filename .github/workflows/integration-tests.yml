@@ -26,15 +26,23 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
+      # Run the tests, if they fail, show docker logs and fail the step.
       - name: Cypress integration tests
         run: |
           npm ci
-          npm run cypress-run
+          npm run cypress-run || docker-compose -f ../../../dev/docker-compose.yml -f ../../../dev/docker-compose.ci.yml logs && false
         working-directory: verification/curator-service/ui
         env:
           CI: true
+      # Screenshots are only available on failures.
       - uses: actions/upload-artifact@v1
         if: failure()
+        with:
+          name: cypress-screenshots
+          path: verification/curator-service/ui/cypress/screenshots
+      # Videos are always available.
+      - uses: actions/upload-artifact@v1
+        if: always()
         with:
           name: cypress-videos
           path: verification/curator-service/ui/cypress/videos/components
