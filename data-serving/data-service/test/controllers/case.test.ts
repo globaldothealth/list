@@ -215,8 +215,9 @@ describe('Sources', () => {
         expect(c.sources).toHaveLength(1);
     });
     it('are reused if existing on create', async () => {
-        const source = await new Source({ url: 'cdc.gov' }).save();
-        console.log('created source with id', source.id);
+        const source = await new Source({
+            url: minimalCase.sources[0].url,
+        }).save();
         return request(app)
             .post('/api/cases')
             .send(minimalCase)
@@ -225,7 +226,6 @@ describe('Sources', () => {
     });
     it('are reused if existing on update', async () => {
         const source = await new Source({ url: 'nope.gov' }).save();
-        console.log('created source with id', source.id);
         const resp = await request(app)
             .post('/api/cases')
             .send(minimalCase)
@@ -240,8 +240,9 @@ describe('Sources', () => {
             .expect(200, new RegExp(source.id));
     });
     it('are reused if existing on upsert', async () => {
-        const source = await new Source({ url: 'cdc.gov' }).save();
-        console.log('created source with id', source.id);
+        const source = await new Source({
+            url: minimalCase.sources[0].url,
+        }).save();
         return request(app)
             .put('/api/cases/')
             .send(minimalCase)
