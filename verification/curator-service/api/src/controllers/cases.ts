@@ -118,36 +118,35 @@ export default class CasesController {
     private async geocode(req: Request): Promise<boolean> {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
-        if (!location?.geometry?.latitude || !location.geometry?.longitude) {
-            for (const geocoder of this.geocoders) {
-                const opts: GeocodeOptions = {};
-                if (location['limitToResolution']) {
-                    opts.limitToResolution =
-                        Resolution[
-                            location[
-                                'limitToResolution'
-                            ] as keyof typeof Resolution
-                        ];
-                    if (!opts.limitToResolution) {
-                        throw new InvalidParamError(
-                            `invalid limitToResolution: ${location['limitToResolution']}`,
-                        );
-                    }
-                }
-                const features = await geocoder.geocode(location?.query, opts);
-                if (features.length === 0) {
-                    continue;
-                }
-                // Currently a 1:1 match between the GeocodeResult and the data service API.
-                req.body['location'] = features[0];
-                return true;
-            }
-            return false;
-        } else {
-            // Remove any left over field as the schema doesn't allow unknown fields.
-            delete location.query;
-            delete location.limitToResolution;
+        if (location?.geometry?.latitude & location.geometry?.longitude) {
+            return true;
         }
-        return true;
+        if (location?.query) {
+            throw new InvalidParamError(
+                'location.query must be specified to be able to geocode',
+            );
+        }
+        for (const geocoder of this.geocoders) {
+            const opts: GeocodeOptions = {};
+            if (location['limitToResolution']) {
+                opts.limitToResolution =
+                    Resolution[
+                        location['limitToResolution'] as keyof typeof Resolution
+                    ];
+                if (!opts.limitToResolution) {
+                    throw new InvalidParamError(
+                        `invalid limitToResolution: ${location['limitToResolution']}`,
+                    );
+                }
+            }
+            const features = await geocoder.geocode(location?.query, opts);
+            if (features.length === 0) {
+                continue;
+            }
+            // Currently a 1:1 match between the GeocodeResult and the data service API.
+            req.body['location'] = features[0];
+            return true;
+        }
+        return false;
     }
 }
