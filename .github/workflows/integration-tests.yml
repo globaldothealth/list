@@ -33,3 +33,8 @@ jobs:
         working-directory: verification/curator-service/ui
         env:
           CI: true
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: cypress-videos
+          path: verification/curator-service/ui/cypress/videos/components
