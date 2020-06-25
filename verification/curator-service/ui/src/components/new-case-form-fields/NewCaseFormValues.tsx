@@ -23,8 +23,17 @@ export default interface NewCaseFormValues {
     transmissionRoutes: string[];
     transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
-    // TODO: add other travel history fields
-    travelHistory: Loc[];
+    travelHistory: Travel[];
     sourceUrl: string;
     notes: string;
+}
+
+interface Travel {
+    location: Loc;
+    dateRange: {
+        start: string | null;
+        end: string | null;
+    };
+    purpose?: string;
+    method?: string;
 }
