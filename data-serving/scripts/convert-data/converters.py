@@ -432,7 +432,7 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
         date_range = convert_date_range(dates)
     except (ValueError) as e:
         log_error(id, 'travel_history_dates',
-                  'travelHistory.dateRange', location, e)
+                  'travelHistory.dateRange', dates, e)
 
     if not location_list and not date_range:
         return None
