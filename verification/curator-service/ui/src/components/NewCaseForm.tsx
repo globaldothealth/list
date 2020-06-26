@@ -194,9 +194,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             demographics: {
                 sex: values.sex,
                 ageRange: ageRange,
-                ethnicity: values.ethnicity || '',
+                ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                profession: values.profession || '',
+                profession: values.profession,
             },
             location: values.location,
             events: [
