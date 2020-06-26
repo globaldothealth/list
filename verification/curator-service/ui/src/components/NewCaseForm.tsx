@@ -35,6 +35,7 @@ const styles = () =>
         },
         tableOfContents: {
             position: 'fixed',
+            marginTop: '2em',
         },
         tableOfContentsRow: {
             alignItems: 'center',
@@ -42,6 +43,9 @@ const styles = () =>
         },
         form: {
             paddingLeft: '15em',
+        },
+        formSection: {
+            margin: '2em 0',
         },
     });
 
@@ -519,15 +523,33 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
-                                <Demographics></Demographics>
-                                <LocationForm></LocationForm>
-                                <Events></Events>
-                                <Symptoms></Symptoms>
-                                <Transmission></Transmission>
-                                <TravelHistory></TravelHistory>
-                                <GenomeSequences></GenomeSequences>
-                                <Source></Source>
-                                <Notes></Notes>
+                                <div className={classes.formSection}>
+                                    <Demographics></Demographics>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <LocationForm></LocationForm>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Events></Events>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Symptoms></Symptoms>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Transmission></Transmission>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <TravelHistory></TravelHistory>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <GenomeSequences></GenomeSequences>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Source></Source>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Notes></Notes>
+                                </div>
                                 {isSubmitting && <LinearProgress />}
                                 <br />
                                 <Button
