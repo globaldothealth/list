@@ -63,6 +63,15 @@ export interface Travel {
     method?: string;
 }
 
+interface GenomeSequence {
+    sampleCollectionDate: string | null;
+    repositoryUrl?: string;
+    sequenceId?: string;
+    sequenceName?: string;
+    sequenceLength?: number;
+    notes?: string;
+}
+
 export interface Case {
     _id: string;
     importedCase: {
@@ -75,5 +84,6 @@ export interface Case {
     transmission: Transmission;
     sources: Source[];
     travelHistory: TravelHistory;
+    genomeSequences: GenomeSequence[];
     notes: string;
 }
