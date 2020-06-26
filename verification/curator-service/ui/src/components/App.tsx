@@ -70,6 +70,7 @@ const styles = () =>
             flexGrow: 1,
         },
         appBar: {
+            background: 'white',
             transition: theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
@@ -330,22 +331,23 @@ class App extends React.Component<Props, State> {
                             ].map(
                                 (item) =>
                                     item.displayCheck() && (
-                                        <Link to={item.to}>
-                                            <ListItem
-                                                button
-                                                key={item.text}
-                                                divider={item.divider}
+                                        <ListItem
+                                            button
+                                            key={item.text}
+                                            divider={item.divider}
+                                        >
+                                            <ListItemIcon>
+                                                {item.icon}
+                                            </ListItemIcon>
+                                            <Link
+                                                to={item.to}
                                                 onClick={this.handleDrawerClose}
                                             >
-                                                <ListItemIcon>
-                                                    {item.icon}
-                                                </ListItemIcon>
-
                                                 <ListItemText
                                                     primary={item.text}
                                                 />
-                                            </ListItem>
-                                        </Link>
+                                            </Link>
+                                        </ListItem>
                                     ),
                             )}
                         </List>
