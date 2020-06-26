@@ -24,11 +24,14 @@ export default interface NewCaseFormValues {
     transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
     travelHistory: Travel[];
+    genomeSequences: GenomeSequence[];
     sourceUrl: string;
     notes: string;
 }
 
 interface Travel {
+    // Used to key react elements in the UI
+    reactId: string;
     location: Loc;
     dateRange: {
         start: string | null;
@@ -36,4 +39,15 @@ interface Travel {
     };
     purpose?: string;
     method?: string;
+}
+
+interface GenomeSequence {
+    // Used to key react elements in the UI
+    reactId: string;
+    sampleCollectionDate: string | null;
+    repositoryUrl?: string;
+    sequenceId?: string;
+    sequenceName?: string;
+    sequenceLength?: number;
+    notes?: string;
 }
