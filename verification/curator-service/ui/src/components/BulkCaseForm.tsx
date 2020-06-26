@@ -47,7 +47,7 @@ class BulkCaseForm extends React.Component<
             statusMessage: '',
         };
     }
-    // Array<any> is the type used by the source library for this data.
+    // Using a generic type for now; will define case record later.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async uploadData(results: ParseResult<Record<string, any>>): Promise<void> {
         for (const c of results.data) {
