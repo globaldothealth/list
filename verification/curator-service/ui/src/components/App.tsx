@@ -70,6 +70,7 @@ const styles = () =>
             flexGrow: 1,
         },
         appBar: {
+            background: 'white',
             transition: theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
