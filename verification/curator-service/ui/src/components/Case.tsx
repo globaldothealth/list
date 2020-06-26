@@ -55,6 +55,12 @@ export interface TravelHistory {
 
 export interface Travel {
     location: Location;
+    dateRange: {
+        start: string;
+        end: string;
+    };
+    purpose?: string;
+    method?: string;
 }
 
 export interface Case {

@@ -75,8 +75,14 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
     }
     return {
         sex: c.demographics?.sex,
-        minAge: c.demographics?.ageRange?.start,
-        maxAge: c.demographics?.ageRange?.end,
+        minAge:
+            c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
+                ? c.demographics?.ageRange?.start
+                : undefined,
+        maxAge:
+            c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
+                ? c.demographics?.ageRange?.end
+                : undefined,
         age:
             c.demographics?.ageRange?.start === c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -119,7 +125,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
-        travelHistory: c.travelHistory?.travel?.map((t) => t.location),
+        travelHistory: c.travelHistory?.travel,
         sourceUrl: c.sources?.length > 0 ? c.sources[0].url : '',
         notes: c.notes,
     };
@@ -183,12 +189,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 
     async submitCase(values: NewCaseFormValues): Promise<void> {
-        const ageRange: { start: number; end: number } = values.age
+        const ageRange = values.age
             ? { start: values.age, end: values.age }
-            : {
-                  start: values.minAge || 0,
-                  end: values.maxAge || 0,
-              };
+            : { start: values.minAge, end: values.maxAge };
         const newCase = {
             demographics: {
                 sex: values.sex || '',
