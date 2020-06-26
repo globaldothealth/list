@@ -9,6 +9,7 @@ import { PlacesAutocomplete } from './LocationForm';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { makeStyles } from '@material-ui/core';
+import shortId from 'shortid';
 
 const useStyles = makeStyles(() => ({
     travelHistorySection: {
@@ -43,41 +44,45 @@ export default function Events(): JSX.Element {
                             <div>
                                 {values.travelHistory &&
                                     values.travelHistory.map(
-                                        (travelHistoryElement, index) => (
-                                            <fieldset
-                                                key={index}
-                                                className={
-                                                    classes.travelHistorySection
-                                                }
-                                            >
-                                                <PlacesAutocomplete
-                                                    name={`travelHistory[${index}].location`}
-                                                ></PlacesAutocomplete>
-                                                <Location
-                                                    location={
-                                                        travelHistoryElement.location
+                                        (travelHistoryElement, index) => {
+                                            return (
+                                                <fieldset
+                                                    key={
+                                                        travelHistoryElement.reactId
                                                     }
-                                                ></Location>
-                                                <DateField
-                                                    name={`travelHistory[${index}].dateRange.start`}
-                                                    label="Start date"
-                                                ></DateField>
-                                                <DateField
-                                                    name={`travelHistory[${index}].dateRange.end`}
-                                                    label="End date"
-                                                ></DateField>
-                                                <SelectField
-                                                    name={`travelHistory[${index}].purpose`}
-                                                    label="Primary reason for travel"
-                                                    values={travelPurposes}
-                                                ></SelectField>
-                                                <SelectField
-                                                    name={`travelHistory[${index}].method`}
-                                                    label="Method of travel"
-                                                    values={travelMethods}
-                                                ></SelectField>
-                                            </fieldset>
-                                        ),
+                                                    className={
+                                                        classes.travelHistorySection
+                                                    }
+                                                >
+                                                    <PlacesAutocomplete
+                                                        name={`travelHistory[${index}].location`}
+                                                    ></PlacesAutocomplete>
+                                                    <Location
+                                                        location={
+                                                            travelHistoryElement.location
+                                                        }
+                                                    ></Location>
+                                                    <DateField
+                                                        name={`travelHistory[${index}].dateRange.start`}
+                                                        label="Start date"
+                                                    ></DateField>
+                                                    <DateField
+                                                        name={`travelHistory[${index}].dateRange.end`}
+                                                        label="End date"
+                                                    ></DateField>
+                                                    <SelectField
+                                                        name={`travelHistory[${index}].purpose`}
+                                                        label="Primary reason for travel"
+                                                        values={travelPurposes}
+                                                    ></SelectField>
+                                                    <SelectField
+                                                        name={`travelHistory[${index}].method`}
+                                                        label="Method of travel"
+                                                        values={travelMethods}
+                                                    ></SelectField>
+                                                </fieldset>
+                                            );
+                                        },
                                     )}
 
                                 <Button
@@ -85,6 +90,7 @@ export default function Events(): JSX.Element {
                                     startIcon={<AddCircleIcon />}
                                     onClick={(): void => {
                                         push({
+                                            reactId: shortId.generate(),
                                             dateRange: {
                                                 start: null,
                                                 end: null,

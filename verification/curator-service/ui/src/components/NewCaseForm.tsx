@@ -9,6 +9,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
+import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
 import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
@@ -24,6 +25,7 @@ import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import shortId from 'shortid';
 import { withStyles } from '@material-ui/core';
 
 const styles = () =>
@@ -69,6 +71,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
             travelHistory: [],
+            genomeSequences: [],
             sourceUrl: '',
             notes: '',
         };
@@ -123,7 +126,12 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
-        travelHistory: c.travelHistory?.travel,
+        travelHistory: c.travelHistory?.travel?.map((travel) => {
+            return { reactId: shortId.generate(), ...travel };
+        }),
+        genomeSequences: c.genomeSequences?.map((genomeSequence) => {
+            return { reactId: shortId.generate(), ...genomeSequence };
+        }),
         sourceUrl: c.sources?.length > 0 ? c.sources[0].url : '',
         notes: c.notes,
     };
@@ -269,6 +277,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             travelHistory: {
                 travel: values.travelHistory,
             },
+            genomeSequences: values.genomeSequences,
             notes: values.notes,
             revisionMetadata: {
                 revisionNumber: 0,
@@ -475,6 +484,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('genomeSequences')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked:
+                                        values.genomeSequences?.length > 0,
+                                    hasError:
+                                        errors.genomeSequences !== undefined,
+                                })}
+                                Genome Sequences
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
@@ -502,6 +525,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Symptoms></Symptoms>
                                 <Transmission></Transmission>
                                 <TravelHistory></TravelHistory>
+                                <GenomeSequences></GenomeSequences>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}

@@ -101,6 +101,23 @@ describe('New case form', function () {
         cy.get('li[data-value="Business"').click();
         cy.get('div[data-testid="travelHistory[1].method"]').click();
         cy.get('li[data-value="Car"').click();
+        cy.get('button[data-testid="addGenomeSequence"').click();
+        cy.get('input[name="genomeSequences[0].sampleCollectionDate"]').type(
+            '2020-01-01',
+        );
+        cy.get('input[name="genomeSequences[0].repositoryUrl"]').type(
+            'www.example2.com',
+        );
+        cy.get('input[name="genomeSequences[0].sequenceId"]').type(
+            'testSequenceId',
+        );
+        cy.get('input[name="genomeSequences[0].sequenceName"]').type(
+            'test sequence name',
+        );
+        cy.get('input[name="genomeSequences[0].sequenceLength"]').type('33000');
+        cy.get('textarea[name="genomeSequences[0].notes"]').type(
+            'test sequence notes\non new line',
+        );
         cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
