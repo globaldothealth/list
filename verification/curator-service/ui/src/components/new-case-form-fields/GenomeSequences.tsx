@@ -8,6 +8,7 @@ import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core';
+import shortId from 'shortid';
 
 const useStyles = makeStyles(() => ({
     genomeSequenceSection: {
@@ -32,7 +33,7 @@ export default function GenomeSequences(): JSX.Element {
                                 {values.genomeSequences &&
                                     values.genomeSequences.map((_, index) => (
                                         <fieldset
-                                            key={index}
+                                            key={shortId.generate()}
                                             className={
                                                 classes.genomeSequenceSection
                                             }
@@ -79,7 +80,6 @@ export default function GenomeSequences(): JSX.Element {
                                                 label="Notes"
                                                 multiline={true}
                                                 fullWidth
-                                                rows="3"
                                                 component={TextField}
                                             ></Field>
                                         </fieldset>

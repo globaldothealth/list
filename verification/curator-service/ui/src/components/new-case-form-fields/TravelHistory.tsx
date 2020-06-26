@@ -9,6 +9,7 @@ import { PlacesAutocomplete } from './LocationForm';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { makeStyles } from '@material-ui/core';
+import shortId from 'shortid';
 
 const useStyles = makeStyles(() => ({
     travelHistorySection: {
@@ -45,7 +46,7 @@ export default function Events(): JSX.Element {
                                     values.travelHistory.map(
                                         (travelHistoryElement, index) => (
                                             <fieldset
-                                                key={index}
+                                                key={shortId.generate()}
                                                 className={
                                                     classes.travelHistorySection
                                                 }
