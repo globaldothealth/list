@@ -1,8 +1,9 @@
 import { Field, useFormikContext } from 'formik';
-import Location, { Loc } from './Location';
 import { Typography, makeStyles } from '@material-ui/core';
 
 import { Autocomplete } from '@material-ui/lab';
+import { Location as Loc } from '../Case';
+import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import React from 'react';
 import Scroll from 'react-scroll';
