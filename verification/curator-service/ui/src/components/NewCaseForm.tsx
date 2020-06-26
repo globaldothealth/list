@@ -25,6 +25,7 @@ import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import shortId from 'shortid';
 import { withStyles } from '@material-ui/core';
 
 const styles = () =>
@@ -125,8 +126,12 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
-        travelHistory: c.travelHistory?.travel,
-        genomeSequences: c.genomeSequences,
+        travelHistory: c.travelHistory?.travel?.map((travel) => {
+            return { reactId: shortId.generate(), ...travel };
+        }),
+        genomeSequences: c.genomeSequences.map((genomeSequence) => {
+            return { reactId: shortId.generate(), ...genomeSequence };
+        }),
         sourceUrl: c.sources?.length > 0 ? c.sources[0].url : '',
         notes: c.notes,
     };
