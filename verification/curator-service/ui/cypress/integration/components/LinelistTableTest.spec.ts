@@ -23,7 +23,7 @@ describe('Linelist table', function () {
         cy.contains('www.example.com');
     });
 
-    it('Can go to the edit page', function () {
+    it.only('Can go to the edit page', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -32,7 +32,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
 
-        cy.get('button[title="Edit"]').click();
+        cy.get('button[title="Edit this case"]').click();
         cy.url().should('contain', '/cases/edit/');
     });
 
