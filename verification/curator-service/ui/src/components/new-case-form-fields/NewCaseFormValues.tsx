@@ -1,4 +1,4 @@
-import { Loc } from './Location';
+import { Location as Loc } from '../Case';
 
 export default interface NewCaseFormValues {
     sex?: string;
