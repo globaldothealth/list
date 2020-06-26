@@ -24,6 +24,7 @@ export default interface NewCaseFormValues {
     transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
     travelHistory: Travel[];
+    genomeSequences: GenomeSequence[];
     sourceUrl: string;
     notes: string;
 }
@@ -36,4 +37,13 @@ interface Travel {
     };
     purpose?: string;
     method?: string;
+}
+
+interface GenomeSequence {
+    sampleCollectionDate: string | null;
+    repositoryUrl?: string;
+    sequenceId?: string;
+    sequenceName?: string;
+    sequenceLength?: number;
+    notes?: string;
 }

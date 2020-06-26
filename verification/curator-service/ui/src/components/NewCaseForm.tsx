@@ -8,6 +8,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
+import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
 import Notes from './new-case-form-fields/Notes';
@@ -187,6 +188,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 travelHistory: {
                     travel: values.travelHistory,
                 },
+                genomeSequences: values.genomeSequences,
                 notes: values.notes,
                 revisionMetadata: {
                     revisionNumber: 0,
@@ -274,6 +276,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     transmissionPlaces: [],
                     transmissionLinkedCaseIds: [],
                     travelHistory: [],
+                    genomeSequences: [],
                     sourceUrl: '',
                     notes: '',
                 }}
@@ -415,6 +418,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void =>
+                                    this.scrollTo('genomeSequences')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked:
+                                        values.genomeSequences.length > 0,
+                                    hasError:
+                                        errors.genomeSequences !== undefined,
+                                })}
+                                Genome Sequences
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
@@ -442,6 +459,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 <Symptoms></Symptoms>
                                 <Transmission></Transmission>
                                 <TravelHistory></TravelHistory>
+                                <GenomeSequences></GenomeSequences>
                                 <Source></Source>
                                 <Notes></Notes>
                                 {isSubmitting && <LinearProgress />}
