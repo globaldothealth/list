@@ -330,12 +330,14 @@ class App extends React.Component<Props, State> {
                             ].map(
                                 (item) =>
                                     item.displayCheck() && (
-                                        <Link to={item.to}>
+                                        <Link
+                                            to={item.to}
+                                            onClick={this.handleDrawerClose}
+                                        >
                                             <ListItem
                                                 button
                                                 key={item.text}
                                                 divider={item.divider}
-                                                onClick={this.handleDrawerClose}
                                             >
                                                 <ListItemIcon>
                                                     {item.icon}
