@@ -15,6 +15,7 @@ const styles = () =>
         },
     });
 
+// TODO: Replace with Case's Location interface definition.
 export interface Loc {
     geometry: {
         latitude: number;
