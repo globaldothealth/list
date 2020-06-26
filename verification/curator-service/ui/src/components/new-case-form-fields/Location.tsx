@@ -1,6 +1,6 @@
 import { Typography, withStyles } from '@material-ui/core';
 
-import { Location as CaseLocation } from '../Case';
+import { Location as Loc } from '../Case';
 import React from 'react';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { createStyles } from '@material-ui/core/styles';
@@ -18,7 +18,7 @@ const styles = () =>
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
 interface Props extends WithStyles<typeof styles> {
-    location?: CaseLocation;
+    location?: Loc;
 }
 
 class Location extends React.Component<Props, {}> {
