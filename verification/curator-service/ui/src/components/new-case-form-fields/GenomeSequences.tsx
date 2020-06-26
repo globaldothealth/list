@@ -31,65 +31,70 @@ export default function GenomeSequences(): JSX.Element {
                         return (
                             <div>
                                 {values.genomeSequences &&
-                                    values.genomeSequences.map((_, index) => (
-                                        <fieldset
-                                            key={shortId.generate()}
-                                            className={
-                                                classes.genomeSequenceSection
-                                            }
-                                        >
-                                            <DateField
-                                                name={`genomeSequences[${index}].sampleCollectionDate`}
-                                                label="Sample collection date"
-                                            ></DateField>
-                                            <Field
-                                                className={classes.field}
-                                                name={`genomeSequences[${index}].repositoryUrl`}
-                                                type="text"
-                                                label="Repository URL"
-                                                fullWidth
-                                                component={TextField}
-                                            ></Field>
-                                            <Field
-                                                className={classes.field}
-                                                name={`genomeSequences[${index}].sequenceId`}
-                                                type="text"
-                                                label="Sequence ID"
-                                                fullWidth
-                                                component={TextField}
-                                            ></Field>
-                                            <Field
-                                                className={classes.field}
-                                                name={`genomeSequences[${index}].sequenceName`}
-                                                type="text"
-                                                label="Sequence name"
-                                                fullWidth
-                                                component={TextField}
-                                            ></Field>
-                                            <Field
-                                                className={classes.field}
-                                                name={`genomeSequences[${index}].sequenceLength`}
-                                                type="number"
-                                                label="Sequence length"
-                                                fullWidth
-                                                component={TextField}
-                                            ></Field>
-                                            <Field
-                                                name={`genomeSequences[${index}].notes`}
-                                                type="text"
-                                                label="Notes"
-                                                multiline={true}
-                                                fullWidth
-                                                component={TextField}
-                                            ></Field>
-                                        </fieldset>
-                                    ))}
+                                    values.genomeSequences.map(
+                                        (genomeSequence, index) => (
+                                            <fieldset
+                                                key={genomeSequence.reactId}
+                                                className={
+                                                    classes.genomeSequenceSection
+                                                }
+                                            >
+                                                <DateField
+                                                    name={`genomeSequences[${index}].sampleCollectionDate`}
+                                                    label="Sample collection date"
+                                                ></DateField>
+                                                <Field
+                                                    className={classes.field}
+                                                    name={`genomeSequences[${index}].repositoryUrl`}
+                                                    type="text"
+                                                    label="Repository URL"
+                                                    fullWidth
+                                                    component={TextField}
+                                                ></Field>
+                                                <Field
+                                                    className={classes.field}
+                                                    name={`genomeSequences[${index}].sequenceId`}
+                                                    type="text"
+                                                    label="Sequence ID"
+                                                    fullWidth
+                                                    component={TextField}
+                                                ></Field>
+                                                <Field
+                                                    className={classes.field}
+                                                    name={`genomeSequences[${index}].sequenceName`}
+                                                    type="text"
+                                                    label="Sequence name"
+                                                    fullWidth
+                                                    component={TextField}
+                                                ></Field>
+                                                <Field
+                                                    className={classes.field}
+                                                    name={`genomeSequences[${index}].sequenceLength`}
+                                                    type="number"
+                                                    label="Sequence length"
+                                                    fullWidth
+                                                    component={TextField}
+                                                ></Field>
+                                                <Field
+                                                    name={`genomeSequences[${index}].notes`}
+                                                    type="text"
+                                                    label="Notes"
+                                                    multiline={true}
+                                                    fullWidth
+                                                    component={TextField}
+                                                ></Field>
+                                            </fieldset>
+                                        ),
+                                    )}
 
                                 <Button
                                     data-testid="addGenomeSequence"
                                     startIcon={<AddCircleIcon />}
                                     onClick={(): void => {
-                                        push({ sampleCollectionDate: null });
+                                        push({
+                                            reactId: shortId.generate(),
+                                            sampleCollectionDate: null,
+                                        });
                                     }}
                                 >
                                     Add genome sequence
