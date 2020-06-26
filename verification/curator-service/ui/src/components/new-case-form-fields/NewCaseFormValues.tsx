@@ -30,6 +30,8 @@ export default interface NewCaseFormValues {
 }
 
 interface Travel {
+    // Used to key react elements in the UI
+    reactId: string;
     location: Loc;
     dateRange: {
         start: string | null;
@@ -40,6 +42,8 @@ interface Travel {
 }
 
 interface GenomeSequence {
+    // Used to key react elements in the UI
+    reactId: string;
     sampleCollectionDate: string | null;
     repositoryUrl?: string;
     sequenceId?: string;
