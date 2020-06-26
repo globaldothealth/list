@@ -6,7 +6,8 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/cases');
 
         cy.get('button[aria-label="open drawer"]').click();
-        cy.get('a[href="/"]').click();
+        cy.contains('Home');
+        cy.get('span').contains('Home').click();
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
