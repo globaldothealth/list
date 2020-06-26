@@ -18,6 +18,7 @@ import CompletenessCharts from './CompletenessCharts';
 import CumulativeCharts from './CumulativeCharts';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
+import EditCase from './EditCase';
 import FreshnessCharts from './FreshnessCharts';
 import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
@@ -357,6 +358,19 @@ class App extends React.Component<Props, State> {
                     >
                         <div className={classes.drawerHeader} />
                         <Switch>
+                            {this.hasAnyRole(['curator']) && (
+                                <Route
+                                    path="/cases/edit/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <EditCase
+                                                id={match.params.id}
+                                                user={this.state.user}
+                                            />
+                                        );
+                                    }}
+                                />
+                            )}
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
