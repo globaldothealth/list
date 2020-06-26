@@ -129,7 +129,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         travelHistory: c.travelHistory?.travel?.map((travel) => {
             return { reactId: shortId.generate(), ...travel };
         }),
-        genomeSequences: c.genomeSequences.map((genomeSequence) => {
+        genomeSequences: c.genomeSequences?.map((genomeSequence) => {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
         sourceUrl: c.sources?.length > 0 ? c.sources[0].url : '',
@@ -490,7 +490,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked:
-                                        values.genomeSequences.length > 0,
+                                        values.genomeSequences?.length > 0,
                                     hasError:
                                         errors.genomeSequences !== undefined,
                                 })}
