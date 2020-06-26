@@ -170,14 +170,14 @@ it('API errors are displayed', async () => {
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
-    // Throw error on edit request.
-    mockedAxios.put.mockRejectedValueOnce(new Error('Request failed'));
+    // Throw error on delete request.
+    mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const editButton = getByText(/edit/);
-    fireEvent.click(editButton);
+    const deleteButton = getByText(/delete_outline/);
+    fireEvent.click(deleteButton);
     const confirmButton = getByText(/check/);
     fireEvent.click(confirmButton);
-    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
     expect(error).toBeInTheDocument();
@@ -273,7 +273,7 @@ it('can delete a row', async () => {
     expect(noRec).toBeInTheDocument();
 });
 
-it('can edit a row', async () => {
+it('can go to page to edit a row', async () => {
     const cases = [
         {
             _id: 'abc123',
@@ -317,10 +317,11 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(
-        <MemoryRouter>
+    const history = createMemoryHistory();
+    const { getByText, findByText } = render(
+        <Router history={history}>
             <LinelistTable user={curator} />
-        </MemoryRouter>,
+        </Router>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -329,67 +330,9 @@ it('can edit a row', async () => {
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
-    // Edit case
-    const editedCases = [
-        {
-            _id: 'abc123',
-            importedCase: {
-                outcome: 'Recovered',
-            },
-            location: {
-                country: 'France',
-                geoResolution: 'Country',
-            },
-            events: [
-                {
-                    name: 'confirmed',
-                    dateRange: {
-                        start: new Date().toJSON(),
-                    },
-                },
-            ],
-            notes: 'some changed notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
-        },
-    ];
-    const axiosGetAfterEditResponse = {
-        data: {
-            cases: editedCases,
-            total: 15,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    const axiosEditResponse = {
-        data: {
-            case: editedCases[0],
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.put.mockResolvedValueOnce(axiosEditResponse);
-    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterEditResponse);
-
     const editButton = getByText(/edit/);
     fireEvent.click(editButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
-    expect(mockedAxios.put).toHaveBeenCalledTimes(1);
-
-    // Check table data is reloaded
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const editedRow = await findByText('some changed notes');
-    expect(editedRow).toBeInTheDocument();
-    const oldRow = queryByText('some notes');
-    expect(oldRow).not.toBeInTheDocument();
+    expect(history.location.pathname).toBe('/cases/edit/abc123');
 });
 
 it('cannot edit data as a reader only', async () => {
