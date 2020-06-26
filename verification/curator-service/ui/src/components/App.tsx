@@ -358,7 +358,7 @@ class App extends React.Component<Props, State> {
                     >
                         <div className={classes.drawerHeader} />
                         <Switch>
-                            {this.hasAnyRole(['curator', 'reader']) && (
+                            {this.hasAnyRole(['curator']) && (
                                 <Route
                                     path="/cases/edit/:id"
                                     render={({ match }) => {

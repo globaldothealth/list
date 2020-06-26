@@ -35,6 +35,7 @@ it('loads and displays case to edit', async () => {
                 },
             },
         ],
+        symptoms: null,
         notes: 'some notes',
         sources: [
             {

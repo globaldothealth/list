@@ -21,11 +21,12 @@ describe('Edit case', function () {
             sourceUrl: 'www.example.com',
         });
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
-            console.log(resp.body);
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/edit/${resp.body.cases[0]._id}`);
             // Check that we have something from the original case.
             cy.contains('France');
+            cy.contains('Female').should('not.exist');
+            cy.contains('21').should('not.exist');
             // Change a few things.
             cy.get('div[data-testid="sex"]').click();
             cy.get('li[data-value="Female"').click();

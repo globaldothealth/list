@@ -108,9 +108,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
                 ?.start || null,
         admittedToHospital: c.events.find(
             (event) => event.name === 'hospitalAdmission',
-        )?.dateRange?.start
-            ? 'Yes'
-            : undefined,
+        )?.value,
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
