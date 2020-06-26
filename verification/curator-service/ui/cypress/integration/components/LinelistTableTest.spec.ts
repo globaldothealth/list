@@ -23,7 +23,7 @@ describe('Linelist table', function () {
         cy.contains('www.example.com');
     });
 
-    it.only('Can go to the edit page', function () {
+    it('Can go to the edit page', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
