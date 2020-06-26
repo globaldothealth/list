@@ -1,5 +1,6 @@
 import { Typography, withStyles } from '@material-ui/core';
 
+import { Location as CaseLocation } from '../Case';
 import React from 'react';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { createStyles } from '@material-ui/core/styles';
@@ -15,30 +16,9 @@ const styles = () =>
         },
     });
 
-// TODO: Replace with Case's Location interface definition.
-export interface Loc {
-    geometry: {
-        latitude: number;
-        longitude: number;
-    };
-    country: string;
-    // First administrative division (state in the US, Länder in Germany, ...).
-    administrativeAreaLevel1: string | undefined;
-    // Second administrative division (county in the US, departments in France, ...).
-    administrativeAreaLevel2: string | undefined;
-    // Third administrative division (cities usually).
-    administrativeAreaLevel3: string | undefined;
-    // A precise location, such as an establishment or POI.
-    place: string | undefined;
-    // Human readable place name.
-    name: string;
-    // How granular the geocode is.
-    geoResolution: string;
-}
-
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
 interface Props extends WithStyles<typeof styles> {
-    location?: Loc;
+    location?: CaseLocation;
 }
 
 class Location extends React.Component<Props, {}> {
