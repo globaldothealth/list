@@ -20,6 +20,7 @@
     "@types/react-dom": "^16.9.6",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-scroll": "^1.5.5",
+    "@types/shortid": "0.0.29",
     "@types/yup": "^0.29.3",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
@@ -45,6 +46,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-scroll": "^1.7.16",
+    "shortid": "^2.2.15",
     "typeface-roboto": "0.0.75",
     "typescript": "^3.9.5",
     "yup": "^0.29.1"
