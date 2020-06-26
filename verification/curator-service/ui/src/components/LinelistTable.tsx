@@ -1,3 +1,4 @@
+import { Case, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import {
@@ -17,78 +18,6 @@ interface ListResponse {
     cases: Case[];
     nextPage: number;
     total: number;
-}
-
-interface Event {
-    name: string;
-    dateRange: {
-        start: string;
-        end: string;
-    };
-    value: string;
-}
-
-interface Demographics {
-    sex: string;
-    ageRange: {
-        start: number;
-        end: number;
-    };
-    ethnicity: string;
-    nationalities: string[];
-    profession: string;
-}
-
-interface Location {
-    country: string;
-    administrativeAreaLevel1: string;
-    administrativeAreaLevel2: string;
-    administrativeAreaLevel3: string;
-    geoResolution: string;
-    geometry: Geometry;
-    name: string;
-}
-
-interface Geometry {
-    latitude: number;
-    longitude: number;
-}
-
-interface Source {
-    url: string;
-}
-
-interface Symptoms {
-    values: string[];
-}
-
-interface Transmission {
-    routes: string[];
-    places: string[];
-    linkedCaseIds: string[];
-}
-
-interface TravelHistory {
-    travel: Travel[];
-}
-
-interface Travel {
-    location: Location;
-}
-
-interface Case {
-    _id: string;
-    importedCase: {
-        outcome: string;
-    };
-    events: Event[];
-    demographics: Demographics;
-    location: Location;
-    symptoms: Symptoms;
-    transmission: Transmission;
-    sources: Source[];
-    travelHistory: TravelHistory;
-    notes: string;
 }
 
 interface LinelistTableState {
