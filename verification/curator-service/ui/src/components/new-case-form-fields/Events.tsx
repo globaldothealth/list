@@ -1,79 +1,9 @@
-import { Field, useFormikContext } from 'formik';
+import { DateField, SelectField } from './FormikFields';
 
-import DateFnsUtils from '@date-io/date-fns';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
-import { Select } from 'formik-material-ui';
-import { makeStyles } from '@material-ui/core';
-
-const useStyles = makeStyles(() => ({
-    fieldRow: {
-        marginBottom: '2em',
-        width: '100%',
-    },
-    field: {
-        width: '50%',
-    },
-}));
-
-interface DateFieldProps {
-    name: string;
-    label: string;
-}
-
-function DateField(props: DateFieldProps): JSX.Element {
-    const classes = useStyles();
-    return (
-        <div className={classes.fieldRow}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Field
-                    className={classes.field}
-                    name={props.name}
-                    label={props.label}
-                    format="yyyy/MM/dd"
-                    maxDate={new Date()}
-                    minDate={new Date('2019/12/01')}
-                    component={KeyboardDatePicker}
-                />
-            </MuiPickersUtilsProvider>
-        </div>
-    );
-}
-
-interface SelectFieldProps {
-    name: string;
-    label: string;
-    values: (string | undefined)[];
-}
-
-function SelectField(props: SelectFieldProps): JSX.Element {
-    const classes = useStyles();
-    return (
-        <FormControl className={classes.fieldRow}>
-            <InputLabel htmlFor={props.name}>{props.label}</InputLabel>
-            <Field
-                as="select"
-                name={props.name}
-                type="text"
-                data-testid={props.name}
-                className={classes.field}
-                component={Select}
-            >
-                {props.values.map((value) => (
-                    <MenuItem key={value ?? 'undefined'} value={value}>
-                        {value}
-                    </MenuItem>
-                ))}
-            </Field>
-        </FormControl>
-    );
-}
+import { useFormikContext } from 'formik';
 
 const yesNoUndefined = [undefined, 'Yes', 'No'];
 

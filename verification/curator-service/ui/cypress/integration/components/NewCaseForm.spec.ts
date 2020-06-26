@@ -34,7 +34,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('div[data-testid="sex"]').click();
         cy.get('li[data-value="Female"').click();
-        cy.get('input[name="age"]').clear().type('21');
+        cy.get('input[name="age"]').type('21');
         cy.get('div[data-testid="ethnicity"]').click();
         cy.get('li[data-value="Asian"').click();
         cy.get('div[data-testid="nationalities"]').type('Afghan');
@@ -47,23 +47,21 @@ describe('New case form', function () {
         cy.contains('France');
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
-        cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
-        cy.get('input[name="onsetSymptomsDate"]').clear().type('2020-01-02');
-        cy.get('input[name="firstClinicalConsultationDate"]')
-            .clear()
-            .type('2020-01-03');
-        cy.get('input[name="selfIsolationDate"]').clear().type('2020-01-04');
+        cy.get('input[name="onsetSymptomsDate"]').type('2020-01-02');
+        cy.get('input[name="firstClinicalConsultationDate"]').type(
+            '2020-01-03',
+        );
+        cy.get('input[name="selfIsolationDate"]').type('2020-01-04');
         cy.get('div[data-testid="admittedToHospital"]').click();
         cy.get('li[data-value="Yes"').click();
-        cy.get('input[name="hospitalAdmissionDate"]')
-            .clear()
-            .type('2020-01-05');
-        cy.get('input[name="icuAdmissionDate"]').clear().type('2020-01-06');
+        cy.get('input[name="hospitalAdmissionDate"]').type('2020-01-05');
+        cy.get('input[name="icuAdmissionDate"]').type('2020-01-06');
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
-        cy.get('input[name="outcomeDate"]').clear().type('2020-01-07');
+        cy.get('input[name="outcomeDate"]').type('2020-01-07');
         cy.get('div[data-testid="symptoms"]').type('dry cough');
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
@@ -76,15 +74,35 @@ describe('New case form', function () {
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
         cy.get('button[data-testid="addTravelHistory"').click();
-        cy.get('div[data-testid="travelHistory[0]"]').type('Germany');
+        cy.get('div[data-testid="travelHistory[0].location"]').type('Germany');
         cy.get('li').first().should('contain', 'Germany').click();
+        cy.get('input[name="travelHistory[0].dateRange.start"]').type(
+            '2020-01-06',
+        );
+        cy.get('input[name="travelHistory[0].dateRange.end"]').type(
+            '2020-01-07',
+        );
+        cy.get('div[data-testid="travelHistory[0].purpose"]').click();
+        cy.get('li[data-value="Business"').click();
+        cy.get('div[data-testid="travelHistory[0].method"]').click();
+        cy.get('li[data-value="Car"').click();
         cy.get('button[data-testid="addTravelHistory"').click();
-        cy.get('div[data-testid="travelHistory[1]"]').type('United Kingdom');
+        cy.get('div[data-testid="travelHistory[1].location"]').type(
+            'United Kingdom',
+        );
         cy.get('li').first().should('contain', 'United Kingdom').click();
-        cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
-        cy.get('textarea[name="notes"]')
-            .clear()
-            .type('test notes\non new line');
+        cy.get('input[name="travelHistory[1].dateRange.start"]').type(
+            '2020-01-01',
+        );
+        cy.get('input[name="travelHistory[1].dateRange.end"]').type(
+            '2020-01-05',
+        );
+        cy.get('div[data-testid="travelHistory[1].purpose"]').click();
+        cy.get('li[data-value="Business"').click();
+        cy.get('div[data-testid="travelHistory[1].method"]').click();
+        cy.get('li[data-value="Car"').click();
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -124,8 +142,8 @@ describe('New case form', function () {
         cy.contains('France');
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
-        cy.get('input[name="confirmedDate"]').clear().type('2020-01-01');
-        cy.get('input[name="sourceUrl"]').clear().type('www.example.com');
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -176,7 +194,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="confirmedDate"]').clear().type('2020/02/31');
+        cy.get('input[name="confirmedDate"]').type('2020/02/31');
         cy.get('svg[data-testid="error-icon"]').should('exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });

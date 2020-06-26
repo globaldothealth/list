@@ -1,9 +1,27 @@
+import { Field, useFormikContext } from 'formik';
+
 import { Autocomplete } from '@material-ui/lab';
-import { Field } from 'formik';
+import DateFnsUtils from '@date-io/date-fns';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
+import MenuItem from '@material-ui/core/MenuItem';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import React from 'react';
+import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
-import { useFormikContext } from 'formik';
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles(() => ({
+    fieldRow: {
+        marginBottom: '2em',
+        width: '100%',
+    },
+    field: {
+        width: '50%',
+    },
+}));
 
 interface FormikAutocompleteProps {
     name: string;
@@ -14,7 +32,7 @@ interface FormikAutocompleteProps {
 
 // Autocomplete for use in a Formik form.
 // Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
-export default function FormikAutocomplete(
+export function FormikAutocomplete(
     props: FormikAutocompleteProps,
 ): JSX.Element {
     const [open, setOpen] = React.useState(false);
@@ -80,5 +98,58 @@ export default function FormikAutocomplete(
                 ></Field>
             )}
         />
+    );
+}
+
+interface SelectFieldProps {
+    name: string;
+    label: string;
+    values: (string | undefined)[];
+}
+
+export function SelectField(props: SelectFieldProps): JSX.Element {
+    const classes = useStyles();
+    return (
+        <FormControl className={classes.fieldRow}>
+            <InputLabel htmlFor={props.name}>{props.label}</InputLabel>
+            <Field
+                as="select"
+                name={props.name}
+                type="text"
+                data-testid={props.name}
+                className={classes.field}
+                component={Select}
+            >
+                {props.values.map((value) => (
+                    <MenuItem key={value ?? 'undefined'} value={value}>
+                        {value}
+                    </MenuItem>
+                ))}
+            </Field>
+        </FormControl>
+    );
+}
+
+interface DateFieldProps {
+    name: string;
+    label: string;
+}
+
+export function DateField(props: DateFieldProps): JSX.Element {
+    const classes = useStyles();
+    return (
+        <div className={classes.fieldRow}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Field
+                    className={classes.field}
+                    name={props.name}
+                    label={props.label}
+                    format="yyyy/MM/dd"
+                    maxDate={new Date()}
+                    minDate={new Date('2019/12/01')}
+                    component={KeyboardDatePicker}
+                />
+            </MuiPickersUtilsProvider>
+        </div>
     );
 }
