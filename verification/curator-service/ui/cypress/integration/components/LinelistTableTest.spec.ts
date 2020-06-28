@@ -15,12 +15,14 @@ describe('Linelist table', function () {
             notes: 'some notes',
             sourceUrl: 'www.example.com',
             methodOfConfirmation: 'PCR test',
+            curator: 'test@bar.com',
         });
         cy.visit('/cases');
         cy.contains('PCR test');
         cy.contains('some notes');
         cy.contains('France');
         cy.contains('www.example.com');
+        cy.contains('test@bar.com');
     });
 
     it('Can go to the edit page', function () {
