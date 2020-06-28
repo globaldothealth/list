@@ -1,3 +1,5 @@
+import * as fullCase from './fixtures/fullCase.json';
+
 import { fireEvent, render, wait } from '@testing-library/react';
 
 import NewCaseForm from './NewCaseForm';
@@ -61,4 +63,15 @@ it('submits case not ok', async () => {
     });
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     expect(getByText(/foo.bar/)).toBeDefined();
+});
+
+it('renders a complete case', async () => {
+    const { getByText, getByDisplayValue } = render(
+        <NewCaseForm user={user} initialCase={fullCase} />,
+    );
+    expect(getByText(/France/i)).toBeInTheDocument();
+    expect(getByDisplayValue(/50/i)).toBeInTheDocument();
+    expect(getByDisplayValue(/59/i)).toBeInTheDocument();
+    expect(getByDisplayValue(/Female/i)).toBeInTheDocument();
+    expect(getByDisplayValue(/Horse breeder/i)).toBeInTheDocument();
 });

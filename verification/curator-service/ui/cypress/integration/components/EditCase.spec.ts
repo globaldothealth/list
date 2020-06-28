@@ -14,7 +14,7 @@ describe('Edit case', function () {
         cy.contains('Request failed');
     });
 
-    it('can edit an existing case', function () {
+    it('can edit a basic case', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -43,6 +43,20 @@ describe('Edit case', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('Female');
             cy.contains('21');
+        });
+    });
+
+    it.only('can edit a full case', function () {
+        cy.addFullCase();
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.visit(`/cases/edit/${resp.body.cases[0]._id}`);
+            cy.contains('Female');
+            cy.contains('50');
+            cy.contains('59');
+            cy.contains('Other');
+            cy.contains('Horse breeder');
+            cy.contains('France');
         });
     });
 });
