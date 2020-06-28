@@ -1,8 +1,9 @@
 import { Button, withStyles } from '@material-ui/core';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
 import BulkCaseFormValues from './BulkCaseFormValues';
+import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
@@ -19,11 +20,6 @@ interface User {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = () =>
     createStyles({
-        csvInput: {
-            padding: '10px',
-            display: 'block',
-            border: '1px solid #ccc',
-        },
         form: {
             margin: '15px',
         },
@@ -133,26 +129,9 @@ class BulkCaseForm extends React.Component<
                 initialValues={{ file: null }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
-                {({ isSubmitting, setFieldValue, submitForm }): JSX.Element => (
+                {({ isSubmitting, submitForm }): JSX.Element => (
                     <Form className={classes.form}>
-                        <input
-                            className={classes.csvInput}
-                            data-testid="csv-input"
-                            id="file"
-                            name="file"
-                            type="file"
-                            accept=".csv"
-                            onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>,
-                            ): void => {
-                                if (event.currentTarget.files) {
-                                    setFieldValue(
-                                        'file',
-                                        event.currentTarget.files[0],
-                                    );
-                                }
-                            }}
-                        />
+                        <Field name="csv-upload" component={FileUpload} />
                         <br />
                         <Button
                             variant="contained"
