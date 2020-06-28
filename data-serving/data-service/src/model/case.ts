@@ -39,12 +39,16 @@ const caseSchema = new mongoose.Schema(
             type: revisionMetadataSchema,
             required: 'Must include revision metadata',
         },
-        notes: String,
+        notes: {
+            type: String,
+            text: true,
+        },
         pathogens: [pathogenSchema],
         preexistingConditions: dictionarySchema,
         sources: {
             type: [sourceSchema],
             required: true,
+            text: true,
             validate: {
                 validator: (sources: [SourceDocument]) => sources.length > 0,
                 message: 'Must include one or more sources',

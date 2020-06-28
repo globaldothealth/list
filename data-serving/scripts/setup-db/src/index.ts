@@ -42,7 +42,6 @@ const setupDatabase = async ({
         print(`Created collection "${collectionName}" with schema`);
 
         const collection = await database.getCollection(collectionName);
-        // TODO(khmoran): Create indexes.
 
         // Print some stats -- for fun and confirmation!
         const stats = await collection.stats();

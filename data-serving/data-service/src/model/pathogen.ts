@@ -7,6 +7,7 @@ export const pathogenSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        text: true,
     },
     id: {
         ...positiveIntFieldInfo,

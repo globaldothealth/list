@@ -20,6 +20,7 @@ export const sourceSchema = new mongoose.Schema({
     url: {
         type: String,
         required: fieldRequiredValidator,
+        text: true,
     },
     other: {
         type: String,

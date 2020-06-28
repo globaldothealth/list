@@ -25,9 +25,18 @@ export const demographicsSchema = new mongoose.Schema({
         enum: Object.values(Sex),
     },
     // TODO: The below 3 fields should be data dictionaries.
-    profession: String,
-    nationalities: [String],
-    ethnicity: String,
+    profession: {
+        type: String,
+        text: true,
+    },
+    nationalities: {
+        type: [String],
+        text: true,
+    },
+    ethnicity: {
+        type: String,
+        text: true,
+    },
 });
 
 export type DemographicsDocument = mongoose.Document & {
