@@ -1,5 +1,6 @@
 import ChipInput from 'material-ui-chip-input';
 import { FormikAutocomplete } from './FormikFields';
+import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { makeStyles } from '@material-ui/core';
@@ -19,7 +20,9 @@ interface SelectFieldProps {
 }
 
 export default function Transmission(): JSX.Element {
-    const { setFieldValue, setTouched } = useFormikContext();
+    const { setFieldValue, setTouched, initialValues } = useFormikContext<
+        NewCaseFormValues
+    >();
     const classes = useStyles();
     return (
         <Scroll.Element name="transmission">
@@ -29,6 +32,7 @@ export default function Transmission(): JSX.Element {
                     <FormikAutocomplete
                         name="transmissionRoutes"
                         label="Route of transmission"
+                        initialValue={initialValues.transmissionRoutes}
                         multiple={true}
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/route_of_transmission.txt"
                     />
@@ -37,6 +41,7 @@ export default function Transmission(): JSX.Element {
                     <FormikAutocomplete
                         name="transmissionPlaces"
                         label="Places of transmission"
+                        initialValue={initialValues.transmissionPlaces}
                         multiple={true}
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/place_of_transmission.txt"
                     />
