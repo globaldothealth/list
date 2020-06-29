@@ -25,7 +25,7 @@ const styles = () =>
             display: 'flex',
         },
         form: {
-            margin: '15px',
+            paddingLeft: '2em',
         },
         formSection: {
             margin: '2em 0',
