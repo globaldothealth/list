@@ -34,11 +34,7 @@ const styles = () =>
 type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
-const sexes = [
-    ['Unknown', undefined],
-    ['Female', 'Female'],
-    ['Male', 'Male'],
-];
+const sexValues = [undefined, 'Male', 'Female'];
 
 const ethnicityValues = [
     undefined,
@@ -68,9 +64,12 @@ class Demographics extends React.Component<DemographicsProps, {}> {
                                 className={classes.select}
                                 component={Select}
                             >
-                                {sexes.map((v) => (
-                                    <MenuItem key={v[0]} value={v[1]}>
-                                        {v[0]}
+                                {sexValues.map((sex) => (
+                                    <MenuItem
+                                        key={sex ?? undefined}
+                                        value={sex}
+                                    >
+                                        {sex ?? 'Unknown'}
                                     </MenuItem>
                                 ))}
                             </Field>
