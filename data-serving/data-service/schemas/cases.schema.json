@@ -96,9 +96,6 @@
             },
             "sequenceLength": {
               "bsonType": "int"
-            },
-            "notes": {
-              "bsonType": "string"
             }
           }
         }
