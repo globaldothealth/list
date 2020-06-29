@@ -1,5 +1,5 @@
 import { Button, withStyles } from '@material-ui/core';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
 import BulkCaseFormValues from './BulkCaseFormValues';
@@ -43,7 +43,7 @@ interface BulkCaseFormState {
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
