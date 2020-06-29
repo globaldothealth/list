@@ -3,6 +3,7 @@ import { Field, useFormikContext } from 'formik';
 import { Autocomplete } from '@material-ui/lab';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
+import { FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -12,6 +13,7 @@ import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
+import { hasKey } from './../Utils';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
@@ -118,13 +120,17 @@ interface SelectFieldProps {
     name: string;
     label: string;
     values: (string | undefined)[];
+    required?: boolean;
 }
 
 export function SelectField(props: SelectFieldProps): JSX.Element {
     const classes = useStyles();
     return (
         <FormControl className={classes.fieldRow}>
-            <InputLabel htmlFor={props.name}>{props.label}</InputLabel>
+            <InputLabel htmlFor={props.name}>
+                {props.label}
+                {props.required && ' *'}
+            </InputLabel>
             <Field
                 as="select"
                 name={props.name}
@@ -139,6 +145,9 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                     </MenuItem>
                 ))}
             </Field>
+            {props.required && (
+                <RequiredHelperText name={props.name}></RequiredHelperText>
+            )}
         </FormControl>
     );
 }
@@ -146,6 +155,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
 interface DateFieldProps {
     name: string;
     label: string;
+    required?: boolean;
 }
 
 export function DateField(props: DateFieldProps): JSX.Element {
@@ -158,11 +168,36 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
+                    required={props.required}
                     maxDate={new Date()}
                     minDate={new Date('2019/12/01')}
                     component={KeyboardDatePicker}
                 />
             </MuiPickersUtilsProvider>
+            {props.required && (
+                <RequiredHelperText name={props.name}></RequiredHelperText>
+            )}
+        </div>
+    );
+}
+
+interface RequiredHelperTextProps {
+    name: string;
+}
+
+export function RequiredHelperText(
+    props: RequiredHelperTextProps,
+): JSX.Element {
+    const { values, touched } = useFormikContext<NewCaseFormValues>();
+    return (
+        <div>
+            {hasKey(touched, props.name) &&
+                touched[props.name] &&
+                hasKey(values, props.name) &&
+                (values[props.name] === undefined ||
+                    values[props.name] === null) && (
+                    <FormHelperText error>Required field</FormHelperText>
+                )}
         </div>
     );
 }

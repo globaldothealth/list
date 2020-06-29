@@ -1,5 +1,6 @@
 import { Field } from 'formik';
 import React from 'react';
+import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 
@@ -13,10 +14,12 @@ export default class Source extends React.Component<{}, {}> {
                         label="Source URL"
                         name="sourceUrl"
                         type="text"
+                        required
                         placeholder="https://..."
                         component={TextField}
                         fullWidth
                     />
+                    <RequiredHelperText name={'sourceUrl'}></RequiredHelperText>
                 </fieldset>
             </Scroll.Element>
         );

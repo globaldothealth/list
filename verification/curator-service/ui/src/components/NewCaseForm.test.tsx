@@ -2,10 +2,6 @@ import { fireEvent, render, wait } from '@testing-library/react';
 
 import NewCaseForm from './NewCaseForm';
 import React from 'react';
-import axios from 'axios';
-
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const user = {
     _id: 'testUser',
@@ -13,10 +9,6 @@ const user = {
     email: 'foo@bar.com',
     roles: ['admin', 'curator'],
 };
-
-afterEach(() => {
-    jest.clearAllMocks();
-});
 
 it('renders form', () => {
     const { getByText, getAllByText } = render(<NewCaseForm user={user} />);
@@ -40,39 +32,4 @@ it('can add and remove travel history sections', async () => {
         fireEvent.click(queryByTestId('remove-travel-history-button'));
     });
     expect(queryByTestId('travel-history-section')).not.toBeInTheDocument();
-});
-
-it('submits case ok', async () => {
-    const axiosResponse = {
-        data: {},
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.post.mockResolvedValueOnce(axiosResponse);
-
-    const { getByText } = render(<NewCaseForm user={user} />);
-    expect(getByText(/Submit case/i)).toBeInTheDocument();
-
-    await wait(() => {
-        fireEvent.click(getByText(/Submit case/));
-    });
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-});
-
-it('submits case not ok', async () => {
-    const { getByText } = render(<NewCaseForm user={user} />);
-    expect(getByText(/Submit case/i)).toBeInTheDocument();
-
-    const axiosResponse = {
-        message: 'Validation error: foo.bar',
-    };
-    mockedAxios.post.mockRejectedValueOnce(axiosResponse);
-
-    await wait(() => {
-        fireEvent.click(getByText(/Submit case/));
-    });
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-    expect(getByText(/foo.bar/)).toBeDefined();
 });
