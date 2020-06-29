@@ -8,6 +8,7 @@ let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    return Case.syncIndexes();
 });
 
 beforeEach(() => {
@@ -75,20 +76,20 @@ describe('GET', () => {
             // No continuation expected.
             expect(res.body.nextPage).toBeUndefined();
         });
-        it('should filter results', async () => {
+        it('should query results', async () => {
             const c = new Case(minimalCase);
             c.notes = 'got it at work';
             await c.save();
             // Search for non-matching notes.
             let res = await request(app)
-                .get('/api/cases?page=1&limit=10&filter=notes:home')
+                .get('/api/cases?page=1&limit=10&q=blablabla')
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(0);
             expect(res.body.total).toEqual(0);
             // Search for matching notes.
             res = await request(app)
-                .get('/api/cases?page=1&limit=10&filter=notes:work')
+                .get('/api/cases?page=1&limit=10&q=work')
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(1);
