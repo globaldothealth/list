@@ -69,7 +69,7 @@ class Demographics extends React.Component<DemographicsProps, {}> {
                                         key={sex ?? 'undefined'}
                                         value={sex}
                                     >
-                                        {sex}
+                                        {sex ?? 'Unknown'}
                                     </MenuItem>
                                 ))}
                             </Field>
@@ -118,7 +118,7 @@ class Demographics extends React.Component<DemographicsProps, {}> {
                                         key={ethnicity ?? 'undefined'}
                                         value={ethnicity}
                                     >
-                                        {ethnicity}
+                                        {ethnicity ?? 'Unknown'}
                                     </MenuItem>
                                 ))}
                             </Field>
