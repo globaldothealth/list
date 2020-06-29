@@ -145,11 +145,16 @@ class BulkCaseForm extends React.Component<
                             onChange={(
                                 event: React.ChangeEvent<HTMLInputElement>,
                             ): void => {
-                                if (event.currentTarget.files) {
-                                    setFieldValue(
-                                        'file',
-                                        event.currentTarget.files[0],
-                                    );
+                                const uploadedFiles: FileList | null =
+                                    event.currentTarget.files;
+                                if (uploadedFiles) {
+                                    setFieldValue('file', uploadedFiles[0]);
+                                    if (uploadedFiles.length > 1) {
+                                        console.warn(
+                                            `Attempted to upload ${uploadedFiles.length} ` +
+                                                'files. Only one file allowed per upload.',
+                                        );
+                                    }
                                 }
                             }}
                         />
