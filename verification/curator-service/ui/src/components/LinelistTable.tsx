@@ -51,6 +51,7 @@ interface TableRow {
     // sources
     sourceUrl: string | null;
     notes: string;
+    curatedBy: string;
 }
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
@@ -185,6 +186,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'sourceUrl',
                             filtering: false,
                         },
+                        {
+                            title: 'Curated by',
+                            field: 'curatedBy',
+                            tooltip:
+                                'If unknown, this is most likely an imported case',
+                        },
                     ]}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
@@ -192,6 +199,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             listUrl += '&filter=';
+                            // TODO: Map field to their real full.path.notation here to support nested searches.
+                            // Or Maybe just look at full text indexes instead of per-field filter.
                             listUrl += query.filters
                                 .map(
                                     (filter) =>
@@ -267,6 +276,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.sources.length > 0
                                                     ? c.sources[0].url
                                                     : null,
+                                            curatedBy:
+                                                c.revisionMetadata
+                                                    ?.creationMetadata
+                                                    ?.curator || 'Unknown',
                                         });
                                     }
                                     resolve({
