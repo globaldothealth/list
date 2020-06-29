@@ -122,7 +122,6 @@
             "status": "Yes"
         },
         "travelHistory": {
-            "numLocations": 1,
             "travel": [{
                 "dateRange": {
                     "start": {

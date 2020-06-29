@@ -248,9 +248,6 @@
           "_id": {
             "bsonType": "objectId"
           },
-          "numLocations": {
-            "bsonType": "int"
-          },
           "travel": {
             "bsonType": "array",
             "uniqueItems": true,
