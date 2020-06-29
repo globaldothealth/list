@@ -142,6 +142,7 @@ describe('New case form', function () {
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');
+        cy.contains('superuser@');
     });
 
     it('Can add minimal row to linelist', function () {
