@@ -4,19 +4,11 @@ import { positiveIntFieldInfo } from './positive-int';
 
 export const genomeSequenceSchema = new mongoose.Schema({
     sampleCollectionDate: dateFieldInfo,
-    repositoryUrl: {
-        type: String,
-    },
-    sequenceId: {
-        type: String,
-    },
-    sequenceName: {
-        type: String,
-    },
+    repositoryUrl: String,
+    sequenceId: String,
+    sequenceName: String,
     sequenceLength: positiveIntFieldInfo,
-    notes: {
-        type: String,
-    },
+    notes: String,
 });
 
 export type GenomeSequenceDocument = mongoose.Document & {

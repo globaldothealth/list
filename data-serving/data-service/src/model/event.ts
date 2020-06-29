@@ -15,5 +15,4 @@ export type EventDocument = mongoose.Document & {
     name: string;
     value: string;
     dateRange: DateRangeDocument;
-    text: true;
 };

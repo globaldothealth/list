@@ -39,9 +39,7 @@ const caseSchema = new mongoose.Schema(
             type: revisionMetadataSchema,
             required: 'Must include revision metadata',
         },
-        notes: {
-            type: String,
-        },
+        notes: String,
         pathogens: [pathogenSchema],
         preexistingConditions: dictionarySchema,
         sources: {
