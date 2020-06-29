@@ -41,7 +41,6 @@ const caseSchema = new mongoose.Schema(
         },
         notes: {
             type: String,
-            text: true,
         },
         pathogens: [pathogenSchema],
         preexistingConditions: dictionarySchema,
@@ -70,6 +69,29 @@ const caseSchema = new mongoose.Schema(
                 return ret;
             },
         },
+    },
+);
+// We need to create an index on the schema case and can't use "text: true"
+// annotations on individual fields as mongoose doesn't aggregate them all
+// and only one field ends up being full-text-search compatible.
+caseSchema.index(
+    {
+        notes: 'text',
+        'revisionMetadata.creationMetadata.curator': 'text',
+        'demographics.profession': 'text',
+        'demographics.nationalities': 'text',
+        'demographics.ethnicity': 'text',
+        'location.country': 'text',
+        'location.administrativeAreaLevel1': 'text',
+        'location.administrativeAreaLevel2': 'text',
+        'location.administrativeAreaLevel3': 'text',
+        'location.place': 'text',
+        'location.name': 'text',
+        'pathogen.name': 'text',
+        'sources.url': 'text',
+    },
+    {
+        name: 'CasesFTSIndex',
     },
 );
 

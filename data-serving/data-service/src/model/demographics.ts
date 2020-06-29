@@ -27,15 +27,12 @@ export const demographicsSchema = new mongoose.Schema({
     // TODO: The below 3 fields should be data dictionaries.
     profession: {
         type: String,
-        text: true,
     },
     nationalities: {
         type: [String],
-        text: true,
     },
     ethnicity: {
         type: String,
-        text: true,
     },
 });
 

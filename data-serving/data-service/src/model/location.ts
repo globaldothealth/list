@@ -28,38 +28,31 @@ export const locationSchema = new mongoose.Schema({
     country: {
         type: String,
         required: fieldRequiredValidator,
-        text: true,
     },
     administrativeAreaLevel1: {
         type: String,
         required: fieldRequiredValidator,
-        text: true,
     },
     administrativeAreaLevel2: {
         type: String,
         required: fieldRequiredValidator,
-        text: true,
     },
     administrativeAreaLevel3: {
         type: String,
         required: fieldRequiredValidator,
-        text: true,
     },
     // Place represents a precise location, such as an establishment or POI.
     place: {
         type: String,
-        text: true,
     },
     // A human-readable name of the location.
     name: {
         type: String,
-        text: true,
     },
     geoResolution: {
         type: String,
         enum: Object.values(GeoResolution),
         required: true,
-        text: true,
     },
     geometry: {
         latitude: {
