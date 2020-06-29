@@ -5,7 +5,7 @@ export interface Event {
         start: string;
         end: string;
     };
-    value: string;
+    value?: string;
 }
 
 export interface Demographics {
@@ -72,10 +72,19 @@ interface GenomeSequence {
     notes?: string;
 }
 
+interface Revision {
+    curator: string;
+    date: string;
+}
+
+interface RevisionMetadata {
+    creationMetadata: Revision;
+}
+
 export interface Case {
     _id: string;
-    importedCase: {
-        outcome: string;
+    importedCase?: {
+        outcome?: string;
     };
     events: Event[];
     demographics: Demographics;
@@ -86,4 +95,6 @@ export interface Case {
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
     notes: string;
+
+    revisionMetadata: RevisionMetadata;
 }

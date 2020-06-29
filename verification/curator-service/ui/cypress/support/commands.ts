@@ -10,6 +10,8 @@ declare global {
                 notes: string;
                 sourceUrl: string;
                 methodOfConfirmation?: string;
+                nationalities?: string[];
+                curator?: string;
             }) => void;
             login: () => void;
             addSource: (name: string, url: string) => void;
@@ -25,11 +27,16 @@ export function addCase(opts: {
     notes: string;
     sourceUrl: string;
     methodOfConfirmation?: string;
+    nationalities?: string[];
+    curator?: string;
 }): void {
     cy.request({
         method: 'POST',
         url: '/api/cases',
         body: {
+            demographics: {
+                nationalities: opts.nationalities,
+            },
             location: {
                 country: opts.country,
                 geoResolution: 'Country',
@@ -56,7 +63,7 @@ export function addCase(opts: {
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
-                    curator: 'test',
+                    curator: opts.curator || 'test',
                     date: new Date().toJSON(),
                 },
             },
