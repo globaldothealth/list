@@ -48,7 +48,6 @@ const caseSchema = new mongoose.Schema(
         sources: {
             type: [sourceSchema],
             required: true,
-            text: true,
             validate: {
                 validator: (sources: [SourceDocument]) => sources.length > 0,
                 message: 'Must include one or more sources',
