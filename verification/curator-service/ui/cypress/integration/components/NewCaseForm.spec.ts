@@ -160,6 +160,8 @@ describe('New case form', function () {
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
         cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -173,30 +175,11 @@ describe('New case form', function () {
         cy.contains('www.example.com');
     });
 
-    it('Does not add row on submission error', function () {
-        // Avoid geolocation fail, the "Request failed" check below happens at the data service level.
-        cy.seedLocation({
-            name: 'France',
-            geometry: { latitude: 42, longitude: 12 },
-            country: 'France',
-            geoResolution: 'Country',
-        });
-        cy.visit('/cases');
-        cy.contains('No records to display');
-
+    it('Check for required fields', function () {
         cy.visit('/cases/new');
-        cy.server();
-        cy.get('div[data-testid="location"]').type('France');
-        cy.contains('France');
-        cy.contains('Country');
-        cy.get('li').first().should('contain', 'France').click();
-        cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@addCase');
-        cy.contains('Request failed');
 
-        cy.visit('/cases');
-        cy.contains('No records to display');
+        cy.get('p:contains("Required field")').should('have.length', 4);
     });
 
     it('Shows checkbox on field completion', function () {
@@ -211,7 +194,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="confirmedDate"]').type('2020/02/31');
+        cy.get('input[name="confirmedDate"]').type('2020/02/31').blur();
         cy.get('svg[data-testid="error-icon"]').should('exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });
