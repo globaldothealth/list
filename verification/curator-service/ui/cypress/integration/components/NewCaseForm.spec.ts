@@ -175,7 +175,7 @@ describe('New case form', function () {
         cy.contains('www.example.com');
     });
 
-    it.only('Does not add row on submission error', function () {
+    it('Does not add row on submission error', function () {
         // Avoid geolocation fail, the "Request failed" check below happens at the data service level.
         cy.seedLocation({
             name: 'France',
