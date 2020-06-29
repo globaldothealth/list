@@ -21,7 +21,7 @@ function LocationForm(): JSX.Element {
         <Scroll.Element name="location">
             <fieldset>
                 <legend>Location</legend>
-                <PlacesAutocomplete name="location" required={true} />
+                <PlacesAutocomplete name="location" required />
                 <Location location={values.location} />
             </fieldset>
         </Scroll.Element>
