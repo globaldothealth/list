@@ -2,7 +2,9 @@ import { Button, withStyles } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
+import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
+import Source from './common-form-fields/Source';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -18,13 +20,14 @@ interface User {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = () =>
     createStyles({
-        csvInput: {
-            padding: '10px',
-            display: 'block',
-            border: '1px solid #ccc',
+        container: {
+            display: 'flex',
         },
         form: {
-            margin: '15px',
+            paddingLeft: '2em',
+        },
+        formSection: {
+            margin: '2em 0',
         },
     });
 
@@ -136,45 +139,29 @@ class BulkCaseForm extends React.Component<
                 initialValues={{ file: null }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
-                {({ isSubmitting, setFieldValue, submitForm }): JSX.Element => (
-                    <Form className={classes.form}>
-                        <input
-                            className={classes.csvInput}
-                            data-testid="csv-input"
-                            id="file"
-                            name="file"
-                            type="file"
-                            accept=".csv"
-                            onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>,
-                            ): void => {
-                                const uploadedFiles: FileList | null =
-                                    event.currentTarget.files;
-                                if (uploadedFiles) {
-                                    setFieldValue('file', uploadedFiles[0]);
-                                    if (uploadedFiles.length > 1) {
-                                        console.warn(
-                                            `Attempted to upload ${uploadedFiles.length} ` +
-                                                'files. Only one file allowed per upload.',
-                                        );
-                                    }
-                                }
-                            }}
-                        />
-                        <br />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            data-testid="submit"
-                            disabled={isSubmitting}
-                            onClick={submitForm}
-                        >
-                            Upload cases
-                        </Button>
-                        {this.state.statusMessage && (
-                            <h3>{this.state.statusMessage as string}</h3>
-                        )}
-                    </Form>
+                {({ isSubmitting, submitForm }): JSX.Element => (
+                    <div className={classes.container}>
+                        <Form className={classes.form}>
+                            <div className={classes.formSection}>
+                                <Source></Source>
+                            </div>
+                            <div className={classes.formSection}>
+                                <FileUpload></FileUpload>
+                            </div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                data-testid="submit"
+                                disabled={isSubmitting}
+                                onClick={submitForm}
+                            >
+                                Upload cases
+                            </Button>
+                            {this.state.statusMessage && (
+                                <h3>{this.state.statusMessage as string}</h3>
+                            )}
+                        </Form>
+                    </div>
                 )}
             </Formik>
         );

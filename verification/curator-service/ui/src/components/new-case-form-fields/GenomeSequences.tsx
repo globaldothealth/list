@@ -2,7 +2,7 @@ import { Field, FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
-import { DateField } from './FormikFields';
+import { DateField } from '../common-form-fields/FormikFields';
 import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
