@@ -72,6 +72,15 @@ interface GenomeSequence {
     notes?: string;
 }
 
+interface Revision {
+    curator: string;
+    date: string;
+}
+
+interface RevisionMetadata {
+    creationMetadata: Revision;
+}
+
 export interface Case {
     _id: string;
     importedCase?: {
@@ -86,4 +95,6 @@ export interface Case {
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
     notes: string;
+
+    revisionMetadata: RevisionMetadata;
 }

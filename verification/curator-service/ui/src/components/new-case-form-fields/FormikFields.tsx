@@ -134,7 +134,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
             >
                 {props.values.map((value) => (
                     <MenuItem key={value ?? 'undefined'} value={value}>
-                        {value}
+                        {value ?? 'Unknown'}
                     </MenuItem>
                 ))}
             </Field>

@@ -67,7 +67,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         >
                             {sexValues.map((sex) => (
                                 <MenuItem key={sex ?? 'undefined'} value={sex}>
-                                    {sex}
+                                    {sex ?? 'Unknown'}
                                 </MenuItem>
                             ))}
                         </Field>
@@ -114,7 +114,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                                     key={ethnicity ?? 'undefined'}
                                     value={ethnicity}
                                 >
-                                    {ethnicity}
+                                    {ethnicity ?? 'Unknown'}
                                 </MenuItem>
                             ))}
                         </Field>
@@ -140,4 +140,5 @@ function Demographics(props: DemographicsProps): JSX.Element {
         </Scroll.Element>
     );
 }
+
 export default withStyles(styles)(Demographics);

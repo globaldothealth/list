@@ -13,6 +13,7 @@ declare global {
                 sourceUrl: string;
                 methodOfConfirmation?: string;
                 nationalities?: string[];
+                curator?: string;
             }) => void;
             addFullCase: () => void;
             login: () => void;
@@ -40,6 +41,7 @@ export function addCase(opts: {
     sourceUrl: string;
     methodOfConfirmation?: string;
     nationalities?: string[];
+    curator?: string;
 }): void {
     cy.request({
         method: 'POST',
@@ -74,7 +76,7 @@ export function addCase(opts: {
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
-                    curator: 'test',
+                    curator: opts.curator || 'test',
                     date: new Date().toJSON(),
                 },
             },

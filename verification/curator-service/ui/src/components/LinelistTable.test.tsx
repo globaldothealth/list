@@ -60,6 +60,11 @@ it('loads and displays cases', async () => {
                     url: 'http://foo.bar',
                 },
             ],
+            revisionMetadata: {
+                creationMetadata: {
+                    curator: 'foo@bar.com',
+                },
+            },
         },
     ];
     const axiosResponse = {
@@ -84,14 +89,11 @@ it('loads and displays cases', async () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/cases/?limit=10&page=1&filter=',
     );
-    const items = await findByText(/some notes/);
-    expect(items).toBeInTheDocument();
-    const locationName = await findByText(/some place name/);
-    expect(locationName).toBeInTheDocument();
-    const ageRange = await findByText('1-3');
-    expect(ageRange).toBeInTheDocument();
-    const confirmationMethod = await findByText('PCR test');
-    expect(confirmationMethod).toBeInTheDocument();
+    expect(await findByText(/some notes/)).toBeInTheDocument();
+    expect(await findByText(/some place name/)).toBeInTheDocument();
+    expect(await findByText('1-3')).toBeInTheDocument();
+    expect(await findByText('PCR test')).toBeInTheDocument();
+    expect(await findByText('foo@bar.com')).toBeInTheDocument();
 });
 
 it('redirects to new case page when + icon is clicked', async () => {
