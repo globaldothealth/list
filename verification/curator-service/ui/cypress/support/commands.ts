@@ -12,6 +12,7 @@ declare global {
                 notes: string;
                 sourceUrl: string;
                 methodOfConfirmation?: string;
+                nationalities?: string[];
             }) => void;
             addFullCase: () => void;
             login: () => void;
@@ -38,11 +39,15 @@ export function addCase(opts: {
     notes: string;
     sourceUrl: string;
     methodOfConfirmation?: string;
+    nationalities?: string[];
 }): void {
     cy.request({
         method: 'POST',
         url: '/api/cases',
         body: {
+            demographics: {
+                nationalities: opts.nationalities,
+            },
             location: {
                 country: opts.country,
                 geoResolution: 'Country',

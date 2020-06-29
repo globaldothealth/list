@@ -1,3 +1,6 @@
+import * as fullCase from './fixtures/fullCase.json';
+
+import { Case } from './Case';
 import EditCase from './EditCase';
 import React from 'react';
 import axios from 'axios';
@@ -18,36 +21,8 @@ const curator = {
 };
 
 it('loads and displays case to edit', async () => {
-    const c = {
-        _id: 'abc123',
-        importedCase: {
-            outcome: 'Recovered',
-        },
-        location: {
-            country: 'France',
-            geoResolution: 'Country',
-        },
-        events: [
-            {
-                name: 'confirmed',
-                dateRange: {
-                    start: new Date().toJSON(),
-                },
-            },
-        ],
-        demographics: {
-            nationalities: ['Andorran', 'French'],
-        },
-        symptoms: null,
-        notes: 'some notes',
-        sources: [
-            {
-                url: 'http://foo.bar',
-            },
-        ],
-    };
     const axiosResponse = {
-        data: c,
+        data: fullCase,
         status: 200,
         statusText: 'OK',
         config: {},
@@ -55,12 +30,41 @@ it('loads and displays case to edit', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<EditCase id="abc123" user={curator} />);
+    const { findByText, getByText, getByDisplayValue } = render(
+        <EditCase id="abc123" user={curator} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-    expect(await findByText(/some notes/)).toBeInTheDocument();
-    expect(await findByText(/Andorran/)).toBeInTheDocument();
-    expect(await findByText(/French/)).toBeInTheDocument();
+    expect(await findByText(/Female/)).toBeInTheDocument();
+    expect(getByDisplayValue(/Horse breeder/)).toBeInTheDocument();
+    expect(getByDisplayValue(/Asian/)).toBeInTheDocument();
+    expect(
+        getByDisplayValue('https://www.ncbi.nlm.nih.gov/nuccore/NC_045512'),
+    ).toBeInTheDocument();
+    expect(getByDisplayValue('NC_045512.2')).toBeInTheDocument();
+    expect(getByDisplayValue('33000')).toBeInTheDocument();
+    expect(getByText('France')).toBeInTheDocument();
+    expect(getByText('Île-de-F')).toBeInTheDocument();
+    expect(getByText('Paris')).toBeInTheDocument();
+    expect(getByDisplayValue('Recovered')).toBeInTheDocument();
+    expect(getByText('Severe pneumonia')).toBeInTheDocument();
+    expect(getByText('United States')).toBeInTheDocument();
+    expect(getByDisplayValue('Family')).toBeInTheDocument();
+    // TODO: These show up locally but we need to figure out how to query them properly in tests.
+    //expect(await findByText(/Swedish/)).toBeInTheDocument();
+    //expect(getByText('Severe acute respiratory')).toBeInTheDocument();
+    // expect(
+    //     getByDisplayValue('The reference sequence is identical to MN908947'),
+    // ).toBeInTheDocument();
+    //expect(getByText('2.35')).toBeInTheDocument();
+    //expect(getByText('48.85')).toBeInTheDocument();
+    //expect(getByDisplayValue('Hypertension')).toBeInTheDocument();
+    //expect(getByDisplayValue('Plane')).toBeInTheDocument();
+    // expect(
+    //     getByDisplayValue('Contact of a confirmed case at work'),
+    // ).toBeInTheDocument();
+    //expect(getByDisplayValue('Vector borne')).toBeInTheDocument();
+    //expect(getByDisplayValue('Gym')).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
