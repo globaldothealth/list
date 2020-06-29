@@ -2,7 +2,6 @@ import { Button, withStyles } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
-import BulkCaseFormValues from './BulkCaseFormValues';
 import React from 'react';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
@@ -35,6 +34,10 @@ interface BulkCaseFormProps extends WithStyles<typeof styles> {
 
 interface BulkCaseFormState {
     statusMessage: string;
+}
+
+interface BulkCaseFormValues {
+    file: File | null;
 }
 
 class BulkCaseForm extends React.Component<
