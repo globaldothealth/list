@@ -50,7 +50,8 @@ it('loads and displays case to edit', async () => {
     expect(getByText('Severe pneumonia')).toBeInTheDocument();
     expect(getByText('United States')).toBeInTheDocument();
     expect(getByDisplayValue('Family')).toBeInTheDocument();
-    // TODO: These show up locally but we need to figure out how to query them properly in tests.
+    // TODO: These show up locally but we need to figure out how to properly
+    // query them in tests.
     //expect(await findByText(/Swedish/)).toBeInTheDocument();
     //expect(getByText('Severe acute respiratory')).toBeInTheDocument();
     // expect(
