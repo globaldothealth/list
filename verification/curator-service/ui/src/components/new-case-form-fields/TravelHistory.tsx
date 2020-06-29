@@ -3,6 +3,8 @@ import { FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
+import CancelIcon from '@material-ui/icons/Cancel';
+import IconButton from '@material-ui/core/IconButton';
 import Location from './Location';
 import NewCaseFormValues from './NewCaseFormValues';
 import { PlacesAutocomplete } from './LocationForm';
@@ -39,7 +41,7 @@ export default function Events(): JSX.Element {
             <fieldset>
                 <legend>Travel History</legend>
                 <FieldArray name="travelHistory">
-                    {({ push }): JSX.Element => {
+                    {({ push, remove }): JSX.Element => {
                         return (
                             <div>
                                 {values.travelHistory &&
@@ -54,6 +56,15 @@ export default function Events(): JSX.Element {
                                                         classes.travelHistorySection
                                                     }
                                                 >
+                                                    <legend>
+                                                        <IconButton
+                                                            onClick={(): void => {
+                                                                remove(index);
+                                                            }}
+                                                        >
+                                                            <CancelIcon />
+                                                        </IconButton>
+                                                    </legend>
                                                     <PlacesAutocomplete
                                                         name={`travelHistory[${index}].location`}
                                                     ></PlacesAutocomplete>
