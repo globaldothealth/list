@@ -5,6 +5,7 @@ import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import BulkCaseFormValues from './BulkCaseFormValues';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
+import Source from './common-form-fields/Source';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -20,8 +21,14 @@ interface User {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = () =>
     createStyles({
+        container: {
+            display: 'flex',
+        },
         form: {
             margin: '15px',
+        },
+        formSection: {
+            margin: '2em 0',
         },
     });
 
@@ -130,22 +137,31 @@ class BulkCaseForm extends React.Component<
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
                 {({ isSubmitting, submitForm }): JSX.Element => (
-                    <Form className={classes.form}>
-                        <Field name="csv-upload" component={FileUpload} />
-                        <br />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            data-testid="submit"
-                            disabled={isSubmitting}
-                            onClick={submitForm}
-                        >
-                            Upload cases
-                        </Button>
-                        {this.state.statusMessage && (
-                            <h3>{this.state.statusMessage as string}</h3>
-                        )}
-                    </Form>
+                    <div className={classes.container}>
+                        <Form className={classes.form}>
+                            <div className={classes.formSection}>
+                                <Source></Source>
+                            </div>
+                            <div className={classes.formSection}>
+                                <Field
+                                    name="csv-upload"
+                                    component={FileUpload}
+                                />
+                            </div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                data-testid="submit"
+                                disabled={isSubmitting}
+                                onClick={submitForm}
+                            >
+                                Upload cases
+                            </Button>
+                            {this.state.statusMessage && (
+                                <h3>{this.state.statusMessage as string}</h3>
+                            )}
+                        </Form>
+                    </div>
                 )}
             </Formik>
         );
