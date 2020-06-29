@@ -21,7 +21,26 @@
           },
           "sourceEntryId": {
             "bsonType": "string"
-          }
+          },
+          "sourceUrl": {
+            "bsonType": "string"
+          },
+          "additionalSources": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "object",
+              "additionalProperties": false,
+              "properties": {
+                "_id": {
+                  "bsonType": "objectId"
+                },
+                "sourceUrl": {
+                  "bsonType": "string"
+                }
+              }
+            }
+          } 
         }
       },
       "demographics": {
@@ -368,28 +387,6 @@
           },
           "traveledPrior30Days": {
             "bsonType": "bool"
-          }
-        }
-      },
-      "sources": {
-        "bsonType": "array",
-        "uniqueItems": true,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
-            "id": {
-              "bsonType": "string"
-            },
-            "url": {
-              "bsonType": "string"
-            },
-            "other": {
-              "bsonType": "string"
-            }
           }
         }
       },

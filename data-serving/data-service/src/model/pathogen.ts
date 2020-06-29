@@ -1,5 +1,3 @@
-import { SourceDocument, sourceSchema } from './source';
-
 import mongoose from 'mongoose';
 import { positiveIntFieldInfo } from './positive-int';
 
