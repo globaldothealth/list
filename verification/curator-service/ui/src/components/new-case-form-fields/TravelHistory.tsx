@@ -55,9 +55,15 @@ export default function Events(): JSX.Element {
                                                     className={
                                                         classes.travelHistorySection
                                                     }
+                                                    data-testid={
+                                                        'travel-history-section'
+                                                    }
                                                 >
                                                     <legend>
                                                         <IconButton
+                                                            data-testid={
+                                                                'remove-travel-history-button'
+                                                            }
                                                             onClick={(): void => {
                                                                 remove(index);
                                                             }}
