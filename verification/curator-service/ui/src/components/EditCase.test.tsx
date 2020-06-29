@@ -35,6 +35,9 @@ it('loads and displays case to edit', async () => {
                 },
             },
         ],
+        demographics: {
+            nationalities: ['Andorran', 'French'],
+        },
         symptoms: null,
         notes: 'some notes',
         sources: [
@@ -55,8 +58,9 @@ it('loads and displays case to edit', async () => {
     const { findByText } = render(<EditCase id="abc123" user={curator} />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-    const notes = await findByText(/some notes/);
-    expect(notes).toBeInTheDocument();
+    expect(await findByText(/some notes/)).toBeInTheDocument();
+    expect(await findByText(/Andorran/)).toBeInTheDocument();
+    expect(await findByText(/French/)).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {

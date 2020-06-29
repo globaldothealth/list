@@ -29,6 +29,8 @@ interface FormikAutocompleteProps {
     label: string;
     multiple: boolean;
     optionsLocation: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialValue: any;
 }
 
 // Autocomplete for use in a Formik form.
@@ -90,11 +92,11 @@ export function FormikAutocomplete(
                 setOpen(false);
             }}
             options={options}
-            inputValue={initialValues.profession}
             onChange={(_, values): void => {
                 setFieldValue(props.name, values ?? undefined);
             }}
             onBlur={(): void => setTouched({ [props.name]: true })}
+            defaultValue={props.initialValue}
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}
