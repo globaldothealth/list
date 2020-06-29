@@ -31,6 +31,8 @@ interface FormikAutocompleteProps {
     label: string;
     multiple: boolean;
     optionsLocation: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialValue: any;
 }
 
 // Autocomplete for use in a Formik form.
@@ -41,7 +43,9 @@ export function FormikAutocomplete(
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
-    const { setFieldValue, setTouched } = useFormikContext();
+    const { setFieldValue, setTouched, initialValues } = useFormikContext<
+        NewCaseFormValues
+    >();
 
     React.useEffect(() => {
         let active = true;
@@ -62,7 +66,14 @@ export function FormikAutocomplete(
         return (): void => {
             active = false;
         };
-    }, [loading, props.optionsLocation]);
+    }, [
+        initialValues,
+        loading,
+        props.name,
+        props.optionsLocation,
+        setFieldValue,
+        setTouched,
+    ]);
 
     React.useEffect(() => {
         if (!open) {
@@ -88,6 +99,7 @@ export function FormikAutocomplete(
                 setFieldValue(props.name, values ?? undefined);
             }}
             onBlur={(): void => setTouched({ [props.name]: true })}
+            defaultValue={props.initialValue}
             renderInput={(params): JSX.Element => (
                 <Field
                     {...params}

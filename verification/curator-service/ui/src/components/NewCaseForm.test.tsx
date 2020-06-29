@@ -19,3 +19,17 @@ it('renders form', () => {
     expect(getByText(/Source URL/i)).toBeInTheDocument();
     expect(getByText(/Nationality/i)).toBeInTheDocument();
 });
+
+it('can add and remove travel history sections', async () => {
+    const { queryByTestId, getByText } = render(<NewCaseForm user={user} />);
+
+    expect(queryByTestId('travel-history-section')).not.toBeInTheDocument();
+    await wait(() => {
+        fireEvent.click(getByText(/Add travel history/));
+    });
+    expect(queryByTestId('travel-history-section')).toBeInTheDocument();
+    await wait(() => {
+        fireEvent.click(queryByTestId('remove-travel-history-button'));
+    });
+    expect(queryByTestId('travel-history-section')).not.toBeInTheDocument();
+});
