@@ -8,12 +8,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import NewCaseFormValues from './NewCaseFormValues';
+import NewCaseFormValues from '../new-case-form-fields/NewCaseFormValues';
 import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
-import { hasKey } from './../Utils';
+import { hasKey } from '../Utils';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({

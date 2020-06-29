@@ -1,4 +1,4 @@
-import { DateField, SelectField } from './FormikFields';
+import { DateField, SelectField } from '../common-form-fields/FormikFields';
 import { FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
