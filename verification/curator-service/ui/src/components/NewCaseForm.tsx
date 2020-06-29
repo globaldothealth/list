@@ -25,6 +25,7 @@ import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import { hasKey } from './Utils';
 import shortId from 'shortid';
 import { withStyles } from '@material-ui/core';
 
@@ -164,7 +165,12 @@ const NewCaseValidation = Yup.object().shape(
             .max(120, 'Age must be between 0 and 120')
             .when('minAge', {
                 is: (minAge) => minAge !== undefined && minAge !== '',
-                then: Yup.number().required('Must enter maximum age in range'),
+                then: Yup.number()
+                    .min(
+                        Yup.ref('minAge'),
+                        'Max age must be greater than than min age',
+                    )
+                    .required('Must enter maximum age in range'),
             }),
         age: Yup.number()
             .min(0, 'Age must be between 0 and 120')
@@ -186,9 +192,27 @@ const NewCaseValidation = Yup.object().shape(
         transmissionLinkedCaseIds: Yup.array().of(
             Yup.string().matches(new RegExp('[a-z0-9]{24}'), 'Invalid case ID'),
         ),
+        confirmedDate: Yup.string().nullable().required('Required field'),
+        location: Yup.object().required('Required field'),
+        methodOfConfirmation: Yup.string().required('Required field'),
+        sourceUrl: Yup.string().required('Required field'),
     },
     [['maxAge', 'minAge']],
 );
+
+function hasErrors(fields: string[], errors: any, touched: any): boolean {
+    for (const field of fields) {
+        if (
+            hasKey(touched, field) &&
+            touched[field] &&
+            hasKey(errors, field) &&
+            errors[field] !== undefined
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
 
 class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     constructor(props: Props) {
@@ -358,6 +382,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     isSubmitting,
                     values,
                     errors,
+                    touched,
                 }): JSX.Element => (
                     <div className={classes.container}>
                         <nav className={classes.tableOfContents}>
@@ -379,14 +404,19 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         values.ethnicity !== undefined ||
                                         values.nationalities?.length > 0 ||
                                         values.profession !== undefined,
-                                    hasError:
-                                        errors.sex !== undefined ||
-                                        errors.minAge !== undefined ||
-                                        errors.maxAge !== undefined ||
-                                        errors.age !== undefined ||
-                                        errors.ethnicity !== undefined ||
-                                        errors.nationalities !== undefined ||
-                                        errors.profession !== undefined,
+                                    hasError: hasErrors(
+                                        [
+                                            'sex',
+                                            'minAge',
+                                            'maxAge',
+                                            'age',
+                                            'ethnicity',
+                                            'nationalities',
+                                            'profession',
+                                        ],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Demographics
                             </div>
@@ -398,7 +428,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     isChecked:
                                         values.location !== null &&
                                         values.location !== undefined,
-                                    hasError: errors.location !== undefined,
+                                    hasError: hasErrors(
+                                        ['location'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Location
                             </div>
@@ -421,23 +455,22 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         values.icuAdmissionDate !== null ||
                                         values.outcomeDate !== null ||
                                         values.outcome !== undefined,
-                                    hasError:
-                                        errors.confirmedDate !== undefined ||
-                                        errors.methodOfConfirmation !==
-                                            undefined ||
-                                        errors.onsetSymptomsDate !==
-                                            undefined ||
-                                        errors.firstClinicalConsultationDate !==
-                                            undefined ||
-                                        errors.selfIsolationDate !==
-                                            undefined ||
-                                        errors.admittedToHospital !==
-                                            undefined ||
-                                        errors.hospitalAdmissionDate !==
-                                            undefined ||
-                                        errors.icuAdmissionDate !== undefined ||
-                                        errors.outcomeDate !== undefined ||
-                                        errors.outcome !== undefined,
+                                    hasError: hasErrors(
+                                        [
+                                            'confirmedDate',
+                                            'methodOfConfirmation',
+                                            'onsetSymptomsDate',
+                                            'firstClinicalConsultationDate',
+                                            'selfIsolationDate',
+                                            'admittedToHospital',
+                                            'hospitalAdmissionDate',
+                                            'icuAdmissionDate',
+                                            'outcomeDate',
+                                            'outcome',
+                                        ],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Events
                             </div>
@@ -447,7 +480,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked: values.symptoms?.length > 0,
-                                    hasError: errors.symptoms !== undefined,
+                                    hasError: hasErrors(
+                                        ['symptoms'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Symptoms
                             </div>
@@ -463,13 +500,15 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                         values.transmissionPlaces?.length > 0 ||
                                         values.transmissionLinkedCaseIds
                                             ?.length > 0,
-                                    hasError:
-                                        errors.transmissionRoutes !==
-                                            undefined ||
-                                        errors.transmissionPlaces !==
-                                            undefined ||
-                                        errors.transmissionLinkedCaseIds !==
-                                            undefined,
+                                    hasError: hasErrors(
+                                        [
+                                            'transmissionRoutes',
+                                            'transmissionPlaces',
+                                            'transmissionLinkedCaseIds',
+                                        ],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Transmission
                             </div>
@@ -481,8 +520,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked: values.travelHistory?.length > 0,
-                                    hasError:
-                                        errors.travelHistory !== undefined,
+                                    hasError: hasErrors(
+                                        ['travelHistory'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Travel History
                             </div>
@@ -495,8 +537,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 {this.tableOfContentsIcon({
                                     isChecked:
                                         values.genomeSequences?.length > 0,
-                                    hasError:
-                                        errors.genomeSequences !== undefined,
+                                    hasError: hasErrors(
+                                        ['genomeSequences'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Genome Sequences
                             </div>
@@ -506,7 +551,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked: values.sourceUrl?.trim() !== '',
-                                    hasError: errors.sourceUrl !== undefined,
+                                    hasError: hasErrors(
+                                        ['sourceUrl'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Source
                             </div>
@@ -516,7 +565,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             >
                                 {this.tableOfContentsIcon({
                                     isChecked: values.notes?.trim() !== '',
-                                    hasError: errors.notes !== undefined,
+                                    hasError: hasErrors(
+                                        ['notes'],
+                                        errors,
+                                        touched,
+                                    ),
                                 })}
                                 Notes
                             </div>

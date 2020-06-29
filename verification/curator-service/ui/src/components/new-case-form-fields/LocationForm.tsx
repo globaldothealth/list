@@ -6,6 +6,7 @@ import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import React from 'react';
+import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
@@ -20,7 +21,7 @@ function LocationForm(): JSX.Element {
         <Scroll.Element name="location">
             <fieldset>
                 <legend>Location</legend>
-                <PlacesAutocomplete name="location" />
+                <PlacesAutocomplete name="location" required={true} />
                 <Location location={values.location} />
             </fieldset>
         </Scroll.Element>
@@ -42,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface PlacesAutocompleteProps {
     name: string;
+    required?: boolean;
 }
 
 // Place autocomplete, based on
@@ -120,17 +122,25 @@ export function PlacesAutocomplete(
                 setInputValue(newInputValue);
             }}
             renderInput={(params): JSX.Element => (
-                <Field
-                    {...params}
-                    // Setting the name properly allows any typed value
-                    // to be set in the form values, rather than only selected
-                    // dropdown values. Thus we use an unused form value here.
-                    name="unused"
-                    data-testid={props.name}
-                    label="Location"
-                    component={TextField}
-                    fullWidth
-                ></Field>
+                <div>
+                    <Field
+                        {...params}
+                        // Setting the name properly allows any typed value
+                        // to be set in the form values, rather than only selected
+                        // dropdown values. Thus we use an unused form value here.
+                        name="unused"
+                        required={props.required}
+                        data-testid={props.name}
+                        label="Location"
+                        component={TextField}
+                        fullWidth
+                    ></Field>
+                    {props.required && (
+                        <RequiredHelperText
+                            name={props.name}
+                        ></RequiredHelperText>
+                    )}
+                </div>
             )}
             renderOption={(option: Loc): React.ReactNode => {
                 return (
