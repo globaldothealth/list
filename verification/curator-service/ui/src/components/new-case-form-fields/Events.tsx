@@ -27,13 +27,13 @@ export default function Events(): JSX.Element {
                 <DateField
                     name="confirmedDate"
                     label="Confirmed case date"
-                    required={true}
+                    required
                 ></DateField>
                 <SelectField
                     name="methodOfConfirmation"
                     label="Method of confirmation"
                     values={methodsOfConfirmation}
-                    required={true}
+                    required
                 ></SelectField>
                 <DateField
                     name="onsetSymptomsDate"
