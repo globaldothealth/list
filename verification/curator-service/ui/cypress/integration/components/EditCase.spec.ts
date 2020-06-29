@@ -19,6 +19,7 @@ describe('Edit case', function () {
             country: 'France',
             notes: 'some notes',
             sourceUrl: 'www.example.com',
+            methodOfConfirmation: 'PCR test',
         });
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
