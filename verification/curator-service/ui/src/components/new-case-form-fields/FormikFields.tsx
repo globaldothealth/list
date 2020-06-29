@@ -92,6 +92,7 @@ export function FormikAutocomplete(
                 setOpen(false);
             }}
             options={options}
+            loading={loading}
             onChange={(_, values): void => {
                 setFieldValue(props.name, values ?? undefined);
             }}
