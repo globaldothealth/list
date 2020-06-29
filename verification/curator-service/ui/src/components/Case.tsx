@@ -5,7 +5,7 @@ export interface Event {
         start: string;
         end: string;
     };
-    value: string;
+    value?: string;
 }
 
 export interface Demographics {
@@ -83,8 +83,8 @@ interface RevisionMetadata {
 
 export interface Case {
     _id: string;
-    importedCase: {
-        outcome: string;
+    importedCase?: {
+        outcome?: string;
     };
     events: Event[];
     demographics: Demographics;

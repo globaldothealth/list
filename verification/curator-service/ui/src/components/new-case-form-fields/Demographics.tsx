@@ -1,10 +1,11 @@
+import { Field, useFormikContext } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 
-import { Field } from 'formik';
 import FormControl from '@material-ui/core/FormControl';
 import { FormikAutocomplete } from './FormikFields';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
+import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -46,102 +47,98 @@ const ethnicityValues = [
     'Other',
 ];
 
-class Demographics extends React.Component<DemographicsProps, {}> {
-    render(): JSX.Element {
-        const { classes } = this.props;
-        return (
-            <Scroll.Element name="demographics">
-                <fieldset>
-                    <legend>Demographics</legend>
+function Demographics(props: DemographicsProps): JSX.Element {
+    const { classes } = props;
+    const { initialValues } = useFormikContext<NewCaseFormValues>();
+    return (
+        <Scroll.Element name="demographics">
+            <fieldset>
+                <legend>Demographics</legend>
+                <FormControl>
+                    <div className={classes.fieldRow}>
+                        <InputLabel htmlFor="sex">Sex</InputLabel>
+                        <Field
+                            as="select"
+                            name="sex"
+                            type="text"
+                            data-testid="sex"
+                            className={classes.select}
+                            component={Select}
+                        >
+                            {sexValues.map((sex) => (
+                                <MenuItem key={sex ?? 'undefined'} value={sex}>
+                                    {sex ?? 'Unknown'}
+                                </MenuItem>
+                            ))}
+                        </Field>
+                    </div>
+                </FormControl>
+                <div className={`${classes.fieldRow} ${classes.ageRow}`}>
+                    <Field
+                        className={classes.ageField}
+                        name="minAge"
+                        type="number"
+                        label="Min age"
+                        component={TextField}
+                    ></Field>
+                    <span className={classes.ageSeparator}>to</span>
+                    <Field
+                        className={classes.ageField}
+                        name="maxAge"
+                        type="number"
+                        label="Max age"
+                        component={TextField}
+                    ></Field>
+                    <span className={classes.ageSeparator}>or</span>
+                    <Field
+                        className={classes.ageField}
+                        name="age"
+                        type="number"
+                        label="Age"
+                        component={TextField}
+                    ></Field>
+                </div>
+                <div className={classes.fieldRow}>
                     <FormControl>
-                        <div className={classes.fieldRow}>
-                            <InputLabel htmlFor="sex">Sex</InputLabel>
-                            <Field
-                                as="select"
-                                name="sex"
-                                type="text"
-                                data-testid="sex"
-                                className={classes.select}
-                                component={Select}
-                            >
-                                {sexValues.map((sex) => (
-                                    <MenuItem
-                                        key={sex ?? 'undefined'}
-                                        value={sex}
-                                    >
-                                        {sex ?? 'Unknown'}
-                                    </MenuItem>
-                                ))}
-                            </Field>
-                        </div>
+                        <InputLabel htmlFor="ethnicity">Ethnicity</InputLabel>
+                        <Field
+                            as="select"
+                            name="ethnicity"
+                            type="text"
+                            data-testid="ethnicity"
+                            className={classes.select}
+                            component={Select}
+                        >
+                            {ethnicityValues.map((ethnicity) => (
+                                <MenuItem
+                                    key={ethnicity ?? 'undefined'}
+                                    value={ethnicity}
+                                >
+                                    {ethnicity ?? 'Unknown'}
+                                </MenuItem>
+                            ))}
+                        </Field>
                     </FormControl>
-                    <div className={`${classes.fieldRow} ${classes.ageRow}`}>
-                        <Field
-                            className={classes.ageField}
-                            name="minAge"
-                            type="number"
-                            label="Min age"
-                            component={TextField}
-                        ></Field>
-                        <span className={classes.ageSeparator}>to</span>
-                        <Field
-                            className={classes.ageField}
-                            name="maxAge"
-                            type="number"
-                            label="Max age"
-                            component={TextField}
-                        ></Field>
-                        <span className={classes.ageSeparator}>or</span>
-                        <Field
-                            className={classes.ageField}
-                            name="age"
-                            type="number"
-                            label="Age"
-                            component={TextField}
-                        ></Field>
-                    </div>
-                    <div className={classes.fieldRow}>
-                        <FormControl>
-                            <InputLabel htmlFor="ethnicity">
-                                Ethnicity
-                            </InputLabel>
-                            <Field
-                                as="select"
-                                name="ethnicity"
-                                type="text"
-                                data-testid="ethnicity"
-                                className={classes.select}
-                                component={Select}
-                            >
-                                {ethnicityValues.map((ethnicity) => (
-                                    <MenuItem
-                                        key={ethnicity ?? 'undefined'}
-                                        value={ethnicity}
-                                    >
-                                        {ethnicity ?? 'Unknown'}
-                                    </MenuItem>
-                                ))}
-                            </Field>
-                        </FormControl>
-                    </div>
-                    <div className={classes.fieldRow}>
-                        <FormikAutocomplete
-                            name="nationalities"
-                            label="Nationality"
-                            multiple={true}
-                            optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
-                        />
-                    </div>
+                </div>
+                <div className={classes.fieldRow}>
                     <FormikAutocomplete
-                        name="profession"
-                        label="Profession"
-                        multiple={false}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
+                        name="nationalities"
+                        label="Nationality"
+                        initialValue={initialValues.nationalities}
+                        multiple={true}
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
                     />
-                </fieldset>
-            </Scroll.Element>
-        );
-    }
+                </div>
+                <FormikAutocomplete
+                    name="profession"
+                    label="Profession"
+                    initialValue={initialValues.profession}
+                    multiple={false}
+                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
+                />
+            </fieldset>
+        </Scroll.Element>
+    );
 }
 
 export default withStyles(styles)(Demographics);
