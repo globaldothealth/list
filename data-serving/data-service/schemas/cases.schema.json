@@ -54,8 +54,7 @@
             "enum": [
               "Male",
               "Female",
-              "Other",
-              "Unknown"
+              "Other"
             ]
           },
           "profession": {
@@ -215,8 +214,7 @@
             "enum": [
               "Asymptomatic",
               "Presymptomatic",
-              "Symptomatic",
-              "Unknown"
+              "Symptomatic"
             ]
           }
         }
@@ -238,8 +236,7 @@
           "status": {
             "enum": [
               "Yes",
-              "No",
-              "Unknown"
+              "No"
             ]
           }
         }
@@ -343,8 +340,7 @@
                     "Business",
                     "Leisure",
                     "Family",
-                    "Other",
-                    "Unknown"
+                    "Other"
                   ]
                 },
                 "methods": {
@@ -358,8 +354,7 @@
                       "Ferry",
                       "Plane",
                       "Train",
-                      "Other",
-                      "Unknown"
+                      "Other"
                     ]
                   }
                 }
@@ -436,8 +431,7 @@
                 "Vertical",
                 "Iatrogenic",
                 "Vector borne",
-                "Other",
-                "Unknown"
+                "Other"
               ]
             }
           },

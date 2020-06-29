@@ -11,7 +11,6 @@ export enum Route {
     Iatrogenic = 'Iatrogenic',
     VectorBorne = 'Vector borne',
     Other = 'Other',
-    Unknown = 'Unknown',
 }
 
 export const transmissionSchema = new mongoose.Schema({
