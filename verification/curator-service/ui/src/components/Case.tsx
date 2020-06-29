@@ -1,4 +1,15 @@
 // Case definitions as returned by the /api/cases endpoint.
+
+
+export interface CaseReference {
+    sourceId: string;
+    sourceEntryId: string;
+    sourceUrl: string;
+    additionalSources: [{
+        sourceUrl: string;
+    }]
+}
+
 export interface Event {
     name: string;
     dateRange: {
@@ -33,10 +44,6 @@ export interface Location {
 export interface Geometry {
     latitude: number;
     longitude: number;
-}
-
-export interface Source {
-    url: string;
 }
 
 export interface Symptoms {
@@ -83,6 +90,7 @@ interface RevisionMetadata {
 
 export interface Case {
     _id: string;
+    caseReference: CaseReference;
     importedCase?: {
         outcome?: string;
     };
@@ -91,7 +99,6 @@ export interface Case {
     location: Location;
     symptoms: Symptoms;
     transmission: Transmission;
-    sources: Source[];
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
     notes: string;
