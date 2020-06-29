@@ -1,10 +1,11 @@
-import CSVReader, { IFileInfo } from 'react-csv-reader';
+import { Button, withStyles } from '@material-ui/core';
+import { Form, Formik } from 'formik';
+import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
 import React from 'react';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core';
 
 interface User {
     _id: string;
@@ -17,16 +18,12 @@ interface User {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const styles = () =>
     createStyles({
-        container: {
-            display: 'flex',
-        },
         csvInput: {
             padding: '10px',
             display: 'block',
-            margin: '15px',
             border: '1px solid #ccc',
         },
-        statusMessage: {
+        form: {
             margin: '15px',
         },
     });
@@ -39,6 +36,10 @@ interface BulkCaseFormState {
     statusMessage: string;
 }
 
+interface BulkCaseFormValues {
+    file: File | null;
+}
+
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
@@ -49,10 +50,10 @@ class BulkCaseForm extends React.Component<
             statusMessage: '',
         };
     }
-    // Array<any> is the type used by the source library for this data.
+    // Using a generic type for now; will define case record later.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async uploadData(data: Array<any>, fileInfo: IFileInfo): Promise<void> {
-        for (const c of data) {
+    async uploadData(results: ParseResult<Record<string, any>>): Promise<void> {
+        for (const c of results.data) {
             try {
                 await axios.put('/api/cases', {
                     caseReference: {
@@ -114,29 +115,68 @@ class BulkCaseForm extends React.Component<
         }
     }
 
+    async submitCases(values: BulkCaseFormValues): Promise<void> {
+        if (values.file) {
+            const papaparseOptions: ParseConfig<Record<string, any>> = {
+                complete: (results) => {
+                    this.uploadData(results);
+                },
+                dynamicTyping: true,
+                header: true,
+                skipEmptyLines: true,
+            };
+            Papa.parse(values.file, papaparseOptions);
+        }
+    }
+
     render(): JSX.Element {
         const { classes } = this.props;
-        const papaparseOptions = {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-        };
         return (
-            <div className={classes.container}>
-                <CSVReader
-                    cssClass={classes.csvInput}
-                    label="Select CSV with case data."
-                    onFileLoaded={(data, fileInfo): Promise<void> => {
-                        return this.uploadData(data, fileInfo);
-                    }}
-                    parserOptions={papaparseOptions}
-                />
-                {this.state.statusMessage && (
-                    <h3 className={classes.statusMessage}>
-                        {this.state.statusMessage as string}
-                    </h3>
+            <Formik
+                initialValues={{ file: null }}
+                onSubmit={(values): Promise<void> => this.submitCases(values)}
+            >
+                {({ isSubmitting, setFieldValue, submitForm }): JSX.Element => (
+                    <Form className={classes.form}>
+                        <input
+                            className={classes.csvInput}
+                            data-testid="csv-input"
+                            id="file"
+                            name="file"
+                            type="file"
+                            accept=".csv"
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>,
+                            ): void => {
+                                const uploadedFiles: FileList | null =
+                                    event.currentTarget.files;
+                                if (uploadedFiles) {
+                                    setFieldValue('file', uploadedFiles[0]);
+                                    if (uploadedFiles.length > 1) {
+                                        console.warn(
+                                            `Attempted to upload ${uploadedFiles.length} ` +
+                                                'files. Only one file allowed per upload.',
+                                        );
+                                    }
+                                }
+                            }}
+                        />
+                        <br />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            data-testid="submit"
+                            disabled={isSubmitting}
+                            onClick={submitForm}
+                        >
+                            Upload cases
+                        </Button>
+                        {this.state.statusMessage && (
+                            <h3>{this.state.statusMessage as string}</h3>
+                        )}
+                    </Form>
                 )}
-            </div>
+            </Formik>
         );
     }
 }
