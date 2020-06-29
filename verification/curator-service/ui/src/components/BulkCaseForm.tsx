@@ -43,7 +43,7 @@ interface BulkCaseFormState {
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-> {
+    > {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -143,10 +143,7 @@ class BulkCaseForm extends React.Component<
                                 <Source></Source>
                             </div>
                             <div className={classes.formSection}>
-                                <Field
-                                    name="csv-upload"
-                                    component={FileUpload}
-                                />
+                                <FileUpload></FileUpload>
                             </div>
                             <Button
                                 variant="contained"
