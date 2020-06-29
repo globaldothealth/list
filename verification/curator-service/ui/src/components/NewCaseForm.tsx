@@ -17,7 +17,7 @@ import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
-import Source from './new-case-form-fields/Source';
+import Source from './common-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
