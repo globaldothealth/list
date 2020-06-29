@@ -8,7 +8,6 @@ export const genomeSequenceSchema = new mongoose.Schema({
     sequenceId: String,
     sequenceName: String,
     sequenceLength: positiveIntFieldInfo,
-    notes: String,
 });
 
 export type GenomeSequenceDocument = mongoose.Document & {
@@ -17,5 +16,4 @@ export type GenomeSequenceDocument = mongoose.Document & {
     sequenceId: string;
     sequenceName: string;
     sequenceLength: number;
-    notes: string;
 };
