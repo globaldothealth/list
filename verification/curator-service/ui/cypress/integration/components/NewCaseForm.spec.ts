@@ -142,6 +142,7 @@ describe('New case form', function () {
         cy.contains('www.example.com');
         cy.contains('test notes');
         cy.contains('on new line');
+        cy.contains('superuser@');
     });
 
     it('Can add minimal row to linelist', function () {
@@ -160,6 +161,8 @@ describe('New case form', function () {
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
         cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -185,18 +188,35 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
-        cy.server();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
-        cy.route('POST', '/api/cases').as('addCase');
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.server();
+        // Force server to return error
+        cy.route({
+            method: 'POST',
+            url: '/api/cases',
+            status: 422,
+            response: {},
+        }).as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
         cy.contains('Request failed');
 
         cy.visit('/cases');
         cy.contains('No records to display');
+    });
+
+    it('Check for required fields', function () {
+        cy.visit('/cases/new');
+        cy.get('button[data-testid="submit"]').click();
+
+        cy.get('p:contains("Required field")').should('have.length', 4);
     });
 
     it('Shows checkbox on field completion', function () {
@@ -211,7 +231,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('input[name="confirmedDate"]').type('2020/02/31');
+        cy.get('input[name="confirmedDate"]').type('2020/02/31').blur();
         cy.get('svg[data-testid="error-icon"]').should('exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });
