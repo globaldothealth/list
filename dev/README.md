@@ -33,6 +33,7 @@ AWS_ACCESS_KEY_ID=<AWS access key ID>
 AWS_SECRET_ACCESS_KEY=<AWS secret access key to authenticate AWS API calls>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
+MAPBOX_TOKEN=<Mapbox API token>
 ```
 
 #### Permissions
