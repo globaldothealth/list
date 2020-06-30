@@ -44,31 +44,38 @@
         {
             "name": "onsetSymptoms",
             "dateRange": {
-                "start": 1578000000000,
-                "end": 1578027600000
+                "start": "2020-01-01",
+                "end": "2020-01-01"
             }
         },
         {
             "name": "confirmed",
             "value": "PCR test",
             "dateRange": {
-                "start": 1578891600000,
-                "end": 1578891600000
+                "start": "2020-01-02",
+                "end": "2020-01-02"
             }
         },
         {
             "name": "hospitalAdmission",
             "dateRange": {
-                "start": 1579395600000,
-                "end": 1581469200000
+                "start": "2020-01-03",
+                "end": "2020-01-03"
+            }
+        },
+        {
+            "name": "icuAdmission",
+            "dateRange": {
+                "start": "2020-01-04",
+                "end": "2020-01-05"
             }
         },
         {
             "name": "outcome",
             "value": "Recovered",
             "dateRange": {
-                "start": "1581483600000",
-                "end": "1581483600000"
+                "start": "2020-01-06",
+                "end": "2020-01-06"
             }
         }
     ],
@@ -131,7 +138,7 @@
         "revisionNumber": 1,
         "creationMetadata": {
             "curator": "abc123",
-            "date": "2020-01-03",
+            "date": "2020-01-20",
             "notes": "initial data entry"
         },
         "updateMetadata": {
