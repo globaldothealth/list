@@ -256,7 +256,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
     filterGenomeSequences(genomeSequences: GenomeSequence[]): GenomeSequence[] {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
-        filteredGenomeSequences.forEach((genomeSequence) => {
+        filteredGenomeSequences?.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
         });
         return filteredGenomeSequences;
