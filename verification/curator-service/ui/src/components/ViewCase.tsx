@@ -81,6 +81,15 @@ function ageRange(range?: { start: number; end: number }): string {
         : `${range.start}-${range.end}`;
 }
 
+function dateRange(range?: { start: string; end: string }): string {
+    if (!range) {
+        return '';
+    }
+    return range.start === range.end
+        ? `${range.start}`
+        : `${range.start} - ${range.end}`;
+}
+
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
@@ -148,6 +157,144 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                     <RowHeader title="Ethnicity" />
                     <RowContent content={props.c.demographics?.ethnicity} />
+                </Grid>
+            </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Location
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Location" />
+                    <RowContent content={props.c.location?.name} />
+
+                    <RowHeader title="Location type" />
+                    <RowContent content={props.c.location?.geoResolution} />
+
+                    <RowHeader title="Admin area 1" />
+                    <RowContent
+                        content={props.c.location?.administrativeAreaLevel1}
+                    />
+
+                    <RowHeader title="Admin area 2" />
+                    <RowContent
+                        content={props.c.location?.administrativeAreaLevel2}
+                    />
+
+                    <RowHeader title="Admin area 3" />
+                    <RowContent
+                        content={props.c.location?.administrativeAreaLevel3}
+                    />
+
+                    <RowHeader title="Country" />
+                    <RowContent content={props.c.location?.country} />
+
+                    <RowHeader title="Latitude" />
+                    <RowContent
+                        content={`${props.c.location?.geometry?.latitude?.toFixed(
+                            4,
+                        )}`}
+                    />
+                    <RowHeader title="Longitude" />
+                    <RowContent
+                        content={`${props.c.location?.geometry?.longitude?.toFixed(
+                            4,
+                        )}`}
+                    />
+                    {/* TODO: A static map would be nice here. */}
+                </Grid>
+            </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Event history
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Confirmed case date" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find((e) => e.name === 'confirmed')
+                                ?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="Confirmation method" />
+                    <RowContent
+                        content={
+                            props.c.events?.find((e) => e.name === 'confirmed')
+                                ?.value || ''
+                        }
+                    />
+
+                    <RowHeader title="Symptom onset date" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find(
+                                (e) => e.name === 'onsetSymptoms',
+                            )?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="First clinical consultation" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find(
+                                (e) => e.name === 'firstClinicalConsultation',
+                            )?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="Date of self isolation" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find(
+                                (e) => e.name === 'selfIsolation',
+                            )?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="Hospital admission" />
+                    <RowContent
+                        content={
+                            props.c.events?.find(
+                                (e) => e.name === 'hospitalAdmission',
+                            )?.value || ''
+                        }
+                    />
+
+                    <RowHeader title="Hospital admission date" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find(
+                                (e) => e.name === 'hospitalAdmission',
+                            )?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="Date admitted to isolation unit" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find(
+                                (e) => e.name === 'icuAdmission',
+                            )?.dateRange,
+                        )}
+                    />
+
+                    <RowHeader title="Outcome" />
+                    <RowContent
+                        content={
+                            props.c.events?.find((e) => e.name === 'outcome')
+                                ?.value || ''
+                        }
+                    />
+
+                    <RowHeader title="Outcome date" />
+                    <RowContent
+                        content={dateRange(
+                            props.c.events?.find((e) => e.name === 'outcome')
+                                ?.dateRange,
+                        )}
+                    />
                 </Grid>
             </Paper>
         </Container>

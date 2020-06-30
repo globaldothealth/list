@@ -33,13 +33,29 @@ it('loads and displays case', async () => {
         ),
     ).toBeInTheDocument();
     expect(await findByText('abc123')).toBeInTheDocument();
-    expect(await findByText('2020-01-03')).toBeInTheDocument();
+    expect(await findByText('2020-01-20')).toBeInTheDocument();
     // Demographics.
     expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('50-59')).toBeInTheDocument();
     expect(await findByText('Horse breeder')).toBeInTheDocument();
     expect(await findByText('Swedish')).toBeInTheDocument();
     expect(await findByText('Asian')).toBeInTheDocument();
+    // Location.
+    expect(await findByText('France')).toBeInTheDocument();
+    expect(await findByText('Île-de-F')).toBeInTheDocument();
+    expect(await findByText('Wuhan')).toBeInTheDocument();
+    expect(await findByText('Paris')).toBeInTheDocument();
+    expect(await findByText('Admin2')).toBeInTheDocument();
+    expect(await findByText(/2.3522/)).toBeInTheDocument();
+    expect(await findByText(/48.85/)).toBeInTheDocument();
+    // Events.
+    expect(await findByText('2020-01-01')).toBeInTheDocument();
+    expect(await findByText('2020-01-02')).toBeInTheDocument();
+    expect(await findByText('2020-01-03')).toBeInTheDocument();
+    expect(await findByText('2020-01-04 - 2020-01-05')).toBeInTheDocument();
+    expect(await findByText('2020-01-06')).toBeInTheDocument();
+    expect(await findByText('Recovered')).toBeInTheDocument();
+    expect(await findByText('PCR test')).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
