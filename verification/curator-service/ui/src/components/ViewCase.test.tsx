@@ -56,6 +56,14 @@ it('loads and displays case', async () => {
     expect(await findByText('2020-01-06')).toBeInTheDocument();
     expect(await findByText('Recovered')).toBeInTheDocument();
     expect(await findByText('PCR test')).toBeInTheDocument();
+    // Symptoms.
+    expect(await findByText(/Severe pneumonia/)).toBeInTheDocument();
+    expect(await findByText(/Dyspnea/)).toBeInTheDocument();
+    expect(await findByText(/Weakness/)).toBeInTheDocument();
+    expect(await findByText(/Hypertension/)).toBeInTheDocument();
+    expect(await findByText(/Type 2 diabetes/)).toBeInTheDocument();
+    expect(await findByText(/Coronary heart disease/)).toBeInTheDocument();
+    expect(await findByText(/Lung cancer/)).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
