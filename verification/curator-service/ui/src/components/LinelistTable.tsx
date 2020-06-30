@@ -1,4 +1,4 @@
-import { Case, Travel, TravelHistory } from './Case';
+import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
@@ -48,6 +48,7 @@ interface TableRow {
     // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
     transmissionLinkedCaseIds: string;
     travelHistory: TravelHistory;
+    pathogens: Pathogen[];
     // sources
     sourceUrl: string | null;
     notes: string;
@@ -158,12 +159,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Travel history',
                             field: 'travelHistory',
-                            render: (rowData) =>
+                            render: (rowData): string =>
                                 rowData.travelHistory?.travel
                                     ?.map(
                                         (travel: Travel) =>
                                             travel.location.name,
                                     )
+                                    ?.join(', '),
+                        },
+                        {
+                            title: 'Pathogens',
+                            field: 'pathogens',
+                            render: (rowData): string =>
+                                rowData.pathogens
+                                    ?.map((pathogen: Pathogen) => pathogen.name)
                                     ?.join(', '),
                         },
                         { title: 'Notes', field: 'notes' },
@@ -252,6 +261,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 ', ',
                                             ),
                                             travelHistory: c.travelHistory,
+                                            pathogens: c.pathogens,
                                             notes: c.notes,
                                             sourceUrl:
                                                 c.sources &&
