@@ -103,6 +103,5 @@ export interface Case {
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
     notes: string;
-
     revisionMetadata: RevisionMetadata;
 }

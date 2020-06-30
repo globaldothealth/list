@@ -329,6 +329,10 @@ it('can go to page to view a case', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'http://foo.bar',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -349,11 +353,6 @@ it('can go to page to view a case', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
