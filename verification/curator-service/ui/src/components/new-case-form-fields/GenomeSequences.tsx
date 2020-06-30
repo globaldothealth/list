@@ -1,4 +1,4 @@
-import { Field, FieldArray, useFormikContext } from 'formik';
+import { FastField, FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
@@ -43,46 +43,46 @@ export default function GenomeSequences(): JSX.Element {
                                                     name={`genomeSequences[${index}].sampleCollectionDate`}
                                                     label="Sample collection date"
                                                 ></DateField>
-                                                <Field
+                                                <FastField
                                                     className={classes.field}
                                                     name={`genomeSequences[${index}].repositoryUrl`}
                                                     type="text"
                                                     label="Repository URL"
                                                     fullWidth
                                                     component={TextField}
-                                                ></Field>
-                                                <Field
+                                                ></FastField>
+                                                <FastField
                                                     className={classes.field}
                                                     name={`genomeSequences[${index}].sequenceId`}
                                                     type="text"
                                                     label="Sequence ID"
                                                     fullWidth
                                                     component={TextField}
-                                                ></Field>
-                                                <Field
+                                                ></FastField>
+                                                <FastField
                                                     className={classes.field}
                                                     name={`genomeSequences[${index}].sequenceName`}
                                                     type="text"
                                                     label="Sequence name"
                                                     fullWidth
                                                     component={TextField}
-                                                ></Field>
-                                                <Field
+                                                ></FastField>
+                                                <FastField
                                                     className={classes.field}
                                                     name={`genomeSequences[${index}].sequenceLength`}
                                                     type="number"
                                                     label="Sequence length"
                                                     fullWidth
                                                     component={TextField}
-                                                ></Field>
-                                                <Field
+                                                ></FastField>
+                                                <FastField
                                                     name={`genomeSequences[${index}].notes`}
                                                     type="text"
                                                     label="Notes"
                                                     multiline={true}
                                                     fullWidth
                                                     component={TextField}
-                                                ></Field>
+                                                ></FastField>
                                             </fieldset>
                                         ),
                                     )}

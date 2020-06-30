@@ -1,4 +1,4 @@
-import { Field } from 'formik';
+import { FastField } from 'formik';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -9,7 +9,7 @@ export default class Notes extends React.Component<{}, {}> {
             <Scroll.Element name="notes">
                 <fieldset>
                     <legend>Notes</legend>
-                    <Field
+                    <FastField
                         label="Notes"
                         name="notes"
                         type="text"
