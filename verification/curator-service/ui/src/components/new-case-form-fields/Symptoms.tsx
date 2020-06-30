@@ -1,4 +1,4 @@
-import { FormikAutocomplete } from './FormikFields';
+import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';

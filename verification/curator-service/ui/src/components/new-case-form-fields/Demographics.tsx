@@ -1,8 +1,8 @@
-import { Field, useFormikContext } from 'formik';
+import { FastField, useFormikContext } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 
 import FormControl from '@material-ui/core/FormControl';
-import { FormikAutocomplete } from './FormikFields';
+import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import NewCaseFormValues from './NewCaseFormValues';
@@ -57,7 +57,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                 <FormControl>
                     <div className={classes.fieldRow}>
                         <InputLabel htmlFor="sex">Sex</InputLabel>
-                        <Field
+                        <FastField
                             as="select"
                             name="sex"
                             type="text"
@@ -70,38 +70,38 @@ function Demographics(props: DemographicsProps): JSX.Element {
                                     {sex ?? 'Unknown'}
                                 </MenuItem>
                             ))}
-                        </Field>
+                        </FastField>
                     </div>
                 </FormControl>
                 <div className={`${classes.fieldRow} ${classes.ageRow}`}>
-                    <Field
+                    <FastField
                         className={classes.ageField}
                         name="minAge"
                         type="number"
                         label="Min age"
                         component={TextField}
-                    ></Field>
+                    ></FastField>
                     <span className={classes.ageSeparator}>to</span>
-                    <Field
+                    <FastField
                         className={classes.ageField}
                         name="maxAge"
                         type="number"
                         label="Max age"
                         component={TextField}
-                    ></Field>
+                    ></FastField>
                     <span className={classes.ageSeparator}>or</span>
-                    <Field
+                    <FastField
                         className={classes.ageField}
                         name="age"
                         type="number"
                         label="Age"
                         component={TextField}
-                    ></Field>
+                    ></FastField>
                 </div>
                 <div className={classes.fieldRow}>
                     <FormControl>
                         <InputLabel htmlFor="ethnicity">Ethnicity</InputLabel>
-                        <Field
+                        <FastField
                             as="select"
                             name="ethnicity"
                             type="text"
@@ -117,7 +117,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                                     {ethnicity ?? 'Unknown'}
                                 </MenuItem>
                             ))}
-                        </Field>
+                        </FastField>
                     </FormControl>
                 </div>
                 <div className={classes.fieldRow}>

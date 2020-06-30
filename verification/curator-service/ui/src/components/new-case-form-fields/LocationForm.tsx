@@ -6,7 +6,7 @@ import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import React from 'react';
-import { RequiredHelperText } from './FormikFields';
+import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
@@ -123,6 +123,7 @@ export function PlacesAutocomplete(
             }}
             renderInput={(params): JSX.Element => (
                 <div>
+                    {/* Do not use FastField here */}
                     <Field
                         {...params}
                         // Setting the name properly allows any typed value

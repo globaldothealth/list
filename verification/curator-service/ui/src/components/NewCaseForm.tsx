@@ -17,7 +17,7 @@ import Notes from './new-case-form-fields/Notes';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
-import Source from './new-case-form-fields/Source';
+import Source from './common-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
@@ -75,6 +75,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
+            traveledPrior30Days: undefined,
             travelHistory: [],
             genomeSequences: [],
             sourceUrl: '',
@@ -131,6 +132,12 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
+        traveledPrior30Days:
+            c.travelHistory?.traveledPrior30Days === undefined
+                ? undefined
+                : c.travelHistory.traveledPrior30Days
+                ? 'Yes'
+                : 'No',
         travelHistory: c.travelHistory?.travel?.map((travel) => {
             return { reactId: shortId.generate(), ...travel };
         }),
@@ -304,6 +311,12 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 linkedCaseIds: values.transmissionLinkedCaseIds,
             },
             travelHistory: {
+                traveledPrior30Days:
+                    values.traveledPrior30Days === 'Yes'
+                        ? true
+                        : values.traveledPrior30Days === 'No'
+                        ? false
+                        : undefined,
                 travel: values.travelHistory,
             },
             genomeSequences: values.genomeSequences,
@@ -387,6 +400,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 }): JSX.Element => (
                     <div className={classes.container}>
                         <nav className={classes.tableOfContents}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('source')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sourceUrl?.trim() !== '',
+                                    hasError: hasErrors(
+                                        ['sourceUrl'],
+                                        errors,
+                                        touched,
+                                    ),
+                                })}
+                                Source
+                            </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void =>
@@ -520,9 +547,15 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 }
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.travelHistory?.length > 0,
+                                    isChecked:
+                                        values.travelHistory?.length > 0 ||
+                                        values.traveledPrior30Days !==
+                                            undefined,
                                     hasError: hasErrors(
-                                        ['travelHistory'],
+                                        [
+                                            'traveledPrior30Days',
+                                            'travelHistory',
+                                        ],
                                         errors,
                                         touched,
                                     ),
@@ -548,20 +581,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('source')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.sourceUrl?.trim() !== '',
-                                    hasError: hasErrors(
-                                        ['sourceUrl'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Source
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('notes')}
                             >
                                 {this.tableOfContentsIcon({
@@ -577,6 +596,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
+                                <div className={classes.formSection}>
+                                    <Source></Source>
+                                </div>
                                 <div className={classes.formSection}>
                                     <Demographics></Demographics>
                                 </div>
@@ -597,9 +619,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 </div>
                                 <div className={classes.formSection}>
                                     <GenomeSequences></GenomeSequences>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Source></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Notes></Notes>

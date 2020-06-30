@@ -12,6 +12,10 @@ describe('Bulk upload form', function () {
         cy.visit('/cases/bulk');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@upsertCases');
         cy.contains('Success!');
 
         cy.visit('/cases');
@@ -33,6 +37,10 @@ describe('Bulk upload form', function () {
         cy.visit('/cases/bulk');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@upsertCases');
         cy.contains('Success!');
 
         cy.visit('/cases');
@@ -43,6 +51,10 @@ describe('Bulk upload form', function () {
         cy.visit('/cases/bulk');
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
+        cy.server();
+        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@upsertCases');
         cy.contains('Success!');
 
         cy.visit('/cases');
@@ -57,6 +69,10 @@ describe('Bulk upload form', function () {
         cy.visit('/cases/bulk');
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@upsertCases');
         cy.contains('Request failed');
 
         cy.visit('/cases');

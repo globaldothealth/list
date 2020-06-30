@@ -96,7 +96,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:0.0.8
+          image: docker.io/healthmapidha/curatorservice:0.0.9
           ports:
             - containerPort: 3001
           livenessProbe:

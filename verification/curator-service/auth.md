@@ -42,3 +42,5 @@ Cypress request authentication works the same as for unit testing above, a call 
 If you have an ongoing session but remove the Users collection, you can end up in a passport-lockdown where passport doesn't reset your session.
 
 The current fix pending https://github.com/jaredhanson/passport/issues/776 is to manually delete your session cookie.
+
+Some users seem to have trouble login with multi-account sessions (multiple google accounts logged-in at the same time in the same browser profile), we have yet to find a fix for that issue other than only keeping one account at the same time in the same browser profile.
