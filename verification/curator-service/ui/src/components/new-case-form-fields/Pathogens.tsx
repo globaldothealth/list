@@ -43,12 +43,10 @@ export function PathogensAutocomplete(): JSX.Element {
             // CSV lines are of the form '123,Disease name' and we want to
             // map that to [{'Disease name', 123}]
             const retrievedOptions = new Map(
-                resp.data
-                    .split('\n')
-                    .map((option) => [
-                        option.substring(option.indexOf(',') + 1),
-                        +option.substring(0, option.indexOf(',')),
-                    ]),
+                resp.data.split('\n').map((option) => {
+                    const optionArray = option.split(',');
+                    return [optionArray[1], +optionArray[0]];
+                }),
             );
 
             if (active) {
