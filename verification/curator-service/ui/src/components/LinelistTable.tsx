@@ -163,7 +163,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 rowData.travelHistory?.travel
                                     ?.map(
                                         (travel: Travel) =>
-                                            travel.location.name,
+                                            travel.location?.name,
                                     )
                                     ?.join(', '),
                         },
