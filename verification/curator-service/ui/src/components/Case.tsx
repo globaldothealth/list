@@ -1,13 +1,14 @@
 // Case definitions as returned by the /api/cases endpoint.
 
-
 export interface CaseReference {
     sourceId: string;
     sourceEntryId?: string;
     sourceUrl: string;
-    additionalSources: [{
-        sourceUrl: string;
-    }]
+    additionalSources: [
+        {
+            sourceUrl: string;
+        },
+    ];
 }
 
 export interface Event {
@@ -72,7 +73,7 @@ export interface Travel {
         end: string;
     };
     purpose?: string;
-    method?: string;
+    methods?: string[];
 }
 
 interface GenomeSequence {

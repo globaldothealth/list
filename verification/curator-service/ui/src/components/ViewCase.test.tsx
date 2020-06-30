@@ -69,6 +69,18 @@ it('loads and displays case', async () => {
     expect(await findByText(/Gym/)).toBeInTheDocument();
     expect(await findByText(/othercaseid1/)).toBeInTheDocument();
     expect(await findByText(/othercaseid2/)).toBeInTheDocument();
+    // Travel history.
+    expect(await findByText('2020-02-10 - 2020-01-17')).toBeInTheDocument();
+    expect(await findByText('United States')).toBeInTheDocument();
+    expect(await findByText('New York')).toBeInTheDocument();
+    expect(await findByText('Kings County')).toBeInTheDocument();
+    expect(await findByText('Brooklyn')).toBeInTheDocument();
+    expect(await findByText('Kings Hospital Center')).toBeInTheDocument();
+    expect(await findByText('Point')).toBeInTheDocument();
+    expect(await findByText(/40.68/)).toBeInTheDocument();
+    expect(await findByText(/73.97/)).toBeInTheDocument();
+    expect(await findByText('Plane')).toBeInTheDocument();
+    expect(await findByText('Family')).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
