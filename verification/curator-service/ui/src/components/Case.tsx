@@ -19,6 +19,10 @@ export interface Demographics {
     profession: string;
 }
 
+export interface PreexistingConditions {
+    values: string[];
+}
+
 export interface Location {
     country: string;
     administrativeAreaLevel1: string;
@@ -91,6 +95,7 @@ export interface Case {
     demographics: Demographics;
     location: Location;
     symptoms: Symptoms;
+    preexistingConditions?: PreexistingConditions;
     transmission: Transmission;
     sources: Source[];
     travelHistory: TravelHistory;
