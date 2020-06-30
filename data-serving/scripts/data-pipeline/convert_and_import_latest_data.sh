@@ -13,6 +13,7 @@ db='covid19'
 collection='cases'
 sample_rate=1
 schema_path="$SCRIPT_PATH/../../data-service/schemas/cases.schema.json"
+index_path="$SCRIPT_PATH/../../data-service/schemas/cases.index.json"
 
 while getopts :m:d:c:r:s flag
 do
@@ -22,6 +23,7 @@ do
         c) collection=${OPTARG};;
         r) sample_rate=${OPTARG};;
         s) schema_path=${OPTARG};;
+        i) index_path=${OPTARG};;
         ?) echo $USAGE; exit 1
     esac
 done
@@ -64,6 +66,7 @@ function setup_db() {
         DB=$db \
         COLL=$collection \
         SCHEMA=$schema_path \
+        INDEX=$index_path \
         npm run --prefix $SCRIPT_PATH/../setup-db setup
 }
 
@@ -88,7 +91,8 @@ main() {
     [-d] database: $db
     [-c] collection: $collection
     [-r] sample rate: $sample_rate
-    [-s] schema path: $schema_path"
+    [-s] schema path: $schema_path
+    [-i] index path: $index_path"
 
     fetch_latest_data
     convert_data
