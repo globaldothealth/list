@@ -2816,16 +2816,6 @@
         ],
         "revisionMetadata": {
             "revisionNumber": 0
-        },
-        "importedCase": {
-            "ID": "007-686962",
-            "city": "Moscow",
-            "province": "Central",
-            "country": "Russia",
-            "date_confirmation": "13.05.2020",
-            "chronic_disease_binary": "False",
-            "admin_id": "6363.0",
-            "travel_history_binary": "False"
         }
     },
     {
