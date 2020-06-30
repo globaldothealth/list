@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: 'User must have an email',
-        text: true,
     },
     googleID: String,
     roles: {

@@ -12,9 +12,7 @@ import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
-import { Source } from './model/source';
 import SourcesController from './controllers/sources';
-import { User } from './model/user';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -52,14 +50,9 @@ mongoose
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
-        useCreateIndex: true,
     })
     .then(async () => {
-        console.log('Connected to the database, setting up indexes');
-        await Source.syncIndexes();
-        console.log(await Source.listIndexes());
-        await User.syncIndexes();
-        console.log(await User.listIndexes());
+        console.log('Connected to the database');
     })
     .catch((e) => {
         console.error('Failed to connect to DB', e);

@@ -11,7 +11,6 @@ const sourceSchema = new mongoose.Schema({
     name: {
         type: String,
         required: 'Enter a name',
-        text: true,
     },
     origin: {
         type: originSchema,

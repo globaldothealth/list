@@ -2,6 +2,7 @@ import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 let mongoServer: MongoMemoryServer;
@@ -10,12 +11,11 @@ beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
 });
 
-beforeEach(async () => {
-    await Case.ensureIndexes();
+beforeEach(() => {
     return Case.deleteMany({});
 });
 
-afterAll(() => {
+afterAll(async () => {
     return mongoServer.stop();
 });
 
@@ -77,6 +77,18 @@ describe('GET', () => {
             expect(res.body.nextPage).toBeUndefined();
         });
         it('should query results', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connect(process.env.MONGO_URL || '', {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false,
+            });
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
             const c = new Case(minimalCase);
             c.notes = 'got it at work';
             await c.save();
