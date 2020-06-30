@@ -75,14 +75,6 @@ export default function GenomeSequences(): JSX.Element {
                                                     fullWidth
                                                     component={TextField}
                                                 ></FastField>
-                                                <FastField
-                                                    name={`genomeSequences[${index}].notes`}
-                                                    type="text"
-                                                    label="Notes"
-                                                    multiline={true}
-                                                    fullWidth
-                                                    component={TextField}
-                                                ></FastField>
                                             </fieldset>
                                         ),
                                     )}
