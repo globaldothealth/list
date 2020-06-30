@@ -1,4 +1,31 @@
-## Available Scripts
+# Global Health Curator Portal UI
+
+This directory contains the code for the UI of the Global Health Curator Portal accessible here:
+
+- [dev](https://dev-curator.ghdsi.org)
+- [prod](https://curator.ghdsi.org)
+- [local dev](http://localhost:3002)
+
+## Development
+
+The React application was built with the `create-react-app` new project generator.
+
+Run the stack by executing the `/dev/run_stack.sh` script or simply launch the UI alone by running `npm start` from this directory. Note that all API calls are proxied to `localhost:3001` by default so running the full stack is probably a better idea than just running the UI unless you want to change something that isn't API relevant.
+
+The proxy config can be found in the `src/setupProxy.js` file.
+
+All react components can be found in the `src/components` directory and their tests as well.
+To run the unit tests and re-run them each time a file is saved, run `npm test`.
+
+In general **all components should have unit tests and proper coverage**. UI interactions between components are validated using integration tests described in the next section.
+
+### Integration tests
+
+We use https://www.cypress.io/ for our integration tests, you can open the cypress runner locally by running `npm run cypress-open` or simply run the tests in headless mode by running `npm run cypress-run`.
+
+Integration tests tend to be slower and more flaky than unit tests so prefer writing plenty of unit tests first and then finish with integration tests.
+
+## Available Scripts (from `create-react-app`)
 
 In the project directory, you can run:
 
