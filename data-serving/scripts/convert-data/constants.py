@@ -57,7 +57,6 @@ COMMON_LOCATION_ABBREVIATIONS = {
     ('london',): ('London', 'England', 'United Kingdom'),
     ('madrid',): (None, 'Madrid', 'Spain'),
     ('madrid', 'spain'): (None, 'Madrid', 'Spain'),
-    ('miami', 'florida', 'united states'): ('Miami-Dade County', 'Florida', 'United States'),
     ('milan',): ('Milan', 'Lombardia', 'Italy'),
     ('milan', 'italy'): ('Milan', 'Lombardia', 'Italy'),
     ('nanning',): ('Nanning City', 'Guangxi', 'China'),
