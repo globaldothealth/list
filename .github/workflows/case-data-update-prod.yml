@@ -1,10 +1,10 @@
-name: Update case data
+name: Update case data in prod
 
 on:
   push:
     # Update the data when the conversion script changes.
     branches: [master]
-    paths: ["/data-serving/scripts/convert-data/**"]
+    paths: ["data-serving/scripts/convert-data/**"]
   repository_dispatch:
     # Update the data on a signal that the input data has changed.
     types: [latest-data-push]
@@ -14,6 +14,7 @@ on:
     - cron: "0 5 * * *"
 
 jobs:
+  # NOTE: This job should be kept in sync with the dev version.
   update-case-data-prod:
     runs-on: ubuntu-latest
 
@@ -42,5 +43,5 @@ jobs:
       - name: Install Python dependencies
         run: python3 -m pip install -r ./data-serving/scripts/data-pipeline/requirements.txt
 
-      - name: Run update script
-        run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m "${{ secrets.DB_CONNECTION_URL }}"
+      - name: Run update script on prod db
+        run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m "${{ secrets.DB_CONNECTION_URL_PROD }}"
