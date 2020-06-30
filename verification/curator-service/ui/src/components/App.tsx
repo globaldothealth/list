@@ -12,6 +12,7 @@ import Add from '@material-ui/icons/Add';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import BulkCaseForm from './BulkCaseForm';
+import Charts from './Charts';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import CompletenessCharts from './CompletenessCharts';
@@ -298,21 +299,9 @@ class App extends React.Component<Props, State> {
                                     divider: true,
                                 },
                                 {
-                                    text: 'Cumulative charts',
-                                    icon: <BarChartIcon />,
-                                    to: '/charts/cumulative',
-                                    displayCheck: (): boolean => true,
-                                },
-                                {
-                                    text: 'Freshness charts',
-                                    icon: <BubbleChartIcon />,
-                                    to: '/charts/freshness',
-                                    displayCheck: (): boolean => true,
-                                },
-                                {
-                                    text: 'Completeness charts',
+                                    text: 'Charts',
                                     icon: <ShowChartIcon />,
-                                    to: '/charts/completeness',
+                                    to: '/charts',
                                     displayCheck: (): boolean => true,
                                     divider: true,
                                 },
@@ -406,14 +395,8 @@ class App extends React.Component<Props, State> {
                                     <SourceTable />
                                 </Route>
                             )}
-                            <Route path="/charts/cumulative">
-                                <CumulativeCharts />
-                            </Route>
-                            <Route path="/charts/freshness">
-                                <FreshnessCharts />
-                            </Route>
-                            <Route path="/charts/completeness">
-                                <CompletenessCharts />
+                            <Route path="/charts">
+                                <Charts />
                             </Route>
                             {this.state.user.email && (
                                 <Route path="/profile">
