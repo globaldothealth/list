@@ -25,7 +25,7 @@ describe('View case', function () {
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
-            cy.contains('France');
+            cy.contains('French');
         });
     });
 });
