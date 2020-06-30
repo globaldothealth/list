@@ -150,7 +150,7 @@
     "transmission": {
         "routes": [ "Vector borne" ],
         "places": [ "Gym" ],
-        "linkedCaseIds": [ "abc", "def" ]
+        "linkedCaseIds": [ "othercaseid1", "othercaseid2" ]
     },
     "importedCase": {}
 }
