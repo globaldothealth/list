@@ -287,29 +287,39 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         actionsColumnIndex: -1,
                     }}
-                    actions={
-                        this.props.user.roles.includes('curator')
-                            ? [
-                                  {
-                                      icon: 'add',
-                                      tooltip: 'Submit new case',
-                                      isFreeAction: true,
-                                      onClick: (): void => {
-                                          history.push('/cases/new');
-                                      },
+                    actions={(this.props.user.roles.includes('curator')
+                        ? [
+                              {
+                                  icon: 'add',
+                                  tooltip: 'Submit new case',
+                                  isFreeAction: true,
+                                  onClick: (): void => {
+                                      history.push('/cases/new');
                                   },
-                                  {
-                                      icon: 'edit',
-                                      tooltip: 'Edit this case',
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/edit/${id}`);
-                                      },
+                              },
+                              {
+                                  icon: 'edit',
+                                  tooltip: 'Edit this case',
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                  onClick: (_: any, row: any): void => {
+                                      // Somehow the templating system doesn't think row has an id property but it has.
+                                      const id = (row as TableRow).id;
+                                      history.push(`/cases/edit/${id}`);
                                   },
-                              ]
-                            : undefined
-                    }
+                              },
+                          ]
+                        : []
+                    ).concat([
+                        {
+                            icon: 'details',
+                            tooltip: 'View this case details',
+                            onClick: (e, row): void => {
+                                // Somehow the templating system doesn't think row has an id property but it has.
+                                const id = (row as TableRow).id;
+                                history.push(`/cases/view/${id}`);
+                            },
+                        },
+                    ])}
                     editable={
                         this.props.user.roles.includes('curator')
                             ? {

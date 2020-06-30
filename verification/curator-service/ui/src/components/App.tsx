@@ -41,6 +41,7 @@ import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
 import Users from './Users';
+import ViewCase from './ViewCase';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
@@ -369,6 +370,16 @@ class App extends React.Component<Props, State> {
                                                 id={match.params.id}
                                                 user={this.state.user}
                                             />
+                                        );
+                                    }}
+                                />
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route
+                                    path="/cases/view/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <ViewCase id={match.params.id} />
                                         );
                                     }}
                                 />
