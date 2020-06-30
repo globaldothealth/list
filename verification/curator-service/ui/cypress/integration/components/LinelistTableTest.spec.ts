@@ -52,4 +52,18 @@ describe('Linelist table', function () {
 
         cy.contains('some notes').should('not.exist');
     });
+
+    it('Can search', function () {
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'foo.bar',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.get('input[placeholder="Search"]').type('Uruguay');
+        cy.contains('France').should('not.exist');
+        cy.get('input[placeholder="Search"]').clear().type('France');
+        cy.get('td[value="France"]');
+    });
 });
