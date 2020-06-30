@@ -3,7 +3,7 @@
 
 export interface CaseReference {
     sourceId: string;
-    sourceEntryId: string;
+    sourceEntryId?: string;
     sourceUrl: string;
     additionalSources: [{
         sourceUrl: string;
