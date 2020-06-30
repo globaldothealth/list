@@ -2,6 +2,10 @@ import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
+import {
+    GenomeSequence,
+    Travel,
+} from './new-case-form-fields/NewCaseFormValues';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import { Case } from './Case';
@@ -24,6 +28,7 @@ import TravelHistory from './new-case-form-fields/TravelHistory';
 import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { cloneDeep } from 'lodash';
 import { createStyles } from '@material-ui/core/styles';
 import { hasKey } from './Utils';
 import shortId from 'shortid';
@@ -229,6 +234,34 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         };
     }
 
+    filterTravel(travel: Travel[]): Travel[] {
+        const filteredTravel = cloneDeep(travel);
+        filteredTravel.forEach((travel) => {
+            delete travel.reactId;
+            if (
+                travel.dateRange.start === null &&
+                travel.dateRange.end === null
+            ) {
+                delete travel.dateRange;
+            } else {
+                if (travel.dateRange.start === null) {
+                    delete travel.dateRange.start;
+                }
+                if (travel.dateRange.end === null) {
+                    delete travel.dateRange.end;
+                }
+            }
+        });
+        return filteredTravel;
+    }
+    filterGenomeSequences(genomeSequences: GenomeSequence[]): GenomeSequence[] {
+        const filteredGenomeSequences = cloneDeep(genomeSequences);
+        filteredGenomeSequences.forEach((genomeSequence) => {
+            delete genomeSequence.reactId;
+        });
+        return filteredGenomeSequences;
+    }
+
     async submitCase(values: NewCaseFormValues): Promise<void> {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
@@ -316,9 +349,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         : values.traveledPrior30Days === 'No'
                         ? false
                         : undefined,
-                travel: values.travelHistory,
+                travel: this.filterTravel(values.travelHistory),
             },
-            genomeSequences: values.genomeSequences,
+            genomeSequences: this.filterGenomeSequences(values.genomeSequences),
             notes: values.notes,
             revisionMetadata: {
                 revisionNumber: 0,
