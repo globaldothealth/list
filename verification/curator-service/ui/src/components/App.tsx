@@ -9,18 +9,13 @@ import {
 import { Link, Route, Switch } from 'react-router-dom';
 
 import Add from '@material-ui/icons/Add';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import BulkCaseForm from './BulkCaseForm';
 import Charts from './Charts';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import CompletenessCharts from './CompletenessCharts';
-import CumulativeCharts from './CumulativeCharts';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
-import FreshnessCharts from './FreshnessCharts';
 import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
