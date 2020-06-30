@@ -86,9 +86,7 @@ it('loads and displays cases', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     expect(await findByText(/some notes/)).toBeInTheDocument();
     expect(await findByText(/some place name/)).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
@@ -117,9 +115,7 @@ it('redirects to new case page when + icon is clicked', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     fireEvent.click(getByText('add'));
     expect(history.location.pathname).toBe('/cases/new');
 });
@@ -231,9 +227,7 @@ it('can delete a row', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
@@ -326,9 +320,7 @@ it('can go to page to edit a row', async () => {
         </Router>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
@@ -394,9 +386,7 @@ it('cannot edit data as a reader only', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
