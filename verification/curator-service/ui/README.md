@@ -4,6 +4,7 @@ This directory contains the code for the UI of the Global Health Curator Portal 
 
 - [dev](https://dev-curator.ghdsi.org)
 - [prod](https://curator.ghdsi.org)
+- [local dev](http://localhost:3002)
 
 ## Development
 

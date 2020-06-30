@@ -1,6 +1,6 @@
 # Global Health Curator Service
 
-This package contains the Node JS express server responsible to serve the API calls for the curators to interact with the Global Health ingestion system.
+This package contains the Node JS express server responsible for serving the API calls for the curators to interact with the Global Health ingestion system.
 
 It handles CRUD of cases, ingestion sources, users and offers a geocoding service.
 
@@ -16,7 +16,7 @@ Given proper permissions, one can see the cases in the UI at https://curator.ghd
 
 A source is an authoritative URL provided by an organization (government, NGO or news organization) that provides information about _cases_.
 
-Curators cango over those sources to enter the data manually as described earlier or automated scrapers and parsers can go over the more structured sources and try to automatically create the relevant cases data.
+Curators can go over those sources to enter the data manually as described earlier or automated scrapers and parsers can go over the more structured sources and try to automatically create the relevant cases data.
 
 Given proper permissions, one can see the sources in the UI at https://curator.ghdsi.org/sources.
 
