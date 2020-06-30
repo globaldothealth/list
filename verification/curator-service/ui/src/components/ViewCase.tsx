@@ -64,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
         background: theme.palette.background.default,
         marginTop: '1em',
     },
+    caseTitle: {
+        marginTop: '1em',
+    },
     grid: {
         margin: '1em',
     },
@@ -94,7 +97,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
         <Container maxWidth="sm">
-            <Typography variant="h5">Case {props.c._id}</Typography>
+            <Typography className={classes.caseTitle} variant="h5">
+                Case {props.c._id}
+            </Typography>
             <Paper className={classes.paper} variant="outlined" square>
                 <Typography className={classes.sectionTitle} variant="overline">
                     Case data
