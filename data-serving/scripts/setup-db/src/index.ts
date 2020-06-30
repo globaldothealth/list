@@ -5,6 +5,7 @@ interface SetupDatabaseParameters {
     databaseName: string;
     collectionName: string;
     schemaPath: string;
+    indexPath: string;
 }
 
 const setupDatabase = async ({
@@ -12,10 +13,14 @@ const setupDatabase = async ({
     databaseName,
     collectionName,
     schemaPath,
+    indexPath,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
         print(`Read schema from ${schemaPath}`);
+
+        const index = JSON.parse(await cat(indexPath));
+        print(`Read index from ${indexPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
@@ -42,7 +47,14 @@ const setupDatabase = async ({
         print(`Created collection "${collectionName}" with schema`);
 
         const collection = await database.getCollection(collectionName);
-        // TODO(khmoran): Create indexes.
+
+        print('Dropping indexes👇');
+        const indexName = `${collectionName}Idx`;
+        await collection.dropIndex(indexName);
+
+        print('Creating indexes👆');
+        await collection.createIndex(index, { name: indexName });
+        print('done👍');
 
         // Print some stats -- for fun and confirmation!
         const stats = await collection.stats();

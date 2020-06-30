@@ -18,9 +18,9 @@ the default database (`covid19`) and collection (`cases`), run:
 
 To run it with configurable options, e.g. a different connection string, run:
 
-`CONN="some_conn_string" DB="some_db" COLL="some_collection" SCHEMA="../some/schema/path.json" npm run setup`
+`CONN="some_conn_string" DB="some_db" COLL="some_collection" SCHEMA="../some/schema/path.json" INDEX="../some/index/path" npm run setup`
 
 For example, the below invocation of `setup` would give you the same result as
 `setup-cases`:
 
-`CONN="mongodb://127.0.0.1:27017" DB="covid19" COLL="cases" SCHEMA="./../../data-service/schemas/cases.schema.json" npm run setup`
+`CONN="mongodb://127.0.0.1:27017" DB="covid19" COLL="cases" SCHEMA="./../../data-service/schemas/cases.schema.json" INDEX="./../../data-service/schemas/cases.index.json" npm run setup`
