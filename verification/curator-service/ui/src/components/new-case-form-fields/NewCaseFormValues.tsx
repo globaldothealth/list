@@ -31,7 +31,7 @@ export default interface NewCaseFormValues {
     notes: string;
 }
 
-interface Travel {
+export interface Travel {
     // Used to key react elements in the UI
     reactId: string;
     location: Loc;
@@ -43,7 +43,7 @@ interface Travel {
     method?: string;
 }
 
-interface GenomeSequence {
+export interface GenomeSequence {
     // Used to key react elements in the UI
     reactId: string;
     sampleCollectionDate: string | null;

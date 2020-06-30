@@ -64,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
         background: theme.palette.background.default,
         marginTop: '1em',
     },
+    caseTitle: {
+        marginTop: '1em',
+    },
     grid: {
         margin: '1em',
     },
@@ -94,7 +97,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
         <Container maxWidth="sm">
-            <Typography variant="h5">Case {props.c._id}</Typography>
+            <Typography className={classes.caseTitle} variant="h5">
+                Case {props.c._id}
+            </Typography>
             <Paper className={classes.paper} variant="outlined" square>
                 <Typography className={classes.sectionTitle} variant="overline">
                     Case data
@@ -297,6 +302,53 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     />
                 </Grid>
             </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Symptoms
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Symptoms" />
+                    <RowContent
+                        content={props.c.symptoms?.values?.join(', ')}
+                    />
+
+                    <RowHeader title="Pre existing conditions" />
+                    <RowContent
+                        content={
+                            props.c.preexistingConditions?.values?.join(', ') ||
+                            ''
+                        }
+                    />
+                </Grid>
+            </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Transmission
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Route of transmission" />
+                    <RowContent
+                        content={props.c.transmission?.routes?.join(', ')}
+                    />
+
+                    <RowHeader title="Places of transmission" />
+                    <RowContent
+                        content={props.c.transmission?.places?.join(', ')}
+                    />
+
+                    <RowHeader title="Related cases" />
+                    <MultilinkRowContent
+                        links={props.c.transmission?.linkedCaseIds?.map((e) => {
+                            return {
+                                title: e,
+                                link: `/cases/view/${e}`,
+                            };
+                        })}
+                    />
+                </Grid>
+            </Paper>
         </Container>
     );
 }
@@ -317,6 +369,20 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
             ) : (
                 props.content
             )}
+        </Grid>
+    );
+}
+
+function MultilinkRowContent(props: {
+    links?: { title: string; link: string }[];
+}): JSX.Element {
+    return (
+        <Grid item xs={8}>
+            {props.links?.map((e) => (
+                <p key={e.title}>
+                    <a href={e.link}>{e.title}</a>
+                </p>
+            ))}
         </Grid>
     );
 }
