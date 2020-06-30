@@ -1,4 +1,4 @@
-import { Field } from 'formik';
+import { FastField } from 'formik';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
@@ -10,7 +10,7 @@ export default class Source extends React.Component<{}, {}> {
             <Scroll.Element name="source">
                 <fieldset>
                     <legend>Source</legend>
-                    <Field
+                    <FastField
                         label="Source URL"
                         name="sourceUrl"
                         type="text"
