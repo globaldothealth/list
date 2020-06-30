@@ -51,7 +51,7 @@ mongoose
         useUnifiedTopology: true,
         useFindAndModify: false,
     })
-    .then(async () => {
+    .then(() => {
         console.log('Connected to the database');
     })
     .catch((e) => {
