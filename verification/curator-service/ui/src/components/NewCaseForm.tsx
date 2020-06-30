@@ -236,7 +236,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
 
     filterTravel(travel: Travel[]): Travel[] {
         const filteredTravel = cloneDeep(travel);
-        filteredTravel.forEach((travel) => {
+        filteredTravel?.forEach((travel) => {
             delete travel.reactId;
             if (
                 travel.dateRange.start === null &&
