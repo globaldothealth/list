@@ -87,7 +87,7 @@ function dateRange(range?: { start: string; end: string }): string {
     }
     return range.start === range.end
         ? `${range.start}`
-        : `${range.start}-${range.end}`;
+        : `${range.start} - ${range.end}`;
 }
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
