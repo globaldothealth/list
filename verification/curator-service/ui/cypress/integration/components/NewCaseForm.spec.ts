@@ -118,6 +118,10 @@ describe('New case form', function () {
             'test sequence name',
         );
         cy.get('input[name="genomeSequences[0].sequenceLength"]').type('33000');
+        cy.get('div[data-testid="pathogens"]').type('Bartonella');
+        cy.get('li').first().should('contain', 'Bartonella').click();
+        cy.get('div[data-testid="pathogens"]').type('Ebola');
+        cy.get('li').first().should('contain', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -139,6 +143,7 @@ describe('New case form', function () {
         cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('Germany, United Kingdom');
+        cy.contains('Bartonella, Ebola');
         cy.contains('test notes');
         cy.contains('on new line');
         cy.contains('superuser@');
