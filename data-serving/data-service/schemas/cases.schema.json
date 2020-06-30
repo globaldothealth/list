@@ -54,8 +54,7 @@
             "enum": [
               "Male",
               "Female",
-              "Other",
-              "Unknown"
+              "Other"
             ]
           },
           "profession": {
@@ -97,9 +96,6 @@
             },
             "sequenceLength": {
               "bsonType": "int"
-            },
-            "notes": {
-              "bsonType": "string"
             }
           }
         }
@@ -215,8 +211,7 @@
             "enum": [
               "Asymptomatic",
               "Presymptomatic",
-              "Symptomatic",
-              "Unknown"
+              "Symptomatic"
             ]
           }
         }
@@ -238,8 +233,7 @@
           "status": {
             "enum": [
               "Yes",
-              "No",
-              "Unknown"
+              "No"
             ]
           }
         }
@@ -250,9 +244,6 @@
         "properties": {
           "_id": {
             "bsonType": "objectId"
-          },
-          "numLocations": {
-            "bsonType": "int"
           },
           "travel": {
             "bsonType": "array",
@@ -343,8 +334,7 @@
                     "Business",
                     "Leisure",
                     "Family",
-                    "Other",
-                    "Unknown"
+                    "Other"
                   ]
                 },
                 "methods": {
@@ -358,8 +348,7 @@
                       "Ferry",
                       "Plane",
                       "Train",
-                      "Other",
-                      "Unknown"
+                      "Other"
                     ]
                   }
                 }
@@ -436,8 +425,7 @@
                 "Vertical",
                 "Iatrogenic",
                 "Vector borne",
-                "Other",
-                "Unknown"
+                "Other"
               ]
             }
           },
