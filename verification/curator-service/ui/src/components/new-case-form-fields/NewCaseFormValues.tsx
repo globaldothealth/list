@@ -49,5 +49,4 @@ interface GenomeSequence {
     sequenceId?: string;
     sequenceName?: string;
     sequenceLength?: number;
-    notes?: string;
 }

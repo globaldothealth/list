@@ -4,6 +4,12 @@
         "sourceId": "sourceId",
         "sourceEntryId": "entryId"
     },
+    "sources": [
+        {
+            "id": "def456",
+            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+        }
+    ],
     "demographics": {
         "ageRange": {
             "start": 50.0,
@@ -20,8 +26,7 @@
             "repositoryUrl": "https://www.ncbi.nlm.nih.gov/nuccore/NC_045512",
             "sequenceId": "NC_045512.2",
             "sequenceName": "Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome",
-            "sequenceLength": 33000,
-            "notes": "The reference sequence is identical to MN908947."
+            "sequenceLength": 33000
         }
     ],
     "location": {
@@ -111,12 +116,6 @@
         ],
         "traveledPrior30Days": true
     },
-    "sources": [
-        {
-            "id": "def456",
-            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
-        }
-    ],
     "pathogens": [
         {
             "name": "COVID-19",
