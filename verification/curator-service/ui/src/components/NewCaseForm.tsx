@@ -388,6 +388,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         <nav className={classes.tableOfContents}>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('source')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sourceUrl?.trim() !== '',
+                                    hasError: hasErrors(
+                                        ['sourceUrl'],
+                                        errors,
+                                        touched,
+                                    ),
+                                })}
+                                Source
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void =>
                                     this.scrollTo('demographics')
                                 }
@@ -547,20 +561,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('source')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.sourceUrl?.trim() !== '',
-                                    hasError: hasErrors(
-                                        ['sourceUrl'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Source
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('notes')}
                             >
                                 {this.tableOfContentsIcon({
@@ -576,6 +576,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
+                                <div className={classes.formSection}>
+                                    <Source></Source>
+                                </div>
                                 <div className={classes.formSection}>
                                     <Demographics></Demographics>
                                 </div>
@@ -596,9 +599,6 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 </div>
                                 <div className={classes.formSection}>
                                     <GenomeSequences></GenomeSequences>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Source></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Notes></Notes>
