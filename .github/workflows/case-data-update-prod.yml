@@ -14,7 +14,7 @@ on:
     - cron: "0 5 * * *"
 
 jobs:
-  # NOTE: This job should bee kept in sync with the dev version.
+  # NOTE: This job should be kept in sync with the dev version.
   update-case-data-prod:
     runs-on: ubuntu-latest
 
