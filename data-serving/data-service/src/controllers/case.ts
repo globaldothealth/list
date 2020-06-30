@@ -139,7 +139,11 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
             'caseReference.sourceEntryId':
                 req.body.caseReference?.sourceEntryId,
         });
-        if (c) {
+        if (
+            req.body.caseReference?.sourceId &&
+            req.body.caseReference?.sourceEntryId &&
+            c
+        ) {
             c.set(req.body);
             const result = await c.save();
             res.status(200).json(result);
