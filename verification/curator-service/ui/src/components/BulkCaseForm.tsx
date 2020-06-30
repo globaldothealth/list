@@ -62,6 +62,7 @@ class BulkCaseForm extends React.Component<
                     caseReference: {
                         sourceId: c['sourceId'],
                         sourceEntryId: c['sourceEntryId'],
+                        sourceUrl:  c['url'],
                     },
                     demographics: {
                         sex: c['sex'],
@@ -90,11 +91,6 @@ class BulkCaseForm extends React.Component<
                                 start: c['dateConfirmedStart'],
                                 end: c['dateConfirmedEnd'],
                             },
-                        },
-                    ],
-                    sources: [
-                        {
-                            url: c['url'],
                         },
                     ],
                     revisionMetadata: {

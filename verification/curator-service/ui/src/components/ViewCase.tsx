@@ -111,11 +111,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                     <RowHeader title="Data source link" />
                     <RowContent
-                        content={
-                            props.c.sources.length > 0
-                                ? props.c.sources[0].url
-                                : ''
-                        }
+                        content={props.c.caseReference.sourceUrl}
                         isLink
                     />
 

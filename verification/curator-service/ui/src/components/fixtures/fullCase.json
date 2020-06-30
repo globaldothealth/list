@@ -2,7 +2,16 @@
     "_id": "5ef8e943dfe6e00030892d58",
     "caseReference": {
         "sourceId": "sourceId",
-        "sourceEntryId": "entryId"
+        "sourceEntryId": "entryId",
+        "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
     },
     "sources": [
         {

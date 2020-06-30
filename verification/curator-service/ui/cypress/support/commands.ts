@@ -34,6 +34,10 @@ export function addCase(opts: {
         method: 'POST',
         url: '/api/cases',
         body: {
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             demographics: {
                 nationalities: opts.nationalities,
             },
@@ -55,11 +59,6 @@ export function addCase(opts: {
                 },
             ],
             notes: opts.notes,
-            sources: [
-                {
-                    url: opts.sourceUrl,
-                },
-            ],
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {

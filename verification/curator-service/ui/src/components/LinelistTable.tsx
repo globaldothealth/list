@@ -48,7 +48,6 @@ interface TableRow {
     // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
     transmissionLinkedCaseIds: string;
     travelHistory: TravelHistory;
-    // sources
     sourceUrl: string | null;
     notes: string;
     curatedBy: string;
@@ -253,11 +252,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             ),
                                             travelHistory: c.travelHistory,
                                             notes: c.notes,
-                                            sourceUrl:
-                                                c.sources &&
-                                                c.sources.length > 0
-                                                    ? c.sources[0].url
-                                                    : null,
+                                            sourceUrl: c.caseReference.sourceUrl,
                                             curatedBy:
                                                 c.revisionMetadata
                                                     ?.creationMetadata
