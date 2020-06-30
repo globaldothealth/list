@@ -43,6 +43,37 @@ interface BulkCaseFormValues {
     file: File | null;
 }
 
+/**
+ * Flattened case representation.
+ *
+ * Composed of fields present in the standardized manual upload CSV. Comments
+ * denote sections of the canonical case object to which fields correspond,
+ * where applicable.
+ */
+interface ParsedCase {
+    // CaseReference
+    sourceId: string;
+    sourceEntryId?: string;
+    sourceUrl: string;
+
+    // Demographics
+    sex?: string;
+    ageRangeStart?: Date;
+    ageRangeEnd?: Date;
+
+    // Events
+    dateConfirmed: Date;
+
+    // Location
+    country: string;
+    admin1?: string;
+    admin2?: string;
+    admin3?: string;
+    latitude?: string;
+    longitude?: string;
+    locationName?: string;
+}
+
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
@@ -53,48 +84,65 @@ class BulkCaseForm extends React.Component<
             statusMessage: '',
         };
     }
+
+    createGeoResolution(c: ParsedCase): string {
+        if (c.admin3) {
+            return 'Admin3';
+        } else if (c.admin2) {
+            return 'Admin2';
+        } else if (c.admin1) {
+            return 'Admin1';
+        } else {
+            return 'Country';
+        }
+    }
+
+    createLocationQuery(c: any): string {
+        return [c.admin3, c.admin2, c.admin1, c.country]
+            .filter((field) => field)
+            .join(', ');
+    }
+
     // Using a generic type for now; will define case record later.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async uploadData(results: ParseResult<Record<string, any>>): Promise<void> {
+    async uploadData(results: ParseResult<ParsedCase>): Promise<void> {
         for (const c of results.data) {
             try {
+                const geoResolution = this.createGeoResolution(c);
+                const locationQuery = this.createLocationQuery(c);
                 await axios.put('/api/cases', {
                     caseReference: {
-                        sourceId: c['sourceId'],
-                        sourceEntryId: c['sourceEntryId'],
+                        sourceId: c.sourceId,
+                        sourceEntryId: c.sourceEntryId,
+                        sourceUrl: c.sourceUrl,
                     },
                     demographics: {
-                        sex: c['sex'],
+                        sex: c.sex,
                         ageRange: {
-                            start: c['ageRangeStart'],
-                            end: c['ageRangeEnd'],
+                            start: c.ageRangeStart,
+                            end: c.ageRangeEnd,
                         },
                     },
                     location: {
-                        country: c['country'],
-                        administrativeAreaLevel1: c['administrativeAreaLevel1'],
-                        administrativeAreaLevel2: c['administrativeAreaLevel2'],
-                        administrativeAreaLevel3: c['administrativeAreaLevel3'],
-                        query: c['locationQuery'],
+                        country: c.country,
+                        admin1: c.admin1,
+                        admin2: c.admin2,
+                        admin3: c.admin3,
+                        query: locationQuery,
                         geometry: {
-                            latitude: c['latitude'],
-                            longitude: c['longitude'],
+                            latitude: c.latitude,
+                            longitude: c.longitude,
                         },
-                        geoResolution: c['geoResolution'],
-                        name: c['locationName'],
+                        geoResolution: geoResolution,
+                        name: c.locationName,
                     },
                     events: [
                         {
                             name: 'confirmed',
                             dateRange: {
-                                start: c['dateConfirmedStart'],
-                                end: c['dateConfirmedEnd'],
+                                start: c.dateConfirmed,
+                                end: c.dateConfirmed,
                             },
-                        },
-                    ],
-                    sources: [
-                        {
-                            url: c['url'],
                         },
                     ],
                     revisionMetadata: {
@@ -104,6 +152,11 @@ class BulkCaseForm extends React.Component<
                             date: new Date().toISOString(),
                         },
                     },
+                    sources: [
+                        {
+                            url: c.sourceUrl,
+                        },
+                    ],
                 });
                 this.setState({ statusMessage: 'Success!' });
             } catch (e) {
@@ -120,7 +173,7 @@ class BulkCaseForm extends React.Component<
 
     async submitCases(values: BulkCaseFormValues): Promise<void> {
         if (values.file) {
-            const papaparseOptions: ParseConfig<Record<string, any>> = {
+            const papaparseOptions: ParseConfig<ParsedCase> = {
                 complete: (results) => {
                     this.uploadData(results);
                 },
