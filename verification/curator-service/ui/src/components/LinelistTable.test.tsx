@@ -32,6 +32,10 @@ it('loads and displays cases', async () => {
             importedCase: {
                 outcome: 'Recovered',
             },
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             demographics: { ageRange: { start: 1, end: 3 } },
             location: {
                 country: 'France',
@@ -55,11 +59,6 @@ it('loads and displays cases', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
             revisionMetadata: {
                 creationMetadata: {
                     curator: 'foo@bar.com',
@@ -124,6 +123,10 @@ it('API errors are displayed', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -140,11 +143,6 @@ it('API errors are displayed', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosResponse = {
@@ -185,6 +183,10 @@ it('can delete a row', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -201,11 +203,6 @@ it('can delete a row', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
@@ -273,6 +270,10 @@ it('can go to page to edit a row', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -293,11 +294,6 @@ it('can go to page to edit a row', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
@@ -333,6 +329,10 @@ it('can go to page to view a case', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'http://foo.bar',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -353,11 +353,6 @@ it('can go to page to view a case', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
@@ -393,6 +388,10 @@ it('cannot edit data as a reader only', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -413,11 +412,6 @@ it('cannot edit data as a reader only', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {

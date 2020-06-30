@@ -12,7 +12,6 @@ import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
 } from './revision-metadata';
-import { SourceDocument, sourceSchema } from './source';
 import { TransmissionDocument, transmissionSchema } from './transmission';
 import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
@@ -21,7 +20,10 @@ import mongoose from 'mongoose';
 
 const caseSchema = new mongoose.Schema(
     {
-        caseReference: caseReferenceSchema,
+        caseReference: {
+            type: caseReferenceSchema,
+            required: true,
+        },
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
@@ -37,19 +39,11 @@ const caseSchema = new mongoose.Schema(
         location: locationSchema,
         revisionMetadata: {
             type: revisionMetadataSchema,
-            required: 'Must include revision metadata',
+            required: true,
         },
         notes: String,
         pathogens: [pathogenSchema],
         preexistingConditions: dictionarySchema,
-        sources: {
-            type: [sourceSchema],
-            required: true,
-            validate: {
-                validator: (sources: [SourceDocument]) => sources.length > 0,
-                message: 'Must include one or more sources',
-            },
-        },
         symptoms: dictionarySchema,
         transmission: transmissionSchema,
         travelHistory: travelHistorySchema,
@@ -82,7 +76,6 @@ type CaseDocument = mongoose.Document & {
     notes: string;
     pathogens: [PathogenDocument];
     preexistingConditions: DictionaryDocument;
-    sources: [SourceDocument];
     symptoms: DictionaryDocument;
     transmission: TransmissionDocument;
     travelHistory: TravelHistoryDocument;
