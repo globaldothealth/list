@@ -64,6 +64,11 @@ it('loads and displays case', async () => {
     expect(await findByText(/Type 2 diabetes/)).toBeInTheDocument();
     expect(await findByText(/Coronary heart disease/)).toBeInTheDocument();
     expect(await findByText(/Lung cancer/)).toBeInTheDocument();
+    // Transmission.
+    expect(await findByText(/Vector borne/)).toBeInTheDocument();
+    expect(await findByText(/Gym/)).toBeInTheDocument();
+    expect(await findByText(/othercaseid1/)).toBeInTheDocument();
+    expect(await findByText(/othercaseid2/)).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
