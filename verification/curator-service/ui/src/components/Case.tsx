@@ -50,6 +50,7 @@ export interface Transmission {
 }
 
 export interface TravelHistory {
+    traveledPrior30Days?: boolean;
     travel: Travel[];
 }
 
