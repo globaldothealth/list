@@ -17,7 +17,7 @@
         },
         "sex": "Female",
         "profession": "Horse breeder",
-        "nationality": "Swedish",
+        "nationalities": ["Swedish"],
         "ethnicity": "Asian"
     },
     "genomeSequences": [
