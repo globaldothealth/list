@@ -332,6 +332,7 @@ class App extends React.Component<Props, State> {
                                 (item) =>
                                     item.displayCheck() && (
                                         <Link
+                                            key={item.text}
                                             to={item.to}
                                             onClick={this.handleDrawerClose}
                                         >
