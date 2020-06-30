@@ -74,6 +74,8 @@ describe('New case form', function () {
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
+        cy.get('div[data-testid="traveledPrior30Days"]').click();
+        cy.get('li[data-value="Yes"').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[0].location"]').type('Germany');
         cy.get('li').first().should('contain', 'Germany').click();
