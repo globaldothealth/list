@@ -97,7 +97,7 @@ function dateRange(range?: { start: string; end: string }): string {
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Typography className={classes.caseTitle} variant="h5">
                 Case {props.c._id}
             </Typography>
