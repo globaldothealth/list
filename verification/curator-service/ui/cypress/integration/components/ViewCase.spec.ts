@@ -14,7 +14,7 @@ describe('View case', function () {
         cy.contains('Request failed');
     });
 
-    it('can edit a case', function () {
+    it('can view a case', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
