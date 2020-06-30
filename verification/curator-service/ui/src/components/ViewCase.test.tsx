@@ -25,7 +25,21 @@ it('loads and displays case', async () => {
     const { findByText } = render(<ViewCase id="abc123" />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-    expect(await findByText(/Female/)).toBeInTheDocument();
+    // Case data.
+    expect(await findByText(/5ef8e943dfe6e00030892d58/)).toBeInTheDocument();
+    expect(
+        await findByText(
+            'https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19',
+        ),
+    ).toBeInTheDocument();
+    expect(await findByText('abc123')).toBeInTheDocument();
+    expect(await findByText('2020-01-03')).toBeInTheDocument();
+    // Demographics.
+    expect(await findByText('Female')).toBeInTheDocument();
+    expect(await findByText('50-59')).toBeInTheDocument();
+    expect(await findByText('Horse breeder')).toBeInTheDocument();
+    expect(await findByText('Swedish')).toBeInTheDocument();
+    expect(await findByText('Asian')).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {
