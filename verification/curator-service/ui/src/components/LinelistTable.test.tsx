@@ -384,8 +384,8 @@ it('can go to page to view a case', async () => {
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
-    const editButton = getByText(/details/);
-    fireEvent.click(editButton);
+    const detailsButton = getByText(/details/);
+    fireEvent.click(detailsButton);
     expect(history.location.pathname).toBe('/cases/view/abc123');
 });
 
