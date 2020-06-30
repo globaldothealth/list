@@ -99,13 +99,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Sex',
                             field: 'sex',
-                            filtering: false,
                             lookup: { Female: 'Female', Male: 'Male' },
                         },
                         {
                             title: 'Age',
                             field: 'age',
-                            filtering: false,
                             render: (rowData) =>
                                 rowData.age[0] === rowData.age[1]
                                     ? rowData.age[0]
@@ -114,63 +112,51 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Ethnicity',
                             field: 'ethnicity',
-                            filtering: false,
                         },
                         {
                             title: 'Nationality',
                             field: 'nationalities',
-                            filtering: false,
                         },
                         {
                             title: 'Profession',
                             field: 'profession',
-                            filtering: false,
                         },
                         {
                             title: 'Location',
                             field: 'locationName',
-                            filtering: false,
                         },
                         {
                             title: 'Country',
                             field: 'country',
-                            filtering: false,
                         },
                         {
                             title: 'Confirmed date',
                             field: 'confirmedDate',
-                            filtering: false,
                             type: 'date',
                         },
                         {
                             title: 'Confirmation method',
                             field: 'confirmationMethod',
-                            filtering: false,
                         },
                         {
                             title: 'Symptoms',
                             field: 'symptoms',
-                            filtering: false,
                         },
                         {
                             title: 'Routes of transmission',
                             field: 'transmissionRoutes',
-                            filtering: false,
                         },
                         {
                             title: 'Places of transmission',
                             field: 'transmissionPlaces',
-                            filtering: false,
                         },
                         {
                             title: 'Contacted case IDs',
                             field: 'transmissionLinkedCaseIds',
-                            filtering: false,
                         },
                         {
                             title: 'Travel history',
                             field: 'travelHistory',
-                            filtering: false,
                             render: (rowData) =>
                                 rowData.travelHistory?.travel
                                     ?.map(
@@ -183,7 +169,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                            filtering: false,
                         },
                         {
                             title: 'Curated by',
@@ -197,15 +182,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            listUrl += '&filter=';
-                            // TODO: Map field to their real full.path.notation here to support nested searches.
-                            // Or Maybe just look at full text indexes instead of per-field filter.
-                            listUrl += query.filters
-                                .map(
-                                    (filter) =>
-                                        `${filter.column.field}:${filter.value}`,
-                                )
-                                .join(',');
+                            const trimmedQ = query.search.trim();
+                            // TODO: We should probably use lodash.throttle on searches.
+                            if (trimmedQ) {
+                                listUrl +=
+                                    '&q=' + encodeURIComponent(query.search);
+                            }
                             this.setState({ error: '' });
                             const response = axios.get<ListResponse>(listUrl);
                             response
@@ -291,10 +273,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     }
                     title="COVID-19 cases"
                     options={{
-                        // TODO: Create text indexes and support search queries.
-                        // https://docs.mongodb.com/manual/text-search/
-                        search: false,
-                        filtering: true,
+                        search: true,
+                        filtering: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
@@ -302,29 +282,39 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         actionsColumnIndex: -1,
                     }}
-                    actions={
-                        this.props.user.roles.includes('curator')
-                            ? [
-                                  {
-                                      icon: 'add',
-                                      tooltip: 'Submit new case',
-                                      isFreeAction: true,
-                                      onClick: (): void => {
-                                          history.push('/cases/new');
-                                      },
+                    actions={(this.props.user.roles.includes('curator')
+                        ? [
+                              {
+                                  icon: 'add',
+                                  tooltip: 'Submit new case',
+                                  isFreeAction: true,
+                                  onClick: (): void => {
+                                      history.push('/cases/new');
                                   },
-                                  {
-                                      icon: 'edit',
-                                      tooltip: 'Edit this case',
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/edit/${id}`);
-                                      },
+                              },
+                              {
+                                  icon: 'edit',
+                                  tooltip: 'Edit this case',
+                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                  onClick: (_: any, row: any): void => {
+                                      // Somehow the templating system doesn't think row has an id property but it has.
+                                      const id = (row as TableRow).id;
+                                      history.push(`/cases/edit/${id}`);
                                   },
-                              ]
-                            : undefined
-                    }
+                              },
+                          ]
+                        : []
+                    ).concat([
+                        {
+                            icon: 'details',
+                            tooltip: 'View this case details',
+                            onClick: (e, row): void => {
+                                // Somehow the templating system doesn't think row has an id property but it has.
+                                const id = (row as TableRow).id;
+                                history.push(`/cases/view/${id}`);
+                            },
+                        },
+                    ])}
                     editable={
                         this.props.user.roles.includes('curator')
                             ? {

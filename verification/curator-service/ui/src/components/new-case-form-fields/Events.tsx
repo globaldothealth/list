@@ -1,4 +1,4 @@
-import { DateField, SelectField } from './FormikFields';
+import { DateField, SelectField } from '../common-form-fields/FormikFields';
 
 import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';

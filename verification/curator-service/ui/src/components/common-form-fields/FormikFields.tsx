@@ -1,4 +1,4 @@
-import { Field, useFormikContext } from 'formik';
+import { FastField, Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
 import DateFnsUtils from '@date-io/date-fns';
@@ -8,12 +8,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import NewCaseFormValues from './NewCaseFormValues';
+import NewCaseFormValues from '../new-case-form-fields/NewCaseFormValues';
 import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
-import { hasKey } from './../Utils';
+import { hasKey } from '../Utils';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
@@ -101,6 +101,7 @@ export function FormikAutocomplete(
             onBlur={(): void => setTouched({ [props.name]: true })}
             defaultValue={props.initialValue}
             renderInput={(params): JSX.Element => (
+                // Do not use FastField here
                 <Field
                     {...params}
                     // Setting the name properly allows any typed value
@@ -131,7 +132,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                 {props.label}
                 {props.required && ' *'}
             </InputLabel>
-            <Field
+            <FastField
                 as="select"
                 name={props.name}
                 type="text"
@@ -144,7 +145,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                         {value ?? 'Unknown'}
                     </MenuItem>
                 ))}
-            </Field>
+            </FastField>
             {props.required && (
                 <RequiredHelperText name={props.name}></RequiredHelperText>
             )}
@@ -163,7 +164,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
     return (
         <div className={classes.fieldRow}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Field
+                <FastField
                     className={classes.field}
                     name={props.name}
                     label={props.label}

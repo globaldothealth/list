@@ -9,17 +9,13 @@ import {
 import { Link, Route, Switch } from 'react-router-dom';
 
 import Add from '@material-ui/icons/Add';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import BulkCaseForm from './BulkCaseForm';
+import Charts from './Charts';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import CompletenessCharts from './CompletenessCharts';
-import CumulativeCharts from './CumulativeCharts';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
-import FreshnessCharts from './FreshnessCharts';
 import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
@@ -41,6 +37,7 @@ import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
 import Users from './Users';
+import ViewCase from './ViewCase';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
@@ -112,6 +109,7 @@ const styles = () =>
                 duration: theme.transitions.duration.leavingScreen,
             }),
             marginLeft: -drawerWidth,
+            width: '100%',
         },
         contentShift: {
             transition: theme.transitions.create('margin', {
@@ -296,21 +294,9 @@ class App extends React.Component<Props, State> {
                                     divider: true,
                                 },
                                 {
-                                    text: 'Cumulative charts',
-                                    icon: <BarChartIcon />,
-                                    to: '/charts/cumulative',
-                                    displayCheck: (): boolean => true,
-                                },
-                                {
-                                    text: 'Freshness charts',
-                                    icon: <BubbleChartIcon />,
-                                    to: '/charts/freshness',
-                                    displayCheck: (): boolean => true,
-                                },
-                                {
-                                    text: 'Completeness charts',
+                                    text: 'Charts',
                                     icon: <ShowChartIcon />,
-                                    to: '/charts/completeness',
+                                    to: '/charts',
                                     displayCheck: (): boolean => true,
                                     divider: true,
                                 },
@@ -332,6 +318,7 @@ class App extends React.Component<Props, State> {
                                 (item) =>
                                     item.displayCheck() && (
                                         <Link
+                                            key={item.text}
                                             to={item.to}
                                             onClick={this.handleDrawerClose}
                                         >
@@ -374,6 +361,16 @@ class App extends React.Component<Props, State> {
                                 />
                             )}
                             {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route
+                                    path="/cases/view/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <ViewCase id={match.params.id} />
+                                        );
+                                    }}
+                                />
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
                                 </Route>
@@ -393,14 +390,8 @@ class App extends React.Component<Props, State> {
                                     <SourceTable />
                                 </Route>
                             )}
-                            <Route path="/charts/cumulative">
-                                <CumulativeCharts />
-                            </Route>
-                            <Route path="/charts/freshness">
-                                <FreshnessCharts />
-                            </Route>
-                            <Route path="/charts/completeness">
-                                <CompletenessCharts />
+                            <Route path="/charts">
+                                <Charts />
                             </Route>
                             {this.state.user.email && (
                                 <Route path="/profile">
