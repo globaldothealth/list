@@ -58,10 +58,17 @@ export default function Events(): JSX.Element {
                         label="Hospital admission date"
                     ></DateField>
                 )}
-                <DateField
-                    name="icuAdmissionDate"
-                    label="ICU admission date"
-                ></DateField>
+                <SelectField
+                    name="admittedToIcu"
+                    label="ICU admission"
+                    values={yesNoUndefined}
+                ></SelectField>
+                {values.admittedToIcu === 'Yes' && (
+                    <DateField
+                        name="icuAdmissionDate"
+                        label="ICU admission date"
+                    ></DateField>
+                )}
                 <SelectField
                     name="outcome"
                     label="Outcome"
