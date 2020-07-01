@@ -67,8 +67,8 @@ it('loads and displays case', async () => {
     // Transmission.
     expect(await findByText(/Vector borne/)).toBeInTheDocument();
     expect(await findByText(/Gym/)).toBeInTheDocument();
-    expect(await findByText(/othercaseid1/)).toBeInTheDocument();
-    expect(await findByText(/othercaseid2/)).toBeInTheDocument();
+    expect(await findByText(/bbf8e943dfe6e00030892dcc/)).toBeInTheDocument();
+    expect(await findByText(/aaf8e943dfe6e00030892dee/)).toBeInTheDocument();
     // Travel history.
     expect(await findByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
     expect(await findByText('United States')).toBeInTheDocument();
