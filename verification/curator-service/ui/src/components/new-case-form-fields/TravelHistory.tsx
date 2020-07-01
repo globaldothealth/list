@@ -8,8 +8,8 @@ import { FieldArray, useFormikContext } from 'formik';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
+import CaseFormValues from './CaseFormValues';
 import Location from './Location';
-import NewCaseFormValues from './NewCaseFormValues';
 import { PlacesAutocomplete } from './LocationForm';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -45,7 +45,7 @@ const travelMethods = [
 ];
 
 export default function Events(): JSX.Element {
-    const { values, initialValues } = useFormikContext<NewCaseFormValues>();
+    const { values, initialValues } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="travelHistory">

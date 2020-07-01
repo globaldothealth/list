@@ -1,11 +1,11 @@
 import { FastField, useFormikContext } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 
+import CaseFormValues from './CaseFormValues';
 import FormControl from '@material-ui/core/FormControl';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -49,7 +49,7 @@ const ethnicityValues = [
 
 function Demographics(props: DemographicsProps): JSX.Element {
     const { classes } = props;
-    const { initialValues } = useFormikContext<NewCaseFormValues>();
+    const { initialValues } = useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="demographics">
             <fieldset>

@@ -1,6 +1,7 @@
 import { FastField, Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
+import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
 import { FormHelperText } from '@material-ui/core';
@@ -8,7 +9,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import NewCaseFormValues from '../new-case-form-fields/NewCaseFormValues';
 import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
@@ -45,7 +45,7 @@ export function FormikAutocomplete(
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
     const { setFieldValue, setTouched, initialValues } = useFormikContext<
-        NewCaseFormValues
+        CaseFormValues
     >();
 
     React.useEffect(() => {
@@ -194,7 +194,7 @@ interface RequiredHelperTextProps {
 export function RequiredHelperText(
     props: RequiredHelperTextProps,
 ): JSX.Element {
-    const { values, touched } = useFormikContext<NewCaseFormValues>();
+    const { values, touched } = useFormikContext<CaseFormValues>();
     return (
         <div>
             {hasKey(touched, props.name) &&

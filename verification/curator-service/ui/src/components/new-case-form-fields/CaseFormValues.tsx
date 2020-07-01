@@ -1,6 +1,6 @@
 import { Location as Loc } from '../Case';
 
-export default interface NewCaseFormValues {
+export default interface CaseFormValues {
     sex?: string;
     minAge?: number;
     maxAge?: number;

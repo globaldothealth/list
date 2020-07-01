@@ -148,6 +148,26 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         }
                     />
 
+                    {props.c.revisionMetadata?.updateMetadata && (
+                        <>
+                            <RowHeader title="Date of edit" />
+                            <RowContent
+                                content={
+                                    props.c.revisionMetadata?.updateMetadata
+                                        ?.date || ''
+                                }
+                            />
+
+                            <RowHeader title="Edited by" />
+                            <RowContent
+                                content={
+                                    props.c.revisionMetadata?.updateMetadata
+                                        ?.curator || ''
+                                }
+                            />
+                        </>
+                    )}
+
                     <RowHeader title="Notes" />
                     <RowContent content={props.c.notes} />
                 </Grid>

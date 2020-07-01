@@ -1,6 +1,6 @@
 import { fireEvent, render, wait } from '@testing-library/react';
 
-import NewCaseForm from './NewCaseForm';
+import CaseForm from './CaseForm';
 import React from 'react';
 
 const user = {
@@ -11,7 +11,7 @@ const user = {
 };
 
 it('renders form', () => {
-    const { getByText, getAllByText } = render(<NewCaseForm user={user} />);
+    const { getByText, getAllByText } = render(<CaseForm user={user} />);
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
     expect(getAllByText(/Location/i)).toHaveLength(4);
@@ -21,7 +21,7 @@ it('renders form', () => {
 });
 
 it('can add and remove genome sequencing sections', async () => {
-    const { queryByTestId, getByText } = render(<NewCaseForm user={user} />);
+    const { queryByTestId, getByText } = render(<CaseForm user={user} />);
 
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
     await wait(() => {
