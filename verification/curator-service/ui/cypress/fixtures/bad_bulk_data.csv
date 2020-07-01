@@ -1,2 +1,2 @@
-sourceId,sourceEntryId,sex,ageRangeStart,ageRangeEnd,country,locationQuery,latitude,longitude,geoResolution,locationName,dateConfirmedStart,dateConfirmedEnd,url
-abc,def,InvalidSex,42,42,Canada,Canada,42,84,Country,Canada,06/23/2020,06/23/2020,foo.bar
+sourceId,sourceEntryId,sourceUrl,sex,ageRangeStart,ageRangeEnd,country,admin1,admin2,admin3,dateConfirmed,hospitalized,dateHospitalized,outcome,dateOutcome,caseCount
+abc,def,foo.bar,InvalidSex,42,42,Canada,Alberta,,Banff,06/23/2020,true,,,,

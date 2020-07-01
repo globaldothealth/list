@@ -86,8 +86,8 @@ function ageRange(range?: { start: number; end: number }): string {
         : `${range.start}-${range.end}`;
 }
 
-function dateRange(range?: { start: string; end: string }): string {
-    if (!range) {
+function dateRange(range?: { start?: string; end?: string }): string {
+    if (!range || !range.start || !range.end) {
         return '';
     }
     return range.start === range.end
@@ -503,8 +503,8 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
             {props.isLink && props.content ? (
                 <a href={props.content}>{props.content}</a>
             ) : (
-                props.content
-            )}
+                    props.content
+                )}
         </Grid>
     );
 }
