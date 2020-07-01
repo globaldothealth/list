@@ -187,11 +187,6 @@ class BulkCaseForm extends React.Component<
                     date: new Date().toISOString(),
                 },
             },
-            sources: [
-                {
-                    url: c.sourceUrl,
-                },
-            ],
         });
     }
 
