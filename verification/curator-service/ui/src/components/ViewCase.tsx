@@ -9,6 +9,7 @@ import {
 
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
+import StaticMap from './StaticMap';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
@@ -423,7 +424,8 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
             <RowContent
                 content={`${props.loc?.geometry?.longitude?.toFixed(4)}`}
             />
-            {/* TODO: A static map would be nice here. */}
+            <RowHeader title="Map" />
+            <MapRow location={props.loc} />
         </>
     );
 }
@@ -442,6 +444,14 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
 
             <LocationRows loc={props.travel.location} />
         </>
+    );
+}
+
+function MapRow(props: { location?: Location }): JSX.Element {
+    return (
+        <Grid item xs={8}>
+            {props.location && <StaticMap location={props.location} />}
+        </Grid>
     );
 }
 
