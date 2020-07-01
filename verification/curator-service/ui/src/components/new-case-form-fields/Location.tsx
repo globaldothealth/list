@@ -1,4 +1,4 @@
-import { Container, Divider, Typography, withStyles } from '@material-ui/core';
+import { Divider, Typography, withStyles } from '@material-ui/core';
 
 import { Location as Loc } from '../Case';
 import React from 'react';
@@ -14,12 +14,11 @@ const styles = () =>
         column: {
             marginRight: '1em',
         },
-        iframe: {
-            border: 'none',
-            display: 'inline-block',
+        mapContainer: {
+            textAlign: 'center',
         },
         map: {
-            textAlign: 'center',
+            marginTop: '1em',
         },
     });
 
@@ -103,13 +102,13 @@ class Location extends React.Component<Props, {}> {
                     </div>
                 </div>
                 {this.props.location?.geometry !== undefined && (
-                    <div className={classes.map}>
+                    <div className={classes.mapContainer}>
                         <Divider variant="middle" />
-                        <iframe
-                            className={classes.iframe}
-                            title="map"
-                            src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/${this.props.location?.geometry?.longitude},${this.props.location?.geometry?.latitude},5,0/300x200?access_token=${process.env.REACT_MAPBOX_TOKEN}`}
-                        ></iframe>
+                        <img
+                            className={classes.map}
+                            alt="map"
+                            src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/${this.props.location?.geometry?.longitude},${this.props.location?.geometry?.latitude},5,0/300x200?access_token=${process.env.REACT_APP_PUBLIC_MAPBOX_TOKEN}`}
+                        ></img>
                     </div>
                 )}
             </>

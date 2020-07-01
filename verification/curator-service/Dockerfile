@@ -30,6 +30,8 @@ RUN npm ci
 COPY verification/curator-service/ui/. .
 # Build the app.
 ENV REACT_APP_LOGIN_URL /auth/google
+# Set the public (but restricted to our domain) mapbox token.
+ENV REACT_APP_PUBLIC_MAPBOX_TOKEN ""
 RUN npm run build
 
 
