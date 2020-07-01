@@ -2,13 +2,11 @@ import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
-import {
-    GenomeSequence,
-    Travel,
-} from './new-case-form-fields/NewCaseFormValues';
+import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import { Case } from './Case';
+import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -16,7 +14,6 @@ import Events from './new-case-form-fields/Events';
 import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
-import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
 import Notes from './new-case-form-fields/Notes';
 import Pathogens from './new-case-form-fields/Pathogens';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
@@ -56,7 +53,7 @@ const styles = () =>
         },
     });
 
-function initialValuesFromCase(c?: Case): NewCaseFormValues {
+function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
             sex: undefined,
@@ -162,7 +159,7 @@ interface Props extends WithStyles<typeof styles> {
     initialCase?: Case;
 }
 
-interface NewCaseFormState {
+interface CaseFormState {
     errorMessage: string;
 }
 
@@ -229,7 +226,7 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
-class NewCaseForm extends React.Component<Props, NewCaseFormState> {
+class CaseForm extends React.Component<Props, CaseFormState> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -265,7 +262,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         return filteredGenomeSequences;
     }
 
-    async submitCase(values: NewCaseFormValues): Promise<void> {
+    async submitCase(values: CaseFormValues): Promise<void> {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
@@ -360,13 +357,25 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             genomeSequences: this.filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
             notes: values.notes,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: this.props.user.email,
-                    date: new Date().toISOString(),
-                },
-            },
+            revisionMetadata: this.props.initialCase
+                ? {
+                      revisionNumber:
+                          this.props.initialCase.revisionMetadata
+                              .revisionNumber + 1,
+                      creationMetadata: this.props.initialCase.revisionMetadata
+                          .creationMetadata,
+                      updateMetadata: {
+                          curator: this.props.user.email,
+                          date: new Date().toISOString(),
+                      },
+                  }
+                : {
+                      revisionNumber: 0,
+                      creationMetadata: {
+                          curator: this.props.user.email,
+                          date: new Date().toISOString(),
+                      },
+                  },
         };
         try {
             // Update or create depending on the presence of the initial case ID.
@@ -710,4 +719,4 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 }
 
-export default withStyles(styles)(NewCaseForm);
+export default withStyles(styles)(CaseForm);

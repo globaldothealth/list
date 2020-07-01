@@ -3,8 +3,8 @@ import { FastField, FieldArray, useFormikContext } from 'formik';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
+import CaseFormValues from './CaseFormValues';
 import { DateField } from '../common-form-fields/FormikFields';
-import NewCaseFormValues from './NewCaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function GenomeSequences(): JSX.Element {
-    const { values } = useFormikContext<NewCaseFormValues>();
+    const { values } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="genomeSequences">

@@ -96,7 +96,9 @@ interface Revision {
 }
 
 interface RevisionMetadata {
+    revisionNumber: number;
     creationMetadata: Revision;
+    updateMetadata?: Revision;
 }
 
 export interface Case {

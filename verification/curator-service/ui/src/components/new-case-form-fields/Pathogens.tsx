@@ -1,7 +1,7 @@
 import { Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
-import NewCaseFormValues from './NewCaseFormValues';
+import CaseFormValues from './CaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -26,7 +26,7 @@ export function PathogensAutocomplete(): JSX.Element {
     );
     const loading = open && options.keys.length === 0;
     const { setFieldValue, setTouched, initialValues } = useFormikContext<
-        NewCaseFormValues
+        CaseFormValues
     >();
 
     React.useEffect(() => {
