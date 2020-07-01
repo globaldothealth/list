@@ -91,7 +91,7 @@ export function PathogensAutocomplete(): JSX.Element {
                 );
             }}
             onBlur={(): void => setTouched({ pathogens: true } as any)}
-            defaultValue={initialValues.pathogens.map(
+            defaultValue={initialValues.pathogens?.map(
                 (pathogen) => pathogen.name,
             )}
             renderInput={(params): JSX.Element => (
