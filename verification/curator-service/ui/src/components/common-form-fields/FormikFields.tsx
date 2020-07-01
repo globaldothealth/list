@@ -30,7 +30,8 @@ interface FormikAutocompleteProps {
     name: string;
     label: string;
     multiple: boolean;
-    optionsLocation: string;
+    optionsList?: string[];
+    optionsLocation?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialValue: any;
 }
@@ -55,11 +56,14 @@ export function FormikAutocomplete(
         }
 
         (async (): Promise<void> => {
-            const resp = await axios.get<string>(props.optionsLocation);
-            const retrievedOptions = resp.data.split('\n');
+            let retrievedOptions = props.optionsList;
+            if (!retrievedOptions && props.optionsLocation) {
+                const resp = await axios.get<string>(props.optionsLocation);
+                retrievedOptions = resp.data.split('\n');
+            }
 
             if (active) {
-                setOptions(retrievedOptions);
+                setOptions(retrievedOptions as string[]);
             }
         })();
 
@@ -70,6 +74,7 @@ export function FormikAutocomplete(
         initialValues,
         loading,
         props.name,
+        props.optionsList,
         props.optionsLocation,
         setFieldValue,
         setTouched,

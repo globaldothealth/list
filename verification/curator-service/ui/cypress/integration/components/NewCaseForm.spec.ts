@@ -89,8 +89,10 @@ describe('New case form', function () {
         );
         cy.get('div[data-testid="travelHistory[0].purpose"]').click();
         cy.get('li[data-value="Business"').click();
-        cy.get('div[data-testid="travelHistory[0].method"]').click();
-        cy.get('li[data-value="Car"').click();
+        cy.get('div[data-testid="travelHistory[0].methods"]').type('Car');
+        cy.get('li').first().should('contain', 'Car').click();
+        cy.get('div[data-testid="travelHistory[0].methods"]').type('Plane');
+        cy.get('li').first().should('contain', 'Plane').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type(
             'United Kingdom',
@@ -104,8 +106,8 @@ describe('New case form', function () {
         );
         cy.get('div[data-testid="travelHistory[1].purpose"]').click();
         cy.get('li[data-value="Business"').click();
-        cy.get('div[data-testid="travelHistory[1].method"]').click();
-        cy.get('li[data-value="Car"').click();
+        cy.get('div[data-testid="travelHistory[1].methods"]').type('Bus');
+        cy.get('li').first().should('contain', 'Bus').click();
         cy.get('button[data-testid="addGenomeSequence"').click();
         cy.get('input[name="genomeSequences[0].sampleCollectionDate"]').type(
             '2020-01-01',
