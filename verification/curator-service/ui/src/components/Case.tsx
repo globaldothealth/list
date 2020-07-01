@@ -113,7 +113,7 @@ export interface Case {
     transmission: Transmission;
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
-    pathogens?: Pathogen[];
+    pathogens: Pathogen[];
     notes: string;
     revisionMetadata: RevisionMetadata;
 }
