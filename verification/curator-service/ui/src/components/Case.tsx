@@ -1,13 +1,14 @@
 // Case definitions as returned by the /api/cases endpoint.
 
-
 export interface CaseReference {
     sourceId: string;
     sourceEntryId?: string;
     sourceUrl: string;
-    additionalSources: [{
-        sourceUrl: string;
-    }]
+    additionalSources: [
+        {
+            sourceUrl: string;
+        },
+    ];
 }
 
 export interface Event {
@@ -72,7 +73,7 @@ export interface Travel {
         end: string;
     };
     purpose?: string;
-    method?: string;
+    methods?: string[];
 }
 
 interface GenomeSequence {
@@ -82,6 +83,11 @@ interface GenomeSequence {
     sequenceName?: string;
     sequenceLength?: number;
     notes?: string;
+}
+
+export interface Pathogen {
+    name: string;
+    id: number;
 }
 
 interface Revision {
@@ -107,6 +113,7 @@ export interface Case {
     transmission: Transmission;
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
+    pathogens: Pathogen[];
     notes: string;
     revisionMetadata: RevisionMetadata;
 }

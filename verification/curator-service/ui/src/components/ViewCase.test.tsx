@@ -34,6 +34,9 @@ it('loads and displays case', async () => {
     ).toBeInTheDocument();
     expect(await findByText('abc123')).toBeInTheDocument();
     expect(await findByText('2020-01-20')).toBeInTheDocument();
+    expect(
+        await findByText('Contact of a confirmed case at work.'),
+    ).toBeInTheDocument();
     // Demographics.
     expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('50-59')).toBeInTheDocument();
@@ -67,8 +70,20 @@ it('loads and displays case', async () => {
     // Transmission.
     expect(await findByText(/Vector borne/)).toBeInTheDocument();
     expect(await findByText(/Gym/)).toBeInTheDocument();
-    expect(await findByText(/othercaseid1/)).toBeInTheDocument();
-    expect(await findByText(/othercaseid2/)).toBeInTheDocument();
+    expect(await findByText(/bbf8e943dfe6e00030892dcc/)).toBeInTheDocument();
+    expect(await findByText(/aaf8e943dfe6e00030892dee/)).toBeInTheDocument();
+    // Travel history.
+    expect(await findByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
+    expect(await findByText('United States')).toBeInTheDocument();
+    expect(await findByText('New York')).toBeInTheDocument();
+    expect(await findByText('Kings County')).toBeInTheDocument();
+    expect(await findByText('Brooklyn')).toBeInTheDocument();
+    expect(await findByText('Kings Hospital Center')).toBeInTheDocument();
+    expect(await findByText('Point')).toBeInTheDocument();
+    expect(await findByText(/40.68/)).toBeInTheDocument();
+    expect(await findByText(/73.97/)).toBeInTheDocument();
+    expect(await findByText('Plane')).toBeInTheDocument();
+    expect(await findByText('Family')).toBeInTheDocument();
 });
 
 it('displays API errors', async () => {

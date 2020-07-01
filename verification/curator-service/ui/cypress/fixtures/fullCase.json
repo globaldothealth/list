@@ -103,16 +103,16 @@
         "travel": [
             {
                 "dateRange": {
-                    "start": "2020-02-10",
-                    "end": "2020-02-17"
+                    "start": "2020-01-10",
+                    "end": "2020-01-17"
                 },
                 "location": {
                     "country": "United States",
                     "administrativeAreaLevel1": "New York",
                     "administrativeAreaLevel2": "Kings County",
                     "administrativeAreaLevel3": "Brooklyn",
-                    "place": "Kings Hospital Center",
-                    "name": "Kings Hospital Center",
+                    "place": "Kings County Hospital Center",
+                    "name": "Kings County Hospital Center",
                     "geoResolution": "Point",
                     "geometry": {
                         "latitude": 40.6809611,
@@ -152,7 +152,7 @@
     "transmission": {
         "routes": [ "Vector borne" ],
         "places": [ "Gym" ],
-        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee" ]
+        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee"]
     },
     "importedCase": {}
 }
