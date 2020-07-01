@@ -8,7 +8,7 @@ describe('Bulk upload form', function () {
             admin1: 'Alberta',
             admin3: 'Banff',
             geometry: { latitude: 51.1784, longitude: 115.5708 },
-            name: 'Banff',
+            name: 'Banff, Alberta, Canada',
             geoResolution: 'Admin3',
         });
     });
