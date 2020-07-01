@@ -76,7 +76,7 @@ export interface Travel {
     methods?: string[];
 }
 
-interface GenomeSequence {
+export interface GenomeSequence {
     sampleCollectionDate: string | null;
     repositoryUrl?: string;
     sequenceId?: string;
