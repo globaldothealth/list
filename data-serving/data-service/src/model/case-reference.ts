@@ -1,21 +1,25 @@
 import mongoose from 'mongoose';
 
-export const caseReferenceSchema = new mongoose.Schema({
-    sourceId: {
-        type: String,
-        required: true,
-    },
-    sourceEntryId: String,
-    sourceUrl: {
-        type: String,
-        required: true,
-    },
-    additionalSources: [
-        {
-            sourceUrl: String,
+export const caseReferenceSchema = new mongoose.Schema(
+    {
+        sourceId: {
+            type: String,
+            required: true,
         },
-    ],
-});
+        sourceEntryId: String,
+        sourceUrl: {
+            type: String,
+            required: true,
+        },
+        additionalSources: [
+            {
+                sourceUrl: String,
+                _id: false,
+            },
+        ],
+    },
+    { _id: false },
+);
 
 export type CaseReferenceDocument = mongoose.Document & {
     /** Foreign key to the sources collection. */
