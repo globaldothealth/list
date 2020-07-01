@@ -19,6 +19,4 @@ services:
       # not accessible from the user's browser.
       # In production simply /auth/google would work.
       REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"
-      # Use the same private token as for geocoding in dev.
-      # It doesn't really matter/expose the token publicly when running things locally.
-      REACT_APP_PUBLIC_MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
+      REACT_APP_PUBLIC_MAPBOX_TOKEN: "${REACT_APP_PUBLIC_MAPBOX_TOKEN}"

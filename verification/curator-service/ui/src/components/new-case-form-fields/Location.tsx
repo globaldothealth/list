@@ -2,6 +2,7 @@ import { Divider, Typography, withStyles } from '@material-ui/core';
 
 import { Location as Loc } from '../Case';
 import React from 'react';
+import StaticMap from '../StaticMap';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { createStyles } from '@material-ui/core/styles';
 
@@ -17,8 +18,8 @@ const styles = () =>
         mapContainer: {
             textAlign: 'center',
         },
-        map: {
-            marginTop: '1em',
+        divider: {
+            marginBottom: '1em',
         },
     });
 
@@ -103,12 +104,8 @@ class Location extends React.Component<Props, {}> {
                 </div>
                 {this.props.location?.geometry !== undefined && (
                     <div className={classes.mapContainer}>
-                        <Divider variant="middle" />
-                        <img
-                            className={classes.map}
-                            alt="map"
-                            src={`https://api.mapbox.com/styles/v1/mapbox/light-v10/static/${this.props.location?.geometry?.longitude},${this.props.location?.geometry?.latitude},5,0/300x200?access_token=${process.env.REACT_APP_PUBLIC_MAPBOX_TOKEN}`}
-                        ></img>
+                        <Divider className={classes.divider} variant="middle" />
+                        <StaticMap location={this.props.location}></StaticMap>
                     </div>
                 )}
             </>

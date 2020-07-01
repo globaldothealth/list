@@ -30,8 +30,11 @@ RUN npm ci
 COPY verification/curator-service/ui/. .
 # Build the app.
 ENV REACT_APP_LOGIN_URL /auth/google
-# Set the public (but restricted to our domain) mapbox token.
-ENV REACT_APP_PUBLIC_MAPBOX_TOKEN ""
+# Set the public (but restricted to our domains) mapbox token.
+# A more flexible solution to be able to run that image on other domains would
+# be for the curator service to expose the tokens via an API but this is much
+# simpler for now and again, this is public so fine to be checked-in an image.
+ENV REACT_APP_PUBLIC_MAPBOX_TOKEN "pk.eyJ1IjoiaGVhbHRobWFwIiwiYSI6ImNrYzNjczdmczA3cTQyc3M1bHdndHVjZWsifQ.0qMMMDRA3p1VeBQvXKpfdQ"
 RUN npm run build
 
 
