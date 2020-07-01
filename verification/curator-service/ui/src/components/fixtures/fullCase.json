@@ -97,7 +97,7 @@
             "Coronary heart disease",
             "Lung cancer"
         ],
-        "status": "Yes"
+        "hasPreexistingConditions": true
     },
     "travelHistory": {
         "travel": [
