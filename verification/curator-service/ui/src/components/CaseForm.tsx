@@ -51,6 +51,10 @@ const styles = () =>
         formSection: {
             margin: '2em 0',
         },
+        statusMessage: {
+            marginTop: '1em',
+            maxWidth: '80%',
+        },
     });
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
@@ -164,6 +168,7 @@ interface Props extends WithStyles<typeof styles> {
 
 interface CaseFormState {
     errorMessage: string;
+    successMessage: string;
 }
 
 const NewCaseValidation = Yup.object().shape(
@@ -234,6 +239,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         super(props);
         this.state = {
             errorMessage: '',
+            successMessage: '',
         };
     }
 
@@ -387,12 +393,17 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     `/api/cases/${this.props.initialCase?._id}`,
                     newCase,
                 );
+                this.setState({ successMessage: 'Case edited' });
             } else {
                 await axios.post('/api/cases', newCase);
+                this.setState({ successMessage: 'Case added' });
             }
             this.setState({ errorMessage: '' });
         } catch (e) {
-            this.setState({ errorMessage: JSON.stringify(e) });
+            this.setState({
+                successMessage: '',
+                errorMessage: JSON.stringify(e),
+            });
         }
     }
 
@@ -705,8 +716,18 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                         : 'Submit case'}
                                 </Button>
                             </Form>
+                            {this.state.successMessage && (
+                                <MuiAlert
+                                    className={classes.statusMessage}
+                                    elevation={6}
+                                    variant="filled"
+                                >
+                                    {this.state.successMessage}
+                                </MuiAlert>
+                            )}
                             {this.state.errorMessage && (
                                 <MuiAlert
+                                    className={classes.statusMessage}
                                     elevation={6}
                                     variant="filled"
                                     severity="error"

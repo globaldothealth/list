@@ -3,6 +3,14 @@ describe('Bulk upload form', function () {
     beforeEach(() => {
         cy.task('clearCasesDB', {});
         cy.login();
+        cy.seedLocation({
+            country: 'Canada',
+            admin1: 'Alberta',
+            admin3: 'Banff',
+            geometry: { latitude: 51.1784, longitude: 115.5708 },
+            name: 'Banff, Alberta, Canada',
+            geoResolution: 'Admin3',
+        });
     });
 
     // TODO: Test more fields here via the case details UI.

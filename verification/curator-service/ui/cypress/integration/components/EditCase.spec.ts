@@ -42,6 +42,7 @@ describe('Edit case', function () {
             );
             cy.get('button[data-testid="submit"]').click();
             cy.wait('@editCase');
+            cy.contains('Case edited');
             // Updated info should be there.
             cy.visit('/cases');
             cy.contains('No records to display').should('not.exist');
@@ -73,6 +74,7 @@ describe('Edit case', function () {
             );
             cy.get('button[data-testid="submit"]').click();
             cy.wait('@editCase');
+            cy.contains('Case edited');
             // Updated info should be there.
             cy.visit('/cases');
             cy.contains('No records to display').should('not.exist');

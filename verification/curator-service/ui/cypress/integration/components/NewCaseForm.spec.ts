@@ -131,6 +131,7 @@ describe('New case form', function () {
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
+        cy.contains('Case added');
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
@@ -176,6 +177,7 @@ describe('New case form', function () {
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
+        cy.contains('Case added');
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');

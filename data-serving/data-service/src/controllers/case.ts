@@ -40,13 +40,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
           }
         : {};
 
-    console.info('Querying cases with query:', query);
     // Do a fetch of documents and another fetch in parallel for total documents
     // count used in pagination.
-    // TODO: Add sort order on creation metadata date.
     try {
         const [docs, total] = await Promise.all([
             Case.find(query)
+                .sort({ 'revisionMetadata.creationMetadata.date': -1 })
                 .skip(limit * (page - 1))
                 .limit(limit + 1)
                 // We don't need mongoose docs here, just plain json.
