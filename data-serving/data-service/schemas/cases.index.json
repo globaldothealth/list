@@ -11,5 +11,5 @@
     "location.place": "text",
     "location.name": "text",
     "pathogen.name": "text",
-    "sources.url": "text"
+    "caseReference.sourceUrl": "text"
 }
