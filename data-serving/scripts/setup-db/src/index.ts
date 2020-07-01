@@ -49,7 +49,7 @@ const setupDatabase = async ({
             print(
                 `Dropped ${
                     deleteAllDocuments ? 'all' : 'imported'
-                } documents (${results.nRemoved} total) 🗎`,
+                } documents (${results.nRemoved} total) 🗑️`,
             );
 
             await database.runCommand({
