@@ -180,6 +180,45 @@ describe('New case form', function () {
         cy.contains('1/1/2020');
     });
 
+    it('Can submit events without dates', function () {
+        cy.visit('/cases');
+        cy.contains('No records to display');
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
+
+        cy.visit('/cases/new');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('France');
+        cy.contains('Country');
+        cy.get('li').first().should('contain', 'France').click();
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
+        // Outcome without a date.
+        cy.get('div[data-testid="outcome"]').click();
+        cy.get('li[data-value="Recovered"').click();
+        // Hospital admission without a date.
+        cy.get('div[data-testid="admittedToHospital"]').click();
+        cy.get('li[data-value="Yes"').click();
+        cy.server();
+        cy.route('POST', '/api/cases').as('addCase');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@addCase');
+
+        cy.visit('/cases');
+        cy.contains('No records to display').should('not.exist');
+        cy.contains('www.example.com');
+        cy.contains('France');
+        cy.contains('1/1/2020');
+        cy.contains('Yes');
+        cy.contains('Recovered');
+    });
+
     it('Does not add row on submission error', function () {
         // Avoid geolocation fail, the "Request failed" check below happens at the data service level.
         cy.seedLocation({
