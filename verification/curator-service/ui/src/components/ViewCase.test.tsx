@@ -32,6 +32,9 @@ it('loads and displays case', async () => {
             'https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19',
         ),
     ).toBeInTheDocument();
+    expect(getByText('sourceId')).toBeInTheDocument();
+    expect(getByText('twitter.com/a-tweet')).toBeInTheDocument();
+    expect(getByText('news.org/an-article')).toBeInTheDocument();
     expect(getByText('abc123')).toBeInTheDocument();
     expect(getByText('2020-01-20')).toBeInTheDocument();
     expect(

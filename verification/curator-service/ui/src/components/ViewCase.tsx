@@ -107,14 +107,29 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 </Typography>
                 <Grid container className={classes.grid}>
                     <RowHeader title="Data source" />
-                    {/* TODO: Display data source name once we store those */}
-                    <RowContent content="" />
+                    <RowContent content={props.c.caseReference?.sourceId} />
 
                     <RowHeader title="Data source link" />
                     <RowContent
                         content={props.c.caseReference?.sourceUrl}
                         isLink
                     />
+
+                    {props.c.caseReference?.additionalSources && (
+                        <>
+                            <RowHeader title="other sources" />
+                            <MultilinkRowContent
+                                links={props.c.caseReference?.additionalSources?.map(
+                                    (e) => {
+                                        return {
+                                            title: e.sourceUrl,
+                                            link: e.sourceUrl,
+                                        };
+                                    },
+                                )}
+                            />
+                        </>
+                    )}
 
                     <RowHeader title="Date of creation" />
                     <RowContent
