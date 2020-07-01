@@ -74,6 +74,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             selfIsolationDate: null,
             admittedToHospital: undefined,
             hospitalAdmissionDate: null,
+            admittedToIcu: undefined,
             icuAdmissionDate: null,
             outcomeDate: null,
             outcome: undefined,
@@ -128,6 +129,8 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
+        admittedToIcu: c.events.find((event) => event.name === 'icuAdmission')
+            ?.value,
         icuAdmissionDate:
             c.events.find((event) => event.name === 'icuAdmission')?.dateRange
                 ?.start || null,
@@ -316,7 +319,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 {
                     name: 'icuAdmission',
                     dates: values.icuAdmissionDate,
-                    value: undefined,
+                    value: values.admittedToIcu,
                 },
                 {
                     name: 'outcome',
