@@ -96,16 +96,16 @@ export interface Case {
     importedCase?: {
         outcome?: string;
     };
-    events: Event[];
-    demographics: Demographics;
-    location: Location;
-    symptoms: Symptoms;
+    events?: Event[];
+    demographics?: Demographics;
+    location?: Location;
+    symptoms?: Symptoms;
     preexistingConditions?: PreexistingConditions;
-    transmission: Transmission;
-    sources: Source[];
-    travelHistory: TravelHistory;
-    genomeSequences: GenomeSequence[];
-    pathogens: Pathogen[];
-    notes: string;
-    revisionMetadata: RevisionMetadata;
+    transmission?: Transmission;
+    sources?: Source[];
+    travelHistory?: TravelHistory;
+    genomeSequences?: GenomeSequence[];
+    pathogens?: Pathogen[];
+    notes?: string;
+    revisionMetadata?: RevisionMetadata;
 }
