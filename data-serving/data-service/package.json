@@ -59,7 +59,7 @@
     "dotenv": "^8.2.0",
     "envalid": "^6.0.2",
     "express": "^4.17.1",
-    "express-openapi-validator": "^3.16.2",
+    "express-openapi-validator": "^3.16.4",
     "express-validator": "^6.6.0",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.20",

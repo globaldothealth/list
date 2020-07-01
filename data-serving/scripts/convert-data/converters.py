@@ -11,9 +11,10 @@ which row failed to convert.
 
 from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
-                     parse_longitude, parse_range, parse_sex, parse_string_list)
+                     parse_longitude, parse_range, parse_sex, parse_string_list,
+                     parse_url)
 from typing import Any, Callable, Dict, List
-from utils import format_iso_8601_date, is_url, log_error
+from utils import format_iso_8601_date, log_error
 
 
 def convert_range(value: Any, parser: Callable[[Any], Any],
@@ -374,30 +375,44 @@ def convert_notes_field(notes_fields: [str]) -> str:
     return notes or None
 
 
-def convert_sources_field(source: str) -> Dict[str, str]:
+def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
     '''
-    Converts the source field to a new source representation that's a list of
-    objects with either a URL or an unknown reference type.
+    Converts the case reference field from the source field.
 
     Returns:
       None: When the input is empty.
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
-          'url': str,
-          'other': str
+          'sourceUrl': str,
+          'additionalSources': [
+           {
+             'sourceUrl': str
+           }
+          ]
         }
     '''
     if not source:
         return None
 
-    sources = parse_list(source, ',')
+    sources = parse_list(source, ', ')
 
-    return [{
-        'url': source
-    } if is_url(source) else {
-        'other': str(source)
-    } for source in sources]
+    try:
+      sourceUrls = [ parse_url(source) for source in sources ]
+
+      if not sourceUrls:
+        return None
+      
+      caseReference = { 'sourceUrl': sourceUrls[0] }
+
+      if len(sourceUrls) > 1:
+        caseReference['additionalSources'] = [{
+            'sourceUrl': sourceUrl
+        } for sourceUrl in sourceUrls[1:]]
+
+      return caseReference
+    except ValueError as e:
+       log_error(id, 'source', 'caseReference.sourceUrl', source, e)
 
 
 def convert_travel_history(geocoder: Any, id: str, dates: str,

@@ -22,6 +22,16 @@ describe('validate', () => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
+
+    it('a caseReference document without sourceUrl is invalid', async () => {
+        const missingSourceUrl = { ...minimalModel };
+        delete missingSourceUrl.sourceUrl;
+
+        return new CaseReference(missingSourceUrl).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
     it('a minimal caseReference document is valid', async () => {
         return new CaseReference(minimalModel).validate();
     });

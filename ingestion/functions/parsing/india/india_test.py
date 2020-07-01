@@ -15,7 +15,8 @@ _PARSED_CASE = (
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "48765"
+            "sourceEntryId": "48765",
+            "sourceUrl": _SOURCE_URL
         },
         "revisionMetadata": {
             "revisionNumber": 0,
@@ -24,11 +25,6 @@ _PARSED_CASE = (
                 "date": date.today().strftime("%m/%d/%Y")
             }
         },
-        "sources": [
-            {
-                "url": _SOURCE_URL,
-            }
-        ],
         "location": {
             "country": "India",
             "administrativeAreaLevel1": "Bihar",

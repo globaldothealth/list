@@ -49,7 +49,6 @@ interface TableRow {
     transmissionLinkedCaseIds: string;
     travelHistory: TravelHistory;
     pathogens: Pathogen[];
-    // sources
     sourceUrl: string | null;
     notes: string;
     curatedBy: string;
@@ -263,11 +262,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             travelHistory: c.travelHistory,
                                             pathogens: c.pathogens,
                                             notes: c.notes,
-                                            sourceUrl:
-                                                c.sources &&
-                                                c.sources.length > 0
-                                                    ? c.sources[0].url
-                                                    : null,
+                                            sourceUrl: c.caseReference.sourceUrl,
                                             curatedBy:
                                                 c.revisionMetadata
                                                     ?.creationMetadata
