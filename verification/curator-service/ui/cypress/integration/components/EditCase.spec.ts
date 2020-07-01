@@ -65,7 +65,7 @@ describe('Edit case', function () {
             cy.contains('Actor').should('not.exist');
             // Change a few things.
             cy.get('div[data-testid="sex"]').click();
-            cy.get('li[data-value="Female"').click();
+            cy.get('li[data-value="Male"').click();
             // Submit the changes.
             cy.server();
             cy.route('PUT', `/api/cases/${resp.body.cases[0]._id}`).as(
@@ -76,7 +76,7 @@ describe('Edit case', function () {
             // Updated info should be there.
             cy.visit('/cases');
             cy.contains('No records to display').should('not.exist');
-            cy.contains('Female');
+            cy.contains('Male');
             // What's untouched should stay as is.
             cy.contains('Swedish');
         });

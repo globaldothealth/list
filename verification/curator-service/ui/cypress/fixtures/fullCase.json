@@ -13,12 +13,6 @@
             }
         ]
     },
-    "sources": [
-        {
-            "id": "def456",
-            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
-        }
-    ],
     "demographics": {
         "ageRange": {
             "start": 50.0,
@@ -106,7 +100,6 @@
         "status": "Yes"
     },
     "travelHistory": {
-        "numLocations": 1,
         "travel": [
             {
                 "dateRange": {
