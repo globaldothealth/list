@@ -105,15 +105,15 @@ export interface Case {
     importedCase?: {
         outcome?: string;
     };
-    events?: Event[];
-    demographics?: Demographics;
-    location?: Location;
-    symptoms?: Symptoms;
+    events: Event[];
+    demographics: Demographics;
+    location: Location;
+    symptoms: Symptoms;
     preexistingConditions?: PreexistingConditions;
-    transmission?: Transmission;
-    travelHistory?: TravelHistory;
-    genomeSequences?: GenomeSequence[];
+    transmission: Transmission;
+    travelHistory: TravelHistory;
+    genomeSequences: GenomeSequence[];
     pathogens?: Pathogen[];
-    notes?: string;
-    revisionMetadata?: RevisionMetadata;
+    notes: string;
+    revisionMetadata: RevisionMetadata;
 }
