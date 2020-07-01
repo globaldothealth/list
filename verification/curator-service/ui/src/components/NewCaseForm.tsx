@@ -327,7 +327,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     value: values.outcome,
                 },
             ]
-                .filter((elem) => elem.dates !== null)
+                .filter((elem) => elem.dates)
                 .map((elem) => {
                     return {
                         name: elem.name,
