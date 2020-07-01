@@ -59,6 +59,8 @@ describe('New case form', function () {
         cy.get('div[data-testid="admittedToHospital"]').click();
         cy.get('li[data-value="Yes"').click();
         cy.get('input[name="hospitalAdmissionDate"]').type('2020-01-05');
+        cy.get('div[data-testid="admittedToIcu"]').click();
+        cy.get('li[data-value="Yes"').click();
         cy.get('input[name="icuAdmissionDate"]').type('2020-01-06');
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
@@ -204,6 +206,9 @@ describe('New case form', function () {
         cy.get('li[data-value="Recovered"').click();
         // Hospital admission without a date.
         cy.get('div[data-testid="admittedToHospital"]').click();
+        cy.get('li[data-value="Yes"').click();
+        // ICU admission without a date.
+        cy.get('div[data-testid="admittedToIcu"]').click();
         cy.get('li[data-value="Yes"').click();
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
