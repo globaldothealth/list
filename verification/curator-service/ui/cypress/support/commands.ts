@@ -13,6 +13,7 @@ declare global {
                 nationalities?: string[];
                 curator?: string;
             }) => void;
+            addFullCase: () => void;
             login: () => void;
             addSource: (name: string, url: string) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +71,16 @@ export function addCase(opts: {
     });
 }
 
+export function addFullCase(): void {
+    cy.fixture('fullCase').then((json) => {
+        cy.request({
+            method: 'POST',
+            url: '/api/cases',
+            body: json,
+        });
+    });
+}
+
 export function login(opts: {
     name: string;
     email: string;
@@ -116,6 +127,7 @@ export function addSource(name: string, url: string): void {
 }
 
 Cypress.Commands.add('addCase', addCase);
+Cypress.Commands.add('addFullCase', addFullCase);
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);
 Cypress.Commands.add('seedLocation', seedLocation);

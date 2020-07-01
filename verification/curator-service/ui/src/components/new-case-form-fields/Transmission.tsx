@@ -50,6 +50,7 @@ export default function Transmission(): JSX.Element {
                     fullWidth
                     alwaysShowPlaceholder
                     placeholder="Contacted case IDs"
+                    defaultValue={initialValues.transmissionLinkedCaseIds}
                     onBlur={(): void =>
                         setTouched({ transmissionLinkedCaseIds: true })
                     }
