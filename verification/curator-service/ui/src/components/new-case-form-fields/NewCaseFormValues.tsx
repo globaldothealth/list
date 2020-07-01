@@ -41,7 +41,7 @@ export interface Travel {
         end: string | null;
     };
     purpose?: string;
-    method?: string;
+    methods: string[];
 }
 
 export interface GenomeSequence {
