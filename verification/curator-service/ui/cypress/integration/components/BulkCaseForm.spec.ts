@@ -23,6 +23,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display').should('not.exist');
         cy.contains('Male');
         cy.contains('42');
+        cy.contains('Ontario');
         cy.contains('Canada');
         // First record.
         cy.contains('foo.bar');
