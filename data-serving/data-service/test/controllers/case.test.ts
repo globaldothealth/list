@@ -167,7 +167,11 @@ describe('PUT', () => {
         const res = await request(app)
             .put('/api/cases')
             .send({
-                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
                 notes: newNotes,
             })
             .expect('Content-Type', /json/)
@@ -197,7 +201,11 @@ describe('PUT', () => {
         return request(app)
             .put('/api/cases')
             .send({
-                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
                 location: {},
             })
             .expect(422);

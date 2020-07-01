@@ -1,7 +1,16 @@
 {
     "caseReference": {
         "sourceId": "sourceId",
-        "sourceEntryId": "entryId"
+        "sourceEntryId": "entryId",
+        "sourceUrl": "cdc.gov",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
     },
     "demographics": {
         "ageRange": {
