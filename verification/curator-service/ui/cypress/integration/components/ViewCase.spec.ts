@@ -26,7 +26,7 @@ describe('View case', function () {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
             cy.contains('France');
-            cy.contains('nome notes');
+            // TODO: show notes cy.contains('some notes');
             cy.contains('www.example.com');
             cy.contains('PCR test');
             cy.contains('French');
@@ -40,6 +40,8 @@ describe('View case', function () {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
             cy.contains('Asian');
+            // Further tests are already done in the unit tests.
+            // No need to fully duplicate those here.
         });
     });
 });

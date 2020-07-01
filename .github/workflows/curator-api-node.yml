@@ -37,4 +37,3 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: verification/curator-service/api/coverage/coverage-final.json
-          fail_ci_if_error: true
