@@ -2,6 +2,7 @@ import { Button, withStyles } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
+import { Event } from './Case';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
 import Source from './common-form-fields/Source';
@@ -43,6 +44,44 @@ interface BulkCaseFormValues {
     file: File | null;
 }
 
+/**
+ * Flattened case representation.
+ *
+ * Composed of fields present in the standardized manual upload CSV. Comments
+ * denote sections of the canonical case object to which fields correspond,
+ * where applicable.
+ */
+interface ParsedCase {
+    // Interface index
+    [key: string]: string | number | boolean | undefined;
+
+    // CaseReference
+    sourceId: string;
+    sourceEntryId?: string;
+    sourceUrl: string;
+
+    // Demographics
+    sex?: string;
+    ageRangeStart?: number;
+    ageRangeEnd?: number;
+
+    // Events
+    dateConfirmed: string;
+    hospitalized?: boolean;
+    dateHospitalized?: string;
+    outcome?: string;
+    dateOutcome?: string;
+
+    // Location
+    country: string;
+    admin1?: string;
+    admin2?: string;
+    admin3?: string;
+    latitude?: string;
+    longitude?: string;
+    locationName?: string;
+}
+
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
@@ -53,54 +92,120 @@ class BulkCaseForm extends React.Component<
             statusMessage: '',
         };
     }
-    // Using a generic type for now; will define case record later.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async uploadData(results: ParseResult<Record<string, any>>): Promise<void> {
+
+    createEvents(c: ParsedCase): Event[] {
+        const events = [];
+        // TODO: Add ParsedCase validation.
+        if (c.dateConfirmed) {
+            events.push({
+                name: 'confirmed',
+                dateRange: {
+                    start: c.dateConfirmed,
+                    end: c.dateConfirmed,
+                },
+            });
+        }
+        if (c.hospitalized) {
+            events.push({
+                name: 'hospitalized',
+                dateRange: c.dateHospitalized
+                    ? {
+                        start: c.dateHospitalized,
+                        end: c.dateHospitalized,
+                    }
+                    : undefined,
+            });
+        }
+        if (c.outcome) {
+            events.push({
+                name: 'outcome',
+                dateRange: {
+                    start: c.dateOutcome,
+                    end: c.dateOutcome,
+                },
+                value: c.outcome,
+            });
+        }
+        return events;
+    }
+
+    createGeoResolution(c: ParsedCase): string {
+        if (c.admin3) {
+            return 'Admin3';
+        } else if (c.admin2) {
+            return 'Admin2';
+        } else if (c.admin1) {
+            return 'Admin1';
+        } else {
+            return 'Country';
+        }
+    }
+
+    createLocationQuery(c: ParsedCase): string {
+        return [c.admin3, c.admin2, c.admin1, c.country]
+            .filter((field) => field)
+            .join(', ');
+    }
+
+    async upsertCase(
+        c: ParsedCase,
+        events: Event[],
+        geoResolution: string,
+        locationQuery: string,
+    ): Promise<void> {
+        return axios.put('/api/cases', {
+            caseReference: {
+                sourceId: c.sourceId,
+                sourceEntryId: c.sourceEntryId,
+                sourceUrl: c.sourceUrl,
+            },
+            demographics: {
+                sex: c.sex,
+                ageRange: {
+                    start: c.ageRangeStart,
+                    end: c.ageRangeEnd,
+                },
+            },
+            location: {
+                country: c.country,
+                admin1: c.admin1,
+                admin2: c.admin2,
+                admin3: c.admin3,
+                query: locationQuery,
+                geometry: {
+                    latitude: c.latitude,
+                    longitude: c.longitude,
+                },
+                geoResolution: geoResolution,
+                name: c.locationName,
+            },
+            events: events,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: this.props.user.email,
+                    date: new Date().toISOString(),
+                },
+            },
+        });
+    }
+
+    async uploadData(results: ParseResult<ParsedCase>): Promise<void> {
         for (const c of results.data) {
+            // papaparse uses null to fill values that are empty in the CSV.
+            // I'm not clear how it does so -- since our types aren't union
+            // null -- but it does.
+            // Here, replace these with undefined so that they aren't populated
+            // in the axios request object.
+            Object.keys(c).forEach(
+                (field) =>
+                    (c[field] = c[field] === null ? undefined : c[field]),
+            );
             try {
-                await axios.put('/api/cases', {
-                    caseReference: {
-                        sourceId: c['sourceId'],
-                        sourceEntryId: c['sourceEntryId'],
-                        sourceUrl:  c['url'],
-                    },
-                    demographics: {
-                        sex: c['sex'],
-                        ageRange: {
-                            start: c['ageRangeStart'],
-                            end: c['ageRangeEnd'],
-                        },
-                    },
-                    location: {
-                        country: c['country'],
-                        administrativeAreaLevel1: c['administrativeAreaLevel1'],
-                        administrativeAreaLevel2: c['administrativeAreaLevel2'],
-                        administrativeAreaLevel3: c['administrativeAreaLevel3'],
-                        query: c['locationQuery'],
-                        geometry: {
-                            latitude: c['latitude'],
-                            longitude: c['longitude'],
-                        },
-                        geoResolution: c['geoResolution'],
-                        name: c['locationName'],
-                    },
-                    events: [
-                        {
-                            name: 'confirmed',
-                            dateRange: {
-                                start: c['dateConfirmedStart'],
-                                end: c['dateConfirmedEnd'],
-                            },
-                        },
-                    ],
-                    revisionMetadata: {
-                        revisionNumber: 0,
-                        creationMetadata: {
-                            curator: this.props.user.email,
-                            date: new Date().toISOString(),
-                        },
-                    },
-                });
+                const geoResolution = this.createGeoResolution(c);
+                const locationQuery = this.createLocationQuery(c);
+                const events = this.createEvents(c);
+                await this.upsertCase(c, events, geoResolution, locationQuery);
                 this.setState({ statusMessage: 'Success!' });
             } catch (e) {
                 if (e.response) {
@@ -116,7 +221,7 @@ class BulkCaseForm extends React.Component<
 
     async submitCases(values: BulkCaseFormValues): Promise<void> {
         if (values.file) {
-            const papaparseOptions: ParseConfig<Record<string, any>> = {
+            const papaparseOptions: ParseConfig<ParsedCase> = {
                 complete: (results) => {
                     this.uploadData(results);
                 },
