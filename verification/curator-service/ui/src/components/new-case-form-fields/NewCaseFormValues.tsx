@@ -26,6 +26,7 @@ export default interface NewCaseFormValues {
     traveledPrior30Days?: string;
     travelHistory: Travel[];
     genomeSequences: GenomeSequence[];
+    pathogens: Pathogen[];
     sourceUrl: string;
     notes: string;
 }
@@ -50,4 +51,9 @@ export interface GenomeSequence {
     sequenceId?: string;
     sequenceName?: string;
     sequenceLength?: number;
+}
+
+interface Pathogen {
+    name: string;
+    id: number;
 }

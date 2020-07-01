@@ -85,6 +85,11 @@ interface GenomeSequence {
     notes?: string;
 }
 
+export interface Pathogen {
+    name: string;
+    id: number;
+}
+
 interface Revision {
     curator: string;
     date: string;
@@ -108,6 +113,7 @@ export interface Case {
     transmission: Transmission;
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
+    pathogens: Pathogen[];
     notes: string;
     revisionMetadata: RevisionMetadata;
 }
