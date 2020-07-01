@@ -53,9 +53,7 @@ interface BulkCaseFormValues {
  */
 interface ParsedCase {
     // Interface index
-    // We need the value to be any, since our members are of multiple types.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
 
     // CaseReference
     sourceId: string;
@@ -87,7 +85,7 @@ interface ParsedCase {
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
