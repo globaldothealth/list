@@ -187,6 +187,22 @@ describe('PUT', () => {
             .expect('Content-Type', /json/)
             .expect(201);
     });
+    it('upsert items without sourceEntryId should return 201 CREATED', async () => {
+        const sharedSourceId = 'abc123';
+        const firstUniqueCase = new Case(minimalCase);
+        firstUniqueCase.set('caseReference.sourceId', sharedSourceId);
+        await firstUniqueCase.save();
+        const secondUniqueCase = new Case(minimalCase);
+        secondUniqueCase.set('caseReference.sourceId', sharedSourceId);
+
+        await request(app)
+            .put('/api/cases')
+            .send(secondUniqueCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(await secondUniqueCase.collection.countDocuments()).toEqual(2);
+    });
     it('upsert new item with invalid input should return 422', () => {
         return request(app).put('/api/cases').send({}).expect(422);
     });
