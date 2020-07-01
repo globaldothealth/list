@@ -80,6 +80,9 @@ interface ParsedCase {
     latitude?: string;
     longitude?: string;
     locationName?: string;
+
+    // Bulk upload specific data
+    caseCount?: number;
 }
 
 class BulkCaseForm extends React.Component<
@@ -93,6 +96,7 @@ class BulkCaseForm extends React.Component<
         };
     }
 
+    // TODO: Standardize event naming/constructions between case forms.
     createEvents(c: ParsedCase): Event[] {
         const events = [];
         // TODO: Add ParsedCase validation.
@@ -107,7 +111,7 @@ class BulkCaseForm extends React.Component<
         }
         if (c.hospitalized) {
             events.push({
-                name: 'hospitalized',
+                name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
                         start: c.dateHospitalized,
@@ -205,7 +209,15 @@ class BulkCaseForm extends React.Component<
                 const geoResolution = this.createGeoResolution(c);
                 const locationQuery = this.createLocationQuery(c);
                 const events = this.createEvents(c);
-                await this.upsertCase(c, events, geoResolution, locationQuery);
+                const casesToUpsert = c.caseCount ? c.caseCount : 1;
+                for (let i = 0; i < casesToUpsert; i++) {
+                    await this.upsertCase(
+                        c,
+                        events,
+                        geoResolution,
+                        locationQuery,
+                    );
+                }
                 this.setState({ statusMessage: 'Success!' });
             } catch (e) {
                 if (e.response) {
