@@ -13,9 +13,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "sourceId": {
             "bsonType": "string"
           },
@@ -32,9 +29,6 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
                 "sourceUrl": {
                   "bsonType": "string"
                 }
@@ -47,16 +41,10 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "ageRange": {
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "start": {
                 "bsonType": "number",
                 "minimum": 0,
@@ -98,9 +86,6 @@
           "bsonType": "object",
           "additionalProperties": false,
           "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
             "sampleCollectionDate": {
               "bsonType": "date"
             },
@@ -123,9 +108,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "country": {
             "bsonType": "string"
           },
@@ -161,9 +143,6 @@
               "longitude"
             ],
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "latitude": {
                 "bsonType": "number",
                 "minimum": -90.0,
@@ -185,9 +164,6 @@
           "bsonType": "object",
           "additionalProperties": false,
           "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
             "name": {
               "bsonType": "string"
             },
@@ -198,9 +174,6 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
                 "start": {
                   "bsonType": "date"
                 },
@@ -216,9 +189,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "values": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -239,9 +209,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "values": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -258,9 +225,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "travel": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -268,16 +232,10 @@
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
                 "location": {
                   "bsonType": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "_id": {
-                      "bsonType": "objectId"
-                    },
                     "country": {
                       "bsonType": "string"
                     },
@@ -313,9 +271,6 @@
                         "longitude"
                       ],
                       "properties": {
-                        "_id": {
-                          "bsonType": "objectId"
-                        },
                         "latitude": {
                           "bsonType": "number",
                           "minimum": -90.0,
@@ -334,9 +289,6 @@
                   "bsonType": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "_id": {
-                      "bsonType": "objectId"
-                    },
                     "start": {
                       "bsonType": "date"
                     },
@@ -386,9 +338,6 @@
             "name"
           ],
           "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
             "name": {
               "bsonType": "string"
             },
@@ -402,9 +351,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "routes": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -449,9 +395,6 @@
           "revisionNumber"
         ],
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "revisionNumber": {
             "bsonType": "int"
           },
@@ -459,9 +402,6 @@
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "curator": {
                 "bsonType": "string"
               },
@@ -477,9 +417,6 @@
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "curator": {
                 "bsonType": "string"
               },
@@ -497,9 +434,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "ID": {
             "bsonType": "string"
           },
