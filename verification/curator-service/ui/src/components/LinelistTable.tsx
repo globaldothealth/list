@@ -52,6 +52,8 @@ interface TableRow {
     sourceUrl: string | null;
     notes: string;
     curatedBy: string;
+    outcome: string;
+    admittedToHospital: string;
 }
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
@@ -138,6 +140,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Confirmation method',
                             field: 'confirmationMethod',
+                        },
+                        {
+                            title: 'Admitted to hospital',
+                            field: 'admittedToHospital',
+                        },
+                        {
+                            title: 'Outcome',
+                            field: 'outcome',
                         },
                         {
                             title: 'Symptoms',
@@ -268,6 +278,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.revisionMetadata
                                                     ?.creationMetadata
                                                     ?.curator || 'Unknown',
+                                            admittedToHospital:
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'hospitalAdmission',
+                                                )?.value || 'Unknown',
+                                            outcome:
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'outcome',
+                                                )?.value || 'Unknown',
                                         });
                                     }
                                     resolve({

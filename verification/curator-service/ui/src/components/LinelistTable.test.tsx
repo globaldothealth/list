@@ -57,6 +57,14 @@ it('loads and displays cases', async () => {
                     },
                     value: 'PCR test',
                 },
+                {
+                    name: 'hospitalAdmission',
+                    value: 'Yes',
+                },
+                {
+                    name: 'outcome',
+                    value: 'Recovered',
+                },
             ],
             notes: 'some notes',
             revisionMetadata: {
@@ -91,6 +99,8 @@ it('loads and displays cases', async () => {
     expect(await findByText('1-3')).toBeInTheDocument();
     expect(await findByText('PCR test')).toBeInTheDocument();
     expect(await findByText('foo@bar.com')).toBeInTheDocument();
+    expect(await findByText('Recovered')).toBeInTheDocument();
+    expect(await findByText('Yes')).toBeInTheDocument();
 });
 
 it('redirects to new case page when + icon is clicked', async () => {

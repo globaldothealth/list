@@ -330,14 +330,16 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     value: values.outcome,
                 },
             ]
-                .filter((elem) => elem.dates !== null)
+                .filter((elem) => elem.dates || elem.value)
                 .map((elem) => {
                     return {
                         name: elem.name,
-                        dateRange: {
-                            start: elem.dates,
-                            end: elem.dates,
-                        },
+                        dateRange: elem.dates
+                            ? {
+                                  start: elem.dates,
+                                  end: elem.dates,
+                              }
+                            : undefined,
                         value: elem.value,
                     };
                 }),
