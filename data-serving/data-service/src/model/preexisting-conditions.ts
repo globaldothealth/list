@@ -3,7 +3,7 @@ import { uniqueStringsArrayFieldInfo } from './unique-strings-array';
 
 export const preexistingConditionsSchema = new mongoose.Schema({
     values: uniqueStringsArrayFieldInfo,
-    status: Boolean,
+    hasPreexistingConditions: Boolean,
 });
 
 export type PreexistingConditionsDocument = mongoose.Document & {
