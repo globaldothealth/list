@@ -39,7 +39,9 @@ const caseSchema = new mongoose.Schema(
             },
         },
         genomeSequences: [genomeSequenceSchema],
-        importedCase: {},
+        importedCase: {
+            _id: false,
+        },
         location: locationSchema,
         revisionMetadata: {
             type: revisionMetadataSchema,
