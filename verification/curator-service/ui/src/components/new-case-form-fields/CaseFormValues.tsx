@@ -16,6 +16,7 @@ export default interface CaseFormValues {
     selfIsolationDate: string | null;
     admittedToHospital?: string;
     hospitalAdmissionDate: string | null;
+    admittedToIcu?: string;
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
     outcome?: string;
