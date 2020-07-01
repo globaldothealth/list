@@ -362,7 +362,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             .join(', ')}
                     />
 
-                    {props.c.genomeSequences.map((e) => (
+                    {props.c.genomeSequences?.map((e) => (
                         <GenomeSequenceRows
                             key={shortId.generate()}
                             sequence={e}
