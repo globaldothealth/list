@@ -34,6 +34,9 @@ it('loads and displays case', async () => {
     ).toBeInTheDocument();
     expect(await findByText('abc123')).toBeInTheDocument();
     expect(await findByText('2020-01-20')).toBeInTheDocument();
+    expect(
+        await findByText('Contact of a confirmed case at work.'),
+    ).toBeInTheDocument();
     // Demographics.
     expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('50-59')).toBeInTheDocument();
