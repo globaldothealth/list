@@ -70,7 +70,7 @@ it('loads and displays case', async () => {
     expect(await findByText(/othercaseid1/)).toBeInTheDocument();
     expect(await findByText(/othercaseid2/)).toBeInTheDocument();
     // Travel history.
-    expect(await findByText('2020-02-10 - 2020-01-17')).toBeInTheDocument();
+    expect(await findByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
     expect(await findByText('United States')).toBeInTheDocument();
     expect(await findByText('New York')).toBeInTheDocument();
     expect(await findByText('Kings County')).toBeInTheDocument();
