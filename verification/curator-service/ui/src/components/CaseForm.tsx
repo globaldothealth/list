@@ -2,9 +2,11 @@ import * as Yup from 'yup';
 
 import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
+import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import { Case } from './Case';
+import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -12,8 +14,8 @@ import Events from './new-case-form-fields/Events';
 import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
-import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
 import Notes from './new-case-form-fields/Notes';
+import Pathogens from './new-case-form-fields/Pathogens';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -24,6 +26,7 @@ import TravelHistory from './new-case-form-fields/TravelHistory';
 import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { cloneDeep } from 'lodash';
 import { createStyles } from '@material-ui/core/styles';
 import { hasKey } from './Utils';
 import shortId from 'shortid';
@@ -50,7 +53,7 @@ const styles = () =>
         },
     });
 
-function initialValuesFromCase(c?: Case): NewCaseFormValues {
+function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
             sex: undefined,
@@ -68,6 +71,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             selfIsolationDate: null,
             admittedToHospital: undefined,
             hospitalAdmissionDate: null,
+            admittedToIcu: undefined,
             icuAdmissionDate: null,
             outcomeDate: null,
             outcome: undefined,
@@ -75,8 +79,10 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
+            traveledPrior30Days: undefined,
             travelHistory: [],
             genomeSequences: [],
+            pathogens: [],
             sourceUrl: '',
             notes: '',
         };
@@ -120,6 +126,8 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
+        admittedToIcu: c.events.find((event) => event.name === 'icuAdmission')
+            ?.value,
         icuAdmissionDate:
             c.events.find((event) => event.name === 'icuAdmission')?.dateRange
                 ?.start || null,
@@ -131,13 +139,20 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
+        traveledPrior30Days:
+            c.travelHistory?.traveledPrior30Days === undefined
+                ? undefined
+                : c.travelHistory.traveledPrior30Days
+                ? 'Yes'
+                : 'No',
         travelHistory: c.travelHistory?.travel?.map((travel) => {
             return { reactId: shortId.generate(), ...travel };
         }),
         genomeSequences: c.genomeSequences?.map((genomeSequence) => {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
-        sourceUrl: c.sources?.length > 0 ? c.sources[0].url : '',
+        pathogens: c.pathogens,
+        sourceUrl: c.caseReference?.sourceUrl,
         notes: c.notes,
     };
 }
@@ -147,7 +162,7 @@ interface Props extends WithStyles<typeof styles> {
     initialCase?: Case;
 }
 
-interface NewCaseFormState {
+interface CaseFormState {
     errorMessage: string;
 }
 
@@ -214,7 +229,7 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
-class NewCaseForm extends React.Component<Props, NewCaseFormState> {
+class CaseForm extends React.Component<Props, CaseFormState> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -222,11 +237,45 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
         };
     }
 
-    async submitCase(values: NewCaseFormValues): Promise<void> {
+    filterTravel(travel: Travel[]): Travel[] {
+        const filteredTravel = cloneDeep(travel);
+        filteredTravel?.forEach((travel) => {
+            delete travel.reactId;
+            if (
+                travel.dateRange.start === null &&
+                travel.dateRange.end === null
+            ) {
+                delete travel.dateRange;
+            } else {
+                if (travel.dateRange.start === null) {
+                    delete travel.dateRange.start;
+                }
+                if (travel.dateRange.end === null) {
+                    delete travel.dateRange.end;
+                }
+            }
+        });
+        return filteredTravel;
+    }
+    filterGenomeSequences(genomeSequences: GenomeSequence[]): GenomeSequence[] {
+        const filteredGenomeSequences = cloneDeep(genomeSequences);
+        filteredGenomeSequences?.forEach((genomeSequence) => {
+            delete genomeSequence.reactId;
+        });
+        return filteredGenomeSequences;
+    }
+
+    async submitCase(values: CaseFormValues): Promise<void> {
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
+            caseReference: {
+                // TODO: Replace the below with a source id once we have lookups
+                // in place.
+                sourceId: 'FAKE_ID',
+                sourceUrl: values.sourceUrl,
+            },
             demographics: {
                 sex: values.sex,
                 ageRange: ageRange,
@@ -267,7 +316,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 {
                     name: 'icuAdmission',
                     dates: values.icuAdmissionDate,
-                    value: undefined,
+                    value: values.admittedToIcu,
                 },
                 {
                     name: 'outcome',
@@ -278,14 +327,16 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                     value: values.outcome,
                 },
             ]
-                .filter((elem) => elem.dates !== null)
+                .filter((elem) => elem.dates || elem.value)
                 .map((elem) => {
                     return {
                         name: elem.name,
-                        dateRange: {
-                            start: elem.dates,
-                            end: elem.dates,
-                        },
+                        dateRange: elem.dates
+                            ? {
+                                  start: elem.dates,
+                                  end: elem.dates,
+                              }
+                            : undefined,
                         value: elem.value,
                     };
                 }),
@@ -297,23 +348,37 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 places: values.transmissionPlaces,
                 linkedCaseIds: values.transmissionLinkedCaseIds,
             },
-            sources: [
-                {
-                    url: values.sourceUrl,
-                },
-            ],
             travelHistory: {
-                travel: values.travelHistory,
+                traveledPrior30Days:
+                    values.traveledPrior30Days === 'Yes'
+                        ? true
+                        : values.traveledPrior30Days === 'No'
+                        ? false
+                        : undefined,
+                travel: this.filterTravel(values.travelHistory),
             },
-            genomeSequences: values.genomeSequences,
+            genomeSequences: this.filterGenomeSequences(values.genomeSequences),
+            pathogens: values.pathogens,
             notes: values.notes,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: this.props.user.email,
-                    date: new Date().toISOString(),
-                },
-            },
+            revisionMetadata: this.props.initialCase
+                ? {
+                      revisionNumber:
+                          this.props.initialCase.revisionMetadata
+                              .revisionNumber + 1,
+                      creationMetadata: this.props.initialCase.revisionMetadata
+                          .creationMetadata,
+                      updateMetadata: {
+                          curator: this.props.user.email,
+                          date: new Date().toISOString(),
+                      },
+                  }
+                : {
+                      revisionNumber: 0,
+                      creationMetadata: {
+                          curator: this.props.user.email,
+                          date: new Date().toISOString(),
+                      },
+                  },
         };
         try {
             // Update or create depending on the presence of the initial case ID.
@@ -386,6 +451,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 }): JSX.Element => (
                     <div className={classes.container}>
                         <nav className={classes.tableOfContents}>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('source')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.sourceUrl?.trim() !== '',
+                                    hasError: hasErrors(
+                                        ['sourceUrl'],
+                                        errors,
+                                        touched,
+                                    ),
+                                })}
+                                Source
+                            </div>
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void =>
@@ -519,9 +598,15 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 }
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.travelHistory?.length > 0,
+                                    isChecked:
+                                        values.travelHistory?.length > 0 ||
+                                        values.traveledPrior30Days !==
+                                            undefined,
                                     hasError: hasErrors(
-                                        ['travelHistory'],
+                                        [
+                                            'traveledPrior30Days',
+                                            'travelHistory',
+                                        ],
                                         errors,
                                         touched,
                                     ),
@@ -547,17 +632,17 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('source')}
+                                onClick={(): void => this.scrollTo('pathogens')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.sourceUrl?.trim() !== '',
+                                    isChecked: values.pathogens?.length > 0,
                                     hasError: hasErrors(
-                                        ['sourceUrl'],
+                                        ['pathogens'],
                                         errors,
                                         touched,
                                     ),
                                 })}
-                                Source
+                                Pathogens
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
@@ -576,6 +661,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                         </nav>
                         <div className={classes.form}>
                             <Form>
+                                <div className={classes.formSection}>
+                                    <Source></Source>
+                                </div>
                                 <div className={classes.formSection}>
                                     <Demographics></Demographics>
                                 </div>
@@ -598,7 +686,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     <GenomeSequences></GenomeSequences>
                                 </div>
                                 <div className={classes.formSection}>
-                                    <Source></Source>
+                                    <Pathogens></Pathogens>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Notes></Notes>
@@ -612,7 +700,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     disabled={isSubmitting}
                                     onClick={submitForm}
                                 >
-                                    Submit case
+                                    {this.props.initialCase
+                                        ? 'Edit case'
+                                        : 'Submit case'}
                                 </Button>
                             </Form>
                             {this.state.errorMessage && (
@@ -632,4 +722,4 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
     }
 }
 
-export default withStyles(styles)(NewCaseForm);
+export default withStyles(styles)(CaseForm);

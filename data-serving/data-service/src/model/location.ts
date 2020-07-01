@@ -24,65 +24,69 @@ const fieldRequiredValidator = [
         'or administrativeAreaLevel3 is required',
 ];
 
-export const locationSchema = new mongoose.Schema({
-    country: {
-        type: String,
-        required: fieldRequiredValidator,
-    },
-    administrativeAreaLevel1: {
-        type: String,
-        required: fieldRequiredValidator,
-    },
-    administrativeAreaLevel2: {
-        type: String,
-        required: fieldRequiredValidator,
-    },
-    administrativeAreaLevel3: {
-        type: String,
-        required: fieldRequiredValidator,
-    },
-    // Place represents a precise location, such as an establishment or POI.
-    place: String,
-    // A human-readable name of the location.
-    name: String,
-    geoResolution: {
-        type: String,
-        enum: Object.values(GeoResolution),
-        required: true,
-    },
-    geometry: {
-        latitude: {
-            type: Number,
-            min: -90.0,
-            max: 90.0,
-            required: [
-                function (this: LocationDocument): boolean {
-                    return (
-                        this != null &&
-                        this.geometry?.latitude == null &&
-                        this.geometry?.longitude != null
-                    );
-                },
-                'latitude must be specified if geometry is present',
-            ],
+export const locationSchema = new mongoose.Schema(
+    {
+        country: {
+            type: String,
+            required: fieldRequiredValidator,
         },
-        longitude: {
-            type: Number,
-            min: -180.0,
-            max: 180.0,
-            required: [
-                function (this: LocationDocument): boolean {
-                    return (
-                        this != null &&
-                        this.geometry?.longitude == null &&
-                        this.geometry?.latitude != null
-                    );
-                },
-                'longitude must be specified if geometry is present',
-            ],
+        administrativeAreaLevel1: {
+            type: String,
+            required: fieldRequiredValidator,
+        },
+        administrativeAreaLevel2: {
+            type: String,
+            required: fieldRequiredValidator,
+        },
+        administrativeAreaLevel3: {
+            type: String,
+            required: fieldRequiredValidator,
+        },
+        // Place represents a precise location, such as an establishment or POI.
+        place: String,
+        // A human-readable name of the location.
+        name: String,
+        geoResolution: {
+            type: String,
+            enum: Object.values(GeoResolution),
+            required: true,
+        },
+        geometry: {
+            latitude: {
+                type: Number,
+                min: -90.0,
+                max: 90.0,
+                required: [
+                    function (this: LocationDocument): boolean {
+                        return (
+                            this != null &&
+                            this.geometry?.latitude == null &&
+                            this.geometry?.longitude != null
+                        );
+                    },
+                    'latitude must be specified if geometry is present',
+                ],
+            },
+            longitude: {
+                type: Number,
+                min: -180.0,
+                max: 180.0,
+                required: [
+                    function (this: LocationDocument): boolean {
+                        return (
+                            this != null &&
+                            this.geometry?.longitude == null &&
+                            this.geometry?.latitude != null
+                        );
+                    },
+                    'longitude must be specified if geometry is present',
+                ],
+            },
+            _id: false,
         },
     },
-});
+    { _id: false },
+);
 
 interface Geometry {
     latitude: number;

@@ -8,7 +8,7 @@ import { Case } from '../model/case';
  * Handles HTTP GET /api/cases/:id.
  */
 export const get = async (req: Request, res: Response): Promise<void> => {
-    const c = await Case.findById(req.params.id);
+    const c = await Case.findById(req.params.id).lean();
     if (!c) {
         res.status(404).send(`Case with ID ${req.params.id} not found.`);
         return;
@@ -32,27 +32,25 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.status(422).json('limit must be > 0');
         return;
     }
-    // Filter query param looks like &filter=notes:work,other_field:foo
-    const filterQuery = String(req.query.filter || '').trim();
-    // Query to mongo looks like { "notes": {$regex: /work/} }
-    // Note: We should use $text instead of $regex but until we have indexes
-    // that's not possible.
-    const query: { [k: string]: { [k: string]: RegExp } } = {};
-    if (filterQuery.length > 0) {
-        const filters = filterQuery.split(',');
-        for (const filter of filters) {
-            const [field, value] = filter.split(':');
-            query[field] = { $regex: new RegExp(value, 'i') };
-        }
-    }
+    // Filter query param looks like &q=some%20search%20query
+    const searchQuery = String(req.query.q || '').trim();
+    const query = searchQuery
+        ? {
+            $text: { $search: searchQuery },
+          }
+        : {};
+
     console.info('Querying cases with query:', query);
     // Do a fetch of documents and another fetch in parallel for total documents
     // count used in pagination.
+    // TODO: Add sort order on creation metadata date.
     try {
         const [docs, total] = await Promise.all([
             Case.find(query)
                 .skip(limit * (page - 1))
-                .limit(limit + 1),
+                .limit(limit + 1)
+                // We don't need mongoose docs here, just plain json.
+                .lean(),
             Case.countDocuments(query),
         ]);
         // If we have more items than limit, add a response param
@@ -139,7 +137,11 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
             'caseReference.sourceEntryId':
                 req.body.caseReference?.sourceEntryId,
         });
-        if (c) {
+        if (
+            req.body.caseReference?.sourceId &&
+            req.body.caseReference?.sourceEntryId &&
+            c
+        ) {
             c.set(req.body);
             const result = await c.save();
             res.status(200).json(result);

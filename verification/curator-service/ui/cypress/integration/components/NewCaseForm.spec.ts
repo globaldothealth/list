@@ -32,6 +32,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.get('div[data-testid="sex"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
@@ -58,6 +59,8 @@ describe('New case form', function () {
         cy.get('div[data-testid="admittedToHospital"]').click();
         cy.get('li[data-value="Yes"').click();
         cy.get('input[name="hospitalAdmissionDate"]').type('2020-01-05');
+        cy.get('div[data-testid="admittedToIcu"]').click();
+        cy.get('li[data-value="Yes"').click();
         cy.get('input[name="icuAdmissionDate"]').type('2020-01-06');
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
@@ -73,6 +76,8 @@ describe('New case form', function () {
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
+        cy.get('div[data-testid="traveledPrior30Days"]').click();
+        cy.get('li[data-value="Yes"').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[0].location"]').type('Germany');
         cy.get('li').first().should('contain', 'Germany').click();
@@ -84,8 +89,10 @@ describe('New case form', function () {
         );
         cy.get('div[data-testid="travelHistory[0].purpose"]').click();
         cy.get('li[data-value="Business"').click();
-        cy.get('div[data-testid="travelHistory[0].method"]').click();
-        cy.get('li[data-value="Car"').click();
+        cy.get('div[data-testid="travelHistory[0].methods"]').type('Car');
+        cy.get('li').first().should('contain', 'Car').click();
+        cy.get('div[data-testid="travelHistory[0].methods"]').type('Plane');
+        cy.get('li').first().should('contain', 'Plane').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type(
             'United Kingdom',
@@ -99,8 +106,8 @@ describe('New case form', function () {
         );
         cy.get('div[data-testid="travelHistory[1].purpose"]').click();
         cy.get('li[data-value="Business"').click();
-        cy.get('div[data-testid="travelHistory[1].method"]').click();
-        cy.get('li[data-value="Car"').click();
+        cy.get('div[data-testid="travelHistory[1].methods"]').type('Bus');
+        cy.get('li').first().should('contain', 'Bus').click();
         cy.get('button[data-testid="addGenomeSequence"').click();
         cy.get('input[name="genomeSequences[0].sampleCollectionDate"]').type(
             '2020-01-01',
@@ -115,10 +122,10 @@ describe('New case form', function () {
             'test sequence name',
         );
         cy.get('input[name="genomeSequences[0].sequenceLength"]').type('33000');
-        cy.get('textarea[name="genomeSequences[0].notes"]').type(
-            'test sequence notes\non new line',
-        );
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="pathogens"]').type('Bartonella');
+        cy.get('li').first().should('contain', 'Bartonella').click();
+        cy.get('div[data-testid="pathogens"]').type('Ebola');
+        cy.get('li').first().should('contain', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -127,6 +134,7 @@ describe('New case form', function () {
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
+        cy.contains('www.example.com');
         cy.contains('Female');
         cy.contains('21');
         cy.contains('Asian');
@@ -139,7 +147,7 @@ describe('New case form', function () {
         cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('Germany, United Kingdom');
-        cy.contains('www.example.com');
+        cy.contains('Bartonella, Ebola');
         cy.contains('test notes');
         cy.contains('on new line');
         cy.contains('superuser@');
@@ -156,6 +164,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -163,7 +172,6 @@ describe('New case form', function () {
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -171,9 +179,51 @@ describe('New case form', function () {
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
+        cy.contains('www.example.com');
         cy.contains('France');
         cy.contains('1/1/2020');
+    });
+
+    it('Can submit events without dates', function () {
+        cy.visit('/cases');
+        cy.contains('No records to display');
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
+
+        cy.visit('/cases/new');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('France');
+        cy.contains('Country');
+        cy.get('li').first().should('contain', 'France').click();
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.get('div[data-testid="methodOfConfirmation"]').click();
+        cy.get('li[data-value="PCR test"').click();
+        // Outcome without a date.
+        cy.get('div[data-testid="outcome"]').click();
+        cy.get('li[data-value="Recovered"').click();
+        // Hospital admission without a date.
+        cy.get('div[data-testid="admittedToHospital"]').click();
+        cy.get('li[data-value="Yes"').click();
+        // ICU admission without a date.
+        cy.get('div[data-testid="admittedToIcu"]').click();
+        cy.get('li[data-value="Yes"').click();
+        cy.server();
+        cy.route('POST', '/api/cases').as('addCase');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@addCase');
+
+        cy.visit('/cases');
+        cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
+        cy.contains('France');
+        cy.contains('1/1/2020');
+        cy.contains('Yes');
+        cy.contains('Recovered');
     });
 
     it('Does not add row on submission error', function () {
@@ -188,6 +238,7 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
+        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -195,7 +246,6 @@ describe('New case form', function () {
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
         cy.server();
         // Force server to return error
         cy.route({

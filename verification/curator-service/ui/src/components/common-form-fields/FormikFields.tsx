@@ -1,6 +1,7 @@
-import { Field, useFormikContext } from 'formik';
+import { FastField, Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
+import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
 import { FormHelperText } from '@material-ui/core';
@@ -8,7 +9,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import NewCaseFormValues from '../new-case-form-fields/NewCaseFormValues';
 import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
@@ -30,7 +30,8 @@ interface FormikAutocompleteProps {
     name: string;
     label: string;
     multiple: boolean;
-    optionsLocation: string;
+    optionsList?: string[];
+    optionsLocation?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialValue: any;
 }
@@ -44,7 +45,7 @@ export function FormikAutocomplete(
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
     const { setFieldValue, setTouched, initialValues } = useFormikContext<
-        NewCaseFormValues
+        CaseFormValues
     >();
 
     React.useEffect(() => {
@@ -55,11 +56,14 @@ export function FormikAutocomplete(
         }
 
         (async (): Promise<void> => {
-            const resp = await axios.get<string>(props.optionsLocation);
-            const retrievedOptions = resp.data.split('\n');
+            let retrievedOptions = props.optionsList;
+            if (!retrievedOptions && props.optionsLocation) {
+                const resp = await axios.get<string>(props.optionsLocation);
+                retrievedOptions = resp.data.split('\n');
+            }
 
             if (active) {
-                setOptions(retrievedOptions);
+                setOptions(retrievedOptions as string[]);
             }
         })();
 
@@ -70,6 +74,7 @@ export function FormikAutocomplete(
         initialValues,
         loading,
         props.name,
+        props.optionsList,
         props.optionsLocation,
         setFieldValue,
         setTouched,
@@ -101,6 +106,7 @@ export function FormikAutocomplete(
             onBlur={(): void => setTouched({ [props.name]: true })}
             defaultValue={props.initialValue}
             renderInput={(params): JSX.Element => (
+                // Do not use FastField here
                 <Field
                     {...params}
                     // Setting the name properly allows any typed value
@@ -131,7 +137,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                 {props.label}
                 {props.required && ' *'}
             </InputLabel>
-            <Field
+            <FastField
                 as="select"
                 name={props.name}
                 type="text"
@@ -144,7 +150,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                         {value ?? 'Unknown'}
                     </MenuItem>
                 ))}
-            </Field>
+            </FastField>
             {props.required && (
                 <RequiredHelperText name={props.name}></RequiredHelperText>
             )}
@@ -163,7 +169,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
     return (
         <div className={classes.fieldRow}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Field
+                <FastField
                     className={classes.field}
                     name={props.name}
                     label={props.label}
@@ -188,7 +194,7 @@ interface RequiredHelperTextProps {
 export function RequiredHelperText(
     props: RequiredHelperTextProps,
 ): JSX.Element {
-    const { values, touched } = useFormikContext<NewCaseFormValues>();
+    const { values, touched } = useFormikContext<CaseFormValues>();
     return (
         <div>
             {hasKey(touched, props.name) &&

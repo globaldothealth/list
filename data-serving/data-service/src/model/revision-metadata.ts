@@ -2,34 +2,40 @@ import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
 import { positiveIntFieldInfo } from './positive-int';
 
-const editMetadataSchema = new mongoose.Schema({
-    curator: {
-        type: String,
-        required: true,
+const editMetadataSchema = new mongoose.Schema(
+    {
+        curator: {
+            type: String,
+            required: true,
+        },
+        date: {
+            ...dateFieldInfo,
+            required: true,
+        },
+        notes: String,
     },
-    date: {
-        ...dateFieldInfo,
-        required: true,
-    },
-    notes: String,
-});
+    { _id: false },
+);
 
-export const revisionMetadataSchema = new mongoose.Schema({
-    revisionNumber: {
-        ...positiveIntFieldInfo,
-        required: true,
-    },
-    creationMetadata: {
-        type: editMetadataSchema,
-        required: true,
-    },
-    updateMetadata: {
-        type: editMetadataSchema,
-        required: function (this: RevisionMetadataDocument): boolean {
-            return this.revisionNumber > 0;
+export const revisionMetadataSchema = new mongoose.Schema(
+    {
+        revisionNumber: {
+            ...positiveIntFieldInfo,
+            required: true,
+        },
+        creationMetadata: {
+            type: editMetadataSchema,
+            required: true,
+        },
+        updateMetadata: {
+            type: editMetadataSchema,
+            required: function (this: RevisionMetadataDocument): boolean {
+                return this?.revisionNumber > 0;
+            },
         },
     },
-});
+    { _id: false },
+);
 
 type EditMetadataDocument = mongoose.Document & {
     curator: string;
@@ -40,5 +46,5 @@ type EditMetadataDocument = mongoose.Document & {
 export type RevisionMetadataDocument = mongoose.Document & {
     revisionNumber: number;
     creationMetadata: EditMetadataDocument;
-    updateMetadata: EditMetadataDocument;
+    updateMetadata?: EditMetadataDocument;
 };

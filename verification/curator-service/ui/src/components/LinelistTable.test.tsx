@@ -32,6 +32,10 @@ it('loads and displays cases', async () => {
             importedCase: {
                 outcome: 'Recovered',
             },
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             demographics: { ageRange: { start: 1, end: 3 } },
             location: {
                 country: 'France',
@@ -53,13 +57,16 @@ it('loads and displays cases', async () => {
                     },
                     value: 'PCR test',
                 },
-            ],
-            notes: 'some notes',
-            sources: [
                 {
-                    url: 'http://foo.bar',
+                    name: 'hospitalAdmission',
+                    value: 'Yes',
+                },
+                {
+                    name: 'outcome',
+                    value: 'Recovered',
                 },
             ],
+            notes: 'some notes',
             revisionMetadata: {
                 creationMetadata: {
                     curator: 'foo@bar.com',
@@ -86,14 +93,14 @@ it('loads and displays cases', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     expect(await findByText(/some notes/)).toBeInTheDocument();
     expect(await findByText(/some place name/)).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
     expect(await findByText('PCR test')).toBeInTheDocument();
     expect(await findByText('foo@bar.com')).toBeInTheDocument();
+    expect(await findByText('Recovered')).toBeInTheDocument();
+    expect(await findByText('Yes')).toBeInTheDocument();
 });
 
 it('redirects to new case page when + icon is clicked', async () => {
@@ -117,9 +124,7 @@ it('redirects to new case page when + icon is clicked', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     fireEvent.click(getByText('add'));
     expect(history.location.pathname).toBe('/cases/new');
 });
@@ -128,6 +133,10 @@ it('API errors are displayed', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -144,11 +153,6 @@ it('API errors are displayed', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosResponse = {
@@ -189,6 +193,10 @@ it('can delete a row', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -205,11 +213,6 @@ it('can delete a row', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
@@ -231,9 +234,7 @@ it('can delete a row', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
@@ -279,6 +280,10 @@ it('can go to page to edit a row', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -299,11 +304,6 @@ it('can go to page to edit a row', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
-                {
-                    url: 'http://foo.bar',
-                },
-            ],
         },
     ];
     const axiosGetResponse = {
@@ -326,9 +326,7 @@ it('can go to page to edit a row', async () => {
         </Router>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
@@ -337,10 +335,14 @@ it('can go to page to edit a row', async () => {
     expect(history.location.pathname).toBe('/cases/edit/abc123');
 });
 
-it('cannot edit data as a reader only', async () => {
+it('can go to page to view a case', async () => {
     const cases = [
         {
             _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'http://foo.bar',
+            },
             importedCase: {
                 outcome: 'Recovered',
             },
@@ -361,11 +363,65 @@ it('cannot edit data as a reader only', async () => {
                 },
             ],
             notes: 'some notes',
-            sources: [
+        },
+    ];
+    const axiosGetResponse = {
+        data: {
+            cases: cases,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+    // Load table
+    const history = createMemoryHistory();
+    const { getByText, findByText } = render(
+        <Router history={history}>
+            <LinelistTable user={curator} />
+        </Router>,
+    );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
+    const row = await findByText('some notes');
+    expect(row).toBeInTheDocument();
+
+    const detailsButton = getByText(/details/);
+    fireEvent.click(detailsButton);
+    expect(history.location.pathname).toBe('/cases/view/abc123');
+});
+
+it('cannot edit data as a reader only', async () => {
+    const cases = [
+        {
+            _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
+            importedCase: {
+                outcome: 'Recovered',
+            },
+            location: {
+                country: 'France',
+                geoResolution: 'Country',
+                geometry: {
+                    latitude: 42,
+                    longitude: 12,
+                },
+            },
+            events: [
                 {
-                    url: 'http://foo.bar',
+                    name: 'confirmed',
+                    dateRange: {
+                        start: new Date().toJSON(),
+                    },
                 },
             ],
+            notes: 'some notes',
         },
     ];
     const axiosGetResponse = {
@@ -394,9 +450,7 @@ it('cannot edit data as a reader only', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/cases/?limit=10&page=1&filter=',
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 

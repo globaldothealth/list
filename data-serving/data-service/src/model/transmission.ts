@@ -11,21 +11,23 @@ export enum Route {
     Iatrogenic = 'Iatrogenic',
     VectorBorne = 'Vector borne',
     Other = 'Other',
-    Unknown = 'Unknown',
 }
 
-export const transmissionSchema = new mongoose.Schema({
-    // Ids of other cases of people with whom this person had contact.
-    linkedCaseIds: [String],
-    // Data dictionary.
-    places: [String],
-    routes: [
-        {
-            type: String,
-            enum: Object.values(Route),
-        },
-    ],
-});
+export const transmissionSchema = new mongoose.Schema(
+    {
+        // Ids of other cases of people with whom this person had contact.
+        linkedCaseIds: [String],
+        // Data dictionary.
+        places: [String],
+        routes: [
+            {
+                type: String,
+                enum: Object.values(Route),
+            },
+        ],
+    },
+    { _id: false },
+);
 
 export type TransmissionDocument = mongoose.Document & {
     linkedCaseIds: [string];

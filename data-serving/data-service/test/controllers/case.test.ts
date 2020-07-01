@@ -2,6 +2,7 @@ import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
+import mongoose from 'mongoose';
 import request from 'supertest';
 
 let mongoServer: MongoMemoryServer;
@@ -75,24 +76,34 @@ describe('GET', () => {
             // No continuation expected.
             expect(res.body.nextPage).toBeUndefined();
         });
-        it('should filter results', async () => {
+        it('should query results', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connect(process.env.MONGO_URL || '', {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false,
+            });
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
             const c = new Case(minimalCase);
             c.notes = 'got it at work';
             await c.save();
             // Search for non-matching notes.
-            let res = await request(app)
-                .get('/api/cases?page=1&limit=10&filter=notes:home')
+            const res = await request(app)
+                .get('/api/cases?page=1&limit=10&q=home')
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(0);
             expect(res.body.total).toEqual(0);
             // Search for matching notes.
-            res = await request(app)
-                .get('/api/cases?page=1&limit=10&filter=notes:work')
-                .expect(200)
+            await request(app)
+                .get(`/api/cases?page=1&limit=10&q=${encodeURI('at work')}`)
+                .expect(200, /got it at work/)
                 .expect('Content-Type', /json/);
-            expect(res.body.cases).toHaveLength(1);
-            expect(res.body.total).toEqual(1);
         });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(422, done);
@@ -156,7 +167,11 @@ describe('PUT', () => {
         const res = await request(app)
             .put('/api/cases')
             .send({
-                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
                 notes: newNotes,
             })
             .expect('Content-Type', /json/)
@@ -172,6 +187,22 @@ describe('PUT', () => {
             .expect('Content-Type', /json/)
             .expect(201);
     });
+    it('upsert items without sourceEntryId should return 201 CREATED', async () => {
+        const sharedSourceId = 'abc123';
+        const firstUniqueCase = new Case(minimalCase);
+        firstUniqueCase.set('caseReference.sourceId', sharedSourceId);
+        await firstUniqueCase.save();
+        const secondUniqueCase = new Case(minimalCase);
+        secondUniqueCase.set('caseReference.sourceId', sharedSourceId);
+
+        await request(app)
+            .put('/api/cases')
+            .send(secondUniqueCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(await secondUniqueCase.collection.countDocuments()).toEqual(2);
+    });
     it('upsert new item with invalid input should return 422', () => {
         return request(app).put('/api/cases').send({}).expect(422);
     });
@@ -186,7 +217,11 @@ describe('PUT', () => {
         return request(app)
             .put('/api/cases')
             .send({
-                caseReference: { sourceId: sourceId, sourceEntryId: entryId },
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
                 location: {},
             })
             .expect(422);

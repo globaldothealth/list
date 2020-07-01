@@ -1,0 +1,15 @@
+{
+    "notes": "text",
+    "revisionMetadata.creationMetadata.curator": "text",
+    "demographics.profession": "text",
+    "demographics.nationalities": "text",
+    "demographics.ethnicity": "text",
+    "location.country": "text",
+    "location.administrativeAreaLevel1": "text",
+    "location.administrativeAreaLevel2": "text",
+    "location.administrativeAreaLevel3": "text",
+    "location.place": "text",
+    "location.name": "text",
+    "pathogen.name": "text",
+    "caseReference.sourceUrl": "text"
+}
