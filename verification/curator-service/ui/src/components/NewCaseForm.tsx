@@ -18,6 +18,7 @@ import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
 import NewCaseFormValues from './new-case-form-fields/NewCaseFormValues';
 import Notes from './new-case-form-fields/Notes';
+import Pathogens from './new-case-form-fields/Pathogens';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -83,6 +84,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             traveledPrior30Days: undefined,
             travelHistory: [],
             genomeSequences: [],
+            pathogens: [],
             sourceUrl: '',
             notes: '',
         };
@@ -149,7 +151,8 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
         genomeSequences: c.genomeSequences?.map((genomeSequence) => {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
-        sourceUrl: c.caseReference.sourceUrl,
+        pathogens: c.pathogens,
+        sourceUrl: c.caseReference?.sourceUrl,
         notes: c.notes,
     };
 }
@@ -353,6 +356,7 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                 travel: this.filterTravel(values.travelHistory),
             },
             genomeSequences: this.filterGenomeSequences(values.genomeSequences),
+            pathogens: values.pathogens,
             notes: values.notes,
             revisionMetadata: {
                 revisionNumber: 0,
@@ -614,6 +618,20 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                             </div>
                             <div
                                 className={classes.tableOfContentsRow}
+                                onClick={(): void => this.scrollTo('pathogens')}
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked: values.pathogens?.length > 0,
+                                    hasError: hasErrors(
+                                        ['pathogens'],
+                                        errors,
+                                        touched,
+                                    ),
+                                })}
+                                Pathogens
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
                                 onClick={(): void => this.scrollTo('notes')}
                             >
                                 {this.tableOfContentsIcon({
@@ -652,6 +670,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                 </div>
                                 <div className={classes.formSection}>
                                     <GenomeSequences></GenomeSequences>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Pathogens></Pathogens>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Notes></Notes>
