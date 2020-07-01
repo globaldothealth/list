@@ -131,6 +131,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 ?.curator || ''
                         }
                     />
+
+                    <RowHeader title="Notes" />
+                    <RowContent content={props.c.notes} />
                 </Grid>
             </Paper>
 
