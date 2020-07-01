@@ -123,6 +123,7 @@ export function PlacesAutocomplete(
             }}
             renderInput={(params): JSX.Element => (
                 <div>
+                    {/* Do not use FastField here */}
                     <Field
                         {...params}
                         // Setting the name properly allows any typed value

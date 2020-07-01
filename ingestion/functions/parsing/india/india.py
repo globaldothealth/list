@@ -98,7 +98,8 @@ def parse_cases(raw_data_file, source_id, source_url):
             {
                 "caseReference": {
                     "sourceId": source_id,
-                    "sourceEntryId": entry["entryid"]
+                    "sourceEntryId": entry["entryid"],
+                    "sourceUrl": source_url
                 },
                 "revisionMetadata": {
                     "revisionNumber": 0,
@@ -107,11 +108,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "date": date.today().strftime("%m/%d/%Y")
                     }
                 },
-                "sources": [
-                    {
-                        "url": source_url,
-                    }
-                ],
                 "location": convert_location(entry),
                 "events": [
                     {

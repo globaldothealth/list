@@ -1,7 +1,7 @@
 import { Case } from './Case';
+import CaseForm from './CaseForm';
 import { LinearProgress } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import NewCaseForm from './NewCaseForm';
 import React from 'react';
 import User from './User';
 import axios from 'axios';
@@ -45,7 +45,7 @@ class EditCase extends React.Component<Props, State> {
                     </MuiAlert>
                 )}
                 {this.state.case && (
-                    <NewCaseForm
+                    <CaseForm
                         user={this.props.user}
                         initialCase={this.state.case}
                     />

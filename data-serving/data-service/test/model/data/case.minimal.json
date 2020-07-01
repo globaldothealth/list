@@ -1,4 +1,8 @@
 {
+    "caseReference": {
+        "sourceId": "sourceId",
+        "sourceUrl": "cdc.gov"
+    },
     "events": [
         {
             "name": "confirmed",
@@ -8,20 +12,15 @@
             }
         }
     ],
-    "sources": [
-        {
-            "url": "cdc.gov"
-        }
-    ],
+    "location": {
+        "country": "China",
+        "geoResolution": "Country"
+    },
     "revisionMetadata": {
         "revisionNumber": 0,
         "creationMetadata": {
             "curator": "abc123",
             "date": "2020-01-03"
         }
-    },
-    "location": {
-        "country": "China",
-        "geoResolution": "Country"
     }
 }

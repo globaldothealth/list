@@ -5,6 +5,9 @@ interface SetupDatabaseParameters {
     databaseName: string;
     collectionName: string;
     schemaPath: string;
+    indexPath: string;
+    /** If not specified, deletes only imported documents. Defaults to false. */
+    deleteAllDocuments: boolean;
 }
 
 const setupDatabase = async ({
@@ -12,10 +15,15 @@ const setupDatabase = async ({
     databaseName,
     collectionName,
     schemaPath,
+    indexPath,
+    deleteAllDocuments = false,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
         print(`Read schema from ${schemaPath}`);
+
+        const index = JSON.parse(await cat(indexPath));
+        print(`Read index from ${indexPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
@@ -25,24 +33,47 @@ const setupDatabase = async ({
         const database = await connection.getDB(databaseName);
         print(`Connected to database "${database}"`);
 
-        // If the collection already exists, drop it so we can recreate it
-        // fresh.
+        // If the collection already exists, drop all imported data from it and
+        // apply the latest schema.
+        let collection;
         if (
             (await database.getCollectionNames()).some(
                 (c) => c == collectionName,
             )
         ) {
-            await (await database.getCollection(collectionName)).drop();
-            print('Dropped existing collection');
+            collection = await database.getCollection(collectionName);
+            const query = deleteAllDocuments
+                ? {}
+                : { importedCase: { $exists: true, $ne: null } };
+            const results = await collection.remove(query);
+            print(
+                `Dropped ${
+                    deleteAllDocuments ? 'all' : 'imported'
+                } documents (${results.nRemoved} total) 🗑️`,
+            );
+
+            await database.runCommand({
+                collMod: collectionName,
+                validator: schema,
+            });
+            print(
+                `Applied schema to existing collection "${collectionName}" 📑`,
+            );
+        } else {
+            await database.createCollection(collectionName, {
+                validator: schema,
+            });
+            print(`Created collection "${collectionName}" with schema 📑`);
+            collection = await database.getCollection(collectionName);
         }
 
-        await database.createCollection(collectionName, {
-            validator: schema,
-        });
-        print(`Created collection "${collectionName}" with schema`);
+        print('Dropping indexes 👇');
+        const indexName = `${collectionName}Idx`;
+        await collection.dropIndex(indexName);
 
-        const collection = await database.getCollection(collectionName);
-        // TODO(khmoran): Create indexes.
+        print('Creating indexes 👆');
+        await collection.createIndex(index, { name: indexName });
+        print('Done 👍');
 
         // Print some stats -- for fun and confirmation!
         const stats = await collection.stats();

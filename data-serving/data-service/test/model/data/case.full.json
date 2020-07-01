@@ -1,7 +1,16 @@
 {
     "caseReference": {
         "sourceId": "sourceId",
-        "sourceEntryId": "entryId"
+        "sourceEntryId": "entryId",
+        "sourceUrl": "cdc.gov",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
     },
     "demographics": {
         "ageRange": {
@@ -19,8 +28,7 @@
             "repositoryUrl": "https://www.ncbi.nlm.nih.gov/nuccore/NC_045512",
             "sequenceId": "NC_045512.2",
             "sequenceName": "Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome",
-            "sequenceLength": 33000,
-            "notes": "The reference sequence is identical to MN908947."
+            "sequenceLength": 33000
         }
     ],
     "location": {
@@ -81,10 +89,9 @@
             "Coronary heart disease",
             "Lung cancer"
         ],
-        "status": "Yes"
+        "hasPreexistingConditions": true
     },
     "travelHistory": {
-        "numLocations": 1,
         "travel": [
             {
                 "dateRange": {

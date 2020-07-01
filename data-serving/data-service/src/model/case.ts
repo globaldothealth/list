@@ -1,6 +1,5 @@
 import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
 import { DemographicsDocument, demographicsSchema } from './demographics';
-import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
 import {
     GenomeSequenceDocument,
@@ -9,10 +8,14 @@ import {
 import { LocationDocument, locationSchema } from './location';
 import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
+    PreexistingConditionsDocument,
+    preexistingConditionsSchema,
+} from './preexisting-conditions';
+import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
 } from './revision-metadata';
-import { SourceDocument, sourceSchema } from './source';
+import { SymptomsDocument, symptomsSchema } from './symptoms';
 import { TransmissionDocument, transmissionSchema } from './transmission';
 import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
@@ -21,7 +24,10 @@ import mongoose from 'mongoose';
 
 const caseSchema = new mongoose.Schema(
     {
-        caseReference: caseReferenceSchema,
+        caseReference: {
+            type: caseReferenceSchema,
+            required: true,
+        },
         demographics: demographicsSchema,
         events: {
             type: [eventSchema],
@@ -33,24 +39,18 @@ const caseSchema = new mongoose.Schema(
             },
         },
         genomeSequences: [genomeSequenceSchema],
-        importedCase: {},
+        importedCase: {
+            _id: false,
+        },
         location: locationSchema,
         revisionMetadata: {
             type: revisionMetadataSchema,
-            required: 'Must include revision metadata',
+            required: true,
         },
         notes: String,
         pathogens: [pathogenSchema],
-        preexistingConditions: dictionarySchema,
-        sources: {
-            type: [sourceSchema],
-            required: true,
-            validate: {
-                validator: (sources: [SourceDocument]) => sources.length > 0,
-                message: 'Must include one or more sources',
-            },
-        },
-        symptoms: dictionarySchema,
+        preexistingConditions: preexistingConditionsSchema,
+        symptoms: symptomsSchema,
         transmission: transmissionSchema,
         travelHistory: travelHistorySchema,
     },
@@ -81,9 +81,8 @@ type CaseDocument = mongoose.Document & {
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     pathogens: [PathogenDocument];
-    preexistingConditions: DictionaryDocument;
-    sources: [SourceDocument];
-    symptoms: DictionaryDocument;
+    preexistingConditions: PreexistingConditionsDocument;
+    symptoms: SymptomsDocument;
     transmission: TransmissionDocument;
     travelHistory: TravelHistoryDocument;
 };

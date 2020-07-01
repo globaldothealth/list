@@ -1,4 +1,16 @@
 // Case definitions as returned by the /api/cases endpoint.
+
+export interface CaseReference {
+    sourceId: string;
+    sourceEntryId?: string;
+    sourceUrl: string;
+    additionalSources: [
+        {
+            sourceUrl: string;
+        },
+    ];
+}
+
 export interface Event {
     name: string;
     dateRange?: {
@@ -19,6 +31,10 @@ export interface Demographics {
     profession: string;
 }
 
+export interface PreexistingConditions {
+    values: string[];
+}
+
 export interface Location {
     country: string;
     administrativeAreaLevel1: string;
@@ -35,10 +51,6 @@ export interface Geometry {
     longitude: number;
 }
 
-export interface Source {
-    url: string;
-}
-
 export interface Symptoms {
     values: string[];
 }
@@ -50,6 +62,7 @@ export interface Transmission {
 }
 
 export interface TravelHistory {
+    traveledPrior30Days?: boolean;
     travel: Travel[];
 }
 
@@ -60,10 +73,10 @@ export interface Travel {
         end: string;
     };
     purpose?: string;
-    method?: string;
+    methods: string[];
 }
 
-interface GenomeSequence {
+export interface GenomeSequence {
     sampleCollectionDate: string | null;
     repositoryUrl?: string;
     sequenceId?: string;
@@ -72,17 +85,25 @@ interface GenomeSequence {
     notes?: string;
 }
 
+export interface Pathogen {
+    name: string;
+    id: number;
+}
+
 interface Revision {
     curator: string;
     date: string;
 }
 
 interface RevisionMetadata {
+    revisionNumber: number;
     creationMetadata: Revision;
+    updateMetadata?: Revision;
 }
 
 export interface Case {
     _id: string;
+    caseReference: CaseReference;
     importedCase?: {
         outcome?: string;
     };
@@ -90,11 +111,11 @@ export interface Case {
     demographics: Demographics;
     location: Location;
     symptoms: Symptoms;
+    preexistingConditions?: PreexistingConditions;
     transmission: Transmission;
-    sources: Source[];
     travelHistory: TravelHistory;
     genomeSequences: GenomeSequence[];
+    pathogens: Pathogen[];
     notes: string;
-
     revisionMetadata: RevisionMetadata;
 }

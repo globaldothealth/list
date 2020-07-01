@@ -1,6 +1,6 @@
 import { Location as Loc } from '../Case';
 
-export default interface NewCaseFormValues {
+export default interface CaseFormValues {
     sex?: string;
     minAge?: number;
     maxAge?: number;
@@ -16,6 +16,7 @@ export default interface NewCaseFormValues {
     selfIsolationDate: string | null;
     admittedToHospital?: string;
     hospitalAdmissionDate: string | null;
+    admittedToIcu?: string;
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
     outcome?: string;
@@ -23,13 +24,15 @@ export default interface NewCaseFormValues {
     transmissionRoutes: string[];
     transmissionPlaces: string[];
     transmissionLinkedCaseIds: string[];
+    traveledPrior30Days?: string;
     travelHistory: Travel[];
     genomeSequences: GenomeSequence[];
+    pathogens: Pathogen[];
     sourceUrl: string;
     notes: string;
 }
 
-interface Travel {
+export interface Travel {
     // Used to key react elements in the UI
     reactId: string;
     location: Loc;
@@ -38,10 +41,10 @@ interface Travel {
         end: string | null;
     };
     purpose?: string;
-    method?: string;
+    methods: string[];
 }
 
-interface GenomeSequence {
+export interface GenomeSequence {
     // Used to key react elements in the UI
     reactId: string;
     sampleCollectionDate: string | null;
@@ -49,5 +52,9 @@ interface GenomeSequence {
     sequenceId?: string;
     sequenceName?: string;
     sequenceLength?: number;
-    notes?: string;
+}
+
+interface Pathogen {
+    name: string;
+    id: number;
 }

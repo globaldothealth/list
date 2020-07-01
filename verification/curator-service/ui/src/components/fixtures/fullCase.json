@@ -2,7 +2,16 @@
     "_id": "5ef8e943dfe6e00030892d58",
     "caseReference": {
         "sourceId": "sourceId",
-        "sourceEntryId": "entryId"
+        "sourceEntryId": "entryId",
+        "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
     },
     "demographics": {
         "ageRange": {
@@ -11,7 +20,7 @@
         },
         "sex": "Female",
         "profession": "Horse breeder",
-        "nationality": "Swedish",
+        "nationalities": ["Swedish"],
         "ethnicity": "Asian"
     },
     "genomeSequences": [
@@ -20,8 +29,7 @@
             "repositoryUrl": "https://www.ncbi.nlm.nih.gov/nuccore/NC_045512",
             "sequenceId": "NC_045512.2",
             "sequenceName": "Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome",
-            "sequenceLength": 33000,
-            "notes": "The reference sequence is identical to MN908947."
+            "sequenceLength": 33000
         }
     ],
     "location": {
@@ -39,31 +47,38 @@
         {
             "name": "onsetSymptoms",
             "dateRange": {
-                "start": 1578000000000,
-                "end": 1578027600000
+                "start": "2020-01-01",
+                "end": "2020-01-01"
             }
         },
         {
             "name": "confirmed",
             "value": "PCR test",
             "dateRange": {
-                "start": 1578891600000,
-                "end": 1578891600000
+                "start": "2020-01-02",
+                "end": "2020-01-02"
             }
         },
         {
             "name": "hospitalAdmission",
             "dateRange": {
-                "start": 1579395600000,
-                "end": 1581469200000
+                "start": "2020-01-03",
+                "end": "2020-01-03"
+            }
+        },
+        {
+            "name": "icuAdmission",
+            "dateRange": {
+                "start": "2020-01-04",
+                "end": "2020-01-05"
             }
         },
         {
             "name": "outcome",
             "value": "Recovered",
             "dateRange": {
-                "start": "1581483600000",
-                "end": "1581483600000"
+                "start": "2020-01-06",
+                "end": "2020-01-06"
             }
         }
     ],
@@ -82,23 +97,22 @@
             "Coronary heart disease",
             "Lung cancer"
         ],
-        "status": "Yes"
+        "hasPreexistingConditions": true
     },
     "travelHistory": {
-        "numLocations": 1,
         "travel": [
             {
                 "dateRange": {
-                    "start": "2020-01-10",
-                    "end": "2020-01-17"
+                    "start": "2020-02-10",
+                    "end": "2020-02-17"
                 },
                 "location": {
                     "country": "United States",
                     "administrativeAreaLevel1": "New York",
                     "administrativeAreaLevel2": "Kings County",
                     "administrativeAreaLevel3": "Brooklyn",
-                    "place": "Kings County Hospital Center",
-                    "name": "Kings County Hospital Center",
+                    "place": "Kings Hospital Center",
+                    "name": "Kings Hospital Center",
                     "geoResolution": "Point",
                     "geometry": {
                         "latitude": 40.6809611,
@@ -111,12 +125,6 @@
         ],
         "traveledPrior30Days": true
     },
-    "sources": [
-        {
-            "id": "def456",
-            "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
-        }
-    ],
     "pathogens": [
         {
             "name": "COVID-19",
@@ -132,19 +140,19 @@
         "revisionNumber": 1,
         "creationMetadata": {
             "curator": "abc123",
-            "date": "2020-01-03",
+            "date": "2020-01-20",
             "notes": "initial data entry"
         },
         "updateMetadata": {
             "curator": "xyz789",
-            "date": "2020-01-13",
+            "date": "2020-04-13",
             "notes": "fix source error"
         }
     },
     "transmission": {
         "routes": [ "Vector borne" ],
         "places": [ "Gym" ],
-        "linkedCaseIds": [ "abc", "def" ]
+        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee" ]
     },
     "importedCase": {}
 }

@@ -26,7 +26,7 @@ the curator UI to manage case report data sources and view or update case data, 
 #### Secrets
 
 **Important:** running the full stack correctly requires having access to a few secrets: you should create a `.env` file
-at the top of your repository (where you run the `run_stack.sh` command) that looks like this:
+in `${REPOSITORY_ROOT}/dev` that looks like this:
 
 ```shell
 AWS_ACCESS_KEY_ID=<AWS access key ID>
@@ -34,6 +34,7 @@ AWS_SECRET_ACCESS_KEY=<AWS secret access key to authenticate AWS API calls>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 MAPBOX_TOKEN=<Mapbox API token>
+REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 ```
 
 #### Permissions

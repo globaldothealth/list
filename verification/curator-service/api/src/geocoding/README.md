@@ -13,8 +13,6 @@ It will return a list of `GeocodeResult` as defined in `geocoder.ts`.
 
 Maximum 5 results will be returned in order of relevance, as such they are suitable for autocompleting the `location.query` field in the UI as well.
 
-TODO: Describe new `/api/suggest/location` API for location autocomplete when implemented.
-
 ## Integration testing
 
 We can't (and don't want to either because it's costly) use the mapbox geocoder in integration testing, `index.ts` will look at the `MAPBOX_TOKEN` environment variable and if it is empty, it will use a fake geocoder instead with seedable responses so that the overall flow can still be tested without any additional cost.
