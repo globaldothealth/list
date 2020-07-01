@@ -262,7 +262,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             travelHistory: c.travelHistory,
                                             pathogens: c.pathogens,
                                             notes: c.notes,
-                                            sourceUrl: c.caseReference.sourceUrl,
+                                            sourceUrl:
+                                                c.caseReference?.sourceUrl,
                                             curatedBy:
                                                 c.revisionMetadata
                                                     ?.creationMetadata

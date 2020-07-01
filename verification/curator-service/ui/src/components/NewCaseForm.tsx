@@ -152,7 +152,7 @@ function initialValuesFromCase(c?: Case): NewCaseFormValues {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
         pathogens: c.pathogens,
-        sourceUrl: c.caseReference.sourceUrl,
+        sourceUrl: c.caseReference?.sourceUrl,
         notes: c.notes,
     };
 }
@@ -270,11 +270,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference:  {
+            caseReference: {
                 // TODO: Replace the below with a source id once we have lookups
                 // in place.
                 sourceId: 'FAKE_ID',
-                sourceUrl: values.sourceUrl
+                sourceUrl: values.sourceUrl,
             },
             demographics: {
                 sex: values.sex,
