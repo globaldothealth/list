@@ -14,7 +14,7 @@ describe('View case', function () {
         cy.contains('Request failed');
     });
 
-    it('can view a case', function () {
+    it('can view a minimal case', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -25,7 +25,21 @@ describe('View case', function () {
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
+            cy.contains('France');
+            cy.contains('nome notes');
+            cy.contains('www.example.com');
+            cy.contains('PCR test');
             cy.contains('French');
+            cy.contains('Andorrean');
+        });
+    });
+
+    it('can view a full case', function () {
+        cy.addFullCase();
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
+            cy.contains('Asian');
         });
     });
 });

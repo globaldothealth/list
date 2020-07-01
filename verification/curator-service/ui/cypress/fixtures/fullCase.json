@@ -159,7 +159,7 @@
     "transmission": {
         "routes": [ "Vector borne" ],
         "places": [ "Gym" ],
-        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee" ]
+        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee"]
     },
     "importedCase": {}
 }
