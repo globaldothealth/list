@@ -1,6 +1,5 @@
 import { CaseReferenceDocument, caseReferenceSchema } from './case-reference';
 import { DemographicsDocument, demographicsSchema } from './demographics';
-import { DictionaryDocument, dictionarySchema } from './dictionary';
 import { EventDocument, eventSchema } from './event';
 import {
     GenomeSequenceDocument,
@@ -9,9 +8,14 @@ import {
 import { LocationDocument, locationSchema } from './location';
 import { PathogenDocument, pathogenSchema } from './pathogen';
 import {
+    PreexistingConditionsDocument,
+    preexistingConditionsSchema,
+} from './preexisting-conditions';
+import {
     RevisionMetadataDocument,
     revisionMetadataSchema,
 } from './revision-metadata';
+import { SymptomsDocument, symptomsSchema } from './symptoms';
 import { TransmissionDocument, transmissionSchema } from './transmission';
 import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 
@@ -43,8 +47,8 @@ const caseSchema = new mongoose.Schema(
         },
         notes: String,
         pathogens: [pathogenSchema],
-        preexistingConditions: dictionarySchema,
-        symptoms: dictionarySchema,
+        preexistingConditions: preexistingConditionsSchema,
+        symptoms: symptomsSchema,
         transmission: transmissionSchema,
         travelHistory: travelHistorySchema,
     },
@@ -75,8 +79,8 @@ type CaseDocument = mongoose.Document & {
     revisionMetadata: RevisionMetadataDocument;
     notes: string;
     pathogens: [PathogenDocument];
-    preexistingConditions: DictionaryDocument;
-    symptoms: DictionaryDocument;
+    preexistingConditions: PreexistingConditionsDocument;
+    symptoms: SymptomsDocument;
     transmission: TransmissionDocument;
     travelHistory: TravelHistoryDocument;
 };
