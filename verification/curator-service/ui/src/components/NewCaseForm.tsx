@@ -267,11 +267,11 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference:  {
+            caseReference: {
                 // TODO: Replace the below with a source id once we have lookups
                 // in place.
                 sourceId: 'FAKE_ID',
-                sourceUrl: values.sourceUrl
+                sourceUrl: values.sourceUrl,
             },
             demographics: {
                 sex: values.sex,
@@ -665,7 +665,9 @@ class NewCaseForm extends React.Component<Props, NewCaseFormState> {
                                     disabled={isSubmitting}
                                     onClick={submitForm}
                                 >
-                                    Submit case
+                                    {this.props.initialCase
+                                        ? 'Edit case'
+                                        : 'Submit case'}
                                 </Button>
                             </Form>
                             {this.state.errorMessage && (
