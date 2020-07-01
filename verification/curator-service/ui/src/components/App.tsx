@@ -10,6 +10,7 @@ import { Link, Route, Switch } from 'react-router-dom';
 
 import Add from '@material-ui/icons/Add';
 import BulkCaseForm from './BulkCaseForm';
+import CaseForm from './CaseForm';
 import Charts from './Charts';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -26,7 +27,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
-import NewCaseForm from './NewCaseForm';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
@@ -377,7 +377,7 @@ class App extends React.Component<Props, State> {
                             )}
                             {this.hasAnyRole(['curator']) && (
                                 <Route path="/cases/new">
-                                    <NewCaseForm user={this.state.user} />
+                                    <CaseForm user={this.state.user} />
                                 </Route>
                             )}
                             {this.hasAnyRole(['curator']) && (

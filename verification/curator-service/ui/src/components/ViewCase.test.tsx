@@ -37,6 +37,8 @@ it('loads and displays case', async () => {
     expect(getByText('news.org/an-article')).toBeInTheDocument();
     expect(getByText('abc123')).toBeInTheDocument();
     expect(getByText('2020-01-20')).toBeInTheDocument();
+    expect(getByText('xyz789')).toBeInTheDocument();
+    expect(getByText('2020-04-13')).toBeInTheDocument();
     expect(
         getByText('Contact of a confirmed case at work.'),
     ).toBeInTheDocument();

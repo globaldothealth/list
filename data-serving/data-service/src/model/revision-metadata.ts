@@ -26,7 +26,7 @@ export const revisionMetadataSchema = new mongoose.Schema({
     updateMetadata: {
         type: editMetadataSchema,
         required: function (this: RevisionMetadataDocument): boolean {
-            return this.revisionNumber > 0;
+            return this?.revisionNumber > 0;
         },
     },
 });
@@ -40,5 +40,5 @@ type EditMetadataDocument = mongoose.Document & {
 export type RevisionMetadataDocument = mongoose.Document & {
     revisionNumber: number;
     creationMetadata: EditMetadataDocument;
-    updateMetadata: EditMetadataDocument;
+    updateMetadata?: EditMetadataDocument;
 };

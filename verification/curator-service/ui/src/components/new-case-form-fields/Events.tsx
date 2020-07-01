@@ -1,6 +1,6 @@
 import { DateField, SelectField } from '../common-form-fields/FormikFields';
 
-import NewCaseFormValues from './NewCaseFormValues';
+import CaseFormValues from './CaseFormValues';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
@@ -19,7 +19,7 @@ const methodsOfConfirmation = [
 const outcomes = [undefined, 'Death', 'Recovered'];
 
 export default function Events(): JSX.Element {
-    const { values } = useFormikContext<NewCaseFormValues>();
+    const { values } = useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="events">
             <fieldset>
