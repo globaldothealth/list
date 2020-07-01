@@ -249,11 +249,8 @@
               "bsonType": "string"
             }
           },
-          "status": {
-            "enum": [
-              "Yes",
-              "No"
-            ]
+          "hasPreexistingConditions": {
+            "bsonType": "bool"
           }
         }
       },
