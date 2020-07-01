@@ -1,4 +1,8 @@
-import { DateField, SelectField } from '../common-form-fields/FormikFields';
+import {
+    DateField,
+    FormikAutocomplete,
+    SelectField,
+} from '../common-form-fields/FormikFields';
 import { FieldArray, useFormikContext } from 'formik';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -20,6 +24,9 @@ const useStyles = makeStyles(() => ({
     spacer: {
         flex: '1',
     },
+    fieldRow: {
+        marginBottom: '2em',
+    },
 }));
 
 const hasTravelledValues = [undefined, 'Yes', 'No'];
@@ -28,7 +35,6 @@ const hasTravelledValues = [undefined, 'Yes', 'No'];
 const travelPurposes = [undefined, 'Business', 'Leisure', 'Family', 'Other'];
 
 const travelMethods = [
-    undefined,
     'Bus',
     'Car',
     'Coach',
@@ -39,7 +45,7 @@ const travelMethods = [
 ];
 
 export default function Events(): JSX.Element {
-    const { values } = useFormikContext<CaseFormValues>();
+    const { values, initialValues } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="travelHistory">
@@ -119,13 +125,26 @@ export default function Events(): JSX.Element {
                                                                 travelPurposes
                                                             }
                                                         ></SelectField>
-                                                        <SelectField
-                                                            name={`travelHistory[${index}].method`}
-                                                            label="Method of travel"
-                                                            values={
-                                                                travelMethods
+                                                        <div
+                                                            className={
+                                                                classes.fieldRow
                                                             }
-                                                        ></SelectField>
+                                                        >
+                                                            <FormikAutocomplete
+                                                                name={`travelHistory[${index}].methods`}
+                                                                label="Methods of travel"
+                                                                initialValue={
+                                                                    initialValues
+                                                                        .travelHistory[
+                                                                        index
+                                                                    ]?.methods
+                                                                }
+                                                                multiple={true}
+                                                                optionsList={
+                                                                    travelMethods
+                                                                }
+                                                            />
+                                                        </div>
                                                     </div>
                                                 );
                                             },

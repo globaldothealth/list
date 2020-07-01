@@ -73,7 +73,7 @@ export interface Travel {
         end: string;
     };
     purpose?: string;
-    methods?: string[];
+    methods: string[];
 }
 
 export interface GenomeSequence {
