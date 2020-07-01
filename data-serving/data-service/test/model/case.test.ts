@@ -5,8 +5,11 @@ import minimalEvent from './data/event.minimal.json';
 import minimalModel from './data/case.minimal.json';
 
 describe('validate', () => {
-    it('model without sources is invalid', async () => {
-        return new Case({ ...minimalModel, sources: [] }).validate((e) => {
+    it('model without caseReference is invalid', async () => {
+        const noCaseReference = { ...minimalModel };
+        delete noCaseReference.caseReference;
+
+        return new Case({ ...noCaseReference }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
@@ -28,10 +31,10 @@ describe('validate', () => {
     });
 
     it('model without revision metadata is invalid', async () => {
-        const noRevisionmetadata = { ...minimalModel };
-        delete noRevisionmetadata.revisionMetadata;
+        const noRevisionMetadata = { ...minimalModel };
+        delete noRevisionMetadata.revisionMetadata;
 
-        return new Case(noRevisionmetadata).validate((e) => {
+        return new Case(noRevisionMetadata).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });

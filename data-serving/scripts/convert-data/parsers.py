@@ -19,7 +19,7 @@ import datetime
 from typing import Any, Callable, Dict, List, Tuple
 from constants import (COMMON_LOCATION_ABBREVIATIONS,
                        VALID_GEO_RESOLUTIONS, VALID_SEXES)
-from utils import trim_string_list
+from utils import is_url, trim_string_list
 from geocode_util import lookup_location
 
 
@@ -380,3 +380,11 @@ def parse_string_list(value: Any) -> List[str]:
 
     # Assuming this wasn't a list, but a singular value.
     return [value]
+
+
+def parse_url(value: Any) -> str:
+  # TODO: Too noisy right now. Use a more accurate URL parser before throwing.
+  # if not is_url(value):
+  #  raise ValueError('not a valid URL')
+
+  return value
