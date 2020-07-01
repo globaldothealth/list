@@ -1,4 +1,4 @@
-import { Case, Location, Travel } from './Case';
+import { Case, GenomeSequence, Location, Travel } from './Case';
 import {
     Container,
     Grid,
@@ -338,9 +338,44 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 <Typography className={classes.sectionTitle} variant="overline">
                     Pathogens & genome sequencing
                 </Typography>
-                {/* TODO */}
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Pathogens" />
+                    <RowContent
+                        content={props.c.pathogens
+                            ?.map((e) => `${e.name} (${e.id})`)
+                            .join(', ')}
+                    />
+
+                    {props.c.genomeSequences.map((e) => (
+                        <GenomeSequenceRows
+                            key={shortId.generate()}
+                            sequence={e}
+                        />
+                    ))}
+                </Grid>
             </Paper>
         </Container>
+    );
+}
+
+function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
+    return (
+        <>
+            <RowHeader title="Date of sample collection" />
+            <RowContent content={props.sequence?.sampleCollectionDate || ''} />
+
+            <RowHeader title="Genome sequence repository" />
+            <RowContent content={props.sequence?.repositoryUrl || ''} isLink />
+
+            <RowHeader title="Genome sequence name" />
+            <RowContent content={props.sequence?.sequenceName || ''} />
+
+            <RowHeader title="Genome sequence length" />
+            <RowContent content={`${props.sequence?.sequenceLength}` || ''} />
+
+            <RowHeader title="Genome sequence ID" />
+            <RowContent content={props.sequence?.sequenceId || ''} />
+        </>
     );
 }
 
@@ -420,7 +455,7 @@ function RowHeader(props: {
 function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     return (
         <Grid item xs={8}>
-            {props.isLink ? (
+            {props.isLink && props.content ? (
                 <a href={props.content}>{props.content}</a>
             ) : (
                 props.content
