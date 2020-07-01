@@ -74,6 +74,25 @@ describe('Bulk upload form', function () {
         cy.contains('new.url');
     });
 
+    it('Upserts multiple cases if dictated by caseCount CSV field', function () {
+        cy.visit('/cases');
+        cy.contains('No records to display');
+
+        cy.visit('/cases/bulk');
+        const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
+        cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('PUT', '/api/cases').as('upsertCase');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@upsertCase');
+        cy.wait('@upsertCase');
+        cy.wait('@upsertCase');
+        cy.contains('Success!');
+
+        cy.visit('/cases');
+        cy.get('tr').should('have.length', 3);
+    });
+
     it('Does not upload bad data', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
