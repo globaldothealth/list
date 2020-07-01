@@ -1,9 +1,9 @@
 // Case definitions as returned by the /api/cases endpoint.
 export interface Event {
     name: string;
-    dateRange: {
-        start: string;
-        end: string;
+    dateRange?: {
+        start?: string;
+        end?: string;
     };
     value?: string;
 }
