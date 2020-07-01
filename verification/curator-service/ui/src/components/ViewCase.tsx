@@ -1,3 +1,4 @@
+import { Case, Location, Travel } from './Case';
 import {
     Container,
     Grid,
@@ -6,11 +7,11 @@ import {
     Typography,
 } from '@material-ui/core';
 
-import { Case } from './Case';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';
+import shortId from 'shortid';
 
 interface Props {
     id: string;
@@ -96,7 +97,7 @@ function dateRange(range?: { start: string; end: string }): string {
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Typography className={classes.caseTitle} variant="h5">
                 Case {props.c._id}
             </Typography>
@@ -111,7 +112,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                     <RowHeader title="Data source link" />
                     <RowContent
-                        content={props.c.caseReference.sourceUrl}
+                        content={props.c.caseReference?.sourceUrl}
                         isLink
                     />
 
@@ -166,43 +167,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     Location
                 </Typography>
                 <Grid container className={classes.grid}>
-                    <RowHeader title="Location" />
-                    <RowContent content={props.c.location?.name} />
-
-                    <RowHeader title="Location type" />
-                    <RowContent content={props.c.location?.geoResolution} />
-
-                    <RowHeader title="Admin area 1" />
-                    <RowContent
-                        content={props.c.location?.administrativeAreaLevel1}
-                    />
-
-                    <RowHeader title="Admin area 2" />
-                    <RowContent
-                        content={props.c.location?.administrativeAreaLevel2}
-                    />
-
-                    <RowHeader title="Admin area 3" />
-                    <RowContent
-                        content={props.c.location?.administrativeAreaLevel3}
-                    />
-
-                    <RowHeader title="Country" />
-                    <RowContent content={props.c.location?.country} />
-
-                    <RowHeader title="Latitude" />
-                    <RowContent
-                        content={`${props.c.location?.geometry?.latitude?.toFixed(
-                            4,
-                        )}`}
-                    />
-                    <RowHeader title="Longitude" />
-                    <RowContent
-                        content={`${props.c.location?.geometry?.longitude?.toFixed(
-                            4,
-                        )}`}
-                    />
-                    {/* TODO: A static map would be nice here. */}
+                    <LocationRows loc={props.c.location} />
                 </Grid>
             </Paper>
 
@@ -345,13 +310,105 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     />
                 </Grid>
             </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Travel history
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Travelled in last 30 days" />
+                    <RowContent
+                        content={
+                            props.c.travelHistory?.traveledPrior30Days
+                                ? 'Yes'
+                                : 'No'
+                        }
+                    />
+
+                    {props.c.travelHistory?.travel?.map((e) => (
+                        <TravelRow key={shortId.generate()} travel={e} />
+                    ))}
+                </Grid>
+            </Paper>
+
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Pathogens & genome sequencing
+                </Typography>
+                {/* TODO */}
+            </Paper>
         </Container>
     );
 }
 
-function RowHeader(props: { title: string }): JSX.Element {
+function LocationRows(props: { loc?: Location }): JSX.Element {
     return (
-        <Grid item xs={4}>
+        <>
+            <RowHeader title="Location" />
+            <RowContent content={props.loc?.name || ''} />
+
+            <RowHeader title="Location type" />
+            <RowContent content={props.loc?.geoResolution || ''} />
+
+            <RowHeader title="Admin area 1" />
+            <RowContent content={props.loc?.administrativeAreaLevel1 || ''} />
+
+            <RowHeader title="Admin area 2" />
+            <RowContent content={props.loc?.administrativeAreaLevel2 || ''} />
+
+            <RowHeader title="Admin area 3" />
+            <RowContent content={props.loc?.administrativeAreaLevel3 || ''} />
+
+            <RowHeader title="Country" />
+            <RowContent content={props.loc?.country || ''} />
+
+            <RowHeader title="Latitude" />
+            <RowContent
+                content={`${props.loc?.geometry?.latitude?.toFixed(4)}`}
+            />
+            <RowHeader title="Longitude" />
+            <RowContent
+                content={`${props.loc?.geometry?.longitude?.toFixed(4)}`}
+            />
+            {/* TODO: A static map would be nice here. */}
+        </>
+    );
+}
+
+function TravelRow(props: { travel: Travel }): JSX.Element {
+    return (
+        <>
+            <RowHeader title="Methods of travel" isSeparated />
+            <RowContent content={props.travel.methods?.join(', ') || ''} />
+
+            <RowHeader title="Travel dates" />
+            <RowContent content={dateRange(props.travel.dateRange)} />
+
+            <RowHeader title="Primary reason of travel" />
+            <RowContent content={props.travel.purpose || ''} />
+
+            <LocationRows loc={props.travel.location} />
+        </>
+    );
+}
+
+const headerStyles = makeStyles(() => ({
+    separatedHeader: {
+        marginTop: '2em',
+    },
+}));
+
+function RowHeader(props: {
+    title: string;
+    isSeparated?: boolean;
+}): JSX.Element {
+    const classes = headerStyles();
+    return (
+        <Grid
+            className={props.isSeparated ? classes.separatedHeader : ''}
+            item
+            xs={4}
+        >
             <Typography variant="body2">{props.title}</Typography>
         </Grid>
     );
