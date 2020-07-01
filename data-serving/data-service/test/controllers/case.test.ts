@@ -44,8 +44,13 @@ describe('GET', () => {
                 .expect(200);
         });
         it('should paginate', async () => {
+            const now = new Date();
             for (const i of Array.from(Array(15).keys())) {
-                await new Case(minimalCase).save();
+                const c = new Case(minimalCase);
+                c.revisionMetadata.creationMetadata.set({
+                    date: now.setHours(i),
+                });
+                await c.save();
             }
             // Fetch first page.
             let res = await request(app)
@@ -53,6 +58,14 @@ describe('GET', () => {
                 .expect(200)
                 .expect('Content-Type', /json/);
             expect(res.body.cases).toHaveLength(10);
+            // Results should be ordered by date desc.
+            for (let i = 0; i < res.body.cases.length - 1; i++) {
+                expect(
+                    res.body.cases[i].revisionMetadata.creationMetadata.date >
+                        res.body.cases[i + 1].revisionMetadata.creationMetadata
+                            .date,
+                ).toBeTruthy();
+            }
             // Second page is expected.
             expect(res.body.nextPage).toEqual(2);
             expect(res.body.total).toEqual(15);
