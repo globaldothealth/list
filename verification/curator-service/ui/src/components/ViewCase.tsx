@@ -75,6 +75,10 @@ const useStyles = makeStyles((theme) => ({
     sectionTitle: {
         margin: '1em',
     },
+    container: {
+        marginTop: '1em',
+        marginBottom: '1em',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -98,7 +102,7 @@ function dateRange(range?: { start?: string; end?: string }): string {
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="md" className={classes.container}>
             <Typography className={classes.caseTitle} variant="h5">
                 Case {props.c._id}
             </Typography>
@@ -475,10 +479,19 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
     );
 }
 
+const headerStyles = makeStyles(() => ({
+    separatedHeader: {
+        marginTop: '3em',
+    },
+}));
+
 function TravelRow(props: { travel: Travel }): JSX.Element {
+    const classes = headerStyles();
     return (
         <>
-            <RowHeader title="Methods of travel" isSeparated />
+            <span className={classes.separatedHeader}></span>
+
+            <RowHeader title="Methods of travel" />
             <RowContent content={props.travel.methods?.join(', ') || ''} />
 
             <RowHeader title="Travel dates" />
@@ -500,23 +513,9 @@ function MapRow(props: { location?: Location }): JSX.Element {
     );
 }
 
-const headerStyles = makeStyles(() => ({
-    separatedHeader: {
-        marginTop: '2em',
-    },
-}));
-
-function RowHeader(props: {
-    title: string;
-    isSeparated?: boolean;
-}): JSX.Element {
-    const classes = headerStyles();
+function RowHeader(props: { title: string }): JSX.Element {
     return (
-        <Grid
-            className={props.isSeparated ? classes.separatedHeader : ''}
-            item
-            xs={4}
-        >
+        <Grid item xs={4}>
             <Typography variant="body2">{props.title}</Typography>
         </Grid>
     );
