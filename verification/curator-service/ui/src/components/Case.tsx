@@ -53,6 +53,7 @@ export interface Geometry {
 }
 
 export interface Symptoms {
+    status: string;
     values: string[];
 }
 

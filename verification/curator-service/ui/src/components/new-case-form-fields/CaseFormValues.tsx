@@ -20,6 +20,7 @@ export default interface CaseFormValues {
     icuAdmissionDate: string | null;
     outcomeDate: string | null;
     outcome?: string;
+    symptomsStatus?: string;
     symptoms: string[];
     hasPreexistingConditions?: string;
     preexistingConditions: string[];
