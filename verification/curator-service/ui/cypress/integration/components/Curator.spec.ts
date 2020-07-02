@@ -66,6 +66,8 @@ describe('Curator', function () {
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
         cy.get('input[name="outcomeDate"]').type('2020-01-07');
+        cy.get('div[data-testid="symptomsStatus"]').click();
+        cy.get('li[data-value="Presymptomatic"').click();
         cy.get('div[data-testid="symptoms"]').type('dry cough');
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');

@@ -308,6 +308,8 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     Symptoms
                 </Typography>
                 <Grid container className={classes.grid}>
+                    <RowHeader title="Symptoms status" />
+                    <RowContent content={props.c.symptoms?.status} />
                     <RowHeader title="Symptoms" />
                     <RowContent
                         content={props.c.symptoms?.values?.join(', ')}
@@ -526,8 +528,8 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
             {props.isLink && props.content ? (
                 <a href={props.content}>{props.content}</a>
             ) : (
-                    props.content
-                )}
+                props.content
+            )}
         </Grid>
     );
 }

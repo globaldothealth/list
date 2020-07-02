@@ -80,6 +80,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             icuAdmissionDate: null,
             outcomeDate: null,
             outcome: undefined,
+            symptomsStatus: undefined,
             symptoms: [],
             hasPreexistingConditions: undefined,
             preexistingConditions: [],
@@ -142,6 +143,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             c.events.find((event) => event.name === 'outcome')?.dateRange
                 ?.start || null,
         outcome: c.events.find((event) => event.name === 'outcome')?.value,
+        symptomsStatus: c.symptoms?.status,
         symptoms: c.symptoms?.values,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
@@ -357,6 +359,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     };
                 }),
             symptoms: {
+                status: values.symptomsStatus,
                 values: values.symptoms,
             },
             preexistingConditions: {
@@ -588,9 +591,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 onClick={(): void => this.scrollTo('symptoms')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.symptoms?.length > 0,
+                                    isChecked:
+                                        values.symptomsStatus !== undefined ||
+                                        values.symptoms?.length > 0,
                                     hasError: hasErrors(
-                                        ['symptoms'],
+                                        ['symptomsStatus', 'symptoms'],
                                         errors,
                                         touched,
                                     ),
