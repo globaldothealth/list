@@ -103,6 +103,13 @@ export default function Events(): JSX.Element {
                                                             </Button>
                                                         </div>
                                                         <PlacesAutocomplete
+                                                            initialValue={
+                                                                initialValues
+                                                                    .travelHistory[
+                                                                    index
+                                                                ]?.location
+                                                                    ?.name
+                                                            }
                                                             name={`travelHistory[${index}].location`}
                                                         ></PlacesAutocomplete>
                                                         <Location
