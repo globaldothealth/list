@@ -271,7 +271,6 @@ describe('Curator', function () {
         cy.contains('45.7589');
         cy.contains('4.8414');
         // Events.
-        cy.contains('2019-12-31');
         cy.contains('2020-01-01');
         cy.contains('2020-01-02');
         cy.contains('2020-01-03');
@@ -283,6 +282,7 @@ describe('Curator', function () {
         cy.contains('Yes');
         //  Symptoms.
         cy.contains('dry cough, mild fever');
+        cy.contains('Presymptomatic');
         // Preexisting conditions.
         cy.contains('ABCD syndrome, ADULT syndrome');
         // Transmission.
