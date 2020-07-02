@@ -120,10 +120,16 @@ export default function Events(): JSX.Element {
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.start`}
                                                             label="Start date"
+                                                            initialFocusedDate={
+                                                                values.confirmedDate
+                                                            }
                                                         ></DateField>
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.end`}
                                                             label="End date"
+                                                            initialFocusedDate={
+                                                                values.confirmedDate
+                                                            }
                                                         ></DateField>
                                                         <SelectField
                                                             name={`travelHistory[${index}].purpose`}
