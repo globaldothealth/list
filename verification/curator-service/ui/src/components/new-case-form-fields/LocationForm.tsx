@@ -2,6 +2,7 @@ import { Field, useFormikContext } from 'formik';
 import { Typography, makeStyles } from '@material-ui/core';
 
 import { Autocomplete } from '@material-ui/lab';
+import CaseFormValues from './CaseFormValues';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
@@ -10,18 +11,20 @@ import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import axios from 'axios';
+import { hasKey } from '../Utils';
 import throttle from 'lodash/throttle';
 
-interface Values {
-    location: Loc;
-}
 function LocationForm(): JSX.Element {
-    const { values } = useFormikContext<Values>();
+    const { values, initialValues } = useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="location">
             <fieldset>
                 <legend>Location</legend>
-                <PlacesAutocomplete name="location" required />
+                <PlacesAutocomplete
+                    initialValue={initialValues.location?.name}
+                    name="location"
+                    required
+                />
                 <Location location={values.location} />
             </fieldset>
         </Scroll.Element>
@@ -44,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 interface PlacesAutocompleteProps {
     name: string;
     required?: boolean;
+    initialValue?: string;
 }
 
 // Place autocomplete, based on
@@ -55,7 +59,9 @@ export function PlacesAutocomplete(
     const [value, setValue] = React.useState<Loc | null>(null);
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<Loc[]>([]);
-    const { setFieldValue, setTouched } = useFormikContext();
+    const { setFieldValue, setTouched, touched } = useFormikContext<
+        CaseFormValues
+    >();
 
     const fetch = React.useMemo(
         () =>
@@ -122,7 +128,7 @@ export function PlacesAutocomplete(
                 setInputValue(newInputValue);
             }}
             renderInput={(params): JSX.Element => (
-                <div>
+                <>
                     {/* Do not use FastField here */}
                     <Field
                         {...params}
@@ -132,7 +138,13 @@ export function PlacesAutocomplete(
                         name="unused"
                         required={props.required}
                         data-testid={props.name}
-                        label="Location"
+                        // Use the initial valuelocation name as a hint when untouched
+                        // otherwise just use the field name.
+                        label={
+                            hasKey(touched, props.name)
+                                ? props.name
+                                : props.initialValue || props.name
+                        }
                         component={TextField}
                         fullWidth
                     ></Field>
@@ -141,7 +153,7 @@ export function PlacesAutocomplete(
                             name={props.name}
                         ></RequiredHelperText>
                     )}
-                </div>
+                </>
             )}
             renderOption={(option: Loc): React.ReactNode => {
                 return (
