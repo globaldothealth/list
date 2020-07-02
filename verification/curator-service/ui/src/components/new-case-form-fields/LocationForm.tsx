@@ -142,8 +142,8 @@ export function PlacesAutocomplete(
                         // otherwise just use the field name.
                         label={
                             hasKey(touched, props.name)
-                                ? props.name
-                                : props.initialValue || props.name
+                                ? 'Location'
+                                : props.initialValue || 'Location'
                         }
                         component={TextField}
                         fullWidth
