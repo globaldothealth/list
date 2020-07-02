@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import { MemoryRouter, Router } from 'react-router-dom';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, getByLabelText, render } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
 import React from 'react';
@@ -117,7 +117,7 @@ it('redirects to new case page when + icon is clicked', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     const history = createMemoryHistory();
-    const { getByText } = render(
+    const { getByLabelText } = render(
         <Router history={history}>
             <LinelistTable user={curator} />
         </Router>,
@@ -125,7 +125,7 @@ it('redirects to new case page when + icon is clicked', async () => {
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
-    fireEvent.click(getByText('add'));
+    fireEvent.click(getByLabelText('add'));
     expect(history.location.pathname).toBe('/cases/new');
 });
 
@@ -320,7 +320,7 @@ it('can go to page to edit a row', async () => {
 
     // Load table
     const history = createMemoryHistory();
-    const { getByText, findByText } = render(
+    const { getByLabelText, findByText } = render(
         <Router history={history}>
             <LinelistTable user={curator} />
         </Router>,
@@ -330,7 +330,7 @@ it('can go to page to edit a row', async () => {
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
-    const editButton = getByText(/edit/);
+    const editButton = getByLabelText(/edit/);
     fireEvent.click(editButton);
     expect(history.location.pathname).toBe('/cases/edit/abc123');
 });
@@ -379,7 +379,7 @@ it('can go to page to view a case', async () => {
 
     // Load table
     const history = createMemoryHistory();
-    const { getByText, findByText } = render(
+    const { findByText, getByLabelText } = render(
         <Router history={history}>
             <LinelistTable user={curator} />
         </Router>,
@@ -389,7 +389,7 @@ it('can go to page to view a case', async () => {
     const row = await findByText('some notes');
     expect(row).toBeInTheDocument();
 
-    const detailsButton = getByText(/details/);
+    const detailsButton = getByLabelText(/details/);
     fireEvent.click(detailsButton);
     expect(history.location.pathname).toBe('/cases/view/abc123');
 });
@@ -437,7 +437,7 @@ it('cannot edit data as a reader only', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { findByText, queryByText } = render(
+    const { findByText, queryByText, queryByLabelText } = render(
         <MemoryRouter>
             <LinelistTable
                 user={{
@@ -458,6 +458,6 @@ it('cannot edit data as a reader only', async () => {
     expect(deleteButton).not.toBeInTheDocument();
     const addButton = queryByText(/add_box/);
     expect(addButton).not.toBeInTheDocument();
-    const editButton = queryByText(/edit/);
+    const editButton = queryByLabelText(/edit/);
     expect(editButton).not.toBeInTheDocument();
 });
