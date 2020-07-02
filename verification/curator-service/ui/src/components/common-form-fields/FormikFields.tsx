@@ -162,6 +162,7 @@ interface DateFieldProps {
     name: string;
     label: string;
     required?: boolean;
+    initialFocusedDate?: string | null;
 }
 
 export function DateField(props: DateFieldProps): JSX.Element {
@@ -169,14 +170,19 @@ export function DateField(props: DateFieldProps): JSX.Element {
     return (
         <div className={classes.fieldRow}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <FastField
+                {/* Don't use FastField here */}
+                <Field
                     className={classes.field}
                     name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
                     required={props.required}
-                    maxDate={new Date()}
                     minDate={new Date('2019/12/01')}
+                    disableFuture
+                    autoOk
+                    initialFocusedDate={Date.parse(
+                        props.initialFocusedDate ?? '',
+                    )}
                     component={KeyboardDatePicker}
                 />
             </MuiPickersUtilsProvider>
