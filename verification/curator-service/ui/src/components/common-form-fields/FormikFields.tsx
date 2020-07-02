@@ -201,7 +201,8 @@ export function RequiredHelperText(
                 touched[props.name] &&
                 hasKey(values, props.name) &&
                 (values[props.name] === undefined ||
-                    values[props.name] === null) && (
+                    values[props.name] === null ||
+                    values[props.name] === '') && (
                     <FormHelperText error>Required field</FormHelperText>
                 )}
         </div>

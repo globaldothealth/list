@@ -21,7 +21,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -53,7 +53,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -96,7 +96,7 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
-        cy.get('input[name="sourceUrl"]').type('www.example.com');
+        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');

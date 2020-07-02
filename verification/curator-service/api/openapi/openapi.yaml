@@ -54,6 +54,12 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: url
+          in: query
+          description: Origin URL substring on which to filter the result set
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/200SourceArray"
