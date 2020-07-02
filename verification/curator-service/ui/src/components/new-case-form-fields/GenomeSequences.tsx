@@ -87,7 +87,7 @@ export default function GenomeSequences(): JSX.Element {
                                                     className={classes.field}
                                                     name={`genomeSequences[${index}].sequenceId`}
                                                     type="text"
-                                                    label="Sequence ID"
+                                                    label="Sequence accession"
                                                     fullWidth
                                                     component={TextField}
                                                 ></FastField>
