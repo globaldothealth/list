@@ -8,7 +8,7 @@ import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
 
-// TODO: get symptoms from DB
+// TODO: get values from DB
 const symptomStatusValues = [
     undefined,
     'Asymptomatic',
@@ -33,7 +33,7 @@ export default function Symptoms(): JSX.Element {
                         name="symptoms"
                         label="Symptoms"
                         initialValue={initialValues.symptoms}
-                        multiple={true}
+                        multiple
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/symptoms.txt"
                     />
                 )}
