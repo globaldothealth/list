@@ -312,8 +312,28 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <RowContent
                         content={props.c.symptoms?.values?.join(', ')}
                     />
+                </Grid>
+            </Paper>
 
-                    <RowHeader title="Pre existing conditions" />
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Preexisting conditions
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Has preexisting conditions" />
+                    <RowContent
+                        content={
+                            props.c.preexistingConditions
+                                ?.hasPreexistingConditions === undefined
+                                ? ''
+                                : props.c.preexistingConditions
+                                      .hasPreexistingConditions
+                                ? 'Yes'
+                                : 'No'
+                        }
+                    />
+
+                    <RowHeader title="Preexisting conditions" />
                     <RowContent
                         content={
                             props.c.preexistingConditions?.values?.join(', ') ||
@@ -358,7 +378,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <RowHeader title="Travelled in last 30 days" />
                     <RowContent
                         content={
-                            props.c.travelHistory?.traveledPrior30Days
+                            props.c.travelHistory?.traveledPrior30Days ===
+                            undefined
+                                ? ''
+                                : props.c.travelHistory.traveledPrior30Days
                                 ? 'Yes'
                                 : 'No'
                         }

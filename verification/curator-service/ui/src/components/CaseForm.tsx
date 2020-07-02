@@ -16,6 +16,7 @@ import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
 import Notes from './new-case-form-fields/Notes';
 import Pathogens from './new-case-form-fields/Pathogens';
+import PreexistingConditions from './new-case-form-fields/PreexistingConditions';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -80,6 +81,8 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             outcomeDate: null,
             outcome: undefined,
             symptoms: [],
+            hasPreexistingConditions: undefined,
+            preexistingConditions: [],
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
@@ -140,6 +143,13 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 ?.start || null,
         outcome: c.events.find((event) => event.name === 'outcome')?.value,
         symptoms: c.symptoms?.values,
+        hasPreexistingConditions:
+            c.preexistingConditions?.hasPreexistingConditions === undefined
+                ? undefined
+                : c.preexistingConditions?.hasPreexistingConditions
+                ? 'Yes'
+                : 'No',
+        preexistingConditions: c.preexistingConditions?.values ?? [],
         transmissionRoutes: c.transmission?.routes,
         transmissionPlaces: c.transmission?.places,
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
@@ -348,6 +358,15 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 }),
             symptoms: {
                 values: values.symptoms,
+            },
+            preexistingConditions: {
+                hasPreexistingConditions:
+                    values.hasPreexistingConditions === 'Yes'
+                        ? true
+                        : values.hasPreexistingConditions === 'No'
+                        ? false
+                        : undefined,
+                values: values.preexistingConditions,
             },
             transmission: {
                 routes: values.transmissionRoutes,
@@ -581,6 +600,29 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                             <div
                                 className={classes.tableOfContentsRow}
                                 onClick={(): void =>
+                                    this.scrollTo('preexistingConditions')
+                                }
+                            >
+                                {this.tableOfContentsIcon({
+                                    isChecked:
+                                        values.hasPreexistingConditions !==
+                                            undefined ||
+                                        values.preexistingConditions?.length >
+                                            0,
+                                    hasError: hasErrors(
+                                        [
+                                            'hasPreexistingConditions',
+                                            'preexistingConditions',
+                                        ],
+                                        errors,
+                                        touched,
+                                    ),
+                                })}
+                                Preexisting conditions
+                            </div>
+                            <div
+                                className={classes.tableOfContentsRow}
+                                onClick={(): void =>
                                     this.scrollTo('transmission')
                                 }
                             >
@@ -686,6 +728,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div className={classes.formSection}>
                                     <Symptoms></Symptoms>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <PreexistingConditions></PreexistingConditions>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Transmission></Transmission>
