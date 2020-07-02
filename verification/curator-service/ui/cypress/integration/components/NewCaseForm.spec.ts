@@ -69,6 +69,16 @@ describe('New case form', function () {
         cy.get('li').first().should('contain', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
         cy.get('li').first().should('contain', 'mild fever').click();
+        cy.get('div[data-testid="hasPreexistingConditions"]').click();
+        cy.get('li[data-value="Yes"').click();
+        cy.get('div[data-testid="preexistingConditions"]').type(
+            'ABCD syndrome',
+        );
+        cy.get('li').first().should('contain', 'ABCD syndrome').click();
+        cy.get('div[data-testid="preexistingConditions"]').type(
+            'ADULT syndrome',
+        );
+        cy.get('li').first().should('contain', 'ADULT syndrome').click();
         cy.get('div[data-testid="transmissionRoutes"]').click();
         cy.get('li').first().should('contain', 'Airborne infection').click();
         cy.get('div[data-testid="transmissionPlaces"]').click();
