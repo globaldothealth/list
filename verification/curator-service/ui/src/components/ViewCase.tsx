@@ -438,7 +438,7 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
             <RowHeader title="Genome sequence length" />
             <RowContent content={`${props.sequence?.sequenceLength}` || ''} />
 
-            <RowHeader title="Genome sequence ID" />
+            <RowHeader title="Genome sequence accession" />
             <RowContent content={props.sequence?.sequenceId || ''} />
         </>
     );
