@@ -28,10 +28,9 @@ export default class SourcesController {
         }
         const filter = req.query.url
             ? {
-                  'origin.url': new RegExp(req.query.url as string, 'i'),
-              }
+                'origin.url': new RegExp(req.query.url as string, 'i'),
+            }
             : {};
-        console.warn(`List filter: ${Object.entries(filter)}`);
         try {
             const [docs, total] = await Promise.all([
                 Source.find(filter)
