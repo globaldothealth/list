@@ -13,7 +13,7 @@ export default function PreexistingConditions(): JSX.Element {
             <fieldset>
                 <legend>Pre-existing conditions</legend>
                 <SelectField
-                    name={`hasPreexistingConditions`}
+                    name="hasPreexistingConditions"
                     label="Has preexisting conditions"
                     values={hasPreexistingConditionsValues}
                 ></SelectField>
@@ -22,7 +22,7 @@ export default function PreexistingConditions(): JSX.Element {
                         name="preexistingConditions"
                         label="Preexisting conditions"
                         initialValue={initialValues.preexistingConditions}
-                        multiple={true}
+                        multiple
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/preexisting_conditions.txt"
                     />
                 )}
