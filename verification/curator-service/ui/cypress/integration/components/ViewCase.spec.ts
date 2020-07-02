@@ -14,7 +14,8 @@ describe('View case', function () {
         cy.contains('Request failed');
     });
 
-    it('can view a minimal case', function () {
+    // View of a full case is covered in the curator test.
+    it('can view a case', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -31,17 +32,6 @@ describe('View case', function () {
             cy.contains('PCR test');
             cy.contains('French');
             cy.contains('Andorrean');
-        });
-    });
-
-    it('can view a full case', function () {
-        cy.addFullCase();
-        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
-            expect(resp.body.cases).to.have.lengthOf(1);
-            cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
-            cy.contains('Asian');
-            // Further tests are already done in the unit tests.
-            // No need to fully duplicate those here.
         });
     });
 });
