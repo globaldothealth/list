@@ -321,7 +321,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     actions={(this.props.user.roles.includes('curator')
                         ? [
                               {
-                                  icon: () => <AddIcon />,
+                                  icon: () => (
+                                      <span aria-label="add">
+                                          <AddIcon />
+                                      </span>
+                                  ),
                                   tooltip: 'Submit new case',
                                   isFreeAction: true,
                                   onClick: (): void => {
@@ -329,7 +333,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   },
                               },
                               {
-                                  icon: () => <EditIcon />,
+                                  icon: () => (
+                                      <span aria-label="edit">
+                                          <EditIcon />
+                                      </span>
+                                  ),
                                   tooltip: 'Edit this case',
                                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                   onClick: (_: any, row: any): void => {
@@ -342,7 +350,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         : []
                     ).concat([
                         {
-                            icon: () => <VisibilityIcon />,
+                            icon: () => (
+                                <span aria-label="details">
+                                    <VisibilityIcon />
+                                </span>
+                            ),
                             tooltip: 'View this case details',
                             onClick: (e, row): void => {
                                 // Somehow the templating system doesn't think row has an id property but it has.
