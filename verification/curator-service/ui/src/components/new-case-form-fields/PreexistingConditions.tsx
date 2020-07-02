@@ -20,7 +20,7 @@ export default function PreexistingConditions(): JSX.Element {
                 {values.hasPreexistingConditions === 'Yes' && (
                     <FormikAutocomplete
                         name="preexistingConditions"
-                        label="Pre-existing conditions"
+                        label="Preexisting conditions"
                         initialValue={initialValues.preexistingConditions}
                         multiple={true}
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/preexisting_conditions.txt"
