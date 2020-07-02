@@ -75,6 +75,10 @@ const useStyles = makeStyles((theme) => ({
     sectionTitle: {
         margin: '1em',
     },
+    container: {
+        marginTop: '1em',
+        marginBottom: '1em',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -98,7 +102,7 @@ function dateRange(range?: { start?: string; end?: string }): string {
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
     const classes = useStyles();
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="md" className={classes.container}>
             <Typography className={classes.caseTitle} variant="h5">
                 Case {props.c._id}
             </Typography>
@@ -308,12 +312,34 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     Symptoms
                 </Typography>
                 <Grid container className={classes.grid}>
+                    <RowHeader title="Symptoms status" />
+                    <RowContent content={props.c.symptoms?.status} />
                     <RowHeader title="Symptoms" />
                     <RowContent
                         content={props.c.symptoms?.values?.join(', ')}
                     />
+                </Grid>
+            </Paper>
 
-                    <RowHeader title="Pre existing conditions" />
+            <Paper className={classes.paper} variant="outlined" square>
+                <Typography className={classes.sectionTitle} variant="overline">
+                    Preexisting conditions
+                </Typography>
+                <Grid container className={classes.grid}>
+                    <RowHeader title="Has preexisting conditions" />
+                    <RowContent
+                        content={
+                            props.c.preexistingConditions
+                                ?.hasPreexistingConditions === undefined
+                                ? ''
+                                : props.c.preexistingConditions
+                                      .hasPreexistingConditions
+                                ? 'Yes'
+                                : 'No'
+                        }
+                    />
+
+                    <RowHeader title="Preexisting conditions" />
                     <RowContent
                         content={
                             props.c.preexistingConditions?.values?.join(', ') ||
@@ -358,7 +384,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <RowHeader title="Travelled in last 30 days" />
                     <RowContent
                         content={
-                            props.c.travelHistory?.traveledPrior30Days
+                            props.c.travelHistory?.traveledPrior30Days ===
+                            undefined
+                                ? ''
+                                : props.c.travelHistory.traveledPrior30Days
                                 ? 'Yes'
                                 : 'No'
                         }
@@ -409,7 +438,7 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
             <RowHeader title="Genome sequence length" />
             <RowContent content={`${props.sequence?.sequenceLength}` || ''} />
 
-            <RowHeader title="Genome sequence ID" />
+            <RowHeader title="Genome sequence accession" />
             <RowContent content={props.sequence?.sequenceId || ''} />
         </>
     );
@@ -450,10 +479,19 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
     );
 }
 
+const headerStyles = makeStyles(() => ({
+    separatedHeader: {
+        marginTop: '3em',
+    },
+}));
+
 function TravelRow(props: { travel: Travel }): JSX.Element {
+    const classes = headerStyles();
     return (
         <>
-            <RowHeader title="Methods of travel" isSeparated />
+            <span className={classes.separatedHeader}></span>
+
+            <RowHeader title="Methods of travel" />
             <RowContent content={props.travel.methods?.join(', ') || ''} />
 
             <RowHeader title="Travel dates" />
@@ -475,23 +513,9 @@ function MapRow(props: { location?: Location }): JSX.Element {
     );
 }
 
-const headerStyles = makeStyles(() => ({
-    separatedHeader: {
-        marginTop: '2em',
-    },
-}));
-
-function RowHeader(props: {
-    title: string;
-    isSeparated?: boolean;
-}): JSX.Element {
-    const classes = headerStyles();
+function RowHeader(props: { title: string }): JSX.Element {
     return (
-        <Grid
-            className={props.isSeparated ? classes.separatedHeader : ''}
-            item
-            xs={4}
-        >
+        <Grid item xs={4}>
             <Typography variant="body2">{props.title}</Typography>
         </Grid>
     );
@@ -503,8 +527,8 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
             {props.isLink && props.content ? (
                 <a href={props.content}>{props.content}</a>
             ) : (
-                    props.content
-                )}
+                props.content
+            )}
         </Grid>
     );
 }

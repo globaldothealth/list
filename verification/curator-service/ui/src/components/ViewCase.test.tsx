@@ -65,9 +65,11 @@ it('loads and displays case', async () => {
     expect(getByText('Recovered')).toBeInTheDocument();
     expect(getByText('PCR test')).toBeInTheDocument();
     // Symptoms.
+    expect(getByText(/Symptomatic/)).toBeInTheDocument();
     expect(getByText(/Severe pneumonia/)).toBeInTheDocument();
     expect(getByText(/Dyspnea/)).toBeInTheDocument();
     expect(getByText(/Weakness/)).toBeInTheDocument();
+    // Preexisting conditions
     expect(getByText(/Hypertension/)).toBeInTheDocument();
     expect(getByText(/Type 2 diabetes/)).toBeInTheDocument();
     expect(getByText(/Coronary heart disease/)).toBeInTheDocument();

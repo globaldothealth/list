@@ -32,6 +32,7 @@ export interface Demographics {
 }
 
 export interface PreexistingConditions {
+    hasPreexistingConditions: boolean;
     values: string[];
 }
 
@@ -52,6 +53,7 @@ export interface Geometry {
 }
 
 export interface Symptoms {
+    status: string;
     values: string[];
 }
 
