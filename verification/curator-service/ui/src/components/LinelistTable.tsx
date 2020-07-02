@@ -2,10 +2,13 @@ import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import AddIcon from '@material-ui/icons/AddOutlined';
+import EditIcon from '@material-ui/icons/EditOutlined';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import React from 'react';
 import User from './User';
+import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
 
 interface ListResponse {
@@ -318,7 +321,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     actions={(this.props.user.roles.includes('curator')
                         ? [
                               {
-                                  icon: 'add',
+                                  icon: () => <AddIcon />,
                                   tooltip: 'Submit new case',
                                   isFreeAction: true,
                                   onClick: (): void => {
@@ -326,7 +329,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   },
                               },
                               {
-                                  icon: 'edit',
+                                  icon: () => <EditIcon />,
                                   tooltip: 'Edit this case',
                                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                   onClick: (_: any, row: any): void => {
@@ -339,7 +342,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         : []
                     ).concat([
                         {
-                            icon: 'details',
+                            icon: () => <VisibilityIcon />,
                             tooltip: 'View this case details',
                             onClick: (e, row): void => {
                                 // Somehow the templating system doesn't think row has an id property but it has.
