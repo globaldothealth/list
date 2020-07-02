@@ -102,9 +102,10 @@ describe('Edit case', function () {
             );
             cy.get('input[name="outcome"]').should('have.value', 'Recovered');
             // Symptoms.
+            cy.contains('Symptomatic');
             cy.contains('Severe pneumonia');
-            // TODO: Preexisting conditions.
-            // cy.contains('Hypertension');
+            // Preexisting conditions.
+            cy.contains('Hypertension');
             // Travel history.
             cy.get('input[name="travelHistory[0].dateRange.start"]').should(
                 'have.value',
