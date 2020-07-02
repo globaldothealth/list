@@ -470,6 +470,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             <Formik
                 initialValues={initialValuesFromCase(initialCase)}
                 validationSchema={NewCaseValidation}
+                // Validating on change slows down the form too much. It will
+                // validate on blur and form submission.
+                validateOnChange={false}
                 onSubmit={(values) => this.submitCase(values)}
             >
                 {({
