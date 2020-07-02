@@ -32,6 +32,7 @@ export interface Demographics {
 }
 
 export interface PreexistingConditions {
+    hasPreexistingConditions: boolean;
     values: string[];
 }
 
