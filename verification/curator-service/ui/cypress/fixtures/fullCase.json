@@ -64,14 +64,16 @@
             "dateRange": {
                 "start": "2020-01-03",
                 "end": "2020-01-03"
-            }
+            },
+            "value": "Yes"
         },
         {
             "name": "icuAdmission",
             "dateRange": {
                 "start": "2020-01-04",
                 "end": "2020-01-05"
-            }
+            },
+            "value": "Yes"
         },
         {
             "name": "outcome",
@@ -111,8 +113,8 @@
                     "administrativeAreaLevel1": "New York",
                     "administrativeAreaLevel2": "Kings County",
                     "administrativeAreaLevel3": "Brooklyn",
-                    "place": "Kings County Hospital Center",
-                    "name": "Kings County Hospital Center",
+                    "place": "Kings Hospital Center",
+                    "name": "Kings Hospital Center",
                     "geoResolution": "Point",
                     "geometry": {
                         "latitude": 40.6809611,
