@@ -15,7 +15,7 @@ export default class Source extends React.Component<{}, {}> {
             <Scroll.Element name="source">
                 <fieldset>
                     <legend>Source</legend>
-                    <SourcesAutocomplete name="sourceUrl" required />
+                    <SourcesAutocomplete />
                 </fieldset>
             </Scroll.Element>
         );
@@ -35,18 +35,12 @@ interface ListSourcesResponse {
     sources: SourceData[];
 }
 
-interface SourcesAutocompleteProps {
-    name: string;
-    required?: boolean;
-}
-
-export function SourcesAutocomplete(
-    props: SourcesAutocompleteProps,
-): JSX.Element {
+export function SourcesAutocomplete(): JSX.Element {
     const [value, setValue] = React.useState<string | null>(null);
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<string[]>([]);
     const { setFieldValue, setTouched } = useFormikContext();
+    const name = 'sourceUrl';
 
     const fetch = React.useMemo(
         () =>
@@ -110,9 +104,9 @@ export function SourcesAutocomplete(
             onChange={(event: any, newValue: string | null): void => {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
-                setFieldValue(props.name, newValue);
+                setFieldValue(name, newValue);
             }}
-            onBlur={(): void => setTouched({ [props.name]: true })}
+            onBlur={(): void => setTouched({ [name]: true })}
             onInputChange={(event, newInputValue): void => {
                 setInputValue(newInputValue);
             }}
@@ -125,18 +119,14 @@ export function SourcesAutocomplete(
                         // to be set in the form values, rather than only selected
                         // dropdown values. Thus we use an unused form value here.
                         name="unused"
-                        required={props.required}
-                        data-testid={props.name}
+                        required
+                        data-testid={name}
                         label="Source URL"
                         placeholder="https://..."
                         component={TextField}
                         fullWidth
                     ></Field>
-                    {props.required && (
-                        <RequiredHelperText
-                            name={props.name}
-                        ></RequiredHelperText>
-                    )}
+                    <RequiredHelperText name={name}></RequiredHelperText>
                 </div>
             )}
             renderOption={(option: string): React.ReactNode => {
