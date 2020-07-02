@@ -64,14 +64,16 @@
             "dateRange": {
                 "start": "2020-01-03",
                 "end": "2020-01-03"
-            }
+            },
+            "value": "Yes"
         },
         {
             "name": "icuAdmission",
             "dateRange": {
                 "start": "2020-01-04",
                 "end": "2020-01-05"
-            }
+            },
+            "value": "Yes"
         },
         {
             "name": "outcome",
