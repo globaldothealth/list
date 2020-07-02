@@ -38,14 +38,17 @@ export default function Events(): JSX.Element {
                 <DateField
                     name="onsetSymptomsDate"
                     label="Onset of symptoms date"
+                    initialFocusedDate={values.confirmedDate}
                 ></DateField>
                 <DateField
                     name="firstClinicalConsultationDate"
                     label="First clinical consultation date"
+                    initialFocusedDate={values.confirmedDate}
                 ></DateField>
                 <DateField
                     name="selfIsolationDate"
                     label="Self isolation date"
+                    initialFocusedDate={values.confirmedDate}
                 ></DateField>
                 <SelectField
                     name="admittedToHospital"
@@ -56,6 +59,7 @@ export default function Events(): JSX.Element {
                     <DateField
                         name="hospitalAdmissionDate"
                         label="Hospital admission date"
+                        initialFocusedDate={values.confirmedDate}
                     ></DateField>
                 )}
                 <SelectField
@@ -67,6 +71,7 @@ export default function Events(): JSX.Element {
                     <DateField
                         name="icuAdmissionDate"
                         label="ICU admission date"
+                        initialFocusedDate={values.confirmedDate}
                     ></DateField>
                 )}
                 <SelectField
@@ -78,6 +83,7 @@ export default function Events(): JSX.Element {
                     <DateField
                         name="outcomeDate"
                         label="Outcome date"
+                        initialFocusedDate={values.confirmedDate}
                     ></DateField>
                 )}
             </fieldset>
