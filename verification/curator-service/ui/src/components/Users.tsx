@@ -1,10 +1,13 @@
-import { WithStyles, createStyles, withStyles } from '@material-ui/core';
+import MaterialTable, { MaterialTableProps, QueryResult } from 'material-table';
+import { Paper, makeStyles } from '@material-ui/core';
 
 import Chip from '@material-ui/core/Chip';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
+import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import Select from '@material-ui/core/Select';
+import User from './User';
 import axios from 'axios';
 
 interface ListResponse {
@@ -13,42 +16,22 @@ interface ListResponse {
     total: number;
 }
 
-interface User {
-    _id: string;
+interface UsersState {
+    users: User[];
+    availableRoles: string[];
+    url: string;
+
+    error: string;
+}
+
+interface TableRow {
+    id: string;
     name: string;
     email: string;
     roles: string[];
 }
 
-interface UsersState {
-    users: User[];
-    availableRoles: string[];
-    url: string;
-}
-
-const styles = () =>
-    createStyles({
-        table: {
-            width: '100%',
-        },
-        headerCell: {
-            height: '3.5em',
-            textAlign: 'start',
-            width: '50%',
-        },
-        cell: {
-            fontWeight: 'normal',
-            height: '3.5em',
-            textAlign: 'start',
-            width: '50%',
-        },
-        chip: {
-            margin: 2,
-        },
-    });
-
-// Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends WithStyles<typeof styles> {
+interface Props {
     user: User;
     onUserChange: () => void;
 }
@@ -57,14 +40,19 @@ interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
     'data-testid'?: string;
 }
 
-class Users extends React.Component<Props, UsersState> {
+export default class Users extends React.Component<Props, UsersState> {
+    tableRef = React.createRef<MaterialTableProps<TableRow>>();
     constructor(props: Props) {
         super(props);
-        this.state = { users: [], availableRoles: [], url: '/api/users/' };
+        this.state = {
+            users: [],
+            availableRoles: [],
+            url: '/api/users/',
+            error: '',
+        };
     }
 
     componentDidMount(): void {
-        // TODO: add UI for paging through users
         axios
             .get<ListResponse>(this.state.url + '?limit=50')
             .then((resp) => {
@@ -85,113 +73,150 @@ class Users extends React.Component<Props, UsersState> {
             });
     }
 
+    render(): JSX.Element {
+        return (
+            <Paper>
+                {this.state.error && (
+                    <MuiAlert elevation={6} variant="filled" severity="error">
+                        {this.state.error}
+                    </MuiAlert>
+                )}
+                <MaterialTable
+                    tableRef={this.tableRef}
+                    columns={[
+                        {
+                            title: 'id',
+                            field: 'id',
+                            hidden: true,
+                        },
+                        {
+                            title: 'Name',
+                            field: 'name',
+                            type: 'string',
+                        },
+                        {
+                            title: 'Email',
+                            field: 'email',
+                            type: 'string',
+                        },
+                        {
+                            title: 'Roles',
+                            field: 'roles',
+                            type: 'string',
+                            render: (rowData): JSX.Element =>
+                                this.rolesFormControl(rowData),
+                        },
+                    ]}
+                    data={(query): Promise<QueryResult<TableRow>> =>
+                        new Promise((resolve, reject) => {
+                            let listUrl = this.state.url;
+                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '&page=' + (query.page + 1);
+                            this.setState({ error: '' });
+                            const response = axios.get<ListResponse>(listUrl);
+                            response
+                                .then((result) => {
+                                    const flattenedUsers: TableRow[] = [];
+                                    const users = result.data.users;
+                                    for (const c of users) {
+                                        flattenedUsers.push({
+                                            id: c._id,
+                                            name: c.name,
+                                            email: c.email,
+                                            roles: c.roles,
+                                        });
+                                    }
+                                    resolve({
+                                        data: flattenedUsers,
+                                        page: query.page,
+                                        totalCount: result.data.total,
+                                    });
+                                })
+                                .catch((e) => {
+                                    this.setState({ error: e.toString() });
+                                    reject(e);
+                                });
+                        })
+                    }
+                    title="Users"
+                    options={{
+                        search: false,
+                        filtering: false,
+                        sorting: false,
+                        padding: 'dense',
+                        draggable: false, // No need to be able to drag and drop headers.
+                        pageSize: 10,
+                        pageSizeOptions: [5, 10, 20, 50, 100],
+                    }}
+                />
+            </Paper>
+        );
+    }
+
     updateRoles(
         event: React.ChangeEvent<{ value: string[] }>,
-        updatedUser: User,
+        userId: string,
     ): void {
         axios
-            .put(this.state.url + updatedUser._id, {
+            .put(this.state.url + userId, {
                 roles: event.target.value,
             })
             .then(() => {
                 const updatedUsers = this.state.users.slice();
                 (updatedUsers.find(
-                    (user: User) => user._id === updatedUser._id,
+                    (user: User) => user._id === userId,
                 ) as User).roles = event.target.value;
-                this.setState({ users: updatedUsers });
-                if (updatedUser._id === this.props.user._id) {
+                this.setState({ users: updatedUsers, error: '' });
+                if (userId === this.props.user._id) {
                     this.props.onUserChange();
+                }
+                if (this.tableRef?.current) {
+                    // We'd need to refresh the table but TS is too strict here.
+                    // https://github.com/mbrn/material-table/issues/1752
+                    this.tableRef.current.onQueryChange!();
                 }
             })
             .catch((e) => {
+                this.setState({ error: JSON.stringify(e) });
                 console.error(e);
             });
     }
 
-    render(): JSX.Element {
-        const { classes } = this.props;
+    rolesFormControl(rowData: TableRow): JSX.Element {
         return (
-            <div>
-                <table className={classes.table}>
-                    <thead>
-                        <tr>
-                            <th className={classes.headerCell}>Name</th>
-                            <th className={classes.headerCell}>Email</th>
-                            <th className={classes.headerCell}>Roles</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.users.map((user) => (
-                            <tr key={user._id}>
-                                <th
-                                    className={classes.cell}
-                                    data-testid={user.name}
-                                >
-                                    {user.name || 'Name not provided'}
-                                </th>
-                                <th
-                                    className={classes.cell}
-                                    data-testid={user.email}
-                                >
-                                    {user.email}
-                                </th>
-                                <th
-                                    className={classes.cell}
-                                    data-testid={`${user.name}-roles`}
-                                >
-                                    <FormControl>
-                                        <Select
-                                            data-testid={`${user.name}-select-roles`}
-                                            SelectDisplayProps={
-                                                {
-                                                    'data-testid': `${user.name}-select-roles-button`,
-                                                } as UsersSelectDisplayProps
-                                            }
-                                            multiple
-                                            value={user.roles}
-                                            onChange={(event) =>
-                                                this.updateRoles(
-                                                    event as React.ChangeEvent<{
-                                                        value: string[];
-                                                    }>,
-                                                    user,
-                                                )
-                                            }
-                                            renderValue={(selected) => (
-                                                <div>
-                                                    {(selected as string[]).map(
-                                                        (value) => (
-                                                            <Chip
-                                                                key={value}
-                                                                label={value}
-                                                                className={
-                                                                    classes.chip
-                                                                }
-                                                            />
-                                                        ),
-                                                    )}
-                                                </div>
-                                            )}
-                                        >
-                                            {this.state.availableRoles.map(
-                                                (role) => (
-                                                    <MenuItem
-                                                        key={role}
-                                                        value={role}
-                                                    >
-                                                        {role}
-                                                    </MenuItem>
-                                                ),
-                                            )}
-                                        </Select>
-                                    </FormControl>
-                                </th>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <FormControl>
+                <Select
+                    data-testid={`${rowData.name}-select-roles`}
+                    SelectDisplayProps={
+                        {
+                            'data-testid': `${rowData.name}-select-roles-button`,
+                        } as UsersSelectDisplayProps
+                    }
+                    multiple
+                    value={rowData.roles}
+                    onChange={(event) =>
+                        this.updateRoles(
+                            event as React.ChangeEvent<{
+                                value: string[];
+                            }>,
+                            rowData.id,
+                        )
+                    }
+                    renderValue={(selected) => (
+                        <>
+                            {(selected as string[]).map((value) => (
+                                <Chip key={value} label={value} />
+                            ))}
+                        </>
+                    )}
+                >
+                    {this.state.availableRoles.map((role) => (
+                        <MenuItem key={role} value={role}>
+                            {role}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
         );
     }
 }
-export default withStyles(styles, {})(Users);
