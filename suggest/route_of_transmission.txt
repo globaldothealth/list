@@ -6,6 +6,5 @@ Oral
 Direct contact
 Vertical (Parent to child)
 Iatrogenic
-Vector borne
-Other
+Vector bornOther
 Unknown
