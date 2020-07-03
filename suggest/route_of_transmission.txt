@@ -1,10 +1,10 @@
 Airborne infection
+Direct contact
 Droplet infection
 Fecal–oral
-Sexual
-Oral
-Direct contact
-Vertical (Parent to child)
 Iatrogenic
-Vector bornOther
+Oral
+Sexual
 Unknown
+Vector born
+Vertical (Parent to child)
