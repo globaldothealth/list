@@ -196,6 +196,7 @@ Hairdresser
 Handyman
 Hardware retailer
 Head Teacher
+Healthcare worker
 Health food store worker
 Home maintenance contractor
 Homemaker
