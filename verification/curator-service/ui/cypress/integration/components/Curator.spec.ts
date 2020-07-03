@@ -84,6 +84,7 @@ describe('Curator', function () {
         cy.get('li').first().should('contain', 'ADULT syndrome').click();
         cy.get('div[data-testid="transmissionRoutes"]').click();
         cy.get('li').first().should('contain', 'Airborne infection').click();
+        cy.get('div[data-testid="transmissionRoutes"]').type('Breath{enter}');
         cy.get('div[data-testid="transmissionPlaces"]').click();
         cy.get('li').first().should('contain', 'Assisted Living').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
@@ -159,6 +160,7 @@ describe('Curator', function () {
         cy.contains('1/1/2020');
         cy.contains('dry cough, mild fever');
         cy.contains('Airborne infection');
+        cy.contains('Breath');
         cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('Germany, United Kingdom');
@@ -238,6 +240,7 @@ describe('Curator', function () {
         );
         // Transmission.
         cy.contains('Airborne infection');
+        cy.contains('Breath');
         cy.contains('Assisted Living');
         cy.contains('testcaseid12345678987654');
         cy.contains('testcaseid12345678987655');
