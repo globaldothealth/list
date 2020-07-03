@@ -34,6 +34,7 @@ interface FormikAutocompleteProps {
     optionsLocation?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialValue: any;
+    freeSolo?: boolean;
 }
 
 // Autocomplete for use in a Formik form.
@@ -92,6 +93,7 @@ export function FormikAutocomplete(
             filterSelectedOptions
             itemType="string"
             open={open}
+            freeSolo={props.freeSolo}
             onOpen={(): void => {
                 setOpen(true);
             }}

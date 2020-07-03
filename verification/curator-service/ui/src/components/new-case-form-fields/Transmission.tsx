@@ -31,6 +31,7 @@ export default function Transmission(): JSX.Element {
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionRoutes"
+                        freeSolo={true}
                         label="Route of transmission"
                         initialValue={initialValues.transmissionRoutes}
                         multiple={true}

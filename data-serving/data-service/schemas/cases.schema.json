@@ -355,18 +355,7 @@
             "bsonType": "array",
             "uniqueItems": true,
             "items": {
-              "enum": [
-                "Airborne infection",
-                "Droplet infection",
-                "Fecal–oral",
-                "Sexual",
-                "Oral",
-                "Direct contact",
-                "Vertical",
-                "Iatrogenic",
-                "Vector borne",
-                "Other"
-              ]
+              "bsonType": "string"
             }
           },
           "places": {
