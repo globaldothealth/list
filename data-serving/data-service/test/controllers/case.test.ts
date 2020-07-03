@@ -44,7 +44,7 @@ describe('GET', () => {
                 .expect(200);
         });
         it('should paginate', async () => {
-            const now = new Date();
+            const now = new Date('2020-01-01');
             for (const i of Array.from(Array(15).keys())) {
                 const c = new Case(minimalCase);
                 c.revisionMetadata.creationMetadata.set({
