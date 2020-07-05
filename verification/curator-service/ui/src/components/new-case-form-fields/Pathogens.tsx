@@ -38,7 +38,7 @@ export function PathogensAutocomplete(): JSX.Element {
 
         (async (): Promise<void> => {
             const resp = await axios.get<string>(
-                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/pathogens.csv',
+                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/pathogens.csv',
             );
             // CSV lines are of the form '123,Disease name' and we want to
             // map that to [{'Disease name', 123}]
