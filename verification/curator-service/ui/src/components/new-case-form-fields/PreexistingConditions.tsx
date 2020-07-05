@@ -23,7 +23,7 @@ export default function PreexistingConditions(): JSX.Element {
                         label="Preexisting conditions"
                         initialValue={initialValues.preexistingConditions}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/preexisting_conditions.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/preexisting_conditions.txt"
                     />
                 )}
             </fieldset>

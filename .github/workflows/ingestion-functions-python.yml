@@ -2,12 +2,12 @@ name: Ingestion functions Python CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
     - '.github/workflows/ingestion-functions-python.yml'
     - 'ingestion/functions/**'
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
     - '.github/workflows/ingestion-functions-python.yml'
     - 'ingestion/functions/**'

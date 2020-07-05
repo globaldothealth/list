@@ -37,9 +37,9 @@ function fetch_latest_data() {
     if [ -d $NCOV2019_REPO_PATH ]; then 
         print "CoV2019 repo already exists at $NCOV2019_REPO_PATH; updating"
         (cd $NCOV2019_REPO_PATH;
-         git checkout master &> /dev/null;
+         git checkout main &> /dev/null;
          git fetch origin;
-         git reset --hard origin/master)
+         git reset --hard origin/main)
     else
         print "Cloning nCoV2019 repo to $NCOV2019_REPO_PATH"
         git clone https://github.com/beoutbreakprepared/nCoV2019.git \
