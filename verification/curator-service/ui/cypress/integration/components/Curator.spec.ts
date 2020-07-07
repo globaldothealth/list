@@ -86,7 +86,7 @@ describe('Curator', function () {
         cy.get('li').first().should('contain', 'Airborne infection').click();
         cy.get('div[data-testid="transmissionRoutes"]').type('Breath{enter}');
         cy.get('div[data-testid="transmissionPlaces"]').click();
-        cy.get('li').first().should('contain', 'Assisted Living').click();
+        cy.get('li').first().should('contain', 'Airplane').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
@@ -161,7 +161,7 @@ describe('Curator', function () {
         cy.contains('dry cough, mild fever');
         cy.contains('Airborne infection');
         cy.contains('Breath');
-        cy.contains('Assisted Living');
+        cy.contains('Airplane');
         cy.contains('testcaseid12345678987654, testcaseid12345678987655');
         cy.contains('Germany, United Kingdom');
         cy.contains('Bartonella, Ebola');
@@ -247,7 +247,7 @@ describe('Curator', function () {
         // Transmission.
         cy.contains('Airborne infection');
         cy.contains('Breath');
-        cy.contains('Assisted Living');
+        cy.contains('Airplane');
         cy.contains('testcaseid12345678987654');
         cy.contains('testcaseid12345678987655');
         // Change a few things.
@@ -295,7 +295,7 @@ describe('Curator', function () {
         cy.contains('ABCD syndrome, ADULT syndrome');
         // Transmission.
         cy.contains('Airborne infection');
-        cy.contains('Assisted Living');
+        cy.contains('Airplane');
         cy.contains('testcaseid12345678987654');
         cy.contains('testcaseid12345678987655');
         // Travel history.
