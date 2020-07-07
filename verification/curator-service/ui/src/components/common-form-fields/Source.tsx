@@ -9,13 +9,19 @@ import { Typography } from '@material-ui/core';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
-export default class Source extends React.Component<{}, {}> {
+interface SourceProps {
+    initialValue: string;
+}
+
+export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         return (
             <Scroll.Element name="source">
                 <fieldset>
                     <legend>Source</legend>
-                    <SourcesAutocomplete />
+                    <SourcesAutocomplete
+                        initialValue={this.props.initialValue}
+                    />
                 </fieldset>
             </Scroll.Element>
         );
@@ -35,8 +41,14 @@ interface ListSourcesResponse {
     sources: SourceData[];
 }
 
-export function SourcesAutocomplete(): JSX.Element {
-    const [value, setValue] = React.useState<string | null>(null);
+interface SourceAutocompleteProps {
+    initialValue: string;
+}
+
+export function SourcesAutocomplete(
+    props: SourceAutocompleteProps,
+): JSX.Element {
+    const [value, setValue] = React.useState<string | null>(props.initialValue);
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<string[]>([]);
     const { setFieldValue, setTouched } = useFormikContext();
@@ -66,17 +78,12 @@ export function SourcesAutocomplete(): JSX.Element {
         let active = true;
 
         if (inputValue.trim() === '') {
-            setOptions(value ? [value] : []);
             return undefined;
         }
 
         fetch({ url: inputValue }, (results?: SourceData[]) => {
             if (active) {
                 let newOptions = [] as string[];
-
-                if (value) {
-                    newOptions = [value];
-                }
 
                 if (results) {
                     newOptions = [

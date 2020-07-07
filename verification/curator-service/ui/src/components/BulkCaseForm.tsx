@@ -42,6 +42,7 @@ interface BulkCaseFormState {
 
 interface BulkCaseFormValues {
     file: File | null;
+    sourceUrl: string;
 }
 
 /**
@@ -88,7 +89,7 @@ interface ParsedCase {
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-> {
+    > {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -249,14 +250,16 @@ class BulkCaseForm extends React.Component<
         const { classes } = this.props;
         return (
             <Formik
-                initialValues={{ file: null }}
+                initialValues={{ file: null, sourceUrl: '' }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
-                {({ isSubmitting, submitForm }): JSX.Element => (
+                {({ isSubmitting, submitForm, values }): JSX.Element => (
                     <div className={classes.container}>
                         <Form className={classes.form}>
                             <div className={classes.formSection}>
-                                <Source></Source>
+                                <Source
+                                    initialValue={values.sourceUrl}
+                                ></Source>
                             </div>
                             <div className={classes.formSection}>
                                 <FileUpload></FileUpload>
