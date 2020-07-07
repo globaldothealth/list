@@ -723,7 +723,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         <div className={classes.form}>
                             <Form>
                                 <div className={classes.formSection}>
-                                    <Source></Source>
+                                    <Source
+                                        initialValue={values.sourceUrl}
+                                    ></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <Demographics></Demographics>

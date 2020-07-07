@@ -21,14 +21,22 @@ const curator = {
 };
 
 it('loads and displays case to edit', async () => {
-    const axiosResponse = {
+    const axiosCaseResponse = {
         data: fullCase,
         status: 200,
         statusText: 'OK',
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    const axiosSourcesResponse = {
+        data: { sources: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosCaseResponse);
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
 
     const { findByText, getByText, getByDisplayValue } = render(
         <EditCase id="abc123" user={curator} />,
