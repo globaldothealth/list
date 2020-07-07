@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 describe('New case form', function () {
     beforeEach(() => {
+        cy.task('clearSourcesDB', {});
         cy.task('clearCasesDB', {});
         cy.login();
     });
@@ -21,7 +22,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -53,7 +54,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -96,7 +97,7 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -144,3 +145,12 @@ describe('New case form', function () {
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });
 });
+
+function enterSource(url: string): void {
+    cy.get('div[data-testid="caseReference"]').type(`${url}{downarrow}{enter}`);
+    cy.get('input[id="name"]').type('New source');
+    cy.server();
+    cy.route('POST', '/api/sources').as('addSource');
+    cy.get('button[data-testid="sourceAdd"').click();
+    cy.wait('@addSource');
+}

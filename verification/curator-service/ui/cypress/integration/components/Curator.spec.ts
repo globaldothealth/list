@@ -33,7 +33,14 @@ describe('Curator', function () {
 
         // Input full case.
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        cy.get('div[data-testid="caseReference"]').type(
+            'www.example.com{downarrow}{enter}',
+        );
+        cy.get('input[id="name"]').type('New source');
+        cy.server();
+        cy.route('POST', '/api/sources').as('addSource');
+        cy.get('button[data-testid="sourceAdd"').click();
+        cy.wait('@addSource');
         cy.get('div[data-testid="sex"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
@@ -174,7 +181,7 @@ describe('Curator', function () {
 
         // Everything should be there.
         // Source.
-        cy.get('div[data-testid="sourceUrl"]').within(() => {
+        cy.get('div[data-testid="caseReference"]').within(() => {
             cy.get('input[type="text"]').should(
                 'have.value',
                 'www.example.com',
