@@ -61,6 +61,7 @@ const styles = () =>
 function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
+            caseReference: undefined,
             sex: undefined,
             minAge: undefined,
             maxAge: undefined,
@@ -91,11 +92,11 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             travelHistory: [],
             genomeSequences: [],
             pathogens: [],
-            sourceUrl: '',
             notes: '',
         };
     }
     return {
+        caseReference: c.caseReference,
         sex: c.demographics?.sex,
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
@@ -168,7 +169,6 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
         pathogens: c.pathogens,
-        sourceUrl: c.caseReference?.sourceUrl,
         notes: c.notes,
     };
 }
@@ -185,6 +185,7 @@ interface CaseFormState {
 
 const NewCaseValidation = Yup.object().shape(
     {
+        caseReference: Yup.object().required('Required field'),
         minAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
@@ -227,7 +228,6 @@ const NewCaseValidation = Yup.object().shape(
         confirmedDate: Yup.string().nullable().required('Required field'),
         location: Yup.object().required('Required field'),
         methodOfConfirmation: Yup.string().required('Required field'),
-        sourceUrl: Yup.string().required('Required field'),
     },
     [['maxAge', 'minAge']],
 );
@@ -288,12 +288,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference: {
-                // TODO: Replace the below with a source id once we have lookups
-                // in place.
-                sourceId: 'FAKE_ID',
-                sourceUrl: values.sourceUrl,
-            },
+            caseReference: values.caseReference,
             demographics: {
                 sex: values.sex,
                 ageRange: ageRange,
@@ -492,9 +487,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 onClick={(): void => this.scrollTo('source')}
                             >
                                 {this.tableOfContentsIcon({
-                                    isChecked: values.sourceUrl?.trim() !== '',
+                                    isChecked:
+                                        values.caseReference !== null &&
+                                        values.caseReference !== undefined,
                                     hasError: hasErrors(
-                                        ['sourceUrl'],
+                                        ['caseReference'],
                                         errors,
                                         touched,
                                     ),
@@ -724,7 +721,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                             <Form>
                                 <div className={classes.formSection}>
                                     <Source
-                                        initialValue={values.sourceUrl}
+                                        initialValue={values.caseReference}
                                     ></Source>
                                 </div>
                                 <div className={classes.formSection}>
