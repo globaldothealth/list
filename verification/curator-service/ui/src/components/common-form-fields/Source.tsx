@@ -178,7 +178,7 @@ export function SourcesAutocomplete(
                     newValue: CaseReference | null,
                 ): void => {
                     if (typeof newValue === 'string') {
-                        // timeout to avoid instant validation of the dialog's form.
+                        // Timeout to avoid instant validation of the dialog's form.
                         setTimeout(() => {
                             toggleOpen(true);
                             setDialogValue({
@@ -221,27 +221,10 @@ export function SourcesAutocomplete(
                 handleHomeEndKeys
                 options={options}
                 value={value}
-                // onChange={(event: any, newValue: CaseReference | null): void => {
-                //     setOptions(newValue ? [newValue, ...options] : options);
-                //     setValue(newValue);
-                //     setFieldValue(name, newValue);
-                // }}
                 onBlur={(): void => setTouched({ [name]: true })}
                 onInputChange={(event, newInputValue): void => {
                     setInputValue(newInputValue);
                 }}
-                // getOptionLabel={(option) => {
-                //     // Value selected with enter, right from the input
-                //     if (typeof option === 'string') {
-                //       return option;
-                //     }
-                //     // Add "xxx" option created dynamically
-                //     if (option.inputValue) {
-                //       return option.inputValue;
-                //     }
-                //     // Regular option
-                //     return option.title;
-                //   }}
                 renderInput={(params): JSX.Element => (
                     <div>
                         {/* Do not use FastField here */}
