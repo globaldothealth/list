@@ -1,16 +1,25 @@
+import { Autocomplete, createFilterOptions } from '@material-ui/lab';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Typography,
+} from '@material-ui/core';
 import { Field, useFormikContext } from 'formik';
 
-import { Autocomplete } from '@material-ui/lab';
+import { CaseReference as CaseRef } from '../Case';
+import { TextField as MUITextField } from '@material-ui/core';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
-import { Typography } from '@material-ui/core';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
 interface SourceProps {
-    initialValue: string;
+    initialValue?: CaseRef;
 }
 
 export default class Source extends React.Component<SourceProps, {}> {
@@ -42,17 +51,62 @@ interface ListSourcesResponse {
 }
 
 interface SourceAutocompleteProps {
-    initialValue: string;
+    initialValue?: CaseReference;
 }
+
+interface AdditionalSource {
+    sourceUrl: string;
+}
+
+interface CaseReference extends CaseRef {
+    inputValue?: string;
+}
+
+const filter = createFilterOptions<CaseReference>();
 
 export function SourcesAutocomplete(
     props: SourceAutocompleteProps,
 ): JSX.Element {
-    const [value, setValue] = React.useState<string | null>(props.initialValue);
+    const name = 'caseReference';
+    const [open, toggleOpen] = React.useState(false);
+    const [value, setValue] = React.useState<CaseReference | null>(
+        props.initialValue ? props.initialValue : null,
+    );
+    const [dialogValue, setDialogValue] = React.useState({
+        url: '',
+        name: '',
+    });
+
+    const handleClose = (): void => {
+        setDialogValue({
+            url: '',
+            name: '',
+        });
+        toggleOpen(false);
+    };
+
+    const handleDialogSubmit = async (): Promise<void> => {
+        const newSource = {
+            name: dialogValue.name,
+            origin: {
+                url: dialogValue.url,
+            },
+        };
+        const resp = await axios.post<SourceData>('/api/sources', newSource);
+        const newValue = {
+            sourceId: resp.data._id,
+            sourceUrl: dialogValue.url,
+            additionalSources: ([] as unknown) as [{ sourceUrl: string }],
+        };
+
+        setValue(newValue);
+        setFieldValue(name, newValue);
+        handleClose();
+    };
+
     const [inputValue, setInputValue] = React.useState('');
-    const [options, setOptions] = React.useState<string[]>([]);
+    const [options, setOptions] = React.useState<CaseReference[]>([]);
     const { setFieldValue, setTouched } = useFormikContext();
-    const name = 'sourceUrl';
 
     const fetch = React.useMemo(
         () =>
@@ -77,18 +131,20 @@ export function SourcesAutocomplete(
     React.useEffect(() => {
         let active = true;
 
-        if (inputValue.trim() === '') {
-            return undefined;
-        }
-
         fetch({ url: inputValue }, (results?: SourceData[]) => {
             if (active) {
-                let newOptions = [] as string[];
+                let newOptions = [] as CaseReference[];
 
                 if (results) {
                     newOptions = [
                         ...newOptions,
-                        ...results.map((source) => source.origin.url),
+                        ...results.map((source) => ({
+                            sourceId: source._id,
+                            sourceUrl: source.origin.url,
+                            additionalSources: ([] as unknown) as [
+                                { sourceUrl: string },
+                            ],
+                        })),
                     ];
                 }
 
@@ -102,47 +158,177 @@ export function SourcesAutocomplete(
     }, [value, inputValue, fetch]);
 
     return (
-        <Autocomplete
-            // TODO: Replace freeSolo with offering an 'Add source' dialogue.
-            freeSolo
-            itemType="SourceData"
-            options={options}
-            value={value}
-            onChange={(event: any, newValue: string | null): void => {
-                setOptions(newValue ? [newValue, ...options] : options);
-                setValue(newValue);
-                setFieldValue(name, newValue);
-            }}
-            onBlur={(): void => setTouched({ [name]: true })}
-            onInputChange={(event, newInputValue): void => {
-                setInputValue(newInputValue);
-            }}
-            renderInput={(params): JSX.Element => (
-                <div>
-                    {/* Do not use FastField here */}
-                    <Field
-                        {...params}
-                        // Setting the name properly allows any typed value
-                        // to be set in the form values, rather than only selected
-                        // dropdown values. Thus we use an unused form value here.
-                        name="unused"
-                        required
-                        data-testid={name}
-                        label="Source URL"
-                        placeholder="https://..."
-                        component={TextField}
-                        fullWidth
-                    ></Field>
-                    <RequiredHelperText name={name}></RequiredHelperText>
-                </div>
-            )}
-            renderOption={(option: string): React.ReactNode => {
-                return (
-                    <span>
-                        <Typography variant="body2">{option}</Typography>
-                    </span>
-                );
-            }}
-        />
+        <React.Fragment>
+            <Autocomplete
+                itemType="CaseReference"
+                getOptionLabel={(option: CaseReference): string =>
+                    option.sourceUrl
+                }
+                getOptionSelected={(
+                    option: CaseReference,
+                    value: CaseReference,
+                ): boolean => {
+                    return (
+                        option.sourceId === value.sourceId &&
+                        option.sourceUrl === value.sourceUrl
+                    );
+                }}
+                onChange={(
+                    event: any,
+                    newValue: CaseReference | null,
+                ): void => {
+                    if (typeof newValue === 'string') {
+                        // timeout to avoid instant validation of the dialog's form.
+                        setTimeout(() => {
+                            toggleOpen(true);
+                            setDialogValue({
+                                url: newValue,
+                                name: '',
+                            });
+                        });
+                    } else if (newValue && newValue.inputValue) {
+                        toggleOpen(true);
+                        setDialogValue({
+                            url: newValue.inputValue,
+                            name: '',
+                        });
+                    } else {
+                        setValue(newValue);
+                        setFieldValue(name, newValue);
+                    }
+                }}
+                filterOptions={(
+                    options: CaseReference[],
+                    params,
+                ): CaseReference[] => {
+                    const filtered = filter(options, params) as CaseReference[];
+
+                    if (params.inputValue !== '') {
+                        filtered.push({
+                            inputValue: params.inputValue,
+                            sourceUrl: `Add "${params.inputValue}"`,
+                            sourceId: '',
+                            additionalSources: ([] as unknown) as [
+                                { sourceUrl: string },
+                            ],
+                        });
+                    }
+
+                    return filtered;
+                }}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                options={options}
+                value={value}
+                // onChange={(event: any, newValue: CaseReference | null): void => {
+                //     setOptions(newValue ? [newValue, ...options] : options);
+                //     setValue(newValue);
+                //     setFieldValue(name, newValue);
+                // }}
+                onBlur={(): void => setTouched({ [name]: true })}
+                onInputChange={(event, newInputValue): void => {
+                    setInputValue(newInputValue);
+                }}
+                // getOptionLabel={(option) => {
+                //     // Value selected with enter, right from the input
+                //     if (typeof option === 'string') {
+                //       return option;
+                //     }
+                //     // Add "xxx" option created dynamically
+                //     if (option.inputValue) {
+                //       return option.inputValue;
+                //     }
+                //     // Regular option
+                //     return option.title;
+                //   }}
+                renderInput={(params): JSX.Element => (
+                    <div>
+                        {/* Do not use FastField here */}
+                        <Field
+                            {...params}
+                            // Setting the name properly allows any typed value
+                            // to be set in the form values, rather than only selected
+                            // dropdown values. Thus we use an unused form value here.
+                            name="unused"
+                            required
+                            data-testid={name}
+                            label="Source URL"
+                            placeholder="https://..."
+                            component={TextField}
+                            fullWidth
+                        ></Field>
+                        <RequiredHelperText name={name}></RequiredHelperText>
+                    </div>
+                )}
+                renderOption={(option: CaseReference): React.ReactNode => {
+                    return (
+                        <span>
+                            <Typography variant="body2">
+                                {option.sourceUrl}
+                            </Typography>
+                        </span>
+                    );
+                }}
+            />
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="form-dialog-title"
+            >
+                <form>
+                    <DialogTitle id="form-dialog-title">
+                        Add a new source
+                    </DialogTitle>
+                    <DialogContent>
+                        <MUITextField
+                            autoFocus
+                            margin="dense"
+                            id="url"
+                            value={dialogValue.url}
+                            onChange={(event): void =>
+                                setDialogValue({
+                                    ...dialogValue,
+                                    url: event.target.value,
+                                })
+                            }
+                            label="URL"
+                            type="text"
+                        />
+                        <MUITextField
+                            margin="dense"
+                            id="name"
+                            value={dialogValue.name}
+                            onChange={(event): void =>
+                                setDialogValue({
+                                    ...dialogValue,
+                                    name: event.target.value,
+                                })
+                            }
+                            label="Name"
+                            type="text"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Cancel
+                        </Button>
+                        {
+                            // Don't use submit type for this button.
+                            // It'll trigger the outer form submit.
+                            // We could make this dialog use a nested Formik
+                            // declaration/context, but no need for now.
+                        }
+                        <Button
+                            onClick={handleDialogSubmit}
+                            color="primary"
+                            data-testid="sourceAdd"
+                        >
+                            Add
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+        </React.Fragment>
     );
 }
