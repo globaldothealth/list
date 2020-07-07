@@ -171,9 +171,15 @@ describe('Curator', function () {
 
         // Edit the case.
         cy.get('button[title="Edit this case"]').click();
+
         // Everything should be there.
         // Source.
-        //  TODO: Display existing values for the sourceUrl.
+        cy.get('div[data-testid="sourceUrl"]').within(() => {
+            cy.get('input[type="text"]').should(
+                'have.value',
+                'www.example.com',
+            );
+        });
 
         // Demographics.
         cy.get('input[name="sex"]').should('have.value', 'Female');
@@ -250,6 +256,7 @@ describe('Curator', function () {
         // Submit the changes.
         cy.get('button[data-testid="submit"]').click();
         cy.contains('Case edited');
+
         // Updated info should be there.
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
