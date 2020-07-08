@@ -121,7 +121,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.get('button[data-testid="submit"]').click();
 
-        cy.get('p:contains("Required field")').should('have.length', 4);
+        cy.get('p:contains("Required field")').should('have.length', 3);
     });
 
     it('Shows checkbox on field completion', function () {
