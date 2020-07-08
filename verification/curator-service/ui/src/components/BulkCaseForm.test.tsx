@@ -14,22 +14,37 @@ const user = {
     roles: ['admin', 'curator'],
 };
 
+beforeEach(() => {
+    const axiosSourcesResponse = {
+        data: { sources: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
+});
+
 afterEach(() => {
     jest.clearAllMocks();
 });
 
-it('renders csv upload widget', () => {
-    const { getByTestId, getByRole } = render(<BulkCaseForm user={user} />);
+it('renders csv upload widget', async () => {
+    const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
     const inputField = getByTestId('csv-input');
 
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
-    expect(getByRole('button')).toHaveTextContent(/Upload cases/);
+    expect(getByText(/Upload cases/)).toBeInTheDocument();
 });
 
 it('uploads case ok', async () => {
     const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
     const inputField = getByTestId('csv-input');
     const file = new File(['a\nb'], 'data.csv', {
         type: 'text/csv',
@@ -55,6 +70,8 @@ it('uploads case ok', async () => {
 
 it('uploads case not ok', async () => {
     const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
     const inputField = getByTestId('csv-input');
     const file = new File(['a\nb'], 'data.csv', {
         type: 'text/csv',

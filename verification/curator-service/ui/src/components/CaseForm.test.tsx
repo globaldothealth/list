@@ -2,6 +2,10 @@ import { fireEvent, render, wait } from '@testing-library/react';
 
 import CaseForm from './CaseForm';
 import React from 'react';
+import axios from 'axios';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const user = {
     _id: 'testUser',
@@ -10,8 +14,24 @@ const user = {
     roles: ['admin', 'curator'],
 };
 
-it('renders form', () => {
+beforeEach(() => {
+    const axiosSourcesResponse = {
+        data: { sources: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
+});
+
+afterEach(() => {
+    jest.clearAllMocks();
+});
+
+it('renders form', async () => {
     const { getByText, getAllByText } = render(<CaseForm user={user} />);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
     expect(getAllByText(/Location/i)).toHaveLength(4);
@@ -22,6 +42,7 @@ it('renders form', () => {
 
 it('can add and remove genome sequencing sections', async () => {
     const { queryByTestId, getByText } = render(<CaseForm user={user} />);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
     await wait(() => {

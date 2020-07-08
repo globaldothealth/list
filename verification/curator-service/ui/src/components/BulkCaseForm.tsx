@@ -1,8 +1,8 @@
 import { Button, withStyles } from '@material-ui/core';
+import { CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
-import { Event } from './Case';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
 import Source from './common-form-fields/Source';
@@ -42,7 +42,7 @@ interface BulkCaseFormState {
 
 interface BulkCaseFormValues {
     file: File | null;
-    sourceUrl: string;
+    caseReference?: CaseReference;
 }
 
 /**
@@ -250,7 +250,7 @@ class BulkCaseForm extends React.Component<
         const { classes } = this.props;
         return (
             <Formik
-                initialValues={{ file: null, sourceUrl: '' }}
+                initialValues={{ file: null, caseReference: undefined }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
                 {({ isSubmitting, submitForm, values }): JSX.Element => (
@@ -258,7 +258,7 @@ class BulkCaseForm extends React.Component<
                         <Form className={classes.form}>
                             <div className={classes.formSection}>
                                 <Source
-                                    initialValue={values.sourceUrl}
+                                    initialValue={values.caseReference}
                                 ></Source>
                             </div>
                             <div className={classes.formSection}>

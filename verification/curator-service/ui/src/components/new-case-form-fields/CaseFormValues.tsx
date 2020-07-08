@@ -1,6 +1,8 @@
+import { CaseReference } from '../Case';
 import { Location as Loc } from '../Case';
 
 export default interface CaseFormValues {
+    caseReference?: CaseReference;
     sex?: string;
     minAge?: number;
     maxAge?: number;
@@ -31,7 +33,6 @@ export default interface CaseFormValues {
     travelHistory: Travel[];
     genomeSequences: GenomeSequence[];
     pathogens: Pathogen[];
-    sourceUrl: string;
     notes: string;
 }
 
