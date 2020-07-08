@@ -227,7 +227,6 @@ const NewCaseValidation = Yup.object().shape(
         ),
         confirmedDate: Yup.string().nullable().required('Required field'),
         location: Yup.object().required('Required field'),
-        methodOfConfirmation: Yup.string().required('Required field'),
     },
     [['maxAge', 'minAge']],
 );
