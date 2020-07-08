@@ -33,7 +33,6 @@ export default function Events(): JSX.Element {
                     name="methodOfConfirmation"
                     label="Method of confirmation"
                     values={methodsOfConfirmation}
-                    required
                 ></SelectField>
                 <DateField
                     name="onsetSymptomsDate"
