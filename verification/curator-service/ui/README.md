@@ -48,6 +48,11 @@ Sheets template to generate a valid CSV, using roughly the following process:
 
 ![CSV template process](./csv.gif)
 
+As a more realistic example, consider the following process that a curator might
+use in order to prepare data obtained from the Ohio state government website:
+
+![Ohio data preparation](./ohio.gif)
+
 #### Additional notes
 
 Some features to note:
