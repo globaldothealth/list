@@ -29,7 +29,7 @@ export default function FileUpload(): JSX.Element {
                     const uploadedFiles: FileList | null =
                         event.currentTarget.files;
                     if (uploadedFiles) {
-                        setFieldValue('file', uploadedFiles[0]);
+                        setFieldValue(name, uploadedFiles[0]);
                         if (uploadedFiles.length > 1) {
                             console.warn(
                                 `Attempted to upload ${uploadedFiles.length} ` +
