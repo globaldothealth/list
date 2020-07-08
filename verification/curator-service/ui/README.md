@@ -28,8 +28,8 @@ the specific case.
 - `admin1`: Optional.
 - `admin2`: Optional.
 - `sex`: Optional. One of `Female` or `Male`.
-- `ageRangeStart`: Optional. Number from 0 to 140.
-- `ageRangeEnd`: Optional. Number from 0 to 140.
+- `ageRangeStart`: Optional. Number (years) from 0 to 140.
+- `ageRangeEnd`: Optional. Number (years) from 0 to 140.
 - `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was
 confirmed.
 - `hospitalized`: Optional. One of `true` or `false`.
