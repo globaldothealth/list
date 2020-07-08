@@ -7,13 +7,12 @@ import {
     Typography,
 } from '@material-ui/core';
 import { Link, Route, Switch } from 'react-router-dom';
+import { Theme, createStyles } from '@material-ui/core/styles';
 
 import Add from '@material-ui/icons/Add';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
@@ -42,7 +41,6 @@ import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 
 const theme = createMuiTheme({
@@ -58,7 +56,7 @@ const theme = createMuiTheme({
 
 const drawerWidth = 240;
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
@@ -68,18 +66,7 @@ const styles = () =>
         },
         appBar: {
             background: 'white',
-            transition: theme.transitions.create(['margin', 'width'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-        },
-        appBarShift: {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: drawerWidth,
-            transition: theme.transitions.create(['margin', 'width'], {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
+            zIndex: theme.zIndex.drawer + 1,
         },
         menuButton: {
             marginRight: theme.spacing(2),
@@ -95,12 +82,8 @@ const styles = () =>
             width: drawerWidth,
         },
         drawerHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            padding: theme.spacing(0, 1),
             // necessary for content to be below app bar
             ...theme.mixins.toolbar,
-            justifyContent: 'flex-end',
         },
         content: {
             flexGrow: 1,
@@ -131,7 +114,7 @@ class App extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            drawerOpen: false,
+            drawerOpen: true,
             user: {
                 _id: '',
                 name: '',
@@ -140,8 +123,7 @@ class App extends React.Component<Props, State> {
             },
         };
         // https://reactjs.org/docs/handling-events.html.
-        this.handleDrawerClose = this.handleDrawerClose.bind(this);
-        this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
+        this.toggleDrawer = this.toggleDrawer.bind(this);
         this.getUser = this.getUser.bind(this);
         this.hasAnyRole = this.hasAnyRole.bind(this);
     }
@@ -176,12 +158,8 @@ class App extends React.Component<Props, State> {
         );
     }
 
-    handleDrawerOpen(): void {
-        this.setState({ drawerOpen: true });
-    }
-
-    handleDrawerClose(): void {
-        this.setState({ drawerOpen: false });
+    toggleDrawer(): void {
+        this.setState({ drawerOpen: !this.state.drawerOpen });
     }
 
     render(): JSX.Element {
@@ -190,22 +168,14 @@ class App extends React.Component<Props, State> {
             <div className={classes.root}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <AppBar
-                        position="fixed"
-                        className={clsx(classes.appBar, {
-                            [classes.appBarShift]: this.state.drawerOpen,
-                        })}
-                    >
+                    <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <IconButton
                                 color="inherit"
-                                aria-label="open drawer"
-                                onClick={this.handleDrawerOpen}
+                                aria-label="toggle drawer"
+                                onClick={this.toggleDrawer}
                                 edge="start"
-                                className={clsx(
-                                    classes.menuButton,
-                                    this.state.drawerOpen && classes.hide,
-                                )}
+                                className={classes.menuButton}
                             >
                                 <MenuIcon />
                             </IconButton>
@@ -244,15 +214,7 @@ class App extends React.Component<Props, State> {
                             paper: classes.drawerPaper,
                         }}
                     >
-                        <div className={classes.drawerHeader}>
-                            <IconButton onClick={this.handleDrawerClose}>
-                                {theme.direction === 'ltr' ? (
-                                    <ChevronLeftIcon />
-                                ) : (
-                                    <ChevronRightIcon />
-                                )}
-                            </IconButton>
-                        </div>
+                        <div className={classes.drawerHeader}></div>
                         <Divider />
                         <List>
                             {[
@@ -317,11 +279,7 @@ class App extends React.Component<Props, State> {
                             ].map(
                                 (item) =>
                                     item.displayCheck() && (
-                                        <Link
-                                            key={item.text}
-                                            to={item.to}
-                                            onClick={this.handleDrawerClose}
-                                        >
+                                        <Link key={item.text} to={item.to}>
                                             <ListItem
                                                 button
                                                 key={item.text}
