@@ -244,8 +244,6 @@ class BulkCaseForm extends React.Component<
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<void> {
-        console.log('Submitting cases');
-        console.log(`VALUES: ${Object.entries(values)}`);
         if (values.file) {
             const papaparseOptions: ParseConfig<ParsedCase> = {
                 complete: (results) => {
