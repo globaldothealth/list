@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+
 import { Button, withStyles } from '@material-ui/core';
 import { CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
@@ -57,9 +59,8 @@ interface ParsedCase {
     [key: string]: string | number | boolean | undefined;
 
     // CaseReference
-    sourceId: string;
+    // sourceId and sourceUrl are provided elsewhere in the form
     sourceEntryId?: string;
-    sourceUrl: string;
 
     // Demographics
     sex?: string;
@@ -86,10 +87,15 @@ interface ParsedCase {
     caseCount?: number;
 }
 
+const BulkFormSchema = Yup.object().shape({
+    caseReference: Yup.object().required('Required field'),
+    file: Yup.mixed().required('Please upload a file'),
+});
+
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -115,9 +121,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                        start: c.dateHospitalized,
-                        end: c.dateHospitalized,
-                    }
+                          start: c.dateHospitalized,
+                          end: c.dateHospitalized,
+                      }
                     : undefined,
             });
         }
@@ -157,12 +163,13 @@ class BulkCaseForm extends React.Component<
         events: Event[],
         geoResolution: string,
         locationQuery: string,
+        caseReference: CaseReference,
     ): Promise<void> {
         return axios.put('/api/cases', {
             caseReference: {
-                sourceId: c.sourceId,
+                sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
-                sourceUrl: c.sourceUrl,
+                sourceUrl: caseReference.sourceUrl,
             },
             demographics: {
                 sex: c.sex,
@@ -195,7 +202,10 @@ class BulkCaseForm extends React.Component<
         });
     }
 
-    async uploadData(results: ParseResult<ParsedCase>): Promise<void> {
+    async uploadData(
+        results: ParseResult<ParsedCase>,
+        caseReference: CaseReference,
+    ): Promise<void> {
         for (const c of results.data) {
             // papaparse uses null to fill values that are empty in the CSV.
             // I'm not clear how it does so -- since our types aren't union
@@ -217,6 +227,7 @@ class BulkCaseForm extends React.Component<
                         events,
                         geoResolution,
                         locationQuery,
+                        caseReference,
                     );
                 }
                 this.setState({ statusMessage: 'Success!' });
@@ -236,7 +247,11 @@ class BulkCaseForm extends React.Component<
         if (values.file) {
             const papaparseOptions: ParseConfig<ParsedCase> = {
                 complete: (results) => {
-                    this.uploadData(results);
+                    // CaseReference is required per form validation.
+                    // But, Typescript doesn't know that.
+                    if (values.caseReference) {
+                        this.uploadData(results, values.caseReference);
+                    }
                 },
                 dynamicTyping: true,
                 header: true,
@@ -250,6 +265,8 @@ class BulkCaseForm extends React.Component<
         const { classes } = this.props;
         return (
             <Formik
+                validationSchema={BulkFormSchema}
+                validateOnChange={false}
                 initialValues={{ file: null, caseReference: undefined }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >

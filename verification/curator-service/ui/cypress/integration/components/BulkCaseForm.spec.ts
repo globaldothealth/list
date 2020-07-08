@@ -1,6 +1,9 @@
+import enterSource from '../utils/enterSource';
+
 /* eslint-disable no-undef */
 describe('Bulk upload form', function () {
     beforeEach(() => {
+        cy.task('clearSourcesDB', {});
         cy.task('clearCasesDB', {});
         cy.login();
         cy.seedLocation({
@@ -19,6 +22,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/bulk');
+        enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -31,15 +35,12 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         // Common data.
         cy.contains('No records to display').should('not.exist');
+        cy.contains('www.bulksource.com');
         cy.contains('Male');
         cy.contains('42');
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
-        // First record.
-        cy.contains('foo.bar');
-        // Second record.
-        cy.contains('bar.baz');
     });
 
     it('Upserts data', function () {
@@ -47,6 +48,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/bulk');
+        enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -57,10 +59,11 @@ describe('Bulk upload form', function () {
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
-        cy.contains('foo.bar');
-        cy.contains('new.url').should('not.exist');
+        cy.contains('Male');
+        cy.contains('Female').should('not.exist');
 
         cy.visit('/cases/bulk');
+        enterSource('www.bulksource.com', true);
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
         cy.server();
@@ -70,8 +73,8 @@ describe('Bulk upload form', function () {
         cy.contains('Success!');
 
         cy.visit('/cases');
-        cy.contains('foo.bar').should('not.exist');
-        cy.contains('new.url');
+        // The updated case now has a sex of Female.
+        cy.contains('Female');
     });
 
     it('Upserts multiple cases if dictated by caseCount CSV field', function () {
@@ -79,6 +82,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/bulk');
+        enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -98,6 +102,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/bulk');
+        enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
