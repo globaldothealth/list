@@ -1,6 +1,9 @@
+import enterSource from '../utils/enterSource';
+
 /* eslint-disable no-undef */
 describe('New case form', function () {
     beforeEach(() => {
+        cy.task('clearSourcesDB', {});
         cy.task('clearCasesDB', {});
         cy.login();
     });
@@ -21,7 +24,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -53,7 +56,7 @@ describe('New case form', function () {
         });
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
@@ -96,7 +99,7 @@ describe('New case form', function () {
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');

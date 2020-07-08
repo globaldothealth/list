@@ -1,10 +1,11 @@
 import * as fullCase from './fixtures/fullCase.json';
 
+import { render, wait } from '@testing-library/react';
+
 import { Case } from './Case';
 import EditCase from './EditCase';
 import React from 'react';
 import axios from 'axios';
-import { render } from '@testing-library/react';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -36,13 +37,27 @@ it('loads and displays case to edit', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosCaseResponse);
+    // This is currently called twice, because the value from the case being
+    // edited is populated in the form field a split second after the page
+    // initially loads (resulting in two queries: ?url={} and ?url={fullURL}).
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
     mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
 
     const { findByText, getByText, getByDisplayValue } = render(
         <EditCase id="abc123" user={curator} />,
     );
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(3));
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources', {
+        params: {
+            url: '',
+        },
+    });
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources', {
+        params: {
+            url: fullCase.caseReference.sourceUrl,
+        },
+    });
     expect(await findByText(/Female/)).toBeInTheDocument();
     expect(getByDisplayValue(/Horse breeder/)).toBeInTheDocument();
     expect(getByDisplayValue(/Asian/)).toBeInTheDocument();

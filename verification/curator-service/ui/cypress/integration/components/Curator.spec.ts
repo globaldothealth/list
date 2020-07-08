@@ -1,3 +1,5 @@
+import enterSource from '../utils/enterSource';
+
 /* eslint-disable no-undef */
 describe('Curator', function () {
     beforeEach(() => {
@@ -33,7 +35,7 @@ describe('Curator', function () {
 
         // Input full case.
         cy.visit('/cases/new');
-        cy.get('div[data-testid="sourceUrl"]').type('www.example.com{enter}');
+        enterSource('www.example.com');
         cy.get('div[data-testid="sex"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
@@ -174,7 +176,7 @@ describe('Curator', function () {
 
         // Everything should be there.
         // Source.
-        cy.get('div[data-testid="sourceUrl"]').within(() => {
+        cy.get('div[data-testid="caseReference"]').within(() => {
             cy.get('input[type="text"]').should(
                 'have.value',
                 'www.example.com',
