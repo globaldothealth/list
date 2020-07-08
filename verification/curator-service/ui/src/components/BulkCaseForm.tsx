@@ -266,6 +266,7 @@ class BulkCaseForm extends React.Component<
         return (
             <Formik
                 validationSchema={BulkFormSchema}
+                validateOnChange={false}
                 initialValues={{ file: null, caseReference: undefined }}
                 onSubmit={(values): Promise<void> => this.submitCases(values)}
             >
