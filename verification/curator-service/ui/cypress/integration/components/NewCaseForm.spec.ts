@@ -30,8 +30,6 @@ describe('New case form', function () {
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.get('div[data-testid="methodOfConfirmation"]').click();
-        cy.get('li[data-value="PCR test"').click();
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
@@ -62,8 +60,6 @@ describe('New case form', function () {
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.get('div[data-testid="methodOfConfirmation"]').click();
-        cy.get('li[data-value="PCR test"').click();
         // Outcome without a date.
         cy.get('div[data-testid="outcome"]').click();
         cy.get('li[data-value="Recovered"').click();
@@ -105,8 +101,6 @@ describe('New case form', function () {
         cy.contains('Country');
         cy.get('li').first().should('contain', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
-        cy.get('div[data-testid="methodOfConfirmation"]').click();
-        cy.get('li[data-value="PCR test"').click();
         cy.server();
         // Force server to return error
         cy.route({
