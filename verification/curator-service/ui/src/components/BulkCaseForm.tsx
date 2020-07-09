@@ -214,17 +214,6 @@ class BulkCaseForm extends React.Component<
         return axios.put('/api/cases', c);
     }
 
-    async validateParsedCases(
-        results: ParseResult<RawParsedCase>,
-        caseReference: CaseReference,
-    ): Promise<Array<string>> {
-        return [];
-    }
-
-    surfaceErrorMessage(errors: Array<string>): void {
-        return;
-    }
-
     async uploadData(
         results: ParseResult<RawParsedCase>,
         caseReference: CaseReference,
