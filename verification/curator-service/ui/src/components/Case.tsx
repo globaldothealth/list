@@ -4,7 +4,7 @@ export interface CaseReference {
     sourceId: string;
     sourceEntryId?: string;
     sourceUrl: string;
-    additionalSources: [
+    additionalSources?: [
         {
             sourceUrl: string;
         },
@@ -21,14 +21,14 @@ export interface Event {
 }
 
 export interface Demographics {
-    sex: string;
-    ageRange: {
-        start: number;
-        end: number;
+    sex?: string;
+    ageRange?: {
+        start?: number;
+        end?: number;
     };
-    ethnicity: string;
-    nationalities: string[];
-    profession: string;
+    ethnicity?: string;
+    nationalities?: string[];
+    profession?: string;
 }
 
 export interface PreexistingConditions {
@@ -38,13 +38,14 @@ export interface PreexistingConditions {
 
 export interface Location {
     country: string;
-    administrativeAreaLevel1: string;
-    administrativeAreaLevel2: string;
-    administrativeAreaLevel3: string;
+    administrativeAreaLevel1?: string;
+    administrativeAreaLevel2?: string;
+    administrativeAreaLevel3?: string;
     geoResolution: string;
-    geometry: Geometry;
-    name: string;
-    place: string;
+    geometry?: Geometry;
+    name?: string;
+    place?: string;
+    query?: string;
 }
 
 export interface Geometry {
@@ -104,20 +105,20 @@ interface RevisionMetadata {
 }
 
 export interface Case {
-    _id: string;
+    _id?: string;
     caseReference: CaseReference;
     importedCase?: {
         outcome?: string;
     };
     events: Event[];
-    demographics: Demographics;
+    demographics?: Demographics;
     location: Location;
-    symptoms: Symptoms;
+    symptoms?: Symptoms;
     preexistingConditions?: PreexistingConditions;
-    transmission: Transmission;
-    travelHistory: TravelHistory;
-    genomeSequences: GenomeSequence[];
-    pathogens: Pathogen[];
-    notes: string;
+    transmission?: Transmission;
+    travelHistory?: TravelHistory;
+    genomeSequences?: GenomeSequence[];
+    pathogens?: Pathogen[];
+    notes?: string;
     revisionMetadata: RevisionMetadata;
 }
