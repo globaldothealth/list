@@ -83,7 +83,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         // storage.
         const c = new Case(req.body);
         let result;
-        if (req.query.validate_only) {
+        if (req.query.validate_only === 'true') {
             await c.validate();
             result = c;
         } else {
