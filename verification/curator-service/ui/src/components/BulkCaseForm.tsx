@@ -87,9 +87,18 @@ interface RawParsedCase {
     caseCount?: number;
 }
 
-interface CompleteParsedCase extends Case {
-    caseCount?: number;
-}
+type RecursivePartial<T> = {
+    [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
+// Re-use the case model defined in this dir, but with all optional fields.
+// Existing components rely on pseudo-optional semantics for most fields in the
+// case object (e.g., relying on axios only to populate the fields indicated by
+// the case API), but we can't cleanly do that here, since we're directly both
+// populating and using the values in the object.
+//
+// TODO: Consider defining truly optional fields as optional in Case.tsx.
+type CompleteParsedCase = RecursivePartial<Case> & { caseCount?: number };
 
 const BulkFormSchema = Yup.object().shape({
     caseReference: Yup.object().required('Required field'),
@@ -234,8 +243,8 @@ class BulkCaseForm extends React.Component<
             return this.createCaseObject(
                 c,
                 events,
-                locationQuery,
                 geoResolution,
+                locationQuery,
                 caseReference,
             );
         });
