@@ -5,9 +5,11 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
+import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
 import Source from './common-form-fields/Source';
+import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -40,6 +42,7 @@ interface BulkCaseFormProps extends WithStyles<typeof styles> {
 
 interface BulkCaseFormState {
     statusMessage: string;
+    errors: CaseValidationError[];
 }
 
 interface BulkCaseFormValues {
@@ -116,11 +119,12 @@ const BulkFormSchema = Yup.object().shape({
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-> {
+    > {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
             statusMessage: '',
+            errors: [],
         };
     }
 
@@ -142,9 +146,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                          start: c.dateHospitalized,
-                          end: c.dateHospitalized,
-                      }
+                        start: c.dateHospitalized,
+                        end: c.dateHospitalized,
+                    }
                     : undefined,
             });
         }
@@ -208,9 +212,9 @@ class BulkCaseForm extends React.Component<
                 geometry:
                     c.latitude && c.longitude
                         ? {
-                              latitude: c.latitude,
-                              longitude: c.longitude,
-                          }
+                            latitude: c.latitude,
+                            longitude: c.longitude,
+                        }
                         : undefined,
                 geoResolution: geoResolution,
                 name: c.locationName,
@@ -229,6 +233,29 @@ class BulkCaseForm extends React.Component<
 
     async upsertCase(c: CompleteParsedCase): Promise<void> {
         return axios.put('/api/cases', c);
+    }
+
+    /**
+     * Provides any validation errors associated with the provided cases.
+     *
+     * TODO: Find a way to parallelize these requests. We need the AxiosResponse
+     * value; so we can't use Promise.allSettled().
+     */
+    async validateCases(
+        cases: CompleteParsedCase[],
+    ): Promise<CaseValidationError[]> {
+        const validationErrors: CaseValidationError[] = [];
+        for (let i = 0; i < cases.length; i++) {
+            const c = cases[i];
+            try {
+                await axios.post('/api/cases?validate_only=true', c);
+            } catch (e) {
+                validationErrors.push(
+                    new CaseValidationError(i + 1, e.response.data),
+                );
+            }
+        }
+        return validationErrors;
     }
 
     async uploadData(
@@ -256,6 +283,11 @@ class BulkCaseForm extends React.Component<
                 caseReference,
             );
         });
+        const validationErrors = await this.validateCases(cases);
+        this.setState({ errors: validationErrors });
+        if (validationErrors.length > 0) {
+            return;
+        }
         for (const c of cases) {
             try {
                 const casesToUpsert = c.caseCount ? c.caseCount : 1;
@@ -322,6 +354,12 @@ class BulkCaseForm extends React.Component<
                             </Button>
                             {this.state.statusMessage && (
                                 <h3>{this.state.statusMessage as string}</h3>
+                            )}
+                            {this.state.errors.length > 0 && (
+                                <ValidationErrorList
+                                    errors={this.state.errors}
+                                    maxDisplayErrors={10}
+                                />
                             )}
                         </Form>
                     </div>
