@@ -261,11 +261,11 @@ describe('Cases', () => {
 
         const code = 404;
         const message = 'Not found';
-        mockedAxios.put.mockRejectedValueOnce({
+        mockedAxios.post.mockRejectedValueOnce({
             response: { status: code, data: message },
         });
         const res = await curatorRequest
-            .put('/api/cases')
+            .post('/api/cases')
             .send({
                 age: '42',
                 location: { query: 'Lyon', limitToResolution: 'Admin3' },
