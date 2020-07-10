@@ -73,6 +73,18 @@ describe('Cases', () => {
         );
     });
 
+    it('list maintains error data from proxied call if available', async () => {
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.get.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .get('/api/cases?limit=10&page=1&filter=')
+            .expect(code);
+        expect(res.text).toEqual(message);
+    });
+
     it('proxies get calls', async () => {
         mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
@@ -83,6 +95,18 @@ describe('Cases', () => {
         expect(mockedAxios.get).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
         );
+    });
+
+    it('get maintains error data from proxied call if available', async () => {
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.get.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .get('/api/cases/5e99f21a1c9d440000ceb088')
+            .expect(code);
+        expect(res.text).toEqual(message);
     });
 
     it('proxies update calls', async () => {
@@ -101,6 +125,19 @@ describe('Cases', () => {
         );
     });
 
+    it('update maintains error data from proxied call if available', async () => {
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.put.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .put('/api/cases/5e99f21a1c9d440000ceb088')
+            .send({ age: '42' })
+            .expect(code);
+        expect(res.text).toEqual(message);
+    });
+
     it('proxies delete calls', async () => {
         mockedAxios.delete.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
@@ -111,6 +148,18 @@ describe('Cases', () => {
         expect(mockedAxios.delete).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
         );
+    });
+
+    it('delete maintains error data from proxied call if available', async () => {
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.delete.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .delete('/api/cases/5e99f21a1c9d440000ceb088')
+            .expect(code);
+        expect(res.text).toEqual(message);
     });
 
     it('proxies upsert calls and geocodes', async () => {
@@ -139,6 +188,31 @@ describe('Cases', () => {
                 location: lyon,
             },
         );
+    });
+
+    it('upsert maintains error data from proxied call if available', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.put.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .put('/api/cases')
+            .send({ age: '42', location: { query: 'Lyon' } })
+            .expect(code);
+        expect(res.text).toEqual(message);
     });
 
     it('proxies create calls and geocode', async () => {
@@ -170,6 +244,34 @@ describe('Cases', () => {
                 location: lyon,
             },
         );
+    });
+
+    it('create maintains error data from proxied call if available', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+
+        const code = 404;
+        const message = 'Not found';
+        mockedAxios.post.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .post('/api/cases')
+            .send({
+                age: '42',
+                location: { query: 'Lyon', limitToResolution: 'Admin3' },
+            })
+            .expect(code);
+        expect(res.text).toEqual(message);
     });
 
     it('throws on invalid location restrictions', async () => {
