@@ -119,7 +119,7 @@ const BulkFormSchema = Yup.object().shape({
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -146,9 +146,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                        start: c.dateHospitalized,
-                        end: c.dateHospitalized,
-                    }
+                          start: c.dateHospitalized,
+                          end: c.dateHospitalized,
+                      }
                     : undefined,
             });
         }
@@ -212,9 +212,9 @@ class BulkCaseForm extends React.Component<
                 geometry:
                     c.latitude && c.longitude
                         ? {
-                            latitude: c.latitude,
-                            longitude: c.longitude,
-                        }
+                              latitude: c.latitude,
+                              longitude: c.longitude,
+                          }
                         : undefined,
                 geoResolution: geoResolution,
                 name: c.locationName,
@@ -246,9 +246,8 @@ class BulkCaseForm extends React.Component<
     ): Promise<CaseValidationError[]> {
         const validationErrors: CaseValidationError[] = [];
         for (let i = 0; i < cases.length; i++) {
-            const c = cases[i];
             try {
-                await axios.post('/api/cases?validate_only=true', c);
+                await axios.post('/api/cases?validate_only=true', cases[i]);
             } catch (e) {
                 validationErrors.push(
                     new CaseValidationError(i + 1, e.response.data),
