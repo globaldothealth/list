@@ -6,6 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import AddIcon from '@material-ui/icons/AddOutlined';
 import CaseForm from './CaseForm';
 import EditCase from './EditCase';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -70,6 +71,7 @@ interface Props extends RouteComponentProps {
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
+  
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -356,6 +358,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
+                            selection: true,
                             pageSize: 10,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             actionsColumnIndex: -1,
@@ -393,37 +396,71 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               caseFormId: id,
                                           });
                                       },
+                                      position: 'row',
+                                  },
+                                  // This action is for deleting selected rows.
+                                  // The action for deleting single rows is in the
+                                  // editable section.
+                                  {
+                                      icon: () => (
+                                          <span aria-label="delete all">
+                                              <DeleteIcon />
+                                          </span>
+                                      ),
+                                      tooltip: 'Delete selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          rows.forEach((row: TableRow) =>
+                                              this.deleteCase(row),
+                                          );
+                                          this.tableRef.current.onQueryChange();
+                                      },
+                                  },
+                                  {
+                                      icon: () => (
+                                          <span aria-label="details">
+                                              <VisibilityIcon />
+                                          </span>
+                                      ),
+                                      onClick: (e, row): void => {
+                                          // Somehow the templating system doesn't think row has an id property but it has.
+                                          const id = (row as TableRow).id;
+                                          history.push(`/cases/view/${id}`);
+                                      },
+                                      tooltip: 'View this case details',
+                                      position: 'row',
                                   },
                               ]
-                            : []
-                        ).concat([
-                            {
-                                icon: () => (
-                                    <span aria-label="details">
-                                        <VisibilityIcon />
-                                    </span>
-                                ),
-                                tooltip: 'View this case details',
-                                onClick: (e, row): void => {
-                                    // Somehow the templating system doesn't think row has an id property but it has.
-                                    const id = (row as TableRow).id;
-                                    history.push(`/cases/view/${id}`);
-                                },
-                            },
-                        ])}
-                        editable={
-                            this.props.user.roles.includes('curator')
-                                ? {
-                                      onRowDelete: (
-                                          rowData: TableRow,
-                                      ): Promise<unknown> =>
-                                          this.deleteCase(rowData),
-                                  }
-                                : undefined
-                        }
-                    />
-                </Paper>
-            </>
+                            : [
+                                  {
+                                      icon: () => (
+                                          <span aria-label="details">
+                                              <VisibilityIcon />
+                                          </span>
+                                      ),
+                                      onClick: (e, row): void => {
+                                          // Somehow the templating system doesn't think row has an id property but it has.
+                                          const id = (row as TableRow).id;
+                                          history.push(`/cases/view/${id}`);
+                                      },
+                                      tooltip: 'View this case details',
+                                      position: 'row',
+                                  },
+                              ]
+                    }
+                    editable={
+                        this.props.user.roles.includes('curator')
+                            ? {
+                                  onRowDelete: (
+                                      rowData: TableRow,
+                                  ): Promise<unknown> =>
+                                      this.deleteCase(rowData),
+                              }
+                            : undefined
+                    }
+                />
+            </Paper>
+          </>
         );
     }
 }

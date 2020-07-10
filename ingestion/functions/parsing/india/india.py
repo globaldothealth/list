@@ -182,8 +182,8 @@ def lambda_handler(event, context):
     ----------
     event: dict, required
         Input event JSON-as-dict.
-        This must contain both `s3Bucket` and `s3Key` fields specifying the
-        location of the stored source content.
+        This must contain `s3Bucket`, `s3Key`, and `sourceUrl` fields specifying
+        the details of the stored source content.
 
     context: object, required
         Lambda Context runtime methods and attributes.

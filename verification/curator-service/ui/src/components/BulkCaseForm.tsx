@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 import { Button, withStyles } from '@material-ui/core';
-import { CaseReference, Event } from './Case';
+import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
@@ -54,7 +54,7 @@ interface BulkCaseFormValues {
  * denote sections of the canonical case object to which fields correspond,
  * where applicable.
  */
-interface ParsedCase {
+interface RawParsedCase {
     // Interface index
     [key: string]: string | number | boolean | undefined;
 
@@ -79,13 +79,34 @@ interface ParsedCase {
     admin1?: string;
     admin2?: string;
     admin3?: string;
-    latitude?: string;
-    longitude?: string;
+    latitude?: number;
+    longitude?: number;
     locationName?: string;
 
     // Bulk upload specific data
     caseCount?: number;
 }
+
+// See description below for usage. This is a mapped partial type that
+// reproduces the fields of <T>, including for nested fields. The non-
+// recursive variant of this is easier to understand, and is explained here:
+//
+//   https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types
+//
+// By changing the field type from T[P] to RecursivePartial<T[P]>, we can make
+// nested fields optional; which is important for this specific abstraction.
+type RecursivePartial<T> = {
+    [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
+// Re-use the case model defined in this dir, but with all optional fields.
+// Existing components rely on pseudo-optional semantics for most fields in the
+// case object (e.g., relying on axios only to populate the fields indicated by
+// the case API), but we can't cleanly do that here, since we're directly both
+// populating and using the values in the object.
+//
+// TODO: Consider defining truly optional fields as optional in Case.tsx.
+type CompleteParsedCase = RecursivePartial<Case> & { caseCount?: number };
 
 const BulkFormSchema = Yup.object().shape({
     caseReference: Yup.object().required('Required field'),
@@ -104,7 +125,7 @@ class BulkCaseForm extends React.Component<
     }
 
     // TODO: Standardize event naming/constructions between case forms.
-    createEvents(c: ParsedCase): Event[] {
+    createEvents(c: RawParsedCase): Event[] {
         const events = [];
         // TODO: Add ParsedCase validation.
         if (c.dateConfirmed) {
@@ -140,7 +161,7 @@ class BulkCaseForm extends React.Component<
         return events;
     }
 
-    createGeoResolution(c: ParsedCase): string {
+    createGeoResolution(c: RawParsedCase): string {
         if (c.admin3) {
             return 'Admin3';
         } else if (c.admin2) {
@@ -152,20 +173,20 @@ class BulkCaseForm extends React.Component<
         }
     }
 
-    createLocationQuery(c: ParsedCase): string {
+    createLocationQuery(c: RawParsedCase): string {
         return [c.admin3, c.admin2, c.admin1, c.country]
             .filter((field) => field)
             .join(', ');
     }
 
-    async upsertCase(
-        c: ParsedCase,
+    createCaseObject(
+        c: RawParsedCase,
         events: Event[],
         geoResolution: string,
         locationQuery: string,
         caseReference: CaseReference,
-    ): Promise<void> {
-        return axios.put('/api/cases', {
+    ): CompleteParsedCase {
+        return {
             caseReference: {
                 sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
@@ -180,14 +201,17 @@ class BulkCaseForm extends React.Component<
             },
             location: {
                 country: c.country,
-                admin1: c.admin1,
-                admin2: c.admin2,
-                admin3: c.admin3,
+                administrativeAreaLevel1: c.admin1,
+                administrativeAreaLevel2: c.admin2,
+                administrativeAreaLevel3: c.admin3,
                 query: locationQuery,
-                geometry: {
-                    latitude: c.latitude,
-                    longitude: c.longitude,
-                },
+                geometry:
+                    c.latitude && c.longitude
+                        ? {
+                              latitude: c.latitude,
+                              longitude: c.longitude,
+                          }
+                        : undefined,
                 geoResolution: geoResolution,
                 name: c.locationName,
             },
@@ -199,14 +223,19 @@ class BulkCaseForm extends React.Component<
                     date: new Date().toISOString(),
                 },
             },
-        });
+            caseCount: c.caseCount,
+        };
+    }
+
+    async upsertCase(c: CompleteParsedCase): Promise<void> {
+        return axios.put('/api/cases', c);
     }
 
     async uploadData(
-        results: ParseResult<ParsedCase>,
+        results: ParseResult<RawParsedCase>,
         caseReference: CaseReference,
     ): Promise<void> {
-        for (const c of results.data) {
+        const cases = results.data.map((c) => {
             // papaparse uses null to fill values that are empty in the CSV.
             // I'm not clear how it does so -- since our types aren't union
             // null -- but it does.
@@ -216,36 +245,37 @@ class BulkCaseForm extends React.Component<
                 (field) =>
                     (c[field] = c[field] === null ? undefined : c[field]),
             );
+            const geoResolution = this.createGeoResolution(c);
+            const locationQuery = this.createLocationQuery(c);
+            const events = this.createEvents(c);
+            return this.createCaseObject(
+                c,
+                events,
+                geoResolution,
+                locationQuery,
+                caseReference,
+            );
+        });
+        for (const c of cases) {
             try {
-                const geoResolution = this.createGeoResolution(c);
-                const locationQuery = this.createLocationQuery(c);
-                const events = this.createEvents(c);
                 const casesToUpsert = c.caseCount ? c.caseCount : 1;
                 for (let i = 0; i < casesToUpsert; i++) {
-                    await this.upsertCase(
-                        c,
-                        events,
-                        geoResolution,
-                        locationQuery,
-                        caseReference,
-                    );
+                    await this.upsertCase(c);
                 }
                 this.setState({ statusMessage: 'Success!' });
             } catch (e) {
-                if (e.response) {
-                    this.setState({ statusMessage: e.response.data });
-                } else if (e.request) {
-                    this.setState({ statusMessage: e.request });
-                } else {
-                    this.setState({ statusMessage: e.message });
-                }
+                this.setState({
+                    statusMessage: `System error during upload: ${JSON.stringify(
+                        e,
+                    )}`,
+                });
             }
         }
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<void> {
         if (values.file) {
-            const papaparseOptions: ParseConfig<ParsedCase> = {
+            const papaparseOptions: ParseConfig<RawParsedCase> = {
                 complete: (results) => {
                     // CaseReference is required per form validation.
                     // But, Typescript doesn't know that.

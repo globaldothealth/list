@@ -62,6 +62,32 @@ describe('Linelist table', function () {
         cy.contains('some notes').should('not.exist');
     });
 
+    it('Can delete multiple cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
+
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.get('button[title="Delete selected rows"]').click();
+
+        cy.contains('France').should('not.exist');
+        cy.contains('Germany');
+        cy.contains('United Kingdom').should('not.exist');
+    });
+
     it('Can search', function () {
         cy.addCase({
             country: 'France',
