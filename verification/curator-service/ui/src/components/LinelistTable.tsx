@@ -5,8 +5,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import AddIcon from '@material-ui/icons/AddOutlined';
 import CaseForm from './CaseForm';
-import EditCase from './EditCase';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
+import EditCase from './EditCase';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -71,7 +71,7 @@ interface Props extends RouteComponentProps {
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
-  
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -363,104 +363,109 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             actionsColumnIndex: -1,
                         }}
-                        actions={(this.props.user.roles.includes('curator')
-                            ? [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="add">
-                                              <AddIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Submit new case',
-                                      isFreeAction: true,
-                                      onClick: (): void => {
-                                          this.setState({
-                                              showCaseForm: true,
-                                              caseFormId: '',
-                                          });
+                        // actions cannot be a function https://github.com/mbrn/material-table/issues/676
+                        actions={
+                            this.props.user.roles.includes('curator')
+                                ? [
+                                      {
+                                          icon: () => (
+                                              <span aria-label="add">
+                                                  <AddIcon />
+                                              </span>
+                                          ),
+                                          tooltip: 'Submit new case',
+                                          isFreeAction: true,
+                                          onClick: (): void => {
+                                              this.setState({
+                                                  showCaseForm: true,
+                                                  caseFormId: '',
+                                              });
+                                          },
                                       },
-                                  },
-                                  {
-                                      icon: () => (
-                                          <span aria-label="edit">
-                                              <EditIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Edit this case',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, row: any): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          this.setState({
-                                              showCaseForm: true,
-                                              caseFormId: id,
-                                          });
+                                      {
+                                          icon: () => (
+                                              <span aria-label="edit">
+                                                  <EditIcon />
+                                              </span>
+                                          ),
+                                          tooltip: 'Edit this case',
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                          onClick: (_: any, row: any): void => {
+                                              // Somehow the templating system doesn't think row has an id property but it has.
+                                              const id = (row as TableRow).id;
+                                              this.setState({
+                                                  showCaseForm: true,
+                                                  caseFormId: id,
+                                              });
+                                          },
+                                          position: 'row',
                                       },
-                                      position: 'row',
-                                  },
-                                  // This action is for deleting selected rows.
-                                  // The action for deleting single rows is in the
-                                  // editable section.
-                                  {
-                                      icon: () => (
-                                          <span aria-label="delete all">
-                                              <DeleteIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Delete selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
-                                          rows.forEach((row: TableRow) =>
-                                              this.deleteCase(row),
-                                          );
-                                          this.tableRef.current.onQueryChange();
+                                      // This action is for deleting selected rows.
+                                      // The action for deleting single rows is in the
+                                      // editable section.
+                                      {
+                                          icon: () => (
+                                              <span aria-label="delete all">
+                                                  <DeleteIcon />
+                                              </span>
+                                          ),
+                                          tooltip: 'Delete selected rows',
+                                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                          onClick: (
+                                              _: any,
+                                              rows: any,
+                                          ): void => {
+                                              rows.forEach((row: TableRow) =>
+                                                  this.deleteCase(row),
+                                              );
+                                              this.tableRef.current.onQueryChange();
+                                          },
                                       },
-                                  },
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
+                                      {
+                                          icon: () => (
+                                              <span aria-label="details">
+                                                  <VisibilityIcon />
+                                              </span>
+                                          ),
+                                          onClick: (e, row): void => {
+                                              // Somehow the templating system doesn't think row has an id property but it has.
+                                              const id = (row as TableRow).id;
+                                              history.push(`/cases/view/${id}`);
+                                          },
+                                          tooltip: 'View this case details',
+                                          position: 'row',
                                       },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
-                              ]
-                            : [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
+                                  ]
+                                : [
+                                      {
+                                          icon: () => (
+                                              <span aria-label="details">
+                                                  <VisibilityIcon />
+                                              </span>
+                                          ),
+                                          onClick: (e, row): void => {
+                                              // Somehow the templating system doesn't think row has an id property but it has.
+                                              const id = (row as TableRow).id;
+                                              history.push(`/cases/view/${id}`);
+                                          },
+                                          tooltip: 'View this case details',
+                                          position: 'row',
                                       },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
-                              ]
-                    }
-                    editable={
-                        this.props.user.roles.includes('curator')
-                            ? {
-                                  onRowDelete: (
-                                      rowData: TableRow,
-                                  ): Promise<unknown> =>
-                                      this.deleteCase(rowData),
-                              }
-                            : undefined
-                    }
-                />
-            </Paper>
-          </>
+                                  ]
+                        }
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteCase(rowData),
+                                  }
+                                : undefined
+                        }
+                    />
+                </Paper>
+            </>
         );
     }
 }
