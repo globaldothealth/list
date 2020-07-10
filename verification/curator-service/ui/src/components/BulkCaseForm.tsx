@@ -87,6 +87,14 @@ interface RawParsedCase {
     caseCount?: number;
 }
 
+// See description below for usage. This is a mapped partial type that
+// reproduces the fields of <T>, including for nested fields. The non-
+// recursive variant of this is easier to understand, and is explained here:
+//
+//   https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types
+//
+// By changing the field type from T[P] to RecursivePartial<T[P]>, we can make
+// nested fields optional; which is important for this specific abstraction.
 type RecursivePartial<T> = {
     [P in keyof T]?: RecursivePartial<T[P]>;
 };

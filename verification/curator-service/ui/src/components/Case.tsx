@@ -1,4 +1,4 @@
-// Case definitions as returned by the /api/cases endpoint.
+// Case definitions as defined by the /api/cases endpoint.
 
 export interface CaseReference {
     sourceId: string;
@@ -45,6 +45,8 @@ export interface Location {
     geometry: Geometry;
     name: string;
     place: string;
+    // This is required for requests to the API (for geocoding), but isn't
+    // returned by the API in new case objects.
     query?: string;
 }
 
