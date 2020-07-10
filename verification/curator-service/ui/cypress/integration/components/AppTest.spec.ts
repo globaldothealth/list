@@ -68,6 +68,7 @@ describe('App', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/');
 
+        cy.contains('Create new');
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Profile');
@@ -79,10 +80,21 @@ describe('App', function () {
         cy.login({ roles: ['reader'] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
+    });
+
+    it('Can open new case modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.contains('New case').should('not.exist');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
+        cy.contains('New case');
     });
 });

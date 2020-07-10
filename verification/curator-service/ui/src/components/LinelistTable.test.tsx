@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import { MemoryRouter, Router } from 'react-router-dom';
-import { fireEvent, getByLabelText, render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
 import React from 'react';
@@ -103,32 +103,6 @@ it('loads and displays cases', async () => {
     expect(await findByText('Yes')).toBeInTheDocument();
 });
 
-it('redirects to new case page when + icon is clicked', async () => {
-    const axiosResponse = {
-        data: {
-            cases: [],
-            total: 15,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-
-    const history = createMemoryHistory();
-    const { getByLabelText } = render(
-        <Router history={history}>
-            <LinelistTable user={curator} />
-        </Router>,
-    );
-
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
-    fireEvent.click(getByLabelText('add'));
-    expect(history.location.pathname).toBe('/cases/new');
-});
-
 it('API errors are displayed', async () => {
     const cases = [
         {
@@ -228,7 +202,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(
+    const { getByText, findByText } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
@@ -274,65 +248,6 @@ it('can delete a row', async () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     const noRec = await findByText(/No records to display/);
     expect(noRec).toBeInTheDocument();
-});
-
-it('can go to page to edit a row', async () => {
-    const cases = [
-        {
-            _id: 'abc123',
-            caseReference: {
-                sourceId: 'CDC',
-                sourceUrl: 'www.example.com',
-            },
-            importedCase: {
-                outcome: 'Recovered',
-            },
-            location: {
-                country: 'France',
-                geoResolution: 'Country',
-                geometry: {
-                    latitude: 42,
-                    longitude: 12,
-                },
-            },
-            events: [
-                {
-                    name: 'confirmed',
-                    dateRange: {
-                        start: new Date().toJSON(),
-                    },
-                },
-            ],
-            notes: 'some notes',
-        },
-    ];
-    const axiosGetResponse = {
-        data: {
-            cases: cases,
-            total: 15,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
-
-    // Load table
-    const history = createMemoryHistory();
-    const { getByLabelText, findByText } = render(
-        <Router history={history}>
-            <LinelistTable user={curator} />
-        </Router>,
-    );
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
-    const row = await findByText('some notes');
-    expect(row).toBeInTheDocument();
-
-    const editButton = getByLabelText(/edit/);
-    fireEvent.click(editButton);
-    expect(history.location.pathname).toBe('/cases/edit/abc123');
 });
 
 it('can go to page to view a case', async () => {
