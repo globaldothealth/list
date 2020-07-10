@@ -36,7 +36,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     const searchQuery = String(req.query.q || '').trim();
     const query = searchQuery
         ? {
-            $text: { $search: searchQuery },
+              $text: { $search: searchQuery },
           }
         : {};
 
@@ -82,7 +82,13 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         // TODO: Don't consume req.body directly; add layer between API and
         // storage.
         const c = new Case(req.body);
-        const result = await c.save();
+        let result;
+        if (req.query.validate_only === 'true') {
+            await c.validate();
+            result = c;
+        } else {
+            result = await c.save();
+        }
         res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {

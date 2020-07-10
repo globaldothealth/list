@@ -23,6 +23,10 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err);
         }
     };
@@ -35,6 +39,10 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err);
         }
     };
@@ -47,6 +55,10 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err);
         }
     };
@@ -60,6 +72,10 @@ export default class CasesController {
             res.json(response.data);
         } catch (err) {
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err);
         }
     };
@@ -83,6 +99,10 @@ export default class CasesController {
                 return;
             }
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err.message);
         }
     };
@@ -106,6 +126,10 @@ export default class CasesController {
                 return;
             }
             console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
             res.status(500).send(err.message);
         }
     };

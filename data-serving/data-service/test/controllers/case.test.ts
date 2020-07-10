@@ -138,6 +138,22 @@ describe('POST', () => {
             .expect('Content-Type', /json/)
             .expect(201);
     });
+    it('create with invalid input and validate_only should return 422', async () => {
+        return request(app)
+            .post('/api/cases?validate_only=true')
+            .send({})
+            .expect(422);
+    });
+    it('create with valid input and validate_only should not save case', async () => {
+        const res = await request(app)
+            .post('/api/cases?validate_only=true')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(await Case.collection.countDocuments()).toEqual(0);
+        expect(res.body._id).not.toHaveLength(0);
+    });
 });
 
 describe('PUT', () => {

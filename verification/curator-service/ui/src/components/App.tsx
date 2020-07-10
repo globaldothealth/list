@@ -100,6 +100,7 @@ const styles = (theme: Theme) =>
                 duration: theme.transitions.duration.enteringScreen,
             }),
             marginLeft: 0,
+            width: `calc(100% - ${drawerWidth}px)`,
         },
         createNewButton: {
             margin: '1em',
