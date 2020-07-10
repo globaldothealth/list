@@ -1,16 +1,18 @@
 export default class CaseValidationError {
-    public readonly formattedIssues: string[];
+    private static readonly leadingErrorText = 'Case validation failed: ';
+    private static readonly errorDelimiter = '., ';
+    private static readonly fieldMessageDelimiter = ':';
 
-    private readonly leadingErrorText = 'Case validation failed: ';
-    private readonly errorDelimiter = '., ';
-    private readonly fieldMessageDelimiter = ':';
+    public readonly formattedIssues: string[];
 
     constructor(public readonly rowNumber: number, apiResponse: string) {
         const sortedErrorsByField = apiResponse
-            .substr(this.leadingErrorText.length)
-            .split(this.errorDelimiter)
+            .substr(CaseValidationError.leadingErrorText.length)
+            .split(CaseValidationError.errorDelimiter)
             .map((str) => {
-                const parts = str.split(this.fieldMessageDelimiter);
+                const parts = str.split(
+                    CaseValidationError.fieldMessageDelimiter,
+                );
                 return {
                     field: parts[0],
                     message: parts.slice(1).join().trim(),
