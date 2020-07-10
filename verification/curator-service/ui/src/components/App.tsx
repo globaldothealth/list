@@ -3,19 +3,19 @@ import {
     Button,
     CssBaseline,
     IconButton,
+    Menu,
+    MenuItem,
     Toolbar,
     Typography,
 } from '@material-ui/core';
 import { Link, Route, Switch } from 'react-router-dom';
 import { Theme, createStyles } from '@material-ui/core/styles';
 
-import Add from '@material-ui/icons/Add';
+import AddIcon from '@material-ui/icons/Add';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import EditCase from './EditCase';
 import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
@@ -101,6 +101,10 @@ const styles = (theme: Theme) =>
             }),
             marginLeft: 0,
         },
+        createNewButton: {
+            margin: '1em',
+            width: '70%',
+        },
     });
 
 type Props = WithStyles<typeof styles>;
@@ -108,6 +112,9 @@ type Props = WithStyles<typeof styles>;
 interface State {
     drawerOpen: boolean;
     user: User;
+    createNewButtonAnchorEl?: Element;
+    showCaseForm: boolean;
+    caseFormId: string;
 }
 
 class App extends React.Component<Props, State> {
@@ -121,11 +128,17 @@ class App extends React.Component<Props, State> {
                 email: '',
                 roles: [],
             },
+            createNewButtonAnchorEl: undefined,
+            showCaseForm: false,
+            caseFormId: '',
         };
         // https://reactjs.org/docs/handling-events.html.
         this.toggleDrawer = this.toggleDrawer.bind(this);
         this.getUser = this.getUser.bind(this);
         this.hasAnyRole = this.hasAnyRole.bind(this);
+        this.openCreateNewPopup = this.openCreateNewPopup.bind(this);
+        this.closeCreateNewPopup = this.closeCreateNewPopup.bind(this);
+        this.showCaseForm = this.showCaseForm.bind(this);
     }
 
     componentDidMount(): void {
@@ -160,6 +173,18 @@ class App extends React.Component<Props, State> {
 
     toggleDrawer(): void {
         this.setState({ drawerOpen: !this.state.drawerOpen });
+    }
+
+    openCreateNewPopup(event: any): void {
+        this.setState({ createNewButtonAnchorEl: event.currentTarget });
+    }
+
+    closeCreateNewPopup(): void {
+        this.setState({ createNewButtonAnchorEl: undefined });
+    }
+
+    showCaseForm(id?: string): void {
+        this.setState({ showCaseForm: true, caseFormId: id ?? '' });
     }
 
     render(): JSX.Element {
@@ -215,7 +240,53 @@ class App extends React.Component<Props, State> {
                         }}
                     >
                         <div className={classes.drawerHeader}></div>
-                        <Divider />
+                        {this.hasAnyRole(['curator']) && (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    data-testid="create-new-button"
+                                    className={classes.createNewButton}
+                                    onClick={this.openCreateNewPopup}
+                                    startIcon={<AddIcon />}
+                                >
+                                    Create new
+                                </Button>
+                                <Menu
+                                    anchorEl={
+                                        this.state.createNewButtonAnchorEl
+                                    }
+                                    getContentAnchorEl={null}
+                                    keepMounted
+                                    open={Boolean(
+                                        this.state.createNewButtonAnchorEl,
+                                    )}
+                                    onClose={this.closeCreateNewPopup}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                >
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.closeCreateNewPopup();
+                                            this.setState({
+                                                showCaseForm: true,
+                                            });
+                                        }}
+                                    >
+                                        New line list case
+                                    </MenuItem>
+                                </Menu>
+                            </>
+                        )}
+                        {this.state.showCaseForm && (
+                            <CaseForm
+                                user={this.state.user}
+                                onModalClose={() =>
+                                    this.setState({ showCaseForm: false })
+                                }
+                            />
+                        )}
                         <List>
                             {[
                                 {
@@ -231,13 +302,6 @@ class App extends React.Component<Props, State> {
                                     to: '/cases',
                                     displayCheck: (): boolean =>
                                         this.hasAnyRole(['reader', 'curator']),
-                                },
-                                {
-                                    text: 'New',
-                                    icon: <Add />,
-                                    to: '/cases/new',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['curator']),
                                 },
                                 {
                                     text: 'Bulk upload',
@@ -305,19 +369,6 @@ class App extends React.Component<Props, State> {
                     >
                         <div className={classes.drawerHeader} />
                         <Switch>
-                            {this.hasAnyRole(['curator']) && (
-                                <Route
-                                    path="/cases/edit/:id"
-                                    render={({ match }) => {
-                                        return (
-                                            <EditCase
-                                                id={match.params.id}
-                                                user={this.state.user}
-                                            />
-                                        );
-                                    }}
-                                />
-                            )}
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route
                                     path="/cases/view/:id"
@@ -331,11 +382,6 @@ class App extends React.Component<Props, State> {
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/new">
-                                    <CaseForm user={this.state.user} />
                                 </Route>
                             )}
                             {this.hasAnyRole(['curator']) && (

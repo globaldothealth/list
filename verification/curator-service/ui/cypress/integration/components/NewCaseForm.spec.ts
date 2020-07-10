@@ -23,12 +23,12 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.visit('/cases/new');
+        cy.get('button[title="Submit new case"]').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').first().should('contain', 'France').click();
+        cy.get('li').contains('France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -36,7 +36,7 @@ describe('New case form', function () {
         cy.wait('@addCase');
         cy.contains('Case added');
 
-        cy.visit('/cases');
+        cy.get('button[aria-label="close case form"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
         cy.contains('France');
@@ -53,12 +53,12 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.visit('/cases/new');
+        cy.get('button[title="Submit new case"]').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').first().should('contain', 'France').click();
+        cy.get('li').contains('France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         // Outcome without a date.
         cy.get('div[data-testid="outcome"]').click();
@@ -74,7 +74,7 @@ describe('New case form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
-        cy.visit('/cases');
+        cy.get('button[aria-label="close case form"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
         cy.contains('France');
@@ -94,12 +94,12 @@ describe('New case form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/cases/new');
+        cy.get('button[title="Submit new case"]').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').first().should('contain', 'France').click();
+        cy.get('li').contains('France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         // Force server to return error
@@ -113,19 +113,21 @@ describe('New case form', function () {
         cy.wait('@addCase');
         cy.contains('Request failed');
 
-        cy.visit('/cases');
+        cy.get('button[aria-label="close case form"').click();
         cy.contains('No records to display');
     });
 
     it('Check for required fields', function () {
-        cy.visit('/cases/new');
+        cy.visit('/cases');
+        cy.get('button[title="Submit new case"]').click();
         cy.get('button[data-testid="submit"]').click();
 
         cy.get('p:contains("Required field")').should('have.length', 3);
     });
 
     it('Shows checkbox on field completion', function () {
-        cy.visit('/cases/new');
+        cy.visit('/cases');
+        cy.get('button[title="Submit new case"]').click();
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('div[data-testid="sex"]').click();
         cy.get('li[data-value="Female"').click();
@@ -133,7 +135,8 @@ describe('New case form', function () {
     });
 
     it('Shows error icon on field submission error', function () {
-        cy.visit('/cases/new');
+        cy.visit('/cases');
+        cy.get('button[title="Submit new case"]').click();
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('input[name="confirmedDate"]').type('2020/02/31').blur();

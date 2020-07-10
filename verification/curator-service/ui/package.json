@@ -82,7 +82,8 @@
   },
   "devDependencies": {
     "cypress": "^4.9.0",
-    "cypress-file-upload": "^4.0.7"
+    "cypress-file-upload": "^4.0.7",
+    "jest-canvas-mock": "^2.2.0"
   },
   "husky": {
     "hooks": {
