@@ -27,6 +27,9 @@ const useStyles = makeStyles(() => ({
     fieldRow: {
         marginBottom: '2em',
     },
+    fieldRowTop: {
+        marginTop: '2em',
+    },
 }));
 
 const hasTravelledValues = [undefined, 'Yes', 'No'];
@@ -112,18 +115,26 @@ export default function Events(): JSX.Element {
                                                             }
                                                             name={`travelHistory[${index}].location`}
                                                         ></PlacesAutocomplete>
-                                                        <Location
-                                                            location={
-                                                                travelHistoryElement.location
+                                                        {travelHistoryElement.location && (
+                                                            <Location
+                                                                location={
+                                                                    travelHistoryElement.location
+                                                                }
+                                                            ></Location>
+                                                        )}
+                                                        <div
+                                                            className={
+                                                                classes.fieldRowTop
                                                             }
-                                                        ></Location>
-                                                        <DateField
-                                                            name={`travelHistory[${index}].dateRange.start`}
-                                                            label="Start date"
-                                                            initialFocusedDate={
-                                                                values.confirmedDate
-                                                            }
-                                                        ></DateField>
+                                                        >
+                                                            <DateField
+                                                                name={`travelHistory[${index}].dateRange.start`}
+                                                                label="Start date"
+                                                                initialFocusedDate={
+                                                                    values.confirmedDate
+                                                                }
+                                                            ></DateField>
+                                                        </div>
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.end`}
                                                             label="End date"

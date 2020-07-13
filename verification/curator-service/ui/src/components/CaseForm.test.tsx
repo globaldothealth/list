@@ -34,7 +34,7 @@ it('renders form', async () => {
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
-    expect(getAllByText(/Location/i)).toHaveLength(4);
+    expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(2);
     expect(getByText(/Source URL/i)).toBeInTheDocument();
     expect(getByText(/Nationality/i)).toBeInTheDocument();
