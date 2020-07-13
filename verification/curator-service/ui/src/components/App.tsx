@@ -36,7 +36,6 @@ import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
 import Users from './Users';
-import ViewCase from './ViewCase';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
@@ -370,16 +369,6 @@ class App extends React.Component<Props, State> {
                     >
                         <div className={classes.drawerHeader} />
                         <Switch>
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <Route
-                                    path="/cases/view/:id"
-                                    render={({ match }) => {
-                                        return (
-                                            <ViewCase id={match.params.id} />
-                                        );
-                                    }}
-                                />
-                            )}
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
