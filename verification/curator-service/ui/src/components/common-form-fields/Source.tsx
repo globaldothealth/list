@@ -234,7 +234,6 @@ export function SourcesAutocomplete(
                             // to be set in the form values, rather than only selected
                             // dropdown values. Thus we use an unused form value here.
                             name="unused"
-                            required
                             data-testid={name}
                             label="Source URL"
                             placeholder="https://..."

@@ -136,7 +136,6 @@ export function PlacesAutocomplete(
                         // to be set in the form values, rather than only selected
                         // dropdown values. Thus we use an unused form value here.
                         name="unused"
-                        required={props.required}
                         data-testid={props.name}
                         // Use the initial valuelocation name as a hint when untouched
                         // otherwise just use the field name.
