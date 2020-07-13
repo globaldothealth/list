@@ -67,6 +67,7 @@ const styles = (theme: Theme) =>
             marginTop: '1em',
             maxWidth: '80%',
         },
+        cancelButton: { marginLeft: '1em' },
     });
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
@@ -478,7 +479,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         const { classes, initialCase } = this.props;
         return (
             <AppModal
-                title={this.props.initialCase ? 'Edit case' : 'New case'}
+                title={
+                    this.props.initialCase
+                        ? 'Edit case'
+                        : 'Create new COVID-19 line list case'
+                }
                 onModalClose={this.props.onModalClose}
             >
                 <Formik
@@ -791,6 +796,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     <Button
                                         variant="contained"
                                         color="primary"
+                                        disableElevation
                                         data-testid="submit"
                                         disabled={isSubmitting}
                                         onClick={submitForm}
@@ -798,6 +804,14 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                         {this.props.initialCase
                                             ? 'Edit case'
                                             : 'Submit case'}
+                                    </Button>
+                                    <Button
+                                        className={classes.cancelButton}
+                                        color="primary"
+                                        variant="outlined"
+                                        onClick={this.props.onModalClose}
+                                    >
+                                        Cancel
                                     </Button>
                                 </Form>
                                 {this.state.successMessage && (
