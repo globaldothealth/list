@@ -178,7 +178,6 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
-                    required={props.required}
                     minDate={new Date('2019/12/01')}
                     disableFuture
                     autoOk
@@ -205,14 +204,18 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<CaseFormValues>();
     return (
         <div>
-            {hasKey(touched, props.name) &&
-                touched[props.name] &&
-                hasKey(values, props.name) &&
-                (values[props.name] === undefined ||
-                    values[props.name] === null ||
-                    values[props.name] === '') && (
-                    <FormHelperText error>Required field</FormHelperText>
-                )}
+            <FormHelperText
+                error={
+                    hasKey(touched, props.name) &&
+                    touched[props.name] &&
+                    hasKey(values, props.name) &&
+                    (values[props.name] === undefined ||
+                        values[props.name] === null ||
+                        values[props.name] === '')
+                }
+            >
+                Required
+            </FormHelperText>
         </div>
     );
 }

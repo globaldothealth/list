@@ -197,7 +197,7 @@ interface CaseFormState {
 
 const NewCaseValidation = Yup.object().shape(
     {
-        caseReference: Yup.object().required('Required field'),
+        caseReference: Yup.object().required('Required'),
         minAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
@@ -237,8 +237,8 @@ const NewCaseValidation = Yup.object().shape(
         transmissionLinkedCaseIds: Yup.array().of(
             Yup.string().matches(new RegExp('[a-z0-9]{24}'), 'Invalid case ID'),
         ),
-        confirmedDate: Yup.string().nullable().required('Required field'),
-        location: Yup.object().required('Required field'),
+        confirmedDate: Yup.string().nullable().required('Required'),
+        location: Yup.object().required('Required'),
     },
     [['maxAge', 'minAge']],
 );
