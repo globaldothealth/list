@@ -9,11 +9,6 @@ describe('View case', function () {
         cy.clearSeededLocations();
     });
 
-    it('Errors when case does not exist', function () {
-        cy.visit('/cases/view/foo');
-        cy.contains('Request failed');
-    });
-
     // View of a full case is covered in the curator test.
     it('can view a case', function () {
         cy.addCase({
@@ -23,15 +18,13 @@ describe('View case', function () {
             methodOfConfirmation: 'PCR test',
             nationalities: ['Andorrean', 'French'],
         });
-        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
-            expect(resp.body.cases).to.have.lengthOf(1);
-            cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
-            cy.contains('France');
-            cy.contains('some notes');
-            cy.contains('www.example.com');
-            cy.contains('PCR test');
-            cy.contains('French');
-            cy.contains('Andorrean');
-        });
+        cy.visit('cases');
+        cy.get('button[title="View this case details"]').click();
+        cy.contains('France');
+        cy.contains('some notes');
+        cy.contains('www.example.com');
+        cy.contains('PCR test');
+        cy.contains('French');
+        cy.contains('Andorrean');
     });
 });
