@@ -1,44 +1,17 @@
-import boto3
 import json
 import os
-import requests
-import google.auth.transport.requests
-from google.oauth2 import service_account
+import sys
 from datetime import date, datetime
 
-
-LOCAL_DATA_FILE = "/tmp/data.json"
-METADATA_BUCKET = "epid-ingestion"
-SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
-SOURCE_URL_FIELD = "sourceUrl"
-S3_BUCKET_FIELD = "s3Bucket"
-S3_KEY_FIELD = "s3Key"
-S3_KEY_PATH_SEPERATOR = "/"
-
-s3_client = boto3.client("s3")
-
-
-def extract_event_fields(event):
-    if any(
-            field not in event
-            for field in [SOURCE_URL_FIELD, S3_BUCKET_FIELD, S3_KEY_FIELD]):
-        error_message = (
-            f"Required fields {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
-            f"{S3_KEY_FIELD} not found in input event json.")
-        print(error_message)
-        raise ValueError(error_message)
-    return event[SOURCE_URL_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
-
-
-def retrieve_raw_data_file(s3_bucket, s3_key):
-    try:
-        local_data_file = LOCAL_DATA_FILE
-        print(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
-        s3_client.download_file(s3_bucket, s3_key, local_data_file)
-        return local_data_file
-    except Exception as e:
-        print(e)
-        raise e
+# Layer code, like parsing_lib, is added to the path by AWS.
+# To test locally (e.g. via pytest), we have to modify sys.path.
+# pylint: disable=import-error
+if ('lambda' not in sys.argv[0]):
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'common/python'))
+import parsing_lib
 
 
 def convert_date(raw_date):
@@ -83,7 +56,7 @@ def convert_location(raw_entry):
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
-    Parses GHDSI-format case data from raw API data.
+    Parses G.h-format case data from raw API data.
 
     Two primary caveats at present:
         1. We aren't converting all fields yet.
@@ -130,50 +103,6 @@ def parse_cases(raw_data_file, source_id, source_url):
             } for entry in cases["raw_data"] if entry["agebracket"]]
 
 
-def write_to_server(cases, headers):
-    count_success = 0
-    count_error = 0
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases"
-    print(f"Sending {len(cases)} cases to {put_api_url}")
-    for case in cases:
-        try:
-            r = requests.put(put_api_url, json=case,
-                             headers=headers).raise_for_status()
-            count_success += 1
-        except Exception as e:
-            print(e)
-            count_error += 1
-    return count_success, count_error
-
-
-def obtain_api_credentials():
-    """
-    Creates HTTP headers credentialed for access to the EPID Source API.
-    """
-    try:
-        local_creds_file = "/tmp/creds.json"
-        print(
-            "Retrieving service account credentials from "
-            f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-        s3_client.download_file(
-            METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file)
-        credentials = service_account.Credentials.from_service_account_file(
-            local_creds_file, scopes=["email"])
-        headers = {}
-        request = google.auth.transport.requests.Request()
-        credentials.refresh(request)
-        credentials.apply(headers)
-        return headers
-    except Exception as e:
-        print(e)
-        raise e
-
-
-def extract_source_id(s3_key):
-    """Extracts the source ID based on the canonical object key format."""
-    return s3_key.split(S3_KEY_PATH_SEPERATOR, 1)[0]
-
-
 def lambda_handler(event, context):
     """
     Case data parsing function for the COVID19-India API.
@@ -193,16 +122,17 @@ def lambda_handler(event, context):
     Returns
     ------
     JSON object containing the count of line list cases successfully written to
-    GHDSI servers.
+    G.h servers.
     For more information on return types, see:
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, s3_bucket, s3_key = extract_event_fields(event)
-    raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
+    source_url, s3_bucket, s3_key = parsing_lib.extract_event_fields(event)
+    raw_data_file = parsing_lib.retrieve_raw_data_file(s3_bucket, s3_key)
     case_data = parse_cases(
-        raw_data_file, extract_source_id(s3_key),
+        raw_data_file, parsing_lib.extract_source_id(s3_key),
         source_url)
-    api_creds = obtain_api_credentials()
-    count_success, count_error = write_to_server(case_data, api_creds)
+    api_creds = parsing_lib.obtain_api_credentials()
+    count_success, count_error = parsing_lib.write_to_server(
+        case_data, api_creds)
     return {"count_success": count_success, "count_error": count_error}

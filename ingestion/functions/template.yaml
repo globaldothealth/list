@@ -30,6 +30,20 @@ Resources:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
+  ParsingLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: parsing_lib
+      Description: Common functions required for parsing
+      ContentUri: parsing/lib/
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.6
   IndiaParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -42,6 +56,8 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
       Timeout: 60 # Seconds
+      Layers:
+        - !Ref ParsingLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
