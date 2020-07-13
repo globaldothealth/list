@@ -36,7 +36,7 @@ describe('New case form', function () {
         cy.wait('@addCase');
         cy.contains('Case added');
 
-        cy.get('button[aria-label="close case form"').click();
+        cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
         cy.contains('France');
@@ -74,7 +74,7 @@ describe('New case form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
-        cy.get('button[aria-label="close case form"').click();
+        cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
         cy.contains('France');
@@ -113,7 +113,7 @@ describe('New case form', function () {
         cy.wait('@addCase');
         cy.contains('Request failed');
 
-        cy.get('button[aria-label="close case form"').click();
+        cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display');
     });
 

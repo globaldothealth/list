@@ -7,15 +7,28 @@ import {
     Typography,
 } from '@material-ui/core';
 
+import AppModal from './AppModal';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import StaticMap from './StaticMap';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
+import { withStyles } from '@material-ui/core';
 
-interface Props {
+const styles = () =>
+    createStyles({
+        errorMessage: {
+            height: 'fit-content',
+            width: '100%',
+        },
+    });
+
+interface Props extends WithStyles<typeof styles> {
     id: string;
+    onModalClose: () => void;
 }
 
 interface State {
@@ -43,16 +56,22 @@ class ViewCase extends React.Component<Props, State> {
     }
 
     render(): JSX.Element {
+        const { classes } = this.props;
         return (
-            <div>
+            <AppModal title="View case" onModalClose={this.props.onModalClose}>
                 {this.state.loading && <LinearProgress />}
                 {this.state.errorMessage && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
+                    <MuiAlert
+                        className={classes.errorMessage}
+                        elevation={6}
+                        variant="filled"
+                        severity="error"
+                    >
                         {this.state.errorMessage}
                     </MuiAlert>
                 )}
                 {this.state.case && <CaseDetails c={this.state.case} />}
-            </div>
+            </AppModal>
         );
     }
 }
@@ -547,4 +566,4 @@ function MultilinkRowContent(props: {
     );
 }
 
-export default ViewCase;
+export default withStyles(styles)(ViewCase);
