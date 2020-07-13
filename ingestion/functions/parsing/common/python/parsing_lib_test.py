@@ -7,7 +7,6 @@ import requests
 
 from datetime import date
 from moto import mock_s3
-from unittest.mock import MagicMock
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
@@ -87,6 +86,24 @@ def sample_data():
         return json.load(event_file)
 
 
+@mock_s3
+def test_retrieve_raw_data_file_stores_s3_in_local_file(
+        input_event, s3, sample_data):
+    from python import parsing_lib  # Import locally to avoid superseding mock
+    s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
+    s3.put_object(
+        Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
+        Key=input_event[parsing_lib.S3_KEY_FIELD],
+        Body=json.dumps(sample_data))
+
+    local_file = parsing_lib.retrieve_raw_data_file(
+        input_event[parsing_lib.S3_BUCKET_FIELD],
+        input_event[parsing_lib.S3_KEY_FIELD])
+    assert local_file == parsing_lib.LOCAL_DATA_FILE
+    with open(local_file, "r") as f:
+        assert json.load(f) == sample_data
+
+
 def test_extract_event_fields_returns_url_bucket_and_key(input_event):
     from python import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
@@ -106,24 +123,6 @@ def test_extract_event_fields_errors_if_missing_key_field():
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
         parsing_lib.extract_event_fields(
             {parsing_lib.S3_BUCKET_FIELD: "bucket"})
-
-
-@mock_s3
-def test_retrieve_raw_data_file_stores_s3_in_local_file(
-        input_event, s3, sample_data):
-    from python import parsing_lib  # Import locally to avoid superseding mock
-    s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
-    s3.put_object(
-        Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
-        Key=input_event[parsing_lib.S3_KEY_FIELD],
-        Body=json.dumps(sample_data))
-
-    local_file = parsing_lib.retrieve_raw_data_file(
-        input_event[parsing_lib.S3_BUCKET_FIELD],
-        input_event[parsing_lib.S3_KEY_FIELD])
-    assert local_file == parsing_lib.LOCAL_DATA_FILE
-    with open(local_file, "r") as f:
-        assert json.load(f) == sample_data
 
 
 def test_write_to_server_returns_success_count_for_each_entered_case(
