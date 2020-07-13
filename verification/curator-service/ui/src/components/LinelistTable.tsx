@@ -1,7 +1,6 @@
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import AddIcon from '@material-ui/icons/AddOutlined';
 import CaseForm from './CaseForm';
@@ -11,6 +10,7 @@ import EditIcon from '@material-ui/icons/EditOutlined';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import User from './User';
+import ViewCase from './ViewCase';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
 
@@ -25,6 +25,8 @@ interface LinelistTableState {
     error: string;
     showCaseForm: boolean;
     caseFormId: string;
+    showCaseDetails: boolean;
+    caseDetailsId: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -64,12 +66,14 @@ interface TableRow {
     admittedToHospital: string;
 }
 
-// Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends RouteComponentProps {
+interface Props {
     user: User;
 }
 
-class LinelistTable extends React.Component<Props, LinelistTableState> {
+export default class LinelistTable extends React.Component<
+    Props,
+    LinelistTableState
+> {
     tableRef: RefObject<any> = React.createRef();
 
     constructor(props: Props) {
@@ -79,6 +83,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             error: '',
             showCaseForm: false,
             caseFormId: '',
+            showCaseDetails: false,
+            caseDetailsId: '',
         };
         this.closeCaseForm = this.closeCaseForm.bind(this);
     }
@@ -101,7 +107,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     render(): JSX.Element {
-        const { history } = this.props;
         return (
             <>
                 {this.state.showCaseForm &&
@@ -117,6 +122,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             onModalClose={this.closeCaseForm}
                         ></EditCase>
                     ))}
+                {this.state.showCaseDetails && (
+                    <ViewCase
+                        id={this.state.caseDetailsId}
+                        onModalClose={() =>
+                            this.setState({
+                                showCaseDetails: false,
+                                caseDetailsId: '',
+                            })
+                        }
+                    ></ViewCase>
+                )}
                 <Paper>
                     {this.state.error && (
                         <MuiAlert
@@ -430,7 +446,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           onClick: (e, row): void => {
                                               // Somehow the templating system doesn't think row has an id property but it has.
                                               const id = (row as TableRow).id;
-                                              history.push(`/cases/view/${id}`);
+                                              this.setState({
+                                                  showCaseDetails: true,
+                                                  caseDetailsId: id,
+                                              });
                                           },
                                           tooltip: 'View this case details',
                                           position: 'row',
@@ -446,7 +465,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           onClick: (e, row): void => {
                                               // Somehow the templating system doesn't think row has an id property but it has.
                                               const id = (row as TableRow).id;
-                                              history.push(`/cases/view/${id}`);
+                                              this.setState({
+                                                  showCaseDetails: true,
+                                                  caseDetailsId: id,
+                                              });
                                           },
                                           tooltip: 'View this case details',
                                           position: 'row',
@@ -469,5 +491,3 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
     }
 }
-
-export default withRouter(LinelistTable);

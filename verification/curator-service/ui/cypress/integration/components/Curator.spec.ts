@@ -152,7 +152,7 @@ describe('Curator', function () {
         cy.contains('Case added');
 
         // Check that linelist has everything.
-        cy.get('button[aria-label="close case form"').click();
+        cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.example.com');
         cy.contains('Female');
@@ -262,11 +262,12 @@ describe('Curator', function () {
         cy.contains('Case edited');
 
         // Updated info should be there.
-        cy.get('button[aria-label="close case form"').click();
+        cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display').should('not.exist');
         cy.contains('Male');
         // What's untouched should stay as is.
         cy.contains('Asian');
+
         // View full details about the case
         cy.get('button[title="View this case details"]').click();
         // Case data.

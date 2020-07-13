@@ -1,23 +1,15 @@
 import * as Yup from 'yup';
 
-import {
-    AppBar,
-    Button,
-    IconButton,
-    LinearProgress,
-    Modal,
-    Toolbar,
-    Typography,
-} from '@material-ui/core';
+import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
+import AppModal from './AppModal';
 import { Case } from './Case';
 import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import CloseIcon from '@material-ui/icons/Close';
 import Demographics from './new-case-form-fields/Demographics';
 import ErrorIcon from '@material-ui/icons/Error';
 import Events from './new-case-form-fields/Events';
@@ -56,12 +48,7 @@ const styles = (theme: Theme) =>
         appBar: {
             background: 'white',
         },
-        container: {
-            display: 'flex',
-            height: 'calc(100% - 80px)',
-            overflow: 'auto',
-            padding: '1em',
-        },
+        container: { display: 'flex,' },
         tableOfContents: {
             position: 'fixed',
             marginTop: '2em',
@@ -490,452 +477,353 @@ class CaseForm extends React.Component<Props, CaseFormState> {
     render(): JSX.Element {
         const { classes, initialCase } = this.props;
         return (
-            <>
-                <Modal open={true}>
-                    <div className={classes.modalContents}>
-                        <AppBar position="relative" className={classes.appBar}>
-                            <Toolbar>
-                                <IconButton
-                                    color="inherit"
-                                    aria-label="close case form"
-                                    onClick={this.props.onModalClose}
-                                    edge="start"
-                                >
-                                    <CloseIcon />
-                                </IconButton>
-                                <Typography variant="h6" noWrap>
-                                    {this.props.initialCase
-                                        ? 'Edit case'
-                                        : 'New case'}
-                                </Typography>
-                            </Toolbar>
-                        </AppBar>
-                        <Formik
-                            initialValues={initialValuesFromCase(initialCase)}
-                            validationSchema={NewCaseValidation}
-                            // Validating on change slows down the form too much. It will
-                            // validate on blur and form submission.
-                            validateOnChange={false}
-                            onSubmit={(values) => this.submitCase(values)}
-                        >
-                            {({
-                                submitForm,
-                                isSubmitting,
-                                values,
-                                errors,
-                                touched,
-                            }): JSX.Element => (
+            <AppModal
+                title={this.props.initialCase ? 'Edit case' : 'New case'}
+                onModalClose={this.props.onModalClose}
+            >
+                <Formik
+                    initialValues={initialValuesFromCase(initialCase)}
+                    validationSchema={NewCaseValidation}
+                    // Validating on change slows down the form too much. It will
+                    // validate on blur and form submission.
+                    validateOnChange={false}
+                    onSubmit={(values) => this.submitCase(values)}
+                >
+                    {({
+                        submitForm,
+                        isSubmitting,
+                        values,
+                        errors,
+                        touched,
+                    }): JSX.Element => (
+                        <div className={classes.container} id="container">
+                            <nav className={classes.tableOfContents}>
                                 <div
-                                    className={classes.container}
-                                    id="container"
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('source')
+                                    }
                                 >
-                                    <nav className={classes.tableOfContents}>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('source')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.caseReference !==
-                                                        null &&
-                                                    values.caseReference !==
-                                                        undefined,
-                                                hasError: hasErrors(
-                                                    ['caseReference'],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Source
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('demographics')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.sex !== undefined ||
-                                                    (values.age !== undefined &&
-                                                        values.age.toString() !==
-                                                            '') ||
-                                                    (values.minAge !==
-                                                        undefined &&
-                                                        values.minAge.toString() !==
-                                                            '' &&
-                                                        values.maxAge !==
-                                                            undefined &&
-                                                        values.maxAge.toString() !==
-                                                            '') ||
-                                                    values.ethnicity !==
-                                                        undefined ||
-                                                    values.nationalities
-                                                        ?.length > 0 ||
-                                                    values.profession !==
-                                                        undefined,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'sex',
-                                                        'minAge',
-                                                        'maxAge',
-                                                        'age',
-                                                        'ethnicity',
-                                                        'nationalities',
-                                                        'profession',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Demographics
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('location')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.location !== null &&
-                                                    values.location !==
-                                                        undefined,
-                                                hasError: hasErrors(
-                                                    ['location'],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Location
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('events')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.confirmedDate !==
-                                                        null ||
-                                                    values.methodOfConfirmation !==
-                                                        undefined ||
-                                                    values.onsetSymptomsDate !==
-                                                        null ||
-                                                    values.firstClinicalConsultationDate !==
-                                                        null ||
-                                                    values.selfIsolationDate !==
-                                                        null ||
-                                                    values.admittedToHospital !==
-                                                        undefined ||
-                                                    values.hospitalAdmissionDate !==
-                                                        null ||
-                                                    values.icuAdmissionDate !==
-                                                        null ||
-                                                    values.outcomeDate !==
-                                                        null ||
-                                                    values.outcome !==
-                                                        undefined,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'confirmedDate',
-                                                        'methodOfConfirmation',
-                                                        'onsetSymptomsDate',
-                                                        'firstClinicalConsultationDate',
-                                                        'selfIsolationDate',
-                                                        'admittedToHospital',
-                                                        'hospitalAdmissionDate',
-                                                        'icuAdmissionDate',
-                                                        'outcomeDate',
-                                                        'outcome',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Events
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('symptoms')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.symptomsStatus !==
-                                                        undefined ||
-                                                    values.symptoms?.length > 0,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'symptomsStatus',
-                                                        'symptoms',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Symptoms
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo(
-                                                    'preexistingConditions',
-                                                )
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.hasPreexistingConditions !==
-                                                        undefined ||
-                                                    values.preexistingConditions
-                                                        ?.length > 0,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'hasPreexistingConditions',
-                                                        'preexistingConditions',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Preexisting conditions
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('transmission')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.transmissionRoutes
-                                                        ?.length > 0 ||
-                                                    values.transmissionPlaces
-                                                        ?.length > 0 ||
-                                                    values
-                                                        .transmissionLinkedCaseIds
-                                                        ?.length > 0,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'transmissionRoutes',
-                                                        'transmissionPlaces',
-                                                        'transmissionLinkedCaseIds',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Transmission
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('travelHistory')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.travelHistory
-                                                        ?.length > 0 ||
-                                                    values.traveledPrior30Days !==
-                                                        undefined,
-                                                hasError: hasErrors(
-                                                    [
-                                                        'traveledPrior30Days',
-                                                        'travelHistory',
-                                                    ],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Travel History
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('genomeSequences')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.genomeSequences
-                                                        ?.length > 0,
-                                                hasError: hasErrors(
-                                                    ['genomeSequences'],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Genome Sequences
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('pathogens')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.pathogens?.length >
-                                                    0,
-                                                hasError: hasErrors(
-                                                    ['pathogens'],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Pathogens
-                                        </div>
-                                        <div
-                                            className={
-                                                classes.tableOfContentsRow
-                                            }
-                                            onClick={(): void =>
-                                                this.scrollTo('notes')
-                                            }
-                                        >
-                                            {this.tableOfContentsIcon({
-                                                isChecked:
-                                                    values.notes?.trim() !== '',
-                                                hasError: hasErrors(
-                                                    ['notes'],
-                                                    errors,
-                                                    touched,
-                                                ),
-                                            })}
-                                            Notes
-                                        </div>
-                                    </nav>
-                                    <div className={classes.form}>
-                                        <Form>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Source
-                                                    initialValue={
-                                                        values.caseReference
-                                                    }
-                                                ></Source>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Demographics></Demographics>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <LocationForm></LocationForm>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Events></Events>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Symptoms></Symptoms>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <PreexistingConditions></PreexistingConditions>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Transmission></Transmission>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <TravelHistory></TravelHistory>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <GenomeSequences></GenomeSequences>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Pathogens></Pathogens>
-                                            </div>
-                                            <div
-                                                className={classes.formSection}
-                                            >
-                                                <Notes></Notes>
-                                            </div>
-                                            {isSubmitting && <LinearProgress />}
-                                            <br />
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                data-testid="submit"
-                                                disabled={isSubmitting}
-                                                onClick={submitForm}
-                                            >
-                                                {this.props.initialCase
-                                                    ? 'Edit case'
-                                                    : 'Submit case'}
-                                            </Button>
-                                        </Form>
-                                        {this.state.successMessage && (
-                                            <MuiAlert
-                                                className={
-                                                    classes.statusMessage
-                                                }
-                                                elevation={6}
-                                                variant="filled"
-                                            >
-                                                {this.state.successMessage}
-                                            </MuiAlert>
-                                        )}
-                                        {this.state.errorMessage && (
-                                            <MuiAlert
-                                                className={
-                                                    classes.statusMessage
-                                                }
-                                                elevation={6}
-                                                variant="filled"
-                                                severity="error"
-                                            >
-                                                {this.state.errorMessage}
-                                            </MuiAlert>
-                                        )}
-                                    </div>
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.caseReference !== null &&
+                                            values.caseReference !== undefined,
+                                        hasError: hasErrors(
+                                            ['caseReference'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Source
                                 </div>
-                            )}
-                        </Formik>
-                    </div>
-                </Modal>
-            </>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('demographics')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.sex !== undefined ||
+                                            (values.age !== undefined &&
+                                                values.age.toString() !== '') ||
+                                            (values.minAge !== undefined &&
+                                                values.minAge.toString() !==
+                                                    '' &&
+                                                values.maxAge !== undefined &&
+                                                values.maxAge.toString() !==
+                                                    '') ||
+                                            values.ethnicity !== undefined ||
+                                            values.nationalities?.length > 0 ||
+                                            values.profession !== undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'sex',
+                                                'minAge',
+                                                'maxAge',
+                                                'age',
+                                                'ethnicity',
+                                                'nationalities',
+                                                'profession',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Demographics
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('location')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.location !== null &&
+                                            values.location !== undefined,
+                                        hasError: hasErrors(
+                                            ['location'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Location
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('events')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.confirmedDate !== null ||
+                                            values.methodOfConfirmation !==
+                                                undefined ||
+                                            values.onsetSymptomsDate !== null ||
+                                            values.firstClinicalConsultationDate !==
+                                                null ||
+                                            values.selfIsolationDate !== null ||
+                                            values.admittedToHospital !==
+                                                undefined ||
+                                            values.hospitalAdmissionDate !==
+                                                null ||
+                                            values.icuAdmissionDate !== null ||
+                                            values.outcomeDate !== null ||
+                                            values.outcome !== undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'confirmedDate',
+                                                'methodOfConfirmation',
+                                                'onsetSymptomsDate',
+                                                'firstClinicalConsultationDate',
+                                                'selfIsolationDate',
+                                                'admittedToHospital',
+                                                'hospitalAdmissionDate',
+                                                'icuAdmissionDate',
+                                                'outcomeDate',
+                                                'outcome',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Events
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('symptoms')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.symptomsStatus !==
+                                                undefined ||
+                                            values.symptoms?.length > 0,
+                                        hasError: hasErrors(
+                                            ['symptomsStatus', 'symptoms'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Symptoms
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('preexistingConditions')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.hasPreexistingConditions !==
+                                                undefined ||
+                                            values.preexistingConditions
+                                                ?.length > 0,
+                                        hasError: hasErrors(
+                                            [
+                                                'hasPreexistingConditions',
+                                                'preexistingConditions',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Preexisting conditions
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('transmission')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.transmissionRoutes?.length >
+                                                0 ||
+                                            values.transmissionPlaces?.length >
+                                                0 ||
+                                            values.transmissionLinkedCaseIds
+                                                ?.length > 0,
+                                        hasError: hasErrors(
+                                            [
+                                                'transmissionRoutes',
+                                                'transmissionPlaces',
+                                                'transmissionLinkedCaseIds',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Transmission
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('travelHistory')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.travelHistory?.length > 0 ||
+                                            values.traveledPrior30Days !==
+                                                undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'traveledPrior30Days',
+                                                'travelHistory',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Travel History
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('genomeSequences')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.genomeSequences?.length > 0,
+                                        hasError: hasErrors(
+                                            ['genomeSequences'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Genome Sequences
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('pathogens')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked: values.pathogens?.length > 0,
+                                        hasError: hasErrors(
+                                            ['pathogens'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Pathogens
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void => this.scrollTo('notes')}
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked: values.notes?.trim() !== '',
+                                        hasError: hasErrors(
+                                            ['notes'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    Notes
+                                </div>
+                            </nav>
+                            <div className={classes.form}>
+                                <Form>
+                                    <div className={classes.formSection}>
+                                        <Source
+                                            initialValue={values.caseReference}
+                                        ></Source>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Demographics></Demographics>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <LocationForm></LocationForm>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Events></Events>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Symptoms></Symptoms>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <PreexistingConditions></PreexistingConditions>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Transmission></Transmission>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <TravelHistory></TravelHistory>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <GenomeSequences></GenomeSequences>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Pathogens></Pathogens>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Notes></Notes>
+                                    </div>
+                                    {isSubmitting && <LinearProgress />}
+                                    <br />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        data-testid="submit"
+                                        disabled={isSubmitting}
+                                        onClick={submitForm}
+                                    >
+                                        {this.props.initialCase
+                                            ? 'Edit case'
+                                            : 'Submit case'}
+                                    </Button>
+                                </Form>
+                                {this.state.successMessage && (
+                                    <MuiAlert
+                                        className={classes.statusMessage}
+                                        elevation={6}
+                                        variant="filled"
+                                    >
+                                        {this.state.successMessage}
+                                    </MuiAlert>
+                                )}
+                                {this.state.errorMessage && (
+                                    <MuiAlert
+                                        className={classes.statusMessage}
+                                        elevation={6}
+                                        variant="filled"
+                                        severity="error"
+                                    >
+                                        {this.state.errorMessage}
+                                    </MuiAlert>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </Formik>
+            </AppModal>
         );
     }
 }
