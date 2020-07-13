@@ -25,7 +25,7 @@ function LocationForm(): JSX.Element {
                     name="location"
                     required
                 />
-                <Location location={values.location} />
+                {values.location && <Location location={values.location} />}
             </fieldset>
         </Scroll.Element>
     );
