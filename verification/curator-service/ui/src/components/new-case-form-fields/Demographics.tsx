@@ -2,6 +2,7 @@ import { FastField, useFormikContext } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import FormControl from '@material-ui/core/FormControl';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -53,7 +54,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
     return (
         <Scroll.Element name="demographics">
             <fieldset>
-                <legend>Demographics</legend>
+                <FieldTitle title="Demographics"></FieldTitle>
                 <FormControl>
                     <div className={classes.fieldRow}>
                         <InputLabel htmlFor="sex">Sex</InputLabel>
