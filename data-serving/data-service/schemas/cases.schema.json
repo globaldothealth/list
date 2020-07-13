@@ -58,11 +58,7 @@
             }
           },
           "sex": {
-            "enum": [
-              "Male",
-              "Female",
-              "Other"
-            ]
+            "bsonType": "string"
           },
           "profession": {
             "bsonType": "string"
@@ -127,13 +123,7 @@
             "bsonType": "string"
           },
           "geoResolution": {
-            "enum": [
-              "Point",
-              "Admin3",
-              "Admin2",
-              "Admin1",
-              "Country"
-            ]
+            "bsonType": "string"
           },
           "geometry": {
             "bsonType": "object",
@@ -197,11 +187,7 @@
             }
           },
           "status": {
-            "enum": [
-              "Asymptomatic",
-              "Presymptomatic",
-              "Symptomatic"
-            ]
+            "bsonType": "string"
           }
         }
       },
@@ -255,13 +241,7 @@
                       "bsonType": "string"
                     },
                     "geoResolution": {
-                      "enum": [
-                        "Point",
-                        "Admin3",
-                        "Admin2",
-                        "Admin1",
-                        "Country"
-                      ]
+                      "bsonType": "string"
                     },
                     "geometry": {
                       "bsonType": "object",
@@ -298,26 +278,13 @@
                   }
                 },
                 "purpose": {
-                  "enum": [
-                    "Business",
-                    "Leisure",
-                    "Family",
-                    "Other"
-                  ]
+                  "bsonType": "string"
                 },
                 "methods": {
                   "bsonType": "array",
                   "uniqueItems": true,
                   "items": {
-                    "enum": [
-                      "Bus",
-                      "Car",
-                      "Coach",
-                      "Ferry",
-                      "Plane",
-                      "Train",
-                      "Other"
-                    ]
+                    "bsonType": "string"
                   }
                 }
               }
