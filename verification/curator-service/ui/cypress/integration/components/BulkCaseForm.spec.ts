@@ -97,7 +97,7 @@ describe('Bulk upload form', function () {
         cy.get('tr').should('have.length', 3);
     });
 
-    it('Does not upload bad data', function () {
+    it('Does not upload bad data and displays validation errors', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
@@ -106,10 +106,31 @@ describe('Bulk upload form', function () {
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
-        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.route('POST', '/api/cases?validate_only=true').as('validateCases');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@upsertCases');
-        cy.contains('Request failed');
+        cy.wait('@validateCases');
+        cy.get('p').should(
+            'contain',
+            'The selected file could not be uploaded. Found 1 row(s) with errors.',
+        );
+        cy.get('ul').eq(1).get('li').should('contain', 'Row 1');
+        cy.get('ul')
+            .eq(1)
+            .get('li')
+            .children('ul')
+            .first()
+            .find('li')
+            .should('have.length', 1);
+        cy.get('ul')
+            .eq(1)
+            .get('li')
+            .children('ul')
+            .first()
+            .get('li')
+            .should(
+                'contain',
+                'demographics.sex: `InvalidSex` is not a valid enum value for path `sex`',
+            );
 
         cy.visit('/cases');
         cy.contains('No records to display');
