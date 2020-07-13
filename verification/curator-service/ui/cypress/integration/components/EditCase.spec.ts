@@ -9,11 +9,6 @@ describe('Edit case', function () {
         cy.clearSeededLocations();
     });
 
-    it('Errors when case does not exist', function () {
-        cy.visit('/cases/edit/foo');
-        cy.contains('Request failed');
-    });
-
     // Full case edit is covered in the curator tests.
     it('can edit a case', function () {
         cy.addCase({
@@ -26,6 +21,8 @@ describe('Edit case', function () {
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`/cases/edit/${resp.body.cases[0]._id}`);
+            cy.visit('cases');
+            cy.get('button[title="Edit this case"]').click();
             // Check that we have something from the original case.
             cy.contains('France');
             cy.contains('Andorrean');
@@ -45,7 +42,7 @@ describe('Edit case', function () {
             cy.wait('@editCase');
             cy.contains('Case edited');
             // Updated info should be there.
-            cy.visit('/cases');
+            cy.get('button[aria-label="close case form"').click();
             cy.contains('No records to display').should('not.exist');
             cy.contains('Female');
             cy.contains('21');

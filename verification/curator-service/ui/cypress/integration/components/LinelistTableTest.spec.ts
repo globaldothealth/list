@@ -25,7 +25,7 @@ describe('Linelist table', function () {
         cy.contains('test@bar.com');
     });
 
-    it('Can go to the edit page', function () {
+    it('Can open the edit modal', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -34,8 +34,17 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
 
+        cy.contains('Edit case').should('not.exist');
         cy.get('button[title="Edit this case"]').click();
-        cy.url().should('contain', '/cases/edit/');
+        cy.contains('Edit case');
+    });
+
+    it('Can open the new case modal', function () {
+        cy.visit('/cases');
+
+        cy.contains('New case').should('not.exist');
+        cy.get('button[title="Submit new case"]').click();
+        cy.contains('New case');
     });
 
     it('Can delete a case', function () {
