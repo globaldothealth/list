@@ -3,6 +3,7 @@ import { Typography, makeStyles } from '@material-ui/core';
 
 import { Autocomplete } from '@material-ui/lab';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
@@ -19,7 +20,7 @@ function LocationForm(): JSX.Element {
     return (
         <Scroll.Element name="location">
             <fieldset>
-                <legend>Location</legend>
+                <FieldTitle title="Location"></FieldTitle>
                 <PlacesAutocomplete
                     initialValue={initialValues.location?.name}
                     name="location"

@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CaseFormValues from './CaseFormValues';
 import { DateField } from '../common-form-fields/FormikFields';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -30,7 +31,7 @@ export default function GenomeSequences(): JSX.Element {
     return (
         <Scroll.Element name="genomeSequences">
             <fieldset>
-                <legend>Genome Sequences</legend>
+                <FieldTitle title="Genome Sequences"></FieldTitle>
                 <FieldArray name="genomeSequences">
                     {({ push, remove }): JSX.Element => {
                         return (

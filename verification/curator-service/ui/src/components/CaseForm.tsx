@@ -51,14 +51,13 @@ const styles = (theme: Theme) =>
         container: { display: 'flex,' },
         tableOfContents: {
             position: 'fixed',
-            marginTop: '2em',
         },
         tableOfContentsRow: {
             alignItems: 'center',
             display: 'flex',
         },
         form: {
-            paddingLeft: '15em',
+            paddingLeft: '18em',
         },
         formSection: {
             margin: '2em 0',
@@ -514,7 +513,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Source
+                                    {'Source'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -550,7 +549,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Demographics
+                                    {'Demographics'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -568,7 +567,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Location
+                                    {'Location'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -609,7 +608,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Events
+                                    {'Events'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -628,7 +627,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Symptoms
+                                    {'Symptoms'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -651,7 +650,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Preexisting conditions
+                                    {'Preexisting conditions'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -677,7 +676,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Transmission
+                                    {'Transmission'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -699,7 +698,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Travel History
+                                    {'Travel History'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -716,7 +715,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Genome Sequences
+                                    {'Genome Sequences'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -732,7 +731,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Pathogens
+                                    {'Pathogens'.toLocaleUpperCase()}
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
@@ -746,7 +745,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             touched,
                                         ),
                                     })}
-                                    Notes
+                                    {'Notes'.toLocaleUpperCase()}
                                 </div>
                             </nav>
                             <div className={classes.form}>

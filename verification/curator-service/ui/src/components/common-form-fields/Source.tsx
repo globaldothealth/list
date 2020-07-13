@@ -10,6 +10,7 @@ import {
 import { Field, useFormikContext } from 'formik';
 
 import { CaseReference as CaseRef } from '../Case';
+import FieldTitle from './FieldTitle';
 import { TextField as MUITextField } from '@material-ui/core';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
@@ -22,12 +23,21 @@ interface SourceProps {
     initialValue?: CaseRef;
 }
 
+// TODO: format this text to have newlines in it
+const tooltipText =
+    'Enter the URL of the data source used for reporting the line list case. ' +
+    'If this is a new data source you will need to add it to the system along with a data source name. The form will prompt you to do this if this is the case. ' +
+    'If the URL is an existing source already in the system, select the appropriate source from the list provided. ';
+
 export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         return (
             <Scroll.Element name="source">
                 <fieldset>
-                    <legend>Source</legend>
+                    <FieldTitle
+                        title="Source"
+                        tooltip={tooltipText}
+                    ></FieldTitle>
                     <SourcesAutocomplete
                         initialValue={this.props.initialValue}
                     />

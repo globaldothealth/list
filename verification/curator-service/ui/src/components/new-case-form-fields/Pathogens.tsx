@@ -2,6 +2,7 @@ import { Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -11,7 +12,7 @@ export default function Pathogens(): JSX.Element {
     return (
         <Scroll.Element name="pathogens">
             <fieldset>
-                <legend>Pathogens</legend>
+                <FieldTitle title="Pathogens"></FieldTitle>
                 <PathogensAutocomplete />
             </fieldset>
         </Scroll.Element>
