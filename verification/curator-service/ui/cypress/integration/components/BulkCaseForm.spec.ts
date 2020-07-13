@@ -120,13 +120,7 @@ describe('Bulk upload form', function () {
             .children('ul')
             .first()
             .find('li')
-            .should('have.length', 1);
-        cy.get('ul')
-            .eq(1)
-            .get('li')
-            .children('ul')
-            .first()
-            .get('li')
+            .should('have.length', 1)
             .should(
                 'contain',
                 'demographics.sex: `InvalidSex` is not a valid enum value for path `sex`',
