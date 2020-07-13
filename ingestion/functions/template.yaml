@@ -35,7 +35,7 @@ Resources:
     Properties:
       LayerName: parsing_lib
       Description: Common functions required for parsing
-      ContentUri: parsing/lib/
+      ContentUri: parsing/common/
       CompatibleRuntimes:
         - python3.6
         - python3.7
