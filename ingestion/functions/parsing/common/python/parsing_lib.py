@@ -42,6 +42,7 @@ def write_to_server(cases, headers):
     """
     Upserts the provided cases via the G.h Case API.
 
+    TODO: Link out to the Case API resource documentation, once available.
     TODO: Parallelize these requests.
     """
     count_success = 0
