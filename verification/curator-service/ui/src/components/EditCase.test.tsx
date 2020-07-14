@@ -58,7 +58,7 @@ it('loads and displays case to edit', async () => {
             url: fullCase.caseReference.sourceUrl,
         },
     });
-    expect(await findByText(/Female/)).toBeInTheDocument();
+    expect(await findByText(/Non-binary\/Third gender/)).toBeInTheDocument();
     expect(getByDisplayValue(/Horse breeder/)).toBeInTheDocument();
     expect(getByDisplayValue(/Asian/)).toBeInTheDocument();
     expect(
