@@ -357,6 +357,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             filtering: false,
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                            maxBodyHeight: 'calc(100vh - 15em)',
                         }}
                         onChangeRowsPerPage={(newPageSize: number) => {
                             this.setState({ pageSize: newPageSize });

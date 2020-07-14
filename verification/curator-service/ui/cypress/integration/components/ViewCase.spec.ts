@@ -19,7 +19,7 @@ describe('View case', function () {
             nationalities: ['Andorrean', 'French'],
         });
         cy.visit('cases');
-        cy.get('button[title="View this case details"]').click();
+        cy.get('button[title="View this case details"]').click({ force: true });
         cy.contains('France');
         cy.contains('some notes');
         cy.contains('www.example.com');
