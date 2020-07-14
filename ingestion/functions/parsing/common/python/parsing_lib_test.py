@@ -6,6 +6,7 @@ import pytest
 import requests
 
 from datetime import date
+from mock import MagicMock
 from moto import mock_s3
 
 _SOURCE_ID = "abc123"
@@ -52,6 +53,11 @@ _PARSED_CASE = (
     })
 
 
+def fake_parsing_fn(raw_data_file, source_id, source_url):
+    """For use in testing parsing_lib.run_lambda()."""
+    return [_PARSED_CASE]
+
+
 @pytest.fixture()
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -84,6 +90,28 @@ def sample_data():
     file_path = os.path.join(current_dir, "sample_data.json")
     with open(file_path) as event_file:
         return json.load(event_file)
+
+
+@mock_s3
+def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
+    from python import parsing_lib  # Import locally to avoid superseding mock
+    parsing_lib.obtain_api_credentials = MagicMock(
+        name="obtain_api_credentials")
+    s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
+    s3.put_object(
+        Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
+        Key=input_event[parsing_lib.S3_KEY_FIELD],
+        Body=json.dumps(sample_data))
+    source_api_url = "http://foo.bar"
+    os.environ["SOURCE_API_URL"] = source_api_url
+    full_source_url = f"{source_api_url}/cases"
+    requests_mock.put(full_source_url)
+
+    response = parsing_lib.run_lambda(input_event, "", fake_parsing_fn)
+
+    assert requests_mock.request_history[0].url == full_source_url
+    assert response["count_success"] == 1
+    assert response["count_error"] == 0
 
 
 @mock_s3

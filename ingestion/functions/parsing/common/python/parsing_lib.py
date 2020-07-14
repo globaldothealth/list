@@ -86,3 +86,44 @@ def obtain_api_credentials():
 def extract_source_id(s3_key):
     """Extracts the source ID based on the canonical object key format."""
     return s3_key.split(S3_KEY_PATH_SEPERATOR, 1)[0]
+
+
+def run_lambda(event, context, parsing_function):
+    """
+    Encapsulates all of the work performed by a parsing Lambda.
+
+    Parameters
+    ----------
+    event: dict, required
+        Input event JSON-as-dict.
+        This must contain `s3Bucket`, `s3Key`, and `sourceUrl` fields specifying
+        the details of the stored source content.
+
+    context: object, required
+        Lambda Context runtime methods and attributes.
+        For more information, see:
+          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+
+    parsing_function: function, required
+        Python function that parses raw source data into G.h case data.
+        This function must accept (in order): a file containing raw source
+        data, a string representing the source UUID, and a string representing
+        the source URL.
+
+    Returns
+    ------
+    JSON object containing the count of line list cases successfully written to
+    G.h servers.
+    For more information on return types, see:
+      https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
+    """
+
+    source_url, s3_bucket, s3_key = extract_event_fields(event)
+    raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
+    case_data = parsing_function(
+        raw_data_file, extract_source_id(s3_key),
+        source_url)
+    api_creds = obtain_api_credentials()
+    count_success, count_error = write_to_server(
+        case_data, api_creds)
+    return {"count_success": count_success, "count_error": count_error}
