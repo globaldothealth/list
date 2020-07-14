@@ -143,7 +143,7 @@ class BulkCaseForm extends React.Component<
                 },
             });
         }
-        if (c.hospitalized) {
+        if (c.hospitalized === true) {
             events.push({
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
@@ -152,6 +152,7 @@ class BulkCaseForm extends React.Component<
                           end: c.dateHospitalized,
                       }
                     : undefined,
+                value: 'Yes',
             });
         }
         if (c.outcome) {

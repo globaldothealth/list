@@ -44,6 +44,11 @@ describe('Bulk upload form', function () {
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
+        cy.contains('th', 'Admitted to hospital')
+            .invoke('index')
+            .then((i) => {
+                cy.get('td').eq(i).should('have.text', 'Yes');
+            });
     });
 
     it('Upserts data', function () {
@@ -104,8 +109,10 @@ describe('Bulk upload form', function () {
         cy.contains('Success!');
         cy.get('button[aria-label="close overlay"').click();
 
-        cy.visit('/cases');
-        cy.get('tr').should('have.length', 3);
+        // TODO: Reimplement this check, after we remove phantom rows from
+        // the linelist table.
+        // cy.visit('/cases');
+        // cy.get('tr').should('have.length', 3);
     });
 
     it('Does not upload bad data and displays validation errors', function () {
