@@ -8,7 +8,6 @@ import FreshnessCharts from './FreshnessCharts';
 import React from 'react';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -27,11 +26,7 @@ function TabPanel(props: TabPanelProps) {
             aria-labelledby={`simple-tab-${index}`}
             {...other}
         >
-            {value === index && (
-                <Box p={3}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
+            {value === index && <Box p={3}>{children}</Box>}
         </div>
     );
 }
