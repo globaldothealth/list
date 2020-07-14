@@ -92,9 +92,9 @@ describe('App', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/');
 
-        cy.contains('New case').should('not.exist');
+        cy.contains('Create new COVID-19 line list case').should('not.exist');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.get('li').first().should('contain', 'New line list case').click();
-        cy.contains('New case');
+        cy.contains('Create new COVID-19 line list case');
     });
 });
