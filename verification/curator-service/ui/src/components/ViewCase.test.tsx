@@ -43,7 +43,7 @@ it('loads and displays case', async () => {
         getByText('Contact of a confirmed case at work.'),
     ).toBeInTheDocument();
     // Demographics.
-    expect(getByText('Female')).toBeInTheDocument();
+    expect(getByText('Non-binary/Third gender')).toBeInTheDocument();
     expect(getByText('50-59')).toBeInTheDocument();
     expect(getByText('Horse breeder')).toBeInTheDocument();
     expect(getByText('Swedish')).toBeInTheDocument();
