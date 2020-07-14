@@ -380,6 +380,7 @@ export default class LinelistTable extends React.Component<
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             actionsColumnIndex: -1,
+                            maxBodyHeight: 'calc(100vh - 15em)',
                         }}
                         onChangeRowsPerPage={(newPageSize: number) => {
                             this.setState({ pageSize: newPageSize });
