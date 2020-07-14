@@ -60,7 +60,7 @@
           "sex": {
             "bsonType": "string"
           },
-          "profession": {
+          "occupation": {
             "bsonType": "string"
           },
           "nationalities": {

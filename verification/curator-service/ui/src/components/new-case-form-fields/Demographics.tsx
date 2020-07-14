@@ -131,9 +131,9 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     />
                 </div>
                 <FormikAutocomplete
-                    name="profession"
-                    label="Profession"
-                    initialValue={initialValues.profession}
+                    name="occupation"
+                    label="Occupation"
+                    initialValue={initialValues.occupation}
                     multiple={false}
                     optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
                 />
