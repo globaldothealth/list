@@ -39,7 +39,7 @@ interface TableRow {
     ethnicity: string;
     // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
     nationalities: string;
-    profession: string;
+    occupation: string;
     country: string;
     adminArea1: string;
     adminArea2: string;
@@ -176,8 +176,8 @@ export default class LinelistTable extends React.Component<
                                 field: 'nationalities',
                             },
                             {
-                                title: 'Profession',
-                                field: 'profession',
+                                title: 'Occupation',
+                                field: 'occupation',
                             },
                             {
                                 title: 'Location',
@@ -293,8 +293,8 @@ export default class LinelistTable extends React.Component<
                                                 nationalities: c.demographics?.nationalities?.join(
                                                     ', ',
                                                 ),
-                                                profession:
-                                                    c.demographics?.profession,
+                                                occupation:
+                                                    c.demographics?.occupation,
                                                 country: c.location.country,
                                                 adminArea1:
                                                     c.location

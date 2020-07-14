@@ -9,7 +9,7 @@ export default interface CaseFormValues {
     age?: number;
     ethnicity?: string;
     nationalities: string[];
-    profession?: string;
+    occupation?: string;
     location?: Loc;
     confirmedDate: string | null;
     methodOfConfirmation?: string;

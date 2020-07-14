@@ -118,7 +118,7 @@ We are backfilling fields including:
 
 Some fields in the new schema cannot be converted because they are not present in the original data, including:
 
-- `demographics.profession`
+- `demographics.occupation`
 - `demographics.nationality`
 - `demographics.ethnicity`
 - `pathogens`
