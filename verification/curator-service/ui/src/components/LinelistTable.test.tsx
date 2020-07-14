@@ -93,7 +93,7 @@ it('loads and displays cases', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
     expect(await findByText(/some notes/)).toBeInTheDocument();
     expect(await findByText(/some place name/)).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
@@ -208,7 +208,7 @@ it('can delete a row', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
@@ -306,7 +306,7 @@ it('cannot edit data as a reader only', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=10&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
     const row = await findByText(/some notes/);
     expect(row).toBeInTheDocument();
 
