@@ -21,7 +21,9 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/cases/bulk');
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
@@ -31,9 +33,10 @@ describe('Bulk upload form', function () {
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
         cy.contains('Success!');
+        cy.get('button[aria-label="close overlay"').click();
 
-        cy.visit('/cases');
         // Common data.
+        cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
         cy.contains('www.bulksource.com');
         cy.contains('Male');
@@ -47,7 +50,9 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/cases/bulk');
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
@@ -56,13 +61,16 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCases');
         cy.contains('Success!');
+        cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/cases');
         cy.contains('No records to display').should('not.exist');
         cy.contains('Male');
         cy.contains('Female').should('not.exist');
 
-        cy.visit('/cases/bulk');
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com', true);
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
@@ -81,7 +89,9 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/cases/bulk');
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
@@ -92,6 +102,7 @@ describe('Bulk upload form', function () {
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
         cy.contains('Success!');
+        cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/cases');
         cy.get('tr').should('have.length', 3);
@@ -101,7 +112,9 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.visit('/cases/bulk');
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com');
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
@@ -125,6 +138,7 @@ describe('Bulk upload form', function () {
                 'contain',
                 'demographics.sex: `InvalidSex` is not a valid enum value for path `sex`',
             );
+        cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/cases');
         cy.contains('No records to display');

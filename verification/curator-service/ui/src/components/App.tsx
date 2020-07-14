@@ -28,7 +28,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
-import Publish from '@material-ui/icons/Publish';
 import React from 'react';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
@@ -113,6 +112,7 @@ interface State {
     createNewButtonAnchorEl?: Element;
     showCaseForm: boolean;
     caseFormId: string;
+    showBulkUpload: boolean;
 }
 
 class App extends React.Component<Props, State> {
@@ -129,6 +129,7 @@ class App extends React.Component<Props, State> {
             createNewButtonAnchorEl: undefined,
             showCaseForm: false,
             caseFormId: '',
+            showBulkUpload: false,
         };
         // https://reactjs.org/docs/handling-events.html.
         this.toggleDrawer = this.toggleDrawer.bind(this);
@@ -274,14 +275,34 @@ class App extends React.Component<Props, State> {
                                     >
                                         New line list case
                                     </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            this.closeCreateNewPopup();
+                                            this.setState({
+                                                showBulkUpload: true,
+                                            });
+                                        }}
+                                    >
+                                        New bulk upload
+                                    </MenuItem>
                                 </Menu>
                             </>
                         )}
+                        {/* // TODO: update case table data when CaseForm and
+                        BulkCaseForm modals are closed */}
                         {this.state.showCaseForm && (
                             <CaseForm
                                 user={this.state.user}
                                 onModalClose={() =>
                                     this.setState({ showCaseForm: false })
+                                }
+                            />
+                        )}
+                        {this.state.showBulkUpload && (
+                            <BulkCaseForm
+                                user={this.state.user}
+                                onModalClose={() =>
+                                    this.setState({ showBulkUpload: false })
                                 }
                             />
                         )}
@@ -300,14 +321,6 @@ class App extends React.Component<Props, State> {
                                     to: '/cases',
                                     displayCheck: (): boolean =>
                                         this.hasAnyRole(['reader', 'curator']),
-                                },
-                                {
-                                    text: 'Bulk upload',
-                                    icon: <Publish />,
-                                    to: '/cases/bulk',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['curator']),
-                                    divider: true,
                                 },
                                 {
                                     text: 'Sources',
@@ -363,11 +376,6 @@ class App extends React.Component<Props, State> {
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/bulk">
-                                    <BulkCaseForm user={this.state.user} />
                                 </Route>
                             )}
                             {this.hasAnyRole(['curator', 'reader']) && (

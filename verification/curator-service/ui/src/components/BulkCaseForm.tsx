@@ -5,6 +5,7 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 
+import AppModal from './AppModal';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
@@ -38,6 +39,7 @@ const styles = () =>
 
 interface BulkCaseFormProps extends WithStyles<typeof styles> {
     user: User;
+    onModalClose: () => void;
 }
 
 interface BulkCaseFormState {
@@ -325,45 +327,54 @@ class BulkCaseForm extends React.Component<
     render(): JSX.Element {
         const { classes } = this.props;
         return (
-            <Formik
-                validationSchema={BulkFormSchema}
-                validateOnChange={false}
-                initialValues={{ file: null, caseReference: undefined }}
-                onSubmit={(values): Promise<void> => this.submitCases(values)}
+            <AppModal
+                title="New bulk upload"
+                onModalClose={this.props.onModalClose}
             >
-                {({ isSubmitting, submitForm, values }): JSX.Element => (
-                    <div className={classes.container}>
-                        <Form className={classes.form}>
-                            <div className={classes.formSection}>
-                                <Source
-                                    initialValue={values.caseReference}
-                                ></Source>
-                            </div>
-                            <div className={classes.formSection}>
-                                <FileUpload></FileUpload>
-                            </div>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                data-testid="submit"
-                                disabled={isSubmitting}
-                                onClick={submitForm}
-                            >
-                                Upload cases
-                            </Button>
-                            {this.state.statusMessage && (
-                                <h3>{this.state.statusMessage as string}</h3>
-                            )}
-                            {this.state.errors.length > 0 && (
-                                <ValidationErrorList
-                                    errors={this.state.errors}
-                                    maxDisplayErrors={10}
-                                />
-                            )}
-                        </Form>
-                    </div>
-                )}
-            </Formik>
+                <Formik
+                    validationSchema={BulkFormSchema}
+                    validateOnChange={false}
+                    initialValues={{ file: null, caseReference: undefined }}
+                    onSubmit={(values): Promise<void> =>
+                        this.submitCases(values)
+                    }
+                >
+                    {({ isSubmitting, submitForm, values }): JSX.Element => (
+                        <div className={classes.container}>
+                            <Form className={classes.form}>
+                                <div className={classes.formSection}>
+                                    <Source
+                                        initialValue={values.caseReference}
+                                    ></Source>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <FileUpload></FileUpload>
+                                </div>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    Upload cases
+                                </Button>
+                                {this.state.statusMessage && (
+                                    <h3>
+                                        {this.state.statusMessage as string}
+                                    </h3>
+                                )}
+                                {this.state.errors.length > 0 && (
+                                    <ValidationErrorList
+                                        errors={this.state.errors}
+                                        maxDisplayErrors={10}
+                                    />
+                                )}
+                            </Form>
+                        </div>
+                    )}
+                </Formik>
+            </AppModal>
         );
     }
 }
