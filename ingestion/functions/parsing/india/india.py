@@ -104,35 +104,4 @@ def parse_cases(raw_data_file, source_id, source_url):
 
 
 def lambda_handler(event, context):
-    """
-    Case data parsing function for the COVID19-India API.
-
-    Parameters
-    ----------
-    event: dict, required
-        Input event JSON-as-dict.
-        This must contain `s3Bucket`, `s3Key`, and `sourceUrl` fields specifying
-        the details of the stored source content.
-
-    context: object, required
-        Lambda Context runtime methods and attributes.
-        For more information, see:
-          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    JSON object containing the count of line list cases successfully written to
-    G.h servers.
-    For more information on return types, see:
-      https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
-    """
-
-    source_url, s3_bucket, s3_key = parsing_lib.extract_event_fields(event)
-    raw_data_file = parsing_lib.retrieve_raw_data_file(s3_bucket, s3_key)
-    case_data = parse_cases(
-        raw_data_file, parsing_lib.extract_source_id(s3_key),
-        source_url)
-    api_creds = parsing_lib.obtain_api_credentials()
-    count_success, count_error = parsing_lib.write_to_server(
-        case_data, api_creds)
-    return {"count_success": count_success, "count_error": count_error}
+    return parsing_lib.run_lambda(event, context, parse_cases)
