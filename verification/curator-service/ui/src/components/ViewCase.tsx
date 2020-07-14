@@ -209,8 +209,8 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <RowHeader title="Sex" />
                     <RowContent content={props.c.demographics?.sex} />
 
-                    <RowHeader title="Profession" />
-                    <RowContent content={props.c.demographics?.profession} />
+                    <RowHeader title="Occupation" />
+                    <RowContent content={props.c.demographics?.occupation} />
 
                     <RowHeader title="Nationality" />
                     <RowContent
