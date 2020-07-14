@@ -21,7 +21,7 @@ export interface Event {
 }
 
 export interface Demographics {
-    sex: string;
+    gender: string;
     ageRange: {
         start: number;
         end: number;

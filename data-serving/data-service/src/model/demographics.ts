@@ -16,7 +16,7 @@ export const demographicsSchema = new mongoose.Schema(
             },
             _id: false,
         },
-        sex: String,
+        gender: String,
         // TODO: The below 3 fields should be data dictionaries.
         profession: String,
         nationalities: [String],
@@ -27,7 +27,7 @@ export const demographicsSchema = new mongoose.Schema(
 
 export type DemographicsDocument = mongoose.Document & {
     ageRange: Range<number>;
-    sex: string;
+    gender: string;
     profession: string;
     nationalities: [string];
     ethnicity: string;

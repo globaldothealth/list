@@ -9,7 +9,7 @@
                 "start": 50,
                 "end": 59
             },
-            "sex": "Female",
+            "gender": "Female",
             "profession": "Horse trainer",
             "nationalities": [
                 "Swedish"
@@ -216,7 +216,7 @@
     },
     {
         "demographics": {
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "administrativeAreaLevel1": "Hong Kong",
@@ -451,7 +451,7 @@
                 "start": 64.0,
                 "end": 64.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Philippines",
@@ -963,7 +963,7 @@
                 "start": 30.0,
                 "end": 30.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "India",
@@ -1144,7 +1144,7 @@
                 "start": 50.0,
                 "end": 59.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Belgium",
@@ -1191,7 +1191,7 @@
                 "start": 60.0,
                 "end": 69.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Belgium",
@@ -1238,7 +1238,7 @@
                 "start": 39.0,
                 "end": 39.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "geometry": {
@@ -1541,7 +1541,7 @@
                 "start": 15.0,
                 "end": 34.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Germany",
@@ -1726,7 +1726,7 @@
                 "start": 35.0,
                 "end": 59.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "administrativeAreaLevel2": "Mansfeld-Sudharz",
@@ -2229,7 +2229,7 @@
                 "start": 60.0,
                 "end": 79.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Germany",
@@ -2330,7 +2330,7 @@
                 "start": 60.0,
                 "end": 79.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "administrativeAreaLevel2": "Tubingen",
@@ -2565,7 +2565,7 @@
             "ageRange": {
                 "start": 80.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Germany",
@@ -2861,7 +2861,7 @@
                 "start": 35.0,
                 "end": 59.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Germany",
@@ -4239,7 +4239,7 @@
                 "start": 55.0,
                 "end": 55.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Colombia",
@@ -4295,7 +4295,7 @@
                 "start": 20.0,
                 "end": 20.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Peru",
@@ -4339,7 +4339,7 @@
                 "start": 22.0,
                 "end": 22.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Argentina",
@@ -4395,7 +4395,7 @@
                 "start": 28.0,
                 "end": 28.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Peru",
@@ -4439,7 +4439,7 @@
                 "start": 37.0,
                 "end": 37.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Peru",
@@ -4483,7 +4483,7 @@
                 "start": 45.0,
                 "end": 45.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Peru",
@@ -4527,7 +4527,7 @@
                 "start": 68.0,
                 "end": 68.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Peru",
@@ -4571,7 +4571,7 @@
                 "start": 52.0,
                 "end": 52.0
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "location": {
             "country": "Peru",
@@ -4615,7 +4615,7 @@
                 "start": 56.0,
                 "end": 56.0
             },
-            "sex": "Female"
+            "gender": "Female"
         },
         "location": {
             "country": "Peru",

@@ -19,8 +19,8 @@ export default class CaseValidationError {
      *   4. Sort these by the field name, ascending.
      *   5. Filter all fields that are substrings of other fields. In other
      *      words, this filters down [{demographics: [...]}.
-     *      {demographics.sex: [...]}] to only contain the dict corresponding
-     *      to demographics.sex. Validation issues contain duplicate messages
+     *      {demographics.gender: [...]}] to only contain the dict corresponding
+     *      to demographics.gender. Validation issues contain duplicate messages
      *      for nested fields -- this filtering removes these duplicates,
      *      leaving only issues keyed by the fully-qualified field name.
      *   6. Recombine field and message into an interface-friendly string.

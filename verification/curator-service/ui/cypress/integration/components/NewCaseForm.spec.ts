@@ -128,7 +128,7 @@ describe('New case form', function () {
         cy.visit('/cases');
         cy.get('button[title="Submit new case"]').click();
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
-        cy.get('div[data-testid="sex"]').click();
+        cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('svg[data-testid="check-icon"]').should('exist');
     });
