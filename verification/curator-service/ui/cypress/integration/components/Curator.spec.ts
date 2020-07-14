@@ -36,7 +36,7 @@ describe('Curator', function () {
         // Input full case.
         cy.get('button[title="Submit new case"]').click();
         enterSource('www.example.com');
-        cy.get('div[data-testid="sex"]').click();
+        cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
         cy.get('div[data-testid="ethnicity"]').click();
@@ -186,7 +186,7 @@ describe('Curator', function () {
         });
 
         // Demographics.
-        cy.get('input[name="sex"]').should('have.value', 'Female');
+        cy.get('input[name="gender"]').should('have.value', 'Female');
         cy.get('input[name="age"]').should('have.value', '21');
         // TODO: tedious: check "accountant"
         cy.contains('Afghan');
@@ -255,7 +255,7 @@ describe('Curator', function () {
         cy.contains('testcaseid12345678987654');
         cy.contains('testcaseid12345678987655');
         // Change a few things.
-        cy.get('div[data-testid="sex"]').click();
+        cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Male"').click();
         // Submit the changes.
         cy.get('button[data-testid="submit"]').click();

@@ -68,7 +68,7 @@ interface RawParsedCase {
     sourceEntryId?: string;
 
     // Demographics
-    sex?: string;
+    gender?: string;
     ageRangeStart?: number;
     ageRangeEnd?: number;
 
@@ -200,7 +200,7 @@ class BulkCaseForm extends React.Component<
                 sourceUrl: caseReference.sourceUrl,
             },
             demographics: {
-                sex: c.sex,
+                gender: c.gender,
                 ageRange: {
                     start: c.ageRangeStart,
                     end: c.ageRangeEnd,

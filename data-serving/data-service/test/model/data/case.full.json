@@ -17,7 +17,7 @@
             "start": 50.0,
             "end": 59.0
         },
-        "sex": "Female",
+        "gender": "Female",
         "occupation": "Horse trainer",
         "nationality": "Swedish",
         "ethnicity": "Other"

@@ -27,7 +27,7 @@ the specific case.
 - `country`: **Required**.
 - `admin1`: Optional.
 - `admin2`: Optional.
-- `sex`: Optional. One of `Female` or `Male`.
+- `gender`: Optional. One of `Female`, `Male`, `Non-binary/Third gender`, or `Other`.
 - `ageRangeStart`: Optional. Number (years) from 0 to 140.
 - `ageRangeEnd`: Optional. Number (years) from 0 to 140.
 - `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was

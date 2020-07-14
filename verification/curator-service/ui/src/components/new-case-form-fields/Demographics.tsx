@@ -36,7 +36,7 @@ const styles = () =>
 type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
-const sexValues = [undefined, 'Male', 'Female'];
+const genderValues = [undefined, 'Male', 'Female', 'Non-binary/Third gender', 'Other'];
 
 const ethnicityValues = [
     undefined,
@@ -57,18 +57,18 @@ function Demographics(props: DemographicsProps): JSX.Element {
                 <FieldTitle title="Demographics"></FieldTitle>
                 <FormControl>
                     <div className={classes.fieldRow}>
-                        <InputLabel htmlFor="sex">Sex</InputLabel>
+                        <InputLabel htmlFor="gender">Gender</InputLabel>
                         <FastField
                             as="select"
-                            name="sex"
+                            name="gender"
                             type="text"
-                            data-testid="sex"
+                            data-testid="gender"
                             className={classes.select}
                             component={Select}
                         >
-                            {sexValues.map((sex) => (
-                                <MenuItem key={sex ?? 'undefined'} value={sex}>
-                                    {sex ?? 'Unknown'}
+                            {genderValues.map((gender) => (
+                                <MenuItem key={gender ?? 'undefined'} value={gender}>
+                                    {gender ?? 'Unknown'}
                                 </MenuItem>
                             ))}
                         </FastField>

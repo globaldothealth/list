@@ -16,7 +16,7 @@ export const demographicsSchema = new mongoose.Schema(
             },
             _id: false,
         },
-        sex: String,
+        gender: String,
         occupation: String,
         nationalities: [String],
         ethnicity: String,
@@ -26,7 +26,7 @@ export const demographicsSchema = new mongoose.Schema(
 
 export type DemographicsDocument = mongoose.Document & {
     ageRange: Range<number>;
-    sex: string;
+    gender: string;
     occupation: string;
     nationalities: [string];
     ethnicity: string;

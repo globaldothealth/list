@@ -86,7 +86,7 @@ describe('Bulk upload form', function () {
         cy.contains('Success!');
 
         cy.visit('/cases');
-        // The updated case now has a sex of Female.
+        // The updated case now has a gender of Female.
         cy.contains('Female');
     });
 

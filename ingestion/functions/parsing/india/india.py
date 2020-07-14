@@ -25,10 +25,10 @@ def convert_date(raw_date):
     return date.strftime("%m/%d/%YZ")
 
 
-def convert_sex(raw_sex):
-    if raw_sex == "M":
+def convert_gender(raw_gender):
+    if raw_gender == "M":
         return "Male"
-    if raw_sex == "F":
+    if raw_gender == "F":
         return "Female"
     return None
 
@@ -97,7 +97,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "start": float(entry["agebracket"].split(" ", 1)[0]),
                         "end": float(entry["agebracket"].split(" ", 1)[0])
                     },
-                    "sex": convert_sex(entry["gender"])
+                    "gender": convert_gender(entry["gender"])
                 },
                 "notes": entry["notes"] or None
             } for entry in cases["raw_data"] if entry["agebracket"]]
