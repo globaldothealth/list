@@ -27,7 +27,7 @@ describe('Edit case', function () {
         cy.contains('Female').should('not.exist');
         cy.contains('21').should('not.exist');
         // Change a few things.
-        cy.get('div[data-testid="sex"]').click();
+        cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
         // Submit the changes.

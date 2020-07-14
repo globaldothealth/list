@@ -72,7 +72,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
             caseReference: undefined,
-            sex: undefined,
+            gender: undefined,
             minAge: undefined,
             maxAge: undefined,
             age: undefined,
@@ -107,7 +107,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     }
     return {
         caseReference: c.caseReference,
-        sex: c.demographics?.sex,
+        gender: c.demographics?.gender,
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -300,7 +300,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                sex: values.sex,
+                gender: values.gender,
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
@@ -527,7 +527,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 >
                                     {this.tableOfContentsIcon({
                                         isChecked:
-                                            values.sex !== undefined ||
+                                            values.gender !== undefined ||
                                             (values.age !== undefined &&
                                                 values.age.toString() !== '') ||
                                             (values.minAge !== undefined &&
@@ -541,7 +541,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             values.occupation !== undefined,
                                         hasError: hasErrors(
                                             [
-                                                'sex',
+                                                'gender',
                                                 'minAge',
                                                 'maxAge',
                                                 'age',

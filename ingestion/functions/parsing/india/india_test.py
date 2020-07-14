@@ -43,7 +43,7 @@ _PARSED_CASE = (
                 "start": 65,
                 "end": 65
             },
-            "sex": "Male"
+            "gender": "Male"
         },
         "notes": None
     })

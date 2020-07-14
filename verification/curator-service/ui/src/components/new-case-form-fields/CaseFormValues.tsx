@@ -3,7 +3,7 @@ import { Location as Loc } from '../Case';
 
 export default interface CaseFormValues {
     caseReference?: CaseReference;
-    sex?: string;
+    gender?: string;
     minAge?: number;
     maxAge?: number;
     age?: number;

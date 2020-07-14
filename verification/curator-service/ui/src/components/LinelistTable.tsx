@@ -34,7 +34,7 @@ interface LinelistTableState {
 interface TableRow {
     id: string;
     // demographics
-    sex: string;
+    gender: string;
     age: [number, number]; // start, end.
     ethnicity: string;
     // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
@@ -155,9 +155,8 @@ export default class LinelistTable extends React.Component<
                                 hidden: true,
                             },
                             {
-                                title: 'Sex',
-                                field: 'sex',
-                                lookup: { Female: 'Female', Male: 'Male' },
+                                title: 'Gender',
+                                field: 'gender',
                             },
                             {
                                 title: 'Age',
@@ -281,7 +280,7 @@ export default class LinelistTable extends React.Component<
                                             );
                                             flattenedCases.push({
                                                 id: c._id,
-                                                sex: c.demographics?.sex,
+                                                gender: c.demographics?.gender,
                                                 age: [
                                                     c.demographics?.ageRange
                                                         ?.start,

@@ -5,11 +5,11 @@ import React from 'react';
 import ValidationErrorList from './ValidationErrorList';
 
 const exampleApiResponse =
-    'Case validation failed: demographics.sex: `female` is not a valid enum ' +
-    'value for path `sex`., demographics.ageRange.end: Path `ageRange.end` ' +
+    'Case validation failed: demographics.gender: `female` is not a valid enum ' +
+    'value for path `gender`., demographics.ageRange.end: Path `ageRange.end` ' +
     '(419) is more than maximum allowed value (120)., demographics: ' +
-    'Validation failed: sex: `female` is not a valid enum value for path ' +
-    '`sex`., ageRange.end: Path `ageRange.end` (419) is more than maximum ' +
+    'Validation failed: gender: `female` is not a valid enum value for path ' +
+    '`gender`., ageRange.end: Path `ageRange.end` (419) is more than maximum ' +
     'allowed value (120).';
 
 function caseValidationError(rowNumber: number): CaseValidationError {
@@ -35,7 +35,7 @@ it('displays summary and issues', async () => {
 
     expect(getByText('Row 1')).toBeInTheDocument();
     expect(getByText('Row 2')).toBeInTheDocument();
-    expect(getAllByText(/demographics.sex/)).toHaveLength(2);
+    expect(getAllByText(/demographics.gender/)).toHaveLength(2);
     expect(getAllByText(/demographics.ageRange.end/)).toHaveLength(2);
 });
 

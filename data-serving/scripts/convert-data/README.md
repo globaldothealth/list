@@ -51,7 +51,7 @@ The following fields are lossy:
 
 The following fields are *not* lossy, although they require conversion to a new type:
 
-- `sex`
+- `gender`
 - `location.geometry.latitude`, `location.geometry.longitude`
 - `events[name='admissionHospital']`, `events[name='confirmed']`, `events[name='deathOrDischarge']`
 
