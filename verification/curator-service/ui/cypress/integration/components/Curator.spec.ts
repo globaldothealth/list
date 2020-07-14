@@ -174,7 +174,7 @@ describe('Curator', function () {
         cy.contains('superuser@');
 
         // Edit the case.
-        cy.get('button[title="Edit this case"]').click();
+        cy.get('button[title="Edit this case"]').click({ force: true });
 
         // Everything should be there.
         // Source.
@@ -269,7 +269,7 @@ describe('Curator', function () {
         cy.contains('Asian');
 
         // View full details about the case
-        cy.get('button[title="View this case details"]').click();
+        cy.get('button[title="View this case details"]').click({ force: true });
         // Case data.
         cy.contains('www.example.com');
         cy.contains('superuser@test.com');
