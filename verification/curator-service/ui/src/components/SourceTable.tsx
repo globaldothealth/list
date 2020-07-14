@@ -1,8 +1,8 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import React, { RefObject } from 'react';
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
 
 import Paper from '@material-ui/core/Paper';
-import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
@@ -53,6 +53,7 @@ interface Source {
 interface SourceTableState {
     url: string;
     error: string;
+    pageSize: number;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -82,11 +83,14 @@ const styles = (theme: Theme) =>
 type Props = WithStyles<typeof styles>;
 
 class SourceTable extends React.Component<Props, SourceTableState> {
+    tableRef: RefObject<any> = React.createRef();
+
     constructor(props: Props) {
         super(props);
         this.state = {
             url: '/api/sources/',
             error: '',
+            pageSize: 10,
         };
     }
 
@@ -239,6 +243,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             <div>
                 <Paper>
                     <MaterialTable
+                        tableRef={this.tableRef}
                         columns={[
                             { title: 'ID', field: '_id', editable: 'never' },
                             {
@@ -306,7 +311,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
                                 let listUrl = this.state.url;
-                                listUrl += '?limit=' + query.pageSize;
+                                listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 this.setState({ error: '' });
                                 const response = axios.get<ListResponse>(
@@ -350,8 +355,12 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             // https://docs.mongodb.com/manual/text-search/
                             search: false,
                             filtering: false,
-                            pageSize: 10,
+                            pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                        }}
+                        onChangeRowsPerPage={(newPageSize: number) => {
+                            this.setState({ pageSize: newPageSize });
+                            this.tableRef.current.onQueryChange();
                         }}
                         editable={{
                             onRowAdd: (rowData: TableRow): Promise<unknown> =>

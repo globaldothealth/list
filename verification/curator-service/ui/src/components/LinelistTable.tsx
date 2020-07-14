@@ -27,6 +27,7 @@ interface LinelistTableState {
     caseFormId: string;
     showCaseDetails: boolean;
     caseDetailsId: string;
+    pageSize: number;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -85,6 +86,7 @@ export default class LinelistTable extends React.Component<
             caseFormId: '',
             showCaseDetails: false,
             caseDetailsId: '',
+            pageSize: 50,
         };
         this.closeCaseForm = this.closeCaseForm.bind(this);
     }
@@ -255,7 +257,7 @@ export default class LinelistTable extends React.Component<
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
                                 let listUrl = this.state.url;
-                                listUrl += '?limit=' + query.pageSize;
+                                listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 const trimmedQ = query.search.trim();
                                 // TODO: We should probably use lodash.throttle on searches.
@@ -375,9 +377,13 @@ export default class LinelistTable extends React.Component<
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
                             selection: true,
-                            pageSize: 10,
+                            pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             actionsColumnIndex: -1,
+                        }}
+                        onChangeRowsPerPage={(newPageSize: number) => {
+                            this.setState({ pageSize: newPageSize });
+                            this.tableRef.current.onQueryChange();
                         }}
                         // actions cannot be a function https://github.com/mbrn/material-table/issues/676
                         actions={
