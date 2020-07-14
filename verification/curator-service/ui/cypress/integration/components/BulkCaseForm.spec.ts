@@ -123,7 +123,7 @@ describe('Bulk upload form', function () {
             .should('have.length', 1)
             .should(
                 'contain',
-                'demographics.sex: `InvalidSex` is not a valid enum value for path `sex`',
+                'demographics.ageRange.start: Path `ageRange.start` (142) is more than maximum allowed value (120)',
             );
 
         cy.visit('/cases');
