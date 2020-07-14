@@ -1,7 +1,8 @@
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
+import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import { makeStyles } from '@material-ui/core';
 import { useFormikContext } from 'formik';
-import { RequiredHelperText } from '../common-form-fields/FormikFields';
 
 const useStyles = makeStyles(() => ({
     csvInput: {
@@ -15,7 +16,7 @@ export default function FileUpload(): JSX.Element {
     const name = 'file';
     return (
         <fieldset>
-            <legend>CSV Data</legend>
+            <FieldTitle title="CSV Data"></FieldTitle>
             <input
                 className={classes.csvInput}
                 data-testid="csv-input"

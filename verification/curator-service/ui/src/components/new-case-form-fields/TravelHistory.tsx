@@ -9,6 +9,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import Location from './Location';
 import { PlacesAutocomplete } from './LocationForm';
 import React from 'react';
@@ -53,7 +54,7 @@ export default function Events(): JSX.Element {
     return (
         <Scroll.Element name="travelHistory">
             <fieldset>
-                <legend>Travel History</legend>
+                <FieldTitle title="Travel History"></FieldTitle>
                 <SelectField
                     name={`traveledPrior30Days`}
                     label="Travelled in the last 30 days"
