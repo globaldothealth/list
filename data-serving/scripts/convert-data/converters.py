@@ -229,9 +229,9 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
     try:
         parsed_sex = parse_sex(sex)
         if parsed_sex:
-            demographics['sex'] = parsed_sex
+            demographics['gender'] = parsed_sex
     except ValueError as e:
-        log_error(id, 'sex', 'demographics.sex', age, e)
+        log_error(id, 'sex', 'demographics.gender', age, e)
 
     return demographics or None
 
