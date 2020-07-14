@@ -175,7 +175,7 @@ class BulkCaseForm extends React.Component<
      * return only types specified in the uploaded data. Setting this prevents
      * inadvertent increases in resolution: e.g., an non-geocodable county name
      * being interpreted as a street name.
-     * 
+     *
      * TODO: Once county-level geocoding is fixed, consider removing the option
      * to lose resolution, here. For now, we can't require the most precise
      * resolution, because the erroneous county cases will 404.
