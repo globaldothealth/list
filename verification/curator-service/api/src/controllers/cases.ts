@@ -152,15 +152,19 @@ export default class CasesController {
         }
         const opts: GeocodeOptions = {};
         if (location['limitToResolution']) {
-            opts.limitToResolution =
-                Resolution[
-                    location['limitToResolution'] as keyof typeof Resolution
-                ];
-            if (!opts.limitToResolution) {
-                throw new InvalidParamError(
-                    `invalid limitToResolution: ${location['limitToResolution']}`,
-                );
-            }
+            opts.limitToResolution = [];
+            location['limitToResolution']
+                .split(',')
+                .forEach((supplied: string) => {
+                    const resolution =
+                        Resolution[supplied as keyof typeof Resolution];
+                    if (!resolution) {
+                        throw new InvalidParamError(
+                            `invalid limitToResolution: ${supplied}`,
+                        );
+                    }
+                    opts.limitToResolution?.push(resolution);
+                });
         }
         for (const geocoder of this.geocoders) {
             const features = await geocoder.geocode(location?.query, opts);
