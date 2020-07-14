@@ -16,7 +16,6 @@ import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
-import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
@@ -31,7 +30,6 @@ import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
 import Publish from '@material-ui/icons/Publish';
 import React from 'react';
-import ShowChartIcon from '@material-ui/icons/ShowChart';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
@@ -320,13 +318,6 @@ class App extends React.Component<Props, State> {
                                     divider: true,
                                 },
                                 {
-                                    text: 'Charts',
-                                    icon: <ShowChartIcon />,
-                                    to: '/charts',
-                                    displayCheck: (): boolean => true,
-                                    divider: true,
-                                },
-                                {
                                     text: 'Profile',
                                     icon: <PersonIcon />,
                                     to: '/profile',
@@ -384,9 +375,6 @@ class App extends React.Component<Props, State> {
                                     <SourceTable />
                                 </Route>
                             )}
-                            <Route path="/charts">
-                                <Charts />
-                            </Route>
                             {this.state.user.email && (
                                 <Route path="/profile">
                                     <Profile user={this.state.user} />
@@ -401,7 +389,7 @@ class App extends React.Component<Props, State> {
                                 </Route>
                             )}
                             <Route exact path="/">
-                                <Home user={this.state.user} />
+                                <Charts />
                             </Route>
                         </Switch>
                     </main>
