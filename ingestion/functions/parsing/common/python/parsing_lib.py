@@ -108,7 +108,10 @@ def run_lambda(event, context, parsing_function):
         Python function that parses raw source data into G.h case data.
         This function must accept (in order): a file containing raw source
         data, a string representing the source UUID, and a string representing
-        the source URL.
+        the source URL. It must return a list of data conforming to the G.h
+        case format (TODO: add a link to this definition).
+        For an example, see:
+          https://github.com/open-covid-data/healthmap-gdo-temp/blob/master/ingestion/functions/parsing/india/india.py#L57
 
     Returns
     ------
