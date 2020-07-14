@@ -61,7 +61,11 @@ class AppModal extends React.Component<Props, {}> {
                                 </Typography>
                             </Toolbar>
                         </AppBar>
-                        <div className={classes.container}>
+                        {/* scroll-container id needed for scrolling in CaseForm */}
+                        <div
+                            className={classes.container}
+                            id="scroll-container"
+                        >
                             {this.props.children}
                         </div>
                     </div>
