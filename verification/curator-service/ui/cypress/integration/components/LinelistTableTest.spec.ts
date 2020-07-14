@@ -35,7 +35,7 @@ describe('Linelist table', function () {
         cy.contains('some notes');
 
         cy.contains('Edit case').should('not.exist');
-        cy.get('button[title="Edit this case"]').click();
+        cy.get('button[title="Edit this case"]').click({ force: true });
         cy.contains('Edit case');
     });
 
@@ -56,8 +56,8 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
 
-        cy.get('button[title="Delete"]').click();
-        cy.get('button[title="Save"]').click();
+        cy.get('button[title="Delete"]').click({ force: true });
+        cy.get('button[title="Save"]').click({ force: true });
 
         cy.contains('some notes').should('not.exist');
     });

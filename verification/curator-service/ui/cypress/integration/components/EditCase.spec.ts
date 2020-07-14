@@ -19,7 +19,7 @@ describe('Edit case', function () {
             nationalities: ['Andorrean', 'French'],
         });
         cy.visit('cases');
-        cy.get('button[title="Edit this case"]').click();
+        cy.get('button[title="Edit this case"]').click({ force: true });
         // Check that we have something from the original case.
         cy.contains('France');
         cy.contains('Andorrean');
