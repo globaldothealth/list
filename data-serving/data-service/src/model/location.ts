@@ -1,15 +1,5 @@
 import mongoose from 'mongoose';
 
-// See https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country
-// for an explanation of each level of resolution.
-export enum GeoResolution {
-    Point = 'Point',
-    Admin3 = 'Admin3',
-    Admin2 = 'Admin2',
-    Admin1 = 'Admin1',
-    Country = 'Country',
-}
-
 const fieldRequiredValidator = [
     function (this: LocationDocument): boolean {
         return (
@@ -48,7 +38,6 @@ export const locationSchema = new mongoose.Schema(
         name: String,
         geoResolution: {
             type: String,
-            enum: Object.values(GeoResolution),
             required: true,
         },
         geometry: {
@@ -100,6 +89,6 @@ export type LocationDocument = mongoose.Document & {
     administrativeAreaLevel3?: string;
     place?: string;
     name: string;
-    geoResolution: GeoResolution;
+    geoResolution: string;
     geometry?: Geometry;
 };
