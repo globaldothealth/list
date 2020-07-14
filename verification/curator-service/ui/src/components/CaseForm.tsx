@@ -48,7 +48,6 @@ const styles = (theme: Theme) =>
         appBar: {
             background: 'white',
         },
-        container: { display: 'flex,' },
         tableOfContents: {
             position: 'fixed',
         },
@@ -470,7 +469,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             duration: 100,
             smooth: true,
             offset: -64, // Account for header height
-            containerId: 'container',
+            containerId: 'scroll-container',
         });
     }
 
@@ -500,7 +499,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         errors,
                         touched,
                     }): JSX.Element => (
-                        <div className={classes.container} id="container">
+                        <div>
                             <nav className={classes.tableOfContents}>
                                 <div
                                     className={classes.tableOfContentsRow}
