@@ -45,7 +45,7 @@ describe('Curator', function () {
         cy.get('li').contains('Afghan').click();
         cy.get('div[data-testid="nationalities"]').type('Albanian');
         cy.get('li').contains('Albanian').click();
-        cy.get('div[data-testid="profession"]').type('Accountant');
+        cy.get('div[data-testid="occupation"]').type('Accountant');
         cy.get('li').contains('Accountant').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');

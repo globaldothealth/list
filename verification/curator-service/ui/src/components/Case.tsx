@@ -28,7 +28,7 @@ export interface Demographics {
     };
     ethnicity: string;
     nationalities: string[];
-    profession: string;
+    occupation: string;
 }
 
 export interface PreexistingConditions {
