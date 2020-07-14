@@ -1,5 +1,6 @@
 import CaseFormValues from './CaseFormValues';
 import ChipInput from 'material-ui-chip-input';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -27,7 +28,7 @@ export default function Transmission(): JSX.Element {
     return (
         <Scroll.Element name="transmission">
             <fieldset>
-                <legend>Transmission</legend>
+                <FieldTitle title="Transmission"></FieldTitle>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionRoutes"
