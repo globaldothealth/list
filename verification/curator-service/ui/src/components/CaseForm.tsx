@@ -78,7 +78,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             age: undefined,
             ethnicity: undefined,
             nationalities: [],
-            profession: undefined,
+            occupation: undefined,
             location: undefined,
             confirmedDate: null,
             methodOfConfirmation: undefined,
@@ -122,7 +122,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 : undefined,
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
-        profession: c.demographics?.profession,
+        occupation: c.demographics?.occupation,
         location: c.location,
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
@@ -304,7 +304,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                profession: values.profession,
+                occupation: values.occupation,
             },
             location: values.location,
             events: [
@@ -538,7 +538,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                                     '') ||
                                             values.ethnicity !== undefined ||
                                             values.nationalities?.length > 0 ||
-                                            values.profession !== undefined,
+                                            values.occupation !== undefined,
                                         hasError: hasErrors(
                                             [
                                                 'gender',
@@ -547,7 +547,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                                 'age',
                                                 'ethnicity',
                                                 'nationalities',
-                                                'profession',
+                                                'occupation',
                                             ],
                                             errors,
                                             touched,
