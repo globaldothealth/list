@@ -10,6 +10,14 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
+    it('Shows charts on home page', function () {
+        cy.visit('/');
+
+        cy.contains('Completeness');
+        cy.contains('Cumulative');
+        cy.contains('Freshness');
+    });
+
     it('shows login button when logged out', function () {
         cy.visit('/');
 
@@ -26,29 +34,22 @@ describe('App', function () {
     it('Homepage with logged out user', function () {
         cy.visit('/');
 
-        cy.contains('Please login');
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile').should('not.exist');
         cy.contains('Manage users').should('not.exist');
-    });
-
-    it('Charts', function () {
-        cy.visit('/charts');
-
-        cy.contains('Completeness');
-        cy.contains('Cumulative');
-        cy.contains('Freshness');
     });
 
     it('Homepage with logged in user with no roles', function () {
         cy.login({ roles: [] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
     });
@@ -57,9 +58,10 @@ describe('App', function () {
         cy.login({ roles: ['admin'] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users');
     });
@@ -69,10 +71,10 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new');
+        cy.contains('Home');
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Profile');
-        cy.contains('Charts');
         cy.contains('Manage users').should('not.exist');
     });
 
@@ -81,9 +83,9 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist');
         cy.contains('Sources');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
     });
