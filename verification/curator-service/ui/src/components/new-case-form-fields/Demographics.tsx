@@ -38,16 +38,6 @@ type DemographicsProps = WithStyles<typeof styles>;
 // TODO: get values from DB.
 const genderValues = [undefined, 'Male', 'Female', 'Non-binary/Third gender', 'Other'];
 
-const ethnicityValues = [
-    undefined,
-    'Asian',
-    'Black',
-    'Latino',
-    'Multi-race',
-    'White',
-    'Other',
-];
-
 function Demographics(props: DemographicsProps): JSX.Element {
     const { classes } = props;
     const { initialValues } = useFormikContext<CaseFormValues>();
@@ -100,26 +90,14 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     ></FastField>
                 </div>
                 <div className={classes.fieldRow}>
-                    <FormControl>
-                        <InputLabel htmlFor="ethnicity">Ethnicity</InputLabel>
-                        <FastField
-                            as="select"
-                            name="ethnicity"
-                            type="text"
-                            data-testid="ethnicity"
-                            className={classes.select}
-                            component={Select}
-                        >
-                            {ethnicityValues.map((ethnicity) => (
-                                <MenuItem
-                                    key={ethnicity ?? 'undefined'}
-                                    value={ethnicity}
-                                >
-                                    {ethnicity ?? 'Unknown'}
-                                </MenuItem>
-                            ))}
-                        </FastField>
-                    </FormControl>
+                    <FastField
+                        label="Race / Ethnicity"
+                        name="ethnicity"
+                        type="text"
+                        data-testid="ethnicity"
+                        component={TextField}
+                        fullWidth
+                    />
                 </div>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete

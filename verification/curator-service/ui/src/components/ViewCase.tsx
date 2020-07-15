@@ -219,7 +219,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         )}
                     />
 
-                    <RowHeader title="Ethnicity" />
+                    <RowHeader title="Race / Ethnicity" />
                     <RowContent content={props.c.demographics?.ethnicity} />
                 </Grid>
             </Paper>

@@ -167,7 +167,7 @@ export default class LinelistTable extends React.Component<
                                         : `${rowData.age[0]}-${rowData.age[1]}`,
                             },
                             {
-                                title: 'Ethnicity',
+                                title: 'Race / Ethnicity',
                                 field: 'ethnicity',
                             },
                             {
