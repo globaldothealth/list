@@ -22,7 +22,14 @@ it('loads and displays case', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText, getByText } = render(<ViewCase id="abc123" />);
+    const { findByText, getByText } = render(
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
     // Case data.
@@ -33,8 +40,14 @@ it('loads and displays case', async () => {
         ),
     ).toBeInTheDocument();
     expect(getByText('sourceId')).toBeInTheDocument();
-    expect(getByText('twitter.com/a-tweet')).toBeInTheDocument();
-    expect(getByText('news.org/an-article')).toBeInTheDocument();
+    expect(getByText('twitter.com/a-tweet')).toHaveAttribute(
+        'href',
+        'https://twitter.com/a-tweet',
+    );
+    expect(getByText('news.org/an-article')).toHaveAttribute(
+        'href',
+        'https://news.org/an-article',
+    );
     expect(getByText('abc123')).toBeInTheDocument();
     expect(getByText('2020-01-20')).toBeInTheDocument();
     expect(getByText('xyz789')).toBeInTheDocument();
@@ -77,8 +90,15 @@ it('loads and displays case', async () => {
     // Transmission.
     expect(getByText(/Vector borne/)).toBeInTheDocument();
     expect(getByText(/Gym/)).toBeInTheDocument();
-    expect(getByText(/bbf8e943dfe6e00030892dcc/)).toBeInTheDocument();
-    expect(getByText(/aaf8e943dfe6e00030892dee/)).toBeInTheDocument();
+    expect(getByText(/bbf8e943dfe6e00030892dcc/)).toHaveAttribute(
+        'href',
+        '/cases/view/bbf8e943dfe6e00030892dcc',
+    );
+    expect(getByText(/aaf8e943dfe6e00030892dee/)).toHaveAttribute(
+        'href',
+        '/cases/view/aaf8e943dfe6e00030892dee',
+    );
+
     // Travel history.
     expect(getByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
     expect(getByText('United States')).toBeInTheDocument();
@@ -109,7 +129,14 @@ it('loads and displays case', async () => {
 it('displays API errors', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Request failed'));
 
-    const { findByText } = render(<ViewCase id="abc123" />);
+    const { findByText } = render(
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
