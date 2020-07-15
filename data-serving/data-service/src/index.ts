@@ -47,16 +47,18 @@ app.get('/health', (req: Request, res: Response) => {
 new OpenApiValidator({
     apiSpec: './api/openapi.yaml',
     validateResponses: true,
-}).install(app).then(() => {
-    const apiRouter = express.Router();
-    apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
-    apiRouter.get('/cases', caseController.list);
-    apiRouter.post('/cases', caseController.create);
-    apiRouter.put('/cases', caseController.upsert);
-    apiRouter.put('/cases/:id([a-z0-9]{24})', caseController.update);
-    apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
-    app.use('/api', apiRouter);
-});
+})
+    .install(app)
+    .then(() => {
+        const apiRouter = express.Router();
+        apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
+        apiRouter.get('/cases', caseController.list);
+        apiRouter.post('/cases', caseController.create);
+        apiRouter.put('/cases', caseController.upsert);
+        apiRouter.put('/cases/:id([a-z0-9]{24})', caseController.update);
+        apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
+        app.use('/api', apiRouter);
+    });
 
 (async (): Promise<void> => {
     try {
