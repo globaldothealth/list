@@ -274,6 +274,41 @@ describe('Cases', () => {
         expect(res.text).toEqual(message);
     });
 
+    it('handles multiple location restrictions', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+        mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
+
+        await curatorRequest
+            .post('/api/cases')
+            .send({
+                age: '42',
+                location: {
+                    query: 'Lyon',
+                    limitToResolution: 'Admin3,Admin2',
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases',
+            {
+                age: '42',
+                location: lyon,
+            },
+        );
+    });
+
     it('throws on invalid location restrictions', async () => {
         await curatorRequest
             .post('/api/cases')
