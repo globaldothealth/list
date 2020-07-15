@@ -29,7 +29,8 @@ const AppTooltip = withStyles((theme: Theme) => ({
 
 interface FieldTitleProps extends WithStyles<typeof styles> {
     title: string;
-    tooltip?: string;
+    tooltip?: string | JSX.Element;
+    interactive?: boolean;
 }
 
 function FieldTitle(props: FieldTitleProps): JSX.Element {
@@ -40,7 +41,11 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
                 {props.title.toLocaleUpperCase()}
             </div>
             {props.tooltip && (
-                <AppTooltip title={props.tooltip} className={classes.tooltip}>
+                <AppTooltip
+                    interactive={props.interactive}
+                    title={props.tooltip}
+                    className={classes.tooltip}
+                >
                     <HelpOutlineIcon fontSize="small" />
                 </AppTooltip>
             )}
