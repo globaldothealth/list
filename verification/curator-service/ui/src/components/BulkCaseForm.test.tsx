@@ -34,7 +34,7 @@ it('renders csv upload widget', async () => {
         <BulkCaseForm
             user={user}
             onModalClose={(): void => {
-                console.log('Closed!');
+                return;
             }}
         />,
     );
