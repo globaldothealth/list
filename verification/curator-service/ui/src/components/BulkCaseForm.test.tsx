@@ -1,4 +1,4 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { render, wait } from '@testing-library/react';
 
 import BulkCaseForm from './BulkCaseForm';
 import React from 'react';
@@ -30,7 +30,14 @@ afterEach(() => {
 });
 
 it('renders csv upload widget', async () => {
-    const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
+    const { getByTestId, getByText } = render(
+        <BulkCaseForm
+            user={user}
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
     const inputField = getByTestId('csv-input');

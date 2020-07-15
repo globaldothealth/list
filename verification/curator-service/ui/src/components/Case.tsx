@@ -45,9 +45,12 @@ export interface Location {
     geometry: Geometry;
     name: string;
     place: string;
-    // This is required for requests to the API (for geocoding), but isn't
-    // returned by the API in new case objects.
+    // These two fields are either required or supplemental for requests, but
+    // aren't part of the returned case objects.
+    // Required to perform geocoding.
     query?: string;
+    // Optional to hint geocoding results.
+    limitToResolution?: string;
 }
 
 export interface Geometry {

@@ -168,16 +168,31 @@ class BulkCaseForm extends React.Component<
         return events;
     }
 
-    createGeoResolution(c: RawParsedCase): string {
+    /**
+     * Defines the acceptable geocoding result types.
+     *
+     * Currently operates under the assumption that the final geocode should be
+     * return only types specified in the uploaded data. Setting this prevents
+     * inadvertent increases in resolution: e.g., an non-geocodable county name
+     * being interpreted as a street name.
+     *
+     * TODO: Once county-level geocoding is fixed, consider removing the option
+     * to lose resolution, here. For now, we can't require the most precise
+     * resolution, because the erroneous county cases will 404.
+     */
+    createGeoResolutionLimit(c: RawParsedCase): string {
+        const types = [];
         if (c.admin3) {
-            return 'Admin3';
-        } else if (c.admin2) {
-            return 'Admin2';
-        } else if (c.admin1) {
-            return 'Admin1';
-        } else {
-            return 'Country';
+            types.push('Admin3');
         }
+        if (c.admin2) {
+            types.push('Admin2');
+        }
+        if (c.admin1) {
+            types.push('Admin1');
+        }
+        types.push('Country');
+        return types.join(',');
     }
 
     createLocationQuery(c: RawParsedCase): string {
@@ -189,7 +204,7 @@ class BulkCaseForm extends React.Component<
     createCaseObject(
         c: RawParsedCase,
         events: Event[],
-        geoResolution: string,
+        geoResolutionLimit: string,
         locationQuery: string,
         caseReference: CaseReference,
     ): CompleteParsedCase {
@@ -219,8 +234,8 @@ class BulkCaseForm extends React.Component<
                               longitude: c.longitude,
                           }
                         : undefined,
-                geoResolution: geoResolution,
                 name: c.locationName,
+                limitToResolution: geoResolutionLimit,
             },
             events: events,
             revisionMetadata: {
@@ -274,13 +289,13 @@ class BulkCaseForm extends React.Component<
                 (field) =>
                     (c[field] = c[field] === null ? undefined : c[field]),
             );
-            const geoResolution = this.createGeoResolution(c);
+            const geoResolutionLimit = this.createGeoResolutionLimit(c);
             const locationQuery = this.createLocationQuery(c);
             const events = this.createEvents(c);
             return this.createCaseObject(
                 c,
                 events,
-                geoResolution,
+                geoResolutionLimit,
                 locationQuery,
                 caseReference,
             );
