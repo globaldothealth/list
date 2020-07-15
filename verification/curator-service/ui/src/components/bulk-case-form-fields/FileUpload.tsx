@@ -4,6 +4,22 @@ import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import { makeStyles } from '@material-ui/core';
 import { useFormikContext } from 'formik';
 
+const tooltip = (
+    <React.Fragment>
+        {'Select a CSV file to upload in the format described '}
+        <a
+            href={
+                'https://github.com/open-covid-data/healthmap-gdo-temp/tree/master/verification/curator-service/ui#bulk-upload-process'
+            }
+            rel="noopener noreferrer"
+            target="_blank"
+        >
+            {'here'}
+        </a>
+        {'.'}
+    </React.Fragment>
+);
+
 const useStyles = makeStyles(() => ({
     csvInput: {
         padding: '15px',
@@ -16,7 +32,11 @@ export default function FileUpload(): JSX.Element {
     const name = 'file';
     return (
         <fieldset>
-            <FieldTitle title="CSV Data"></FieldTitle>
+            <FieldTitle
+                title="CSV Data"
+                tooltip={tooltip}
+                interactive
+            ></FieldTitle>
             <input
                 className={classes.csvInput}
                 data-testid="csv-input"
