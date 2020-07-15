@@ -39,8 +39,7 @@ describe('Curator', function () {
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
-        cy.get('div[data-testid="ethnicity"]').click();
-        cy.get('li[data-value="Asian"').click();
+        cy.get('div[data-testid="ethnicity"]').click().type('Asian');
         cy.get('div[data-testid="nationalities"]').type('Afghan');
         cy.get('li').contains('Afghan').click();
         cy.get('div[data-testid="nationalities"]').type('Albanian');
