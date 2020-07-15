@@ -544,7 +544,13 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
-                <a href={props.content}>{props.content}</a>
+                <a
+                    href={createHref(props.content)}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    {props.content}
+                </a>
             ) : (
                 props.content
             )}
@@ -559,11 +565,26 @@ function MultilinkRowContent(props: {
         <Grid item xs={8}>
             {props.links?.map((e) => (
                 <p key={e.title}>
-                    <a href={e.link}>{e.title}</a>
+                    <a
+                        href={createHref(e.link)}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        {e.title}
+                    </a>
                 </p>
             ))}
         </Grid>
     );
+}
+
+/**
+ * Prepare raw link strings for use in <a> href values.
+ */
+function createHref(rawLink: string): string {
+    // Don't modify relative links.
+    if (rawLink.startsWith('/')) return rawLink;
+    return rawLink.match(/^https?:\/\//) ? rawLink : 'https://'.concat(rawLink);
 }
 
 export default withStyles(styles)(ViewCase);
