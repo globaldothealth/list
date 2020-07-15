@@ -95,7 +95,6 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         name="ethnicity"
                         type="text"
                         data-testid="ethnicity"
-                        multiline={true}
                         component={TextField}
                         fullWidth
                     />
