@@ -20,7 +20,7 @@ export default class CasesController {
             const response = await axios.get(
                 this.dataServerURL + '/api' + req.url,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {
@@ -36,7 +36,7 @@ export default class CasesController {
             const response = await axios.get(
                 this.dataServerURL + '/api' + req.url,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {
@@ -52,7 +52,7 @@ export default class CasesController {
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {
@@ -69,7 +69,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 req.body,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {
@@ -92,7 +92,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 req.body,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
                 res.status(422).send(err.message);
@@ -119,7 +119,7 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
                 req.body,
             );
-            res.json(response.data);
+            res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
                 res.status(422).send(err.message);
