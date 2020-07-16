@@ -4,7 +4,9 @@ import { Button, withStyles } from '@material-ui/core';
 import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
+import axios, { AxiosResponse } from 'axios';
 
+import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
@@ -12,7 +14,6 @@ import React from 'react';
 import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 
 interface User {
@@ -35,6 +36,10 @@ const styles = () =>
         formSection: {
             margin: '2em 0',
         },
+        statusMessage: {
+            marginTop: '2em',
+            maxWidth: '80%',
+        },
     });
 
 interface BulkCaseFormProps extends WithStyles<typeof styles> {
@@ -43,7 +48,8 @@ interface BulkCaseFormProps extends WithStyles<typeof styles> {
 }
 
 interface BulkCaseFormState {
-    statusMessage: string;
+    errorMessage: string;
+    successMessage: string;
     errors: CaseValidationError[];
 }
 
@@ -125,7 +131,8 @@ class BulkCaseForm extends React.Component<
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
-            statusMessage: '',
+            errorMessage: '',
+            successMessage: '',
             errors: [],
         };
     }
@@ -249,7 +256,7 @@ class BulkCaseForm extends React.Component<
         };
     }
 
-    async upsertCase(c: CompleteParsedCase): Promise<void> {
+    upsertCase(c: CompleteParsedCase): Promise<AxiosResponse<Case>> {
         return axios.put('/api/cases', c);
     }
 
@@ -303,23 +310,38 @@ class BulkCaseForm extends React.Component<
         const validationErrors = await this.validateCases(cases);
         this.setState({ errors: validationErrors });
         if (validationErrors.length > 0) {
+            this.setState({
+                errors: validationErrors,
+                errorMessage: '',
+                successMessage: '',
+            });
             return;
         }
+        let created = 0;
+        let updated = 0;
         for (const c of cases) {
             try {
                 const casesToUpsert = c.caseCount ? c.caseCount : 1;
                 for (let i = 0; i < casesToUpsert; i++) {
-                    await this.upsertCase(c);
+                    const response = await this.upsertCase(c);
+                    response.status === 201 ? created++ : updated++;
                 }
-                this.setState({ statusMessage: 'Success!' });
             } catch (e) {
                 this.setState({
-                    statusMessage: `System error during upload: ${JSON.stringify(
+                    errorMessage: `System error during upload: ${JSON.stringify(
                         e,
                     )}`,
+                    successMessage: '',
                 });
             }
         }
+        const createdMessage =
+            created > 0 ? `Created ${created} new rows. ` : '';
+        const updatedMessage = updated > 0 ? `Updated ${updated} rows.` : '';
+        this.setState({
+            errorMessage: '',
+            successMessage: `Success! ${createdMessage}${updatedMessage}`,
+        });
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<void> {
@@ -375,16 +397,27 @@ class BulkCaseForm extends React.Component<
                                 >
                                     Upload cases
                                 </Button>
-                                {this.state.statusMessage && (
-                                    <h3>
-                                        {this.state.statusMessage as string}
-                                    </h3>
-                                )}
                                 {this.state.errors.length > 0 && (
                                     <ValidationErrorList
                                         errors={this.state.errors}
                                         maxDisplayErrors={10}
                                     />
+                                )}
+                                {this.state.successMessage && (
+                                    <Alert
+                                        className={classes.statusMessage}
+                                        severity="success"
+                                    >
+                                        {this.state.successMessage}
+                                    </Alert>
+                                )}
+                                {this.state.errorMessage && (
+                                    <Alert
+                                        className={classes.statusMessage}
+                                        severity="error"
+                                    >
+                                        {this.state.errorMessage}
+                                    </Alert>
                                 )}
                             </Form>
                         </div>
