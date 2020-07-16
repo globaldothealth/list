@@ -36,7 +36,7 @@ afterAll(async () => {
 
 const emptyAxiosResponse = {
     data: {},
-    status: 202,
+    status: 200,
     statusText: 'OK',
     config: {},
     headers: {},
@@ -65,7 +65,7 @@ describe('Cases', () => {
         mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .get('/api/cases?limit=10&page=1&filter=')
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ describe('Cases', () => {
         mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .get('/api/cases/5e99f21a1c9d440000ceb088')
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -114,7 +114,7 @@ describe('Cases', () => {
         await curatorRequest
             .put('/api/cases/5e99f21a1c9d440000ceb088')
             .send({ age: '42' })
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
         expect(
@@ -142,7 +142,7 @@ describe('Cases', () => {
         mockedAxios.delete.mockResolvedValueOnce(emptyAxiosResponse);
         await curatorRequest
             .delete('/api/cases/5e99f21a1c9d440000ceb088')
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
         expect(mockedAxios.delete).toHaveBeenCalledWith(
@@ -178,7 +178,7 @@ describe('Cases', () => {
         await curatorRequest
             .put('/api/cases')
             .send({ age: '42', location: { query: 'Lyon' } })
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).toHaveBeenCalledWith(
@@ -234,7 +234,7 @@ describe('Cases', () => {
                 age: '42',
                 location: { query: 'Lyon', limitToResolution: 'Admin3' },
             })
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
@@ -297,7 +297,7 @@ describe('Cases', () => {
                     limitToResolution: 'Admin3,Admin2',
                 },
             })
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
