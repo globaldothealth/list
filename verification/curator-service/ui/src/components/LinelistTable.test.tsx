@@ -1,12 +1,11 @@
 import '@testing-library/jest-dom/extend-expect';
 
-import { MemoryRouter, Router } from 'react-router-dom';
 import { fireEvent, render } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

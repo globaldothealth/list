@@ -1,8 +1,8 @@
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import AddIcon from '@material-ui/icons/AddOutlined';
 import CaseForm from './CaseForm';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditCase from './EditCase';
@@ -67,15 +67,18 @@ interface TableRow {
     admittedToHospital: string;
 }
 
-interface Props {
+interface LocationState {
+    newCaseIds: [string];
+    editedCaseIds: [string];
+}
+
+interface Props extends RouteComponentProps<any, any, LocationState> {
     user: User;
 }
 
-export default class LinelistTable extends React.Component<
-    Props,
-    LinelistTableState
-> {
+class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
+    unlisten: () => void;
 
     constructor(props: Props) {
         super(props);
@@ -89,6 +92,15 @@ export default class LinelistTable extends React.Component<
             pageSize: 50,
         };
         this.closeCaseForm = this.closeCaseForm.bind(this);
+        // history.location.state can be updated with newCaseIds, on which we
+        // must refresh the table
+        this.unlisten = this.props.history.listen((_, __) =>
+            this.tableRef.current?.onQueryChange(),
+        );
+    }
+
+    componentWillUnmount(): void {
+        this.unlisten();
     }
 
     deleteCase(rowData: TableRow): Promise<unknown> {
@@ -145,14 +157,26 @@ export default class LinelistTable extends React.Component<
                             {this.state.error}
                         </MuiAlert>
                     )}
+                    {/* TODO: update for multiple cases added/edited */}
+                    {(this.props.location.state?.newCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.newCaseIds} added`}
+                        </MuiAlert>
+                    )}
+                    {(this.props.location.state?.editedCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.editedCaseIds} edited`}
+                        </MuiAlert>
+                    )}
                     <MaterialTable
                         tableRef={this.tableRef}
                         columns={[
                             {
-                                title: 'id',
+                                title: 'Case ID',
                                 field: 'id',
                                 type: 'string',
-                                hidden: true,
                             },
                             {
                                 title: 'Gender',
@@ -379,7 +403,18 @@ export default class LinelistTable extends React.Component<
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             actionsColumnIndex: -1,
-                            maxBodyHeight: 'calc(100vh - 15em)',
+                            maxBodyHeight: 'calc(100vh - 18em)',
+                            // TODO: style highlighted rows to spec
+                            rowStyle: (rowData) =>
+                                (
+                                    this.props.location.state?.newCaseIds ?? []
+                                ).includes(rowData.id) ||
+                                (
+                                    this.props.location.state?.editedCaseIds ??
+                                    []
+                                ).includes(rowData.id)
+                                    ? { backgroundColor: '#E8F0FE' }
+                                    : {},
                         }}
                         onChangeRowsPerPage={(newPageSize: number) => {
                             this.setState({ pageSize: newPageSize });
@@ -389,21 +424,6 @@ export default class LinelistTable extends React.Component<
                         actions={
                             this.props.user.roles.includes('curator')
                                 ? [
-                                      {
-                                          icon: () => (
-                                              <span aria-label="add">
-                                                  <AddIcon />
-                                              </span>
-                                          ),
-                                          tooltip: 'Submit new case',
-                                          isFreeAction: true,
-                                          onClick: (): void => {
-                                              this.setState({
-                                                  showCaseForm: true,
-                                                  caseFormId: '',
-                                              });
-                                          },
-                                      },
                                       {
                                           icon: () => (
                                               <span aria-label="edit">
@@ -497,3 +517,5 @@ export default class LinelistTable extends React.Component<
         );
     }
 }
+
+export default withRouter(LinelistTable);

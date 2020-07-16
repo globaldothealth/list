@@ -34,7 +34,8 @@ describe('Curator', function () {
         });
 
         // Input full case.
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
@@ -148,171 +149,180 @@ describe('Curator', function () {
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
-        cy.contains('Case added');
 
         // Check that linelist has everything.
-        cy.get('button[aria-label="close overlay"').click();
-        cy.contains('No records to display').should('not.exist');
-        cy.contains('www.example.com');
-        cy.contains('Female');
-        cy.contains('21');
-        cy.contains('Asian');
-        cy.contains('Afghan, Albanian');
-        cy.contains('Accountant');
-        cy.contains('France');
-        cy.contains('1/1/2020');
-        cy.contains('dry cough, mild fever');
-        cy.contains('Airborne infection');
-        cy.contains('Breath');
-        cy.contains('Airplane');
-        cy.contains('testcaseid12345678987654, testcaseid12345678987655');
-        cy.contains('Germany, United Kingdom');
-        cy.contains('Bartonella, Ebola');
-        cy.contains('test notes');
-        cy.contains('on new line');
-        cy.contains('superuser@');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.contains(`Case ${resp.body.cases[0]._id} added`);
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('www.example.com');
+            cy.contains('Female');
+            cy.contains('21');
+            cy.contains('Asian');
+            cy.contains('Afghan, Albanian');
+            cy.contains('Accountant');
+            cy.contains('France');
+            cy.contains('1/1/2020');
+            cy.contains('dry cough, mild fever');
+            cy.contains('Airborne infection');
+            cy.contains('Breath');
+            cy.contains('Airplane');
+            cy.contains('testcaseid12345678987654, testcaseid12345678987655');
+            cy.contains('Germany, United Kingdom');
+            cy.contains('Bartonella, Ebola');
+            cy.contains('test notes');
+            cy.contains('on new line');
+            cy.contains('superuser@');
 
-        // Edit the case.
-        cy.get('button[title="Edit this case"]').click({ force: true });
+            // Edit the case.
+            cy.get('button[title="Edit this case"]').click({ force: true });
 
-        // Everything should be there.
-        // Source.
-        cy.get('div[data-testid="caseReference"]').within(() => {
-            cy.get('input[type="text"]').should(
+            // Everything should be there.
+            // Source.
+            cy.get('div[data-testid="caseReference"]').within(() => {
+                cy.get('input[type="text"]').should(
+                    'have.value',
+                    'www.example.com',
+                );
+            });
+
+            // Demographics.
+            cy.get('input[name="gender"]').should('have.value', 'Female');
+            cy.get('input[name="age"]').should('have.value', '21');
+            // TODO: tedious: check "accountant"
+            cy.contains('Afghan');
+            cy.contains('Albanian');
+
+            // Location.
+            cy.contains('France');
+            cy.contains('Country');
+            cy.contains('45.75');
+            cy.contains('4.84');
+            // Events.
+            cy.get('input[name="onsetSymptomsDate"]').should(
                 'have.value',
-                'www.example.com',
+                '2020/01/02',
             );
+            cy.get('input[name="confirmedDate"]').should(
+                'have.value',
+                '2020/01/01',
+            );
+            cy.get('input[name="methodOfConfirmation"]').should(
+                'have.value',
+                'PCR test',
+            );
+            cy.get('input[name="hospitalAdmissionDate"]').should(
+                'have.value',
+                '2020/01/05',
+            );
+            cy.get('input[name="icuAdmissionDate"]').should(
+                'have.value',
+                '2020/01/06',
+            );
+            cy.get('input[name="outcome"]').should('have.value', 'Recovered');
+            cy.get('input[name="outcomeDate"]').should(
+                'have.value',
+                '2020/01/07',
+            );
+            // Symptoms.
+            cy.contains('dry cough');
+            cy.contains('mild fever');
+            // Preconditions.
+            cy.contains('ABCD syndrome');
+            cy.contains('ADULT syndrome');
+            // Travel history.
+            cy.contains('Germany');
+            cy.contains('United Kingdom');
+            cy.get('input[name="travelHistory[1].dateRange.start"]').should(
+                'have.value',
+                '2020/01/01',
+            );
+            cy.get('input[name="travelHistory[1].dateRange.end"]').should(
+                'have.value',
+                '2020/01/05',
+            );
+            cy.contains('Car');
+            cy.contains('Plane');
+            cy.contains('Business');
+            cy.contains('Yes');
+            // Pathogens.
+            cy.contains('Bartonella');
+            cy.contains('Ebola');
+            cy.get('textarea[name="notes"]').should(
+                'have.value',
+                'test notes\non new line',
+            );
+            // Transmission.
+            cy.contains('Airborne infection');
+            cy.contains('Breath');
+            cy.contains('Airplane');
+            cy.contains('testcaseid12345678987654');
+            cy.contains('testcaseid12345678987655');
+            // Change a few things.
+            cy.get('div[data-testid="gender"]').click();
+            cy.get('li[data-value="Male"').click();
+            // Submit the changes.
+            cy.get('button[data-testid="submit"]').click();
+
+            // Updated info should be there.
+            cy.contains(`Case ${resp.body.cases[0]._id} edited`);
+            cy.contains(`Case ${resp.body.cases[0]._id} added`).should(
+                'not.exist',
+            );
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('Male');
+            // What's untouched should stay as is.
+            cy.contains('Asian');
+
+            // View full details about the case
+            cy.get('button[title="View this case details"]').click({
+                force: true,
+            });
+            // Case data.
+            cy.contains('www.example.com');
+            cy.contains('superuser@test.com');
+            cy.contains('test notes on new line');
+            // Demographics.
+            cy.contains('21');
+            cy.contains('Male');
+            cy.contains('Accountant');
+            cy.contains('Afghan, Albanian');
+            cy.contains('Asian');
+            cy.contains('France');
+            cy.contains('45.7589');
+            cy.contains('4.8414');
+            // Events.
+            cy.contains('2020-01-01');
+            cy.contains('2020-01-02');
+            cy.contains('2020-01-03');
+            cy.contains('2020-01-04');
+            cy.contains('2020-01-05');
+            cy.contains('2020-01-06');
+            cy.contains('PCR test');
+            cy.contains('Recovered');
+            cy.contains('Yes');
+            //  Symptoms.
+            cy.contains('dry cough, mild fever');
+            cy.contains('Presymptomatic');
+            // Preexisting conditions.
+            cy.contains('ABCD syndrome, ADULT syndrome');
+            // Transmission.
+            cy.contains('Airborne infection');
+            cy.contains('Airplane');
+            cy.contains('testcaseid12345678987654');
+            cy.contains('testcaseid12345678987655');
+            // Travel history.
+            cy.contains('Car, Plane');
+            cy.contains('Business');
+            cy.contains('Germany');
+            cy.contains('Bus');
+            cy.contains('United Kingdom');
+            // Pathogens and genome.
+            cy.contains('Bartonella (232), Ebola (41)');
+            cy.contains('www.example2.com');
+            cy.contains('test sequence name');
+            cy.contains('33000');
+            cy.contains('testSequenceId');
         });
-
-        // Demographics.
-        cy.get('input[name="gender"]').should('have.value', 'Female');
-        cy.get('input[name="age"]').should('have.value', '21');
-        // TODO: tedious: check "accountant"
-        cy.contains('Afghan');
-        cy.contains('Albanian');
-
-        // Location.
-        cy.contains('France');
-        cy.contains('Country');
-        cy.contains('45.75');
-        cy.contains('4.84');
-        // Events.
-        cy.get('input[name="onsetSymptomsDate"]').should(
-            'have.value',
-            '2020/01/02',
-        );
-        cy.get('input[name="confirmedDate"]').should(
-            'have.value',
-            '2020/01/01',
-        );
-        cy.get('input[name="methodOfConfirmation"]').should(
-            'have.value',
-            'PCR test',
-        );
-        cy.get('input[name="hospitalAdmissionDate"]').should(
-            'have.value',
-            '2020/01/05',
-        );
-        cy.get('input[name="icuAdmissionDate"]').should(
-            'have.value',
-            '2020/01/06',
-        );
-        cy.get('input[name="outcome"]').should('have.value', 'Recovered');
-        cy.get('input[name="outcomeDate"]').should('have.value', '2020/01/07');
-        // Symptoms.
-        cy.contains('dry cough');
-        cy.contains('mild fever');
-        // Preconditions.
-        cy.contains('ABCD syndrome');
-        cy.contains('ADULT syndrome');
-        // Travel history.
-        cy.contains('Germany');
-        cy.contains('United Kingdom');
-        cy.get('input[name="travelHistory[1].dateRange.start"]').should(
-            'have.value',
-            '2020/01/01',
-        );
-        cy.get('input[name="travelHistory[1].dateRange.end"]').should(
-            'have.value',
-            '2020/01/05',
-        );
-        cy.contains('Car');
-        cy.contains('Plane');
-        cy.contains('Business');
-        cy.contains('Yes');
-        // Pathogens.
-        cy.contains('Bartonella');
-        cy.contains('Ebola');
-        cy.get('textarea[name="notes"]').should(
-            'have.value',
-            'test notes\non new line',
-        );
-        // Transmission.
-        cy.contains('Airborne infection');
-        cy.contains('Breath');
-        cy.contains('Airplane');
-        cy.contains('testcaseid12345678987654');
-        cy.contains('testcaseid12345678987655');
-        // Change a few things.
-        cy.get('div[data-testid="gender"]').click();
-        cy.get('li[data-value="Male"').click();
-        // Submit the changes.
-        cy.get('button[data-testid="submit"]').click();
-        cy.contains('Case edited');
-
-        // Updated info should be there.
-        cy.get('button[aria-label="close overlay"').click();
-        cy.contains('No records to display').should('not.exist');
-        cy.contains('Male');
-        // What's untouched should stay as is.
-        cy.contains('Asian');
-
-        // View full details about the case
-        cy.get('button[title="View this case details"]').click({ force: true });
-        // Case data.
-        cy.contains('www.example.com');
-        cy.contains('superuser@test.com');
-        cy.contains('test notes on new line');
-        // Demographics.
-        cy.contains('21');
-        cy.contains('Male');
-        cy.contains('Accountant');
-        cy.contains('Afghan, Albanian');
-        cy.contains('Asian');
-        cy.contains('France');
-        cy.contains('45.7589');
-        cy.contains('4.8414');
-        // Events.
-        cy.contains('2020-01-01');
-        cy.contains('2020-01-02');
-        cy.contains('2020-01-03');
-        cy.contains('2020-01-04');
-        cy.contains('2020-01-05');
-        cy.contains('2020-01-06');
-        cy.contains('PCR test');
-        cy.contains('Recovered');
-        cy.contains('Yes');
-        //  Symptoms.
-        cy.contains('dry cough, mild fever');
-        cy.contains('Presymptomatic');
-        // Preexisting conditions.
-        cy.contains('ABCD syndrome, ADULT syndrome');
-        // Transmission.
-        cy.contains('Airborne infection');
-        cy.contains('Airplane');
-        cy.contains('testcaseid12345678987654');
-        cy.contains('testcaseid12345678987655');
-        // Travel history.
-        cy.contains('Car, Plane');
-        cy.contains('Business');
-        cy.contains('Germany');
-        cy.contains('Bus');
-        cy.contains('United Kingdom');
-        // Pathogens and genome.
-        cy.contains('Bartonella (232), Ebola (41)');
-        cy.contains('www.example2.com');
-        cy.contains('test sequence name');
-        cy.contains('33000');
-        cy.contains('testSequenceId');
     });
 });
