@@ -14,7 +14,11 @@
     ],
     "location": {
         "country": "China",
-        "geoResolution": "Country"
+        "geoResolution": "Country",
+        "geometry": {
+            "latitude": 2.3522219,
+            "longitude": 48.85661400000001
+        }
     },
     "revisionMetadata": {
         "revisionNumber": 0,

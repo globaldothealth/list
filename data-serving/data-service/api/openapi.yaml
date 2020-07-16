@@ -223,10 +223,20 @@ components:
               type: string
             place:
               type: string
-            query:
+            name:
               type: string
             geoResolution: 
               type: string
+            geometry:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+              required:
+                - latitude
+                - longitude
         events:
           type: array
           items:
@@ -270,6 +280,8 @@ components:
         location:
           required:
             - country
+            - geoResolution
+            - geometry
       required:
         - caseReference
         - location
