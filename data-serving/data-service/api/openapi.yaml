@@ -60,7 +60,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewCase"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              required:
+                - caseReference
+                - location
+                - events
+                - revisionMetadata
       parameters:
         - name: validate_only
           in: query
@@ -94,7 +100,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewCase"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              required:
+                - caseReference
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -173,10 +182,38 @@ paths:
 components:
   schemas:
     Case:
-      description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
-      allOf:
-        - $ref: "#/components/schemas/NewCase"
-        - type: object
+      description: A single line-list case.
+      properties:
+        caseReference:
+          type: object
+        demographics:
+          type: object
+        location:
+          type: object
+        events:
+          type: array
+          items:
+            type: object
+        symptoms:
+          type: object
+        preexistingConditions:
+          type: object
+        transmission:
+          type: object
+        travelHistory:
+          type: object
+        genomeSequences:
+          type: array
+          items:
+            type: object
+        pathogens:
+          type: array
+          items:
+            type: object
+        notes:
+          type: string
+        revisionMetadata:
+          type: object
     CaseArray:
       type: object
       properties:
@@ -184,9 +221,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Case"
-    NewCase:
-      description: The subset of "#/components/schemas/Case" required to create the entity
-      type: object
   responses:
     "200Case":
       description: OK
