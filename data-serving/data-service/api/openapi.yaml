@@ -238,15 +238,64 @@ components:
                 - latitude
                 - longitude
         events:
+          description: > 
+            An event with name "confirmed" must be specified. Other event names
+            include onsetSymptoms, firstClinicalConsultation, selfIsolation,
+            hospitalAdmission, icuAdmission, and outcome.
           type: array
           items:
             type: object
+            properties:
+              name:
+                type: string
+              dateRange:
+                type: object
+                properties:
+                  start:
+                    oneOf:
+                      - type: string
+                      - type: object
+                      - type: number
+                  end:
+                    oneOf:
+                      - type: string
+                      - type: object
+                      - type: number
+              value:
+                type: string
         symptoms:
           type: object
+          properties:
+            status:
+              type: string
+            values:
+              type: array
+              items:
+                type: string
         preexistingConditions:
           type: object
+          properties:
+            hasPreexistingConditions:
+              type: boolean
+            values:
+              type: array
+              items:
+                type: string
         transmission:
           type: object
+          properties:
+            routes:
+              type: array
+              items:
+                type: string
+            places:
+              type: array
+              items:
+                type: string
+            linkedCaseIds:
+              type: array
+              items:
+                type: string
         travelHistory:
           type: object
         genomeSequences:
