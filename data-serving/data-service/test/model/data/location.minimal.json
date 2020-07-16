@@ -1,6 +1,6 @@
 {
-    "place": "Kings County Hospital Center",
-    "geoResolution": "Point",
+    "country": "Canada",
+    "geoResolution": "Country",
     "geometry": {
         "latitude": 40.6809611,
         "longitude": -73.9740028

@@ -48,6 +48,10 @@ describe('validate', () => {
         });
     });
 
+    it('a minimal location is valid', async () => {
+        return new Location(minimalModel).validate();
+    });
+
     it('a fully specified location is valid', async () => {
         return new Location(fullModel).validate();
     });
