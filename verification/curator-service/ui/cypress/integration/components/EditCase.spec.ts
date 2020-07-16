@@ -35,14 +35,17 @@ describe('Edit case', function () {
         cy.route('PUT', `/api/cases/*`).as('editCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@editCase');
-        cy.contains('Case edited');
+
         // Updated info should be there.
-        cy.get('button[aria-label="close overlay"').click();
-        cy.contains('No records to display').should('not.exist');
-        cy.contains('Female');
-        cy.contains('21');
-        // What's untouched should stay as is.
-        cy.contains('Andorrean');
-        cy.contains('French');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.contains(`Case ${resp.body.cases[0]._id} edited`);
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('Female');
+            cy.contains('21');
+            // What's untouched should stay as is.
+            cy.contains('Andorrean');
+            cy.contains('French');
+        });
     });
 });
