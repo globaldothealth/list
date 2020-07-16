@@ -1,4 +1,8 @@
 {
     "place": "Kings County Hospital Center",
-    "geo_resolution": "Point"
+    "geoResolution": "Point",
+    "geometry": {
+        "latitude": 40.6809611,
+        "longitude": -73.9740028
+    }
 }
