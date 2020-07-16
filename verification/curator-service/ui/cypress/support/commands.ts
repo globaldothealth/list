@@ -48,6 +48,7 @@ export function addCase(opts: {
                     latitude: 42,
                     longitude: 12,
                 },
+                name: opts.country,
             },
             events: [
                 {

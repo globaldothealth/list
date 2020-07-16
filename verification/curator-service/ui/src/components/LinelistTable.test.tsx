@@ -268,6 +268,7 @@ it('cannot edit data as a reader only', async () => {
                     latitude: 42,
                     longitude: 12,
                 },
+                name: 'France',
             },
             events: [
                 {

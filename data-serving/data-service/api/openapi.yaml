@@ -282,6 +282,7 @@ components:
             - country
             - geoResolution
             - geometry
+            - name
       required:
         - caseReference
         - location
