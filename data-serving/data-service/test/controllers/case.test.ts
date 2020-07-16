@@ -7,6 +7,11 @@ import request from 'supertest';
 
 let mongoServer: MongoMemoryServer;
 
+const invalidCase = {
+    ...minimalCase,
+    demographics: { ageRange: { start: 400 } },
+};
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
 });
@@ -131,6 +136,9 @@ describe('POST', () => {
     it('create with input missing required properties should return 400', () => {
         return request(app).post('/api/cases').send({}).expect(400);
     });
+    it('create with required properties but invalid input should return 422', () => {
+        return request(app).post('/api/cases').send(invalidCase).expect(422);
+    });
     it('create with valid input should return 201 OK', async () => {
         return request(app)
             .post('/api/cases')
@@ -233,8 +241,11 @@ describe('PUT', () => {
 
         expect(await secondUniqueCase.collection.countDocuments()).toEqual(2);
     });
+    it('upsert new item without required fields should return 400', () => {
+        return request(app).put('/api/cases').send({}).expect(400);
+    });
     it('upsert new item with invalid input should return 422', () => {
-        return request(app).put('/api/cases').send({}).expect(422);
+        return request(app).put('/api/cases').send(invalidCase).expect(422);
     });
     it('invalid upsert present item should return 422', async () => {
         const c = new Case(minimalCase);

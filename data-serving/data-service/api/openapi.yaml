@@ -100,7 +100,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Case"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              required:
+                - caseReference
       responses:
         "200":
           $ref: "#/components/responses/200Case"
