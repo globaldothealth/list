@@ -119,10 +119,10 @@ describe('GET', () => {
                 .expect('Content-Type', /json/);
         });
         it('rejects negative page param', (done) => {
-            request(app).get('/api/cases?page=-7').expect(422, done);
+            request(app).get('/api/cases?page=-7').expect(400, done);
         });
         it('rejects negative limit param', (done) => {
-            request(app).get('/api/cases?page=1&limit=-2').expect(422, done);
+            request(app).get('/api/cases?page=1&limit=-2').expect(400, done);
         });
     });
 });
@@ -182,6 +182,7 @@ describe('PUT', () => {
     it('update absent item should return 404 NOT FOUND', () => {
         return request(app)
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .send({})
             .expect(404);
     });
     it('upsert present item should return 200 OK', async () => {

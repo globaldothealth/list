@@ -34,6 +34,12 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: q
+          in: query
+          description: The search query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -55,6 +61,15 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/NewCase"
+      parameters:
+        - name: validate_only
+          in: query
+          description: Whether to validate the case without creating it
+          required: false
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
       responses:
         "201":
           $ref: "#/components/responses/201Case"
@@ -163,9 +178,12 @@ components:
         - $ref: "#/components/schemas/NewCase"
         - type: object
     CaseArray:
-      type: array
-      items:
-        $ref: "#/components/schemas/Case"
+      type: object
+      properties:
+        cases:
+          type: array
+          items:
+            $ref: "#/components/schemas/Case"
     NewCase:
       description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
