@@ -8,47 +8,34 @@ import mongoose from 'mongoose';
 const Location = mongoose.model<LocationDocument>('Location', locationSchema);
 
 describe('validate', () => {
-    it('empty location is invalid', async () => {
-        return new Location({}).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
     it('a location without a geo resolution is invalid', async () => {
-        return new Location({ country: 'United States' }).validate((e) => {
+        const noGeoResolution = { ...minimalModel };
+        delete noGeoResolution.geoResolution;
+
+        return new Location(noGeoResolution).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
-    it('a location with only country is valid', async () => {
-        return new Location({
-            country: 'United States',
-            geoResolution: 'Country',
-        }).validate();
+    it('a location without a geometry is invalid', async () => {
+        const noGeometry = { ...minimalModel };
+        delete noGeometry.geometry;
+
+        return new Location(noGeometry).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
     });
 
-    it('a location with only administrativeAreaLevel1 is valid', async () => {
-        return new Location({
-            administrativeAreaLevel1: 'New York',
-            geoResolution: 'Admin1',
-        }).validate();
+    it('a location without a name is invalid', async () => {
+        const noName = { ...minimalModel };
+        delete noName.name;
+
+        return new Location(noName).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
     });
 
-    it('a location with only administrativeAreaLevel2 is valid', async () => {
-        return new Location({
-            administrativeAreaLevel2: 'Kings County',
-            geoResolution: 'Admin2',
-        }).validate();
-    });
-
-    it('a location with only administrativeAreaLevel3 is valid', async () => {
-        return new Location({
-            administrativeAreaLevel3: 'Brooklyn',
-            geoResolution: 'Admin3',
-        }).validate();
-    });
-
-    it('a latitude without a longitude is invalid', async () => {
+    it('a geometry without a longitude is invalid', async () => {
         return new Location({
             ...minimalModel,
             geometry: {
@@ -59,7 +46,7 @@ describe('validate', () => {
         });
     });
 
-    it('a longitude without a latitude is invalid', async () => {
+    it('a geometry without a latitude is invalid', async () => {
         return new Location({
             ...minimalModel,
             geometry: {
@@ -70,19 +57,11 @@ describe('validate', () => {
         });
     });
 
-    it('a fully specified location is valid', async () => {
-        return new Location(fullModel).validate();
+    it('a minimal location is valid', async () => {
+        return new Location(minimalModel).validate();
     });
 
-    it('validators work for embedded locations', async () => {
-        const FakeModel = mongoose.model(
-            'FakeDocument',
-            new mongoose.Schema({
-                location: locationSchema,
-            }),
-        );
-        return new FakeModel({ location: {} }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
+    it('a fully specified location is valid', async () => {
+        return new Location(fullModel).validate();
     });
 });

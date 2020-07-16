@@ -1,77 +1,46 @@
 import mongoose from 'mongoose';
 
-const fieldRequiredValidator = [
-    function (this: LocationDocument): boolean {
-        return (
-            this != null &&
-            this.country == null &&
-            this.administrativeAreaLevel1 == null &&
-            this.administrativeAreaLevel2 == null &&
-            this.administrativeAreaLevel3 == null
-        );
+const geometrySchema = new mongoose.Schema(
+    {
+        latitude: {
+            type: Number,
+            min: -90.0,
+            max: 90.0,
+            required: true,
+        },
+        longitude: {
+            type: Number,
+            min: -180.0,
+            max: 180.0,
+            required: true,
+        },
     },
-    'One of country, administrativeAreaLevel1, administrativeAreaLevel2, ' +
-        'or administrativeAreaLevel3 is required',
-];
+    { _id: false },
+);
 
 export const locationSchema = new mongoose.Schema(
     {
         country: {
             type: String,
-            required: fieldRequiredValidator,
+            required: true,
         },
-        administrativeAreaLevel1: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        administrativeAreaLevel2: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
-        administrativeAreaLevel3: {
-            type: String,
-            required: fieldRequiredValidator,
-        },
+        administrativeAreaLevel1: String,
+        administrativeAreaLevel2: String,
+        administrativeAreaLevel3: String,
         // Place represents a precise location, such as an establishment or POI.
         place: String,
         // A human-readable name of the location.
-        name: String,
+        name: {
+            type: String,
+            required: true,
+        },
         geoResolution: {
             type: String,
             required: true,
         },
         geometry: {
-            latitude: {
-                type: Number,
-                min: -90.0,
-                max: 90.0,
-                required: [
-                    function (this: LocationDocument): boolean {
-                        return (
-                            this != null &&
-                            this.geometry?.latitude == null &&
-                            this.geometry?.longitude != null
-                        );
-                    },
-                    'latitude must be specified if geometry is present',
-                ],
-            },
-            longitude: {
-                type: Number,
-                min: -180.0,
-                max: 180.0,
-                required: [
-                    function (this: LocationDocument): boolean {
-                        return (
-                            this != null &&
-                            this.geometry?.longitude == null &&
-                            this.geometry?.latitude != null
-                        );
-                    },
-                    'longitude must be specified if geometry is present',
-                ],
-            },
-            _id: false,
+            type: geometrySchema,
+            required: true,
         },
     },
     { _id: false },

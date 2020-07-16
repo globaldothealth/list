@@ -35,7 +35,7 @@ export function addCase(opts: {
         url: '/api/cases',
         body: {
             caseReference: {
-                sourceId: 'CDC',
+                sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
             },
             demographics: {
@@ -48,6 +48,7 @@ export function addCase(opts: {
                     latitude: 42,
                     longitude: 12,
                 },
+                name: opts.country,
             },
             events: [
                 {

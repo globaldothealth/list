@@ -33,7 +33,7 @@ it('loads and displays cases', async () => {
                 outcome: 'Recovered',
             },
             caseReference: {
-                sourceId: 'CDC',
+                sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
             },
             demographics: { ageRange: { start: 1, end: 3 } },
@@ -268,6 +268,7 @@ it('cannot edit data as a reader only', async () => {
                     latitude: 42,
                     longitude: 12,
                 },
+                name: 'France',
             },
             events: [
                 {
