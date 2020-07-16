@@ -195,7 +195,7 @@ describe('PUT', () => {
     });
     it('upsert present item should return 200 OK', async () => {
         const c = new Case(minimalCase);
-        const sourceId = 'abc123';
+        const sourceId = '5ea86423bae6982635d2e1f8';
         const entryId = 'def456';
         c.set('caseReference.sourceId', sourceId);
         c.set('caseReference.sourceEntryId', entryId);
@@ -226,7 +226,7 @@ describe('PUT', () => {
             .expect(201);
     });
     it('upsert items without sourceEntryId should return 201 CREATED', async () => {
-        const sharedSourceId = 'abc123';
+        const sharedSourceId = '5ea86423bae6982635d2e1f8';
         const firstUniqueCase = new Case(minimalCase);
         firstUniqueCase.set('caseReference.sourceId', sharedSourceId);
         await firstUniqueCase.save();
@@ -249,7 +249,7 @@ describe('PUT', () => {
     });
     it('invalid upsert present item should return 422', async () => {
         const c = new Case(minimalCase);
-        const sourceId = 'abc123';
+        const sourceId = '5ea86423bae6982635d2e1f8';
         const entryId = 'def456';
         c.set('caseReference.sourceId', sourceId);
         c.set('caseReference.sourceEntryId', entryId);
