@@ -26,6 +26,15 @@ describe('validate', () => {
         });
     });
 
+    it('a location without a name is invalid', async () => {
+        const noName = { ...minimalModel };
+        delete noName.name;
+
+        return new Location(noName).validate((e) => {
+            expect(e.name).toBe(Error.ValidationError.name);
+        });
+    });
+
     it('a geometry without a longitude is invalid', async () => {
         return new Location({
             ...minimalModel,

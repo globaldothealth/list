@@ -30,7 +30,10 @@ export const locationSchema = new mongoose.Schema(
         // Place represents a precise location, such as an establishment or POI.
         place: String,
         // A human-readable name of the location.
-        name: String,
+        name: {
+            type: String,
+            required: true,
+        },
         geoResolution: {
             type: String,
             required: true,
