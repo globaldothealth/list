@@ -447,6 +447,7 @@ class BulkCaseForm extends React.Component<
                                     </Button>
                                     {isSubmitting && (
                                         <FileUploadProgress
+                                            data-testid="progress"
                                             value={this.state.uploadProgress}
                                         />
                                     )}
