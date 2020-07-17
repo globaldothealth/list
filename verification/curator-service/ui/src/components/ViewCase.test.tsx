@@ -22,7 +22,14 @@ it('loads and displays case', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText, getByText } = render(<ViewCase id="abc123" />);
+    const { findByText, getByText } = render(
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
     // Case data.
@@ -109,7 +116,14 @@ it('loads and displays case', async () => {
 it('displays API errors', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Request failed'));
 
-    const { findByText } = render(<ViewCase id="abc123" />);
+    const { findByText } = render(
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
