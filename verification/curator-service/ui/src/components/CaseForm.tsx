@@ -194,6 +194,7 @@ interface CaseFormState {
     errorMessage: string;
 }
 
+// TODO: get 0 and 120 min/max age values from the backend.
 const NewCaseValidation = Yup.object().shape(
     {
         caseReference: Yup.object().required('Required'),
@@ -202,7 +203,9 @@ const NewCaseValidation = Yup.object().shape(
             .max(120, 'Age must be between 0 and 120')
             .when('maxAge', {
                 is: (maxAge) => maxAge !== undefined && maxAge !== '',
-                then: Yup.number().required('Must enter minimum age in range'),
+                then: Yup.number().required(
+                    'Min age required in range. Minimum value is 0.',
+                ),
             }),
         maxAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
@@ -214,7 +217,9 @@ const NewCaseValidation = Yup.object().shape(
                         Yup.ref('minAge'),
                         'Max age must be greater than than min age',
                     )
-                    .required('Must enter maximum age in range'),
+                    .required(
+                        'Max age required in range. Maximum value is 120.',
+                    ),
             }),
         age: Yup.number()
             .min(0, 'Age must be between 0 and 120')
