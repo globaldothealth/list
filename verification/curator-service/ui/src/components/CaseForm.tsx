@@ -194,6 +194,7 @@ interface CaseFormState {
     errorMessage: string;
 }
 
+// TODO: get 0 and 120 min/max age values from the backend.
 const NewCaseValidation = Yup.object().shape(
     {
         caseReference: Yup.object().required('Required'),
