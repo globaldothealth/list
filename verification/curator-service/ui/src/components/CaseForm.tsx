@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
@@ -183,15 +184,14 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     };
 }
 
-interface Props extends WithStyles<typeof styles> {
+interface Props extends RouteComponentProps, WithStyles<typeof styles> {
     user: User;
     initialCase?: Case;
-    onModalClose?: () => void;
+    onModalClose: () => void;
 }
 
 interface CaseFormState {
     errorMessage: string;
-    successMessage: string;
 }
 
 const NewCaseValidation = Yup.object().shape(
@@ -261,7 +261,6 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         super(props);
         this.state = {
             errorMessage: '',
-            successMessage: '',
         };
     }
 
@@ -413,6 +412,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                       },
                   },
         };
+        let newCaseId = '';
         try {
             // Update or create depending on the presence of the initial case ID.
             if (this.props.initialCase?._id) {
@@ -420,18 +420,28 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     `/api/cases/${this.props.initialCase?._id}`,
                     newCase,
                 );
-                this.setState({ successMessage: 'Case edited' });
             } else {
-                await axios.post('/api/cases', newCase);
-                this.setState({ successMessage: 'Case added' });
+                const postResponse = await axios.post('/api/cases', newCase);
+                newCaseId = postResponse.data._id;
             }
             this.setState({ errorMessage: '' });
         } catch (e) {
             this.setState({
-                successMessage: '',
                 errorMessage: JSON.stringify(e),
             });
+            return;
         }
+        // Navigate to cases after successful submit
+        this.props.onModalClose();
+        this.props.history.push({
+            pathname: '/cases',
+            state: {
+                newCaseIds: newCaseId ? [newCaseId] : [],
+                editedCaseIds: this.props.initialCase?._id
+                    ? [this.props.initialCase._id]
+                    : [],
+            },
+        });
     }
 
     tableOfContentsIcon(opts: {
@@ -812,15 +822,6 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                         Cancel
                                     </Button>
                                 </Form>
-                                {this.state.successMessage && (
-                                    <MuiAlert
-                                        className={classes.statusMessage}
-                                        elevation={6}
-                                        variant="filled"
-                                    >
-                                        {this.state.successMessage}
-                                    </MuiAlert>
-                                )}
                                 {this.state.errorMessage && (
                                     <MuiAlert
                                         className={classes.statusMessage}
@@ -840,4 +841,4 @@ class CaseForm extends React.Component<Props, CaseFormState> {
     }
 }
 
-export default withStyles(styles)(CaseForm);
+export default withRouter(withStyles(styles)(CaseForm));
