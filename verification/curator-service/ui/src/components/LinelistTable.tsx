@@ -68,8 +68,8 @@ interface TableRow {
 }
 
 interface LocationState {
-    newCaseIds: [string];
-    editedCaseIds: [string];
+    newCaseIds: string[];
+    editedCaseIds: string[];
 }
 
 interface Props extends RouteComponentProps<never, never, LocationState> {
