@@ -101,7 +101,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Batch creates multiple cases.
+ * Batch validates cases.
  *
  * Handles HTTP POST /api/cases/batchValidate.
  */
