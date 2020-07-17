@@ -9,7 +9,7 @@ import axios from 'axios';
 interface Props {
     user: User;
     id: string;
-    onModalClose?: () => void;
+    onModalClose: () => void;
 }
 
 interface State {

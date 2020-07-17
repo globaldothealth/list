@@ -39,14 +39,6 @@ describe('Linelist table', function () {
         cy.contains('Edit case');
     });
 
-    it('Can open the new case modal', function () {
-        cy.visit('/cases');
-
-        cy.contains('Create new COVID-19 line list case').should('not.exist');
-        cy.get('button[title="Submit new case"]').click();
-        cy.contains('Create new COVID-19 line list case');
-    });
-
     it('Can delete a case', function () {
         cy.addCase({
             country: 'France',
