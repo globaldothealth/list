@@ -162,6 +162,38 @@ describe('POST', () => {
         expect(await Case.collection.countDocuments()).toEqual(0);
         expect(res.body._id).not.toHaveLength(0);
     });
+    it('batch validate with no body should return 415', () => {
+        return request(app).post('/api/cases/batchValidate').expect(415);
+    });
+    it('batch validate with no cases should return 400', () => {
+        return request(app)
+            .post('/api/cases/batchValidate')
+            .send({})
+            .expect(400);
+    });
+    it('batch validate with empty cases should return empty 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(0);
+    });
+    it('batch validate with only valid cases should return empty 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [minimalCase] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(0);
+    });
+    it('batch validate returns errors for invalid cases in 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [minimalCase, invalidCase] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(1);
+        expect(res.body.errors[0].index).toBe(1);
+        expect(res.body.errors[0].message).toMatch('Case validation failed');
+    });
 });
 
 describe('PUT', () => {
