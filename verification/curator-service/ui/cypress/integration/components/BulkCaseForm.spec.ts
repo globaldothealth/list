@@ -127,8 +127,8 @@ describe('Bulk upload form', function () {
         cy.route('POST', '/api/cases?validate_only=true').as('validateCases');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@validateCases');
-        cy.get('p').should(
-            'contain',
+        cy.contains(
+            'p',
             'The selected file could not be uploaded. Found 1 row(s) with errors.',
         );
         cy.get('ul').eq(1).get('li').should('contain', 'Row 1');

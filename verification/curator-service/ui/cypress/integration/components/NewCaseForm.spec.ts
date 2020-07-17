@@ -27,8 +27,7 @@ describe('New case form', function () {
         cy.contains('Create new COVID-19 line list case');
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
-        cy.contains('France');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
@@ -61,7 +60,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         // Outcome without a date.
         cy.get('div[data-testid="outcome"]').click();
@@ -106,7 +105,7 @@ describe('New case form', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         // Force server to return error
