@@ -73,7 +73,11 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').should('have.length', 4);
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('DELETE', '/api/cases/*').as('deleteCase');
         cy.get('button[title="Delete selected rows"]').click();
+        cy.wait('@deleteCase');
+        cy.wait('@deleteCase');
 
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
