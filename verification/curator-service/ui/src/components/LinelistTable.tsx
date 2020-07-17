@@ -72,7 +72,7 @@ interface LocationState {
     editedCaseIds: [string];
 }
 
-interface Props extends RouteComponentProps<any, any, LocationState> {
+interface Props extends RouteComponentProps<never, never, LocationState> {
     user: User;
 }
 

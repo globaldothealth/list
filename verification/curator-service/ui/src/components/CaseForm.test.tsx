@@ -51,7 +51,7 @@ it('renders form', async () => {
 });
 
 it('can add and remove genome sequencing sections', async () => {
-    const { queryByTestId, getByText } = render(
+    const { queryByTestId, getByTestId, getByText } = render(
         <MemoryRouter>
             <CaseForm
                 user={user}
@@ -69,7 +69,7 @@ it('can add and remove genome sequencing sections', async () => {
     });
     expect(queryByTestId('genome-sequence-section')).toBeInTheDocument();
     await wait(() => {
-        fireEvent.click(queryByTestId('remove-genome-sequence-button'));
+        fireEvent.click(getByTestId('remove-genome-sequence-button'));
     });
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
 });
