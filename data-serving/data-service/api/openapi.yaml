@@ -117,6 +117,22 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchValidate:
+    post:
+      summary: Batch validates cases
+      operationId: batchValidateCases
+      requestBody:
+        description: Cases to validate
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/CaseArray"
+      responses:
+        "207":
+          $ref: "#/components/responses/207BatchValidateCaseResponse"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/{id}:
     parameters:
       - name: id
@@ -181,6 +197,23 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    BatchValidateCaseResponse:
+      description: Response to batch validate case API requests
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              message:
+                type: string
+            required:
+              - index
+              - message
+      required:
+        - errors
     Case:
       description: A single line-list case.
       properties:
@@ -221,6 +254,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Case"
+      required:
+        - cases
   responses:
     "200Case":
       description: OK
@@ -240,6 +275,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Case"
+    "207BatchValidateCaseResponse":
+      description: Multi-status
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BatchValidateCaseResponse'
     "400":
       description: Malformed request
     "403":
