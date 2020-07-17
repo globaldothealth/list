@@ -35,22 +35,22 @@ describe('Curator', function () {
 
         // Input full case.
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.get('li').first().should('contain', 'New line list case').click();
+        cy.contains('li', 'New line list case').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
         cy.get('div[data-testid="ethnicity"]').click().type('Asian');
         cy.get('div[data-testid="nationalities"]').type('Afghan');
-        cy.get('li').contains('Afghan').click();
+        cy.contains('li', 'Afghan').click();
         cy.get('div[data-testid="nationalities"]').type('Albanian');
-        cy.get('li').contains('Albanian').click();
+        cy.contains('li', 'Albanian').click();
         cy.get('div[data-testid="occupation"]').type('Accountant');
-        cy.get('li').contains('Accountant').click();
+        cy.contains('li', 'Accountant').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
@@ -71,26 +71,26 @@ describe('Curator', function () {
         cy.get('div[data-testid="symptomsStatus"]').click();
         cy.get('li[data-value="Presymptomatic"').click();
         cy.get('div[data-testid="symptoms"]').type('dry cough');
-        cy.get('li').contains('dry cough').click();
+        cy.contains('li', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
-        cy.get('li').contains('mild fever').click();
+        cy.contains('li', 'mild fever').click();
         cy.get('div[data-testid="hasPreexistingConditions"]').click();
         cy.get('li[data-value="Yes"').click();
         cy.get('div[data-testid="preexistingConditions"]').type(
             'ABCD syndrome',
         );
-        cy.get('li').contains('ABCD syndrome').click();
+        cy.contains('li', 'ABCD syndrome').click();
         cy.get('div[data-testid="preexistingConditions"]').type(
             'ADULT syndrome',
         );
-        cy.get('li').contains('ADULT syndrome').click();
+        cy.contains('li', 'ADULT syndrome').click();
         cy.get('div[data-testid="transmissionRoutes"]').type(
             'Airborne infection',
         );
-        cy.get('li').contains('Airborne infection').click();
+        cy.contains('li', 'Airborne infection').click();
         cy.get('div[data-testid="transmissionRoutes"]').type('Breath{enter}');
         cy.get('div[data-testid="transmissionPlaces"]').type('Airplane');
-        cy.get('li').contains('Airplane').click();
+        cy.contains('li', 'Airplane').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
@@ -98,7 +98,7 @@ describe('Curator', function () {
         cy.get('li[data-value="Yes"').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[0].location"]').type('Germany');
-        cy.get('li').contains('Germany').click();
+        cy.contains('li', 'Germany').click();
         cy.get('input[name="travelHistory[0].dateRange.start"]').type(
             '2020-01-06',
         );
@@ -108,14 +108,14 @@ describe('Curator', function () {
         cy.get('div[data-testid="travelHistory[0].purpose"]').click();
         cy.get('li[data-value="Business"').click();
         cy.get('div[data-testid="travelHistory[0].methods"]').type('Car');
-        cy.get('li').contains('Car').click();
+        cy.contains('li', 'Car').click();
         cy.get('div[data-testid="travelHistory[0].methods"]').type('Plane');
-        cy.get('li').contains('Plane').click();
+        cy.contains('li', 'Plane').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type(
             'United Kingdom',
         );
-        cy.get('li').contains('United Kingdom').click();
+        cy.contains('li', 'United Kingdom').click();
         cy.get('input[name="travelHistory[1].dateRange.start"]').type(
             '2020-01-01',
         );
@@ -125,7 +125,7 @@ describe('Curator', function () {
         cy.get('div[data-testid="travelHistory[1].purpose"]').click();
         cy.get('li[data-value="Business"').click();
         cy.get('div[data-testid="travelHistory[1].methods"]').type('Bus');
-        cy.get('li').contains('Bus').click();
+        cy.contains('li', 'Bus').click();
         cy.get('button[data-testid="addGenomeSequence"').click();
         cy.get('input[name="genomeSequences[0].sampleCollectionDate"]').type(
             '2020-01-01',
@@ -141,9 +141,9 @@ describe('Curator', function () {
         );
         cy.get('input[name="genomeSequences[0].sequenceLength"]').type('33000');
         cy.get('div[data-testid="pathogens"]').type('Bartonella');
-        cy.get('li').contains('Bartonella').click();
+        cy.contains('li', 'Bartonella').click();
         cy.get('div[data-testid="pathogens"]').type('Ebola');
-        cy.get('li').contains('Ebola').click();
+        cy.contains('li', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
