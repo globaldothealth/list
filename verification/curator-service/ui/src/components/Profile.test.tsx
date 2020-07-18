@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import Profile from './Profile';
 import React from 'react';
 
@@ -6,6 +7,7 @@ test('shows profile when passed user information', async () => {
     render(
         <Profile
             user={{
+                _id: 'abc123',
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
                 roles: ['admin', 'reader'],
@@ -19,7 +21,7 @@ test('shows profile when passed user information', async () => {
 });
 
 test('shows login message when not passed user information', async () => {
-    render(<Profile user={{ name: '', email: '', roles: [] }} />);
+    render(<Profile user={{ _id: '', name: '', email: '', roles: [] }} />);
     expect(
         screen.getByText(/Login required to view this page/i),
     ).toBeInTheDocument();

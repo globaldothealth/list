@@ -36,7 +36,13 @@ const styles = () =>
 type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
-const genderValues = [undefined, 'Male', 'Female', 'Non-binary/Third gender', 'Other'];
+const genderValues = [
+    undefined,
+    'Male',
+    'Female',
+    'Non-binary/Third gender',
+    'Other',
+];
 
 function Demographics(props: DemographicsProps): JSX.Element {
     const { classes } = props;
@@ -57,7 +63,10 @@ function Demographics(props: DemographicsProps): JSX.Element {
                             component={Select}
                         >
                             {genderValues.map((gender) => (
-                                <MenuItem key={gender ?? 'undefined'} value={gender}>
+                                <MenuItem
+                                    key={gender ?? 'undefined'}
+                                    value={gender}
+                                >
                                     {gender ?? 'Unknown'}
                                 </MenuItem>
                             ))}
