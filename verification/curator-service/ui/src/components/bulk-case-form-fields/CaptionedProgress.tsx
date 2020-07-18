@@ -10,7 +10,11 @@ export default function FileUploadProgress(
     props: CircularProgressProps & { value: number },
 ): JSX.Element {
     return (
-        <Box position="relative" display="inline-flex">
+        <Box
+            position="relative"
+            data-testid="cap-progress"
+            display="inline-flex"
+        >
             <CircularProgress {...props} />
             <Box
                 top={0}
