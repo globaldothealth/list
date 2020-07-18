@@ -10,6 +10,7 @@ import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
+import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import React from 'react';
 import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
@@ -40,6 +41,13 @@ const styles = () =>
             marginTop: '2em',
             maxWidth: '80%',
         },
+        uploadButton: {
+            marginRight: '2em',
+        },
+        uploadDiv: {
+            display: 'flex',
+            alignItems: 'center',
+        },
     });
 
 interface BulkCaseFormProps extends WithStyles<typeof styles> {
@@ -51,6 +59,8 @@ interface BulkCaseFormState {
     errorMessage: string;
     successMessage: string;
     errors: CaseValidationError[];
+    uploadProgress: number;
+    uploadTotalRequests: number;
 }
 
 interface BulkCaseFormValues {
@@ -134,6 +144,8 @@ class BulkCaseForm extends React.Component<
             errorMessage: '',
             successMessage: '',
             errors: [],
+            uploadProgress: 0,
+            uploadTotalRequests: 0,
         };
     }
 
@@ -256,6 +268,30 @@ class BulkCaseForm extends React.Component<
         };
     }
 
+    incrementProgress(): void {
+        const incrementPercent = 100 / this.state.uploadTotalRequests;
+        this.setState({
+            uploadProgress: this.state.uploadProgress + incrementPercent,
+        });
+    }
+
+    /**
+     * Determine the number of remote requests required to upload the provided
+     * row.
+     *
+     * Each row is validated, accounting for one request, and incurs a further
+     * `caseCount` requests to write rows to the server.
+     */
+    getUploadTotalRequests(cases: CompleteParsedCase[]): number {
+        return cases
+            .map((c) => {
+                return 1 + (c.caseCount ? c.caseCount : 1);
+            })
+            .reduce((accumulator, currentValue) => {
+                return accumulator + currentValue;
+            }, 0);
+    }
+
     upsertCase(c: CompleteParsedCase): Promise<AxiosResponse<Case>> {
         return axios.put('/api/cases', c);
     }
@@ -278,6 +314,7 @@ class BulkCaseForm extends React.Component<
                     new CaseValidationError(i + 1, e.response.data),
                 );
             }
+            this.incrementProgress();
         }
         return validationErrors;
     }
@@ -307,6 +344,9 @@ class BulkCaseForm extends React.Component<
                 caseReference,
             );
         });
+        this.setState({
+            uploadTotalRequests: this.getUploadTotalRequests(cases),
+        });
         const validationErrors = await this.validateCases(cases);
         this.setState({ errors: validationErrors });
         if (validationErrors.length > 0) {
@@ -324,6 +364,7 @@ class BulkCaseForm extends React.Component<
                 const casesToUpsert = c.caseCount ? c.caseCount : 1;
                 for (let i = 0; i < casesToUpsert; i++) {
                     const response = await this.upsertCase(c);
+                    this.incrementProgress();
                     response.status === 201 ? created++ : updated++;
                 }
             } catch (e) {
@@ -344,21 +385,26 @@ class BulkCaseForm extends React.Component<
         });
     }
 
-    async submitCases(values: BulkCaseFormValues): Promise<void> {
-        if (values.file) {
-            const papaparseOptions: ParseConfig<RawParsedCase> = {
-                complete: (results) => {
-                    // CaseReference is required per form validation.
-                    // But, Typescript doesn't know that.
-                    if (values.caseReference) {
-                        this.uploadData(results, values.caseReference);
-                    }
-                },
-                dynamicTyping: true,
-                header: true,
-                skipEmptyLines: true,
+    async submitCases(values: BulkCaseFormValues): Promise<unknown> {
+        if (values.file && values.caseReference) {
+            const parsePromise = (
+                file: File,
+                caseReference: CaseReference,
+            ): Promise<unknown> => {
+                return new Promise((resolve) => {
+                    const papaparseOptions: ParseConfig<RawParsedCase> = {
+                        complete: async (results) => {
+                            await this.uploadData(results, caseReference);
+                            resolve();
+                        },
+                        dynamicTyping: true,
+                        header: true,
+                        skipEmptyLines: true,
+                    };
+                    Papa.parse(file, papaparseOptions);
+                });
             };
-            Papa.parse(values.file, papaparseOptions);
+            return parsePromise(values.file, values.caseReference);
         }
     }
 
@@ -373,9 +419,9 @@ class BulkCaseForm extends React.Component<
                     validationSchema={BulkFormSchema}
                     validateOnChange={false}
                     initialValues={{ file: null, caseReference: undefined }}
-                    onSubmit={(values): Promise<void> =>
-                        this.submitCases(values)
-                    }
+                    onSubmit={async (values): Promise<void> => {
+                        await this.submitCases(values);
+                    }}
                 >
                     {({ isSubmitting, submitForm, values }): JSX.Element => (
                         <div className={classes.container}>
@@ -388,15 +434,24 @@ class BulkCaseForm extends React.Component<
                                 <div className={classes.formSection}>
                                     <FileUpload></FileUpload>
                                 </div>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    data-testid="submit"
-                                    disabled={isSubmitting}
-                                    onClick={submitForm}
-                                >
-                                    Upload cases
-                                </Button>
+                                <div className={classes.uploadDiv}>
+                                    <Button
+                                        className={classes.uploadButton}
+                                        variant="contained"
+                                        color="primary"
+                                        data-testid="submit"
+                                        disabled={isSubmitting}
+                                        onClick={submitForm}
+                                    >
+                                        Upload cases
+                                    </Button>
+                                    {isSubmitting && (
+                                        <CaptionedProgress
+                                            data-testid="progress"
+                                            value={this.state.uploadProgress}
+                                        />
+                                    )}
+                                </div>
                                 {this.state.errors.length > 0 && (
                                     <ValidationErrorList
                                         errors={this.state.errors}
