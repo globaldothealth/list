@@ -10,7 +10,7 @@ import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
-import FileUploadProgress from './bulk-case-form-fields/FileUploadProgress';
+import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import React from 'react';
 import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
@@ -446,7 +446,7 @@ class BulkCaseForm extends React.Component<
                                         Upload cases
                                     </Button>
                                     {isSubmitting && (
-                                        <FileUploadProgress
+                                        <CaptionedProgress
                                             data-testid="progress"
                                             value={this.state.uploadProgress}
                                         />

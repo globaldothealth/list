@@ -1,4 +1,9 @@
-import { render, wait } from '@testing-library/react';
+import {
+    fireEvent,
+    render,
+    wait,
+    waitForElementToBeRemoved,
+} from '@testing-library/react';
 
 import BulkCaseForm from './BulkCaseForm';
 import React from 'react';
@@ -29,8 +34,8 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
-it('renders csv upload widget', async () => {
-    const { getByTestId, getByText } = render(
+it('renders source and csv upload widgets', async () => {
+    const { getByRole, getByTestId, getByText } = render(
         <BulkCaseForm
             user={user}
             onModalClose={(): void => {
@@ -45,5 +50,44 @@ it('renders csv upload widget', async () => {
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
+
+    const sourceComponent = getByTestId('caseReference');
+    expect(getByRole('combobox')).toContainElement(sourceComponent);
+
     expect(getByText(/Upload cases/)).toBeInTheDocument();
+});
+
+it('displays spinner post upload', async () => {
+    const { getByTestId, getByText } = render(
+        <BulkCaseForm
+            user={user}
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
+    const inputField = getByTestId('csv-input');
+    const file = new File(['a\nb'], 'data.csv', {
+        type: 'text/csv',
+    });
+    Object.defineProperty(inputField, 'files', {
+        value: [file],
+    });
+
+    const axiosResponse = {
+        data: {},
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.post.mockResolvedValueOnce(axiosResponse);
+    mockedAxios.put.mockResolvedValueOnce(axiosResponse);
+
+    fireEvent.change(inputField);
+    fireEvent.click(getByText(/Upload cases/));
+    expect(getByTestId('cap-progress')).toBeInTheDocument();
+    waitForElementToBeRemoved(() => getByTestId('cap-progress'));
 });
