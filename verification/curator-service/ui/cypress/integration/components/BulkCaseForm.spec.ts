@@ -33,7 +33,7 @@ describe('Bulk upload form', function () {
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
         cy.contains('Success! Created 2 new rows.');
-        cy.get('[data-testid="progress"]').should('not.be.visible');
+        cy.get('[data-testid="progress"]').should('not.exist');
         cy.get('button[aria-label="close overlay"').click();
 
         // Common data.
@@ -67,7 +67,7 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCases');
         cy.contains('Success! Created 2 new rows.');
-        cy.get('[data-testid="progress"]').should('not.be.visible');
+        cy.get('[data-testid="progress"]').should('not.exist');
         cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/cases');
@@ -86,7 +86,7 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCases');
         cy.contains('Success! Updated 2 rows.');
-        cy.get('[data-testid="progress"]').should('not.be.visible');
+        cy.get('[data-testid="progress"]').should('not.exist');
 
         cy.visit('/cases');
         // The updated case now has a gender of Female.
@@ -110,7 +110,7 @@ describe('Bulk upload form', function () {
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
         cy.contains('Success! Created 3 new rows.');
-        cy.get('[data-testid="progress"]').should('not.be.visible');
+        cy.get('[data-testid="progress"]').should('not.exist');
         cy.get('button[aria-label="close overlay"').click();
 
         cy.visit('/cases');

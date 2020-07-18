@@ -88,6 +88,6 @@ it('displays spinner post upload', async () => {
 
     fireEvent.change(inputField);
     fireEvent.click(getByText(/Upload cases/));
-    expect(getByTestId('cap-progress')).toBeInTheDocument();
-    waitForElementToBeRemoved(() => getByTestId('cap-progress'));
+    expect(getByTestId('progress')).toBeInTheDocument();
+    waitForElementToBeRemoved(() => getByTestId('progress'));
 });
