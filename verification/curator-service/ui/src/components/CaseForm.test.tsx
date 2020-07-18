@@ -1,6 +1,7 @@
 import { fireEvent, render, wait } from '@testing-library/react';
 
 import CaseForm from './CaseForm';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
@@ -30,7 +31,16 @@ afterEach(() => {
 });
 
 it('renders form', async () => {
-    const { getByText, getAllByText } = render(<CaseForm user={user} />);
+    const { getByText, getAllByText } = render(
+        <MemoryRouter>
+            <CaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
@@ -41,7 +51,16 @@ it('renders form', async () => {
 });
 
 it('can add and remove genome sequencing sections', async () => {
-    const { queryByTestId, getByText } = render(<CaseForm user={user} />);
+    const { queryByTestId, getByTestId, getByText } = render(
+        <MemoryRouter>
+            <CaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
@@ -50,7 +69,7 @@ it('can add and remove genome sequencing sections', async () => {
     });
     expect(queryByTestId('genome-sequence-section')).toBeInTheDocument();
     await wait(() => {
-        fireEvent.click(queryByTestId('remove-genome-sequence-button'));
+        fireEvent.click(getByTestId('remove-genome-sequence-button'));
     });
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
 });

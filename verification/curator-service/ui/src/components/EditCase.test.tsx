@@ -2,8 +2,8 @@ import * as fullCase from './fixtures/fullCase.json';
 
 import { render, wait } from '@testing-library/react';
 
-import { Case } from './Case';
 import EditCase from './EditCase';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
@@ -44,7 +44,15 @@ it('loads and displays case to edit', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
 
     const { findByText, getByText, getByDisplayValue } = render(
-        <EditCase id="abc123" user={curator} />,
+        <MemoryRouter>
+            <EditCase
+                id="abc123"
+                user={curator}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(3));
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
@@ -94,7 +102,17 @@ it('loads and displays case to edit', async () => {
 it('displays API errors', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Request failed'));
 
-    const { findByText } = render(<EditCase id="abc123" user={curator} />);
+    const { findByText } = render(
+        <MemoryRouter>
+            <EditCase
+                id="abc123"
+                user={curator}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');

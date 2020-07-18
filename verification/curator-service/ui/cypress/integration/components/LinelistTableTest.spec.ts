@@ -39,14 +39,6 @@ describe('Linelist table', function () {
         cy.contains('Edit case');
     });
 
-    it('Can open the new case modal', function () {
-        cy.visit('/cases');
-
-        cy.contains('Create new COVID-19 line list case').should('not.exist');
-        cy.get('button[title="Submit new case"]').click();
-        cy.contains('Create new COVID-19 line list case');
-    });
-
     it('Can delete a case', function () {
         cy.addCase({
             country: 'France',
@@ -81,7 +73,11 @@ describe('Linelist table', function () {
         cy.get('input[type="checkbox"]').should('have.length', 4);
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('DELETE', '/api/cases/*').as('deleteCase');
         cy.get('button[title="Delete selected rows"]').click();
+        cy.wait('@deleteCase');
+        cy.wait('@deleteCase');
 
         cy.contains('France').should('not.exist');
         cy.contains('Germany');

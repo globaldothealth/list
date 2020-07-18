@@ -6,7 +6,7 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/cases');
 
         cy.contains('Home');
-        cy.get('span').contains('Home').click();
+        cy.contains('span', 'Home').click();
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
@@ -96,7 +96,7 @@ describe('App', function () {
 
         cy.contains('Create new COVID-19 line list case').should('not.exist');
         cy.get('button[data-testid="create-new-button"]').click();
-        cy.get('li').first().should('contain', 'New line list case').click();
+        cy.contains('li', 'New line list case').click();
         cy.contains('Create new COVID-19 line list case');
     });
 });

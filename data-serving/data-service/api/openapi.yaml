@@ -60,13 +60,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/Case"
-              required:
-                - caseReference
-                - location
-                - events
-                - revisionMetadata
+              $ref: "#/components/schemas/NewCase"
       parameters:
         - name: validate_only
           in: query
@@ -219,20 +213,122 @@ components:
       properties:
         caseReference:
           type: object
+          properties:
+            sourceId:
+              type: string
+              pattern: '^[a-f\d]{24}$'
+            sourceUrl:
+              type: string
+            additionalSources:
+              type: array
+              items:
+                type: string
         demographics:
           type: object
+          properties:
+            gender:
+              type: string
+            ageRange:
+              type: object
+              properties:
+                start:
+                  type: number
+                end:
+                  type: number
+            ethnicity:
+              type: string
+            nationalities:
+              type: array
+              items:
+                type: string
+            occupation:
+              type: string
         location:
           type: object
+          properties:
+            country:
+              type: string
+            administrativeAreaLevel1:
+              type: string
+            administrativeAreaLevel2:
+              type: string
+            administrativeAreaLevel3:
+              type: string
+            place:
+              type: string
+            name:
+              type: string
+            geoResolution: 
+              type: string
+            geometry:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+              required:
+                - latitude
+                - longitude
         events:
+          description: > 
+            An event with name "confirmed" must be specified. Other event names
+            include onsetSymptoms, firstClinicalConsultation, selfIsolation,
+            hospitalAdmission, icuAdmission, and outcome.
           type: array
           items:
             type: object
+            properties:
+              name:
+                type: string
+              dateRange:
+                type: object
+                properties:
+                  start:
+                    oneOf:
+                      - type: string
+                      - type: object
+                      - type: number
+                  end:
+                    oneOf:
+                      - type: string
+                      - type: object
+                      - type: number
+              value:
+                type: string
         symptoms:
           type: object
+          properties:
+            status:
+              type: string
+            values:
+              type: array
+              items:
+                type: string
         preexistingConditions:
           type: object
+          properties:
+            hasPreexistingConditions:
+              type: boolean
+            values:
+              type: array
+              items:
+                type: string
         transmission:
           type: object
+          properties:
+            routes:
+              type: array
+              items:
+                type: string
+            places:
+              type: array
+              items:
+                type: string
+            linkedCaseIds:
+              type: array
+              items:
+                type: string
         travelHistory:
           type: object
         genomeSequences:
@@ -256,6 +352,26 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    NewCase:
+      description: A "#/components/schemas/Case" with additional required fields for newly-created cases
+      allOf:
+        - $ref: "#/components/schemas/Case"
+      properties:
+        caseReference:
+          required:
+            - sourceId
+            - sourceUrl
+        location:
+          required:
+            - country
+            - geoResolution
+            - geometry
+            - name
+      required:
+        - caseReference
+        - location
+        - events
+        - revisionMetadata
   responses:
     "200Case":
       description: OK

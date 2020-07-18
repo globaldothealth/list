@@ -39,7 +39,7 @@ it('loads and displays case', async () => {
             'https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19',
         ),
     ).toBeInTheDocument();
-    expect(getByText('sourceId')).toBeInTheDocument();
+    expect(getByText('5ea86423bae6982635d2e1f8')).toBeInTheDocument();
     expect(getByText('twitter.com/a-tweet')).toHaveAttribute(
         'href',
         'https://twitter.com/a-tweet',

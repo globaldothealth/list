@@ -14,8 +14,7 @@ describe('New case form', function () {
 
     // Full case is covered in curator test.
     it('Can add minimal row to linelist', function () {
-        cy.visit('/cases');
-        cy.contains('No records to display');
+        cy.visit('/');
         cy.seedLocation({
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
@@ -23,24 +22,26 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
+        cy.contains('Create new COVID-19 line list case');
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
-        cy.contains('France');
-        cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         cy.route('POST', '/api/cases').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
-        cy.contains('Case added');
-
-        cy.get('button[aria-label="close overlay"').click();
-        cy.contains('No records to display').should('not.exist');
-        cy.contains('www.example.com');
-        cy.contains('France');
-        cy.contains('1/1/2020');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.url().should('eq', 'http://localhost:3002/cases');
+            cy.contains(`Case ${resp.body.cases[0]._id} added`);
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('www.example.com');
+            cy.contains('France');
+            cy.contains('1/1/2020');
+        });
     });
 
     it('Can submit events without dates', function () {
@@ -53,12 +54,13 @@ describe('New case form', function () {
             geoResolution: 'Country',
         });
 
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         // Outcome without a date.
         cy.get('div[data-testid="outcome"]').click();
@@ -74,13 +76,16 @@ describe('New case form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
-        cy.get('button[aria-label="close overlay"').click();
-        cy.contains('No records to display').should('not.exist');
-        cy.contains('www.example.com');
-        cy.contains('France');
-        cy.contains('1/1/2020');
-        cy.contains('Yes');
-        cy.contains('Recovered');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.contains(`Case ${resp.body.cases[0]._id} added`);
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('www.example.com');
+            cy.contains('France');
+            cy.contains('1/1/2020');
+            cy.contains('Yes');
+            cy.contains('Recovered');
+        });
     });
 
     it('Does not add row on submission error', function () {
@@ -94,12 +99,13 @@ describe('New case form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
         enterSource('www.example.com');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('Country');
-        cy.get('li').contains('France').click();
+        cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.server();
         // Force server to return error
@@ -119,14 +125,16 @@ describe('New case form', function () {
 
     it('Check for required fields', function () {
         cy.visit('/cases');
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
 
         cy.get('p:contains("Required")').should('have.length', 3);
     });
 
     it('Shows checkbox on field completion', function () {
         cy.visit('/cases');
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Other"').click();
@@ -135,7 +143,8 @@ describe('New case form', function () {
 
     it('Shows error icon on field submission error', function () {
         cy.visit('/cases');
-        cy.get('button[title="Submit new case"]').click();
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.get('li').first().should('contain', 'New line list case').click();
         cy.get('svg[data-testid="error-icon"]').should('not.exist');
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
         cy.get('input[name="confirmedDate"]').type('2020/02/31').blur();
