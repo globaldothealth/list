@@ -204,6 +204,10 @@ export default class CasesController {
      *
      * @returns {boolean} Whether lat lng were either provided or geocoded
      */
+    // For batch requests, the case body is nested.
+    // While we could define a type here, the right change is probably to use a
+    // batch geocoding API for such cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private async geocode(req: Request | any): Promise<boolean> {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
@@ -274,8 +278,9 @@ export default class CasesController {
                         index: index,
                         message: err.message,
                     });
+                } else {
+                    throw err;
                 }
-                throw err;
             }
         }
         return geocodeErrors;

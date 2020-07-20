@@ -278,7 +278,7 @@ describe('Cases', () => {
                     },
                     {
                         age: '42',
-                        location: { query: 'Lyon' },
+                        location: {},
                     },
                     {
                         age: '42',
@@ -294,7 +294,11 @@ describe('Cases', () => {
         expect(res.body.numErrors).toBe(2);
         expect(res.body.phase).toBe('GEOCODE');
         expect(res.body.errors).toEqual([
-            { index: 1, message: 'no geolocation found for Lyon' },
+            {
+                index: 1,
+                message:
+                    'location.query must be specified to be able to geocode',
+            },
             { index: 2, message: 'no geolocation found for Lyon' },
         ]);
     });
