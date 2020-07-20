@@ -74,12 +74,12 @@ it('loads and displays case to edit', async () => {
     ).toBeInTheDocument();
     expect(getByDisplayValue('NC_045512.2')).toBeInTheDocument();
     expect(getByDisplayValue('33000')).toBeInTheDocument();
-    expect(getByText('France')).toBeInTheDocument();
-    expect(getByText('Île-de-F')).toBeInTheDocument();
-    expect(getByText('Paris')).toBeInTheDocument();
+    expect(getByDisplayValue('France')).toBeInTheDocument();
+    expect(getByDisplayValue('Île-de-F')).toBeInTheDocument();
+    expect(getByDisplayValue('Paris')).toBeInTheDocument();
     expect(getByDisplayValue('Recovered')).toBeInTheDocument();
     expect(getByText('Severe pneumonia')).toBeInTheDocument();
-    expect(getByText('United States')).toBeInTheDocument();
+    expect(getByDisplayValue('United States')).toBeInTheDocument();
     expect(getByDisplayValue('Family')).toBeInTheDocument();
     // TODO: These show up locally but we need to figure out how to properly
     // query them in tests.
