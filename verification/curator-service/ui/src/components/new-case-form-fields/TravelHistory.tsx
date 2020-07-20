@@ -118,8 +118,13 @@ export default function Events(): JSX.Element {
                                                         ></PlacesAutocomplete>
                                                         {travelHistoryElement.location && (
                                                             <Location
-                                                                location={
-                                                                    travelHistoryElement.location
+                                                                locationPath={`travelHistory[${index}].location`}
+                                                                geometry={
+                                                                    values
+                                                                        .travelHistory[
+                                                                        index
+                                                                    ]?.location
+                                                                        ?.geometry
                                                                 }
                                                             ></Location>
                                                         )}

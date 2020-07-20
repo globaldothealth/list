@@ -1,8 +1,9 @@
-import { Divider, Typography } from '@material-ui/core';
-
-import { Location as Loc } from '../Case';
+import { Divider } from '@material-ui/core';
+import { Field } from 'formik';
+import { Geometry } from '../Case';
 import React from 'react';
 import StaticMap from '../StaticMap';
+import { TextField } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 
 const styles = makeStyles(() => ({
@@ -10,73 +11,110 @@ const styles = makeStyles(() => ({
         display: 'flex',
         flexWrap: 'wrap',
     },
-    column: {
+    field: {
         marginRight: '1em',
+        width: '8em',
     },
     mapContainer: {
         textAlign: 'center',
     },
     divider: {
+        marginTop: '1em',
         marginBottom: '1em',
     },
 }));
 
-export default function Location(props: { location?: Loc }): JSX.Element {
+export default function Location(props: {
+    locationPath: string;
+    geometry?: Geometry;
+}): JSX.Element {
     const classes = styles();
     return (
         <>
             <div className={classes.root}>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Location Type</Typography>
-                    </p>
-                    <p>{props.location?.geoResolution}</p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Country</Typography>
-                    </p>
-                    <p>{props.location?.country}</p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Admin area 1</Typography>
-                    </p>
-                    <p>{props.location?.administrativeAreaLevel1 || 'N/A'}</p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Admin area 2</Typography>
-                    </p>
-                    <p>{props.location?.administrativeAreaLevel2 || 'N/A'}</p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Admin area 3</Typography>
-                    </p>
-                    <p>{props.location?.administrativeAreaLevel3 || 'N/A'}</p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Latitude</Typography>
-                    </p>
-                    <p>
-                        {props.location?.geometry?.latitude?.toFixed(4) || '-'}
-                    </p>
-                </div>
-                <div className={classes.column}>
-                    <p>
-                        <Typography variant="caption">Longitude</Typography>
-                    </p>
-                    <p>
-                        {props.location?.geometry?.longitude?.toFixed(4) || '-'}
-                    </p>
-                </div>
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Location type"
+                    size="small"
+                    name={`${props.locationPath}.geoResolution`}
+                    type="text"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Country"
+                    name={`${props.locationPath}.country`}
+                    type="text"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Admin area 1"
+                    name={`${props.locationPath}.administrativeAreaLevel1`}
+                    type="text"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Admin area 2"
+                    name={`${props.locationPath}.administrativeAreaLevel2`}
+                    type="text"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Admin area 3"
+                    name={`${props.locationPath}.administrativeAreaLevel3`}
+                    type="text"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Latitude"
+                    name={`${props.locationPath}.geometry.latitude`}
+                    type="number"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                <Field
+                    className={classes.field}
+                    disabled
+                    label="Longitude"
+                    name={`${props.locationPath}.geometry.longitude`}
+                    type="number"
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
             </div>
-            {props.location?.geometry !== undefined && (
+            {props.geometry && (
                 <div className={classes.mapContainer}>
                     <Divider className={classes.divider} variant="middle" />
-                    <StaticMap location={props.location}></StaticMap>
+                    <StaticMap geometry={props.geometry}></StaticMap>
                 </div>
             )}
         </>

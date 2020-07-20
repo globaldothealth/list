@@ -527,7 +527,9 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
 function MapRow(props: { location?: Location }): JSX.Element {
     return (
         <Grid item xs={8}>
-            {props.location && <StaticMap location={props.location} />}
+            {props.location?.geometry && (
+                <StaticMap geometry={props.location.geometry} />
+            )}
         </Grid>
     );
 }
