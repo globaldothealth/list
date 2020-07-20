@@ -394,10 +394,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Delete selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          const deletePromises: Promise<
+                                              unknown
+                                          >[] = [];
                                           rows.forEach((row: TableRow) =>
-                                              this.deleteCase(row),
+                                              deletePromises.push(
+                                                  this.deleteCase(row),
+                                              ),
                                           );
-                                          this.tableRef.current.onQueryChange();
+                                          Promise.all(deletePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
                                       },
                                   },
                                   {
