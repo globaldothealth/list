@@ -35,10 +35,8 @@ describe('Linelist table', function () {
         cy.contains('some notes');
         cy.contains('Edit case').should('not.exist');
         cy.get('button[title="Edit this case"]').click({ force: true });
-        cy.contains('some notes').should('not.exist');
         cy.contains('Edit case');
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains('some notes');
         cy.contains('Edit case').should('not.exist');
     });
 
