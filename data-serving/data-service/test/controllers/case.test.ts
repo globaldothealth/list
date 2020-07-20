@@ -299,7 +299,7 @@ describe('PUT', () => {
             .expect('Content-Type', /json/)
             .expect(201);
 
-        expect(await Case.collection.countDocuments()).toEqual(0);
+        expect(await Case.collection.countDocuments()).toEqual(2);
     });
     it('upsert new item without required fields should return 400', () => {
         return request(app).put('/api/cases').send({}).expect(400);

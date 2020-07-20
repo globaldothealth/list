@@ -1,7 +1,7 @@
 import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
