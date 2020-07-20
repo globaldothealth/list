@@ -18,13 +18,15 @@ describe('View case', function () {
             methodOfConfirmation: 'PCR test',
             nationalities: ['Andorrean', 'French'],
         });
-        cy.visit('cases');
-        cy.get('button[title="View this case details"]').click({ force: true });
-        cy.contains('France');
-        cy.contains('some notes');
-        cy.contains('www.example.com');
-        cy.contains('PCR test');
-        cy.contains('French');
-        cy.contains('Andorrean');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.visit(`cases/view/${resp.body.cases[0]._id}`);
+            cy.contains('France');
+            cy.contains('some notes');
+            cy.contains('www.example.com');
+            cy.contains('PCR test');
+            cy.contains('French');
+            cy.contains('Andorrean');
+        });
     });
 });

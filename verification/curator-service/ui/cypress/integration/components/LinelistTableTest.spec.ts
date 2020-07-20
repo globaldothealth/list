@@ -25,7 +25,7 @@ describe('Linelist table', function () {
         cy.contains('test@bar.com');
     });
 
-    it('Can open the edit modal', function () {
+    it('Can open and close the edit modal', function () {
         cy.addCase({
             country: 'France',
             notes: 'some notes',
@@ -33,10 +33,30 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('some notes');
-
         cy.contains('Edit case').should('not.exist');
         cy.get('button[title="Edit this case"]').click({ force: true });
+        cy.contains('some notes').should('not.exist');
         cy.contains('Edit case');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.contains('some notes');
+        cy.contains('Edit case').should('not.exist');
+    });
+
+    it('Can open and close the details modal', function () {
+        cy.addCase({
+            country: 'France',
+            notes: 'some notes',
+            sourceUrl: 'www.example.com',
+        });
+        cy.visit('/cases');
+        cy.contains('some notes');
+        cy.contains('View case').should('not.exist');
+        cy.get('button[title="View this case details"]').click({ force: true });
+        cy.contains('some notes').should('not.exist');
+        cy.contains('View case');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.contains('some notes');
+        cy.contains('View case').should('not.exist');
     });
 
     it('Can delete a case', function () {
