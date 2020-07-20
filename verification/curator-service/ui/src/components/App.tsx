@@ -8,7 +8,13 @@ import {
     Toolbar,
     Typography,
 } from '@material-ui/core';
-import { Link, Route, Switch } from 'react-router-dom';
+import {
+    Link,
+    Route,
+    RouteComponentProps,
+    Switch,
+    withRouter,
+} from 'react-router-dom';
 import { Theme, createStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -16,6 +22,7 @@ import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
+import EditCase from './EditCase';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
@@ -33,6 +40,7 @@ import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
 import Users from './Users';
+import ViewCase from './ViewCase';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
@@ -104,15 +112,12 @@ const styles = (theme: Theme) =>
         },
     });
 
-type Props = WithStyles<typeof styles>;
+interface Props extends RouteComponentProps, WithStyles<typeof styles> {}
 
 interface State {
     drawerOpen: boolean;
     user: User;
     createNewButtonAnchorEl?: Element;
-    showCaseForm: boolean;
-    caseFormId: string;
-    showBulkUpload: boolean;
 }
 
 class App extends React.Component<Props, State> {
@@ -127,9 +132,6 @@ class App extends React.Component<Props, State> {
                 roles: [],
             },
             createNewButtonAnchorEl: undefined,
-            showCaseForm: false,
-            caseFormId: '',
-            showBulkUpload: false,
         };
         // https://reactjs.org/docs/handling-events.html.
         this.toggleDrawer = this.toggleDrawer.bind(this);
@@ -137,7 +139,6 @@ class App extends React.Component<Props, State> {
         this.hasAnyRole = this.hasAnyRole.bind(this);
         this.openCreateNewPopup = this.openCreateNewPopup.bind(this);
         this.closeCreateNewPopup = this.closeCreateNewPopup.bind(this);
-        this.showCaseForm = this.showCaseForm.bind(this);
     }
 
     componentDidMount(): void {
@@ -182,12 +183,8 @@ class App extends React.Component<Props, State> {
         this.setState({ createNewButtonAnchorEl: undefined });
     }
 
-    showCaseForm(id?: string): void {
-        this.setState({ showCaseForm: true, caseFormId: id ?? '' });
-    }
-
     render(): JSX.Element {
-        const { classes } = this.props;
+        const { classes, history } = this.props;
         return (
             <div className={classes.root}>
                 <ThemeProvider theme={theme}>
@@ -266,45 +263,23 @@ class App extends React.Component<Props, State> {
                                     }}
                                 >
                                     <MenuItem
-                                        onClick={() => {
+                                        onClick={(): void => {
                                             this.closeCreateNewPopup();
-                                            this.setState({
-                                                showCaseForm: true,
-                                            });
+                                            history.push('/cases/new');
                                         }}
                                     >
                                         New line list case
                                     </MenuItem>
                                     <MenuItem
-                                        onClick={() => {
+                                        onClick={(): void => {
                                             this.closeCreateNewPopup();
-                                            this.setState({
-                                                showBulkUpload: true,
-                                            });
+                                            history.push('/cases/bulk');
                                         }}
                                     >
                                         New bulk upload
                                     </MenuItem>
                                 </Menu>
                             </>
-                        )}
-                        {/* // TODO: update case table data when CaseForm and
-                        BulkCaseForm modals are closed */}
-                        {this.state.showCaseForm && (
-                            <CaseForm
-                                user={this.state.user}
-                                onModalClose={() =>
-                                    this.setState({ showCaseForm: false })
-                                }
-                            />
-                        )}
-                        {this.state.showBulkUpload && (
-                            <BulkCaseForm
-                                user={this.state.user}
-                                onModalClose={() =>
-                                    this.setState({ showBulkUpload: false })
-                                }
-                            />
                         )}
                         <List>
                             {[
@@ -395,6 +370,57 @@ class App extends React.Component<Props, State> {
                                         onUserChange={this.getUser}
                                     />
                                 </Route>
+                            )}{' '}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/bulk">
+                                    <BulkCaseForm
+                                        user={this.state.user}
+                                        onModalClose={(): void =>
+                                            history.push('/cases')
+                                        }
+                                    />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/new">
+                                    <CaseForm
+                                        user={this.state.user}
+                                        onModalClose={(): void =>
+                                            history.push('/cases')
+                                        }
+                                    />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route
+                                    path="/cases/edit/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <EditCase
+                                                id={match.params.id}
+                                                user={this.state.user}
+                                                onModalClose={(): void =>
+                                                    history.push('/cases')
+                                                }
+                                            />
+                                        );
+                                    }}
+                                />
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route
+                                    path="/cases/view/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <ViewCase
+                                                id={match.params.id}
+                                                onModalClose={(): void =>
+                                                    history.push('/cases')
+                                                }
+                                            />
+                                        );
+                                    }}
+                                />
                             )}
                             <Route exact path="/">
                                 <Charts />
@@ -407,4 +433,4 @@ class App extends React.Component<Props, State> {
     }
 }
 
-export default withStyles(styles, {})(App);
+export default withRouter(withStyles(styles, {})(App));

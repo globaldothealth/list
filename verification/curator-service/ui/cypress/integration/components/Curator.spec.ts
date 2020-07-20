@@ -49,7 +49,6 @@ describe('Curator', function () {
         cy.contains('li', 'Accountant').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
-        cy.contains('Country');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();

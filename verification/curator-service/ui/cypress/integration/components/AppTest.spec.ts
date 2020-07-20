@@ -98,5 +98,20 @@ describe('App', function () {
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
         cy.contains('Create new COVID-19 line list case');
+        cy.url().should('eq', 'http://localhost:3002/cases/new');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
+    });
+
+    it('Can open bulk upload modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload');
+        cy.url().should('eq', 'http://localhost:3002/cases/bulk');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 });
