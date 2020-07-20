@@ -244,6 +244,25 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchUpsert:
+    post:
+      tags: [Case]
+      summary: Upserts multiple cases
+      operationId: batchUpsertCase
+      requestBody:
+        description: Cases to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseArray"
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpsert"
+        "207":
+          $ref: "#/components/responses/207BatchCaseUpsert"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/{id}:
     parameters:
       - name: id
@@ -435,7 +454,56 @@ components:
       type: array
       items:
         $ref: "#components/schemas/Location"
+    BatchCaseUpsertResponse:
+      description: Response to batch upsert case API requests
+      properties:
+        phase:
+          type: string
+          description: The last operation completed by the server
+          enum:
+            - GEOCODE
+            - VALIDATE
+            - UPSERT
+        numUpserted:
+          type: integer
+          description: The number of cases upserted by the server
+          format: int32
+          minimum: 0
+        numErrors:
+          type: integer
+          description: The number of cases found to have errors
+          format: int32
+          minimum: 0
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              message:
+                type: string
+            required:
+              - index
+              - message
+      required:
+        - phase
+        - numUpserted
+        - numErrors
+        - errors
   responses:
+    "200BatchCaseUpsert":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchCaseUpsertResponse"
+    "207BatchCaseUpsert":
+      description: Multi-Status
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchCaseUpsertResponse"
     "200Case":
       description: OK
       content:

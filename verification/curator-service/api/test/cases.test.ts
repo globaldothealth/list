@@ -250,7 +250,7 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).toHaveBeenCalledTimes(2);
-        expect(res.body.numCreated).toBe(2);
+        expect(res.body.numUpserted).toBe(2);
         expect(res.body.numErrors).toBe(0);
         expect(res.body.phase).toBe('UPSERT');
         expect(res.body.errors).toHaveLength(0);
@@ -290,7 +290,7 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).not.toHaveBeenCalled();
         expect(mockedAxios.put).not.toHaveBeenCalled();
-        expect(res.body.numCreated).toBe(0);
+        expect(res.body.numUpserted).toBe(0);
         expect(res.body.numErrors).toBe(2);
         expect(res.body.phase).toBe('GEOCODE');
         expect(res.body.errors).toEqual([
@@ -345,7 +345,7 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).not.toHaveBeenCalled();
-        expect(res.body.numCreated).toBe(0);
+        expect(res.body.numUpserted).toBe(0);
         expect(res.body.numErrors).toBe(2);
         expect(res.body.phase).toBe('VALIDATE');
         expect(res.body.errors).toEqual(validationErrors);
