@@ -1,6 +1,7 @@
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
+import { UserDocument } from '../model/user';
 import axios from 'axios';
 
 class InvalidParamError extends Error {}
@@ -67,7 +68,10 @@ export default class CasesController {
         try {
             const response = await axios.put(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {
@@ -90,7 +94,10 @@ export default class CasesController {
             }
             const response = await axios.put(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {
@@ -117,7 +124,10 @@ export default class CasesController {
             }
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {
