@@ -50,10 +50,8 @@ describe('Linelist table', function () {
         cy.contains('some notes');
         cy.contains('View case').should('not.exist');
         cy.get('button[title="View this case details"]').click({ force: true });
-        cy.contains('some notes').should('not.exist');
         cy.contains('View case');
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains('some notes');
         cy.contains('View case').should('not.exist');
     });
 
