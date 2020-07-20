@@ -1,17 +1,8 @@
-import {
-    RevisionMetadataDocument,
-    revisionMetadataSchema,
-} from '../../src/model/revision-metadata';
-
 import { Error } from 'mongoose';
+import { RevisionMetadata } from '../../src/model/revision-metadata';
 import fullModel from './data/revision-metadata.full.json';
 import minimalModel from './data/revision-metadata.minimal.json';
 import mongoose from 'mongoose';
-
-const RevisionMetadata = mongoose.model<RevisionMetadataDocument>(
-    'RevisionMetadata',
-    revisionMetadataSchema,
-);
 
 describe('validate', () => {
     it('revision metadata without revision number is invalid', async () => {

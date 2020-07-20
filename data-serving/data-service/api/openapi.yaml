@@ -96,8 +96,12 @@ paths:
             schema:
               allOf:
                 - $ref: "#/components/schemas/Case"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
               required:
                 - caseReference
+                - curator
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -161,7 +165,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Case"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -418,8 +428,17 @@ components:
           required:
             - latitude
             - longitude
+    Curator:
+      description: The logged-in user who submitted the case.
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
     NewCase:
-      description: A "#/components/schemas/Case" with additional required fields for newly-created cases
+      description: >
+        A "#/components/schemas/Case" with additional required fields for
+        newly-created cases.
       allOf:
         - $ref: "#/components/schemas/Case"
       properties:
@@ -433,11 +452,14 @@ components:
             - geoResolution
             - geometry
             - name
+        curator:
+          $ref: "#/components/schemas/Curator"
       required:
         - caseReference
         - location
         - events
         - revisionMetadata
+        - curator
   responses:
     "200Case":
       description: OK
