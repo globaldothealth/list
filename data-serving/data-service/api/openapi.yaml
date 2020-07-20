@@ -222,7 +222,10 @@ components:
             additionalSources:
               type: array
               items:
-                type: string
+                type: object
+                properties:
+                  sourceUrl:
+                    type: string
         demographics:
           type: object
           properties:
