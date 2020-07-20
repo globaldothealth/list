@@ -222,7 +222,10 @@ components:
             additionalSources:
               type: array
               items:
-                type: string
+                type: object
+                properties:
+                  sourceUrl:
+                    type: string
         demographics:
           type: object
           properties:
@@ -244,32 +247,7 @@ components:
             occupation:
               type: string
         location:
-          type: object
-          properties:
-            country:
-              type: string
-            administrativeAreaLevel1:
-              type: string
-            administrativeAreaLevel2:
-              type: string
-            administrativeAreaLevel3:
-              type: string
-            place:
-              type: string
-            name:
-              type: string
-            geoResolution: 
-              type: string
-            geometry:
-              type: object
-              properties:
-                latitude:
-                  type: number
-                longitude:
-                  type: number
-              required:
-                - latitude
-                - longitude
+          $ref: "#/components/schemas/Location"
         events:
           description: > 
             An event with name "confirmed" must be specified. Other event names
@@ -282,18 +260,7 @@ components:
               name:
                 type: string
               dateRange:
-                type: object
-                properties:
-                  start:
-                    oneOf:
-                      - type: string
-                      - type: object
-                      - type: number
-                  end:
-                    oneOf:
-                      - type: string
-                      - type: object
-                      - type: number
+                $ref: "#/components/schemas/DateRange"
               value:
                 type: string
         symptoms:
@@ -331,18 +298,65 @@ components:
                 type: string
         travelHistory:
           type: object
+          properties:
+            traveledPrior30Days:
+              type: boolean
+            travel:
+              type: array
+              items:
+                type: object
+                properties:
+                  dateRange:
+                    $ref: "#/components/schemas/DateRange"
+                  location:
+                    $ref: "#/components/schemas/Location"
+                  purpose:
+                    type: string
+                  methods:
+                    type: array
+                    items:
+                      type: string
         genomeSequences:
           type: array
           items:
             type: object
+            properties:
+              sampleCollectionDate:
+                $ref: "#/components/schemas/Date"
+              repositoryUrl:
+                type: string
+              sequenceId:
+                type: string
+              sequenceName:
+                type: string
+              sequenceLength:
+                type: integer
+                format: int64
+                minimum: 0
         pathogens:
           type: array
           items:
             type: object
+            properties:
+              name:
+                type: string
+              id:
+                type: integer
+                format: int32
+                minimum: 0
         notes:
           type: string
         revisionMetadata:
           type: object
+          properties:
+            revisionNumber:
+              type: integer
+              format: int32
+              minimum: 0
+            creationMetadata:
+              $ref: "#/components/schemas/EditMetadata"
+            editMetadata:
+              $ref: "#/components/schemas/EditMetadata"
     CaseArray:
       type: object
       properties:
@@ -352,6 +366,58 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    Date:
+      oneOf:
+        - type: string
+        - type: object
+        - type: number
+    DateRange:
+      type: object
+      properties:
+        start:
+          $ref: "#/components/schemas/Date"
+        end:
+          $ref: "#/components/schemas/Date"
+    EditMetadata:
+      type: object
+      properties:
+        curator:
+          type: string
+        date:
+          $ref: "#/components/schemas/Date"
+        notes:
+          type: string
+    Location:
+      type: object
+      properties:
+        country:
+          type: string
+        administrativeAreaLevel1:
+          type: string
+        administrativeAreaLevel2:
+          type: string
+        administrativeAreaLevel3:
+          type: string
+        place:
+          type: string
+        name:
+          type: string
+        geoResolution: 
+          type: string
+        geometry:
+          type: object
+          properties:
+            latitude:
+              type: number
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              minimum: -180
+              maximum: 180
+          required:
+            - latitude
+            - longitude
     NewCase:
       description: A "#/components/schemas/Case" with additional required fields for newly-created cases
       allOf:
