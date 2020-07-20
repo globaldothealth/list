@@ -101,6 +101,34 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Batch validates cases.
+ *
+ * Handles HTTP POST /api/cases/batchValidate.
+ */
+export const batchValidate = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const errors: { index: number; message: string }[] = [];
+        await Promise.all(
+            // We're about to validate this data; any is fine, here.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            req.body.cases.map((c: any, index: number) => {
+                return new Case(c).validate().catch((e) => {
+                    errors.push({ index: index, message: e.message });
+                });
+            }),
+        );
+        res.status(207).json({ errors: errors });
+        return;
+    } catch (err) {
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
  * Update a specific case.
  *
  * Handles HTTP PUT /api/cases/:id.
