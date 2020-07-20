@@ -151,6 +151,8 @@ export default class CasesController {
             }
 
             // 3. Upsert each case.
+            // Consider adding a batchUpsert endpoint on the data service if
+            // this slows us down too much.
             for (let index = 0; index < req.body.cases.length; index++) {
                 const c = req.body.cases[index];
                 await axios.put(this.dataServerURL + '/api/cases', c);
