@@ -193,10 +193,18 @@ describe('Curator', function () {
             cy.contains('Albanian');
 
             // Location.
-            cy.contains('France');
-            cy.contains('Country');
-            cy.contains('45.75');
-            cy.contains('4.84');
+            cy.get('input[name="location.country"]').should(
+                'have.value',
+                'France',
+            );
+            cy.get('input[name="location.geometry.latitude"]').should(
+                'have.value',
+                '45.75889',
+            );
+            cy.get('input[name="location.geometry.longitude"]').should(
+                'have.value',
+                '4.84139',
+            );
             // Events.
             cy.get('input[name="onsetSymptomsDate"]').should(
                 'have.value',
@@ -288,6 +296,7 @@ describe('Curator', function () {
             cy.contains('Afghan, Albanian');
             cy.contains('Asian');
             cy.contains('France');
+            // Rounded numbers when displayed.
             cy.contains('45.7589');
             cy.contains('4.8414');
             // Events.
