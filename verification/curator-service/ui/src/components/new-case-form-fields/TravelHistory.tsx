@@ -169,7 +169,8 @@ export default function Events(): JSX.Element {
                                                                         index
                                                                     ]?.methods
                                                                 }
-                                                                multiple={true}
+                                                                multiple
+                                                                freeSolo
                                                                 optionsList={
                                                                     travelMethods
                                                                 }

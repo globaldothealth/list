@@ -6,6 +6,7 @@ import {
 } from '@testing-library/react';
 
 import BulkCaseForm from './BulkCaseForm';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
@@ -36,12 +37,14 @@ afterEach(() => {
 
 it('renders source and csv upload widgets', async () => {
     const { getByRole, getByTestId, getByText } = render(
-        <BulkCaseForm
-            user={user}
-            onModalClose={(): void => {
-                return;
-            }}
-        />,
+        <MemoryRouter>
+            <BulkCaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
@@ -59,12 +62,14 @@ it('renders source and csv upload widgets', async () => {
 
 it('displays spinner post upload', async () => {
     const { getByTestId, getByText } = render(
-        <BulkCaseForm
-            user={user}
-            onModalClose={(): void => {
-                return;
-            }}
-        />,
+        <MemoryRouter>
+            <BulkCaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
