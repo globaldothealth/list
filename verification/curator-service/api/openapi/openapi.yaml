@@ -720,5 +720,5 @@ components:
     "500":
       description: Internal server error
 servers:
-  - url: http://localhost:3002/api
+  - url: http://localhost:3001/api
     description: Local server
