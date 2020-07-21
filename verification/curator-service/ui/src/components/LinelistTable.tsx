@@ -1,12 +1,12 @@
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
+import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import AddIcon from '@material-ui/icons/AddOutlined';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import React from 'react';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
@@ -20,18 +20,19 @@ interface ListResponse {
 interface LinelistTableState {
     url: string;
     error: string;
+    pageSize: number;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
 interface TableRow {
     id: string;
     // demographics
-    sex: string;
+    gender: string;
     age: [number, number]; // start, end.
     ethnicity: string;
     // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
     nationalities: string;
-    profession: string;
+    occupation: string;
     country: string;
     adminArea1: string;
     adminArea2: string;
@@ -59,18 +60,36 @@ interface TableRow {
     admittedToHospital: string;
 }
 
-// Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends RouteComponentProps {
+interface LocationState {
+    newCaseIds: string[];
+    editedCaseIds: string[];
+    bulkMessage: string;
+}
+
+interface Props extends RouteComponentProps<never, never, LocationState> {
     user: User;
 }
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
+    tableRef: RefObject<any> = React.createRef();
+    unlisten: () => void;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             url: '/api/cases/',
             error: '',
+            pageSize: 50,
         };
+        // history.location.state can be updated with newCaseIds, on which we
+        // must refresh the table
+        this.unlisten = this.props.history.listen((_, __) =>
+            this.tableRef.current?.onQueryChange(),
+        );
+    }
+
+    componentWillUnmount(): void {
+        this.unlisten();
     }
 
     deleteCase(rowData: TableRow): Promise<unknown> {
@@ -94,18 +113,36 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.state.error}
                     </MuiAlert>
                 )}
+                {!this.props.location.state?.bulkMessage &&
+                    (this.props.location.state?.newCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.newCaseIds} added`}
+                        </MuiAlert>
+                    )}
+                {!this.props.location.state?.bulkMessage &&
+                    (this.props.location.state?.editedCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.editedCaseIds} edited`}
+                        </MuiAlert>
+                    )}
+                {this.props.location.state?.bulkMessage && (
+                    <MuiAlert elevation={6} severity="info" variant="outlined">
+                        {this.props.location.state.bulkMessage}
+                    </MuiAlert>
+                )}
                 <MaterialTable
+                    tableRef={this.tableRef}
                     columns={[
                         {
-                            title: 'id',
+                            title: 'Case ID',
                             field: 'id',
                             type: 'string',
-                            hidden: true,
                         },
                         {
-                            title: 'Sex',
-                            field: 'sex',
-                            lookup: { Female: 'Female', Male: 'Male' },
+                            title: 'Gender',
+                            field: 'gender',
                         },
                         {
                             title: 'Age',
@@ -116,7 +153,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
                         },
                         {
-                            title: 'Ethnicity',
+                            title: 'Race / Ethnicity',
                             field: 'ethnicity',
                         },
                         {
@@ -124,8 +161,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'nationalities',
                         },
                         {
-                            title: 'Profession',
-                            field: 'profession',
+                            title: 'Occupation',
+                            field: 'occupation',
                         },
                         {
                             title: 'Location',
@@ -202,7 +239,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
-                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             const trimmedQ = query.search.trim();
                             // TODO: We should probably use lodash.throttle on searches.
@@ -223,7 +260,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         );
                                         flattenedCases.push({
                                             id: c._id,
-                                            sex: c.demographics?.sex,
+                                            gender: c.demographics?.gender,
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
@@ -233,8 +270,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             nationalities: c.demographics?.nationalities?.join(
                                                 ', ',
                                             ),
-                                            profession:
-                                                c.demographics?.profession,
+                                            occupation:
+                                                c.demographics?.occupation,
                                             country: c.location.country,
                                             adminArea1:
                                                 c.location
@@ -314,55 +351,104 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        pageSize: 10,
+                        selection: true,
+                        pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         actionsColumnIndex: -1,
+                        maxBodyHeight: 'calc(100vh - 18em)',
+                        // TODO: style highlighted rows to spec
+                        rowStyle: (rowData) =>
+                            (
+                                this.props.location.state?.newCaseIds ?? []
+                            ).includes(rowData.id) ||
+                            (
+                                this.props.location.state?.editedCaseIds ?? []
+                            ).includes(rowData.id)
+                                ? { backgroundColor: '#E8F0FE' }
+                                : {},
                     }}
-                    actions={(this.props.user.roles.includes('curator')
-                        ? [
-                              {
-                                  icon: () => (
-                                      <span aria-label="add">
-                                          <AddIcon />
-                                      </span>
-                                  ),
-                                  tooltip: 'Submit new case',
-                                  isFreeAction: true,
-                                  onClick: (): void => {
-                                      history.push('/cases/new');
+                    onChangeRowsPerPage={(newPageSize: number) => {
+                        this.setState({ pageSize: newPageSize });
+                        this.tableRef.current.onQueryChange();
+                    }}
+                    // actions cannot be a function https://github.com/mbrn/material-table/issues/676
+                    actions={
+                        this.props.user.roles.includes('curator')
+                            ? [
+                                  {
+                                      icon: () => (
+                                          <span aria-label="edit">
+                                              <EditIcon />
+                                          </span>
+                                      ),
+                                      tooltip: 'Edit this case',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, row: any): void => {
+                                          // Somehow the templating system doesn't think row has an id property but it has.
+                                          const id = (row as TableRow).id;
+                                          history.push(`/cases/edit/${id}`);
+                                      },
+                                      position: 'row',
                                   },
-                              },
-                              {
-                                  icon: () => (
-                                      <span aria-label="edit">
-                                          <EditIcon />
-                                      </span>
-                                  ),
-                                  tooltip: 'Edit this case',
-                                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                  onClick: (_: any, row: any): void => {
-                                      // Somehow the templating system doesn't think row has an id property but it has.
-                                      const id = (row as TableRow).id;
-                                      history.push(`/cases/edit/${id}`);
+                                  // This action is for deleting selected rows.
+                                  // The action for deleting single rows is in the
+                                  // editable section.
+                                  {
+                                      icon: () => (
+                                          <span aria-label="delete all">
+                                              <DeleteIcon />
+                                          </span>
+                                      ),
+                                      tooltip: 'Delete selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          const deletePromises: Promise<
+                                              unknown
+                                          >[] = [];
+                                          rows.forEach((row: TableRow) =>
+                                              deletePromises.push(
+                                                  this.deleteCase(row),
+                                              ),
+                                          );
+                                          Promise.all(deletePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
+                                      },
                                   },
-                              },
-                          ]
-                        : []
-                    ).concat([
-                        {
-                            icon: () => (
-                                <span aria-label="details">
-                                    <VisibilityIcon />
-                                </span>
-                            ),
-                            tooltip: 'View this case details',
-                            onClick: (e, row): void => {
-                                // Somehow the templating system doesn't think row has an id property but it has.
-                                const id = (row as TableRow).id;
-                                history.push(`/cases/view/${id}`);
-                            },
-                        },
-                    ])}
+                                  {
+                                      icon: () => (
+                                          <span aria-label="details">
+                                              <VisibilityIcon />
+                                          </span>
+                                      ),
+                                      onClick: (e, row): void => {
+                                          // Somehow the templating system doesn't think row has an id property but it has.
+                                          const id = (row as TableRow).id;
+                                          history.push(`/cases/view/${id}`);
+                                      },
+                                      tooltip: 'View this case details',
+                                      position: 'row',
+                                  },
+                              ]
+                            : [
+                                  {
+                                      icon: () => (
+                                          <span aria-label="details">
+                                              <VisibilityIcon />
+                                          </span>
+                                      ),
+                                      onClick: (e, row): void => {
+                                          // Somehow the templating system doesn't think row has an id property but it has.
+                                          const id = (row as TableRow).id;
+                                          history.push(`/cases/view/${id}`);
+                                      },
+                                      tooltip: 'View this case details',
+                                      position: 'row',
+                                  },
+                              ]
+                    }
                     editable={
                         this.props.user.roles.includes('curator')
                             ? {

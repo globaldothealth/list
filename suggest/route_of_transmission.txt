@@ -6,5 +6,5 @@ Iatrogenic
 Oral
 Sexual
 Unknown
-Vector born
+Vector borne
 Vertical (Parent to child)

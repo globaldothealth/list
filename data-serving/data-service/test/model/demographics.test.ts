@@ -50,15 +50,6 @@ describe('validate', () => {
         });
     });
 
-    it('an unknown sex is invalid', async () => {
-        return new Demographics({
-            ...fullModel,
-            ...{ sex: 'Some free text' },
-        }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
     it('a minimal demographics document is valid', async () => {
         return new Demographics(minimalModel).validate();
     });

@@ -5,10 +5,17 @@ describe('App', function () {
         cy.visit('/cases');
         cy.url().should('eq', 'http://localhost:3002/cases');
 
-        cy.get('button[aria-label="open drawer"]').click();
         cy.contains('Home');
-        cy.get('span').contains('Home').click();
+        cy.contains('span', 'Home').click();
         cy.url().should('eq', 'http://localhost:3002/');
+    });
+
+    it('Shows charts on home page', function () {
+        cy.visit('/');
+
+        cy.contains('Completeness');
+        cy.contains('Cumulative');
+        cy.contains('Freshness');
     });
 
     it('shows login button when logged out', function () {
@@ -27,29 +34,22 @@ describe('App', function () {
     it('Homepage with logged out user', function () {
         cy.visit('/');
 
-        cy.contains('Please login');
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile').should('not.exist');
         cy.contains('Manage users').should('not.exist');
-    });
-
-    it('Charts', function () {
-        cy.visit('/charts');
-
-        cy.contains('Completeness');
-        cy.contains('Cumulative');
-        cy.contains('Freshness');
     });
 
     it('Homepage with logged in user with no roles', function () {
         cy.login({ roles: [] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
     });
@@ -58,9 +58,10 @@ describe('App', function () {
         cy.login({ roles: ['admin'] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users');
     });
@@ -69,10 +70,11 @@ describe('App', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/');
 
+        cy.contains('Create new');
+        cy.contains('Home');
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Profile');
-        cy.contains('Charts');
         cy.contains('Manage users').should('not.exist');
     });
 
@@ -80,10 +82,36 @@ describe('App', function () {
         cy.login({ roles: ['reader'] });
         cy.visit('/');
 
+        cy.contains('Create new').should('not.exist');
+        cy.contains('Home');
         cy.contains('Linelist');
         cy.contains('Sources');
-        cy.contains('Charts');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
+    });
+
+    it('Can open new case modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.contains('Create new COVID-19 line list case').should('not.exist');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New line list case').click();
+        cy.contains('Create new COVID-19 line list case');
+        cy.url().should('eq', 'http://localhost:3002/cases/new');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
+    });
+
+    it('Can open bulk upload modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
+        cy.contains('New bulk upload');
+        cy.url().should('eq', 'http://localhost:3002/cases/bulk');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
     });
 });

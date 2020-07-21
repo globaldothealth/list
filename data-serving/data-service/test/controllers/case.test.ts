@@ -7,6 +7,11 @@ import request from 'supertest';
 
 let mongoServer: MongoMemoryServer;
 
+const invalidCase = {
+    ...minimalCase,
+    demographics: { ageRange: { start: 400 } },
+};
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
 });
@@ -119,17 +124,20 @@ describe('GET', () => {
                 .expect('Content-Type', /json/);
         });
         it('rejects negative page param', (done) => {
-            request(app).get('/api/cases?page=-7').expect(422, done);
+            request(app).get('/api/cases?page=-7').expect(400, done);
         });
         it('rejects negative limit param', (done) => {
-            request(app).get('/api/cases?page=1&limit=-2').expect(422, done);
+            request(app).get('/api/cases?page=1&limit=-2').expect(400, done);
         });
     });
 });
 
 describe('POST', () => {
-    it('create with invalid input should return 422', () => {
-        return request(app).post('/api/cases').send({}).expect(422);
+    it('create with input missing required properties should return 400', () => {
+        return request(app).post('/api/cases').send({}).expect(400);
+    });
+    it('create with required properties but invalid input should return 422', () => {
+        return request(app).post('/api/cases').send(invalidCase).expect(422);
     });
     it('create with valid input should return 201 OK', async () => {
         return request(app)
@@ -137,6 +145,54 @@ describe('POST', () => {
             .send(minimalCase)
             .expect('Content-Type', /json/)
             .expect(201);
+    });
+    it('create with input missing required properties and validate_only should return 400', async () => {
+        return request(app)
+            .post('/api/cases?validate_only=true')
+            .send({})
+            .expect(400);
+    });
+    it('create with valid input and validate_only should not save case', async () => {
+        const res = await request(app)
+            .post('/api/cases?validate_only=true')
+            .send(minimalCase)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(await Case.collection.countDocuments()).toEqual(0);
+        expect(res.body._id).not.toHaveLength(0);
+    });
+    it('batch validate with no body should return 415', () => {
+        return request(app).post('/api/cases/batchValidate').expect(415);
+    });
+    it('batch validate with no cases should return 400', () => {
+        return request(app)
+            .post('/api/cases/batchValidate')
+            .send({})
+            .expect(400);
+    });
+    it('batch validate with empty cases should return empty 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(0);
+    });
+    it('batch validate with only valid cases should return empty 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [minimalCase] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(0);
+    });
+    it('batch validate returns errors for invalid cases in 207', async () => {
+        const res = await request(app)
+            .post('/api/cases/batchValidate')
+            .send({ cases: [minimalCase, invalidCase] })
+            .expect(207);
+        expect(res.body.errors).toHaveLength(1);
+        expect(res.body.errors[0].index).toBe(1);
+        expect(res.body.errors[0].message).toMatch('Case validation failed');
     });
 });
 
@@ -166,11 +222,12 @@ describe('PUT', () => {
     it('update absent item should return 404 NOT FOUND', () => {
         return request(app)
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
+            .send({})
             .expect(404);
     });
     it('upsert present item should return 200 OK', async () => {
         const c = new Case(minimalCase);
-        const sourceId = 'abc123';
+        const sourceId = '5ea86423bae6982635d2e1f8';
         const entryId = 'def456';
         c.set('caseReference.sourceId', sourceId);
         c.set('caseReference.sourceEntryId', entryId);
@@ -201,7 +258,7 @@ describe('PUT', () => {
             .expect(201);
     });
     it('upsert items without sourceEntryId should return 201 CREATED', async () => {
-        const sharedSourceId = 'abc123';
+        const sharedSourceId = '5ea86423bae6982635d2e1f8';
         const firstUniqueCase = new Case(minimalCase);
         firstUniqueCase.set('caseReference.sourceId', sharedSourceId);
         await firstUniqueCase.save();
@@ -216,12 +273,15 @@ describe('PUT', () => {
 
         expect(await secondUniqueCase.collection.countDocuments()).toEqual(2);
     });
+    it('upsert new item without required fields should return 400', () => {
+        return request(app).put('/api/cases').send({}).expect(400);
+    });
     it('upsert new item with invalid input should return 422', () => {
-        return request(app).put('/api/cases').send({}).expect(422);
+        return request(app).put('/api/cases').send(invalidCase).expect(422);
     });
     it('invalid upsert present item should return 422', async () => {
         const c = new Case(minimalCase);
-        const sourceId = 'abc123';
+        const sourceId = '5ea86423bae6982635d2e1f8';
         const entryId = 'def456';
         c.set('caseReference.sourceId', sourceId);
         c.set('caseReference.sourceEntryId', entryId);

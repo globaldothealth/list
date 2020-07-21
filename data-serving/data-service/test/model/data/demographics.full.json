@@ -3,8 +3,8 @@
         "start": 20,
         "end": 29
     },
-    "sex": "Female",
-    "profession": "Horse trainer",
+    "gender": "Female",
+    "occupation": "Horse trainer",
     "nationalities": ["American", "Swedish"],
     "ethnicity": "Other"
 }
