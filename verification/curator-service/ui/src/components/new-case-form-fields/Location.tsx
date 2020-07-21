@@ -1,9 +1,12 @@
-import { Divider } from '@material-ui/core';
+import { Divider, MenuItem } from '@material-ui/core';
+import { Select, TextField } from 'formik-material-ui';
+
 import { FastField } from 'formik';
+import FormControl from '@material-ui/core/FormControl';
 import { Geometry } from '../Case';
+import InputLabel from '@material-ui/core/InputLabel';
 import React from 'react';
 import StaticMap from '../StaticMap';
-import { TextField } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 
 const styles = makeStyles(() => ({
@@ -32,22 +35,29 @@ export default function Location(props: {
     return (
         <>
             <div className={classes.root}>
+                <FormControl className={classes.field}>
+                    <InputLabel htmlFor={`${props.locationPath}.geoResolution`}>
+                        Geo resolution
+                    </InputLabel>
+                    <FastField
+                        as="select"
+                        id={`${props.locationPath}.geoResolution`}
+                        name={`${props.locationPath}.geoResolution`}
+                        type="text"
+                        component={Select}
+                    >
+                        {['Point', 'Admin3', 'Admin2', 'Admin1', 'Country'].map(
+                            (res) => (
+                                <MenuItem key={res} value={res}>
+                                    {res}
+                                </MenuItem>
+                            ),
+                        )}
+                    </FastField>
+                </FormControl>
+
                 <FastField
                     className={classes.field}
-                    disabled
-                    label="Location type"
-                    size="small"
-                    required
-                    name={`${props.locationPath}.geoResolution`}
-                    type="text"
-                    component={TextField}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                />
-                <FastField
-                    className={classes.field}
-                    disabled
                     label="Country"
                     name={`${props.locationPath}.country`}
                     type="text"
@@ -59,7 +69,6 @@ export default function Location(props: {
                 />
                 <FastField
                     className={classes.field}
-                    disabled
                     label="Admin area 1"
                     name={`${props.locationPath}.administrativeAreaLevel1`}
                     type="text"
@@ -70,7 +79,6 @@ export default function Location(props: {
                 />
                 <FastField
                     className={classes.field}
-                    disabled
                     label="Admin area 2"
                     name={`${props.locationPath}.administrativeAreaLevel2`}
                     type="text"
@@ -81,7 +89,6 @@ export default function Location(props: {
                 />
                 <FastField
                     className={classes.field}
-                    disabled
                     label="Admin area 3"
                     name={`${props.locationPath}.administrativeAreaLevel3`}
                     type="text"
@@ -92,7 +99,6 @@ export default function Location(props: {
                 />
                 <FastField
                     className={classes.field}
-                    disabled
                     label="Latitude"
                     name={`${props.locationPath}.geometry.latitude`}
                     type="number"
@@ -104,7 +110,6 @@ export default function Location(props: {
                 />
                 <FastField
                     className={classes.field}
-                    disabled
                     label="Longitude"
                     name={`${props.locationPath}.geometry.longitude`}
                     type="number"
