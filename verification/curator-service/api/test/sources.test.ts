@@ -117,7 +117,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
 
-        // Fetch inexistant page.
+        // Fetch nonexistant page.
         res = await curatorRequest
             .get('/api/sources?page=42&limit=10')
             .expect(200)
@@ -128,10 +128,10 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
     it('rejects negative page param', (done) => {
-        curatorRequest.get('/api/sources?page=-7').expect(422, done);
+        curatorRequest.get('/api/sources?page=-7').expect(400, done);
     });
     it('rejects negative limit param', (done) => {
-        curatorRequest.get('/api/sources?page=1&limit=-2').expect(422, done);
+        curatorRequest.get('/api/sources?page=1&limit=-2').expect(400, done);
     });
     it('one existing item should return 200', async () => {
         const source = await new Source({
@@ -213,9 +213,13 @@ describe('PUT', () => {
             source.set('name', newName).toAwsRuleDescription(),
         );
     });
-    it('cannot update an inexistent source', (done) => {
+    it('cannot update an nonexistent source', (done) => {
         curatorRequest
-            .put('/api/sources/424242424242424242424242')
+            .put('/api/sources/5ea86423bae6982635d2e1f8')
+            .send({
+                name: 'test-source',
+                origin: { url: 'http://foo.bar' },
+            })
             .expect(404, done);
     });
     it('should not update to an invalid source', async () => {
@@ -272,7 +276,10 @@ describe('POST', () => {
         );
     });
     it('should not create invalid source', async () => {
-        const res = await curatorRequest.post('/api/sources').expect(422);
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send({})
+            .expect(422);
         expect(res.body).toMatch('Enter a name');
     });
 });

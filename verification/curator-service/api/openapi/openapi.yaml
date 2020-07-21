@@ -10,6 +10,25 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
 paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Authorize a user for the given roles
+      operationId: registerAuth
+      requestBody:
+        description: User to authorize
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Auth"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
   /suggest/locations:
     get:
       tags: [Location]
@@ -57,6 +76,13 @@ paths:
         - name: url
           in: query
           description: Origin URL substring on which to filter the result set
+          required: false
+          allowEmptyValue: true
+          allowReserved: true
+          schema:
+            type: string
+        - name: access_token
+          in: query
           required: false
           schema:
             type: string
@@ -183,6 +209,14 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: q
+          in: query
+          description: The search query
+          required: false
+          allowEmptyValue: true
+          allowReserved: true
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -205,6 +239,15 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/NewCase"
+      parameters:
+        - name: validate_only
+          in: query
+          description: Whether to validate the case without creating it
+          required: false
+          schema:
+            type: boolean
+            default: false
+          allowEmptyValue: true
       responses:
         "201":
           $ref: "#/components/responses/201Case"
@@ -328,6 +371,45 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /geocode/seed:
+    post:
+      tags: [Geocode]
+      summary: Adds geocodes to the geocoding database
+      operationId: seedGeocodes
+      requestBody:
+        description: A single geocode record
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+  /geocode/clear:
+    post:
+      tags: [Geocode]
+      summary: Clears geocodes from the geocoding database
+      operationId: clearGeocodes
+      responses:
+        "200":
+          description: OK
+  /geocode/suggest:
+    get:
+      tags: [Geocode]
+      summary: Suggests geocodes for a given query string
+      operationId: suggestGeocodes
+      parameters:
+        - name: q
+          in: query
+          description: The location string for which to find geocodes
+          required: true
+          allowReserved: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/200GeocodeArray"
   /users:
     get:
       tags: [User]
@@ -383,7 +465,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Roles"
+              $ref: "#/components/schemas/RoleArray"
       responses:
         "200":
           $ref: "#/components/responses/200User"
@@ -404,7 +486,7 @@ paths:
       operationId: listUserRoles
       responses:
         "200":
-          $ref: "#/components/responses/200Roles"
+          $ref: "#/components/responses/200RoleArray"
         "403":
           $ref: "#/components/responses/403"
         "500":
@@ -416,36 +498,87 @@ components:
       allOf:
         - $ref: "#/components/schemas/NewSource"
         - type: object
+          # TODO: Define Source object.
     SourceArray:
-      type: array
+      type: object
+      properties:
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Source"
+        nextPage:
+          type: integer
+        total:
+          type: integer
       items:
         $ref: "#/components/schemas/Source"
     NewSource:
       description: The subset of "#/components/schemas/Source" required to create the entity
       type: object
+          # TODO: Define NewSource object.
     Case:
       description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
       allOf:
         - $ref: "#/components/schemas/NewCase"
         - type: object
+          # TODO: Define Case object.
     CaseArray:
+      type: object
+      properties:
+        cases:
+          type: array
+          items:
+            $ref: "#/components/schemas/Case"
+      required:
+        - cases
+    Geocode:
+      type: object
+      # TODO: Define Geocode object.
+    GeocodeArray:
       type: array
       items:
-        $ref: "#/components/schemas/Case"
+        $ref: "#/components/schemas/Geocode"
     NewCase:
       description: The subset of "#/components/schemas/Case" required to create the entity
       type: object
+      # TODO: Define NewCase object.
     User:
       description: A user
       type: object
+      properties:
+        allOf:
+          $ref: "#/components/schemas/RoleArray"
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        googleID:
+          type: string
+      required:
+        - email
     UserArray:
-      type: array
-      items:
-        $ref: "#/components/schemas/User"
-    Roles:
-      type: array
-      items:
-        type: string
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+    Role:
+      type: string
+      enum:
+        - admin
+        - curator
+        - reader
+    RoleArray:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
     Location:
       description: A geo location
       type: object
@@ -453,7 +586,7 @@ components:
       description: A list of geo locations
       type: array
       items:
-        $ref: "#components/schemas/Location"
+        $ref: "#/components/schemas/Location"
     BatchCaseUpsertResponse:
       description: Response to batch upsert case API requests
       properties:
@@ -492,6 +625,12 @@ components:
         - numErrors
         - errors
   responses:
+    "200Auth":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
     "200BatchCaseUpsert":
       description: OK
       content:
@@ -522,6 +661,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Case"
+    "200GeocodeArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GeocodeArray"
     "200Source":
       description: OK
       content:
@@ -552,12 +697,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UserArray"
-    "200Roles":
+    "200RoleArray":
       description: OK
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Roles"
+            $ref: "#/components/schemas/RoleArray"
     "200LocationArray":
       description: OK
       content:
@@ -575,5 +720,5 @@ components:
     "500":
       description: Internal server error
 servers:
-  - url: http://localhost:3001/api
+  - url: http://localhost:3002/api
     description: Local server
