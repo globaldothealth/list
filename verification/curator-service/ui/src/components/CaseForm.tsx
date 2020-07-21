@@ -772,6 +772,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     <div className={classes.formSection}>
                                         <Source
                                             initialValue={values.caseReference}
+                                            hasSourceEntryId={true}
                                         ></Source>
                                     </div>
                                     <div className={classes.formSection}>

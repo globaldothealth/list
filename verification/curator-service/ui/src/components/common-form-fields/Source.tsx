@@ -7,7 +7,7 @@ import {
     DialogTitle,
     Typography,
 } from '@material-ui/core';
-import { Field, useFormikContext } from 'formik';
+import { FastField, Field, useFormikContext } from 'formik';
 
 import { CaseReference as CaseRef } from '../Case';
 import FieldTitle from './FieldTitle';
@@ -21,6 +21,7 @@ import { throttle } from 'lodash';
 
 interface SourceProps {
     initialValue?: CaseRef;
+    hasSourceEntryId?: boolean;
 }
 
 // TODO: format this text to have newlines in it
@@ -41,6 +42,16 @@ export default class Source extends React.Component<SourceProps, {}> {
                     <SourcesAutocomplete
                         initialValue={this.props.initialValue}
                     />
+                    {this.props.hasSourceEntryId && (
+                        <FastField
+                            label="Source entry ID"
+                            name="caseReference.sourceEntryId"
+                            type="text"
+                            data-testid="sourceEntryId"
+                            component={TextField}
+                            fullWidth
+                        />
+                    )}
                 </fieldset>
             </Scroll.Element>
         );
