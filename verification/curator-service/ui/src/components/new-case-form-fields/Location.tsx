@@ -36,7 +36,10 @@ export default function Location(props: {
         <>
             <div className={classes.root}>
                 <FormControl className={classes.field}>
-                    <InputLabel htmlFor={`${props.locationPath}.geoResolution`}>
+                    <InputLabel
+                        htmlFor={`${props.locationPath}.geoResolution`}
+                        shrink
+                    >
                         Geo resolution
                     </InputLabel>
                     <FastField
@@ -55,7 +58,17 @@ export default function Location(props: {
                         )}
                     </FastField>
                 </FormControl>
-
+                <FastField
+                    className={classes.field}
+                    label="Name"
+                    name={`${props.locationPath}.name`}
+                    type="text"
+                    required
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
                 <FastField
                     className={classes.field}
                     label="Country"
@@ -120,7 +133,7 @@ export default function Location(props: {
                     }}
                 />
             </div>
-            {props.geometry && (
+            {props.geometry?.latitude && props.geometry?.longitude && (
                 <div className={classes.mapContainer}>
                     <Divider className={classes.divider} variant="middle" />
                     <StaticMap geometry={props.geometry}></StaticMap>
