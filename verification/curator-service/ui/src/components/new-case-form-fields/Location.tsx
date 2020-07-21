@@ -1,5 +1,5 @@
 import { Divider } from '@material-ui/core';
-import { Field } from 'formik';
+import { FastField } from 'formik';
 import { Geometry } from '../Case';
 import React from 'react';
 import StaticMap from '../StaticMap';
@@ -32,11 +32,12 @@ export default function Location(props: {
     return (
         <>
             <div className={classes.root}>
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Location type"
                     size="small"
+                    required
                     name={`${props.locationPath}.geoResolution`}
                     type="text"
                     component={TextField}
@@ -44,18 +45,19 @@ export default function Location(props: {
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Country"
                     name={`${props.locationPath}.country`}
                     type="text"
+                    required
                     component={TextField}
                     InputLabelProps={{
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Admin area 1"
@@ -66,7 +68,7 @@ export default function Location(props: {
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Admin area 2"
@@ -77,7 +79,7 @@ export default function Location(props: {
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Admin area 3"
@@ -88,23 +90,25 @@ export default function Location(props: {
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Latitude"
                     name={`${props.locationPath}.geometry.latitude`}
                     type="number"
+                    required
                     component={TextField}
                     InputLabelProps={{
                         shrink: true,
                     }}
                 />
-                <Field
+                <FastField
                     className={classes.field}
                     disabled
                     label="Longitude"
                     name={`${props.locationPath}.geometry.longitude`}
                     type="number"
+                    required
                     component={TextField}
                     InputLabelProps={{
                         shrink: true,
