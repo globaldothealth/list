@@ -32,19 +32,20 @@ export default function Transmission(): JSX.Element {
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionRoutes"
-                        freeSolo={true}
+                        freeSolo
                         label="Route of transmission"
                         initialValue={initialValues.transmissionRoutes}
-                        multiple={true}
+                        multiple
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/route_of_transmission.txt"
                     />
                 </div>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionPlaces"
+                        freeSolo
                         label="Places of transmission"
                         initialValue={initialValues.transmissionPlaces}
-                        multiple={true}
+                        multiple
                         optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/place_of_transmission.txt"
                     />
                 </div>

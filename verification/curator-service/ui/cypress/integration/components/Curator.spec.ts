@@ -92,9 +92,12 @@ describe('Curator', function () {
             'Airborne infection',
         );
         cy.contains('li', 'Airborne infection').click();
-        cy.get('div[data-testid="transmissionRoutes"]').type('Breath{enter}');
+        cy.get('div[data-testid="transmissionRoutes"]').type('Test route');
+        cy.contains('li', 'Test route').click();
         cy.get('div[data-testid="transmissionPlaces"]').type('Airplane');
         cy.contains('li', 'Airplane').click();
+        cy.get('div[data-testid="transmissionPlaces"]').type('Test place');
+        cy.contains('li', 'Test place').click();
         cy.get('input[placeholder="Contacted case IDs"').type(
             'testcaseid12345678987654\ntestcaseid12345678987655\n',
         );
@@ -113,8 +116,10 @@ describe('Curator', function () {
         cy.get('li[data-value="Business"').click();
         cy.get('div[data-testid="travelHistory[0].methods"]').type('Car');
         cy.contains('li', 'Car').click();
-        cy.get('div[data-testid="travelHistory[0].methods"]').type('Plane');
-        cy.contains('li', 'Plane').click();
+        cy.get('div[data-testid="travelHistory[0].methods"]').type(
+            'Test method',
+        );
+        cy.contains('li', 'Test method').click();
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[1].location"]').type(
             'United Kingdom',
@@ -169,8 +174,9 @@ describe('Curator', function () {
             cy.contains('1/1/2020');
             cy.contains('dry cough, mild fever');
             cy.contains('Airborne infection');
-            cy.contains('Breath');
+            cy.contains('Test route');
             cy.contains('Airplane');
+            cy.contains('Test place');
             cy.contains('testcaseid12345678987654, testcaseid12345678987655');
             cy.contains('Germany, United Kingdom');
             cy.contains('Bartonella, Ebola');
@@ -197,7 +203,9 @@ describe('Curator', function () {
             // Demographics.
             cy.get('input[name="gender"]').should('have.value', 'Female');
             cy.get('input[name="age"]').should('have.value', '21');
-            // TODO: tedious: check "accountant"
+            cy.get('div[data-testid="occupation"]').within(() => {
+                cy.get('input[type="text"]').should('have.value', 'Accountant');
+            });
             cy.contains('Afghan');
             cy.contains('Albanian');
 
@@ -258,7 +266,7 @@ describe('Curator', function () {
                 '2020/01/05',
             );
             cy.contains('Car');
-            cy.contains('Plane');
+            cy.contains('Test method');
             cy.contains('Business');
             cy.contains('Yes');
             // Pathogens.
@@ -270,13 +278,19 @@ describe('Curator', function () {
             );
             // Transmission.
             cy.contains('Airborne infection');
-            cy.contains('Breath');
+            cy.contains('Test route');
             cy.contains('Airplane');
+            cy.contains('Test place');
             cy.contains('testcaseid12345678987654');
             cy.contains('testcaseid12345678987655');
             // Change a few things.
             cy.get('div[data-testid="gender"]').click();
             cy.get('li[data-value="Male"').click();
+            // Check you can submit any value for occupation
+            cy.get('div[data-testid="occupation"]').within(() => {
+                cy.get('input[type="text"]').clear().type('Test occupation');
+            });
+            cy.contains('li', 'Test occupation').click();
             // Submit the changes.
             cy.get('button[data-testid="submit"]').click();
 
@@ -302,7 +316,7 @@ describe('Curator', function () {
             // Demographics.
             cy.contains('21');
             cy.contains('Male');
-            cy.contains('Accountant');
+            cy.contains('Test occupation');
             cy.contains('Afghan, Albanian');
             cy.contains('Asian');
             cy.contains('Frankreich');
@@ -326,11 +340,13 @@ describe('Curator', function () {
             cy.contains('ABCD syndrome, ADULT syndrome');
             // Transmission.
             cy.contains('Airborne infection');
+            cy.contains('Test route');
             cy.contains('Airplane');
+            cy.contains('Test place');
             cy.contains('testcaseid12345678987654');
             cy.contains('testcaseid12345678987655');
             // Travel history.
-            cy.contains('Car, Plane');
+            cy.contains('Car, Test method');
             cy.contains('Business');
             cy.contains('Germany');
             cy.contains('Bus');
