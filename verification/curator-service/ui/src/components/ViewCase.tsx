@@ -139,6 +139,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         isLink
                     />
 
+                    <RowHeader title="Data source entry ID" />
+                    <RowContent
+                        content={props.c.caseReference?.sourceEntryId || ''}
+                    />
+
                     {props.c.caseReference?.additionalSources && (
                         <>
                             <RowHeader title="other sources" />

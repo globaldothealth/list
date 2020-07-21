@@ -37,6 +37,9 @@ describe('Curator', function () {
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
         enterSource('www.example.com');
+        cy.get('div[data-testid="sourceEntryId"]')
+            .click()
+            .type('testSourceEntryID123');
         cy.get('div[data-testid="gender"]').click();
         cy.get('li[data-value="Female"').click();
         cy.get('input[name="age"]').type('21');
@@ -184,6 +187,10 @@ describe('Curator', function () {
                     'www.example.com',
                 );
             });
+            cy.get('input[name="caseReference.sourceEntryId"]').should(
+                'have.value',
+                'testSourceEntryID123',
+            );
 
             // Demographics.
             cy.get('input[name="gender"]').should('have.value', 'Female');
@@ -287,6 +294,7 @@ describe('Curator', function () {
             });
             // Case data.
             cy.contains('www.example.com');
+            cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
             cy.contains('test notes on new line');
             // Demographics.
