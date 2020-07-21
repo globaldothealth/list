@@ -58,7 +58,17 @@ export default function Location(props: {
                         )}
                     </FastField>
                 </FormControl>
-
+                <FastField
+                    className={classes.field}
+                    label="Name"
+                    name={`${props.locationPath}.name`}
+                    type="text"
+                    required
+                    component={TextField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
                 <FastField
                     className={classes.field}
                     label="Country"

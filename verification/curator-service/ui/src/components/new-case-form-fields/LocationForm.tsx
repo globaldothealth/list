@@ -34,6 +34,7 @@ function LocationForm(): JSX.Element {
                     <Button
                         variant="outlined"
                         color="default"
+                        id="add-location"
                         startIcon={<AddIcon />}
                         onClick={() => setFieldValue('location', {})}
                     >
