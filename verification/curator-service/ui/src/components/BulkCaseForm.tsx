@@ -4,13 +4,14 @@ import { Button, withStyles } from '@material-ui/core';
 import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import axios, { AxiosResponse } from 'axios';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
+import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
-import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import React from 'react';
 import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
@@ -50,14 +51,15 @@ const styles = () =>
         },
     });
 
-interface BulkCaseFormProps extends WithStyles<typeof styles> {
+interface BulkCaseFormProps
+    extends RouteComponentProps,
+        WithStyles<typeof styles> {
     user: User;
     onModalClose: () => void;
 }
 
 interface BulkCaseFormState {
     errorMessage: string;
-    successMessage: string;
     errors: CaseValidationError[];
     uploadProgress: number;
     uploadTotalRequests: number;
@@ -142,7 +144,6 @@ class BulkCaseForm extends React.Component<
         super(props);
         this.state = {
             errorMessage: '',
-            successMessage: '',
             errors: [],
             uploadProgress: 0,
             uploadTotalRequests: 0,
@@ -322,6 +323,7 @@ class BulkCaseForm extends React.Component<
     async uploadData(
         results: ParseResult<RawParsedCase>,
         caseReference: CaseReference,
+        filename: string,
     ): Promise<void> {
         const cases = results.data.map((c) => {
             // papaparse uses null to fill values that are empty in the CSV.
@@ -353,35 +355,49 @@ class BulkCaseForm extends React.Component<
             this.setState({
                 errors: validationErrors,
                 errorMessage: '',
-                successMessage: '',
             });
             return;
         }
-        let created = 0;
-        let updated = 0;
+        const createdIds: string[] = [];
+        const updatedIds: string[] = [];
         for (const c of cases) {
             try {
                 const casesToUpsert = c.caseCount ? c.caseCount : 1;
                 for (let i = 0; i < casesToUpsert; i++) {
                     const response = await this.upsertCase(c);
                     this.incrementProgress();
-                    response.status === 201 ? created++ : updated++;
+                    response.status === 201
+                        ? createdIds.push(response.data._id)
+                        : updatedIds.push(response.data._id);
                 }
             } catch (e) {
                 this.setState({
                     errorMessage: `System error during upload: ${JSON.stringify(
                         e,
                     )}`,
-                    successMessage: '',
                 });
+                return;
             }
         }
         const createdMessage =
-            created > 0 ? `Created ${created} new rows. ` : '';
-        const updatedMessage = updated > 0 ? `Updated ${updated} rows.` : '';
-        this.setState({
-            errorMessage: '',
-            successMessage: `Success! ${createdMessage}${updatedMessage}`,
+            createdIds.length === 0
+                ? ''
+                : createdIds.length === 1
+                ? '1 new case added. '
+                : `${createdIds.length} new cases added. `;
+        const updatedMessage =
+            updatedIds.length === 0
+                ? ''
+                : updatedIds.length === 1
+                ? '1 case updated. '
+                : `${updatedIds.length} cases updated. `;
+        this.props.history.push({
+            pathname: '/cases',
+            state: {
+                bulkMessage: `${filename} uploaded. ${createdMessage} ${updatedMessage}`,
+                newCaseIds: createdIds,
+                editedCaseIds: updatedIds,
+            },
         });
     }
 
@@ -394,7 +410,11 @@ class BulkCaseForm extends React.Component<
                 return new Promise((resolve) => {
                     const papaparseOptions: ParseConfig<RawParsedCase> = {
                         complete: async (results) => {
-                            await this.uploadData(results, caseReference);
+                            await this.uploadData(
+                                results,
+                                caseReference,
+                                file.name,
+                            );
                             resolve();
                         },
                         dynamicTyping: true,
@@ -458,14 +478,6 @@ class BulkCaseForm extends React.Component<
                                         maxDisplayErrors={10}
                                     />
                                 )}
-                                {this.state.successMessage && (
-                                    <Alert
-                                        className={classes.statusMessage}
-                                        severity="success"
-                                    >
-                                        {this.state.successMessage}
-                                    </Alert>
-                                )}
                                 {this.state.errorMessage && (
                                     <Alert
                                         className={classes.statusMessage}
@@ -483,4 +495,4 @@ class BulkCaseForm extends React.Component<
     }
 }
 
-export default withStyles(styles)(BulkCaseForm);
+export default withRouter(withStyles(styles)(BulkCaseForm));

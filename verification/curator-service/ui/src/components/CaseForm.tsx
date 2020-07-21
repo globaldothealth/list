@@ -437,7 +437,6 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             return;
         }
         // Navigate to cases after successful submit
-        this.props.onModalClose();
         this.props.history.push({
             pathname: '/cases',
             state: {
