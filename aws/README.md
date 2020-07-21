@@ -138,7 +138,7 @@ Images used in deployments are pulled from docker hub where automated builds hav
 
 Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
 
-Automated builds create a new image with the _latest_ tag upon every push to the master branch on this github repo. More specialized tags are described below.
+Automated builds create a new image with the _latest_ tag upon every push to the main branch on this github repo. More specialized tags are described below.
 
 ## Releases
 
@@ -150,11 +150,11 @@ We follow [semantic versioning](https://semver.org/) which is basically:
     MINOR version when you add functionality in a backwards compatible manner, and
     PATCH version when you make backwards compatible bug fixes.
 
-Docker-hub has automated builds setup that extract the semantic version from tags in the master branch.
+Docker-hub has automated builds setup that extract the semantic version from tags in the main branch.
 
 To push a new release of the curator service:
 
-Tag master with the `curator-0.1.2` tag:
+Tag main with the `curator-0.1.2` tag:
 
 `git tag curator-0.1.2`
 
