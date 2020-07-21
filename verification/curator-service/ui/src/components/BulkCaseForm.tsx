@@ -5,7 +5,6 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import axios, { AxiosResponse } from 'axios';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
@@ -15,6 +14,7 @@ import React from 'react';
 import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 
 interface User {
@@ -22,18 +22,6 @@ interface User {
     name: string;
     email: string;
     roles: string[];
-}
-
-interface BatchUpsertError {
-    index: number;
-    message: string;
-}
-
-interface BatchUpsertResponse {
-    phase: string;
-    createdCaseIds: string[];
-    updatedCaseIds: string[];
-    errors: BatchUpsertError[];
 }
 
 // Return type isn't meaningful.
@@ -64,7 +52,7 @@ const styles = () =>
 
 interface BulkCaseFormProps
     extends RouteComponentProps,
-    WithStyles<typeof styles> {
+        WithStyles<typeof styles> {
     user: User;
     onModalClose: () => void;
 }
@@ -72,8 +60,6 @@ interface BulkCaseFormProps
 interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
-    uploadProgress: number;
-    uploadTotalRequests: number;
 }
 
 interface BulkCaseFormValues {
@@ -121,6 +107,18 @@ interface RawParsedCase {
     caseCount?: number;
 }
 
+interface BatchUpsertError {
+    index: number;
+    message: string;
+}
+
+interface BatchUpsertResponse {
+    phase: string;
+    createdCaseIds: string[];
+    updatedCaseIds: string[];
+    errors: BatchUpsertError[];
+}
+
 // See description below for usage. This is a mapped partial type that
 // reproduces the fields of <T>, including for nested fields. The non-
 // recursive variant of this is easier to understand, and is explained here:
@@ -150,14 +148,12 @@ const BulkFormSchema = Yup.object().shape({
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
             errorMessage: '',
             errors: [],
-            uploadProgress: 0,
-            uploadTotalRequests: 0,
         };
     }
 
@@ -179,9 +175,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                        start: c.dateHospitalized,
-                        end: c.dateHospitalized,
-                    }
+                          start: c.dateHospitalized,
+                          end: c.dateHospitalized,
+                      }
                     : undefined,
                 value: 'Yes',
             });
@@ -261,9 +257,9 @@ class BulkCaseForm extends React.Component<
                 geometry:
                     c.latitude && c.longitude
                         ? {
-                            latitude: c.latitude,
-                            longitude: c.longitude,
-                        }
+                              latitude: c.latitude,
+                              longitude: c.longitude,
+                          }
                         : undefined,
                 name: c.locationName,
                 limitToResolution: geoResolutionLimit,
@@ -278,30 +274,6 @@ class BulkCaseForm extends React.Component<
             },
             caseCount: c.caseCount,
         };
-    }
-
-    incrementProgress(): void {
-        const incrementPercent = 100 / this.state.uploadTotalRequests;
-        this.setState({
-            uploadProgress: this.state.uploadProgress + incrementPercent,
-        });
-    }
-
-    /**
-     * Determine the number of remote requests required to upload the provided
-     * row.
-     *
-     * Each row is validated, accounting for one request, and incurs a further
-     * `caseCount` requests to write rows to the server.
-     */
-    getUploadTotalRequests(cases: CompleteParsedCase[]): number {
-        return cases
-            .map((c) => {
-                return 1 + (c.caseCount ? c.caseCount : 1);
-            })
-            .reduce((accumulator, currentValue) => {
-                return accumulator + currentValue;
-            }, 0);
     }
 
     async batchUpsertCases(
@@ -345,9 +317,6 @@ class BulkCaseForm extends React.Component<
                 caseReference,
             );
         });
-        this.setState({
-            uploadTotalRequests: this.getUploadTotalRequests(cases),
-        });
 
         let upsertResponse: BatchUpsertResponse;
         try {
@@ -377,14 +346,14 @@ class BulkCaseForm extends React.Component<
             createdIds.length === 0
                 ? ''
                 : createdIds.length === 1
-                    ? '1 new case added. '
-                    : `${createdIds.length} new cases added. `;
+                ? '1 new case added. '
+                : `${createdIds.length} new cases added. `;
         const updatedMessage =
             updatedIds.length === 0
                 ? ''
                 : updatedIds.length === 1
-                    ? '1 case updated. '
-                    : `${updatedIds.length} cases updated. `;
+                ? '1 case updated. '
+                : `${updatedIds.length} cases updated. `;
         this.props.history.push({
             pathname: '/cases',
             state: {
@@ -459,7 +428,9 @@ class BulkCaseForm extends React.Component<
                                     >
                                         Upload cases
                                     </Button>
-                                    {isSubmitting && <CircularProgress />}
+                                    {isSubmitting && (
+                                        <CircularProgress data-testid="progress" />
+                                    )}
                                 </div>
                                 {this.state.errors.length > 0 && (
                                     <ValidationErrorList
