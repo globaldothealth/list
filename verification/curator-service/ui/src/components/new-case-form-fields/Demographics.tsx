@@ -122,6 +122,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     label="Occupation"
                     initialValue={initialValues.occupation}
                     multiple={false}
+                    freeSolo
                     optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/occupations.txt"
                 />
             </fieldset>
