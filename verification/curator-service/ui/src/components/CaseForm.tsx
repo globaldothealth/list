@@ -437,7 +437,6 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             return;
         }
         // Navigate to cases after successful submit
-        this.props.onModalClose();
         this.props.history.push({
             pathname: '/cases',
             state: {
@@ -772,6 +771,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     <div className={classes.formSection}>
                                         <Source
                                             initialValue={values.caseReference}
+                                            hasSourceEntryId={true}
                                         ></Source>
                                     </div>
                                     <div className={classes.formSection}>

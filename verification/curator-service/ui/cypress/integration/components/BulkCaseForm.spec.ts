@@ -32,13 +32,10 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
-        cy.contains('Success! Created 2 new rows.');
-        cy.get('[data-testid="progress"]').should('not.exist');
-        cy.get('button[aria-label="close overlay"').click();
 
-        // Common data.
-        cy.visit('/cases');
+        // Check data in linelist table.
         cy.contains('No records to display').should('not.exist');
+        cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('www.bulksource.com');
         cy.contains('Male');
         cy.contains('42');
@@ -66,16 +63,13 @@ describe('Bulk upload form', function () {
         cy.route('PUT', '/api/cases').as('upsertCases');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCases');
-        cy.contains('Success! Created 2 new rows.');
-        cy.get('[data-testid="progress"]').should('not.exist');
-        cy.get('button[aria-label="close overlay"').click();
 
-        cy.visit('/cases');
+        // Check data in linelist table.
         cy.contains('No records to display').should('not.exist');
+        cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('Male');
         cy.contains('Female').should('not.exist');
 
-        cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
         enterSource('www.bulksource.com', true);
@@ -85,11 +79,9 @@ describe('Bulk upload form', function () {
         cy.route('PUT', '/api/cases').as('upsertCases');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@upsertCases');
-        cy.contains('Success! Updated 2 rows.');
-        cy.get('[data-testid="progress"]').should('not.exist');
 
-        cy.visit('/cases');
         // The updated case now has a gender of Female.
+        cy.contains('bulk_data.csv uploaded. 2 cases updated.');
         cy.contains('Female');
     });
 
@@ -109,11 +101,10 @@ describe('Bulk upload form', function () {
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
         cy.wait('@upsertCase');
-        cy.contains('Success! Created 3 new rows.');
-        cy.get('[data-testid="progress"]').should('not.exist');
-        cy.get('button[aria-label="close overlay"').click();
 
-        cy.visit('/cases');
+        cy.contains(
+            'bulk_data_with_case_count.csv uploaded. 3 new cases added.',
+        );
         cy.get('tr').get('td:contains(Male)').should('have.length', 3);
     });
 

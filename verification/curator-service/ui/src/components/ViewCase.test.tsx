@@ -48,6 +48,7 @@ it('loads and displays case', async () => {
         'href',
         'https://news.org/an-article',
     );
+    expect(getByText('entryId')).toBeInTheDocument();
     expect(getByText('abc123')).toBeInTheDocument();
     expect(getByText('2020-01-20')).toBeInTheDocument();
     expect(getByText('xyz789')).toBeInTheDocument();

@@ -9,7 +9,7 @@ const tooltip = (
         {'Select a CSV file to upload in the format described '}
         <a
             href={
-                'https://github.com/open-covid-data/healthmap-gdo-temp/tree/master/verification/curator-service/ui#bulk-upload-process'
+                'https://github.com/open-covid-data/healthmap-gdo-temp/tree/main/verification/curator-service/ui#bulk-upload-process'
             }
             rel="noopener noreferrer"
             target="_blank"
@@ -54,7 +54,7 @@ export default function FileUpload(): JSX.Element {
                         if (uploadedFiles.length > 1) {
                             console.warn(
                                 `Attempted to upload ${uploadedFiles.length} ` +
-                                    'files. Only one file allowed per upload.',
+                                'files. Only one file allowed per upload.',
                             );
                         }
                     }

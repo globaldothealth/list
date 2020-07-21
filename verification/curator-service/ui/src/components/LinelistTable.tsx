@@ -63,6 +63,7 @@ interface TableRow {
 interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
+    bulkMessage: string;
 }
 
 interface Props extends RouteComponentProps<never, never, LocationState> {
@@ -112,16 +113,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.state.error}
                     </MuiAlert>
                 )}
-                {/* TODO: update for multiple cases added/edited */}
-                {(this.props.location.state?.newCaseIds?.length ?? 0) > 0 && (
-                    <MuiAlert elevation={6} variant="filled">
-                        {`Case ${this.props.location.state.newCaseIds} added`}
-                    </MuiAlert>
-                )}
-                {(this.props.location.state?.editedCaseIds?.length ?? 0) >
-                    0 && (
-                    <MuiAlert elevation={6} variant="filled">
-                        {`Case ${this.props.location.state.editedCaseIds} edited`}
+                {!this.props.location.state?.bulkMessage &&
+                    (this.props.location.state?.newCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.newCaseIds} added`}
+                        </MuiAlert>
+                    )}
+                {!this.props.location.state?.bulkMessage &&
+                    (this.props.location.state?.editedCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`Case ${this.props.location.state.editedCaseIds} edited`}
+                        </MuiAlert>
+                    )}
+                {this.props.location.state?.bulkMessage && (
+                    <MuiAlert elevation={6} severity="info" variant="outlined">
+                        {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
                 <MaterialTable
@@ -394,10 +402,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Delete selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          const deletePromises: Promise<
+                                              unknown
+                                          >[] = [];
                                           rows.forEach((row: TableRow) =>
-                                              this.deleteCase(row),
+                                              deletePromises.push(
+                                                  this.deleteCase(row),
+                                              ),
                                           );
-                                          this.tableRef.current.onQueryChange();
+                                          Promise.all(deletePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
                                       },
                                   },
                                   {
