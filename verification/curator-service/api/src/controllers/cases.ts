@@ -107,6 +107,73 @@ export default class CasesController {
         }
     };
 
+    /**
+     * Validates and upserts the provided cases.
+     *
+     * Executes three operations on the supplied data:
+     *
+     *   1. Geocodes provided cases as required. If there are any issues
+     *      geocoding (which is done serially -- though we should consider
+     *      taking advantage of a batch geocode API), return the results now
+     *      without proceeding to the validation stage.
+     *   2. Performs validation of all provided cases via the data service
+     *      batchValidate API. If any validation issues are found, return the
+     *      results now without proceeding to the upsert stage.
+     *   3. Upserts the data via the data service upsert API.
+     */
+    batchUpsert = async (req: Request, res: Response): Promise<void> => {
+        try {
+            // 1. Geocode each case.
+            const geocodeErrors = await this.batchGeocode(req);
+            if (geocodeErrors.length > 0) {
+                res.status(207).send({
+                    phase: 'GEOCODE',
+                    numUpserted: 0,
+                    numErrors: geocodeErrors.length,
+                    errors: geocodeErrors,
+                });
+                return;
+            }
+
+            // 2. Batch validate.
+            const validationResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchValidate',
+                req.body,
+            );
+            if (validationResponse.data.errors.length > 0) {
+                res.status(207).send({
+                    phase: 'VALIDATE',
+                    numUpserted: 0,
+                    numErrors: validationResponse.data.errors.length,
+                    errors: validationResponse.data.errors,
+                });
+                return;
+            }
+
+            // 3. Upsert each case.
+            // Consider adding a batchUpsert endpoint on the data service if
+            // this slows us down too much.
+            for (let index = 0; index < req.body.cases.length; index++) {
+                const c = req.body.cases[index];
+                await axios.put(this.dataServerURL + '/api/cases', c);
+            }
+            res.status(200).send({
+                phase: 'UPSERT',
+                numUpserted: req.body.cases.length,
+                numErrors: 0,
+                errors: [],
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err.message);
+        }
+    };
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
@@ -139,7 +206,11 @@ export default class CasesController {
      *
      * @returns {boolean} Whether lat lng were either provided or geocoded
      */
-    private async geocode(req: Request): Promise<boolean> {
+    // For batch requests, the case body is nested.
+    // While we could define a type here, the right change is probably to use a
+    // batch geocoding API for such cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async geocode(req: Request | any): Promise<boolean> {
         // Geocode query if no lat lng were provided.
         const location = req.body['location'];
         if (location?.geometry?.latitude && location.geometry?.longitude) {
@@ -176,5 +247,44 @@ export default class CasesController {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Perform geocoding for each case (of multiple `cases` specified in the
+     * request body), in accordance with the above geocoding logic.
+     *
+     * TODO: Use a batch geocode API.
+     *
+     * @returns {object} Detailing the nature of any issues encountered.
+     */
+    private async batchGeocode(
+        req: Request,
+    ): Promise<{ index: number; message: string }[]> {
+        const caseCount = req.body.cases.length;
+        const geocodeErrors: { index: number; message: string }[] = [];
+        for (let index = 0; index < caseCount; index++) {
+            const c = req.body.cases[index];
+            try {
+                const geocodeResult = await this.geocode({
+                    body: c,
+                });
+                if (!geocodeResult) {
+                    geocodeErrors.push({
+                        index: index,
+                        message: `no geolocation found for ${c.location?.query}`,
+                    });
+                }
+            } catch (err) {
+                if (err instanceof InvalidParamError) {
+                    geocodeErrors.push({
+                        index: index,
+                        message: err.message,
+                    });
+                } else {
+                    throw err;
+                }
+            }
+        }
+        return geocodeErrors;
     }
 }
