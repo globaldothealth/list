@@ -140,7 +140,6 @@ describe('New case form', function () {
         cy.get('svg[data-testid="check-icon"]').should('not.exist');
     });
 
-    // Full case is covered in curator test.
     it('Can specify geocode manually', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
