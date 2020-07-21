@@ -6,6 +6,69 @@ This directory contains the code for the UI of the Global Health Curator Portal 
 - [prod](https://curator.ghdsi.org)
 - [local dev](http://localhost:3002)
 
+## Usage
+
+All relevant usage information will ultimately be provided by the interface
+itself. This section contains documentation that hasn't yet been incorporated
+into the interface.
+
+### Bulk upload process
+
+#### Input data in the proper format
+
+The current bulk upload process is _parserless_, and so for data to be properly
+ingested it must be uploaded in a standard CSV format. A Google Sheets template
+corresponding to this CSV format is available
+[here](https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE).
+The following fields are currently incorporated:
+
+- `sourceEntryId`: Optional. The UUID provided by the data source to identify
+the specific case.
+- `country`: **Required**.
+- `admin1`: Optional.
+- `admin2`: Optional.
+- `admin3`: Optional.
+- `gender`: Optional. One of `Female`, `Male`, `Non-binary/Third gender`, or `Other`.
+- `ageRangeStart`: Optional. Number (years) from 0 to 140.
+- `ageRangeEnd`: Optional. Number (years) from 0 to 140.
+- `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was
+confirmed.
+- `hospitalized`: Optional. One of `true` or `false`.
+- `dateHospitalized`: Optional. Date (MM/DD/YYYY) on which the patient was
+hospitalized.
+- `outcome`: Optional. One of either `Death` or `Recovered`.
+- `dateOutcome`: Optional. Date (MM/DD/YYYY) on which the above outcome
+transpired.
+- `caseCount`: Optional. Number greater than 0. If provided, `caseCount` number
+of cases will be inserted into the database: each containing identical values
+for all other columns. Cannot be provided in combination with `sourceEntryId`.
+
+Any valid CSV file with the above headers can be uploaded via the bulk upload
+form. For convenience, users can make a copy of the aforementioned Google
+Sheets template to generate a valid CSV, using roughly the following process:
+
+![CSV template process](./csv.gif)
+
+As a more realistic example, consider the following process that a curator might
+use in order to prepare data obtained from the Ohio state government website:
+
+![Ohio data preparation](./ohio.gif)
+
+#### Additional notes
+
+Some features to note:
+
+- Bulk upload _upserts_ data. If a row is uploaded that contains a
+`sourceEntryId` corresponding to an existing case in our database with the
+selected source, the provided data will update the existing row. It will not
+create duplicate row(s) with the same `sourceEntryId`. This enables easy
+updating of sources that publish all cases together with UUIDs.
+- Upload feedback is currently WIP. The existing feedback message, which is
+dispalyed at the bottom of the form after uploading, reflects the status of the
+final case in the CSV. If it was successful, the message will be `Success!`;
+otherwise, it's likely to say that the request failed with `422`, which means
+the data wasn't properly formatted. This is changing in the near future.
+
 ## Development
 
 The React application was built with the `create-react-app` new project generator.

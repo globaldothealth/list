@@ -1,8 +1,11 @@
 import { Field, useFormikContext } from 'formik';
 import { Typography, makeStyles } from '@material-ui/core';
 
+import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
+import Button from '@material-ui/core/Button';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
@@ -15,17 +18,35 @@ import { hasKey } from '../Utils';
 import throttle from 'lodash/throttle';
 
 function LocationForm(): JSX.Element {
-    const { values, initialValues } = useFormikContext<CaseFormValues>();
+    const { values, initialValues, setFieldValue } = useFormikContext<
+        CaseFormValues
+    >();
     return (
         <Scroll.Element name="location">
             <fieldset>
-                <legend>Location</legend>
+                <FieldTitle title="Location"></FieldTitle>
                 <PlacesAutocomplete
                     initialValue={initialValues.location?.name}
                     name="location"
                     required
                 />
-                <Location location={values.location} />
+                {!values.location && (
+                    <Button
+                        variant="outlined"
+                        color="default"
+                        id="add-location"
+                        startIcon={<AddIcon />}
+                        onClick={() => setFieldValue('location', {})}
+                    >
+                        Specify geocode manually
+                    </Button>
+                )}
+                {values.location && (
+                    <Location
+                        locationPath="location"
+                        geometry={values.location?.geometry}
+                    />
+                )}
             </fieldset>
         </Scroll.Element>
     );
@@ -95,10 +116,6 @@ export function PlacesAutocomplete(
             if (active) {
                 let newOptions = [] as Loc[];
 
-                if (value) {
-                    newOptions = [value];
-                }
-
                 if (results) {
                     newOptions = [...newOptions, ...results];
                 }
@@ -127,6 +144,7 @@ export function PlacesAutocomplete(
             onInputChange={(event, newInputValue): void => {
                 setInputValue(newInputValue);
             }}
+            noOptionsText="No locations"
             renderInput={(params): JSX.Element => (
                 <>
                     {/* Do not use FastField here */}
@@ -136,7 +154,6 @@ export function PlacesAutocomplete(
                         // to be set in the form values, rather than only selected
                         // dropdown values. Thus we use an unused form value here.
                         name="unused"
-                        required={props.required}
                         data-testid={props.name}
                         // Use the initial valuelocation name as a hint when untouched
                         // otherwise just use the field name.

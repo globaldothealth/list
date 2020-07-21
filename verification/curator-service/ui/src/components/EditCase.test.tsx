@@ -1,10 +1,11 @@
 import * as fullCase from './fixtures/fullCase.json';
 
-import { Case } from './Case';
+import { render, wait } from '@testing-library/react';
+
 import EditCase from './EditCase';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { render } from '@testing-library/react';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -21,21 +22,51 @@ const curator = {
 };
 
 it('loads and displays case to edit', async () => {
-    const axiosResponse = {
+    const axiosCaseResponse = {
         data: fullCase,
         status: 200,
         statusText: 'OK',
         config: {},
         headers: {},
     };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+    const axiosSourcesResponse = {
+        data: { sources: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosCaseResponse);
+    // This is currently called twice, because the value from the case being
+    // edited is populated in the form field a split second after the page
+    // initially loads (resulting in two queries: ?url={} and ?url={fullURL}).
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
 
     const { findByText, getByText, getByDisplayValue } = render(
-        <EditCase id="abc123" user={curator} />,
+        <MemoryRouter>
+            <EditCase
+                id="abc123"
+                user={curator}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
     );
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(3));
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-    expect(await findByText(/Female/)).toBeInTheDocument();
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources', {
+        params: {
+            url: '',
+        },
+    });
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources', {
+        params: {
+            url: fullCase.caseReference.sourceUrl,
+        },
+    });
+    expect(await findByText(/Non-binary\/Third gender/)).toBeInTheDocument();
     expect(getByDisplayValue(/Horse breeder/)).toBeInTheDocument();
     expect(getByDisplayValue(/Asian/)).toBeInTheDocument();
     expect(
@@ -43,12 +74,12 @@ it('loads and displays case to edit', async () => {
     ).toBeInTheDocument();
     expect(getByDisplayValue('NC_045512.2')).toBeInTheDocument();
     expect(getByDisplayValue('33000')).toBeInTheDocument();
-    expect(getByText('France')).toBeInTheDocument();
-    expect(getByText('Île-de-F')).toBeInTheDocument();
-    expect(getByText('Paris')).toBeInTheDocument();
+    expect(getByDisplayValue('France')).toBeInTheDocument();
+    expect(getByDisplayValue('Île-de-F')).toBeInTheDocument();
+    expect(getByDisplayValue('Paris')).toBeInTheDocument();
     expect(getByDisplayValue('Recovered')).toBeInTheDocument();
     expect(getByText('Severe pneumonia')).toBeInTheDocument();
-    expect(getByText('United States')).toBeInTheDocument();
+    expect(getByDisplayValue('United States')).toBeInTheDocument();
     expect(getByDisplayValue('Family')).toBeInTheDocument();
     // TODO: These show up locally but we need to figure out how to properly
     // query them in tests.
@@ -71,7 +102,17 @@ it('loads and displays case to edit', async () => {
 it('displays API errors', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Request failed'));
 
-    const { findByText } = render(<EditCase id="abc123" user={curator} />);
+    const { findByText } = render(
+        <MemoryRouter>
+            <EditCase
+                id="abc123"
+                user={curator}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');

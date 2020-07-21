@@ -1,6 +1,6 @@
+import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
-import { Autocomplete } from '@material-ui/lab';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
@@ -36,6 +36,8 @@ interface FormikAutocompleteProps {
     initialValue: any;
     freeSolo?: boolean;
 }
+
+const filter = createFilterOptions<string>();
 
 // Autocomplete for use in a Formik form.
 // Based on https://material-ui.com/components/autocomplete/#asynchronous-requests.
@@ -101,6 +103,15 @@ export function FormikAutocomplete(
                 setOpen(false);
             }}
             options={options}
+            filterOptions={(options: string[], params): string[] => {
+                const filtered = filter(options, params) as string[];
+
+                if (props.freeSolo && params.inputValue !== '') {
+                    filtered.push(params.inputValue);
+                }
+
+                return filtered;
+            }}
             loading={loading}
             onChange={(_, values): void => {
                 setFieldValue(props.name, values ?? undefined);
@@ -178,7 +189,6 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
-                    required={props.required}
                     minDate={new Date('2019/12/01')}
                     disableFuture
                     autoOk
@@ -205,14 +215,18 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<CaseFormValues>();
     return (
         <div>
-            {hasKey(touched, props.name) &&
-                touched[props.name] &&
-                hasKey(values, props.name) &&
-                (values[props.name] === undefined ||
-                    values[props.name] === null ||
-                    values[props.name] === '') && (
-                    <FormHelperText error>Required field</FormHelperText>
-                )}
+            <FormHelperText
+                error={
+                    hasKey(touched, props.name) &&
+                    touched[props.name] &&
+                    hasKey(values, props.name) &&
+                    (values[props.name] === undefined ||
+                        values[props.name] === null ||
+                        values[props.name] === '')
+                }
+            >
+                Required
+            </FormHelperText>
         </div>
     );
 }

@@ -9,11 +9,6 @@ describe('Edit case', function () {
         cy.clearSeededLocations();
     });
 
-    it('Errors when case does not exist', function () {
-        cy.visit('/cases/edit/foo');
-        cy.contains('Request failed');
-    });
-
     // Full case edit is covered in the curator tests.
     it('can edit a case', function () {
         cy.addCase({
@@ -25,7 +20,7 @@ describe('Edit case', function () {
         });
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
-            cy.visit(`/cases/edit/${resp.body.cases[0]._id}`);
+            cy.visit(`cases/edit/${resp.body.cases[0]._id}`);
             // Check that we have something from the original case.
             cy.contains('France');
             cy.contains('Andorrean');
@@ -33,19 +28,17 @@ describe('Edit case', function () {
             cy.contains('Female').should('not.exist');
             cy.contains('21').should('not.exist');
             // Change a few things.
-            cy.get('div[data-testid="sex"]').click();
+            cy.get('div[data-testid="gender"]').click();
             cy.get('li[data-value="Female"').click();
             cy.get('input[name="age"]').type('21');
             // Submit the changes.
             cy.server();
-            cy.route('PUT', `/api/cases/${resp.body.cases[0]._id}`).as(
-                'editCase',
-            );
+            cy.route('PUT', `/api/cases/*`).as('editCase');
             cy.get('button[data-testid="submit"]').click();
             cy.wait('@editCase');
-            cy.contains('Case edited');
+
             // Updated info should be there.
-            cy.visit('/cases');
+            cy.contains(`Case ${resp.body.cases[0]._id} edited`);
             cy.contains('No records to display').should('not.exist');
             cy.contains('Female');
             cy.contains('21');

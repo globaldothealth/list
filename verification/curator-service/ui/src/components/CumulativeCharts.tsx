@@ -1,6 +1,7 @@
-import React from 'react';
-import ChartsEmbedSDK from '@mongodb-js/charts-embed-dom';
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
+
+import ChartsEmbedSDK from '@mongodb-js/charts-embed-dom';
+import React from 'react';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

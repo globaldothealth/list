@@ -3,21 +3,26 @@ import {
     Button,
     CssBaseline,
     IconButton,
+    Menu,
+    MenuItem,
     Toolbar,
     Typography,
 } from '@material-ui/core';
-import { Link, Route, Switch } from 'react-router-dom';
+import {
+    Link,
+    Route,
+    RouteComponentProps,
+    Switch,
+    withRouter,
+} from 'react-router-dom';
+import { Theme, createStyles } from '@material-ui/core/styles';
 
-import Add from '@material-ui/icons/Add';
+import AddIcon from '@material-ui/icons/Add';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
-import Home from './Home';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
@@ -30,9 +35,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
-import Publish from '@material-ui/icons/Publish';
 import React from 'react';
-import ShowChartIcon from '@material-ui/icons/ShowChart';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
@@ -42,7 +45,6 @@ import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 
 const theme = createMuiTheme({
@@ -58,7 +60,7 @@ const theme = createMuiTheme({
 
 const drawerWidth = 240;
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
@@ -68,18 +70,7 @@ const styles = () =>
         },
         appBar: {
             background: 'white',
-            transition: theme.transitions.create(['margin', 'width'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-        },
-        appBarShift: {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: drawerWidth,
-            transition: theme.transitions.create(['margin', 'width'], {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
+            zIndex: theme.zIndex.drawer + 1,
         },
         menuButton: {
             marginRight: theme.spacing(2),
@@ -95,12 +86,8 @@ const styles = () =>
             width: drawerWidth,
         },
         drawerHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            padding: theme.spacing(0, 1),
             // necessary for content to be below app bar
             ...theme.mixins.toolbar,
-            justifyContent: 'flex-end',
         },
         content: {
             flexGrow: 1,
@@ -117,33 +104,41 @@ const styles = () =>
                 duration: theme.transitions.duration.enteringScreen,
             }),
             marginLeft: 0,
+            width: `calc(100% - ${drawerWidth}px)`,
+        },
+        createNewButton: {
+            margin: '1em',
+            width: '70%',
         },
     });
 
-type Props = WithStyles<typeof styles>;
+interface Props extends RouteComponentProps, WithStyles<typeof styles> {}
 
 interface State {
     drawerOpen: boolean;
     user: User;
+    createNewButtonAnchorEl?: Element;
 }
 
 class App extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            drawerOpen: false,
+            drawerOpen: true,
             user: {
                 _id: '',
                 name: '',
                 email: '',
                 roles: [],
             },
+            createNewButtonAnchorEl: undefined,
         };
         // https://reactjs.org/docs/handling-events.html.
-        this.handleDrawerClose = this.handleDrawerClose.bind(this);
-        this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
+        this.toggleDrawer = this.toggleDrawer.bind(this);
         this.getUser = this.getUser.bind(this);
         this.hasAnyRole = this.hasAnyRole.bind(this);
+        this.openCreateNewPopup = this.openCreateNewPopup.bind(this);
+        this.closeCreateNewPopup = this.closeCreateNewPopup.bind(this);
     }
 
     componentDidMount(): void {
@@ -176,36 +171,32 @@ class App extends React.Component<Props, State> {
         );
     }
 
-    handleDrawerOpen(): void {
-        this.setState({ drawerOpen: true });
+    toggleDrawer(): void {
+        this.setState({ drawerOpen: !this.state.drawerOpen });
     }
 
-    handleDrawerClose(): void {
-        this.setState({ drawerOpen: false });
+    openCreateNewPopup(event: any): void {
+        this.setState({ createNewButtonAnchorEl: event.currentTarget });
+    }
+
+    closeCreateNewPopup(): void {
+        this.setState({ createNewButtonAnchorEl: undefined });
     }
 
     render(): JSX.Element {
-        const { classes } = this.props;
+        const { classes, history } = this.props;
         return (
             <div className={classes.root}>
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
-                    <AppBar
-                        position="fixed"
-                        className={clsx(classes.appBar, {
-                            [classes.appBarShift]: this.state.drawerOpen,
-                        })}
-                    >
+                    <AppBar position="fixed" className={classes.appBar}>
                         <Toolbar>
                             <IconButton
                                 color="inherit"
-                                aria-label="open drawer"
-                                onClick={this.handleDrawerOpen}
+                                aria-label="toggle drawer"
+                                onClick={this.toggleDrawer}
                                 edge="start"
-                                className={clsx(
-                                    classes.menuButton,
-                                    this.state.drawerOpen && classes.hide,
-                                )}
+                                className={classes.menuButton}
                             >
                                 <MenuIcon />
                             </IconButton>
@@ -244,16 +235,52 @@ class App extends React.Component<Props, State> {
                             paper: classes.drawerPaper,
                         }}
                     >
-                        <div className={classes.drawerHeader}>
-                            <IconButton onClick={this.handleDrawerClose}>
-                                {theme.direction === 'ltr' ? (
-                                    <ChevronLeftIcon />
-                                ) : (
-                                    <ChevronRightIcon />
-                                )}
-                            </IconButton>
-                        </div>
-                        <Divider />
+                        <div className={classes.drawerHeader}></div>
+                        {this.hasAnyRole(['curator']) && (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    data-testid="create-new-button"
+                                    className={classes.createNewButton}
+                                    onClick={this.openCreateNewPopup}
+                                    startIcon={<AddIcon />}
+                                >
+                                    Create new
+                                </Button>
+                                <Menu
+                                    anchorEl={
+                                        this.state.createNewButtonAnchorEl
+                                    }
+                                    getContentAnchorEl={null}
+                                    keepMounted
+                                    open={Boolean(
+                                        this.state.createNewButtonAnchorEl,
+                                    )}
+                                    onClose={this.closeCreateNewPopup}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    }}
+                                >
+                                    <MenuItem
+                                        onClick={(): void => {
+                                            this.closeCreateNewPopup();
+                                            history.push('/cases/new');
+                                        }}
+                                    >
+                                        New line list case
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={(): void => {
+                                            this.closeCreateNewPopup();
+                                            history.push('/cases/bulk');
+                                        }}
+                                    >
+                                        New bulk upload
+                                    </MenuItem>
+                                </Menu>
+                            </>
+                        )}
                         <List>
                             {[
                                 {
@@ -271,33 +298,11 @@ class App extends React.Component<Props, State> {
                                         this.hasAnyRole(['reader', 'curator']),
                                 },
                                 {
-                                    text: 'New',
-                                    icon: <Add />,
-                                    to: '/cases/new',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['curator']),
-                                },
-                                {
-                                    text: 'Bulk upload',
-                                    icon: <Publish />,
-                                    to: '/cases/bulk',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['curator']),
-                                    divider: true,
-                                },
-                                {
                                     text: 'Sources',
                                     icon: <LinkIcon />,
                                     to: '/sources',
                                     displayCheck: (): boolean =>
                                         this.hasAnyRole(['reader', 'curator']),
-                                    divider: true,
-                                },
-                                {
-                                    text: 'Charts',
-                                    icon: <ShowChartIcon />,
-                                    to: '/charts',
-                                    displayCheck: (): boolean => true,
                                     divider: true,
                                 },
                                 {
@@ -317,11 +322,7 @@ class App extends React.Component<Props, State> {
                             ].map(
                                 (item) =>
                                     item.displayCheck() && (
-                                        <Link
-                                            key={item.text}
-                                            to={item.to}
-                                            onClick={this.handleDrawerClose}
-                                        >
+                                        <Link key={item.text} to={item.to}>
                                             <ListItem
                                                 button
                                                 key={item.text}
@@ -347,42 +348,9 @@ class App extends React.Component<Props, State> {
                     >
                         <div className={classes.drawerHeader} />
                         <Switch>
-                            {this.hasAnyRole(['curator']) && (
-                                <Route
-                                    path="/cases/edit/:id"
-                                    render={({ match }) => {
-                                        return (
-                                            <EditCase
-                                                id={match.params.id}
-                                                user={this.state.user}
-                                            />
-                                        );
-                                    }}
-                                />
-                            )}
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <Route
-                                    path="/cases/view/:id"
-                                    render={({ match }) => {
-                                        return (
-                                            <ViewCase id={match.params.id} />
-                                        );
-                                    }}
-                                />
-                            )}
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route exact path="/cases">
                                     <LinelistTable user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/new">
-                                    <CaseForm user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/bulk">
-                                    <BulkCaseForm user={this.state.user} />
                                 </Route>
                             )}
                             {this.hasAnyRole(['curator', 'reader']) && (
@@ -390,9 +358,6 @@ class App extends React.Component<Props, State> {
                                     <SourceTable />
                                 </Route>
                             )}
-                            <Route path="/charts">
-                                <Charts />
-                            </Route>
                             {this.state.user.email && (
                                 <Route path="/profile">
                                     <Profile user={this.state.user} />
@@ -405,9 +370,60 @@ class App extends React.Component<Props, State> {
                                         onUserChange={this.getUser}
                                     />
                                 </Route>
+                            )}{' '}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/bulk">
+                                    <BulkCaseForm
+                                        user={this.state.user}
+                                        onModalClose={(): void =>
+                                            history.push('/cases')
+                                        }
+                                    />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route path="/cases/new">
+                                    <CaseForm
+                                        user={this.state.user}
+                                        onModalClose={(): void =>
+                                            history.push('/cases')
+                                        }
+                                    />
+                                </Route>
+                            )}
+                            {this.hasAnyRole(['curator']) && (
+                                <Route
+                                    path="/cases/edit/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <EditCase
+                                                id={match.params.id}
+                                                user={this.state.user}
+                                                onModalClose={(): void =>
+                                                    history.push('/cases')
+                                                }
+                                            />
+                                        );
+                                    }}
+                                />
+                            )}
+                            {this.hasAnyRole(['curator', 'reader']) && (
+                                <Route
+                                    path="/cases/view/:id"
+                                    render={({ match }) => {
+                                        return (
+                                            <ViewCase
+                                                id={match.params.id}
+                                                onModalClose={(): void =>
+                                                    history.push('/cases')
+                                                }
+                                            />
+                                        );
+                                    }}
+                                />
                             )}
                             <Route exact path="/">
-                                <Home user={this.state.user} />
+                                <Charts />
                             </Route>
                         </Switch>
                     </main>
@@ -417,4 +433,4 @@ class App extends React.Component<Props, State> {
     }
 }
 
-export default withStyles(styles, {})(App);
+export default withRouter(withStyles(styles, {})(App));

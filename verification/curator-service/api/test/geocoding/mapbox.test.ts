@@ -43,7 +43,7 @@ describe('geocode', () => {
         features.push(lyon);
         const geocoder = new Geocoder('token', 'mapbox.places');
         let feats = await geocoder.geocode('some query', {
-            limitToResolution: Resolution.Admin3,
+            limitToResolution: [Resolution.Admin3, Resolution.Admin2],
         });
         expect(feats).toHaveLength(1);
         const wantFeature: GeocodeResult = {
@@ -60,7 +60,7 @@ describe('geocode', () => {
         expect(callCount).toBe(1);
         // Call again, cache should have been hit.
         feats = await geocoder.geocode('some query', {
-            limitToResolution: Resolution.Admin3,
+            limitToResolution: [Resolution.Admin3, Resolution.Admin2],
         });
         expect(feats[0]).toEqual(wantFeature);
         expect(callCount).toBe(1);

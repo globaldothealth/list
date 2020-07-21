@@ -1,10 +1,10 @@
-// Case definitions as returned by the /api/cases endpoint.
+// Case definitions as defined by the /api/cases endpoint.
 
 export interface CaseReference {
     sourceId: string;
     sourceEntryId?: string;
     sourceUrl: string;
-    additionalSources: [
+    additionalSources?: [
         {
             sourceUrl: string;
         },
@@ -21,14 +21,14 @@ export interface Event {
 }
 
 export interface Demographics {
-    sex: string;
+    gender: string;
     ageRange: {
         start: number;
         end: number;
     };
     ethnicity: string;
     nationalities: string[];
-    profession: string;
+    occupation: string;
 }
 
 export interface PreexistingConditions {
@@ -45,6 +45,12 @@ export interface Location {
     geometry: Geometry;
     name: string;
     place: string;
+    // These two fields are either required or supplemental for requests, but
+    // aren't part of the returned case objects.
+    // Required to perform geocoding.
+    query?: string;
+    // Optional to hint geocoding results.
+    limitToResolution?: string;
 }
 
 export interface Geometry {

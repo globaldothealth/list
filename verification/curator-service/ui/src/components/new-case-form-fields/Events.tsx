@@ -1,6 +1,7 @@
 import { DateField, SelectField } from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
@@ -23,7 +24,7 @@ export default function Events(): JSX.Element {
     return (
         <Scroll.Element name="events">
             <fieldset>
-                <legend>Events</legend>
+                <FieldTitle title="Events"></FieldTitle>
                 <DateField
                     name="confirmedDate"
                     label="Confirmed case date"
@@ -33,7 +34,6 @@ export default function Events(): JSX.Element {
                     name="methodOfConfirmation"
                     label="Method of confirmation"
                     values={methodsOfConfirmation}
-                    required
                 ></SelectField>
                 <DateField
                     name="onsetSymptomsDate"
