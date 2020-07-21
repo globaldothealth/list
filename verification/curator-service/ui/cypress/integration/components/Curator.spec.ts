@@ -50,6 +50,8 @@ describe('Curator', function () {
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
+        // Change France to something else to check we can edit geocode results.
+        cy.get('input[name="location.country"]').clear().type('Frankreich');
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.get('div[data-testid="methodOfConfirmation"]').click();
         cy.get('li[data-value="PCR test"').click();
@@ -160,7 +162,7 @@ describe('Curator', function () {
             cy.contains('Asian');
             cy.contains('Afghan, Albanian');
             cy.contains('Accountant');
-            cy.contains('France');
+            cy.contains('Frankreich');
             cy.contains('1/1/2020');
             cy.contains('dry cough, mild fever');
             cy.contains('Airborne infection');
@@ -195,7 +197,7 @@ describe('Curator', function () {
             // Location.
             cy.get('input[name="location.country"]').should(
                 'have.value',
-                'France',
+                'Frankreich',
             );
             cy.get('input[name="location.geometry.latitude"]').should(
                 'have.value',
@@ -295,7 +297,7 @@ describe('Curator', function () {
             cy.contains('Accountant');
             cy.contains('Afghan, Albanian');
             cy.contains('Asian');
-            cy.contains('France');
+            cy.contains('Frankreich');
             // Rounded numbers when displayed.
             cy.contains('45.7589');
             cy.contains('4.8414');
