@@ -128,8 +128,8 @@ export default class CasesController {
             if (geocodeErrors.length > 0) {
                 res.status(207).send({
                     phase: 'GEOCODE',
-                    numUpserted: 0,
-                    numErrors: geocodeErrors.length,
+                    createdCaseIds: [],
+                    updatedCaseIds: [],
                     errors: geocodeErrors,
                 });
                 return;
@@ -143,8 +143,8 @@ export default class CasesController {
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
-                    numUpserted: 0,
-                    numErrors: validationResponse.data.errors.length,
+                    createdCaseIds: [],
+                    updatedCaseIds: [],
                     errors: validationResponse.data.errors,
                 });
                 return;
@@ -153,14 +153,19 @@ export default class CasesController {
             // 3. Upsert each case.
             // Consider adding a batchUpsert endpoint on the data service if
             // this slows us down too much.
+            const createdCasesIds = [];
+            const updatedCasesIds = [];
             for (let index = 0; index < req.body.cases.length; index++) {
                 const c = req.body.cases[index];
-                await axios.put(this.dataServerURL + '/api/cases', c);
+                const r = await axios.put(this.dataServerURL + '/api/cases', c);
+                r.status === 201
+                    ? createdCasesIds.push(r.data._id)
+                    : updatedCasesIds.push(r.data._id);
             }
             res.status(200).send({
                 phase: 'UPSERT',
-                numUpserted: req.body.cases.length,
-                numErrors: 0,
+                createdCaseIds: createdCasesIds,
+                updatedCaseIds: updatedCasesIds,
                 errors: [],
             });
             return;
