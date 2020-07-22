@@ -1,11 +1,10 @@
-import MaterialTable, { MaterialTableProps, QueryResult } from 'material-table';
-import { Paper, makeStyles } from '@material-ui/core';
+import MaterialTable, { QueryResult } from 'material-table';
+import React, { RefObject } from 'react';
 
-import Chip from '@material-ui/core/Chip';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiAlert from '@material-ui/lab/Alert';
-import React from 'react';
+import { Paper } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import User from './User';
 import axios from 'axios';
@@ -41,7 +40,10 @@ interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default class Users extends React.Component<Props, UsersState> {
-    tableRef = React.createRef<MaterialTableProps<TableRow>>();
+    // We could use a proper type here but then we wouldn't be able to call
+    // onQueryChange() to refresh the table as we want.
+    // https://github.com/mbrn/material-table/issues/1752
+    tableRef: RefObject<any> = React.createRef();
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -53,15 +55,6 @@ export default class Users extends React.Component<Props, UsersState> {
     }
 
     componentDidMount(): void {
-        axios
-            .get<ListResponse>(this.state.url + '?limit=50')
-            .then((resp) => {
-                this.setState({ users: resp.data.users });
-            })
-            .catch((e) => {
-                this.setState({ users: [] });
-                console.error(e);
-            });
         axios
             .get(this.state.url + 'roles')
             .then((resp) => {
@@ -118,10 +111,11 @@ export default class Users extends React.Component<Props, UsersState> {
                                 .then((result) => {
                                     const flattenedUsers: TableRow[] = [];
                                     const users = result.data.users;
+                                    this.setState({ users: users });
                                     for (const c of users) {
                                         flattenedUsers.push({
                                             id: c._id,
-                                            name: c.name,
+                                            name: c.name || 'Name not provided',
                                             email: c.email,
                                             roles: c.roles,
                                         });
@@ -133,7 +127,7 @@ export default class Users extends React.Component<Props, UsersState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: e.toString() });
+                                    this.setState({ error: JSON.stringify(e) });
                                     reject(e);
                                 });
                         })
@@ -162,6 +156,8 @@ export default class Users extends React.Component<Props, UsersState> {
                 roles: event.target.value,
             })
             .then(() => {
+                console.log('updated user', userId);
+                console.log('state users', this.state.users);
                 const updatedUsers = this.state.users.slice();
                 (updatedUsers.find(
                     (user: User) => user._id === userId,
@@ -171,9 +167,7 @@ export default class Users extends React.Component<Props, UsersState> {
                     this.props.onUserChange();
                 }
                 if (this.tableRef?.current) {
-                    // We'd need to refresh the table but TS is too strict here.
-                    // https://github.com/mbrn/material-table/issues/1752
-                    this.tableRef.current.onQueryChange!();
+                    this.tableRef.current.onQueryChange();
                 }
             })
             .catch((e) => {
@@ -202,13 +196,9 @@ export default class Users extends React.Component<Props, UsersState> {
                             rowData.id,
                         )
                     }
-                    renderValue={(selected) => (
-                        <>
-                            {(selected as string[]).map((value) => (
-                                <Chip key={value} label={value} />
-                            ))}
-                        </>
-                    )}
+                    renderValue={(selected) =>
+                        (selected as string[]).sort().join(', ')
+                    }
                 >
                     {this.state.availableRoles.map((role) => (
                         <MenuItem key={role} value={role}>
