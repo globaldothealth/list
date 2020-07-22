@@ -16,7 +16,6 @@ interface ListResponse {
 }
 
 interface UsersState {
-    users: User[];
     availableRoles: string[];
     url: string;
     error: string;
@@ -47,7 +46,6 @@ export default class Users extends React.Component<Props, UsersState> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            users: [],
             availableRoles: [],
             url: '/api/users/',
             error: '',
@@ -111,9 +109,7 @@ export default class Users extends React.Component<Props, UsersState> {
                             response
                                 .then((result) => {
                                     const flattenedUsers: TableRow[] = [];
-                                    const users = result.data.users;
-                                    this.setState({ users: users });
-                                    for (const c of users) {
+                                    for (const c of result.data.users) {
                                         flattenedUsers.push({
                                             id: c._id,
                                             name: c.name || 'Name not provided',
@@ -161,11 +157,6 @@ export default class Users extends React.Component<Props, UsersState> {
                 roles: event.target.value,
             })
             .then(() => {
-                const updatedUsers = this.state.users.slice();
-                (updatedUsers.find(
-                    (user: User) => user._id === userId,
-                ) as User).roles = event.target.value;
-                this.setState({ users: updatedUsers, error: '' });
                 if (userId === this.props.user._id) {
                     this.props.onUserChange();
                 }
