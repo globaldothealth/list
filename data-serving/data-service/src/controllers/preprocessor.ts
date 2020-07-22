@@ -3,29 +3,26 @@ import { NextFunction, Request, Response } from 'express';
 
 import { RevisionMetadata } from '../model/revision-metadata';
 
-const createNewMetadata = (curatorEmail: string, creationNotes: string) => {
+const createNewMetadata = (curatorEmail: string) => {
     return {
         revisionNumber: 0,
         creationMetadata: {
             curator: curatorEmail,
             date: Date.now(),
-            notes: creationNotes,
         },
     };
 };
 
-const createUpdateMetadata = (
-    c: CaseDocument,
-    curatorEmail: string,
-    updateNotes: string,
-) => {
+const createUpdateMetadata = (c: CaseDocument, curatorEmail: string) => {
     return {
         revisionNumber: ++c.revisionMetadata.revisionNumber,
-        creationMetadata: c.revisionMetadata.creationMetadata,
+        creationMetadata: {
+            curator: c.revisionMetadata.creationMetadata.curator,
+            date: c.revisionMetadata.creationMetadata.date.getTime(),
+        },
         updateMetadata: {
             curator: curatorEmail,
             date: Date.now(),
-            notes: updateNotes,
         },
     };
 };
@@ -62,21 +59,12 @@ export const setRevisionMetadata = async (
     // Set the correct, server-generated revisionMetadata for subsequent
     // processors to use.
     const revisionMetadata = c
-        ? createUpdateMetadata(
-              c,
-              curatorEmail,
-              request.body?.revisionMetadata?.updateMetadata?.notes,
-          )
-        : createNewMetadata(
-              curatorEmail,
-              request.body?.revisionMetadata?.creationMetadata?.notes,
-          );
+        ? createUpdateMetadata(c, curatorEmail)
+        : createNewMetadata(curatorEmail);
     request.body.revisionMetadata = revisionMetadata;
 
-    // Clean up the additional metadata.
+    // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;
 
-    // NTS: Can you call `next` with the case and save ourselves from having to
-    // do multiple reads?
     next();
 };
