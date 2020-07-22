@@ -117,7 +117,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
 
-        // Fetch nonexistant page.
+        // Fetch nonexistent page.
         res = await curatorRequest
             .get('/api/sources?page=42&limit=10')
             .expect(200)
