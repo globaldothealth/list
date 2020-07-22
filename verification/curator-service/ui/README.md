@@ -24,13 +24,19 @@ The following fields are currently incorporated:
 
 - `sourceEntryId`: Optional. The UUID provided by the data source to identify
 the specific case.
-- `country`: **Required**.
-- `admin1`: Optional.
-- `admin2`: Optional.
-- `admin3`: Optional.
+- `country`: **Required**. Country name text (e.g., "United States").
+- `admin1`: Optional. Meaning differs by country (e.g., this is state in the
+US).
+[See full definition here](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country).
+- `admin2`: Optional. Meaning differs by country (e.g., this is county in the
+US).
+[See full definition here](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country).
+- `admin3`: Optional. Meaning differs by country (e.g., this is municipality in the
+US).
+[See full definition here](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country).
 - `gender`: Optional. One of `Female`, `Male`, `Non-binary/Third gender`, or `Other`.
-- `ageRangeStart`: Optional. Number (years) from 0 to 140.
-- `ageRangeEnd`: Optional. Number (years) from 0 to 140.
+- `ageRangeStart`: Optional. Number (years) from 0 to 120.
+- `ageRangeEnd`: Optional. Number (years) from 0 to 120.
 - `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was
 confirmed.
 - `hospitalized`: Optional. One of `true` or `false`.
