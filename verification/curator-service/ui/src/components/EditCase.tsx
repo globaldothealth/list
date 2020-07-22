@@ -9,6 +9,7 @@ import axios from 'axios';
 interface Props {
     user: User;
     id: string;
+    onModalClose: () => void;
 }
 
 interface State {
@@ -48,6 +49,7 @@ class EditCase extends React.Component<Props, State> {
                     <CaseForm
                         user={this.props.user}
                         initialCase={this.state.case}
+                        onModalClose={this.props.onModalClose}
                     />
                 )}
             </div>

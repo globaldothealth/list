@@ -36,7 +36,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     const searchQuery = String(req.query.q || '').trim();
     const query = searchQuery
         ? {
-            $text: { $search: searchQuery },
+              $text: { $search: searchQuery },
           }
         : {};
 
@@ -82,13 +82,47 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         // TODO: Don't consume req.body directly; add layer between API and
         // storage.
         const c = new Case(req.body);
-        const result = await c.save();
+        let result;
+        if (req.query.validate_only) {
+            await c.validate();
+            result = c;
+        } else {
+            result = await c.save();
+        }
         res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
             res.status(422).json(err.message);
             return;
         }
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
+ * Batch validates cases.
+ *
+ * Handles HTTP POST /api/cases/batchValidate.
+ */
+export const batchValidate = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const errors: { index: number; message: string }[] = [];
+        await Promise.all(
+            // We're about to validate this data; any is fine, here.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            req.body.cases.map((c: any, index: number) => {
+                return new Case(c).validate().catch((e) => {
+                    errors.push({ index: index, message: e.message });
+                });
+            }),
+        );
+        res.status(207).json({ errors: errors });
+        return;
+    } catch (err) {
         res.status(500).json(err.message);
         return;
     }

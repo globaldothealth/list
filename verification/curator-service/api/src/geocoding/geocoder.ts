@@ -28,9 +28,9 @@ export enum Resolution {
 }
 
 export interface GeocodeOptions {
-    // If set, will only return features with the given resolution
-    // otherwise all available resolutions can be returned.
-    limitToResolution?: Resolution;
+    // If set, will only return features with the given resolutions.
+    // Otherwise all available resolutions can be returned.
+    limitToResolution?: Resolution[];
 }
 
 // A geocoder can geocode queries into places.

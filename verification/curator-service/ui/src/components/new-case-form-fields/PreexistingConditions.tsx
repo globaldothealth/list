@@ -1,4 +1,5 @@
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -11,7 +12,7 @@ export default function PreexistingConditions(): JSX.Element {
     return (
         <Scroll.Element name="preexistingConditions">
             <fieldset>
-                <legend>Pre-existing conditions</legend>
+                <FieldTitle title="Pre-existing conditions"></FieldTitle>
                 <SelectField
                     name="hasPreexistingConditions"
                     label="Has preexisting conditions"
@@ -23,7 +24,7 @@ export default function PreexistingConditions(): JSX.Element {
                         label="Preexisting conditions"
                         initialValue={initialValues.preexistingConditions}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/preexisting_conditions.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/preexisting_conditions.txt"
                     />
                 )}
             </fieldset>

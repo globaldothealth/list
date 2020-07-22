@@ -9,6 +9,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import Location from './Location';
 import { PlacesAutocomplete } from './LocationForm';
 import React from 'react';
@@ -26,6 +27,9 @@ const useStyles = makeStyles(() => ({
     },
     fieldRow: {
         marginBottom: '2em',
+    },
+    fieldRowTop: {
+        marginTop: '2em',
     },
 }));
 
@@ -50,7 +54,7 @@ export default function Events(): JSX.Element {
     return (
         <Scroll.Element name="travelHistory">
             <fieldset>
-                <legend>Travel History</legend>
+                <FieldTitle title="Travel History"></FieldTitle>
                 <SelectField
                     name={`traveledPrior30Days`}
                     label="Travelled in the last 30 days"
@@ -112,18 +116,31 @@ export default function Events(): JSX.Element {
                                                             }
                                                             name={`travelHistory[${index}].location`}
                                                         ></PlacesAutocomplete>
-                                                        <Location
-                                                            location={
-                                                                travelHistoryElement.location
+                                                        {travelHistoryElement.location && (
+                                                            <Location
+                                                                locationPath={`travelHistory[${index}].location`}
+                                                                geometry={
+                                                                    values
+                                                                        .travelHistory[
+                                                                        index
+                                                                    ]?.location
+                                                                        ?.geometry
+                                                                }
+                                                            ></Location>
+                                                        )}
+                                                        <div
+                                                            className={
+                                                                classes.fieldRowTop
                                                             }
-                                                        ></Location>
-                                                        <DateField
-                                                            name={`travelHistory[${index}].dateRange.start`}
-                                                            label="Start date"
-                                                            initialFocusedDate={
-                                                                values.confirmedDate
-                                                            }
-                                                        ></DateField>
+                                                        >
+                                                            <DateField
+                                                                name={`travelHistory[${index}].dateRange.start`}
+                                                                label="Start date"
+                                                                initialFocusedDate={
+                                                                    values.confirmedDate
+                                                                }
+                                                            ></DateField>
+                                                        </div>
                                                         <DateField
                                                             name={`travelHistory[${index}].dateRange.end`}
                                                             label="End date"
@@ -152,7 +169,8 @@ export default function Events(): JSX.Element {
                                                                         index
                                                                     ]?.methods
                                                                 }
-                                                                multiple={true}
+                                                                multiple
+                                                                freeSolo
                                                                 optionsList={
                                                                     travelMethods
                                                                 }

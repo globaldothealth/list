@@ -1,6 +1,6 @@
 {
     "caseReference": {
-        "sourceId": "sourceId",
+        "sourceId": "5ea86423bae6982635d2e1f8",
         "sourceEntryId": "entryId",
         "sourceUrl": "cdc.gov",
         "additionalSources": [
@@ -17,8 +17,8 @@
             "start": 50.0,
             "end": 59.0
         },
-        "sex": "Female",
-        "profession": "Horse trainer",
+        "gender": "Female",
+        "occupation": "Horse trainer",
         "nationality": "Swedish",
         "ethnicity": "Other"
     },

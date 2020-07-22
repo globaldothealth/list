@@ -4,6 +4,7 @@ import {
 } from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
@@ -21,7 +22,7 @@ export default function Symptoms(): JSX.Element {
     return (
         <Scroll.Element name="symptoms">
             <fieldset>
-                <legend>Symptoms</legend>
+                <FieldTitle title="Symptoms"></FieldTitle>
                 <SelectField
                     name="symptomsStatus"
                     label="Symptom status"
@@ -34,7 +35,7 @@ export default function Symptoms(): JSX.Element {
                         label="Symptoms"
                         initialValue={initialValues.symptoms}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/symptoms.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/symptoms.txt"
                     />
                 )}
             </fieldset>

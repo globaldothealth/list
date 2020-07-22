@@ -3,8 +3,11 @@ import * as Yup from 'yup';
 import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
+import AppModal from './AppModal';
 import { Case } from './Case';
 import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -28,26 +31,33 @@ import User from './User';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
-import { createStyles } from '@material-ui/core/styles';
 import { hasKey } from './Utils';
 import shortId from 'shortid';
 import { withStyles } from '@material-ui/core';
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
-        container: {
-            display: 'flex',
+        modalContents: {
+            backgroundColor: theme.palette.background.paper,
+            left: '300px',
+            height: '100%',
+            position: 'absolute',
+            outline: 'none',
+            // Remainder of the screen width accounting for left shift
+            width: 'calc(100vw - 300px)',
+        },
+        appBar: {
+            background: 'white',
         },
         tableOfContents: {
             position: 'fixed',
-            marginTop: '2em',
         },
         tableOfContentsRow: {
             alignItems: 'center',
             display: 'flex',
         },
         form: {
-            paddingLeft: '15em',
+            paddingLeft: '18em',
         },
         formSection: {
             margin: '2em 0',
@@ -56,18 +66,20 @@ const styles = () =>
             marginTop: '1em',
             maxWidth: '80%',
         },
+        cancelButton: { marginLeft: '1em' },
     });
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
-            sex: undefined,
+            caseReference: undefined,
+            gender: undefined,
             minAge: undefined,
             maxAge: undefined,
             age: undefined,
             ethnicity: undefined,
             nationalities: [],
-            profession: undefined,
+            occupation: undefined,
             location: undefined,
             confirmedDate: null,
             methodOfConfirmation: undefined,
@@ -91,12 +103,12 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             travelHistory: [],
             genomeSequences: [],
             pathogens: [],
-            sourceUrl: '',
             notes: '',
         };
     }
     return {
-        sex: c.demographics?.sex,
+        caseReference: c.caseReference,
+        gender: c.demographics?.gender,
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -111,7 +123,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 : undefined,
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
-        profession: c.demographics?.profession,
+        occupation: c.demographics?.occupation,
         location: c.location,
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
@@ -168,29 +180,32 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             return { reactId: shortId.generate(), ...genomeSequence };
         }),
         pathogens: c.pathogens,
-        sourceUrl: c.caseReference?.sourceUrl,
         notes: c.notes,
     };
 }
 
-interface Props extends WithStyles<typeof styles> {
+interface Props extends RouteComponentProps, WithStyles<typeof styles> {
     user: User;
     initialCase?: Case;
+    onModalClose: () => void;
 }
 
 interface CaseFormState {
     errorMessage: string;
-    successMessage: string;
 }
 
+// TODO: get 0 and 120 min/max age values from the backend.
 const NewCaseValidation = Yup.object().shape(
     {
+        caseReference: Yup.object().required('Required'),
         minAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
             .when('maxAge', {
                 is: (maxAge) => maxAge !== undefined && maxAge !== '',
-                then: Yup.number().required('Must enter minimum age in range'),
+                then: Yup.number().required(
+                    'Min age required in range. Minimum value is 0.',
+                ),
             }),
         maxAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
@@ -202,7 +217,9 @@ const NewCaseValidation = Yup.object().shape(
                         Yup.ref('minAge'),
                         'Max age must be greater than than min age',
                     )
-                    .required('Must enter maximum age in range'),
+                    .required(
+                        'Max age required in range. Maximum value is 120.',
+                    ),
             }),
         age: Yup.number()
             .min(0, 'Age must be between 0 and 120')
@@ -224,10 +241,8 @@ const NewCaseValidation = Yup.object().shape(
         transmissionLinkedCaseIds: Yup.array().of(
             Yup.string().matches(new RegExp('[a-z0-9]{24}'), 'Invalid case ID'),
         ),
-        confirmedDate: Yup.string().nullable().required('Required field'),
-        location: Yup.object().required('Required field'),
-        methodOfConfirmation: Yup.string().required('Required field'),
-        sourceUrl: Yup.string().required('Required field'),
+        confirmedDate: Yup.string().nullable().required('Required'),
+        location: Yup.object().required('Required'),
     },
     [['maxAge', 'minAge']],
 );
@@ -251,7 +266,6 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         super(props);
         this.state = {
             errorMessage: '',
-            successMessage: '',
         };
     }
 
@@ -288,18 +302,13 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference: {
-                // TODO: Replace the below with a source id once we have lookups
-                // in place.
-                sourceId: 'FAKE_ID',
-                sourceUrl: values.sourceUrl,
-            },
+            caseReference: values.caseReference,
             demographics: {
-                sex: values.sex,
+                gender: values.gender,
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                profession: values.profession,
+                occupation: values.occupation,
             },
             location: values.location,
             events: [
@@ -408,6 +417,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                       },
                   },
         };
+        let newCaseId = '';
         try {
             // Update or create depending on the presence of the initial case ID.
             if (this.props.initialCase?._id) {
@@ -415,18 +425,27 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     `/api/cases/${this.props.initialCase?._id}`,
                     newCase,
                 );
-                this.setState({ successMessage: 'Case edited' });
             } else {
-                await axios.post('/api/cases', newCase);
-                this.setState({ successMessage: 'Case added' });
+                const postResponse = await axios.post('/api/cases', newCase);
+                newCaseId = postResponse.data._id;
             }
             this.setState({ errorMessage: '' });
         } catch (e) {
             this.setState({
-                successMessage: '',
                 errorMessage: JSON.stringify(e),
             });
+            return;
         }
+        // Navigate to cases after successful submit
+        this.props.history.push({
+            pathname: '/cases',
+            state: {
+                newCaseIds: newCaseId ? [newCaseId] : [],
+                editedCaseIds: this.props.initialCase?._id
+                    ? [this.props.initialCase._id]
+                    : [],
+            },
+        });
     }
 
     tableOfContentsIcon(opts: {
@@ -464,336 +483,367 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             duration: 100,
             smooth: true,
             offset: -64, // Account for header height
+            containerId: 'scroll-container',
         });
     }
 
     render(): JSX.Element {
         const { classes, initialCase } = this.props;
         return (
-            <Formik
-                initialValues={initialValuesFromCase(initialCase)}
-                validationSchema={NewCaseValidation}
-                // Validating on change slows down the form too much. It will
-                // validate on blur and form submission.
-                validateOnChange={false}
-                onSubmit={(values) => this.submitCase(values)}
+            <AppModal
+                title={
+                    this.props.initialCase
+                        ? 'Edit case'
+                        : 'Create new COVID-19 line list case'
+                }
+                onModalClose={this.props.onModalClose}
             >
-                {({
-                    submitForm,
-                    isSubmitting,
-                    values,
-                    errors,
-                    touched,
-                }): JSX.Element => (
-                    <div className={classes.container}>
-                        <nav className={classes.tableOfContents}>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('source')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.sourceUrl?.trim() !== '',
-                                    hasError: hasErrors(
-                                        ['sourceUrl'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Source
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void =>
-                                    this.scrollTo('demographics')
-                                }
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.sex !== undefined ||
-                                        (values.age !== undefined &&
-                                            values.age.toString() !== '') ||
-                                        (values.minAge !== undefined &&
-                                            values.minAge.toString() !== '' &&
-                                            values.maxAge !== undefined &&
-                                            values.maxAge.toString() !== '') ||
-                                        values.ethnicity !== undefined ||
-                                        values.nationalities?.length > 0 ||
-                                        values.profession !== undefined,
-                                    hasError: hasErrors(
-                                        [
-                                            'sex',
-                                            'minAge',
-                                            'maxAge',
-                                            'age',
-                                            'ethnicity',
-                                            'nationalities',
-                                            'profession',
-                                        ],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Demographics
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('location')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.location !== null &&
-                                        values.location !== undefined,
-                                    hasError: hasErrors(
-                                        ['location'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Location
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('events')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.confirmedDate !== null ||
-                                        values.methodOfConfirmation !==
-                                            undefined ||
-                                        values.onsetSymptomsDate !== null ||
-                                        values.firstClinicalConsultationDate !==
-                                            null ||
-                                        values.selfIsolationDate !== null ||
-                                        values.admittedToHospital !==
-                                            undefined ||
-                                        values.hospitalAdmissionDate !== null ||
-                                        values.icuAdmissionDate !== null ||
-                                        values.outcomeDate !== null ||
-                                        values.outcome !== undefined,
-                                    hasError: hasErrors(
-                                        [
-                                            'confirmedDate',
-                                            'methodOfConfirmation',
-                                            'onsetSymptomsDate',
-                                            'firstClinicalConsultationDate',
-                                            'selfIsolationDate',
-                                            'admittedToHospital',
-                                            'hospitalAdmissionDate',
-                                            'icuAdmissionDate',
-                                            'outcomeDate',
-                                            'outcome',
-                                        ],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Events
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('symptoms')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.symptomsStatus !== undefined ||
-                                        values.symptoms?.length > 0,
-                                    hasError: hasErrors(
-                                        ['symptomsStatus', 'symptoms'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Symptoms
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void =>
-                                    this.scrollTo('preexistingConditions')
-                                }
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.hasPreexistingConditions !==
-                                            undefined ||
-                                        values.preexistingConditions?.length >
-                                            0,
-                                    hasError: hasErrors(
-                                        [
-                                            'hasPreexistingConditions',
-                                            'preexistingConditions',
-                                        ],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Preexisting conditions
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void =>
-                                    this.scrollTo('transmission')
-                                }
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.transmissionRoutes?.length > 0 ||
-                                        values.transmissionPlaces?.length > 0 ||
-                                        values.transmissionLinkedCaseIds
-                                            ?.length > 0,
-                                    hasError: hasErrors(
-                                        [
-                                            'transmissionRoutes',
-                                            'transmissionPlaces',
-                                            'transmissionLinkedCaseIds',
-                                        ],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Transmission
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void =>
-                                    this.scrollTo('travelHistory')
-                                }
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.travelHistory?.length > 0 ||
-                                        values.traveledPrior30Days !==
-                                            undefined,
-                                    hasError: hasErrors(
-                                        [
-                                            'traveledPrior30Days',
-                                            'travelHistory',
-                                        ],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Travel History
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void =>
-                                    this.scrollTo('genomeSequences')
-                                }
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked:
-                                        values.genomeSequences?.length > 0,
-                                    hasError: hasErrors(
-                                        ['genomeSequences'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Genome Sequences
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('pathogens')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.pathogens?.length > 0,
-                                    hasError: hasErrors(
-                                        ['pathogens'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Pathogens
-                            </div>
-                            <div
-                                className={classes.tableOfContentsRow}
-                                onClick={(): void => this.scrollTo('notes')}
-                            >
-                                {this.tableOfContentsIcon({
-                                    isChecked: values.notes?.trim() !== '',
-                                    hasError: hasErrors(
-                                        ['notes'],
-                                        errors,
-                                        touched,
-                                    ),
-                                })}
-                                Notes
-                            </div>
-                        </nav>
-                        <div className={classes.form}>
-                            <Form>
-                                <div className={classes.formSection}>
-                                    <Source></Source>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Demographics></Demographics>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <LocationForm></LocationForm>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Events></Events>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Symptoms></Symptoms>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <PreexistingConditions></PreexistingConditions>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Transmission></Transmission>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <TravelHistory></TravelHistory>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <GenomeSequences></GenomeSequences>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Pathogens></Pathogens>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <Notes></Notes>
-                                </div>
-                                {isSubmitting && <LinearProgress />}
-                                <br />
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    data-testid="submit"
-                                    disabled={isSubmitting}
-                                    onClick={submitForm}
+                <Formik
+                    initialValues={initialValuesFromCase(initialCase)}
+                    validationSchema={NewCaseValidation}
+                    // Validating on change slows down the form too much. It will
+                    // validate on blur and form submission.
+                    validateOnChange={false}
+                    onSubmit={(values) => this.submitCase(values)}
+                >
+                    {({
+                        submitForm,
+                        isSubmitting,
+                        values,
+                        errors,
+                        touched,
+                    }): JSX.Element => (
+                        <div>
+                            <nav className={classes.tableOfContents}>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('source')
+                                    }
                                 >
-                                    {this.props.initialCase
-                                        ? 'Edit case'
-                                        : 'Submit case'}
-                                </Button>
-                            </Form>
-                            {this.state.successMessage && (
-                                <MuiAlert
-                                    className={classes.statusMessage}
-                                    elevation={6}
-                                    variant="filled"
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.caseReference !== null &&
+                                            values.caseReference !== undefined,
+                                        hasError: hasErrors(
+                                            ['caseReference'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Source'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('demographics')
+                                    }
                                 >
-                                    {this.state.successMessage}
-                                </MuiAlert>
-                            )}
-                            {this.state.errorMessage && (
-                                <MuiAlert
-                                    className={classes.statusMessage}
-                                    elevation={6}
-                                    variant="filled"
-                                    severity="error"
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.gender !== undefined ||
+                                            (values.age !== undefined &&
+                                                values.age.toString() !== '') ||
+                                            (values.minAge !== undefined &&
+                                                values.minAge.toString() !==
+                                                    '' &&
+                                                values.maxAge !== undefined &&
+                                                values.maxAge.toString() !==
+                                                    '') ||
+                                            values.ethnicity !== undefined ||
+                                            values.nationalities?.length > 0 ||
+                                            values.occupation !== undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'gender',
+                                                'minAge',
+                                                'maxAge',
+                                                'age',
+                                                'ethnicity',
+                                                'nationalities',
+                                                'occupation',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Demographics'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('location')
+                                    }
                                 >
-                                    {this.state.errorMessage}
-                                </MuiAlert>
-                            )}
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.location !== null &&
+                                            values.location !== undefined,
+                                        hasError: hasErrors(
+                                            ['location'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Location'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('events')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.confirmedDate !== null ||
+                                            values.methodOfConfirmation !==
+                                                undefined ||
+                                            values.onsetSymptomsDate !== null ||
+                                            values.firstClinicalConsultationDate !==
+                                                null ||
+                                            values.selfIsolationDate !== null ||
+                                            values.admittedToHospital !==
+                                                undefined ||
+                                            values.hospitalAdmissionDate !==
+                                                null ||
+                                            values.icuAdmissionDate !== null ||
+                                            values.outcomeDate !== null ||
+                                            values.outcome !== undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'confirmedDate',
+                                                'methodOfConfirmation',
+                                                'onsetSymptomsDate',
+                                                'firstClinicalConsultationDate',
+                                                'selfIsolationDate',
+                                                'admittedToHospital',
+                                                'hospitalAdmissionDate',
+                                                'icuAdmissionDate',
+                                                'outcomeDate',
+                                                'outcome',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Events'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('symptoms')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.symptomsStatus !==
+                                                undefined ||
+                                            values.symptoms?.length > 0,
+                                        hasError: hasErrors(
+                                            ['symptomsStatus', 'symptoms'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Symptoms'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('preexistingConditions')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.hasPreexistingConditions !==
+                                                undefined ||
+                                            values.preexistingConditions
+                                                ?.length > 0,
+                                        hasError: hasErrors(
+                                            [
+                                                'hasPreexistingConditions',
+                                                'preexistingConditions',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Preexisting conditions'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('transmission')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.transmissionRoutes?.length >
+                                                0 ||
+                                            values.transmissionPlaces?.length >
+                                                0 ||
+                                            values.transmissionLinkedCaseIds
+                                                ?.length > 0,
+                                        hasError: hasErrors(
+                                            [
+                                                'transmissionRoutes',
+                                                'transmissionPlaces',
+                                                'transmissionLinkedCaseIds',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Transmission'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('travelHistory')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.travelHistory?.length > 0 ||
+                                            values.traveledPrior30Days !==
+                                                undefined,
+                                        hasError: hasErrors(
+                                            [
+                                                'traveledPrior30Days',
+                                                'travelHistory',
+                                            ],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Travel History'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('genomeSequences')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked:
+                                            values.genomeSequences?.length > 0,
+                                        hasError: hasErrors(
+                                            ['genomeSequences'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Genome Sequences'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        this.scrollTo('pathogens')
+                                    }
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked: values.pathogens?.length > 0,
+                                        hasError: hasErrors(
+                                            ['pathogens'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Pathogens'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
+                                    onClick={(): void => this.scrollTo('notes')}
+                                >
+                                    {this.tableOfContentsIcon({
+                                        isChecked: values.notes?.trim() !== '',
+                                        hasError: hasErrors(
+                                            ['notes'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Notes'.toLocaleUpperCase()}
+                                </div>
+                            </nav>
+                            <div className={classes.form}>
+                                <Form>
+                                    <div className={classes.formSection}>
+                                        <Source
+                                            initialValue={values.caseReference}
+                                            hasSourceEntryId={true}
+                                        ></Source>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Demographics></Demographics>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <LocationForm></LocationForm>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Events></Events>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Symptoms></Symptoms>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <PreexistingConditions></PreexistingConditions>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Transmission></Transmission>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <TravelHistory></TravelHistory>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <GenomeSequences></GenomeSequences>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Pathogens></Pathogens>
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <Notes></Notes>
+                                    </div>
+                                    {isSubmitting && <LinearProgress />}
+                                    <br />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        disableElevation
+                                        data-testid="submit"
+                                        disabled={isSubmitting}
+                                        onClick={submitForm}
+                                    >
+                                        {this.props.initialCase
+                                            ? 'Edit case'
+                                            : 'Submit case'}
+                                    </Button>
+                                    <Button
+                                        className={classes.cancelButton}
+                                        color="primary"
+                                        variant="outlined"
+                                        onClick={this.props.onModalClose}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Form>
+                                {this.state.errorMessage && (
+                                    <MuiAlert
+                                        className={classes.statusMessage}
+                                        elevation={6}
+                                        variant="filled"
+                                        severity="error"
+                                    >
+                                        {this.state.errorMessage}
+                                    </MuiAlert>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </Formik>
+                    )}
+                </Formik>
+            </AppModal>
         );
     }
 }
 
-export default withStyles(styles)(CaseForm);
+export default withRouter(withStyles(styles)(CaseForm));

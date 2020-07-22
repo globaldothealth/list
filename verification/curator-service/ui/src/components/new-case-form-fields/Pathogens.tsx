@@ -2,6 +2,7 @@ import { Field, useFormikContext } from 'formik';
 
 import { Autocomplete } from '@material-ui/lab';
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -11,7 +12,7 @@ export default function Pathogens(): JSX.Element {
     return (
         <Scroll.Element name="pathogens">
             <fieldset>
-                <legend>Pathogens</legend>
+                <FieldTitle title="Pathogens"></FieldTitle>
                 <PathogensAutocomplete />
             </fieldset>
         </Scroll.Element>
@@ -38,7 +39,7 @@ export function PathogensAutocomplete(): JSX.Element {
 
         (async (): Promise<void> => {
             const resp = await axios.get<string>(
-                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/pathogens.csv',
+                'https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/pathogens.csv',
             );
             // CSV lines are of the form '123,Disease name' and we want to
             // map that to [{'Disease name', 123}]

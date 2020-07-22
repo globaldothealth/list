@@ -1,7 +1,7 @@
 {
     "_id": "5ef8e943dfe6e00030892d58",
     "caseReference": {
-        "sourceId": "sourceId",
+        "sourceId": "5ea86423bae6982635d2e1f8",
         "sourceEntryId": "entryId",
         "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19",
         "additionalSources": [
@@ -18,8 +18,8 @@
             "start": 50.0,
             "end": 59.0
         },
-        "sex": "Female",
-        "profession": "Horse breeder",
+        "gender": "Non-binary/Third gender",
+        "occupation": "Horse breeder",
         "nationalities": ["Swedish"],
         "ethnicity": "Asian"
     },

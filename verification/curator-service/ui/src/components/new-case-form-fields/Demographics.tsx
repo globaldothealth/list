@@ -2,6 +2,7 @@ import { FastField, useFormikContext } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 
 import CaseFormValues from './CaseFormValues';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import FormControl from '@material-ui/core/FormControl';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -35,15 +36,11 @@ const styles = () =>
 type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
-const sexValues = [undefined, 'Male', 'Female'];
-
-const ethnicityValues = [
+const genderValues = [
     undefined,
-    'Asian',
-    'Black',
-    'Latino',
-    'Multi-race',
-    'White',
+    'Male',
+    'Female',
+    'Non-binary/Third gender',
     'Other',
 ];
 
@@ -53,21 +50,24 @@ function Demographics(props: DemographicsProps): JSX.Element {
     return (
         <Scroll.Element name="demographics">
             <fieldset>
-                <legend>Demographics</legend>
+                <FieldTitle title="Demographics"></FieldTitle>
                 <FormControl>
                     <div className={classes.fieldRow}>
-                        <InputLabel htmlFor="sex">Sex</InputLabel>
+                        <InputLabel htmlFor="gender">Gender</InputLabel>
                         <FastField
                             as="select"
-                            name="sex"
+                            name="gender"
                             type="text"
-                            data-testid="sex"
+                            data-testid="gender"
                             className={classes.select}
                             component={Select}
                         >
-                            {sexValues.map((sex) => (
-                                <MenuItem key={sex ?? 'undefined'} value={sex}>
-                                    {sex ?? 'Unknown'}
+                            {genderValues.map((gender) => (
+                                <MenuItem
+                                    key={gender ?? 'undefined'}
+                                    value={gender}
+                                >
+                                    {gender ?? 'Unknown'}
                                 </MenuItem>
                             ))}
                         </FastField>
@@ -99,26 +99,14 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     ></FastField>
                 </div>
                 <div className={classes.fieldRow}>
-                    <FormControl>
-                        <InputLabel htmlFor="ethnicity">Ethnicity</InputLabel>
-                        <FastField
-                            as="select"
-                            name="ethnicity"
-                            type="text"
-                            data-testid="ethnicity"
-                            className={classes.select}
-                            component={Select}
-                        >
-                            {ethnicityValues.map((ethnicity) => (
-                                <MenuItem
-                                    key={ethnicity ?? 'undefined'}
-                                    value={ethnicity}
-                                >
-                                    {ethnicity ?? 'Unknown'}
-                                </MenuItem>
-                            ))}
-                        </FastField>
-                    </FormControl>
+                    <FastField
+                        label="Race / Ethnicity"
+                        name="ethnicity"
+                        type="text"
+                        data-testid="ethnicity"
+                        component={TextField}
+                        fullWidth
+                    />
                 </div>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
@@ -126,15 +114,16 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         label="Nationality"
                         initialValue={initialValues.nationalities}
                         multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/nationalities.txt"
                     />
                 </div>
                 <FormikAutocomplete
-                    name="profession"
-                    label="Profession"
-                    initialValue={initialValues.profession}
+                    name="occupation"
+                    label="Occupation"
+                    initialValue={initialValues.occupation}
                     multiple={false}
-                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/professions.txt"
+                    freeSolo
+                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/occupations.txt"
                 />
             </fieldset>
         </Scroll.Element>

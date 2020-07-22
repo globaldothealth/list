@@ -3,7 +3,7 @@ name: Update case data in dev
 on:
   push:
     # Update the data when the schema changes.
-    branches: [master]
+    branches: [main]
     paths: ["data-serving/data-service/schemas/**"]
 
 jobs:
