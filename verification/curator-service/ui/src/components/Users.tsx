@@ -19,8 +19,8 @@ interface UsersState {
     users: User[];
     availableRoles: string[];
     url: string;
-
     error: string;
+    pageSize: number;
 }
 
 interface TableRow {
@@ -51,6 +51,7 @@ export default class Users extends React.Component<Props, UsersState> {
             availableRoles: [],
             url: '/api/users/',
             error: '',
+            pageSize: 10,
         };
     }
 
@@ -103,7 +104,7 @@ export default class Users extends React.Component<Props, UsersState> {
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
-                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             this.setState({ error: '' });
                             const response = axios.get<ListResponse>(listUrl);
@@ -139,8 +140,12 @@ export default class Users extends React.Component<Props, UsersState> {
                         sorting: false,
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        pageSize: 10,
+                        pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                    }}
+                    onChangeRowsPerPage={(newPageSize: number) => {
+                        this.setState({ pageSize: newPageSize });
+                        this.tableRef.current.onQueryChange();
                     }}
                 />
             </Paper>
