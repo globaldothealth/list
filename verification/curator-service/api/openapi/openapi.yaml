@@ -12,7 +12,9 @@ info:
 paths:
   /auth/register:
     post:
-      tags: [Auth]
+      tags: 
+        - Auth
+        - User
       summary: Authorize a user for the given roles
       operationId: registerAuth
       requestBody:
