@@ -606,7 +606,7 @@ components:
             type: string
         updatedCaseIds:
           type: array
-          description: UUIDs of cases created by the batch upsert
+          description: UUIDs of cases updated by the batch upsert
           items:
             type: string
         errors:
