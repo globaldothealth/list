@@ -599,16 +599,16 @@ components:
             - GEOCODE
             - VALIDATE
             - UPSERT
-        numUpserted:
-          type: integer
-          description: The number of cases upserted by the server
-          format: int32
-          minimum: 0
-        numErrors:
-          type: integer
-          description: The number of cases found to have errors
-          format: int32
-          minimum: 0
+        createdCaseIds:
+          type: array
+          description: UUIDs of cases created by the batch upsert
+          items:
+            type: string
+        updatedCaseIds:
+          type: array
+          description: UUIDs of cases created by the batch upsert
+          items:
+            type: string
         errors:
           type: array
           items:
@@ -623,8 +623,8 @@ components:
               - message
       required:
         - phase
-        - numUpserted
-        - numErrors
+        - createdCaseIds
+        - updatedCaseIds
         - errors
   responses:
     "200Auth":
