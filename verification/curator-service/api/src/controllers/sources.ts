@@ -28,8 +28,8 @@ export default class SourcesController {
         }
         const filter = req.query.url
             ? {
-                'origin.url': new RegExp(req.query.url as string, 'i'),
-            }
+                  'origin.url': new RegExp(req.query.url as string, 'i'),
+              }
             : {};
         try {
             const [docs, total] = await Promise.all([
