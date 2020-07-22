@@ -156,8 +156,6 @@ export default class Users extends React.Component<Props, UsersState> {
                 roles: event.target.value,
             })
             .then(() => {
-                console.log('updated user', userId);
-                console.log('state users', this.state.users);
                 const updatedUsers = this.state.users.slice();
                 (updatedUsers.find(
                     (user: User) => user._id === userId,
