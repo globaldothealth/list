@@ -241,7 +241,10 @@ describe('Cases', () => {
             status: 207,
             data: { errors: [] },
         });
-        mockedAxios.put.mockResolvedValueOnce({ status: 201 });
+        mockedAxios.put.mockResolvedValue({
+            data: { _id: 'abc123' },
+            status: 201,
+        });
         const res = await curatorRequest
             .post('/api/cases/batchUpsert')
             .send({
