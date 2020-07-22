@@ -21,7 +21,7 @@ function mockGetAxios(getUsersResponse: any): void {
                     data: { roles: ['admin', 'curator', 'reader'] },
                 });
             case '/api/users/':
-            case '/api/users/?limit=50':
+            case '/api/users/?limit=10&page=1':
                 return Promise.resolve(getUsersResponse);
             default:
                 return Promise.reject();
@@ -47,7 +47,7 @@ test('lists users', async () => {
     const axiosResponse = {
         data: {
             users: users,
-            total: 15,
+            total: 2,
         },
         status: 200,
         statusText: 'OK',
@@ -69,7 +69,7 @@ test('lists users', async () => {
     expect(await findByText('Name not provided')).toBeInTheDocument();
     expect(await findByText('foo2@bar.com')).toBeInTheDocument();
     expect(queryByText('Carol Smith')).not.toBeInTheDocument();
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/?limit=50');
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/?limit=10&page=1');
 });
 
 test('updates roles on selection', async () => {
@@ -84,7 +84,7 @@ test('updates roles on selection', async () => {
     const axiosResponse = {
         data: {
             users: users,
-            total: 15,
+            total: 1,
         },
         status: 200,
         statusText: 'OK',
@@ -103,8 +103,7 @@ test('updates roles on selection', async () => {
         />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
-    expect(await findByText('admin')).toBeInTheDocument();
-    expect(await findByText('reader')).toBeInTheDocument();
+    expect(await findByText(/admin, reader/)).toBeInTheDocument();
     expect(queryByText('curator')).not.toBeInTheDocument();
 
     // Select new role
@@ -136,14 +135,9 @@ test('updates roles on selection', async () => {
     expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', {
         roles: ['admin', 'reader', 'curator'],
     });
-    expect(await findByText('Alice Smith')).toBeInTheDocument();
-    expect(await findByText('admin')).toBeInTheDocument();
-    expect(await findByText('reader')).toBeInTheDocument();
-    expect(await findByText('curator')).toBeInTheDocument();
 });
 
 test('calls callback when user is changed', async () => {
-    let functionCalledCounter = 0;
     const user = {
         _id: 'abc123',
         name: 'Alice Smith',
@@ -161,14 +155,10 @@ test('calls callback when user is changed', async () => {
         headers: {},
     };
     mockGetAxios(axiosResponse);
+    const mockCallback = jest.fn();
 
     const { getByTestId, findByText, getByRole } = render(
-        <Users
-            user={user}
-            onUserChange={() => {
-                functionCalledCounter++;
-            }}
-        />,
+        <Users user={user} onUserChange={() => mockCallback()} />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
 
@@ -188,7 +178,7 @@ test('calls callback when user is changed', async () => {
         headers: {},
     };
     mockedAxios.put.mockResolvedValueOnce(axiosPutResponse);
-    expect(functionCalledCounter).toBe(0);
+    expect(mockCallback).toHaveBeenCalledTimes(0);
 
     // Select new role
     fireEvent.mouseDown(getByTestId('Alice Smith-select-roles-button'));
@@ -199,7 +189,7 @@ test('calls callback when user is changed', async () => {
     expect(await findByText('Alice Smith')).toBeInTheDocument();
 
     // Check callback has been called
-    expect(functionCalledCounter).toBe(1);
+    expect(mockCallback).toHaveBeenCalledTimes(1);
 });
 
 test('callback not called when other users are changed', async () => {
