@@ -65,8 +65,12 @@ const MongoStore = mongo(session);
 app.use(cookieParser());
 const sess: SessionOptions = {
     secret: env.SESSION_COOKIE_KEY,
-    resave: true,
-    saveUninitialized: true,
+    // MongoStore implements touch() so we don't need resave.
+    // Cf. https://github.com/expressjs/session#resave.
+    resave: false,
+    // Chosing false is useful for login sessions which is what we want.
+    // https://github.com/expressjs/session#saveuninitialized
+    saveUninitialized: false,
     store: new MongoStore({
         mongooseConnection: mongoose.connection,
         secret: env.SESSION_COOKIE_KEY,
