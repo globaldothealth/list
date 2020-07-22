@@ -76,7 +76,7 @@ export class AuthController {
             '/google/redirect',
             // Try to authenticate with the google strategy.
             // This 'google' string is hardcoded within passport.
-            passport.authenticate('google'),
+            passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
                 // User has successfully logged-in.
                 res.redirect(this.afterLoginRedirURL);
@@ -94,6 +94,7 @@ export class AuthController {
             '/google',
             passport.authenticate('google', {
                 scope: ['email'],
+                prompt: 'select_account',
             }),
         );
 

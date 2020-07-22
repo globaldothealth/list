@@ -7,15 +7,28 @@ import {
     Typography,
 } from '@material-ui/core';
 
+import AppModal from './AppModal';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import StaticMap from './StaticMap';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
+import { withStyles } from '@material-ui/core';
 
-interface Props {
+const styles = () =>
+    createStyles({
+        errorMessage: {
+            height: 'fit-content',
+            width: '100%',
+        },
+    });
+
+interface Props extends WithStyles<typeof styles> {
     id: string;
+    onModalClose: () => void;
 }
 
 interface State {
@@ -43,16 +56,22 @@ class ViewCase extends React.Component<Props, State> {
     }
 
     render(): JSX.Element {
+        const { classes } = this.props;
         return (
-            <div>
+            <AppModal title="View case" onModalClose={this.props.onModalClose}>
                 {this.state.loading && <LinearProgress />}
                 {this.state.errorMessage && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
+                    <MuiAlert
+                        className={classes.errorMessage}
+                        elevation={6}
+                        variant="filled"
+                        severity="error"
+                    >
                         {this.state.errorMessage}
                     </MuiAlert>
                 )}
                 {this.state.case && <CaseDetails c={this.state.case} />}
-            </div>
+            </AppModal>
         );
     }
 }
@@ -118,6 +137,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     <RowContent
                         content={props.c.caseReference?.sourceUrl}
                         isLink
+                    />
+
+                    <RowHeader title="Data source entry ID" />
+                    <RowContent
+                        content={props.c.caseReference?.sourceEntryId || ''}
                     />
 
                     {props.c.caseReference?.additionalSources && (
@@ -187,11 +211,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         content={ageRange(props.c.demographics?.ageRange)}
                     />
 
-                    <RowHeader title="Sex" />
-                    <RowContent content={props.c.demographics?.sex} />
+                    <RowHeader title="Gender" />
+                    <RowContent content={props.c.demographics?.gender} />
 
-                    <RowHeader title="Profession" />
-                    <RowContent content={props.c.demographics?.profession} />
+                    <RowHeader title="Occupation" />
+                    <RowContent content={props.c.demographics?.occupation} />
 
                     <RowHeader title="Nationality" />
                     <RowContent
@@ -200,7 +224,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         )}
                     />
 
-                    <RowHeader title="Ethnicity" />
+                    <RowHeader title="Race / Ethnicity" />
                     <RowContent content={props.c.demographics?.ethnicity} />
                 </Grid>
             </Paper>
@@ -508,7 +532,9 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
 function MapRow(props: { location?: Location }): JSX.Element {
     return (
         <Grid item xs={8}>
-            {props.location && <StaticMap location={props.location} />}
+            {props.location?.geometry && (
+                <StaticMap geometry={props.location.geometry} />
+            )}
         </Grid>
     );
 }
@@ -525,7 +551,13 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
     return (
         <Grid item xs={8}>
             {props.isLink && props.content ? (
-                <a href={props.content}>{props.content}</a>
+                <a
+                    href={createHref(props.content)}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    {props.content}
+                </a>
             ) : (
                 props.content
             )}
@@ -540,11 +572,26 @@ function MultilinkRowContent(props: {
         <Grid item xs={8}>
             {props.links?.map((e) => (
                 <p key={e.title}>
-                    <a href={e.link}>{e.title}</a>
+                    <a
+                        href={createHref(e.link)}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        {e.title}
+                    </a>
                 </p>
             ))}
         </Grid>
     );
 }
 
-export default ViewCase;
+/**
+ * Prepare raw link strings for use in <a> href values.
+ */
+function createHref(rawLink: string): string {
+    // Don't modify relative links.
+    if (rawLink.startsWith('/')) return rawLink;
+    return rawLink.match(/^https?:\/\//) ? rawLink : 'https://'.concat(rawLink);
+}
+
+export default withStyles(styles)(ViewCase);

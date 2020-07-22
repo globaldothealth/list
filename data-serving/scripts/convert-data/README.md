@@ -51,7 +51,7 @@ The following fields are lossy:
 
 The following fields are *not* lossy, although they require conversion to a new type:
 
-- `sex`
+- `gender`
 - `location.geometry.latitude`, `location.geometry.longitude`
 - `events[name='admissionHospital']`, `events[name='confirmed']`, `events[name='deathOrDischarge']`
 
@@ -118,7 +118,7 @@ We are backfilling fields including:
 
 Some fields in the new schema cannot be converted because they are not present in the original data, including:
 
-- `demographics.profession`
+- `demographics.occupation`
 - `demographics.nationality`
 - `demographics.ethnicity`
 - `pathogens`

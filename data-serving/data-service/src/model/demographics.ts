@@ -1,12 +1,6 @@
 import { Range } from './range';
 import mongoose from 'mongoose';
 
-export enum Sex {
-    Female = 'Female',
-    Male = 'Male',
-    Other = 'Other',
-}
-
 export const demographicsSchema = new mongoose.Schema(
     {
         ageRange: {
@@ -22,12 +16,8 @@ export const demographicsSchema = new mongoose.Schema(
             },
             _id: false,
         },
-        sex: {
-            type: String,
-            enum: Object.values(Sex),
-        },
-        // TODO: The below 3 fields should be data dictionaries.
-        profession: String,
+        gender: String,
+        occupation: String,
         nationalities: [String],
         ethnicity: String,
     },
@@ -36,8 +26,8 @@ export const demographicsSchema = new mongoose.Schema(
 
 export type DemographicsDocument = mongoose.Document & {
     ageRange: Range<number>;
-    sex: Sex;
-    profession: string;
+    gender: string;
+    occupation: string;
     nationalities: [string];
     ethnicity: string;
 };

@@ -1,2 +1,2 @@
-sourceId,sourceEntryId,sourceUrl,sex,ageRangeStart,ageRangeEnd,country,admin1,admin2,admin3,dateConfirmed,hospitalized,dateHospitalized,outcome,dateOutcome,caseCount
-abc,,foo.bar,Male,42,42,Canada,Alberta,,Banff,06/23/2020,true,,,,3
+sourceEntryId,gender,ageRangeStart,ageRangeEnd,country,admin1,admin2,admin3,dateConfirmed,hospitalized,dateHospitalized,outcome,dateOutcome,caseCount
+,Male,42,42,Canada,Alberta,,Banff,06/23/2020,true,,,,3

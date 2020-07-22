@@ -1,7 +1,7 @@
 {
     "notes": "text",
     "revisionMetadata.creationMetadata.curator": "text",
-    "demographics.profession": "text",
+    "demographics.occupation": "text",
     "demographics.nationalities": "text",
     "demographics.ethnicity": "text",
     "location.country": "text",

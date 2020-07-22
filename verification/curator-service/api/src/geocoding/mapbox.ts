@@ -91,12 +91,20 @@ export default class MapboxGeocoder {
             // with features of that specific type.
             // The context of the feature can still has other types
             // (if you ask for a region, the context will still contain the country).
-            if (opts?.limitToResolution) {
-                const type = resolutionToGeocodeQueryType.get(
-                    opts?.limitToResolution,
-                );
-                if (type) {
-                    req.types = [type];
+            const requestedResolutions = opts?.limitToResolution;
+            if (requestedResolutions) {
+                const types = requestedResolutions
+                    .map((r: Resolution) => resolutionToGeocodeQueryType.get(r))
+                    .filter((t) => t);
+                if (types) {
+                    req.types = [];
+                    types.forEach((t: GeocodeQueryType | undefined) => {
+                        // They're filtered above, but Typescript can't take
+                        // the hint.
+                        if (t) {
+                            req.types?.push(t);
+                        }
+                    });
                 }
             }
             const resp: MapiResponse = await this.geocodeService

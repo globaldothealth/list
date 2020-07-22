@@ -1,5 +1,6 @@
 import CaseFormValues from './CaseFormValues';
 import ChipInput from 'material-ui-chip-input';
+import FieldTitle from '../common-form-fields/FieldTitle';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -27,23 +28,25 @@ export default function Transmission(): JSX.Element {
     return (
         <Scroll.Element name="transmission">
             <fieldset>
-                <legend>Transmission</legend>
+                <FieldTitle title="Transmission"></FieldTitle>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionRoutes"
+                        freeSolo
                         label="Route of transmission"
                         initialValue={initialValues.transmissionRoutes}
-                        multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/route_of_transmission.txt"
+                        multiple
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/route_of_transmission.txt"
                     />
                 </div>
                 <div className={classes.fieldRow}>
                     <FormikAutocomplete
                         name="transmissionPlaces"
+                        freeSolo
                         label="Places of transmission"
                         initialValue={initialValues.transmissionPlaces}
-                        multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/place_of_transmission.txt"
+                        multiple
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/place_of_transmission.txt"
                     />
                 </div>
                 <ChipInput

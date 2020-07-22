@@ -3,7 +3,7 @@ name: Update case data in prod
 on:
   push:
     # Update the data when the conversion script changes.
-    branches: [master]
+    branches: [main]
     paths: ["data-serving/scripts/convert-data/**"]
   repository_dispatch:
     # Update the data on a signal that the input data has changed.

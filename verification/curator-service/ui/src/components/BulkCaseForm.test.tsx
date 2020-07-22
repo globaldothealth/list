@@ -1,6 +1,12 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import {
+    fireEvent,
+    render,
+    wait,
+    waitForElementToBeRemoved,
+} from '@testing-library/react';
 
 import BulkCaseForm from './BulkCaseForm';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
@@ -14,22 +20,59 @@ const user = {
     roles: ['admin', 'curator'],
 };
 
+beforeEach(() => {
+    const axiosSourcesResponse = {
+        data: { sources: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
+});
+
 afterEach(() => {
     jest.clearAllMocks();
 });
 
-it('renders csv upload widget', () => {
-    const { getByTestId, getByRole } = render(<BulkCaseForm user={user} />);
+it('renders source and csv upload widgets', async () => {
+    const { getByRole, getByTestId, getByText } = render(
+        <MemoryRouter>
+            <BulkCaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
     const inputField = getByTestId('csv-input');
 
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
-    expect(getByRole('button')).toHaveTextContent(/Upload cases/);
+
+    const sourceComponent = getByTestId('caseReference');
+    expect(getByRole('combobox')).toContainElement(sourceComponent);
+
+    expect(getByText(/Upload cases/)).toBeInTheDocument();
 });
 
-it('uploads case ok', async () => {
-    const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
+it('displays spinner post upload', async () => {
+    const { getByTestId, getByText } = render(
+        <MemoryRouter>
+            <BulkCaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+
     const inputField = getByTestId('csv-input');
     const file = new File(['a\nb'], 'data.csv', {
         type: 'text/csv',
@@ -45,32 +88,11 @@ it('uploads case ok', async () => {
         config: {},
         headers: {},
     };
+    mockedAxios.post.mockResolvedValueOnce(axiosResponse);
     mockedAxios.put.mockResolvedValueOnce(axiosResponse);
 
     fireEvent.change(inputField);
     fireEvent.click(getByText(/Upload cases/));
-    await wait(() => expect(mockedAxios.put).toHaveBeenCalledTimes(1));
-    expect(getByText(/Success!/)).toBeInTheDocument();
-});
-
-it('uploads case not ok', async () => {
-    const { getByTestId, getByText } = render(<BulkCaseForm user={user} />);
-    const inputField = getByTestId('csv-input');
-    const file = new File(['a\nb'], 'data.csv', {
-        type: 'text/csv',
-    });
-    Object.defineProperty(inputField, 'files', {
-        value: [file],
-    });
-
-    const errorMessage = 'Upload error';
-    const axiosResponse = {
-        message: errorMessage,
-    };
-    mockedAxios.put.mockRejectedValueOnce(axiosResponse);
-
-    fireEvent.change(inputField);
-    fireEvent.click(getByText(/Upload cases/));
-    await wait(() => expect(mockedAxios.put).toHaveBeenCalledTimes(1));
-    expect(getByText(errorMessage)).toBeDefined();
+    expect(getByTestId('progress')).toBeInTheDocument();
+    waitForElementToBeRemoved(() => getByTestId('progress'));
 });
