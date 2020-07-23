@@ -4,6 +4,7 @@ import { Button, LinearProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import Source, { submitSource } from './common-form-fields/Source';
 import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
@@ -23,7 +24,6 @@ import PreexistingConditions from './new-case-form-fields/PreexistingConditions'
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
-import Source from './common-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
@@ -72,7 +72,7 @@ const styles = (theme: Theme) =>
 function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
-            caseReference: undefined,
+            caseReference: { sourceId: '', sourceUrl: '' },
             gender: undefined,
             minAge: undefined,
             maxAge: undefined,
@@ -197,7 +197,13 @@ interface CaseFormState {
 // TODO: get 0 and 120 min/max age values from the backend.
 const NewCaseValidation = Yup.object().shape(
     {
-        caseReference: Yup.object().required('Required'),
+        caseReference: Yup.object().shape({
+            sourceUrl: Yup.string().required('Required'),
+            sourceName: Yup.string().when('sourceId', {
+                is: (sourceId) => !sourceId,
+                then: Yup.string().required('Required'),
+            }),
+        }),
         minAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
@@ -298,6 +304,22 @@ class CaseForm extends React.Component<Props, CaseFormState> {
     }
 
     async submitCase(values: CaseFormValues): Promise<void> {
+        if (values.caseReference && values.caseReference.sourceId === '') {
+            try {
+                const newCaseReference = await submitSource({
+                    name: values.caseReference.sourceName as string,
+                    url: values.caseReference.sourceUrl,
+                });
+                values.caseReference.sourceId = newCaseReference.sourceId;
+            } catch (e) {
+                this.setState({
+                    errorMessage: `System error during source creation: ${JSON.stringify(
+                        e,
+                    )}`,
+                });
+                return;
+            }
+        }
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
@@ -523,8 +545,14 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 >
                                     {this.tableOfContentsIcon({
                                         isChecked:
-                                            values.caseReference !== null &&
-                                            values.caseReference !== undefined,
+                                            values.caseReference !==
+                                                undefined &&
+                                            values.caseReference.sourceUrl !==
+                                                null &&
+                                            values.caseReference.sourceUrl !==
+                                                undefined &&
+                                            values.caseReference.sourceUrl !==
+                                                '',
                                         hasError: hasErrors(
                                             ['caseReference'],
                                             errors,

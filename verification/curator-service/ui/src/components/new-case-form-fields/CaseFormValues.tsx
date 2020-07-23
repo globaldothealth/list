@@ -1,8 +1,8 @@
-import { CaseReference } from '../Case';
+import { CaseReferenceForm } from '../common-form-fields/Source';
 import { Location as Loc } from '../Case';
 
 export default interface CaseFormValues {
-    caseReference?: CaseReference;
+    caseReference?: CaseReferenceForm;
     gender?: string;
     minAge?: number;
     maxAge?: number;

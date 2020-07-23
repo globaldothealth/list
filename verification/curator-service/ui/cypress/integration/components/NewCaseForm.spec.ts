@@ -1,5 +1,3 @@
-import enterSource from '../utils/enterSource';
-
 /* eslint-disable no-undef */
 describe('New case form', function () {
     beforeEach(() => {
@@ -13,17 +11,19 @@ describe('New case form', function () {
     });
 
     // Full case is covered in curator test.
-    it('Can add minimal row to linelist', function () {
+    it('Can add minimal row to linelist with existing source', function () {
         cy.seedLocation({
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             name: 'France',
             geoResolution: 'Country',
         });
+        cy.addSource('Test source', 'www.example.com');
 
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
@@ -42,6 +42,41 @@ describe('New case form', function () {
         });
     });
 
+    it('Can add minimal row to linelist with new source', function () {
+        cy.seedLocation({
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'France',
+            geoResolution: 'Country',
+        });
+
+        cy.visit('/cases/new');
+        cy.contains('Create new COVID-19 line list case');
+        cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
+        cy.contains('li', 'www.new-source.com').click();
+        cy.get('input[name="caseReference.sourceName"]').type('New source');
+        cy.get('div[data-testid="location"]').type('France');
+        cy.contains('li', 'France').click();
+        cy.get('input[name="confirmedDate"]').type('2020-01-01');
+        cy.server();
+        cy.route('POST', '/api/cases').as('addCase');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@addCase');
+        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
+            expect(resp.body.cases).to.have.lengthOf(1);
+            cy.url().should('eq', 'http://localhost:3002/cases');
+            cy.contains(`Case ${resp.body.cases[0]._id} added`);
+            cy.contains('No records to display').should('not.exist');
+            cy.contains('www.new-source.com');
+            cy.contains('France');
+            cy.contains('1/1/2020');
+
+            cy.visit('/sources');
+            cy.contains('www.new-source.com');
+            cy.contains('New source');
+        });
+    });
+
     it('Can submit events without dates', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
@@ -51,9 +86,11 @@ describe('New case form', function () {
             name: 'France',
             geoResolution: 'Country',
         });
+        cy.addSource('Test source', 'www.example.com');
 
         cy.visit('/cases/new');
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
@@ -92,11 +129,13 @@ describe('New case form', function () {
             country: 'France',
             geoResolution: 'Country',
         });
+        cy.addSource('Test source', 'www.example.com');
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/cases/new');
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('France');
         cy.contains('li', 'France').click();
@@ -141,9 +180,11 @@ describe('New case form', function () {
     });
 
     it('Can specify geocode manually', function () {
+        cy.addSource('Test source', 'www.example.com');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
         cy.get('button[id="add-location"]').click();
         cy.get('div[id="location.geoResolution"]').click();
         cy.contains('li', 'Admin3').click();

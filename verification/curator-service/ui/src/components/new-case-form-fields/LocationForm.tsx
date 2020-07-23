@@ -144,7 +144,7 @@ export function PlacesAutocomplete(
             onInputChange={(event, newInputValue): void => {
                 setInputValue(newInputValue);
             }}
-            noOptionsText="No locations"
+            noOptionsText="No locations found, type to search"
             renderInput={(params): JSX.Element => (
                 <>
                     {/* Do not use FastField here */}

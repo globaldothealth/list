@@ -1,21 +1,23 @@
 import * as Yup from 'yup';
 
-import { Button, withStyles } from '@material-ui/core';
+import { Button, CircularProgress, withStyles } from '@material-ui/core';
 import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import axios, { AxiosResponse } from 'axios';
+import Source, {
+    CaseReferenceForm,
+    submitSource,
+} from './common-form-fields/Source';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
-import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
-import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 
 interface User {
@@ -61,13 +63,10 @@ interface BulkCaseFormProps
 interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
-    uploadProgress: number;
-    uploadTotalRequests: number;
 }
-
 interface BulkCaseFormValues {
     file: File | null;
-    caseReference?: CaseReference;
+    caseReference?: CaseReferenceForm;
 }
 
 /**
@@ -110,6 +109,18 @@ interface RawParsedCase {
     caseCount?: number;
 }
 
+interface BatchUpsertError {
+    index: number;
+    message: string;
+}
+
+interface BatchUpsertResponse {
+    phase: string;
+    createdCaseIds: string[];
+    updatedCaseIds: string[];
+    errors: BatchUpsertError[];
+}
+
 // See description below for usage. This is a mapped partial type that
 // reproduces the fields of <T>, including for nested fields. The non-
 // recursive variant of this is easier to understand, and is explained here:
@@ -132,7 +143,10 @@ type RecursivePartial<T> = {
 type CompleteParsedCase = RecursivePartial<Case> & { caseCount?: number };
 
 const BulkFormSchema = Yup.object().shape({
-    caseReference: Yup.object().required('Required field'),
+    caseReference: Yup.object().shape({
+        sourceUrl: Yup.string().required('Required'),
+        sourceName: Yup.string().required('Required'),
+    }),
     file: Yup.mixed().required('Please upload a file'),
 });
 
@@ -145,8 +159,6 @@ class BulkCaseForm extends React.Component<
         this.state = {
             errorMessage: '',
             errors: [],
-            uploadProgress: 0,
-            uploadTotalRequests: 0,
         };
     }
 
@@ -269,55 +281,19 @@ class BulkCaseForm extends React.Component<
         };
     }
 
-    incrementProgress(): void {
-        const incrementPercent = 100 / this.state.uploadTotalRequests;
-        this.setState({
-            uploadProgress: this.state.uploadProgress + incrementPercent,
-        });
-    }
-
-    /**
-     * Determine the number of remote requests required to upload the provided
-     * row.
-     *
-     * Each row is validated, accounting for one request, and incurs a further
-     * `caseCount` requests to write rows to the server.
-     */
-    getUploadTotalRequests(cases: CompleteParsedCase[]): number {
-        return cases
-            .map((c) => {
-                return 1 + (c.caseCount ? c.caseCount : 1);
-            })
-            .reduce((accumulator, currentValue) => {
-                return accumulator + currentValue;
-            }, 0);
-    }
-
-    upsertCase(c: CompleteParsedCase): Promise<AxiosResponse<Case>> {
-        return axios.put('/api/cases', c);
-    }
-
-    /**
-     * Provides any validation errors associated with the provided cases.
-     *
-     * TODO: Find a way to parallelize these requests. We need the AxiosResponse
-     * value; so we can't use Promise.allSettled().
-     */
-    async validateCases(
+    async batchUpsertCases(
         cases: CompleteParsedCase[],
-    ): Promise<CaseValidationError[]> {
-        const validationErrors: CaseValidationError[] = [];
-        for (let i = 0; i < cases.length; i++) {
-            try {
-                await axios.post('/api/cases?validate_only=true', cases[i]);
-            } catch (e) {
-                validationErrors.push(
-                    new CaseValidationError(i + 1, e.response.data),
-                );
-            }
-            this.incrementProgress();
-        }
-        return validationErrors;
+    ): Promise<BatchUpsertResponse> {
+        const casesToSend = cases.flatMap((c) =>
+            Array.from({ length: c.caseCount || 1 }, () => c),
+        );
+        const response = await axios.post<BatchUpsertResponse>(
+            '/api/cases/batchUpsert',
+            {
+                cases: casesToSend,
+            },
+        );
+        return response.data;
     }
 
     async uploadData(
@@ -346,10 +322,21 @@ class BulkCaseForm extends React.Component<
                 caseReference,
             );
         });
-        this.setState({
-            uploadTotalRequests: this.getUploadTotalRequests(cases),
-        });
-        const validationErrors = await this.validateCases(cases);
+
+        let upsertResponse: BatchUpsertResponse;
+        try {
+            upsertResponse = await this.batchUpsertCases(cases);
+        } catch (e) {
+            this.setState({
+                errorMessage: `System error during upload: ${JSON.stringify(
+                    e,
+                )}`,
+            });
+            return;
+        }
+        const validationErrors = upsertResponse.errors.map(
+            (e) => new CaseValidationError(e.index + 1, e.message),
+        );
         this.setState({ errors: validationErrors });
         if (validationErrors.length > 0) {
             this.setState({
@@ -358,27 +345,8 @@ class BulkCaseForm extends React.Component<
             });
             return;
         }
-        const createdIds: string[] = [];
-        const updatedIds: string[] = [];
-        for (const c of cases) {
-            try {
-                const casesToUpsert = c.caseCount ? c.caseCount : 1;
-                for (let i = 0; i < casesToUpsert; i++) {
-                    const response = await this.upsertCase(c);
-                    this.incrementProgress();
-                    response.status === 201
-                        ? createdIds.push(response.data._id)
-                        : updatedIds.push(response.data._id);
-                }
-            } catch (e) {
-                this.setState({
-                    errorMessage: `System error during upload: ${JSON.stringify(
-                        e,
-                    )}`,
-                });
-                return;
-            }
-        }
+        const createdIds = upsertResponse.createdCaseIds;
+        const updatedIds = upsertResponse.updatedCaseIds;
         const createdMessage =
             createdIds.length === 0
                 ? ''
@@ -402,6 +370,22 @@ class BulkCaseForm extends React.Component<
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<unknown> {
+        if (values.caseReference && values.caseReference.sourceId === '') {
+            try {
+                const newCaseReference = await submitSource({
+                    name: values.caseReference.sourceName as string,
+                    url: values.caseReference.sourceUrl,
+                });
+                values.caseReference.sourceId = newCaseReference.sourceId;
+            } catch (e) {
+                this.setState({
+                    errorMessage: `System error during source creation: ${JSON.stringify(
+                        e,
+                    )}`,
+                });
+                return;
+            }
+        }
         if (values.file && values.caseReference) {
             const parsePromise = (
                 file: File,
@@ -443,13 +427,11 @@ class BulkCaseForm extends React.Component<
                         await this.submitCases(values);
                     }}
                 >
-                    {({ isSubmitting, submitForm, values }): JSX.Element => (
+                    {({ isSubmitting, submitForm }): JSX.Element => (
                         <div className={classes.container}>
                             <Form className={classes.form}>
                                 <div className={classes.formSection}>
-                                    <Source
-                                        initialValue={values.caseReference}
-                                    ></Source>
+                                    <Source></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <FileUpload></FileUpload>
@@ -466,10 +448,7 @@ class BulkCaseForm extends React.Component<
                                         Upload cases
                                     </Button>
                                     {isSubmitting && (
-                                        <CaptionedProgress
-                                            data-testid="progress"
-                                            value={this.state.uploadProgress}
-                                        />
+                                        <CircularProgress data-testid="progress" />
                                     )}
                                 </div>
                                 {this.state.errors.length > 0 && (
