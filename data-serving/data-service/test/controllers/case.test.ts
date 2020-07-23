@@ -157,16 +157,13 @@ describe('POST', () => {
     it('create with valid input should result in correct creation metadata', async () => {
         const res = await request(app)
             .post('/api/cases')
-            .send({ ...fullCase, ...curatorMetadata })
+            .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
 
         expect(res.body.revisionMetadata.revisionNumber).toEqual(0);
         expect(res.body.revisionMetadata.creationMetadata.curator).toEqual(
-            'abc@xyz.com',
-        );
-        expect(res.body.revisionMetadata.creationMetadata.notes).toEqual(
-            fullCase.revisionMetadata.creationMetadata.notes,
+            minimalRequest.curator.email,
         );
         expect(res.body).not.toHaveProperty('curator');
     });
@@ -235,7 +232,24 @@ describe('PUT', () => {
         expect(res.body.notes).toEqual(newNotes);
     });
     it('update present item should result in update metadata', async () => {
-        // TODO: write test
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({ ...curatorMetadata, notes: newNotes })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(1);
+        expect(res.body.revisionMetadata.updateMetadata.curator).toEqual(
+            curatorMetadata.curator.email,
+        );
+        expect(res.body.revisionMetadata.creationMetadata).toEqual(
+            minimalCase.revisionMetadata.creationMetadata,
+        );
+        expect(res.body).not.toHaveProperty('curator');
     });
     it('invalid update present item should return 422', async () => {
         const c = new Case(minimalCase);
@@ -279,7 +293,36 @@ describe('PUT', () => {
         expect(await c.collection.countDocuments()).toEqual(1);
     });
     it('upsert present item should result in update metadata', async () => {
-        // TODO: write test
+        const c = new Case(minimalCase);
+        const sourceId = '5ea86423bae6982635d2e1f8';
+        const entryId = 'def456';
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
+        await c.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
+                notes: newNotes,
+                ...curatorMetadata,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(1);
+        expect(res.body.revisionMetadata.updateMetadata.curator).toEqual(
+            curatorMetadata.curator.email,
+        );
+        expect(res.body.revisionMetadata.creationMetadata).toEqual(
+            minimalCase.revisionMetadata.creationMetadata,
+        );
+        expect(res.body).not.toHaveProperty('curator');
     });
     it('upsert new item should return 201 CREATED', async () => {
         return request(app)
@@ -287,6 +330,19 @@ describe('PUT', () => {
             .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
+    });
+    it('upsert new item should result in creation metadata', async () => {
+        const res = await request(app)
+            .put('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(0);
+        expect(res.body.revisionMetadata.creationMetadata.curator).toEqual(
+            minimalRequest.curator.email,
+        );
+        expect(res.body).not.toHaveProperty('curator');
     });
     it('upsert items without sourceEntryId should return 201 CREATED', async () => {
         // NB: Minimal case does not have a sourceEntryId.
