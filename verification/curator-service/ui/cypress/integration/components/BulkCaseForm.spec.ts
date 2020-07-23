@@ -49,7 +49,7 @@ describe('Bulk upload form', function () {
             });
     });
 
-    it.only('Can upload CSV with new source', function () {
+    it('Can upload CSV with new source', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
@@ -63,11 +63,10 @@ describe('Bulk upload form', function () {
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
         cy.route('POST', '/api/sources').as('addSource');
-        cy.route('PUT', '/api/cases').as('upsertCase');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click().click();
         cy.wait('@addSource');
-        cy.wait('@upsertCase');
-        cy.wait('@upsertCase');
+        cy.wait('@batchUpsert');
 
         // Check data in linelist table.
         cy.contains('No records to display').should('not.exist');

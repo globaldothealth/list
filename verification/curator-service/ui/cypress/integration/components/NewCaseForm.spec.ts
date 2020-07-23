@@ -180,9 +180,11 @@ describe('New case form', function () {
     });
 
     it('Can specify geocode manually', function () {
+        cy.addSource('Test source', 'www.example.com');
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
         cy.get('button[id="add-location"]').click();
         cy.get('div[id="location.geoResolution"]').click();
         cy.contains('li', 'Admin3').click();
