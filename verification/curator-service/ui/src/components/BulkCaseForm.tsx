@@ -5,6 +5,7 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import Source, { submitSource } from './common-form-fields/Source';
 import axios, { AxiosResponse } from 'axios';
 
 import Alert from '@material-ui/lab/Alert';
@@ -13,7 +14,6 @@ import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
-import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { createStyles } from '@material-ui/core/styles';
@@ -65,9 +65,13 @@ interface BulkCaseFormState {
     uploadTotalRequests: number;
 }
 
+interface CaseReferenceForm extends CaseReference {
+    sourceName?: string;
+}
+
 interface BulkCaseFormValues {
     file: File | null;
-    caseReference?: CaseReference;
+    caseReference?: CaseReferenceForm;
 }
 
 /**
@@ -132,7 +136,10 @@ type RecursivePartial<T> = {
 type CompleteParsedCase = RecursivePartial<Case> & { caseCount?: number };
 
 const BulkFormSchema = Yup.object().shape({
-    caseReference: Yup.object().required('Required field'),
+    caseReference: Yup.object().shape({
+        sourceUrl: Yup.string().required('Required'),
+        sourceName: Yup.string().required('Required'),
+    }),
     file: Yup.mixed().required('Please upload a file'),
 });
 
@@ -402,6 +409,22 @@ class BulkCaseForm extends React.Component<
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<unknown> {
+        if (values.caseReference && values.caseReference.sourceId === '') {
+            try {
+                const newCaseReference = await submitSource({
+                    name: values.caseReference.sourceName as string,
+                    url: values.caseReference.sourceUrl,
+                });
+                values.caseReference.sourceId = newCaseReference.sourceId;
+            } catch (e) {
+                this.setState({
+                    errorMessage: `System error during source creation: ${JSON.stringify(
+                        e,
+                    )}`,
+                });
+                return;
+            }
+        }
         if (values.file && values.caseReference) {
             const parsePromise = (
                 file: File,
@@ -443,13 +466,11 @@ class BulkCaseForm extends React.Component<
                         await this.submitCases(values);
                     }}
                 >
-                    {({ isSubmitting, submitForm, values }): JSX.Element => (
+                    {({ isSubmitting, submitForm }): JSX.Element => (
                         <div className={classes.container}>
                             <Form className={classes.form}>
                                 <div className={classes.formSection}>
-                                    <Source
-                                        initialValue={values.caseReference}
-                                    ></Source>
+                                    <Source></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <FileUpload></FileUpload>
