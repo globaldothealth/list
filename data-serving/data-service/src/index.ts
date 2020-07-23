@@ -20,8 +20,13 @@ const env = validateEnv();
 
 // Express configuration.
 app.set('port', env.PORT);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(
+    bodyParser.urlencoded({
+        limit: '50mb',
+        extended: true,
+    }),
+);
 
 // Configure app routes.
 app.get('/', homeController.get);
