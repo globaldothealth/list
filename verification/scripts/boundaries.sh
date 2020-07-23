@@ -22,10 +22,8 @@ Admin 1 file: $1
 Admin 2 file: $2
 Admin 3 file: $3"
 
-# Clear previous output so that each line below can append to it.
-touch ${SCRIPT_PATH}/boundaries.json
 # Generate one JSON object per line and append the result to the final file.
-cat $1 | jq -c '.adm1.data.all | to_entries[] | {id: .key, name: .value.name}' >> ${SCRIPT_PATH}/boundaries.json
+cat $1 | jq -c '.adm1.data.all | to_entries[] | {id: .key, name: .value.name}' > ${SCRIPT_PATH}/boundaries.json
 cat $2 | jq -c '.adm2.data.all | to_entries[] | {id: .key, name: .value.name}' >> ${SCRIPT_PATH}/boundaries.json
 cat $3 | jq -c '.adm3.data.all | to_entries[] | {id: .key, name: .value.name}' >> ${SCRIPT_PATH}/boundaries.json
 
