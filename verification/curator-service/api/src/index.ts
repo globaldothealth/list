@@ -246,20 +246,22 @@ new OpenApiValidator({
         // API documentation.
         const swaggerDocument = YAML.load('./openapi/openapi.yaml');
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+        // Serve static UI content if static directory was specified.
+        if (env.STATIC_DIR) {
+            console.log('Serving static files from', env.STATIC_DIR);
+            app.use(express.static(env.STATIC_DIR));
+            // Send index to any unmatched route.
+            // This must be the LAST handler installed on the app.
+            // All subsequent handlers will be ignored.
+            app.get('*', (req: Request, res: Response) => {
+                res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
+            });
+        }
     })
     .catch((e) => {
         console.error('Failed to install OpenAPI validator:', e);
         process.exit(1);
     });
-
-// Serve static UI content if static directory was specified.
-if (env.STATIC_DIR) {
-    console.log('Serving static files from', env.STATIC_DIR);
-    app.use(express.static(env.STATIC_DIR));
-    // Send index to any unmatched route.
-    app.get('*', (req: Request, res: Response) => {
-        res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
-    });
-}
 
 export default app;
