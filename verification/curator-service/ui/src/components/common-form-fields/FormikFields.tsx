@@ -195,6 +195,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     initialFocusedDate={Date.parse(
                         props.initialFocusedDate ?? '',
                     )}
+                    invalidDateMessage="Invalid date format (YYYY/MM/DD)"
                     component={KeyboardDatePicker}
                 />
             </MuiPickersUtilsProvider>
