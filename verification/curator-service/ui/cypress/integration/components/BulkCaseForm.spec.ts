@@ -29,10 +29,9 @@ describe('Bulk upload form', function () {
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
-        cy.route('PUT', '/api/cases').as('upsertCase');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@upsertCase');
-        cy.wait('@upsertCase');
+        cy.wait('@batchUpsert');
 
         // Check data in linelist table.
         cy.contains('No records to display').should('not.exist');
@@ -104,9 +103,9 @@ describe('Bulk upload form', function () {
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
-        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@upsertCases');
+        cy.wait('@batchUpsert');
 
         // Check data in linelist table.
         cy.contains('No records to display').should('not.exist');
@@ -121,9 +120,9 @@ describe('Bulk upload form', function () {
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
         cy.server();
-        cy.route('PUT', '/api/cases').as('upsertCases');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@upsertCases');
+        cy.wait('@batchUpsert');
 
         // The updated case now has a gender of Female.
         cy.contains('bulk_data.csv uploaded. 2 cases updated.');
@@ -144,11 +143,9 @@ describe('Bulk upload form', function () {
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
-        cy.route('PUT', '/api/cases').as('upsertCase');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@upsertCase');
-        cy.wait('@upsertCase');
-        cy.wait('@upsertCase');
+        cy.wait('@batchUpsert');
 
         cy.contains(
             'bulk_data_with_case_count.csv uploaded. 3 new cases added.',
@@ -170,9 +167,9 @@ describe('Bulk upload form', function () {
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
-        cy.route('POST', '/api/cases?validate_only=true').as('validateCases');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
         cy.get('button[data-testid="submit"]').click();
-        cy.wait('@validateCases');
+        cy.wait('@batchUpsert');
         cy.contains(
             'p',
             'The selected file could not be uploaded. Found 1 row(s) with errors.',

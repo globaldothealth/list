@@ -114,7 +114,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         label="Nationality"
                         initialValue={initialValues.nationalities}
                         multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/nationalities.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/nationalities.txt"
                     />
                 </div>
                 <FormikAutocomplete
@@ -123,7 +123,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     initialValue={initialValues.occupation}
                     multiple={false}
                     freeSolo
-                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/occupations.txt"
+                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/occupations.txt"
                 />
             </fieldset>
         </Scroll.Element>

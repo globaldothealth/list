@@ -36,7 +36,7 @@ export default function Transmission(): JSX.Element {
                         label="Route of transmission"
                         initialValue={initialValues.transmissionRoutes}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/route_of_transmission.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/route_of_transmission.txt"
                     />
                 </div>
                 <div className={classes.fieldRow}>
@@ -46,7 +46,7 @@ export default function Transmission(): JSX.Element {
                         label="Places of transmission"
                         initialValue={initialValues.transmissionPlaces}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/master/suggest/place_of_transmission.txt"
+                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/place_of_transmission.txt"
                     />
                 </div>
                 <ChipInput
