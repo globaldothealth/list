@@ -31,25 +31,6 @@ paths:
           $ref: "#/components/responses/400"
         "500":
           $ref: "#/components/responses/500"
-  /suggest/locations:
-    get:
-      tags: [Location]
-      summary: Suggest locations
-      operationId: suggestLocation
-      parameters:
-      - name: q
-        in: query
-        description: Prefix text to suggest locations from.
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/200LocationArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "500":
-          $ref: "#/components/responses/500"
   /sources:
     get:
       tags: [Source]
