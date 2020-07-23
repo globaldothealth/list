@@ -26,8 +26,13 @@ import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(
+    bodyParser.urlencoded({
+        limit: '50mb',
+        extended: true,
+    }),
+);
 
 dotenv.config();
 const env = validateEnv();
@@ -65,8 +70,12 @@ const MongoStore = mongo(session);
 app.use(cookieParser());
 const sess: SessionOptions = {
     secret: env.SESSION_COOKIE_KEY,
-    resave: true,
-    saveUninitialized: true,
+    // MongoStore implements touch() so we don't need resave.
+    // Cf. https://github.com/expressjs/session#resave.
+    resave: false,
+    // Chosing false is useful for login sessions which is what we want.
+    // https://github.com/expressjs/session#saveuninitialized
+    saveUninitialized: false,
     store: new MongoStore({
         mongooseConnection: mongoose.connection,
         secret: env.SESSION_COOKIE_KEY,
@@ -101,130 +110,143 @@ const awsEventsClient = new AwsEventsClient(
     awsLambdaClient,
 );
 
-// Configure curator API routes.
-const apiRouter = express.Router();
-
-// Configure sources controller.
-const sourcesController = new SourcesController(
-    awsEventsClient,
-    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
-);
-apiRouter.get(
-    '/sources',
-    mustHaveAnyRole(['reader', 'curator']),
-    sourcesController.list,
-);
-apiRouter.get(
-    '/sources/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['reader', 'curator']),
-    sourcesController.get,
-);
-apiRouter.post(
-    '/sources',
-    mustHaveAnyRole(['curator']),
-    sourcesController.create,
-);
-apiRouter.put(
-    '/sources/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['curator']),
-    sourcesController.update,
-);
-apiRouter.delete(
-    '/sources/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['curator']),
-    sourcesController.del,
-);
-
-// Chain geocoders so that during dev/integration tests we can use the fake one.
-// It might also just be useful to have various geocoders plugged-in at some point.
-const geocoders = new Array<Geocoder>();
-if (env.ENABLE_FAKE_GEOCODER) {
-    console.log('Using fake geocoder');
-    const fakeGeocoder = new FakeGeocoder();
-    apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-    apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-    geocoders.push(fakeGeocoder);
-}
-if (env.MAPBOX_TOKEN !== '') {
-    console.log('Using mapbox geocoder');
-    geocoders.push(
-        new MapboxGeocoder(
-            env.MAPBOX_TOKEN,
-            env.MAPBOX_PERMANENT_GEOCODE
-                ? 'mapbox.places-permanent'
-                : 'mapbox.places',
-        ),
-    );
-}
-
-// Configure cases controller proxying to data service.
-const casesController = new CasesController(env.DATASERVER_URL, geocoders);
-apiRouter.get(
-    '/cases',
-    mustHaveAnyRole(['reader', 'curator']),
-    casesController.list,
-);
-apiRouter.get(
-    '/cases/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['reader', 'curator']),
-    casesController.get,
-);
-apiRouter.post('/cases', mustHaveAnyRole(['curator']), casesController.create);
-apiRouter.post(
-    '/cases/batchUpsert',
-    mustHaveAnyRole(['curator']),
-    casesController.batchUpsert,
-);
-apiRouter.put('/cases', mustHaveAnyRole(['curator']), casesController.upsert);
-apiRouter.put(
-    '/cases/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['curator']),
-    casesController.update,
-);
-apiRouter.delete(
-    '/cases/:id([a-z0-9]{24})',
-    mustHaveAnyRole(['curator']),
-    casesController.del,
-);
-
-// Configure users controller.
-apiRouter.get('/users', usersController.list);
-apiRouter.put('/users/:id', usersController.updateRoles);
-apiRouter.get('/users/roles', usersController.listRoles);
-
-// Suggest locations based on the request's "q" query param.
-const geocodeSuggester = new GeocodeSuggester(geocoders);
-apiRouter.get(
-    '/geocode/suggest',
-    mustHaveAnyRole(['curator']),
-    geocodeSuggester.suggest,
-);
-
-app.use('/api', apiRouter);
-
-// Basic health check handler.
-app.get('/health', (req: Request, res: Response) => {
-    // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
-    // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
-    if (mongoose.connection.readyState == 1) {
-        res.sendStatus(200);
-        return;
-    }
-    // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
-    // couldn't determine if the backend was healthy or not but honestly
-    // this is simple enough that it makes sense.
-    return res.sendStatus(503);
-});
-
-// API documentation.
-const swaggerDocument = YAML.load('./openapi/openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 // API validation.
 new OpenApiValidator({
     apiSpec: './openapi/openapi.yaml',
     validateResponses: true,
-}).install(app);
+})
+    .install(app)
+    .then(() => {
+        // Configure curator API routes.
+        const apiRouter = express.Router();
+
+        // Configure sources controller.
+        const sourcesController = new SourcesController(
+            awsEventsClient,
+            env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+        );
+        apiRouter.get(
+            '/sources',
+            mustHaveAnyRole(['reader', 'curator']),
+            sourcesController.list,
+        );
+        apiRouter.get(
+            '/sources/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['reader', 'curator']),
+            sourcesController.get,
+        );
+        apiRouter.post(
+            '/sources',
+            mustHaveAnyRole(['curator']),
+            sourcesController.create,
+        );
+        apiRouter.put(
+            '/sources/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            sourcesController.update,
+        );
+        apiRouter.delete(
+            '/sources/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            sourcesController.del,
+        );
+
+        // Chain geocoders so that during dev/integration tests we can use the fake one.
+        // It might also just be useful to have various geocoders plugged-in at some point.
+        const geocoders = new Array<Geocoder>();
+        if (env.ENABLE_FAKE_GEOCODER) {
+            console.log('Using fake geocoder');
+            const fakeGeocoder = new FakeGeocoder();
+            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+            geocoders.push(fakeGeocoder);
+        }
+        if (env.MAPBOX_TOKEN !== '') {
+            console.log('Using mapbox geocoder');
+            geocoders.push(
+                new MapboxGeocoder(
+                    env.MAPBOX_TOKEN,
+                    env.MAPBOX_PERMANENT_GEOCODE
+                        ? 'mapbox.places-permanent'
+                        : 'mapbox.places',
+                ),
+            );
+        }
+
+        // Configure cases controller proxying to data service.
+        const casesController = new CasesController(
+            env.DATASERVER_URL,
+            geocoders,
+        );
+        apiRouter.get(
+            '/cases',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.list,
+        );
+        apiRouter.get(
+            '/cases/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.get,
+        );
+        apiRouter.post(
+            '/cases',
+            mustHaveAnyRole(['curator']),
+            casesController.create,
+        );
+        apiRouter.post(
+            '/cases/batchUpsert',
+            mustHaveAnyRole(['curator']),
+            casesController.batchUpsert,
+        );
+        apiRouter.put(
+            '/cases',
+            mustHaveAnyRole(['curator']),
+            casesController.upsert,
+        );
+        apiRouter.put(
+            '/cases/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            casesController.update,
+        );
+        apiRouter.delete(
+            '/cases/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            casesController.del,
+        );
+
+        // Configure users controller.
+        apiRouter.get('/users', usersController.list);
+        apiRouter.put('/users/:id', usersController.updateRoles);
+        apiRouter.get('/users/roles', usersController.listRoles);
+
+        // Suggest locations based on the request's "q" query param.
+        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        apiRouter.get(
+            '/geocode/suggest',
+            mustHaveAnyRole(['curator']),
+            geocodeSuggester.suggest,
+        );
+
+        app.use('/api', apiRouter);
+
+        // Basic health check handler.
+        app.get('/health', (req: Request, res: Response) => {
+            // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting.
+            // https://mongoosejs.com/docs/api.html#connection_Connection-readyState
+            if (mongoose.connection.readyState == 1) {
+                res.sendStatus(200);
+                return;
+            }
+            // Unavailable, this is wrong as per HTTP RFC, 503 would mean that we
+            // couldn't determine if the backend was healthy or not but honestly
+            // this is simple enough that it makes sense.
+            return res.sendStatus(503);
+        });
+
+        // API documentation.
+        const swaggerDocument = YAML.load('./openapi/openapi.yaml');
+        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    });
 
 // Serve static UI content if static directory was specified.
 if (env.STATIC_DIR) {
