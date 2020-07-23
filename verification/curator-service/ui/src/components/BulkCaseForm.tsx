@@ -5,7 +5,10 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import Source, { submitSource } from './common-form-fields/Source';
+import Source, {
+    CaseReferenceForm,
+    submitSource,
+} from './common-form-fields/Source';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
@@ -61,11 +64,6 @@ interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
 }
-
-interface CaseReferenceForm extends CaseReference {
-    sourceName?: string;
-}
-
 interface BulkCaseFormValues {
     file: File | null;
     caseReference?: CaseReferenceForm;
