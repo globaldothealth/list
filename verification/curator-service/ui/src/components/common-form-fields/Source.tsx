@@ -1,7 +1,7 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
-import { CaseReference as CaseRef } from '../Case';
+import { CaseReference } from '../Case';
 import FieldTitle from './FieldTitle';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
@@ -12,7 +12,7 @@ import axios from 'axios';
 import { throttle } from 'lodash';
 
 interface SourceProps {
-    initialValue?: CaseRef;
+    initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
 }
 
@@ -65,10 +65,10 @@ interface ListSourcesResponse {
 }
 
 interface SourceAutocompleteProps {
-    initialValue?: CaseReference;
+    initialValue?: CaseReferenceForm;
 }
 
-interface CaseReference extends CaseRef {
+export interface CaseReferenceForm extends CaseReference {
     inputValue?: string;
     sourceName?: string;
 }
@@ -76,7 +76,7 @@ interface CaseReference extends CaseRef {
 export async function submitSource(opts: {
     name: string;
     url: string;
-}): Promise<CaseRef> {
+}): Promise<CaseReference> {
     const newSource = {
         name: opts.name,
         origin: {
@@ -91,18 +91,18 @@ export async function submitSource(opts: {
     };
 }
 
-const filter = createFilterOptions<CaseReference>();
+const filter = createFilterOptions<CaseReferenceForm>();
 
 export function SourcesAutocomplete(
     props: SourceAutocompleteProps,
 ): JSX.Element {
     const name = 'caseReference';
-    const [value, setValue] = React.useState<CaseReference | null>(
+    const [value, setValue] = React.useState<CaseReferenceForm | null>(
         props.initialValue ? props.initialValue : null,
     );
 
     const [inputValue, setInputValue] = React.useState('');
-    const [options, setOptions] = React.useState<CaseReference[]>([]);
+    const [options, setOptions] = React.useState<CaseReferenceForm[]>([]);
     const { setFieldValue, setTouched } = useFormikContext();
 
     const fetch = React.useMemo(
@@ -130,7 +130,7 @@ export function SourcesAutocomplete(
 
         fetch({ url: inputValue }, (results?: SourceData[]) => {
             if (active) {
-                let newOptions = [] as CaseReference[];
+                let newOptions = [] as CaseReferenceForm[];
 
                 if (results) {
                     newOptions = [
@@ -158,28 +158,34 @@ export function SourcesAutocomplete(
     return (
         <React.Fragment>
             <Autocomplete
-                itemType="CaseReference"
-                getOptionLabel={(option: CaseReference): string =>
+                itemType="CaseReferenceForm"
+                getOptionLabel={(option: CaseReferenceForm): string =>
                     option.sourceUrl
                 }
                 getOptionSelected={(
-                    option: CaseReference,
-                    value: CaseReference,
+                    option: CaseReferenceForm,
+                    value: CaseReferenceForm,
                 ): boolean => {
                     return (
                         option.sourceId === value.sourceId &&
                         option.sourceUrl === value.sourceUrl
                     );
                 }}
-                onChange={(_: any, newValue: CaseReference | null): void => {
+                onChange={(
+                    _: any,
+                    newValue: CaseReferenceForm | null,
+                ): void => {
                     setValue(newValue);
                     setFieldValue(name, newValue);
                 }}
                 filterOptions={(
-                    options: CaseReference[],
+                    options: CaseReferenceForm[],
                     params,
-                ): CaseReference[] => {
-                    const filtered = filter(options, params) as CaseReference[];
+                ): CaseReferenceForm[] => {
+                    const filtered = filter(
+                        options,
+                        params,
+                    ) as CaseReferenceForm[];
 
                     if (
                         params.inputValue !== '' &&
@@ -228,7 +234,7 @@ export function SourcesAutocomplete(
                         <RequiredHelperText name={name}></RequiredHelperText>
                     </div>
                 )}
-                renderOption={(option: CaseReference): React.ReactNode => {
+                renderOption={(option: CaseReferenceForm): React.ReactNode => {
                     return (
                         <span>
                             <Typography variant="body2">
