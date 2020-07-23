@@ -34,14 +34,6 @@ afterAll(async () => {
     await Session.deleteMany({});
 });
 
-const emptyAxiosResponse = {
-    data: {},
-    status: 202,
-    statusText: 'OK',
-    config: {},
-    headers: {},
-};
-
 describe('Cases', () => {
     let curatorRequest: any;
     beforeEach(async () => {
@@ -55,21 +47,25 @@ describe('Cases', () => {
         await curatorRequest.post('/api/geocode/clear').expect(200);
     });
     it('denies access to non readers', async () => {
-        await supertest
+        return supertest
             .agent(app)
-            .get('/api/cases?limit=10&page=1&filter=')
+            .get('/api/cases?limit=10&page=1&q=')
             .expect(403, /reader/)
             .expect('Content-Type', /json/);
     });
     it('proxies list calls', async () => {
-        mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: { cases: [] },
+        });
         await curatorRequest
-            .get('/api/cases?limit=10&page=1&filter=')
-            .expect(202)
+            .get('/api/cases?limit=10&page=1&q=cough')
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
-            'http://localhost:3000/api/cases?limit=10&page=1&filter=',
+            'http://localhost:3000/api/cases?limit=10&page=1&q=cough',
         );
     });
 
@@ -80,16 +76,20 @@ describe('Cases', () => {
             response: { status: code, data: message },
         });
         const res = await curatorRequest
-            .get('/api/cases?limit=10&page=1&filter=')
+            .get('/api/cases?limit=10&page=1&q=')
             .expect(code);
         expect(res.text).toEqual(message);
     });
 
     it('proxies get calls', async () => {
-        mockedAxios.get.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {},
+        });
         await curatorRequest
             .get('/api/cases/5e99f21a1c9d440000ceb088')
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
         expect(mockedAxios.get).toHaveBeenCalledWith(
@@ -110,11 +110,15 @@ describe('Cases', () => {
     });
 
     it('proxies update calls', async () => {
-        mockedAxios.put.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.put.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {},
+        });
         await curatorRequest
             .put('/api/cases/5e99f21a1c9d440000ceb088')
             .send({ age: '42' })
-            .expect(202)
+            .expect(200)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
         expect(
@@ -139,11 +143,13 @@ describe('Cases', () => {
     });
 
     it('proxies delete calls', async () => {
-        mockedAxios.delete.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.delete.mockResolvedValueOnce({
+            status: 204,
+            statusText: 'Case deleted',
+        });
         await curatorRequest
             .delete('/api/cases/5e99f21a1c9d440000ceb088')
-            .expect(202)
-            .expect('Content-Type', /json/);
+            .expect(204);
         expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
         expect(mockedAxios.delete).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
@@ -174,11 +180,15 @@ describe('Cases', () => {
             geoResolution: Resolution.Admin3,
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
-        mockedAxios.put.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.put.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
         await curatorRequest
             .put('/api/cases')
             .send({ age: '42', location: { query: 'Lyon' } })
-            .expect(202)
+            .expect(201)
             .expect('Content-Type', /json/);
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).toHaveBeenCalledWith(
@@ -228,10 +238,13 @@ describe('Cases', () => {
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
         mockedAxios.post.mockResolvedValueOnce({
-            ...emptyAxiosResponse,
+            status: 207,
             data: { errors: [] },
         });
-        mockedAxios.put.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.put.mockResolvedValue({
+            data: { _id: 'abc123' },
+            status: 201,
+        });
         const res = await curatorRequest
             .post('/api/cases/batchUpsert')
             .send({
@@ -250,9 +263,9 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).toHaveBeenCalledTimes(2);
-        expect(res.body.numUpserted).toBe(2);
-        expect(res.body.numErrors).toBe(0);
         expect(res.body.phase).toBe('UPSERT');
+        expect(res.body.createdCaseIds).toHaveLength(2);
+        expect(res.body.updatedCaseIds).toHaveLength(0);
         expect(res.body.errors).toHaveLength(0);
     });
 
@@ -290,9 +303,9 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).not.toHaveBeenCalled();
         expect(mockedAxios.put).not.toHaveBeenCalled();
-        expect(res.body.numUpserted).toBe(0);
-        expect(res.body.numErrors).toBe(2);
         expect(res.body.phase).toBe('GEOCODE');
+        expect(res.body.createdCaseIds).toHaveLength(0);
+        expect(res.body.updatedCaseIds).toHaveLength(0);
         expect(res.body.errors).toEqual([
             {
                 index: 1,
@@ -320,7 +333,7 @@ describe('Cases', () => {
             { index: 2, message: 'Darn!' },
         ];
         mockedAxios.post.mockResolvedValueOnce({
-            ...emptyAxiosResponse,
+            status: 207,
             data: { errors: validationErrors },
         });
         const res = await curatorRequest
@@ -345,9 +358,9 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).not.toHaveBeenCalled();
-        expect(res.body.numUpserted).toBe(0);
-        expect(res.body.numErrors).toBe(2);
         expect(res.body.phase).toBe('VALIDATE');
+        expect(res.body.createdCaseIds).toHaveLength(0);
+        expect(res.body.updatedCaseIds).toHaveLength(0);
         expect(res.body.errors).toEqual(validationErrors);
     });
 
@@ -364,7 +377,7 @@ describe('Cases', () => {
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
         mockedAxios.post.mockResolvedValueOnce({
-            ...emptyAxiosResponse,
+            status: 207,
             data: { errors: [] },
         });
 
@@ -405,14 +418,18 @@ describe('Cases', () => {
             geoResolution: Resolution.Admin3,
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
-        mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
         await curatorRequest
             .post('/api/cases')
             .send({
                 age: '42',
                 location: { query: 'Lyon', limitToResolution: 'Admin3' },
             })
-            .expect(202)
+            .expect(201)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
@@ -464,7 +481,11 @@ describe('Cases', () => {
             geoResolution: Resolution.Admin3,
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
-        mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
 
         await curatorRequest
             .post('/api/cases')
@@ -475,7 +496,7 @@ describe('Cases', () => {
                     limitToResolution: 'Admin3,Admin2',
                 },
             })
-            .expect(202)
+            .expect(201)
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.post).toHaveBeenCalledWith(
@@ -501,7 +522,11 @@ describe('Cases', () => {
     });
 
     it('returns 404 when no geocode could be found on create', async () => {
-        mockedAxios.post.mockResolvedValueOnce(emptyAxiosResponse);
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
         await curatorRequest
             .post('/api/cases')
             .send({ age: '42', location: { query: 'Lyon' } })
