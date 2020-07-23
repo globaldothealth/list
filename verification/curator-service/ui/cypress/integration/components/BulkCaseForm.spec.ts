@@ -1,5 +1,3 @@
-import enterSource from '../utils/enterSource';
-
 /* eslint-disable no-undef */
 describe('Bulk upload form', function () {
     beforeEach(() => {
@@ -17,14 +15,17 @@ describe('Bulk upload form', function () {
     });
 
     // TODO: Test more fields here via the case details UI.
-    it('Can upload CSV', function () {
+    it('Can upload CSV with existing source', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
-        enterSource('www.bulksource.com');
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -48,14 +49,56 @@ describe('Bulk upload form', function () {
             });
     });
 
-    it('Upserts data', function () {
+    it('Can upload CSV with new source', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
-        enterSource('www.bulksource.com');
+        cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
+        cy.contains('li', 'www.new-source.com').click();
+        cy.get('input[name="caseReference.sourceName"]').type('New source');
+        const csvFixture = '../fixtures/bulk_data.csv';
+        cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('POST', '/api/sources').as('addSource');
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+        cy.get('button[data-testid="submit"]').click().click();
+        cy.wait('@addSource');
+        cy.wait('@batchUpsert');
+
+        // Check data in linelist table.
+        cy.contains('No records to display').should('not.exist');
+        cy.contains('bulk_data.csv uploaded. 2 new cases added.');
+        cy.contains('www.new-source.com');
+        cy.contains('Male');
+        cy.contains('42');
+        cy.contains('Canada');
+        cy.contains('Alberta');
+        cy.contains('Banff');
+        cy.contains('th', 'Admitted to hospital')
+            .invoke('index')
+            .then((i) => {
+                cy.get('td').eq(i).should('have.text', 'Yes');
+            });
+
+        cy.visit('/sources');
+        cy.contains('www.new-source.com');
+        cy.contains('New source');
+    });
+
+    it('Upserts data', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
+        cy.visit('/cases');
+        cy.contains('No records to display');
+
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -71,7 +114,8 @@ describe('Bulk upload form', function () {
 
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
-        enterSource('www.bulksource.com', true);
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
         const updatedCsvFixture = '../fixtures/updated_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(updatedCsvFixture);
         cy.server();
@@ -85,13 +129,16 @@ describe('Bulk upload form', function () {
     });
 
     it('Upserts multiple cases if dictated by caseCount CSV field', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
-        enterSource('www.bulksource.com');
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bulk_data_with_case_count.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
@@ -106,13 +153,16 @@ describe('Bulk upload form', function () {
     });
 
     it('Does not upload bad data and displays validation errors', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
         cy.visit('/cases');
         cy.contains('No records to display');
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New bulk upload').click();
-        enterSource('www.bulksource.com');
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
         const csvFixture = '../fixtures/bad_bulk_data.csv';
         cy.get('input[type="file"]').attachFile(csvFixture);
         cy.server();
