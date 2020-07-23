@@ -1,5 +1,3 @@
-import enterSource from '../utils/enterSource';
-
 /* eslint-disable no-undef */
 describe('Curator', function () {
     beforeEach(() => {
@@ -36,7 +34,9 @@ describe('Curator', function () {
         // Input full case.
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
+        cy.get('input[name="caseReference.sourceName"]').type('Example source');
         cy.get('div[data-testid="sourceEntryId"]')
             .click()
             .type('testSourceEntryID123');
