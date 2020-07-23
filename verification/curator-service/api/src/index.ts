@@ -246,6 +246,10 @@ new OpenApiValidator({
         // API documentation.
         const swaggerDocument = YAML.load('./openapi/openapi.yaml');
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    })
+    .catch((e) => {
+        console.error('Failed to install OpenAPI validator:', e);
+        process.exit(1);
     });
 
 // Serve static UI content if static directory was specified.
