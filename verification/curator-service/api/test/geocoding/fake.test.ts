@@ -15,8 +15,8 @@ afterAll(async () => {
 });
 
 describe('FakeGeocoder', () => {
-    it('can seed geocodes', (done) => {
-        request(app)
+    it('can seed geocodes', async () => {
+        return request(app)
             .post('/api/geocode/seed')
             .send({
                 administrativeAreaLevel1: 'Rhône',
@@ -24,9 +24,9 @@ describe('FakeGeocoder', () => {
                 geometry: { latitude: 45.75889, longitude: 4.84139 },
                 name: 'Lyon',
             })
-            .expect(200, done);
+            .expect(200);
     });
-    it('can clear geocodes', (done) => {
-        request(app).post('/api/geocode/clear').expect(200, done);
+    it('can clear geocodes', () => {
+        return request(app).post('/api/geocode/clear').expect(200);
     });
 });
