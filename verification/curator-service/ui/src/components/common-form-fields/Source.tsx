@@ -1,21 +1,13 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Typography,
-} from '@material-ui/core';
 import { FastField, Field, useFormikContext } from 'formik';
 
 import { CaseReference as CaseRef } from '../Case';
 import FieldTitle from './FieldTitle';
-import { TextField as MUITextField } from '@material-ui/core';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
+import { Typography } from '@material-ui/core';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
@@ -64,6 +56,7 @@ interface OriginData {
 
 interface SourceData {
     _id: string;
+    name: string;
     origin: OriginData;
 }
 
@@ -75,12 +68,27 @@ interface SourceAutocompleteProps {
     initialValue?: CaseReference;
 }
 
-interface AdditionalSource {
-    sourceUrl: string;
-}
-
 interface CaseReference extends CaseRef {
     inputValue?: string;
+    sourceName?: string;
+}
+
+export async function submitSource(opts: {
+    name: string;
+    url: string;
+}): Promise<CaseRef> {
+    const newSource = {
+        name: opts.name,
+        origin: {
+            url: opts.url,
+        },
+    };
+    const resp = await axios.post<SourceData>('/api/sources', newSource);
+    return {
+        sourceId: resp.data._id,
+        sourceUrl: opts.url,
+        additionalSources: ([] as unknown) as [{ sourceUrl: string }],
+    };
 }
 
 const filter = createFilterOptions<CaseReference>();
@@ -89,41 +97,9 @@ export function SourcesAutocomplete(
     props: SourceAutocompleteProps,
 ): JSX.Element {
     const name = 'caseReference';
-    const [open, toggleOpen] = React.useState(false);
     const [value, setValue] = React.useState<CaseReference | null>(
         props.initialValue ? props.initialValue : null,
     );
-    const [dialogValue, setDialogValue] = React.useState({
-        url: '',
-        name: '',
-    });
-
-    const handleClose = (): void => {
-        setDialogValue({
-            url: '',
-            name: '',
-        });
-        toggleOpen(false);
-    };
-
-    const handleDialogSubmit = async (): Promise<void> => {
-        const newSource = {
-            name: dialogValue.name,
-            origin: {
-                url: dialogValue.url,
-            },
-        };
-        const resp = await axios.post<SourceData>('/api/sources', newSource);
-        const newValue = {
-            sourceId: resp.data._id,
-            sourceUrl: dialogValue.url,
-            additionalSources: ([] as unknown) as [{ sourceUrl: string }],
-        };
-
-        setValue(newValue);
-        setFieldValue(name, newValue);
-        handleClose();
-    };
 
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<CaseReference[]>([]);
@@ -162,6 +138,7 @@ export function SourcesAutocomplete(
                         ...results.map((source) => ({
                             sourceId: source._id,
                             sourceUrl: source.origin.url,
+                            sourceName: source.name,
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
@@ -194,29 +171,9 @@ export function SourcesAutocomplete(
                         option.sourceUrl === value.sourceUrl
                     );
                 }}
-                onChange={(
-                    event: any,
-                    newValue: CaseReference | null,
-                ): void => {
-                    if (typeof newValue === 'string') {
-                        // Timeout to avoid instant validation of the dialog's form.
-                        setTimeout(() => {
-                            toggleOpen(true);
-                            setDialogValue({
-                                url: newValue,
-                                name: '',
-                            });
-                        });
-                    } else if (newValue && newValue.inputValue) {
-                        toggleOpen(true);
-                        setDialogValue({
-                            url: newValue.inputValue,
-                            name: '',
-                        });
-                    } else {
-                        setValue(newValue);
-                        setFieldValue(name, newValue);
-                    }
+                onChange={(_: any, newValue: CaseReference | null): void => {
+                    setValue(newValue);
+                    setFieldValue(name, newValue);
                 }}
                 filterOptions={(
                     options: CaseReference[],
@@ -224,11 +181,18 @@ export function SourcesAutocomplete(
                 ): CaseReference[] => {
                     const filtered = filter(options, params) as CaseReference[];
 
-                    if (params.inputValue !== '') {
+                    if (
+                        params.inputValue !== '' &&
+                        !filtered.find(
+                            (caseRef) =>
+                                caseRef.sourceUrl === params.inputValue,
+                        )
+                    ) {
                         filtered.push({
                             inputValue: params.inputValue,
-                            sourceUrl: `Add "${params.inputValue}"`,
+                            sourceUrl: params.inputValue,
                             sourceId: '',
+                            sourceName: '',
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
@@ -274,64 +238,20 @@ export function SourcesAutocomplete(
                     );
                 }}
             />
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <form>
-                    <DialogTitle id="form-dialog-title">
-                        Add a new source
-                    </DialogTitle>
-                    <DialogContent>
-                        <MUITextField
-                            autoFocus
-                            margin="dense"
-                            id="url"
-                            value={dialogValue.url}
-                            onChange={(event): void =>
-                                setDialogValue({
-                                    ...dialogValue,
-                                    url: event.target.value,
-                                })
-                            }
-                            label="URL"
+            {/* If this is a new source, show option to add name */}
+            {inputValue &&
+                !options.find((option) => option.sourceUrl === inputValue) && (
+                    <>
+                        <FastField
+                            label="Source name"
+                            name={`${name}.sourceName`}
                             type="text"
+                            data-testid="sourceName"
+                            component={TextField}
+                            fullWidth
                         />
-                        <MUITextField
-                            margin="dense"
-                            id="name"
-                            value={dialogValue.name}
-                            onChange={(event): void =>
-                                setDialogValue({
-                                    ...dialogValue,
-                                    name: event.target.value,
-                                })
-                            }
-                            label="Name"
-                            type="text"
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose} color="primary">
-                            Cancel
-                        </Button>
-                        {
-                            // Don't use submit type for this button.
-                            // It'll trigger the outer form submit.
-                            // We could make this dialog use a nested Formik
-                            // declaration/context, but no need for now.
-                        }
-                        <Button
-                            onClick={handleDialogSubmit}
-                            color="primary"
-                            data-testid="sourceAdd"
-                        >
-                            Add
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+                    </>
+                )}
         </React.Fragment>
     );
 }
