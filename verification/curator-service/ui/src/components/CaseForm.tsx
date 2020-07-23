@@ -547,6 +547,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                         isChecked:
                                             values.caseReference !==
                                                 undefined &&
+                                            values.caseReference !== null &&
                                             values.caseReference.sourceUrl !==
                                                 null &&
                                             values.caseReference.sourceUrl !==
