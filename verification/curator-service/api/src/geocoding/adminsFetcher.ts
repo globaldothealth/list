@@ -40,9 +40,8 @@ export default class MapboxAdminsFetcher {
             geocode.geometry.latitude
         }.json?access_token=${this.accessToken}`;
         try {
-            const resp = await axios.get(url);
-            const features = (resp.data as BoundariesResponse).features;
-            features.forEach((feature) => {
+            const resp = await axios.get<BoundariesResponse>(url);
+            resp.data.features.forEach((feature) => {
                 switch (feature.properties.tilequery.layer) {
                     case 'boundaries_admin_1':
                     // TODO: Get name from prop.id and put in geocode.administrativeAreaLevel1;
