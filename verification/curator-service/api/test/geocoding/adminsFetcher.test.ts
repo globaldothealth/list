@@ -27,7 +27,7 @@ describe('Admins', () => {
             name: 'the',
             place: 'to be',
         });
-        expect(mockedAxios.get).toHaveBeenCalledTimes(0);
+        expect(mockedAxios.get).not.toHaveBeenCalled();
     });
 
     it('fetches missing admins', async () => {
