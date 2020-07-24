@@ -2,7 +2,7 @@
 describe('Linelist table', function () {
     beforeEach(() => {
         cy.task('clearCasesDB', {});
-        cy.login();
+        cy.login({email: 'test@bar.com', name: 'test', roles: ['admin', 'curator', 'reader']});
     });
 
     afterEach(() => {
