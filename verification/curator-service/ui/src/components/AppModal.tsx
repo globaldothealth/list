@@ -16,12 +16,12 @@ const styles = (theme: Theme) =>
     createStyles({
         modalContents: {
             backgroundColor: theme.palette.background.paper,
-            left: '300px',
+            left: '15%',
             height: '100%',
             position: 'absolute',
             outline: 'none',
             // Remainder of the screen width accounting for left shift
-            width: 'calc(100vw - 300px)',
+            width: 'calc(100vw - 15%)',
         },
         appBar: {
             background: 'white',
