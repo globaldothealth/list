@@ -1,4 +1,9 @@
-import { GeocodeOptions, GeocodeResult, Resolution } from './geocoder';
+import {
+    GeocodeOptions,
+    GeocodeResult,
+    Resolution,
+    isMissingAdmins,
+} from './geocoder';
 import Geocoding, {
     GeocodeFeature,
     GeocodeMode,
@@ -9,6 +14,7 @@ import Geocoding, {
 } from '@mapbox/mapbox-sdk/services/geocoding';
 
 import LRUCache from 'lru-cache';
+import MapboxAdminsFetcher from './adminsFetcher';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
 // getFeatureTypeFromContext will return the feature 'text' field if it is of the provided type.
@@ -58,6 +64,7 @@ const resolutionToGeocodeQueryType = new Map<Resolution, GeocodeQueryType>([
 export default class MapboxGeocoder {
     private geocodeService: GeocodeService;
     private cache: LRUCache<string, GeocodeResult[]>;
+    private adminsFetcher: MapboxAdminsFetcher;
     constructor(accessToken: string, private readonly endpoint: GeocodeMode) {
         this.geocodeService = Geocoding({
             accessToken: accessToken,
@@ -65,6 +72,7 @@ export default class MapboxGeocoder {
         this.cache = new LRUCache<string, GeocodeResult[]>({
             max: 500,
         });
+        this.adminsFetcher = new MapboxAdminsFetcher(accessToken);
     }
 
     async geocode(
@@ -111,34 +119,40 @@ export default class MapboxGeocoder {
                 .forwardGeocode(req)
                 .send();
             const features = (resp.body as GeocodeResponse).features;
-            const geocodes = features.map((feature) => {
-                const contexts: GeocodeFeature[] = [feature];
-                if (feature.context) {
-                    contexts.push(...feature.context);
-                }
-                return {
-                    geometry: {
-                        longitude: feature.center[0],
-                        latitude: feature.center[1],
-                    },
-                    country: getFeatureTypeFromContext(contexts, 'country'),
-                    administrativeAreaLevel1: getFeatureTypeFromContext(
-                        contexts,
-                        'region',
-                    ),
-                    administrativeAreaLevel2: getFeatureTypeFromContext(
-                        contexts,
-                        'district',
-                    ),
-                    administrativeAreaLevel3: getFeatureTypeFromContext(
-                        contexts,
-                        'place',
-                    ),
-                    place: getFeatureTypeFromContext(contexts, 'poi'),
-                    name: feature.place_name,
-                    geoResolution: getResolution(contexts),
-                };
-            });
+            const geocodes = await Promise.all(
+                features.map(async (feature) => {
+                    const contexts: GeocodeFeature[] = [feature];
+                    if (feature.context) {
+                        contexts.push(...feature.context);
+                    }
+                    const res: GeocodeResult = {
+                        geometry: {
+                            longitude: feature.center[0],
+                            latitude: feature.center[1],
+                        },
+                        country: getFeatureTypeFromContext(contexts, 'country'),
+                        administrativeAreaLevel1: getFeatureTypeFromContext(
+                            contexts,
+                            'region',
+                        ),
+                        administrativeAreaLevel2: getFeatureTypeFromContext(
+                            contexts,
+                            'district',
+                        ),
+                        administrativeAreaLevel3: getFeatureTypeFromContext(
+                            contexts,
+                            'place',
+                        ),
+                        place: getFeatureTypeFromContext(contexts, 'poi'),
+                        name: feature.place_name,
+                        geoResolution: getResolution(contexts),
+                    };
+                    if (isMissingAdmins(res)) {
+                        await this.adminsFetcher.fillAdmins(res);
+                    }
+                    return res;
+                }),
+            );
             this.cache.set(cacheKey, geocodes);
             return geocodes;
         } catch (e) {
