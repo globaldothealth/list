@@ -164,7 +164,10 @@ export default class CasesController {
             const updatedCasesIds = [];
             for (let index = 0; index < req.body.cases.length; index++) {
                 const c = req.body.cases[index];
-                const r = await axios.put(this.dataServerURL + '/api/cases', c);
+                const r = await axios.put(this.dataServerURL + '/api/cases', {
+                    ...c,
+                    curator: { email: (req.user as UserDocument).email },
+                });
                 r.status === 201
                     ? createdCasesIds.push(r.data._id)
                     : updatedCasesIds.push(r.data._id);
