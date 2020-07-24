@@ -543,6 +543,7 @@ components:
         location:
           $ref: "#/components/schemas/Location"
         events:
+          # TODO: Make event names an enum.
           description: > 
             An event with name "confirmed" must be specified. Other event names
             include onsetSymptoms, firstClinicalConsultation, selfIsolation,
@@ -700,7 +701,9 @@ components:
             - sourceId
             - sourceUrl
         location:
-          description: Note that either `geometry` or `query` is required.
+          description: >
+            Either `query` or all of `geometry`, `country`, and `geoResolution`
+            is required. The former will trigger geocoding.
           properties:
             query:
               type: string
