@@ -8,6 +8,12 @@ import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 
+const creatorMetadata = {
+    curator: {
+        email: 'foo@bar.com',
+    },
+};
+
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 let mongoServer: MongoMemoryServer;
@@ -125,7 +131,7 @@ describe('Cases', () => {
             mockedAxios.put,
         ).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases/5e99f21a1c9d440000ceb088',
-            { age: '42' },
+            { age: '42', ...creatorMetadata },
         );
     });
 
@@ -196,6 +202,7 @@ describe('Cases', () => {
             {
                 age: '42',
                 location: lyon,
+                ...creatorMetadata,
             },
         );
     });
@@ -437,6 +444,7 @@ describe('Cases', () => {
             {
                 age: '42',
                 location: lyon,
+                ...creatorMetadata,
             },
         );
     });
@@ -504,6 +512,7 @@ describe('Cases', () => {
             {
                 age: '42',
                 location: lyon,
+                ...creatorMetadata,
             },
         );
     });

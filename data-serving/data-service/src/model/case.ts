@@ -70,7 +70,7 @@ const caseSchema = new mongoose.Schema(
     },
 );
 
-type CaseDocument = mongoose.Document & {
+export type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     caseReference: CaseReferenceDocument;
     demographics: DemographicsDocument;
