@@ -256,7 +256,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NewCase"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              required:
+                - caseReference
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -500,11 +503,154 @@ components:
       type: object
           # TODO: Define NewSource object.
     Case:
-      description: A complete case; a superset of "#/components/schemas/NewCase" with server-added fields
-      allOf:
-        - $ref: "#/components/schemas/NewCase"
-        - type: object
-          # TODO: Define Case object.
+      description: A single line-list case.
+      properties:
+        caseReference:
+          type: object
+          properties:
+            sourceId:
+              type: string
+              pattern: '^[a-f\d]{24}$'
+            sourceUrl:
+              type: string
+            additionalSources:
+              type: array
+              items:
+                type: object
+                properties:
+                  sourceUrl:
+                    type: string
+        demographics:
+          type: object
+          properties:
+            gender:
+              type: string
+            ageRange:
+              type: object
+              properties:
+                start:
+                  type: number
+                end:
+                  type: number
+            ethnicity:
+              type: string
+            nationalities:
+              type: array
+              items:
+                type: string
+            occupation:
+              type: string
+        location:
+          $ref: "#/components/schemas/Location"
+        events:
+          description: > 
+            An event with name "confirmed" must be specified. Other event names
+            include onsetSymptoms, firstClinicalConsultation, selfIsolation,
+            hospitalAdmission, icuAdmission, and outcome.
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              dateRange:
+                $ref: "#/components/schemas/DateRange"
+              value:
+                type: string
+        symptoms:
+          type: object
+          properties:
+            status:
+              type: string
+            values:
+              type: array
+              items:
+                type: string
+        preexistingConditions:
+          type: object
+          properties:
+            hasPreexistingConditions:
+              type: boolean
+            values:
+              type: array
+              items:
+                type: string
+        transmission:
+          type: object
+          properties:
+            routes:
+              type: array
+              items:
+                type: string
+            places:
+              type: array
+              items:
+                type: string
+            linkedCaseIds:
+              type: array
+              items:
+                type: string
+        travelHistory:
+          type: object
+          properties:
+            traveledPrior30Days:
+              type: boolean
+            travel:
+              type: array
+              items:
+                type: object
+                properties:
+                  dateRange:
+                    $ref: "#/components/schemas/DateRange"
+                  location:
+                    $ref: "#/components/schemas/Location"
+                  purpose:
+                    type: string
+                  methods:
+                    type: array
+                    items:
+                      type: string
+        genomeSequences:
+          type: array
+          items:
+            type: object
+            properties:
+              sampleCollectionDate:
+                $ref: "#/components/schemas/Date"
+              repositoryUrl:
+                type: string
+              sequenceId:
+                type: string
+              sequenceName:
+                type: string
+              sequenceLength:
+                type: integer
+                format: int64
+                minimum: 0
+        pathogens:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              id:
+                type: integer
+                format: int32
+                minimum: 0
+        notes:
+          type: string
+        revisionMetadata:
+          type: object
+          properties:
+            revisionNumber:
+              type: integer
+              format: int32
+              minimum: 0
+            creationMetadata:
+              $ref: "#/components/schemas/EditMetadata"
+            editMetadata:
+              $ref: "#/components/schemas/EditMetadata"
     CaseArray:
       type: object
       properties:
@@ -514,6 +660,27 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    Date:
+      oneOf:
+        - type: string
+        - type: object
+        - type: number
+    DateRange:
+      type: object
+      properties:
+        start:
+          $ref: "#/components/schemas/Date"
+        end:
+          $ref: "#/components/schemas/Date"
+    EditMetadata:
+      type: object
+      properties:
+        curator:
+          type: string
+        date:
+          $ref: "#/components/schemas/Date"
+        notes:
+          type: string
     Geocode:
       type: object
       # TODO: Define Geocode object.
@@ -522,9 +689,27 @@ components:
       items:
         $ref: "#/components/schemas/Geocode"
     NewCase:
-      description: The subset of "#/components/schemas/Case" required to create the entity
-      type: object
-      # TODO: Define NewCase object.
+      description: >
+        A "#/components/schemas/Case" with additional required fields for
+        newly-created cases.
+      allOf:
+        - $ref: "#/components/schemas/Case"
+      properties:
+        caseReference:
+          required:
+            - sourceId
+            - sourceUrl
+        location:
+          description: Note that either `geometry` or `query` is required.
+          properties:
+            query:
+              type: string
+            limitToResolution:
+              type: string
+      required:
+        - caseReference
+        - location
+        - events
     User:
       description: A user
       type: object
@@ -565,6 +750,35 @@ components:
     Location:
       description: A geo location
       type: object
+      properties:
+        country:
+          type: string
+        administrativeAreaLevel1:
+          type: string
+        administrativeAreaLevel2:
+          type: string
+        administrativeAreaLevel3:
+          type: string
+        place:
+          type: string
+        name:
+          type: string
+        geoResolution: 
+          type: string
+        geometry:
+          type: object
+          properties:
+            latitude:
+              type: number
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              minimum: -180
+              maximum: 180
+          required:
+            - latitude
+            - longitude
     LocationArray:
       description: A list of geo locations
       type: array
