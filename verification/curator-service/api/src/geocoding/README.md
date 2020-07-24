@@ -28,3 +28,14 @@ Check-out their [documentation](https://docs.mapbox.com/api/search/) as well.
 In order to be able to use the `mapbox.places-permanent` endpoint that is needed for storing the results as per Mapbox usage policy, you need to set the right secret token in the `MAPBOX_TOKEN` environment variable.
 
 If the `MAPBOX_PERMANENT_GEOCODE` environment variable doesn't parse as `true` (cf. `src/util/validate-env.ts`), the geocoder will default to the `mapbox.places` endpoint instead which is useful during development.
+
+## Fetch of administrative areas.
+
+Geocode results returned by Mapbox sometimes do not contain the full hierarchical information necessary to fill all administrative area levels.
+
+In order to fill the missing admins we make use of the Boundaries API that Mapbox offers.
+It allows us to query administrative area names in the world based on the centroid of a feature.
+
+Note that this API is private and its official documentation is kind of lacking... Once you register, Mapbox folks send you a bunch of files with more information on administrative levels (like names in various languages, centroids, etc).
+
+We preprocess these files with the `/verification/scripts/gen_boundaries.sh` script and import the mapping of admin IDs to their English names in Mongo DB with the `/verification/scripts/import_boundaries.sh`. This process only needs to be done once for the lifetime of the Mongo DB database.
