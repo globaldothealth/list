@@ -19,6 +19,15 @@ export interface GeocodeResult {
     geoResolution: Resolution;
 }
 
+// Returns whether a given geocode result is missing some administrative areas levels.
+export function isMissingAdmins(result: GeocodeResult): boolean {
+    return (
+        result.administrativeAreaLevel1 === '' ||
+        result.administrativeAreaLevel2 === '' ||
+        result.administrativeAreaLevel3 === ''
+    );
+}
+
 export enum Resolution {
     Point = 'Point',
     Admin3 = 'Admin3',
