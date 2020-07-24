@@ -33,7 +33,7 @@ export const setRevisionMetadata = async (
     next: NextFunction,
 ) => {
     const curatorEmail = request.body.curator.email;
-    const caseReference = request.body?.caseReference;
+    const caseReference = request.body.caseReference;
 
     // Find the case if it already exists so we can update its existing
     // metadata.
