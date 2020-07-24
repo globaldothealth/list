@@ -8,9 +8,34 @@ import app from '../src/index';
 import axios from 'axios';
 import supertest from 'supertest';
 
+const caseReference = {
+    caseReference: {
+        sourceId: '5ea86423bae6982635d2e1f8',
+        sourceEntryId: 'abc',
+        sourceUrl: 'cdc.gov',
+    },
+};
+
 const creatorMetadata = {
     curator: {
         email: 'foo@bar.com',
+    },
+};
+
+const minimalCreateRequest = {
+    ...caseReference,
+    ...creatorMetadata,
+    events: [
+        {
+            name: 'confirmed',
+            dateRange: {
+                start: '2019-12-03T14:07:03.382Z',
+                end: '2019-12-03T14:07:03.382Z',
+            },
+        },
+    ],
+    location: {
+        query: 'Canada',
     },
 };
 
@@ -193,9 +218,10 @@ describe('Cases', () => {
         });
         await curatorRequest
             .put('/api/cases')
-            .send({ age: '42', location: { query: 'Lyon' } })
+            .send({ age: '42', location: { query: 'Lyon' }, ...caseReference })
             .expect(201)
             .expect('Content-Type', /json/);
+
         expect(mockedAxios.put).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases',
@@ -203,6 +229,7 @@ describe('Cases', () => {
                 age: '42',
                 location: lyon,
                 ...creatorMetadata,
+                ...caseReference,
             },
         );
     });
@@ -227,7 +254,7 @@ describe('Cases', () => {
         });
         const res = await curatorRequest
             .put('/api/cases')
-            .send({ age: '42', location: { query: 'Lyon' } })
+            .send({ age: '42', location: { query: 'Lyon' }, ...caseReference })
             .expect(code);
         expect(res.text).toEqual(message);
     });
@@ -433,7 +460,7 @@ describe('Cases', () => {
         await curatorRequest
             .post('/api/cases')
             .send({
-                age: '42',
+                ...minimalCreateRequest,
                 location: { query: 'Lyon', limitToResolution: 'Admin3' },
             })
             .expect(201)
@@ -442,9 +469,42 @@ describe('Cases', () => {
         expect(mockedAxios.post).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases',
             {
-                age: '42',
+                ...minimalCreateRequest,
                 location: lyon,
-                ...creatorMetadata,
+            },
+        );
+    });
+
+    it('proxies create calls when bypassing geocoding', async () => {
+        const lyon = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
+        await curatorRequest
+            .post('/api/cases')
+            .send({
+                ...minimalCreateRequest,
+                location: lyon,
+            })
+            .expect(201)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases',
+            {
+                ...minimalCreateRequest,
+                location: lyon,
             },
         );
     });
@@ -470,7 +530,7 @@ describe('Cases', () => {
         const res = await curatorRequest
             .post('/api/cases')
             .send({
-                age: '42',
+                ...minimalCreateRequest,
                 location: { query: 'Lyon', limitToResolution: 'Admin3' },
             })
             .expect(code);
@@ -498,7 +558,7 @@ describe('Cases', () => {
         await curatorRequest
             .post('/api/cases')
             .send({
-                age: '42',
+                ...minimalCreateRequest,
                 location: {
                     query: 'Lyon',
                     limitToResolution: 'Admin3,Admin2',
@@ -510,7 +570,7 @@ describe('Cases', () => {
         expect(mockedAxios.post).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases',
             {
-                age: '42',
+                ...minimalCreateRequest,
                 location: lyon,
                 ...creatorMetadata,
             },
@@ -521,7 +581,7 @@ describe('Cases', () => {
         await curatorRequest
             .post('/api/cases')
             .send({
-                age: '42',
+                ...minimalCreateRequest,
                 location: {
                     query: 'Lyon',
                     limitToResolution: 'NotAResolution',
@@ -538,7 +598,10 @@ describe('Cases', () => {
         });
         await curatorRequest
             .post('/api/cases')
-            .send({ age: '42', location: { query: 'Lyon' } })
+            .send({
+                ...minimalCreateRequest,
+                location: { query: 'Lyon' },
+            })
             .expect(404);
     });
 });
