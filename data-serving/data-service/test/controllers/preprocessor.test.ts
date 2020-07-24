@@ -28,15 +28,16 @@ afterAll(() => {
 });
 
 describe('create', () => {
-    it('create sets create metadata', async () => {
+    it('sets create metadata', async () => {
         const requestBody = {
             ...minimalCase,
             curator: { email: 'creator@gmail.com' },
         };
+        const nextFn = jest.fn();
         await setRevisionMetadata(
             { body: requestBody, method: 'POST' } as Request,
             {} as Response,
-            /* next= */ jest.fn,
+            nextFn,
         );
 
         expect(requestBody).toEqual({
@@ -53,7 +54,7 @@ describe('create', () => {
 });
 
 describe('update', () => {
-    it('update sets update metadata and preserves create metadata', async () => {
+    it('sets update metadata and preserves create metadata', async () => {
         const c = new Case({
             ...minimalCase,
             revisionMetadata: {
@@ -70,6 +71,7 @@ describe('update', () => {
             ...minimalCase,
             curator: { email: 'updater@gmail.com' },
         };
+        const nextFn = jest.fn();
         await setRevisionMetadata(
             {
                 body: requestBody,
@@ -77,7 +79,7 @@ describe('update', () => {
                 params: { id: c._id },
             } as Request<any>,
             {} as Response,
-            /* next= */ jest.fn,
+            nextFn,
         );
 
         expect(requestBody).toEqual({
@@ -95,7 +97,7 @@ describe('update', () => {
             },
         });
     });
-    it('update sets update metadata and replaces existing update metadata', async () => {
+    it('sets update metadata and replaces existing update metadata', async () => {
         const c = new Case({
             ...minimalCase,
             revisionMetadata: {
@@ -116,6 +118,7 @@ describe('update', () => {
             ...minimalCase,
             curator: { email: 'updater2@gmail.com' },
         };
+        const nextFn = jest.fn();
         await setRevisionMetadata(
             {
                 body: requestBody,
@@ -123,9 +126,10 @@ describe('update', () => {
                 params: { id: c._id },
             } as Request<any>,
             {} as Response,
-            /* next= */ jest.fn,
+            nextFn,
         );
 
+        expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
             ...minimalCase,
             revisionMetadata: {
@@ -144,7 +148,7 @@ describe('update', () => {
 });
 
 describe('upsert', () => {
-    it('upsert with no existing case sets create metadata', async () => {
+    it('with no existing case sets create metadata', async () => {
         const upsertCase = {
             ...minimalCase,
             caseReference: {
@@ -156,10 +160,11 @@ describe('upsert', () => {
             ...upsertCase,
             curator: { email: 'creator@gmail.com' },
         };
+        const nextFn = jest.fn();
         await setRevisionMetadata(
             { body: requestBody, method: 'PUT' } as Request,
             {} as Response,
-            /* next= */ jest.fn,
+            nextFn,
         );
 
         expect(requestBody).toEqual({
@@ -173,7 +178,7 @@ describe('upsert', () => {
             },
         });
     });
-    it('upsert with existing case sets update metadata', async () => {
+    it('with existing case sets update metadata', async () => {
         const upsertCase = {
             ...minimalCase,
             caseReference: {
@@ -197,10 +202,11 @@ describe('upsert', () => {
             ...upsertCase,
             curator: { email: 'updater@gmail.com' },
         };
+        const nextFn = jest.fn();
         await setRevisionMetadata(
             { body: requestBody, method: 'PUT' } as Request,
             {} as Response,
-            /* next= */ jest.fn,
+            nextFn,
         );
 
         expect(requestBody).toEqual({
