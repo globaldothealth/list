@@ -273,6 +273,11 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
+function unknownToUndefined(value: string | undefined): string | undefined {
+    if (value === 'Unknown') return undefined;
+    return value;
+}
+
 class CaseForm extends React.Component<Props, CaseFormState> {
     constructor(props: Props) {
         super(props);
@@ -297,6 +302,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 if (travel.dateRange.end === null) {
                     delete travel.dateRange.end;
                 }
+            }
+            if (travel.purpose === 'Unknown') {
+                travel.purpose = undefined;
             }
         });
         return filteredTravel;
@@ -332,7 +340,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                gender: values.gender,
+                gender: unknownToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
@@ -392,11 +400,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                   end: elem.dates,
                               }
                             : undefined,
-                        value: elem.value,
+                        value: unknownToUndefined(elem.value),
                     };
                 }),
             symptoms: {
-                status: values.symptomsStatus,
+                status: unknownToUndefined(values.symptomsStatus),
                 values: values.symptoms,
             },
             preexistingConditions: {

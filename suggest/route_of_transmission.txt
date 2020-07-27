@@ -5,6 +5,5 @@ Fecal–oral
 Iatrogenic
 Oral
 Sexual
-Unknown
 Vector borne
 Vertical (Parent to child)
