@@ -114,12 +114,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     </MuiAlert>
                 )}
                 {!this.props.location.state?.bulkMessage &&
-                    (this.props.location.state?.newCaseIds?.length ?? 0) >
-                        0 && (
+                    this.props.location.state?.newCaseIds &&
+                    (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert elevation={6} variant="filled">
                             {`Case ${this.props.location.state.newCaseIds} added`}
                         </MuiAlert>
-                    )}
+                    ) : (
+                        <MuiAlert elevation={6} variant="filled">
+                            {`${this.props.location.state.newCaseIds.length} cases added`}
+                        </MuiAlert>
+                    ))}
                 {!this.props.location.state?.bulkMessage &&
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
