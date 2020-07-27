@@ -4,7 +4,7 @@
   "description": "Centralized dataserver for epidemiological line list data",
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-covid-data/healthmap-gdo-temp",
+    "url": "https://github.com/globaldothealth/list",
     "directory": "data-serving/data-service"
   },
   "main": "dist/server.js",
