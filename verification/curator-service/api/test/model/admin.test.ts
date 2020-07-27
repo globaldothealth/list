@@ -1,7 +1,7 @@
 import { Admin } from '../../src/model/admin';
 
 describe('Admin schema', () => {
-    it('should build a valid user', () => {
+    it('should build a valid admin', () => {
         const errors = new Admin({
             id: 'foo',
             name: 'bar',
