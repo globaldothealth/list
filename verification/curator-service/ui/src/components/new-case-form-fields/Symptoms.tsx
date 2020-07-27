@@ -11,7 +11,7 @@ import { useFormikContext } from 'formik';
 
 // TODO: get values from DB
 const symptomStatusValues = [
-    undefined,
+    'Unknown',
     'Asymptomatic',
     'Symptomatic',
     'Presymptomatic',

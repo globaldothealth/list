@@ -33,10 +33,10 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const hasTravelledValues = [undefined, 'Yes', 'No'];
+const hasTravelledValues = ['Unknown', 'Yes', 'No'];
 
 // TODO: get values from DB.
-const travelPurposes = [undefined, 'Business', 'Leisure', 'Family', 'Other'];
+const travelPurposes = ['Unknown', 'Business', 'Leisure', 'Family', 'Other'];
 
 const travelMethods = [
     'Bus',
