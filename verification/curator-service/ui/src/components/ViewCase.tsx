@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: '1em',
         marginLeft: '10em',
         // width - left shift and nav menu size.
-        width: 'calc(100vw - 25em)',
+        width: 'calc(100vw - 23em)',
         scrollBehavior: 'smooth',
     },
     editBtn: {
