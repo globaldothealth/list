@@ -35,7 +35,7 @@ export default function Symptoms(): JSX.Element {
                         label="Symptoms"
                         initialValue={initialValues.symptoms}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/symptoms.txt"
+                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/symptoms.txt"
                     />
                 )}
             </fieldset>
