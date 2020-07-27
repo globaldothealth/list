@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, LinearProgress } from '@material-ui/core';
+import { Button, LinearProgress, Typography } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -796,6 +796,16 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                             </nav>
                             <div className={classes.form}>
+                                <Typography variant="h4">
+                                    Enter the details for{' '}
+                                    {this.props.initialCase
+                                        ? 'an existing case'
+                                        : 'a new case'}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Complete all available data for the case.
+                                    Required fields are marked.
+                                </Typography>
                                 <Form>
                                     <div className={classes.formSection}>
                                         <Source
