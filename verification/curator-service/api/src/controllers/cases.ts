@@ -220,6 +220,60 @@ export default class CasesController {
     };
 
     /**
+     * Creates the provided cases.
+     *
+     * Executes two operations on the supplied data:
+     *
+     *   1. Geocodes provided cases as required. If there are any issues
+     *      geocoding (which is done serially -- though we should consider
+     *      taking advantage of a batch geocode API), return the results now
+     *      without proceeding to the creation stage.
+     *   2. Creates the data via the data service create API.
+     */
+    batchCreate = async (req: Request, res: Response): Promise<void> => {
+        try {
+            // 1. Geocode each case.
+            const geocodeErrors = await this.batchGeocode(req);
+            if (geocodeErrors.length > 0) {
+                res.status(207).send({
+                    phase: 'GEOCODE',
+                    createdCaseIds: [],
+                    errors: geocodeErrors,
+                });
+                return;
+            }
+            // 2. Create each case.
+            const createdCasesIds = [];
+            for (let index = 0; index < req.body.cases.length; index++) {
+                const c = req.body.cases[index];
+                const r = await axios.post(
+                    this.dataServerURL + '/api' + req.url,
+                    {
+                        ...c,
+                        curator: { email: (req.user as UserDocument).email },
+                    },
+                );
+                if (r.status === 201) {
+                    createdCasesIds.push(r.data._id);
+                }
+            }
+            res.status(200).send({
+                phase: 'CREATE',
+                createdCaseIds: createdCasesIds,
+                errors: [],
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err.message);
+        }
+    };
+
+    /**
      * Geocodes request content if no lat lng were provided.
      *
      * @returns {boolean} Whether lat lng were either provided or geocoded
