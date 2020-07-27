@@ -410,10 +410,13 @@ class App extends React.Component<Props, State> {
                             {this.hasAnyRole(['curator', 'reader']) && (
                                 <Route
                                     path="/cases/view/:id"
-                                    render={({ match }) => {
+                                    render={({ match }): JSX.Element => {
                                         return (
                                             <ViewCase
                                                 id={match.params.id}
+                                                enableEdit={this.hasAnyRole([
+                                                    'curator',
+                                                ])}
                                                 onModalClose={(): void =>
                                                     history.push('/cases')
                                                 }
