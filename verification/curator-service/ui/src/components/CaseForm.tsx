@@ -797,7 +797,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                             </nav>
                             <div className={classes.form}>
                                 <Typography variant="h4">
-                                    Enter the details for a new case
+                                    Enter the details for{' '}
+                                    {this.props.initialCase
+                                        ? 'an existing case'
+                                        : 'a new case'}
                                 </Typography>
                                 <Typography variant="body2">
                                     Complete all available data for the case.
