@@ -138,7 +138,7 @@ export function FormikAutocomplete(
 interface SelectFieldProps {
     name: string;
     label: string;
-    values: (string | undefined)[];
+    values: string[];
     required?: boolean;
 }
 
@@ -159,8 +159,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                 component={Select}
             >
                 {props.values.map((value) => (
-                    <MenuItem key={value ?? 'undefined'} value={value}>
-                        {value ?? 'Unknown'}
+                    <MenuItem key={value} value={value}>
+                        {value}
                     </MenuItem>
                 ))}
             </FastField>
