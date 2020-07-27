@@ -5,6 +5,7 @@ import {
     LinearProgress,
     Paper,
     Typography,
+    Button,
 } from '@material-ui/core';
 
 import AppModal from './AppModal';
@@ -17,6 +18,8 @@ import { createStyles } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
 import { withStyles } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/EditOutlined';
+import { Link } from 'react-router-dom';
 
 const styles = () =>
     createStyles({
@@ -28,6 +31,7 @@ const styles = () =>
 
 interface Props extends WithStyles<typeof styles> {
     id: string;
+    enableEdit?: boolean;
     onModalClose: () => void;
 }
 
@@ -70,7 +74,12 @@ class ViewCase extends React.Component<Props, State> {
                         {this.state.errorMessage}
                     </MuiAlert>
                 )}
-                {this.state.case && <CaseDetails c={this.state.case} />}
+                {this.state.case && (
+                    <CaseDetails
+                        enableEdit={this.props.enableEdit}
+                        c={this.state.case}
+                    />
+                )}
             </AppModal>
         );
     }
@@ -78,6 +87,7 @@ class ViewCase extends React.Component<Props, State> {
 
 interface CaseDetailsProps {
     c: Case;
+    enableEdit?: boolean;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -97,6 +107,9 @@ const useStyles = makeStyles((theme) => ({
     container: {
         marginTop: '1em',
         marginBottom: '1em',
+    },
+    editBtn: {
+        marginLeft: '1em',
     },
 }));
 
@@ -123,7 +136,22 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
     return (
         <Container maxWidth="md" className={classes.container}>
             <Typography className={classes.caseTitle} variant="h5">
-                Case {props.c._id}
+                Case {props.c._id}{' '}
+                {props.enableEdit && (
+                    <Link
+                        to={`/cases/edit/${props.c._id}`}
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className={classes.editBtn}
+                            endIcon={<EditIcon />}
+                        >
+                            Edit
+                        </Button>
+                    </Link>
+                )}
             </Typography>
             <Paper className={classes.paper} variant="outlined" square>
                 <Typography className={classes.sectionTitle} variant="overline">
