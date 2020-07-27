@@ -138,7 +138,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
             <Typography className={classes.caseTitle} variant="h5">
                 Case {props.c._id}{' '}
                 {props.enableEdit && (
-                    <Link to={`/cases/edit/${props.c._id}`}>
+                    <Link
+                        to={`/cases/edit/${props.c._id}`}
+                        style={{ textDecoration: 'none' }}
+                    >
                         <Button
                             variant="outlined"
                             color="primary"
