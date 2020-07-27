@@ -34,6 +34,7 @@ export default interface CaseFormValues {
     genomeSequences: GenomeSequence[];
     pathogens: Pathogen[];
     notes: string;
+    numCases?: number;
 }
 
 export interface Travel {
