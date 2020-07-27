@@ -9,7 +9,7 @@ const tooltip = (
         {'Select a CSV file to upload in the format described '}
         <a
             href={
-                'https://github.com/open-covid-data/healthmap-gdo-temp/tree/main/verification/curator-service/ui#bulk-upload-process'
+                'https://github.com/globaldothealth/list/tree/main/verification/curator-service/ui#bulk-upload-process'
             }
             rel="noopener noreferrer"
             target="_blank"
