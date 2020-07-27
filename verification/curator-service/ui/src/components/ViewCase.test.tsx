@@ -3,8 +3,9 @@ import * as fullCase from './fixtures/fullCase.json';
 import React from 'react';
 import ViewCase from './ViewCase';
 import axios from 'axios';
-import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, fireEvent } from '@testing-library/react';
+import { Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -24,20 +25,15 @@ it('loads and displays case', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     const { findByText, getByText } = render(
-        <MemoryRouter>
-            <ViewCase
-                id="abc123"
-                enableEdit={true}
-                onModalClose={(): void => {
-                    return;
-                }}
-            />
-        </MemoryRouter>,
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
-    // Case is editable.
-    expect(await findByText('Edit')).toBeInTheDocument();
     // Case data.
     expect(
         await findByText(/Case 5ef8e943dfe6e00030892d58/),
@@ -133,6 +129,61 @@ it('loads and displays case', async () => {
         ),
     ).toBeInTheDocument();
     expect(getByText('33000')).toBeInTheDocument();
+});
+
+it('can go to the edit page', async () => {
+    const axiosResponse = {
+        data: fullCase,
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const history = createMemoryHistory();
+    const { findByText } = render(
+        <Router history={history}>
+            <ViewCase
+                id="5ef8e943dfe6e00030892d58"
+                enableEdit={true}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </Router>,
+    );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/5ef8e943dfe6e00030892d58',
+    );
+    fireEvent.click(await findByText('Edit'));
+    expect(history.location.pathname).toBe(
+        '/cases/edit/5ef8e943dfe6e00030892d58',
+    );
+});
+
+it('does not show the edit button when not enabled', async () => {
+    const axiosResponse = {
+        data: fullCase,
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const { queryByText } = render(
+        <ViewCase
+            id="abc123"
+            onModalClose={(): void => {
+                return;
+            }}
+        />,
+    );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
+    expect(queryByText('Edit')).toBeNull();
 });
 
 it('displays API errors', async () => {
