@@ -454,6 +454,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     newCase,
                 );
             } else {
+                // TODO: create a batch insert API endpoint and use that here.
                 for (let i = 0; i < (values.numCases ?? 1); i++) {
                     const postResponse = await axios.post(
                         '/api/cases',
