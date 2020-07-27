@@ -4,6 +4,7 @@ import React from 'react';
 import ViewCase from './ViewCase';
 import axios from 'axios';
 import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -23,17 +24,24 @@ it('loads and displays case', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     const { findByText, getByText } = render(
-        <ViewCase
-            id="abc123"
-            onModalClose={(): void => {
-                return;
-            }}
-        />,
+        <MemoryRouter>
+            <ViewCase
+                id="abc123"
+                enableEdit={true}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
+    // Case is editable.
+    expect(await findByText('Edit')).toBeInTheDocument();
     // Case data.
-    expect(await findByText(/5ef8e943dfe6e00030892d58/)).toBeInTheDocument();
+    expect(
+        await findByText(/Case 5ef8e943dfe6e00030892d58/),
+    ).toBeInTheDocument();
     expect(
         getByText(
             'https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19',
