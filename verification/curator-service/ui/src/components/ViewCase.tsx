@@ -192,6 +192,13 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                 <br />
                 <Button
                     variant="text"
+                    onClick={(): void => scrollTo('transmission')}
+                >
+                    transmission
+                </Button>
+                <br />
+                <Button
+                    variant="text"
                     onClick={(): void => scrollTo('travel-history')}
                 >
                     travel history
