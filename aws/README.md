@@ -168,7 +168,7 @@ This tag can then be referenced in the deployment files, change the current imag
 
 To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
 
-You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/open-covid-data/healthmap-gdo-temp/releases).
+You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
 ### `Latest` image tag for dev
 
