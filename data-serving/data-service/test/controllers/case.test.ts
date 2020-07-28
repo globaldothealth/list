@@ -138,6 +138,37 @@ describe('GET', () => {
             request(app).get('/api/cases?page=1&limit=-2').expect(400, done);
         });
     });
+
+    describe.only('list symptoms', () => {
+        it('should return 200 OK', () => {
+            return request(app).get('/api/cases/symptoms?limit=5').expect(200);
+        });
+        it('should show most frequently used symptoms', async () => {
+            for (let i = 1; i <= 5; i++) {
+                const c = new Case(minimalCase);
+                c.set({
+                    symptoms: {
+                        values: Array.from(
+                            Array(i),
+                            (_, index) => `symptom${index + 1}`,
+                        ),
+                    },
+                });
+                await c.save();
+            }
+            const res = await request(app)
+                .get('/api/cases/symptoms?limit=3')
+                .expect(200);
+            expect(res.body.symptoms).toEqual([
+                'symptom1',
+                'symptom2',
+                'symptom3',
+            ]);
+        });
+        it('rejects negative limit param', (done) => {
+            request(app).get('/api/cases/symptoms?limit=-2').expect(400, done);
+        });
+    });
 });
 
 describe('POST', () => {
