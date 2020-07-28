@@ -226,6 +226,7 @@ export const listSymptoms = async (
         const symptoms = await Case.aggregate([
             { $unwind: '$symptoms.values' },
             { $sortByCount: '$symptoms.values' },
+            { $sort: { count: -1, _id: 1 } },
         ]).limit(limit);
         res.json({
             symptoms: symptoms.map((symptomObject) => symptomObject._id),
