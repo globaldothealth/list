@@ -58,9 +58,6 @@ describe('geocode', () => {
         });
         expect(feats).toHaveLength(1);
         const wantFeature: GeocodeResult = {
-            /*administrativeAreaLevel1: 'Rhône',
-            administrativeAreaLevel2: '',
-            administrativeAreaLevel3: 'Lyon',*/
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             place: '',
