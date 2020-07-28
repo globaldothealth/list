@@ -76,7 +76,7 @@ function import_data() {
         --collection $collection \
         --file $CONVERTED_DATA_PATH \
         --jsonArray \
-        --uri="$mongodb_connection_string"
+        --uri="$mongodb_connection_string/$db"
 }
 
 function cleanup() {

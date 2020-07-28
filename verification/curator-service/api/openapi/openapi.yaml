@@ -570,16 +570,21 @@ components:
           $ref: "#/components/schemas/Location"
         events:
           # TODO: Make event names an enum.
-          description: > 
-            An event with name "confirmed" must be specified. Other event names
-            include onsetSymptoms, firstClinicalConsultation, selfIsolation,
-            hospitalAdmission, icuAdmission, and outcome.
+          description: An event with name "confirmed" is required.
           type: array
           items:
             type: object
             properties:
               name:
                 type: string
+                enum:
+                  - confirmed
+                  - firstClinicalConsultation
+                  - hospitalAdmission
+                  - icuAdmission
+                  - onsetSymptoms
+                  - outcome
+                  - selfIsolation
               dateRange:
                 $ref: "#/components/schemas/DateRange"
               value:
