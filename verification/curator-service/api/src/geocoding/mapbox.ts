@@ -1,9 +1,4 @@
-import {
-    GeocodeOptions,
-    GeocodeResult,
-    Resolution,
-    isMissingAdmins,
-} from './geocoder';
+import { GeocodeOptions, GeocodeResult, Resolution } from './geocoder';
 import Geocoding, {
     GeocodeFeature,
     GeocodeMode,
@@ -131,25 +126,12 @@ export default class MapboxGeocoder {
                             latitude: feature.center[1],
                         },
                         country: getFeatureTypeFromContext(contexts, 'country'),
-                        administrativeAreaLevel1: getFeatureTypeFromContext(
-                            contexts,
-                            'region',
-                        ),
-                        administrativeAreaLevel2: getFeatureTypeFromContext(
-                            contexts,
-                            'district',
-                        ),
-                        administrativeAreaLevel3: getFeatureTypeFromContext(
-                            contexts,
-                            'place',
-                        ),
                         place: getFeatureTypeFromContext(contexts, 'poi'),
                         name: feature.place_name,
                         geoResolution: getResolution(contexts),
                     };
-                    if (isMissingAdmins(res)) {
-                        await this.adminsFetcher.fillAdmins(res);
-                    }
+                    // Fill in the administrative areas.
+                    await this.adminsFetcher.fillAdmins(res);
                     return res;
                 }),
             );

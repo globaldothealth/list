@@ -6,26 +6,17 @@ export interface GeocodeResult {
     };
     country: string;
     // First administrative division (state in the US, Länder in Germany, ...).
-    administrativeAreaLevel1: string | undefined;
+    administrativeAreaLevel1?: string;
     // Second administrative division (county in the US, departments in France, ...).
-    administrativeAreaLevel2: string | undefined;
+    administrativeAreaLevel2?: string;
     // Third administrative division (cities usually).
-    administrativeAreaLevel3: string | undefined;
+    administrativeAreaLevel3?: string;
     // A precise location, such as an establishment or POI.
     place: string | undefined;
     // Human readable place name.
     name: string;
     // How granular the geocode is.
     geoResolution: Resolution;
-}
-
-// Returns whether a given geocode result is missing some administrative areas levels.
-export function isMissingAdmins(result: GeocodeResult): boolean {
-    return (
-        result.administrativeAreaLevel1 === '' ||
-        result.administrativeAreaLevel2 === '' ||
-        result.administrativeAreaLevel3 === ''
-    );
 }
 
 export enum Resolution {
