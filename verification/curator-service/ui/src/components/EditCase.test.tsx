@@ -69,6 +69,7 @@ it('loads and displays case to edit', async () => {
     expect(
         await findByText('Enter the details for an existing case'),
     ).toBeInTheDocument();
+    expect(getByText('Submit case edit')).toBeInTheDocument();
     expect(await findByText(/Non-binary\/Third gender/)).toBeInTheDocument();
     expect(getByDisplayValue(/Horse breeder/)).toBeInTheDocument();
     expect(getByDisplayValue(/Asian/)).toBeInTheDocument();

@@ -897,7 +897,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                         onClick={submitForm}
                                     >
                                         {this.props.initialCase
-                                            ? 'Edit case'
+                                            ? 'Submit case edit'
                                             : 'Submit case'}
                                     </Button>
                                     <Button
