@@ -47,9 +47,12 @@ export function FormikAutocomplete(
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
-    const { setFieldValue, setTouched, initialValues } = useFormikContext<
-        CaseFormValues
-    >();
+    const {
+        setFieldValue,
+        setTouched,
+        initialValues,
+        values,
+    } = useFormikContext<CaseFormValues>();
 
     React.useEffect(() => {
         let active = true;
@@ -102,6 +105,7 @@ export function FormikAutocomplete(
             onClose={(): void => {
                 setOpen(false);
             }}
+            value={hasKey(values, props.name) ? values[props.name] : undefined}
             options={options}
             filterOptions={(options: string[], params): string[] => {
                 const filtered = filter(options, params) as string[];
