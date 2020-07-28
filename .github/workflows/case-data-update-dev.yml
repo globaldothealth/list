@@ -2,9 +2,11 @@ name: Update case data in dev
 
 on:
   push:
-    # Update the data when the schema changes.
+    # Update the data when the schema or conversion script changes.
     branches: [main]
-    paths: ["data-serving/data-service/schemas/**"]
+    paths:
+      - "data-serving/data-service/schemas/**"
+      - "data-serving/scripts/convert-data/**"
 
 jobs:
   # NOTE: This job should be kept in sync with the prod version.
