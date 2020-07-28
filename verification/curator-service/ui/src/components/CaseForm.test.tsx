@@ -24,6 +24,14 @@ beforeEach(() => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosSourcesResponse);
+    const axiosSymptomsResponse = {
+        data: { symptoms: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosSymptomsResponse);
 });
 
 afterEach(() => {
@@ -41,7 +49,7 @@ it('renders form', async () => {
             />
         </MemoryRouter>,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(2));
     expect(getByText('Enter the details for a new case')).toBeInTheDocument();
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
@@ -62,7 +70,7 @@ it('can add and remove genome sequencing sections', async () => {
             />
         </MemoryRouter>,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(2));
 
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
     await wait(() => {

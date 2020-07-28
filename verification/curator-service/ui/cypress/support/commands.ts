@@ -12,6 +12,8 @@ declare global {
                 methodOfConfirmation?: string;
                 nationalities?: string[];
                 curator?: string;
+                symptomStatus?: string;
+                symptoms?: string[];
             }) => void;
             login: (opts: {
                 name: string;
@@ -33,6 +35,8 @@ export function addCase(opts: {
     methodOfConfirmation?: string;
     nationalities?: string[];
     curator?: string;
+    symptomStatus?: string;
+    symptoms?: string[];
 }): void {
     cy.request({
         method: 'POST',
@@ -63,6 +67,10 @@ export function addCase(opts: {
                     value: opts.methodOfConfirmation,
                 },
             ],
+            symptoms: {
+                status: opts.symptomStatus ?? undefined,
+                values: opts.symptoms ?? [],
+            },
             notes: opts.notes,
             revisionMetadata: {
                 revisionNumber: 0,
