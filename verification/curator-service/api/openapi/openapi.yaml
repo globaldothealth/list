@@ -569,7 +569,6 @@ components:
         location:
           $ref: "#/components/schemas/Location"
         events:
-          # TODO: Make event names an enum.
           description: An event with name "confirmed" is required.
           type: array
           items:
