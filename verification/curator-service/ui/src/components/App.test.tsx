@@ -44,12 +44,14 @@ it('renders without crashing when logged out', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValue(axiosResponse);
-    const { getByText } = render(
+    const { findByText } = render(
         <MemoryRouter>
             <App />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
-    expect(getByText(/login/i, { selector: 'span' })).toBeInTheDocument();
+    expect(
+        await findByText(/login/i, { selector: 'span' }),
+    ).toBeInTheDocument();
 });
