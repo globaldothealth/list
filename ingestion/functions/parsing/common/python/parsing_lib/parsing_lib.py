@@ -29,15 +29,12 @@ def extract_event_fields(event):
 
 def retrieve_raw_data_file(s3_bucket, s3_key):
     try:
-        print(os.environ)
-        print(s3_client.list_buckets())
         local_data_file = LOCAL_DATA_FILE
         print(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_file(s3_bucket, s3_key, local_data_file)
         return local_data_file
     except Exception as e:
         print(e)
-        print(e.response)
         raise e
 
 
