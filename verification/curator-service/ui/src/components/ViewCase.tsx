@@ -1,7 +1,6 @@
 import { Case, GenomeSequence, Location, Travel } from './Case';
 import Scroll from 'react-scroll';
 import {
-    Container,
     Grid,
     LinearProgress,
     Paper,
@@ -11,6 +10,8 @@ import {
 
 import AppModal from './AppModal';
 import MuiAlert from '@material-ui/lab/Alert';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React from 'react';
 import StaticMap from './StaticMap';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -93,7 +94,7 @@ interface CaseDetailsProps {
 
 const useStyles = makeStyles((theme) => ({
     paper: {
-        background: theme.palette.background.default,
+        background: theme.palette.background.paper,
         marginTop: '1em',
     },
     caseTitle: {
@@ -108,10 +109,6 @@ const useStyles = makeStyles((theme) => ({
     container: {
         marginTop: '1em',
         marginBottom: '1em',
-        marginLeft: '10em',
-        // width - left shift and nav menu size.
-        width: 'calc(100vw - 23em)',
-        scrollBehavior: 'smooth',
     },
     editBtn: {
         marginLeft: '1em',
@@ -119,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
     navMenu: {
         position: 'fixed',
         lineHeight: '2em',
-        width: '13em',
+        width: '10em',
         textTransform: 'uppercase',
     },
 }));
@@ -143,79 +140,90 @@ function dateRange(range?: { start?: string; end?: string }): string {
 }
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
+    const theme = useTheme();
+    const showNavMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const classes = useStyles();
     const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
             duration: 100,
             smooth: true,
-            offset: -64, // Account for header height
             containerId: 'scroll-container',
         });
     };
     return (
         <>
-            <nav className={classes.navMenu}>
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('case-data')}
-                >
-                    case data
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('demographics')}
-                >
-                    demographics
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('location')}
-                >
-                    location
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('event-history')}
-                >
-                    event history
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('symptoms')}
-                >
-                    symptoms
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('transmission')}
-                >
-                    transmission
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('travel-history')}
-                >
-                    travel history
-                </Button>
-                <br />
-                <Button
-                    variant="text"
-                    onClick={(): void => scrollTo('pathogens')}
-                >
-                    pathogens
-                </Button>
-                <br />
-                <Button variant="text" onClick={(): void => scrollTo('notes')}>
-                    notes
-                </Button>
-            </nav>
-            <Container maxWidth="md" className={classes.container}>
+            {showNavMenu && (
+                <nav className={classes.navMenu}>
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('case-data')}
+                    >
+                        case data
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('demographics')}
+                    >
+                        demographics
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('location')}
+                    >
+                        location
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('event-history')}
+                    >
+                        event history
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('symptoms')}
+                    >
+                        symptoms
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('transmission')}
+                    >
+                        transmission
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('travel-history')}
+                    >
+                        travel history
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('pathogens')}
+                    >
+                        pathogens
+                    </Button>
+                    <br />
+                    <Button
+                        variant="text"
+                        onClick={(): void => scrollTo('notes')}
+                    >
+                        notes
+                    </Button>
+                </nav>
+            )}
+            <div
+                className={classes.container}
+                style={{
+                    marginLeft: showNavMenu ? '10em' : '0',
+                }}
+            >
                 <Typography className={classes.caseTitle} variant="h5">
                     Case {props.c._id}{' '}
                     {props.enableEdit && (
@@ -628,7 +636,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Grid>
                     </Scroll.Element>
                 </Paper>
-            </Container>
+            </div>
         </>
     );
 }
@@ -683,7 +691,6 @@ function LocationRows(props: { loc?: Location }): JSX.Element {
             <RowContent
                 content={`${props.loc?.geometry?.longitude?.toFixed(4)}`}
             />
-            <RowHeader title="Map" />
             <MapRow location={props.loc} />
         </>
     );
@@ -717,7 +724,7 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
 
 function MapRow(props: { location?: Location }): JSX.Element {
     return (
-        <Grid item xs={8}>
+        <Grid item xs={12}>
             {props.location?.geometry && (
                 <StaticMap geometry={props.location.geometry} />
             )}
