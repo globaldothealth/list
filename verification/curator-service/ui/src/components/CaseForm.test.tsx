@@ -42,6 +42,7 @@ it('renders form', async () => {
         </MemoryRouter>,
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
+    expect(getByText('Enter the details for a new case')).toBeInTheDocument();
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
     expect(getAllByText(/Location/i)).toHaveLength(3);

@@ -114,7 +114,7 @@ def run_lambda(event, context, parsing_function):
         the source URL. It must return a list of data conforming to the G.h
         case format (TODO: add a link to this definition).
         For an example, see:
-          https://github.com/open-covid-data/healthmap-gdo-temp/blob/main/ingestion/functions/parsing/india/india.py#L57
+          https://github.com/globaldothealth/list/blob/main/ingestion/functions/parsing/india/india.py#L57
 
     Returns
     ------

@@ -10,6 +10,10 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     # Use this issuer defined in letsencrypt.yaml to get certs automatically.
     cert-manager.io/issuer: "letsencrypt-prod"
+    # Set the max size of requests to the service.
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    # Set the timeout (in seconds) for the response to nginx.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
 spec:
   tls:
     - hosts:
