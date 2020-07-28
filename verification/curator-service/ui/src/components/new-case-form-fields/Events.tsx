@@ -6,18 +6,18 @@ import React from 'react';
 import Scroll from 'react-scroll';
 import { useFormikContext } from 'formik';
 
-const yesNoUndefined = [undefined, 'Yes', 'No'];
+const yesNoUndefined = ['Unknown', 'Yes', 'No'];
 
 // TODO: get values from DB.
 const methodsOfConfirmation = [
-    undefined,
+    'Unknown',
     'PCR test',
     'Serological test',
     'Clinical diagnosis',
     'Other',
 ];
 
-const outcomes = [undefined, 'Death', 'Recovered'];
+const outcomes = ['Unknown', 'Death', 'Recovered'];
 
 export default function Events(): JSX.Element {
     const { values } = useFormikContext<CaseFormValues>();
@@ -79,13 +79,14 @@ export default function Events(): JSX.Element {
                     label="Outcome"
                     values={outcomes}
                 ></SelectField>
-                {values.outcome !== undefined && (
-                    <DateField
-                        name="outcomeDate"
-                        label="Outcome date"
-                        initialFocusedDate={values.confirmedDate}
-                    ></DateField>
-                )}
+                {values.outcome !== undefined &&
+                    values.outcome !== 'Unknown' && (
+                        <DateField
+                            name="outcomeDate"
+                            label="Outcome date"
+                            initialFocusedDate={values.confirmedDate}
+                        ></DateField>
+                    )}
             </fieldset>
         </Scroll.Element>
     );

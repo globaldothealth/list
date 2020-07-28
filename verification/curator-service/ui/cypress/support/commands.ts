@@ -13,7 +13,11 @@ declare global {
                 nationalities?: string[];
                 curator?: string;
             }) => void;
-            login: () => void;
+            login: (opts: {
+                name: string;
+                email: string;
+                roles: string[];
+            }) => void;
             addSource: (name: string, url: string) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;

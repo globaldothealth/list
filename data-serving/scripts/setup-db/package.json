@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-covid-data/healthmap-gdo-temp.git",
+    "url": "git+https://github.com/globaldothealth/list.git",
     "directory": "data-serving/scripts/setup-db"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/open-covid-data/healthmap-gdo-temp/issues"
+    "url": "https://github.com/globaldothealth/list/issues"
   },
-  "homepage": "https://github.com/open-covid-data/healthmap-gdo-temp#readme",
+  "homepage": "https://github.com/globaldothealth/list#readme",
   "node_modules": [],
   "dependencies": {
     "@types/node": "^13.13.14",

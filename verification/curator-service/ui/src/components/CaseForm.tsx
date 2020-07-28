@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, LinearProgress } from '@material-ui/core';
+import { Button, LinearProgress, Typography } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -19,6 +19,7 @@ import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
 import Notes from './new-case-form-fields/Notes';
+import NumCases from './new-case-form-fields/NumCases';
 import Pathogens from './new-case-form-fields/Pathogens';
 import PreexistingConditions from './new-case-form-fields/PreexistingConditions';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
@@ -104,6 +105,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             genomeSequences: [],
             pathogens: [],
             notes: '',
+            numCases: 1,
         };
     }
     return {
@@ -181,6 +183,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         }),
         pathogens: c.pathogens,
         notes: c.notes,
+        numCases: undefined,
     };
 }
 
@@ -249,6 +252,9 @@ const NewCaseValidation = Yup.object().shape(
         ),
         confirmedDate: Yup.string().nullable().required('Required'),
         location: Yup.object().required('Required'),
+        numCases: Yup.number()
+            .nullable()
+            .min(1, 'Must enter one or more cases'),
     },
     [['maxAge', 'minAge']],
 );
@@ -265,6 +271,11 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
         }
     }
     return false;
+}
+
+function unknownToUndefined(value: string | undefined): string | undefined {
+    if (value === 'Unknown') return undefined;
+    return value;
 }
 
 class CaseForm extends React.Component<Props, CaseFormState> {
@@ -291,6 +302,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 if (travel.dateRange.end === null) {
                     delete travel.dateRange.end;
                 }
+            }
+            if (travel.purpose === 'Unknown') {
+                travel.purpose = undefined;
             }
         });
         return filteredTravel;
@@ -326,7 +340,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                gender: values.gender,
+                gender: unknownToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
@@ -386,11 +400,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                   end: elem.dates,
                               }
                             : undefined,
-                        value: elem.value,
+                        value: unknownToUndefined(elem.value),
                     };
                 }),
             symptoms: {
-                status: values.symptomsStatus,
+                status: unknownToUndefined(values.symptomsStatus),
                 values: values.symptoms,
             },
             preexistingConditions: {
@@ -439,7 +453,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                       },
                   },
         };
-        let newCaseId = '';
+        const newCaseIds = [];
         try {
             // Update or create depending on the presence of the initial case ID.
             if (this.props.initialCase?._id) {
@@ -448,8 +462,14 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     newCase,
                 );
             } else {
-                const postResponse = await axios.post('/api/cases', newCase);
-                newCaseId = postResponse.data._id;
+                // TODO: create a batch insert API endpoint and use that here.
+                for (let i = 0; i < (values.numCases ?? 1); i++) {
+                    const postResponse = await axios.post(
+                        '/api/cases',
+                        newCase,
+                    );
+                    newCaseIds.push(postResponse.data._id);
+                }
             }
             this.setState({ errorMessage: '' });
         } catch (e) {
@@ -462,7 +482,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
         this.props.history.push({
             pathname: '/cases',
             state: {
-                newCaseIds: newCaseId ? [newCaseId] : [],
+                newCaseIds: newCaseIds,
                 editedCaseIds: this.props.initialCase?._id
                     ? [this.props.initialCase._id]
                     : [],
@@ -794,8 +814,36 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     })}
                                     {'Notes'.toLocaleUpperCase()}
                                 </div>
+                                {!this.props.initialCase && (
+                                    <div
+                                        className={classes.tableOfContentsRow}
+                                        onClick={(): void =>
+                                            this.scrollTo('numCases')
+                                        }
+                                    >
+                                        {this.tableOfContentsIcon({
+                                            isChecked: values.numCases !== 1,
+                                            hasError: hasErrors(
+                                                ['numCases'],
+                                                errors,
+                                                touched,
+                                            ),
+                                        })}
+                                        {'Number of cases'.toLocaleUpperCase()}
+                                    </div>
+                                )}
                             </nav>
                             <div className={classes.form}>
+                                <Typography variant="h4">
+                                    Enter the details for{' '}
+                                    {this.props.initialCase
+                                        ? 'an existing case'
+                                        : 'a new case'}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Complete all available data for the case.
+                                    Required fields are marked.
+                                </Typography>
                                 <Form>
                                     <div className={classes.formSection}>
                                         <Source
@@ -833,6 +881,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     <div className={classes.formSection}>
                                         <Notes></Notes>
                                     </div>
+                                    {!this.props.initialCase && (
+                                        <div className={classes.formSection}>
+                                            <NumCases></NumCases>
+                                        </div>
+                                    )}
                                     {isSubmitting && <LinearProgress />}
                                     <br />
                                     <Button

@@ -79,9 +79,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        // TODO: Don't consume req.body directly; add layer between API and
-        // storage.
         const c = new Case(req.body);
+
         let result;
         if (req.query.validate_only) {
             await c.validate();

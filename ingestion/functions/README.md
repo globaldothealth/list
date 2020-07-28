@@ -10,7 +10,7 @@ workflow accomplishing the retrieval of epidemiological source data, the
 parsing thereof to the standard Global Health data format, and the persisting
 of both raw content and parsed case records for use by the Global Health
 community. For more information on Global Health, refer to the
-[top-level README](https://github.com/open-covid-data/healthmap-gdo-temp/blob/main/README.md).
+[top-level README](https://github.com/globaldothealth/list/blob/main/README.md).
 
 The structure of ingestion is roughly as shown below:
 

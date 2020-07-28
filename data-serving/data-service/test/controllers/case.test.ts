@@ -1,14 +1,22 @@
 import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
+import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
 let mongoServer: MongoMemoryServer;
 
-const invalidCase = {
+const curatorMetadata = { curator: { email: 'abc@xyz.com' } };
+
+const minimalRequest = {
     ...minimalCase,
+    ...curatorMetadata,
+};
+
+const invalidRequest = {
+    ...minimalRequest,
     demographics: { ageRange: { start: 400 } },
 };
 
@@ -137,14 +145,27 @@ describe('POST', () => {
         return request(app).post('/api/cases').send({}).expect(400);
     });
     it('create with required properties but invalid input should return 422', () => {
-        return request(app).post('/api/cases').send(invalidCase).expect(422);
+        return request(app).post('/api/cases').send(invalidRequest).expect(422);
     });
     it('create with valid input should return 201 OK', async () => {
         return request(app)
             .post('/api/cases')
-            .send(minimalCase)
+            .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
+    });
+    it('create with valid input should result in correct creation metadata', async () => {
+        const res = await request(app)
+            .post('/api/cases')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(0);
+        expect(res.body.revisionMetadata.creationMetadata.curator).toEqual(
+            minimalRequest.curator.email,
+        );
+        expect(res.body).not.toHaveProperty('curator');
     });
     it('create with input missing required properties and validate_only should return 400', async () => {
         return request(app)
@@ -155,7 +176,7 @@ describe('POST', () => {
     it('create with valid input and validate_only should not save case', async () => {
         const res = await request(app)
             .post('/api/cases?validate_only=true')
-            .send(minimalCase)
+            .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
 
@@ -188,7 +209,7 @@ describe('POST', () => {
     it('batch validate returns errors for invalid cases in 207', async () => {
         const res = await request(app)
             .post('/api/cases/batchValidate')
-            .send({ cases: [minimalCase, invalidCase] })
+            .send({ cases: [minimalRequest, invalidRequest] })
             .expect(207);
         expect(res.body.errors).toHaveLength(1);
         expect(res.body.errors[0].index).toBe(1);
@@ -204,11 +225,31 @@ describe('PUT', () => {
         const newNotes = 'abc';
         const res = await request(app)
             .put(`/api/cases/${c._id}`)
-            .send({ notes: newNotes })
+            .send({ ...curatorMetadata, notes: newNotes })
             .expect('Content-Type', /json/)
             .expect(200);
 
         expect(res.body.notes).toEqual(newNotes);
+    });
+    it('update present item should result in update metadata', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({ ...curatorMetadata, notes: newNotes })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(1);
+        expect(res.body.revisionMetadata.updateMetadata.curator).toEqual(
+            curatorMetadata.curator.email,
+        );
+        expect(res.body.revisionMetadata.creationMetadata).toEqual(
+            minimalCase.revisionMetadata.creationMetadata,
+        );
+        expect(res.body).not.toHaveProperty('curator');
     });
     it('invalid update present item should return 422', async () => {
         const c = new Case(minimalCase);
@@ -216,13 +257,13 @@ describe('PUT', () => {
 
         return request(app)
             .put(`/api/cases/${c._id}`)
-            .send({ location: {} })
+            .send({ ...curatorMetadata, location: {} })
             .expect(422);
     });
     it('update absent item should return 404 NOT FOUND', () => {
         return request(app)
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
-            .send({})
+            .send(curatorMetadata)
             .expect(404);
     });
     it('upsert present item should return 200 OK', async () => {
@@ -243,6 +284,7 @@ describe('PUT', () => {
                     sourceUrl: 'cdc.gov',
                 },
                 notes: newNotes,
+                ...curatorMetadata,
             })
             .expect('Content-Type', /json/)
             .expect(200);
@@ -250,34 +292,76 @@ describe('PUT', () => {
         expect(res.body.notes).toEqual(newNotes);
         expect(await c.collection.countDocuments()).toEqual(1);
     });
+    it('upsert present item should result in update metadata', async () => {
+        const c = new Case(minimalCase);
+        const sourceId = '5ea86423bae6982635d2e1f8';
+        const entryId = 'def456';
+        c.set('caseReference.sourceId', sourceId);
+        c.set('caseReference.sourceEntryId', entryId);
+        await c.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .put('/api/cases')
+            .send({
+                caseReference: {
+                    sourceId: sourceId,
+                    sourceEntryId: entryId,
+                    sourceUrl: 'cdc.gov',
+                },
+                notes: newNotes,
+                ...curatorMetadata,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(1);
+        expect(res.body.revisionMetadata.updateMetadata.curator).toEqual(
+            curatorMetadata.curator.email,
+        );
+        expect(res.body.revisionMetadata.creationMetadata).toEqual(
+            minimalCase.revisionMetadata.creationMetadata,
+        );
+        expect(res.body).not.toHaveProperty('curator');
+    });
     it('upsert new item should return 201 CREATED', async () => {
         return request(app)
             .put('/api/cases')
-            .send(minimalCase)
+            .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
     });
-    it('upsert items without sourceEntryId should return 201 CREATED', async () => {
-        const sharedSourceId = '5ea86423bae6982635d2e1f8';
-        const firstUniqueCase = new Case(minimalCase);
-        firstUniqueCase.set('caseReference.sourceId', sharedSourceId);
-        await firstUniqueCase.save();
-        const secondUniqueCase = new Case(minimalCase);
-        secondUniqueCase.set('caseReference.sourceId', sharedSourceId);
-
-        await request(app)
+    it('upsert new item should result in creation metadata', async () => {
+        const res = await request(app)
             .put('/api/cases')
-            .send(secondUniqueCase)
+            .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
 
-        expect(await secondUniqueCase.collection.countDocuments()).toEqual(2);
+        expect(res.body.revisionMetadata.revisionNumber).toEqual(0);
+        expect(res.body.revisionMetadata.creationMetadata.curator).toEqual(
+            minimalRequest.curator.email,
+        );
+        expect(res.body).not.toHaveProperty('curator');
+    });
+    it('upsert items without sourceEntryId should return 201 CREATED', async () => {
+        // NB: Minimal case does not have a sourceEntryId.
+        const firstUniqueCase = new Case(minimalCase);
+        await firstUniqueCase.save();
+
+        await request(app)
+            .put('/api/cases')
+            .send({ ...minimalCase, ...curatorMetadata })
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        expect(await Case.collection.countDocuments()).toEqual(2);
     });
     it('upsert new item without required fields should return 400', () => {
         return request(app).put('/api/cases').send({}).expect(400);
     });
     it('upsert new item with invalid input should return 422', () => {
-        return request(app).put('/api/cases').send(invalidCase).expect(422);
+        return request(app).put('/api/cases').send(invalidRequest).expect(422);
     });
     it('invalid upsert present item should return 422', async () => {
         const c = new Case(minimalCase);
@@ -296,6 +380,7 @@ describe('PUT', () => {
                     sourceUrl: 'cdc.gov',
                 },
                 location: {},
+                ...curatorMetadata,
             })
             .expect(422);
     });

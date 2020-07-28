@@ -1,14 +1,14 @@
 import { FastField, useFormikContext } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
+import {
+    FormikAutocomplete,
+    SelectField,
+} from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
-import FormControl from '@material-ui/core/FormControl';
-import { FormikAutocomplete } from '../common-form-fields/FormikFields';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
 import Scroll from 'react-scroll';
+import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { createStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
@@ -37,7 +37,7 @@ type DemographicsProps = WithStyles<typeof styles>;
 
 // TODO: get values from DB.
 const genderValues = [
-    undefined,
+    'Unknown',
     'Male',
     'Female',
     'Non-binary/Third gender',
@@ -51,28 +51,11 @@ function Demographics(props: DemographicsProps): JSX.Element {
         <Scroll.Element name="demographics">
             <fieldset>
                 <FieldTitle title="Demographics"></FieldTitle>
-                <FormControl>
-                    <div className={classes.fieldRow}>
-                        <InputLabel htmlFor="gender">Gender</InputLabel>
-                        <FastField
-                            as="select"
-                            name="gender"
-                            type="text"
-                            data-testid="gender"
-                            className={classes.select}
-                            component={Select}
-                        >
-                            {genderValues.map((gender) => (
-                                <MenuItem
-                                    key={gender ?? 'undefined'}
-                                    value={gender}
-                                >
-                                    {gender ?? 'Unknown'}
-                                </MenuItem>
-                            ))}
-                        </FastField>
-                    </div>
-                </FormControl>
+                <SelectField
+                    name="gender"
+                    label="Gender"
+                    values={genderValues}
+                ></SelectField>
                 <div className={`${classes.fieldRow} ${classes.ageRow}`}>
                     <FastField
                         className={classes.ageField}
@@ -114,7 +97,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         label="Nationality"
                         initialValue={initialValues.nationalities}
                         multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/nationalities.txt"
+                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/nationalities.txt"
                     />
                 </div>
                 <FormikAutocomplete
@@ -123,7 +106,7 @@ function Demographics(props: DemographicsProps): JSX.Element {
                     initialValue={initialValues.occupation}
                     multiple={false}
                     freeSolo
-                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/occupations.txt"
+                    optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/occupations.txt"
                 />
             </fieldset>
         </Scroll.Element>
