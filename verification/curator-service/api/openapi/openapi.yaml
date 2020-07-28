@@ -421,7 +421,7 @@ paths:
             type: string
       responses:
         "200":
-          $ref: "#/components/responses/200GeocodeArray"
+          $ref: "#/components/responses/200LocationArray"
   /users:
     get:
       tags: [User]
@@ -715,13 +715,6 @@ components:
           $ref: "#/components/schemas/Date"
         notes:
           type: string
-    Geocode:
-      type: object
-      # TODO: Define Geocode object.
-    GeocodeArray:
-      type: array
-      items:
-        $ref: "#/components/schemas/Geocode"
     NewCase:
       description: >
         A "#/components/schemas/Case" with additional required fields for
@@ -900,12 +893,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Case"
-    "200GeocodeArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/GeocodeArray"
     "200Source":
       description: OK
       content:
