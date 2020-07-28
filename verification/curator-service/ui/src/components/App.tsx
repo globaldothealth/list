@@ -7,6 +7,7 @@ import {
     MenuItem,
     Toolbar,
     Typography,
+    useMediaQuery,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
 import { Theme, makeStyles } from '@material-ui/core/styles';
@@ -103,6 +104,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 export default function App(): JSX.Element {
+    const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User>({
         _id: '',
         name: '',
@@ -114,6 +116,10 @@ export default function App(): JSX.Element {
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
+
+    useEffect(() => {
+        setDrawerOpen(showMenu);
+    }, [showMenu]);
 
     const getUser = (): void => {
         axios
