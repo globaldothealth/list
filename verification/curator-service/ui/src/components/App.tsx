@@ -7,15 +7,10 @@ import {
     MenuItem,
     Toolbar,
     Typography,
+    useMediaQuery,
 } from '@material-ui/core';
-import {
-    Link,
-    Route,
-    RouteComponentProps,
-    Switch,
-    withRouter,
-} from 'react-router-dom';
-import { Theme, createStyles } from '@material-ui/core/styles';
+import { Link, Route, Switch, useHistory } from 'react-router-dom';
+import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
 import BulkCaseForm from './BulkCaseForm';
@@ -35,17 +30,15 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
 import Users from './Users';
 import ViewCase from './ViewCase';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core';
 
 const theme = createMuiTheme({
     palette: {
@@ -60,380 +53,350 @@ const theme = createMuiTheme({
 
 const drawerWidth = 240;
 
-const styles = (theme: Theme) =>
-    createStyles({
-        root: {
-            display: 'flex',
-        },
-        title: {
-            flexGrow: 1,
-        },
-        appBar: {
-            background: 'white',
-            zIndex: theme.zIndex.drawer + 1,
-        },
-        menuButton: {
-            marginRight: theme.spacing(2),
-        },
-        hide: {
-            display: 'none',
-        },
-        drawer: {
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-        drawerPaper: {
-            width: drawerWidth,
-        },
-        drawerHeader: {
-            // necessary for content to be below app bar
-            ...theme.mixins.toolbar,
-        },
-        content: {
-            flexGrow: 1,
-            transition: theme.transitions.create('margin', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-            marginLeft: -drawerWidth,
-            width: '100%',
-        },
-        contentShift: {
-            transition: theme.transitions.create('margin', {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-            marginLeft: 0,
-            width: `calc(100% - ${drawerWidth}px)`,
-        },
-        createNewButton: {
-            margin: '1em',
-            width: '70%',
-        },
+const useStyles = makeStyles((theme: Theme) => ({
+    root: {
+        display: 'flex',
+    },
+    title: {
+        flexGrow: 1,
+    },
+    appBar: {
+        background: 'white',
+        zIndex: theme.zIndex.drawer + 1,
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    hide: {
+        display: 'none',
+    },
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0,
+    },
+    drawerPaper: {
+        width: drawerWidth,
+    },
+    drawerHeader: {
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    },
+    content: {
+        flexGrow: 1,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        marginLeft: -drawerWidth,
+        width: '100%',
+    },
+    contentShift: {
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        marginLeft: 0,
+        width: `calc(100% - ${drawerWidth}px)`,
+    },
+    createNewButton: {
+        margin: '1em',
+        width: '70%',
+    },
+}));
+export default function App(): JSX.Element {
+    const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
+    const [user, setUser] = useState<User>({
+        _id: '',
+        name: '',
+        email: '',
+        roles: [],
     });
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+    const [
+        createNewButtonAnchorEl,
+        setCreateNewButtonAnchorEl,
+    ] = useState<Element | null>();
 
-interface Props extends RouteComponentProps, WithStyles<typeof styles> {}
+    useEffect(() => {
+        setDrawerOpen(showMenu);
+    }, [showMenu]);
 
-interface State {
-    drawerOpen: boolean;
-    user: User;
-    createNewButtonAnchorEl?: Element;
-}
-
-class App extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            drawerOpen: true,
-            user: {
-                _id: '',
-                name: '',
-                email: '',
-                roles: [],
-            },
-            createNewButtonAnchorEl: undefined,
-        };
-        // https://reactjs.org/docs/handling-events.html.
-        this.toggleDrawer = this.toggleDrawer.bind(this);
-        this.getUser = this.getUser.bind(this);
-        this.hasAnyRole = this.hasAnyRole.bind(this);
-        this.openCreateNewPopup = this.openCreateNewPopup.bind(this);
-        this.closeCreateNewPopup = this.closeCreateNewPopup.bind(this);
-    }
-
-    componentDidMount(): void {
-        this.getUser();
-    }
-    getUser(): void {
+    const getUser = (): void => {
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
-                this.setState({
-                    user: {
-                        _id: resp.data._id,
-                        name: resp.data.name,
-                        email: resp.data.email,
-                        roles: resp.data.roles,
-                    },
+                setUser({
+                    _id: resp.data._id,
+                    name: resp.data.name,
+                    email: resp.data.email,
+                    roles: resp.data.roles,
                 });
             })
             .catch((e) => {
-                this.setState({
-                    user: { _id: '', name: '', email: '', roles: [] },
-                });
+                setUser({ _id: '', name: '', email: '', roles: [] });
                 console.error(e);
             });
-    }
+    };
 
-    hasAnyRole(requiredRoles: string[]): boolean {
-        return this.state.user.roles?.some((r: string) =>
-            requiredRoles.includes(r),
-        );
-    }
+    const hasAnyRole = (requiredRoles: string[]): boolean => {
+        if (!user) {
+            return false;
+        }
+        return user?.roles?.some((r: string) => requiredRoles.includes(r));
+    };
 
-    toggleDrawer(): void {
-        this.setState({ drawerOpen: !this.state.drawerOpen });
-    }
+    const toggleDrawer = (): void => {
+        setDrawerOpen(!drawerOpen);
+    };
 
-    openCreateNewPopup(event: any): void {
-        this.setState({ createNewButtonAnchorEl: event.currentTarget });
-    }
+    const openCreateNewPopup = (event: any): void => {
+        setCreateNewButtonAnchorEl(event.currentTarget);
+    };
 
-    closeCreateNewPopup(): void {
-        this.setState({ createNewButtonAnchorEl: undefined });
-    }
+    const closeCreateNewPopup = (): void => {
+        setCreateNewButtonAnchorEl(undefined);
+    };
 
-    render(): JSX.Element {
-        const { classes, history } = this.props;
-        return (
-            <div className={classes.root}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <AppBar position="fixed" className={classes.appBar}>
-                        <Toolbar>
-                            <IconButton
-                                color="inherit"
-                                aria-label="toggle drawer"
-                                onClick={this.toggleDrawer}
-                                edge="start"
-                                className={classes.menuButton}
+    useEffect(() => {
+        getUser();
+    }, []);
+
+    const classes = useStyles();
+    const history = useHistory();
+    return (
+        <div className={classes.root}>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <AppBar position="fixed" className={classes.appBar}>
+                    <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            aria-label="toggle drawer"
+                            onClick={toggleDrawer}
+                            edge="start"
+                            className={classes.menuButton}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            variant="h6"
+                            className={classes.title}
+                            noWrap
+                        >
+                            Global Health Curator Portal
+                        </Typography>
+                        {user?.email ? (
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                href="/auth/logout"
                             >
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography
-                                variant="h6"
-                                className={classes.title}
-                                noWrap
+                                Logout {user?.email}
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                href={process.env.REACT_APP_LOGIN_URL}
                             >
-                                Global Health Curator Portal
-                            </Typography>
-                            {this.state.user.email ? (
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    href="/auth/logout"
-                                >
-                                    Logout {this.state.user.email}
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    href={process.env.REACT_APP_LOGIN_URL}
-                                >
-                                    Login
-                                </Button>
-                            )}
-                        </Toolbar>
-                    </AppBar>
-                    <Drawer
-                        className={classes.drawer}
-                        variant="persistent"
-                        anchor="left"
-                        open={this.state.drawerOpen}
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                    >
-                        <div className={classes.drawerHeader}></div>
-                        {this.hasAnyRole(['curator']) && (
-                            <>
-                                <Button
-                                    variant="outlined"
-                                    data-testid="create-new-button"
-                                    className={classes.createNewButton}
-                                    onClick={this.openCreateNewPopup}
-                                    startIcon={<AddIcon />}
-                                >
-                                    Create new
-                                </Button>
-                                <Menu
-                                    anchorEl={
-                                        this.state.createNewButtonAnchorEl
-                                    }
-                                    getContentAnchorEl={null}
-                                    keepMounted
-                                    open={Boolean(
-                                        this.state.createNewButtonAnchorEl,
-                                    )}
-                                    onClose={this.closeCreateNewPopup}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                >
-                                    <MenuItem
-                                        onClick={(): void => {
-                                            this.closeCreateNewPopup();
-                                            history.push('/cases/new');
-                                        }}
-                                    >
-                                        New line list case
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={(): void => {
-                                            this.closeCreateNewPopup();
-                                            history.push('/cases/bulk');
-                                        }}
-                                    >
-                                        New bulk upload
-                                    </MenuItem>
-                                </Menu>
-                            </>
+                                Login
+                            </Button>
                         )}
-                        <List>
-                            {[
-                                {
-                                    text: 'Home',
-                                    icon: <HomeIcon />,
-                                    to: '/',
-                                    displayCheck: (): boolean => true,
-                                    divider: true,
-                                },
-                                {
-                                    text: 'Linelist',
-                                    icon: <ListIcon />,
-                                    to: '/cases',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['reader', 'curator']),
-                                },
-                                {
-                                    text: 'Sources',
-                                    icon: <LinkIcon />,
-                                    to: '/sources',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['reader', 'curator']),
-                                    divider: true,
-                                },
-                                {
-                                    text: 'Profile',
-                                    icon: <PersonIcon />,
-                                    to: '/profile',
-                                    displayCheck: (): boolean =>
-                                        this.state.user.email !== '',
-                                },
-                                {
-                                    text: 'Manage users',
-                                    icon: <PeopleIcon />,
-                                    to: '/users',
-                                    displayCheck: (): boolean =>
-                                        this.hasAnyRole(['admin']),
-                                },
-                            ].map(
-                                (item) =>
-                                    item.displayCheck() && (
-                                        <Link key={item.text} to={item.to}>
-                                            <ListItem
-                                                button
-                                                key={item.text}
-                                                divider={item.divider}
-                                            >
-                                                <ListItemIcon>
-                                                    {item.icon}
-                                                </ListItemIcon>
+                    </Toolbar>
+                </AppBar>
+                <Drawer
+                    className={classes.drawer}
+                    variant="persistent"
+                    anchor="left"
+                    open={drawerOpen}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
+                >
+                    <div className={classes.drawerHeader}></div>
+                    {hasAnyRole(['curator']) && (
+                        <>
+                            <Button
+                                variant="outlined"
+                                data-testid="create-new-button"
+                                className={classes.createNewButton}
+                                onClick={openCreateNewPopup}
+                                startIcon={<AddIcon />}
+                            >
+                                Create new
+                            </Button>
+                            <Menu
+                                anchorEl={createNewButtonAnchorEl}
+                                getContentAnchorEl={null}
+                                keepMounted
+                                open={Boolean(createNewButtonAnchorEl)}
+                                onClose={closeCreateNewPopup}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                            >
+                                <MenuItem
+                                    onClick={(): void => {
+                                        closeCreateNewPopup();
+                                        history.push('/cases/new');
+                                    }}
+                                >
+                                    New line list case
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={(): void => {
+                                        closeCreateNewPopup();
+                                        history.push('/cases/bulk');
+                                    }}
+                                >
+                                    New bulk upload
+                                </MenuItem>
+                            </Menu>
+                        </>
+                    )}
+                    <List>
+                        {[
+                            {
+                                text: 'Home',
+                                icon: <HomeIcon />,
+                                to: '/',
+                                displayCheck: (): boolean => true,
+                                divider: true,
+                            },
+                            {
+                                text: 'Linelist',
+                                icon: <ListIcon />,
+                                to: '/cases',
+                                displayCheck: (): boolean =>
+                                    hasAnyRole(['reader', 'curator']),
+                            },
+                            {
+                                text: 'Sources',
+                                icon: <LinkIcon />,
+                                to: '/sources',
+                                displayCheck: (): boolean =>
+                                    hasAnyRole(['reader', 'curator']),
+                                divider: true,
+                            },
+                            {
+                                text: 'Profile',
+                                icon: <PersonIcon />,
+                                to: '/profile',
+                                displayCheck: (): boolean => user?.email !== '',
+                            },
+                            {
+                                text: 'Manage users',
+                                icon: <PeopleIcon />,
+                                to: '/users',
+                                displayCheck: (): boolean =>
+                                    hasAnyRole(['admin']),
+                            },
+                        ].map(
+                            (item) =>
+                                item.displayCheck() && (
+                                    <Link key={item.text} to={item.to}>
+                                        <ListItem
+                                            button
+                                            key={item.text}
+                                            divider={item.divider}
+                                        >
+                                            <ListItemIcon>
+                                                {item.icon}
+                                            </ListItemIcon>
 
-                                                <ListItemText
-                                                    primary={item.text}
-                                                />
-                                            </ListItem>
-                                        </Link>
-                                    ),
-                            )}
-                        </List>
-                    </Drawer>
-                    <main
-                        className={clsx(classes.content, {
-                            [classes.contentShift]: this.state.drawerOpen,
-                        })}
-                    >
-                        <div className={classes.drawerHeader} />
-                        <Switch>
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <Route exact path="/cases">
-                                    <LinelistTable user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <Route path="/sources">
-                                    <SourceTable />
-                                </Route>
-                            )}
-                            {this.state.user.email && (
-                                <Route path="/profile">
-                                    <Profile user={this.state.user} />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['admin']) && (
-                                <Route path="/users">
-                                    <Users
-                                        user={this.state.user}
-                                        onUserChange={this.getUser}
-                                    />
-                                </Route>
-                            )}{' '}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/bulk">
-                                    <BulkCaseForm
-                                        user={this.state.user}
-                                        onModalClose={(): void =>
-                                            history.push('/cases')
-                                        }
-                                    />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route path="/cases/new">
-                                    <CaseForm
-                                        user={this.state.user}
-                                        onModalClose={(): void =>
-                                            history.push('/cases')
-                                        }
-                                    />
-                                </Route>
-                            )}
-                            {this.hasAnyRole(['curator']) && (
-                                <Route
-                                    path="/cases/edit/:id"
-                                    render={({ match }) => {
-                                        return (
-                                            <EditCase
-                                                id={match.params.id}
-                                                user={this.state.user}
-                                                onModalClose={(): void =>
-                                                    history.push('/cases')
-                                                }
-                                            />
-                                        );
-                                    }}
-                                />
-                            )}
-                            {this.hasAnyRole(['curator', 'reader']) && (
-                                <Route
-                                    path="/cases/view/:id"
-                                    render={({ match }): JSX.Element => {
-                                        return (
-                                            <ViewCase
-                                                id={match.params.id}
-                                                enableEdit={this.hasAnyRole([
-                                                    'curator',
-                                                ])}
-                                                onModalClose={(): void =>
-                                                    history.push('/cases')
-                                                }
-                                            />
-                                        );
-                                    }}
-                                />
-                            )}
-                            <Route exact path="/">
-                                <Charts />
+                                            <ListItemText primary={item.text} />
+                                        </ListItem>
+                                    </Link>
+                                ),
+                        )}
+                    </List>
+                </Drawer>
+                <main
+                    className={clsx(classes.content, {
+                        [classes.contentShift]: drawerOpen,
+                    })}
+                >
+                    <div className={classes.drawerHeader} />
+                    <Switch>
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route exact path="/cases">
+                                <LinelistTable user={user} />
                             </Route>
-                        </Switch>
-                    </main>
-                </ThemeProvider>
-            </div>
-        );
-    }
+                        )}
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route path="/sources">
+                                <SourceTable />
+                            </Route>
+                        )}
+                        {user.email && (
+                            <Route path="/profile">
+                                <Profile user={user} />
+                            </Route>
+                        )}
+                        {hasAnyRole(['admin']) && (
+                            <Route path="/users">
+                                <Users user={user} onUserChange={getUser} />
+                            </Route>
+                        )}{' '}
+                        {hasAnyRole(['curator']) && (
+                            <Route path="/cases/bulk">
+                                <BulkCaseForm
+                                    user={user}
+                                    onModalClose={(): void =>
+                                        history.push('/cases')
+                                    }
+                                />
+                            </Route>
+                        )}
+                        {hasAnyRole(['curator']) && (
+                            <Route path="/cases/new">
+                                <CaseForm
+                                    user={user}
+                                    onModalClose={(): void =>
+                                        history.push('/cases')
+                                    }
+                                />
+                            </Route>
+                        )}
+                        {hasAnyRole(['curator']) && (
+                            <Route
+                                path="/cases/edit/:id"
+                                render={({ match }) => {
+                                    return (
+                                        <EditCase
+                                            id={match.params.id}
+                                            user={user}
+                                            onModalClose={(): void =>
+                                                history.push('/cases')
+                                            }
+                                        />
+                                    );
+                                }}
+                            />
+                        )}
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route
+                                path="/cases/view/:id"
+                                render={({ match }): JSX.Element => {
+                                    return (
+                                        <ViewCase
+                                            id={match.params.id}
+                                            enableEdit={hasAnyRole(['curator'])}
+                                            onModalClose={(): void =>
+                                                history.push('/cases')
+                                            }
+                                        />
+                                    );
+                                }}
+                            />
+                        )}
+                        <Route exact path="/">
+                            <Charts />
+                        </Route>
+                    </Switch>
+                </main>
+            </ThemeProvider>
+        </div>
+    );
 }
-
-export default withRouter(withStyles(styles, {})(App));
