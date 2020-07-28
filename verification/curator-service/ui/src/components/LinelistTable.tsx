@@ -10,6 +10,8 @@ import Paper from '@material-ui/core/Paper';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
+import { Button } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 interface ListResponse {
     cases: Case[];
@@ -116,7 +118,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 {!this.props.location.state?.bulkMessage &&
                     this.props.location.state?.newCaseIds &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
-                        <MuiAlert elevation={6} variant="filled">
+                        <MuiAlert
+                            elevation={6}
+                            variant="filled"
+                            action={
+                                <Link
+                                    to={`/cases/view/${this.props.location.state.newCaseIds}`}
+                                >
+                                    <Button
+                                        color="inherit"
+                                        size="small"
+                                        data-testid="view-case-btn"
+                                    >
+                                        VIEW
+                                    </Button>
+                                </Link>
+                            }
+                        >
                             {`Case ${this.props.location.state.newCaseIds} added`}
                         </MuiAlert>
                     ) : (
@@ -127,7 +145,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 {!this.props.location.state?.bulkMessage &&
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
-                        <MuiAlert elevation={6} variant="filled">
+                        <MuiAlert
+                            elevation={6}
+                            variant="filled"
+                            action={
+                                <Link
+                                    to={`/cases/view/${this.props.location.state.editedCaseIds}`}
+                                >
+                                    <Button color="inherit" size="small">
+                                        VIEW
+                                    </Button>
+                                </Link>
+                            }
+                        >
                             {`Case ${this.props.location.state.editedCaseIds} edited`}
                         </MuiAlert>
                     )}

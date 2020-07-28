@@ -184,6 +184,12 @@ describe('Curator', function () {
             cy.contains('on new line');
             cy.contains('superuser@');
 
+            // View the case from the message bar.
+            cy.get('button[data-testid="view-case-btn"').click({ force: true });
+            cy.contains('View case');
+            // Go back to linelist.
+            cy.visit('/cases');
+
             // Edit the case.
             cy.get('button[title="Edit this case"]').click({ force: true });
 
