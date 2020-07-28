@@ -114,5 +114,11 @@ describe('Admins', () => {
         expect(geocode.administrativeAreaLevel1).toBe('some admin 1');
         expect(geocode.administrativeAreaLevel2).toBe('some admin 2');
         expect(geocode.administrativeAreaLevel3).toBe('some admin 3');
+        // Call again, cache should be hit.
+        geocode.administrativeAreaLevel1 = '';
+        geocode.administrativeAreaLevel2 = '';
+        geocode.administrativeAreaLevel3 = '';
+        await fetcher.fillAdmins(geocode);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     });
 });

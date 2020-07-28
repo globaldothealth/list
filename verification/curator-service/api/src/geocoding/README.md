@@ -38,4 +38,6 @@ It allows us to query administrative area names in the world based on the centro
 
 Note that this API is private and its official documentation is kind of lacking... Once you register, Mapbox folks send you a bunch of files with more information on administrative levels (like names in various languages, centroids, etc).
 
+You can check a live demo of the coverage of the boundaries API at https://www.mapbox.com/boundaries/#coverage-map. This is also useful to check why such an admin is empty (Brasil doesn't have admin 3 for example).
+
 We preprocess these files with the `/verification/scripts/gen_boundaries.sh` script and import the mapping of admin IDs to their English names in Mongo DB with the `/verification/scripts/import_boundaries.sh`. This process only needs to be done once for the lifetime of the Mongo DB database.
