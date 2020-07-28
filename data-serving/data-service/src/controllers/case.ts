@@ -207,3 +207,33 @@ export const del = async (req: Request, res: Response): Promise<void> => {
     }
     res.status(204).end();
 };
+
+/**
+ * List most frequently used symptoms.
+ *
+ * Handles HTTP GET /api/cases/symptoms.
+ */
+export const listSymptoms = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit) || 5;
+    if (limit < 1) {
+        res.status(422).json('limit must be > 0');
+        return;
+    }
+    try {
+        const symptoms = await Case.aggregate([
+            { $unwind: '$symptoms.values' },
+            { $sortByCount: '$symptoms.values' },
+        ]).limit(limit);
+        res.json({
+            symptoms: symptoms.map((symptomObject) => symptomObject._id),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
