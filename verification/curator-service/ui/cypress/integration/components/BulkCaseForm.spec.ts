@@ -64,7 +64,7 @@ describe('Bulk upload form', function () {
         cy.server();
         cy.route('POST', '/api/sources').as('addSource');
         cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
-        cy.get('button[data-testid="submit"]').click().click();
+        cy.get('button[data-testid="submit"]').click();
         cy.wait('@addSource');
         cy.wait('@batchUpsert');
 
