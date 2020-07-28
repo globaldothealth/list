@@ -22,21 +22,6 @@ interface Tilequery {
     layer: string;
 }
 
-// Map of admin resolutions to their URL params counterpart in the mapbox boundaries API.
-const adminToLayer = new Map<Resolution, string>([
-    [Resolution.Admin1, 'mapbox.enterprise-boundaries-a1-v2'],
-    [Resolution.Admin2, 'mapbox.enterprise-boundaries-a2-v2'],
-    [Resolution.Admin3, 'mapbox.enterprise-boundaries-a3-v2'],
-]);
-// getLayersParams return the layers query param used by the mapbox boundaries API based on missing admin levels.
-function getLayersParam(admins: Set<Resolution>): string {
-    const layers = [];
-    for (const admin of admins) {
-        layers.push(adminToLayer.get(admin));
-    }
-    return layers.sort().join(',');
-}
-
 /**
  * Mapbox administrative area fetcher using the boundaries API.
  * https://www.mapbox.com/boundaries/.
@@ -59,18 +44,12 @@ export default class MapboxAdminsFetcher {
 
     // Fill in missing admin levels for the given GeocodeResult.
     async fillAdmins(geocode: GeocodeResult): Promise<void> {
-        // Get missing admins from geocode result.
-        const missingAdmins = new Set<Resolution>();
-        if (geocode.administrativeAreaLevel1 === '') {
-            missingAdmins.add(Resolution.Admin1);
-        }
-        if (geocode.administrativeAreaLevel2 === '') {
-            missingAdmins.add(Resolution.Admin2);
-        }
-        if (geocode.administrativeAreaLevel3 === '') {
-            missingAdmins.add(Resolution.Admin3);
-        }
-        if (missingAdmins.size === 0) {
+        // Return early if no need to fill in admins.
+        if (
+            geocode.administrativeAreaLevel1 !== '' &&
+            geocode.administrativeAreaLevel2 !== '' &&
+            geocode.administrativeAreaLevel3 !== ''
+        ) {
             return;
         }
         const cachedResult = this.cache.get(geocode);
@@ -79,11 +58,7 @@ export default class MapboxAdminsFetcher {
             resp = cachedResult;
         } else {
             // Fetch all missing admins in one query.
-            const url = `https://api.mapbox.com/v4/${getLayersParam(
-                missingAdmins,
-            )}/tilequery/${geocode.geometry.longitude},${
-                geocode.geometry.latitude
-            }.json?access_token=${this.accessToken}`;
+            const url = `https://api.mapbox.com/v4/mapbox.enterprise-boundaries-a1-v2,mapbox.enterprise-boundaries-a2-v2,mapbox.enterprise-boundaries-a3-v2/tilequery/${geocode.geometry.longitude},${geocode.geometry.latitude}.json?access_token=${this.accessToken}`;
             try {
                 resp = (await axios.get<BoundariesResponse>(url)).data;
                 this.cache.set(geocode, resp);
