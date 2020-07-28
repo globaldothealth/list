@@ -94,7 +94,7 @@ def sample_data():
 
 @mock_s3
 def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     parsing_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
@@ -117,7 +117,7 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
 @mock_s3
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
@@ -133,7 +133,7 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
 
 
 def test_extract_event_fields_returns_url_bucket_and_key(input_event):
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
@@ -141,13 +141,13 @@ def test_extract_event_fields_returns_url_bucket_and_key(input_event):
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field():
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
         parsing_lib.extract_event_fields({parsing_lib.S3_KEY_FIELD: "key"})
 
 
 def test_extract_event_fields_errors_if_missing_key_field():
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
         parsing_lib.extract_event_fields(
             {parsing_lib.S3_BUCKET_FIELD: "bucket"})
@@ -155,7 +155,7 @@ def test_extract_event_fields_errors_if_missing_key_field():
 
 def test_write_to_server_returns_success_count_for_each_entered_case(
         requests_mock):
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
@@ -169,7 +169,7 @@ def test_write_to_server_returns_success_count_for_each_entered_case(
 
 def test_write_to_server_returns_error_count_for_each_failed_write(
         requests_mock):
-    from python import parsing_lib  # Import locally to avoid superseding mock
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases"
