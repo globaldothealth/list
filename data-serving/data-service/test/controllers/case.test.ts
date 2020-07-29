@@ -1,6 +1,7 @@
 import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
+import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
