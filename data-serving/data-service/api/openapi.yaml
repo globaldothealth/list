@@ -151,7 +151,7 @@ paths:
           $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
-      summary: Lists most frequently used sypmtoms
+      summary: Lists most frequently used symptoms
       operationId: listSymptoms
       parameters:
         - name: limit
