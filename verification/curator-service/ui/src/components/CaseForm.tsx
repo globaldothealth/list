@@ -658,18 +658,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 >
                                     {this.tableOfContentsIcon({
                                         isChecked:
-                                            values.confirmedDate !== null ||
-                                            values.methodOfConfirmation !==
-                                                undefined ||
-                                            values.onsetSymptomsDate !== null ||
-                                            values.firstClinicalConsultationDate !==
-                                                null ||
-                                            values.selfIsolationDate !== null ||
-                                            values.admittedToHospital !==
-                                                undefined ||
-                                            values.admittedToIcu !==
-                                                undefined ||
-                                            values.outcome !== undefined,
+                                            values.confirmedDate !== null,
                                         hasError: hasErrors(
                                             [
                                                 'confirmedDate',
