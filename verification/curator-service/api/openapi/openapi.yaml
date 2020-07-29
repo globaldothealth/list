@@ -506,11 +506,52 @@ paths:
 components:
   schemas:
     Source:
-      description: A complete source; a superset of "#/components/schemas/NewSource" with server-added fields
-      allOf:
-        - $ref: "#/components/schemas/NewSource"
-        - type: object
-          # TODO: Define Source object.
+      description: A source of line list case data.
+      type: object
+      properties:
+        name:
+          type: string
+        origin:
+          type: object
+          properties:
+            url:
+              type: string
+            license:
+              type: string
+        format:
+          type: string
+        automation:
+          type: object
+          properties:
+            parser:
+              type: object
+              properties:
+                awsLambdaArn:
+                  type: string
+                  pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+            regexParsing:
+              type: object
+              properties:
+                fields:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      regex:
+                        type: string
+            schedule:
+              type: object
+              properties:
+                awsRuleArn:
+                  type: string
+                  pattern: '^arn\:aws\:events\:.+\:.+\:rule\/.+'
+                awsScheduleExpression:
+                  type: string
+                  pattern: '^((rate\(((1 (minute|hour|day))|([1-9]+ (minutes|hours|days)))\))|(cron\((.+\s){5}.+\)))'
+              required:
+                - awsScheduleExpression
     SourceArray:
       type: object
       properties:
@@ -524,10 +565,6 @@ components:
           type: integer
       items:
         $ref: "#/components/schemas/Source"
-    NewSource:
-      description: The subset of "#/components/schemas/Source" required to create the entity
-      type: object
-          # TODO: Define NewSource object.
     Case:
       description: A single line-list case.
       properties:
@@ -743,6 +780,21 @@ components:
         - caseReference
         - location
         - events
+    NewSource:
+      description: >
+        A "#/components/schemas/Source" with additional required fields for
+        newly-created sources.
+      allOf:
+        - $ref: "#/components/schemas/Source"
+      properties:
+        origin:
+          required:
+            - url
+        automation:
+          required:
+            - schedule
+      required:
+        - origin
     User:
       description: A user
       type: object

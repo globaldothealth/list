@@ -275,12 +275,17 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
-    it('should not create invalid source', async () => {
+    it('should not create an incomplete source', async () => {
         const res = await curatorRequest
             .post('/api/sources')
             .send({})
+            .expect(400);
+    });
+    it('should not create invalid source', async () => {
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send({ origin: { url: 2 } })
             .expect(422);
-        expect(res.body).toMatch('Enter a name');
     });
 });
 
