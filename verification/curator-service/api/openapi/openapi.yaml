@@ -793,6 +793,9 @@ components:
         origin:
           required:
             - url
+        automation:
+          required:
+            - schedule
       required:
         - origin
     User:
