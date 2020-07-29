@@ -55,6 +55,7 @@ const styles = (theme: Theme) =>
             paddingBottom: '2em',
         },
         allFormSections: {
+            marginBottom: '2em',
             maxWidth: '60%',
             paddingLeft: '1em',
             paddingRight: '1em',
@@ -476,8 +477,15 @@ class BulkCaseForm extends React.Component<
                                     Add new cases or make changes to existing
                                     ones by uploading a CSV file. The CSV needs
                                     to follow the case template format for
-                                    successful entries.
-                                    {/* TODO: Add a link to the CSV template. */}
+                                    successful entries.{' '}
+                                    {/* TODO: Host the final CSV template. */}
+                                    <a
+                                        href="https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        Download case template (.csv)
+                                    </a>
                                 </Typography>
                             </div>
                             <Form>
@@ -489,6 +497,14 @@ class BulkCaseForm extends React.Component<
                                         <FileUpload></FileUpload>
                                     </div>
                                 </fieldset>
+                                {/* TODO: Host the final instructions doc. */}
+                                <a
+                                    href="https://github.com/globaldothealth/list/tree/main/verification/curator-service/ui#bulk-upload-process"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Need help? Detailed instructions here
+                                </a>
                                 <div className={classes.uploadFeedback}>
                                     {this.state.errors.length > 0 && (
                                         <ValidationErrorList
