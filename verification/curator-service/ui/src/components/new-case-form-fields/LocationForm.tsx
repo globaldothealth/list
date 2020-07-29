@@ -25,7 +25,6 @@ function LocationForm(): JSX.Element {
         <Scroll.Element name="location">
             <fieldset>
                 <FieldTitle title="Location"></FieldTitle>
-
                 <PlacesAutocomplete
                     initialValue={initialValues.location?.name}
                     name="location"
