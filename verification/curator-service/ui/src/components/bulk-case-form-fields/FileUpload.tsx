@@ -22,11 +22,7 @@ export default function FileUpload(): JSX.Element {
     const name = 'file';
     return (
         <fieldset className={classes.borderless}>
-            <Typography
-                className={classes.helperText}
-                // data-testid="header-blurb"
-                variant="body2"
-            >
+            <Typography className={classes.helperText} variant="body2">
                 Choose the file to upload
             </Typography>
             <input
@@ -43,9 +39,7 @@ export default function FileUpload(): JSX.Element {
                         event.currentTarget.files;
                     if (uploadedFiles) {
                         setFieldValue(name, uploadedFiles[0]);
-                        setFileName(
-                            uploadedFiles[0]?.name ? uploadedFiles[0].name : '',
-                        );
+                        setFileName(uploadedFiles[0]?.name ?? '');
                         if (uploadedFiles.length > 1) {
                             console.warn(
                                 `Attempted to upload ${uploadedFiles.length} ` +

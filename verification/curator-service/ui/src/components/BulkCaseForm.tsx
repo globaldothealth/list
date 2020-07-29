@@ -55,11 +55,10 @@ const styles = (theme: Theme) =>
             paddingBottom: '2em',
         },
         allFormSections: {
-            border: '2px solid threedface',
             maxWidth: '60%',
             paddingLeft: '1em',
             paddingRight: '1em',
-            paddingTop: '0.5em'
+            paddingTop: '0.5em',
         },
         statusMessage: {
             marginTop: '2em',
@@ -482,14 +481,14 @@ class BulkCaseForm extends React.Component<
                                 </Typography>
                             </div>
                             <Form>
-                                <div className={classes.allFormSections}>
+                                <fieldset className={classes.allFormSections}>
                                     <div className={classes.formSection}>
                                         <Source borderless={true} />
                                     </div>
                                     <div className={classes.formSection}>
                                         <FileUpload></FileUpload>
                                     </div>
-                                </div>
+                                </fieldset>
                                 <div className={classes.uploadFeedback}>
                                     {this.state.errors.length > 0 && (
                                         <ValidationErrorList
