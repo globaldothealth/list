@@ -15,3 +15,8 @@ code {
 fieldset {
   border-style: solid;
 }
+
+a {
+  font-weight: 600;
+  text-decoration: none;
+}
