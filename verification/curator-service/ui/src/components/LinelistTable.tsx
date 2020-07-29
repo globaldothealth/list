@@ -3,15 +3,15 @@ import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import { Button } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import { Link } from 'react-router-dom';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
-import { Button } from '@material-ui/core';
-import { Link } from 'react-router-dom';
 
 interface ListResponse {
     cases: Case[];
@@ -117,6 +117,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 )}
                 {!this.props.location.state?.bulkMessage &&
                     this.props.location.state?.newCaseIds &&
+                    this.props.location.state?.newCaseIds.length > 0 &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert
                             elevation={6}
