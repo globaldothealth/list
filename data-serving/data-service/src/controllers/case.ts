@@ -128,6 +128,89 @@ export const batchValidate = async (
 };
 
 /**
+ * Batch upserts cases.
+ *
+ * Handles HTTP POST /api/cases/batchUpsert.
+ *
+ * Note that this method is _not_ atomic, and that validation _should be
+ * performed prior to invocation. Upserted cases are not validated, and while
+ * any validation issues for created cases will cause the API to return 422,
+ * all provided cases without validation errors will be written.
+ *
+ * TODO: Wrap batchValidate in this method.
+ */
+export const batchUpsert = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const providedCaseReferenceData = req.body.cases
+            .filter(
+                (c: any) =>
+                    c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
+            )
+            .map((c: any) => {
+                return {
+                    'caseReference.sourceId': c.caseReference.sourceId,
+                    'caseReference.sourceEntryId':
+                        c.caseReference.sourceEntryId,
+                };
+            });
+        const toBeUpsertedCaseIds =
+            providedCaseReferenceData.length > 0
+                ? await Case.find()
+                      .select('_id')
+                      .or(providedCaseReferenceData)
+                      .lean()
+                      .exec()
+                : [];
+        const bulkWriteResult = await Case.bulkWrite(
+            req.body.cases.map((c: any) => {
+                if (
+                    c.caseReference?.sourceId &&
+                    c.caseReference?.sourceEntryId
+                ) {
+                    return {
+                        updateOne: {
+                            filter: {
+                                'caseReference.sourceId':
+                                    c.caseReference.sourceId,
+                                'caseReference.sourceEntryId':
+                                    c.caseReference.sourceEntryId,
+                            },
+                            update: { $set: { c } },
+                            upsert: true,
+                        },
+                    };
+                } else {
+                    return {
+                        insertOne: {
+                            document: c,
+                        },
+                    };
+                }
+            }),
+        );
+        res.status(207).json({
+            createdCaseIds: Object.entries(bulkWriteResult.insertedIds)
+                .concat(Object.entries(bulkWriteResult.upsertedIds))
+                .map((kv) => String(kv[1])),
+            updatedCaseIds: toBeUpsertedCaseIds.map((res) =>
+                String(res['_id']),
+            ),
+        });
+        return;
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
  * Update a specific case.
  *
  * Handles HTTP PUT /api/cases/:id.
