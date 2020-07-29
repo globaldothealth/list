@@ -52,7 +52,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     post:
-      summary: Creates one or many new cases with the same schema
+      summary: Creates one (or multiple identical) new cases
       operationId: createCase
       requestBody:
         description: Case to add
