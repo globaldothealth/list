@@ -3,14 +3,12 @@ import {
     render,
     wait,
     waitForElementToBeRemoved,
-    getAllByRole,
 } from '@testing-library/react';
 
 import BulkCaseForm from './BulkCaseForm';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { listenerCount } from 'cluster';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
