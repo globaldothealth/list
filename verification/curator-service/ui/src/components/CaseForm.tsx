@@ -378,13 +378,17 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 },
                 {
                     name: 'icuAdmission',
-                    dates: values.icuAdmissionDate,
+                    dates:
+                        values.admittedToIcu === 'Yes'
+                            ? values.icuAdmissionDate
+                            : undefined,
                     value: values.admittedToIcu,
                 },
                 {
                     name: 'outcome',
                     dates:
-                        values.outcome !== undefined
+                        values.outcome !== undefined &&
+                        values.outcome !== 'Unknown'
                             ? values.outcomeDate
                             : undefined,
                     value: values.outcome,
@@ -405,7 +409,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 }),
             symptoms: {
                 status: unknownToUndefined(values.symptomsStatus),
-                values: values.symptoms,
+                values:
+                    values.symptomsStatus === 'Symptomatic' ||
+                    values.symptomsStatus === 'Presymptomatic'
+                        ? values.symptoms
+                        : [],
             },
             preexistingConditions: {
                 hasPreexistingConditions:
@@ -414,7 +422,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         : values.hasPreexistingConditions === 'No'
                         ? false
                         : undefined,
-                values: values.preexistingConditions,
+                values:
+                    values.hasPreexistingConditions === 'Yes'
+                        ? values.preexistingConditions
+                        : [],
             },
             transmission: {
                 routes: values.transmissionRoutes,
@@ -428,7 +439,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         : values.traveledPrior30Days === 'No'
                         ? false
                         : undefined,
-                travel: this.filterTravel(values.travelHistory),
+                travel:
+                    values.traveledPrior30Days === 'Yes'
+                        ? this.filterTravel(values.travelHistory)
+                        : undefined,
             },
             genomeSequences: this.filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
@@ -653,10 +667,8 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                             values.selfIsolationDate !== null ||
                                             values.admittedToHospital !==
                                                 undefined ||
-                                            values.hospitalAdmissionDate !==
-                                                null ||
-                                            values.icuAdmissionDate !== null ||
-                                            values.outcomeDate !== null ||
+                                            values.admittedToIcu !==
+                                                undefined ||
                                             values.outcome !== undefined,
                                         hasError: hasErrors(
                                             [
@@ -685,9 +697,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 >
                                     {this.tableOfContentsIcon({
                                         isChecked:
-                                            values.symptomsStatus !==
-                                                undefined ||
-                                            values.symptoms?.length > 0,
+                                            values.symptomsStatus !== undefined,
                                         hasError: hasErrors(
                                             ['symptomsStatus', 'symptoms'],
                                             errors,
@@ -705,9 +715,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     {this.tableOfContentsIcon({
                                         isChecked:
                                             values.hasPreexistingConditions !==
-                                                undefined ||
-                                            values.preexistingConditions
-                                                ?.length > 0,
+                                            undefined,
                                         hasError: hasErrors(
                                             [
                                                 'hasPreexistingConditions',
