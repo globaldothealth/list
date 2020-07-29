@@ -8,10 +8,10 @@ The provided file will be rewritten with the acronyms added at the end of the li
 "line with words (LWW)"
 """
 
-from better_profanity import profanity
-
-import pathlib
 import argparse
+import pathlib
+
+from better_profanity import profanity
 
 parser = argparse.ArgumentParser(
     description='Acronym generation script')
@@ -28,6 +28,9 @@ class AcronymGenerator:
                 # Clear whitespace.
                 line = line.strip()
                 if not line:
+                    continue
+                if line.endswith(')'):
+                    lines.add(line)
                     continue
                 # Split line by words.
                 words = line.split(" ")

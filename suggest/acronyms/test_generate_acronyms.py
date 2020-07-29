@@ -20,6 +20,8 @@ class TestGenerator(unittest.TestCase):
                 f.write("\n")
                 # Profanity: ASS
                 f.write("All Success is Sure\n")
+                # Existing acronym
+                f.write("Something already existing (SAE)\n")
         
             generate.AcronymGenerator().Generate(filePath)
 
@@ -27,6 +29,7 @@ class TestGenerator(unittest.TestCase):
                 self.assertEqual(f.readlines(), [
                     "2nd line\n",
                     "All Success is Sure\n",
+                    "Something already existing (SAE)\n",
                     "Third time is a charm (TTC)\n",
                     "first line (FL)\n",
                 ])
