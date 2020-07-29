@@ -213,7 +213,7 @@ paths:
           $ref: "#/components/responses/500"
     post:
       tags: [Case]
-      summary: Creates a new case
+      summary: Creates one (or multiple identical) new cases
       operationId: createCase
       requestBody:
         description: Case to add
@@ -231,9 +231,18 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
+        - name: num_cases
+          in: query
+          description: The number of cases to create
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
       responses:
         "201":
-          $ref: "#/components/responses/201Case"
+          $ref: "#/components/responses/201Create"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -949,6 +958,14 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Case"
+    "201Create":
+      description: Created
+      content:
+        application/json:
+          schema:
+            anyOf:
+              - $ref: "#/components/schemas/Case"
+              - $ref: "#/components/schemas/CaseArray"
     "200Source":
       description: OK
       content:
