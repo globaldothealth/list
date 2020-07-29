@@ -7,11 +7,12 @@ import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
-import { Typography } from '@material-ui/core';
+import { Typography, makeStyles } from '@material-ui/core';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
 interface SourceProps {
+    borderless?: boolean;
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
 }
@@ -26,9 +27,13 @@ export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         return (
             <Scroll.Element name="source">
-                <fieldset>
+                <fieldset
+                    style={{
+                        borderStyle: this.props.borderless ? 'none' : 'solid',
+                    }}
+                >
                     <FieldTitle
-                        title="Source"
+                        title="Data Source"
                         tooltip={tooltipText}
                     ></FieldTitle>
                     <SourcesAutocomplete
@@ -93,9 +98,16 @@ export async function submitSource(opts: {
 
 const filter = createFilterOptions<CaseReferenceForm>();
 
+const useStyles = makeStyles(() => ({
+    sourceNameField: {
+        marginTop: '1em',
+    },
+}));
+
 export function SourcesAutocomplete(
     props: SourceAutocompleteProps,
 ): JSX.Element {
+    const classes = useStyles();
     const name = 'caseReference';
     const [value, setValue] = React.useState<CaseReferenceForm | null>(
         props.initialValue ? props.initialValue : null,
@@ -226,7 +238,7 @@ export function SourcesAutocomplete(
                             // dropdown values. Thus we use an unused form value here.
                             name="unused"
                             data-testid={name}
-                            label="Source URL"
+                            label="Paste URL for data source or search"
                             placeholder="https://..."
                             component={TextField}
                             fullWidth
@@ -249,6 +261,7 @@ export function SourcesAutocomplete(
                 !options.find((option) => option.sourceUrl === inputValue) && (
                     <>
                         <FastField
+                            className={classes.sourceNameField}
                             label="Source name"
                             name={`${name}.sourceName`}
                             type="text"
