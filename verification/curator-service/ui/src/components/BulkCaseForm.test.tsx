@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 it('renders source and csv upload widgets', async () => {
-    const { getByRole, getByTestId, getByText } = render(
+    const { getAllByRole, getByRole, getByTestId, getByText } = render(
         <MemoryRouter>
             <BulkCaseForm
                 user={user}
@@ -61,6 +61,22 @@ it('renders source and csv upload widgets', async () => {
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
+
+    // Reference links
+    const links = getAllByRole('link');
+    expect(links).toHaveLength(2);
+    expect(links[0]).toHaveAttribute(
+        'href',
+        expect.stringMatching(
+            /docs.google.com.*1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE/i,
+        ),
+    );
+    expect(links[1]).toHaveAttribute(
+        'href',
+        expect.stringMatching(
+            /github.com\/globaldothealth\/list.*bulk-upload-process/i,
+        ),
+    );
 
     expect(getByText(/upload cases/i)).toBeEnabled();
     expect(getByText(/cancel/i)).toBeEnabled();
