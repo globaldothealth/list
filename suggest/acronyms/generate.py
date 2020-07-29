@@ -4,7 +4,8 @@ Has some basic checks for alphanumerics, presence of existing acronyms and profa
 
 Run with python3 generate.py -f <path to file containing one sentence per line>
 
-The provided file will be rewritten with the acronyms added.
+The provided file will be rewritten with the acronyms added at the end of the lines like:
+"line with words (LWW)"
 """
 
 from better_profanity import profanity
