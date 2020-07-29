@@ -39,7 +39,7 @@ afterEach(() => {
 });
 
 it('renders form', async () => {
-    const { getByText, getAllByText } = render(
+    const { getAllByText, getByTestId, getByText } = render(
         <MemoryRouter>
             <CaseForm
                 user={user}
@@ -55,7 +55,7 @@ it('renders form', async () => {
     expect(getAllByText(/Demographics/i)).toHaveLength(2);
     expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(2);
-    expect(getByText(/Source URL/i)).toBeInTheDocument();
+    expect(getByTestId('caseReference')).toBeInTheDocument();
     expect(getByText(/Nationality/i)).toBeInTheDocument();
 });
 
