@@ -4,6 +4,9 @@ import { makeStyles, Button, Typography } from '@material-ui/core';
 import { useFormikContext } from 'formik';
 
 const useStyles = makeStyles(() => ({
+    borderless: {
+        borderStyle: 'none',
+    },
     helperText: {
         paddingBottom: '1em',
     },
@@ -18,7 +21,7 @@ export default function FileUpload(): JSX.Element {
     const classes = useStyles();
     const name = 'file';
     return (
-        <fieldset style={{ borderStyle: 'none' }}>
+        <fieldset className={classes.borderless}>
             <Typography
                 className={classes.helperText}
                 // data-testid="header-blurb"
@@ -40,7 +43,9 @@ export default function FileUpload(): JSX.Element {
                         event.currentTarget.files;
                     if (uploadedFiles) {
                         setFieldValue(name, uploadedFiles[0]);
-                        setFileName(uploadedFiles[0].name);
+                        setFileName(
+                            uploadedFiles[0]?.name ? uploadedFiles[0].name : '',
+                        );
                         if (uploadedFiles.length > 1) {
                             console.warn(
                                 `Attempted to upload ${uploadedFiles.length} ` +
