@@ -467,7 +467,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                       },
                   },
         };
-        const newCaseIds = [];
+        let newCaseIds = [];
         try {
             // Update or create depending on the presence of the initial case ID.
             if (this.props.initialCase?._id) {
@@ -476,13 +476,17 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     newCase,
                 );
             } else {
-                // TODO: create a batch insert API endpoint and use that here.
-                for (let i = 0; i < (values.numCases ?? 1); i++) {
-                    const postResponse = await axios.post(
-                        '/api/cases',
-                        newCase,
+                const numCases = values.numCases ?? 1;
+                const postResponse = await axios.post(
+                    `/api/cases?num_cases=${numCases}`,
+                    newCase,
+                );
+                if (numCases === 1) {
+                    newCaseIds = [postResponse.data._id];
+                } else {
+                    newCaseIds = postResponse.data.cases.map(
+                        (c: Case) => c._id,
                     );
-                    newCaseIds.push(postResponse.data._id);
                 }
             }
             this.setState({ errorMessage: '' });

@@ -73,11 +73,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Create a case.
+ * Create one or many identical cases.
  *
  * Handles HTTP POST /api/cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
+    const numCases = Number(req.query.num_cases) || 1;
     try {
         const c = new Case(req.body);
 
@@ -86,7 +87,15 @@ export const create = async (req: Request, res: Response): Promise<void> => {
             await c.validate();
             result = c;
         } else {
-            result = await c.save();
+            if (numCases === 1) {
+                result = await c.save();
+            } else {
+                const cases = Array.from(
+                    { length: numCases },
+                    () => new Case(req.body),
+                );
+                result = { cases: await Case.insertMany(cases) };
+            }
         }
         res.status(201).json(result);
     } catch (err) {

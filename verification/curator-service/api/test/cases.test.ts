@@ -491,6 +491,41 @@ describe('Cases', () => {
         );
     });
 
+    it('proxies create multiple cases calls and geocode', async () => {
+        const lyon: GeocodeResult = {
+            administrativeAreaLevel1: 'Rhône',
+            administrativeAreaLevel2: '',
+            administrativeAreaLevel3: 'Lyon',
+            country: 'France',
+            geometry: { latitude: 45.75889, longitude: 4.84139 },
+            place: '',
+            name: 'Lyon',
+            geoResolution: Resolution.Admin3,
+        };
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 201,
+            statusText: 'Created',
+            data: {},
+        });
+        await curatorRequest
+            .post('/api/cases?num_cases=3')
+            .send({
+                ...minimalCreateRequest,
+                location: { query: 'Lyon', limitToResolution: 'Admin3' },
+            })
+            .expect(201)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases?num_cases=3',
+            {
+                ...minimalCreateRequest,
+                location: lyon,
+            },
+        );
+    });
+
     it('proxies create calls when bypassing geocoding', async () => {
         const lyon = {
             administrativeAreaLevel1: 'Rhône',
