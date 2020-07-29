@@ -137,11 +137,51 @@ export const batchValidate = async (
 };
 
 /**
+ * Find IDs of existing cases that have {caseReference.sourceId,
+ * caseReference.sourceEntryId} combinations matching any cases in the provided
+ * request.
+ *
+ * This is used in batchUpsert. Background:
+ *
+ *   While MongoDB does return IDs of created documents, it doesn't do so
+ *   for modified documents (e.g. cases updated via upsert calls). In
+ *   order to (necessarily) provide that information, we'll query existing
+ *   cases, filtering on provided case reference data, in order to provide
+ *   an accurate list of updated case IDs.
+ */
+const findCaseIdsWithCaseReferenceData = async (
+    req: Request,
+): Promise<string[]> => {
+    const providedCaseReferenceData = req.body.cases
+        .filter(
+            // Case data should be validated prior to this point.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (c: any) =>
+                c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
+        )
+        .map((c: any) => {
+            return {
+                'caseReference.sourceId': c.caseReference.sourceId,
+                'caseReference.sourceEntryId': c.caseReference.sourceEntryId,
+            };
+        });
+    const result =
+        providedCaseReferenceData.length > 0
+            ? await Case.find()
+                  .select('_id')
+                  .or(providedCaseReferenceData)
+                  .lean()
+                  .exec()
+            : [];
+    return result.map((res) => String(res['_id']));
+};
+
+/**
  * Batch upserts cases.
  *
  * Handles HTTP POST /api/cases/batchUpsert.
  *
- * Note that this method is _not_ atomic, and that validation _should be
+ * Note that this method is _not_ atomic, and that validation _should_ be
  * performed prior to invocation. Upserted cases are not validated, and while
  * any validation issues for created cases will cause the API to return 422,
  * all provided cases without validation errors will be written.
@@ -153,27 +193,10 @@ export const batchUpsert = async (
     res: Response,
 ): Promise<void> => {
     try {
-        const providedCaseReferenceData = req.body.cases
-            .filter(
-                (c: any) =>
-                    c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
-            )
-            .map((c: any) => {
-                return {
-                    'caseReference.sourceId': c.caseReference.sourceId,
-                    'caseReference.sourceEntryId':
-                        c.caseReference.sourceEntryId,
-                };
-            });
-        const toBeUpsertedCaseIds =
-            providedCaseReferenceData.length > 0
-                ? await Case.find()
-                      .select('_id')
-                      .or(providedCaseReferenceData)
-                      .lean()
-                      .exec()
-                : [];
+        const toBeUpsertedCaseIds = await findCaseIdsWithCaseReferenceData(req);
         const bulkWriteResult = await Case.bulkWrite(
+            // Case data should be validated prior to this point.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             req.body.cases.map((c: any) => {
                 if (
                     c.caseReference?.sourceId &&
@@ -201,12 +224,13 @@ export const batchUpsert = async (
             }),
         );
         res.status(207).json({
+            // Types are a little goofy here. We're grabbing the string ID from
+            // what MongoDB returns, which is data in the form of:
+            //   { index0 (string): _id0 (ObjectId), ..., indexN: _idN}
             createdCaseIds: Object.entries(bulkWriteResult.insertedIds)
                 .concat(Object.entries(bulkWriteResult.upsertedIds))
                 .map((kv) => String(kv[1])),
-            updatedCaseIds: toBeUpsertedCaseIds.map((res) =>
-                String(res['_id']),
-            ),
+            updatedCaseIds: toBeUpsertedCaseIds,
         });
         return;
     } catch (err) {
@@ -214,6 +238,7 @@ export const batchUpsert = async (
             res.status(422).json(err.message);
             return;
         }
+        console.warn(err);
         res.status(500).json(err.message);
         return;
     }
