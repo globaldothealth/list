@@ -155,7 +155,7 @@ describe('Curator', function () {
         cy.contains('li', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
-        cy.route('POST', '/api/cases').as('addCase');
+        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
