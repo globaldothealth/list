@@ -1,7 +1,6 @@
 import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
-import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
@@ -139,7 +138,7 @@ describe('GET', () => {
         });
     });
 
-    describe.only('list symptoms', () => {
+    describe('list symptoms', () => {
         it('should return 200 OK', () => {
             return request(app).get('/api/cases/symptoms?limit=5').expect(200);
         });
@@ -178,12 +177,27 @@ describe('POST', () => {
     it('create with required properties but invalid input should return 422', () => {
         return request(app).post('/api/cases').send(invalidRequest).expect(422);
     });
-    it('create with valid input should return 201 OK', async () => {
+    it('rejects negative num_cases param', () => {
         return request(app)
+            .post('/api/cases?num_cases=-2')
+            .send(minimalRequest)
+            .expect(400);
+    });
+    it('create with valid input should return 201 OK', async () => {
+        await request(app)
             .post('/api/cases')
             .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
+        expect(await Case.collection.countDocuments()).toEqual(1);
+    });
+    it('create many cases with valid input should return 201 OK', async () => {
+        await request(app)
+            .post('/api/cases?num_cases=3')
+            .send(minimalRequest)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(await Case.collection.countDocuments()).toEqual(3);
     });
     it('create with valid input should result in correct creation metadata', async () => {
         const res = await request(app)
