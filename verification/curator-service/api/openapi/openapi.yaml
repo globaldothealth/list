@@ -90,7 +90,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Source"
+              $ref: "#/components/schemas/NewSource"
       responses:
         "201":
           $ref: "#/components/responses/201Source"
@@ -551,7 +551,7 @@ components:
                   type: string
                   pattern: '^((rate\(((1 (minute|hour|day))|([1-9]+ (minutes|hours|days)))\))|(cron\((.+\s){5}.+\)))'
               required:
-                - awsScheduleExpression     
+                - awsScheduleExpression
     SourceArray:
       type: object
       properties:
@@ -783,6 +783,18 @@ components:
         - caseReference
         - location
         - events
+    NewSource:
+      description: >
+        A "#/components/schemas/Source" with additional required fields for
+        newly-created sources.
+      allOf:
+        - $ref: "#/components/schemas/Source"
+      properties:
+        origin:
+          required:
+            - url
+      required:
+        - origin
     User:
       description: A user
       type: object
