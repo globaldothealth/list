@@ -1,6 +1,11 @@
 import * as Yup from 'yup';
 
-import { Button, CircularProgress, withStyles } from '@material-ui/core';
+import {
+    Button,
+    CircularProgress,
+    Typography,
+    withStyles,
+} from '@material-ui/core';
 import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
@@ -9,6 +14,7 @@ import Source, {
     CaseReferenceForm,
     submitSource,
 } from './common-form-fields/Source';
+import { Theme, createStyles } from '@material-ui/core/styles';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
@@ -18,7 +24,6 @@ import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
-import { createStyles } from '@material-ui/core/styles';
 
 interface User {
     _id: string;
@@ -29,27 +34,48 @@ interface User {
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
-        container: {
-            display: 'flex',
+        headerBlurb: {
+            maxWidth: '70%',
+            paddingTop: '1em',
+        },
+        headerText: {
+            marginTop: '2em',
         },
         form: {
-            paddingLeft: '2em',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            paddingLeft: '3em',
+            paddingRight: '4em',
         },
         formSection: {
             margin: '2em 0',
+            maxWidth: '60%',
         },
         statusMessage: {
             marginTop: '2em',
             maxWidth: '80%',
         },
-        uploadButton: {
-            marginRight: '2em',
+        uploadFeedback: {
+            paddingBottom: '4em',
         },
-        uploadDiv: {
-            display: 'flex',
+        uploadBar: {
             alignItems: 'center',
+            display: 'flex',
+            height: '4em',
+            marginTop: 'auto',
+        },
+        cancelButton: {
+            marginLeft: '1em',
+        },
+        progressIndicator: {
+            alignItems: 'center',
+            display: 'flex',
+        },
+        progressText: {
+            marginLeft: '1em',
         },
     });
 
@@ -428,44 +454,79 @@ class BulkCaseForm extends React.Component<
                     }}
                 >
                     {({ isSubmitting, submitForm }): JSX.Element => (
-                        <div className={classes.container}>
-                            <Form className={classes.form}>
+                        <div className={classes.form}>
+                            <div className={classes.headerText}>
+                                <Typography
+                                    data-testid="header-title"
+                                    variant="h5"
+                                >
+                                    Upload bulk data
+                                </Typography>
+                                <Typography
+                                    className={classes.headerBlurb}
+                                    data-testid="header-blurb"
+                                    variant="body2"
+                                >
+                                    Add new cases or make changes to existing
+                                    ones by uploading a CSV file. The CSV needs
+                                    to follow the case template format for
+                                    successful entries.
+                                    {/* TODO: Add a link to the CSV template. */}
+                                </Typography>
+                            </div>
+                            <Form>
                                 <div className={classes.formSection}>
                                     <Source></Source>
                                 </div>
                                 <div className={classes.formSection}>
                                     <FileUpload></FileUpload>
                                 </div>
-                                <div className={classes.uploadDiv}>
-                                    <Button
-                                        className={classes.uploadButton}
-                                        variant="contained"
-                                        color="primary"
-                                        data-testid="submit"
-                                        disabled={isSubmitting}
-                                        onClick={submitForm}
-                                    >
-                                        Upload cases
-                                    </Button>
-                                    {isSubmitting && (
-                                        <CircularProgress data-testid="progress" />
+                                <div className={classes.uploadFeedback}>
+                                    {this.state.errors.length > 0 && (
+                                        <ValidationErrorList
+                                            errors={this.state.errors}
+                                            maxDisplayErrors={10}
+                                        />
+                                    )}
+                                    {this.state.errorMessage && (
+                                        <Alert
+                                            className={classes.statusMessage}
+                                            severity="error"
+                                        >
+                                            {this.state.errorMessage}
+                                        </Alert>
                                     )}
                                 </div>
-                                {this.state.errors.length > 0 && (
-                                    <ValidationErrorList
-                                        errors={this.state.errors}
-                                        maxDisplayErrors={10}
-                                    />
-                                )}
-                                {this.state.errorMessage && (
-                                    <Alert
-                                        className={classes.statusMessage}
-                                        severity="error"
-                                    >
-                                        {this.state.errorMessage}
-                                    </Alert>
-                                )}
                             </Form>
+                            <div className={classes.uploadBar}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    Upload Cases
+                                </Button>
+                                <Button
+                                    className={classes.cancelButton}
+                                    color="primary"
+                                    disabled={isSubmitting}
+                                    onClick={this.props.onModalClose}
+                                    variant="outlined"
+                                >
+                                    Cancel
+                                </Button>
+                                <span style={{ flexGrow: 1 }}></span>
+                                {isSubmitting && (
+                                    <div className={classes.progressIndicator}>
+                                        <CircularProgress data-testid="progress" />
+                                        <span className={classes.progressText}>
+                                            <strong>Uploading cases</strong>
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </Formik>

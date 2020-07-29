@@ -106,28 +106,32 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     csv_case['latitude'],
                     csv_case['longitude'])
 
-                json_case['events'] = convert_events(csv_case['ID'], {
+                json_case['events'] = convert_events(csv_case['ID'], [
                     (
                         csv_case['date_onset_symptoms'],
+                        None,
                         'date_onset_symptoms',
                         'onsetSymptoms'
                     ),
                     (
                         csv_case['date_admission_hospital'],
+                        None,
                         'date_admission_hospital',
-                        'admissionHospital'
+                        'hospitalAdmission'
                     ),
                     (
                         csv_case['date_confirmation'],
+                        None,
                         'date_confirmation',
                         'confirmed'
                     ),
                     (
                         csv_case['date_death_or_discharge'],
+                        csv_case['outcome'],
                         'date_death_or_discharge',
-                        'deathOrDischarge'
+                        'outcome'
                     )
-                }, csv_case['outcome'])
+                ])
 
                 json_case['symptoms'] = convert_dictionary_field(
                     csv_case['ID'],
