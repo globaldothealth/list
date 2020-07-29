@@ -13,6 +13,11 @@ export default function NumCases(): JSX.Element {
                     label="Number of cases"
                     name="numCases"
                     type="number"
+                    InputProps={{
+                        inputProps: {
+                            min: 1,
+                        },
+                    }}
                     component={TextField}
                     fullWidth
                 />
