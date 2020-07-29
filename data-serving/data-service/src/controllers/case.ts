@@ -79,10 +79,6 @@ export const list = async (req: Request, res: Response): Promise<void> => {
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
     const numCases = Number(req.query.num_cases) || 1;
-    if (numCases < 1) {
-        res.status(422).json('num_cases must be > 0');
-        return;
-    }
     try {
         const c = new Case(req.body);
 
@@ -94,10 +90,10 @@ export const create = async (req: Request, res: Response): Promise<void> => {
             if (numCases === 1) {
                 result = await c.save();
             } else {
-                const cases = [];
-                for (let i = 0; i < numCases; i++) {
-                    cases.push(new Case(req.body));
-                }
+                const cases = Array.from(
+                    { length: numCases },
+                    () => new Case(req.body),
+                );
                 result = { cases: await Case.insertMany(cases) };
             }
         }

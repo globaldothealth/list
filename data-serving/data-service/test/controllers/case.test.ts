@@ -192,11 +192,12 @@ describe('POST', () => {
         expect(await Case.collection.countDocuments()).toEqual(1);
     });
     it('create many cases with valid input should return 201 OK', async () => {
-        await request(app)
+        const res = await request(app)
             .post('/api/cases?num_cases=3')
             .send(minimalRequest)
             .expect('Content-Type', /json/)
             .expect(201);
+        expect(res.body.cases).toHaveLength(3);
         expect(await Case.collection.countDocuments()).toEqual(3);
     });
     it('create with valid input should result in correct creation metadata', async () => {
