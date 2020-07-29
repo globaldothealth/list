@@ -1,5 +1,5 @@
 import { Field, useFormikContext } from 'formik';
-import { Typography, makeStyles } from '@material-ui/core';
+import { Typography, makeStyles, Tooltip, IconButton } from '@material-ui/core';
 
 import AddIcon from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
@@ -9,6 +9,7 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import { Location as Loc } from '../Case';
 import Location from './Location';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
+import HelpIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
 import Scroll from 'react-scroll';
@@ -25,6 +26,7 @@ function LocationForm(): JSX.Element {
         <Scroll.Element name="location">
             <fieldset>
                 <FieldTitle title="Location"></FieldTitle>
+
                 <PlacesAutocomplete
                     initialValue={initialValues.location?.name}
                     name="location"
