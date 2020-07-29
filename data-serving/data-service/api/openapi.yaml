@@ -131,6 +131,24 @@ paths:
           $ref: "#/components/responses/207BatchValidateCaseResponse"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchUpsert:
+    post:
+      summary: Batch upserts cases
+      operationId: batchUpsertCases
+      requestBody:
+        description: Cases to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/CaseArray"
+      responses:
+        "207":
+          $ref: "#/components/responses/207BatchUpsertCaseResponse"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used sypmtoms
@@ -244,6 +262,20 @@ components:
               - message
       required:
         - errors
+    BatchUpsertCaseResponse:
+      description: Response to batch upsert case API requests
+      properties:
+        createdCaseIds:
+          type: array
+          items:
+            type: string
+        updatedCaseIds:
+          type: array
+          items:
+            type: string
+      required:
+        - createdCaseIds
+        - updatedCaseIds
     Case:
       description: A single line-list case.
       properties:
@@ -524,6 +556,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BatchValidateCaseResponse'
+    "207BatchUpsertCaseResponse":
+      description: Multi-status
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BatchUpsertCaseResponse'
     "400":
       description: Malformed request
     "403":
