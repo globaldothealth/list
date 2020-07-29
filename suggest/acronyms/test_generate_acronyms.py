@@ -2,7 +2,7 @@ import unittest
 import os
 import tempfile
 
-import gen_acros
+import generate
 
 class TestGenerator(unittest.TestCase):
 
@@ -21,7 +21,7 @@ class TestGenerator(unittest.TestCase):
                 # Profanity: ASS
                 f.write("All Success is Sure\n")
         
-            gen_acros.AcronymGenerator().Generate(filePath)
+            generate.AcronymGenerator().Generate(filePath)
 
             with open(filePath, "r") as f:
                 self.assertEqual(f.readlines(), [

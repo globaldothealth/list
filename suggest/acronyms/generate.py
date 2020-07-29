@@ -2,7 +2,7 @@
 
 Has some basic checks for alphanumerics, presence of existing acronyms and profanity words.
 
-Run with python3 gen_acros.py -f <path to file containing one sentence per line>
+Run with python3 generate.py -f <path to file containing one sentence per line>
 
 The provided file will be rewritten with the acronyms added.
 """
