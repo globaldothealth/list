@@ -48,16 +48,22 @@ it('renders source and csv upload widgets', async () => {
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
-    const inputField = getByTestId('csv-input');
+    // Header text
+    expect(getByTestId('header-title')).toBeInTheDocument();
+    expect(getByTestId('header-blurb')).toBeInTheDocument();
 
+    // Source selection
+    const sourceComponent = getByTestId('caseReference');
+    expect(getByRole('combobox')).toContainElement(sourceComponent);
+
+    // File upload
+    const inputField = getByTestId('csv-input');
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
 
-    const sourceComponent = getByTestId('caseReference');
-    expect(getByRole('combobox')).toContainElement(sourceComponent);
-
-    expect(getByText(/Upload cases/)).toBeInTheDocument();
+    expect(getByText(/upload cases/i)).toBeEnabled();
+    expect(getByText(/cancel/i)).toBeEnabled();
 });
 
 it('displays spinner post upload', async () => {
@@ -92,7 +98,11 @@ it('displays spinner post upload', async () => {
     mockedAxios.put.mockResolvedValueOnce(axiosResponse);
 
     fireEvent.change(inputField);
-    fireEvent.click(getByText(/Upload cases/));
+    fireEvent.click(getByText(/upload cases/i));
+
+    expect(getByText(/upload cases/i)).toBeDisabled();
+    expect(getByText(/cancel/i)).toBeDisabled();
     expect(getByTestId('progress')).toBeInTheDocument();
+    expect(getByText(/uploading cases/i)).toBeInTheDocument();
     waitForElementToBeRemoved(() => getByTestId('progress'));
 });

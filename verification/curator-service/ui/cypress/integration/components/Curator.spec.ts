@@ -343,7 +343,7 @@ describe('Curator', function () {
             cy.contains('dry cough, mild fever');
             cy.contains('Presymptomatic');
             // Preexisting conditions.
-            cy.contains('ABCD syndrome, ADULT syndrome');
+            cy.contains('ABCD syndrome (AS), ADULT syndrome (AS)');
             // Transmission.
             cy.contains('Airborne infection');
             cy.contains('Test route');
