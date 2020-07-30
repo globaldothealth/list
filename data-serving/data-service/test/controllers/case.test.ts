@@ -257,6 +257,8 @@ describe('POST', () => {
             .expect(207);
         expect(res.body.createdCaseIds).toHaveLength(2);
         expect(res.body.updatedCaseIds).toHaveLength(1);
+        const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        expect(updatedCaseInDb?.notes).toEqual(existingCaseWithEntryId.notes);
     });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)
