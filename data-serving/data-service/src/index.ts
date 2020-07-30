@@ -2,6 +2,7 @@ import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
+import { setRevisionMetadata, writeRevision } from './controllers/preprocessor';
 
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
@@ -9,7 +10,6 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { setRevisionMetadata } from './controllers/preprocessor';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 
@@ -63,10 +63,16 @@ new OpenApiValidator({
         apiRouter.post('/cases', setRevisionMetadata, caseController.create);
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post('/cases/batchUpsert', caseController.batchUpsert);
-        apiRouter.put('/cases', setRevisionMetadata, caseController.upsert);
+        apiRouter.put(
+            '/cases',
+            setRevisionMetadata,
+            writeRevision,
+            caseController.upsert,
+        );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
             setRevisionMetadata,
+            writeRevision,
             caseController.update,
         );
         apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
