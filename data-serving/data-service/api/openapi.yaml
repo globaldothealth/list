@@ -402,6 +402,8 @@ components:
               $ref: "#/components/schemas/EditMetadata"
             editMetadata:
               $ref: "#/components/schemas/EditMetadata"
+          required:
+            - revisionNumber
     CaseArray:
       type: object
       properties:
@@ -500,7 +502,6 @@ components:
         - caseReference
         - location
         - events
-        - revisionMetadata
         - curator
   responses:
     "200Case":

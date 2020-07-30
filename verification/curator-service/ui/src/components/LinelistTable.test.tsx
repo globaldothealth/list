@@ -67,6 +67,7 @@ it('loads and displays cases', async () => {
             ],
             notes: 'some notes',
             revisionMetadata: {
+                revisionNumber: 0,
                 creationMetadata: {
                     curator: 'foo@bar.com',
                 },
