@@ -63,6 +63,7 @@
     "express-validator": "^6.6.0",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.23",
+    "search-query-parser": "^1.5.5",
     "swagger-ui-express": "^4.1.4",
     "yamljs": "^0.3.0"
   },
