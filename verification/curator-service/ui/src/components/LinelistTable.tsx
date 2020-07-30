@@ -3,13 +3,7 @@ import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import {
-    Button,
-    createStyles,
-    Theme,
-    WithStyles,
-    withStyles,
-} from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
@@ -78,14 +72,7 @@ interface LocationState {
     bulkMessage: string;
 }
 
-const styles = (theme: Theme) =>
-    createStyles({
-        search: {},
-    });
-
-interface Props
-    extends RouteComponentProps<never, never, LocationState>,
-        WithStyles<typeof styles> {
+interface Props extends RouteComponentProps<never, never, LocationState> {
     user: User;
 }
 
@@ -125,7 +112,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     render(): JSX.Element {
-        const { history, classes } = this.props;
+        const { history } = this.props;
         return (
             <Paper>
                 {this.state.error && (
@@ -134,7 +121,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     </MuiAlert>
                 )}
                 <TextField
-                    className={classes.search}
                     id="search-field"
                     label="Search"
                     variant="filled"
@@ -540,4 +526,4 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 }
 
-export default withStyles(styles)(withRouter(LinelistTable));
+export default withRouter(LinelistTable);
