@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { Case } from '../model/case';
+import parseSearchQuery from '../util/search';
 
 /**
  * Get a specific case.
@@ -33,13 +34,16 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     // Filter query param looks like &q=some%20search%20query
-    const searchQuery = String(req.query.q || '').trim();
-    const query = searchQuery
+    if (typeof req.query.q !== 'string' && typeof req.query.q !== 'undefined') {
+        res.status(422).json('q must be a unique string');
+        return;
+    }
+    const parsedSearch = parseSearchQuery(req.query.q || '');
+    const query = parsedSearch.fullTextSearch
         ? {
-              $text: { $search: searchQuery },
+              $text: { $search: parsedSearch.fullTextSearch },
           }
         : {};
-
     // Do a fetch of documents and another fetch in parallel for total documents
     // count used in pagination.
     try {
