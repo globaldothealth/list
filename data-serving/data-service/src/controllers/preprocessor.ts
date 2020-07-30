@@ -1,6 +1,7 @@
 import { Case, CaseDocument } from '../model/case';
 import { NextFunction, Request, Response } from 'express';
 
+import { CaseRevision } from '../model/case-revision';
 import { RevisionMetadata } from '../model/revision-metadata';
 
 const createNewMetadata = (curatorEmail: string) => {
@@ -27,20 +28,14 @@ const createUpdateMetadata = (c: CaseDocument, curatorEmail: string) => {
     };
 };
 
-export const setRevisionMetadata = async (
+export const getCase = async (
     request: Request,
-    response: Response,
-    next: NextFunction,
-) => {
-    const curatorEmail = request.body.curator.email;
+): Promise<CaseDocument | null> => {
     const caseReference = request.body.caseReference;
 
-    // Find the case if it already exists so we can update its existing
-    // metadata.
-    let c;
     if (request.method == 'PUT' && request.params?.id) {
         // Update.
-        c = await Case.findById(request.params.id);
+        return Case.findById(request.params.id);
     } else if (
         request.method == 'PUT' &&
         caseReference &&
@@ -50,11 +45,25 @@ export const setRevisionMetadata = async (
         // Upsert.
         // TODO: Upserts should only generate update metadata if there is a
         // diff with what's already in the database.
-        c = await Case.findOne({
+        return Case.findOne({
             'caseReference.sourceId': caseReference.sourceId,
             'caseReference.sourceEntryId': caseReference.sourceEntryId,
         });
     }
+
+    return null;
+};
+
+export const setRevisionMetadata = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const curatorEmail = request.body.curator.email;
+
+    // Find the case if it already exists so we can update its existing
+    // metadata.
+    const c = await getCase(request);
 
     // Set the correct, server-generated revisionMetadata for subsequent
     // processors to use.
@@ -65,6 +74,22 @@ export const setRevisionMetadata = async (
 
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;
+
+    next();
+};
+
+export const writeRevision = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const c = await getCase(request);
+
+    if (c) {
+        await new CaseRevision({
+            case: c
+        }).save();
+    }
 
     next();
 };

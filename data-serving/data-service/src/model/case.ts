@@ -22,7 +22,7 @@ import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
-const caseSchema = new mongoose.Schema(
+export const caseSchema = new mongoose.Schema(
     {
         caseReference: {
             type: caseReferenceSchema,
