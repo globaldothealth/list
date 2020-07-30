@@ -53,7 +53,7 @@ describe('New case form', function () {
         cy.visit('/cases/new');
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.new-source.com');
-        cy.contains('li', 'www.new-source.com').click();
+        cy.get('input[name="caseReference.sourceName"]').click();
         cy.get('input[name="caseReference.sourceName"]').type('New source');
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
