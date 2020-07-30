@@ -10,6 +10,7 @@ export interface ParsedSearch {
 }
 
 // Map of keywords to their case data path.
+// IMPORTANT: If you change this mapping, reflect the new keys in the openapi.yaml file as well.
 const keywords = new Map<string, string>([
     ['curator', 'revisionMetadata.creationMetadata.curator'],
     ['gender', 'demographics.gender'],

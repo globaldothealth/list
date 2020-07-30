@@ -164,6 +164,14 @@ describe('GET', () => {
                     .expect(200, /engineer/)
                     .expect('Content-Type', /json/);
             });
+            it('Search for multiple occurrences of the same keyword', async () => {
+                await request(app)
+                    .get(
+                        '/api/cases?page=1&limit=1&q=country%3AGermany%20country%3APeru',
+                    )
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
         });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(400, done);

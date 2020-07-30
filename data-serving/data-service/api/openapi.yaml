@@ -40,6 +40,13 @@ paths:
           required: false
           schema:
             type: string
+          examples:
+            "full text search":
+              value: "this -butnotthis"
+              summary: Full text search with items that must or must not be present.
+            keywords:
+              value: "curator:foo@bar.com,baz@meh.com country:france"
+              summary: "values are OR'ed for the same keyword and all keywords are AND'ed. Only equality operator is supported. Supported operators are: curator, gender, nationality, occupation, country, outcome, caseid, source, admin1, admin2, admin3"
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
