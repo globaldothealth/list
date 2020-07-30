@@ -318,6 +318,7 @@ class BulkCaseForm extends React.Component<
             {
                 cases: casesToSend,
             },
+            { maxContentLength: Infinity },
         );
         return response.data;
     }
