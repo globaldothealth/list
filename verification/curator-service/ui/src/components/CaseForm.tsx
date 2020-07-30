@@ -446,26 +446,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             },
             genomeSequences: this.filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
-            notes: values.notes,
-            revisionMetadata: this.props.initialCase
-                ? {
-                      revisionNumber:
-                          this.props.initialCase.revisionMetadata
-                              .revisionNumber + 1,
-                      creationMetadata: this.props.initialCase.revisionMetadata
-                          .creationMetadata,
-                      updateMetadata: {
-                          curator: this.props.user.email,
-                          date: new Date().toISOString(),
-                      },
-                  }
-                : {
-                      revisionNumber: 0,
-                      creationMetadata: {
-                          curator: this.props.user.email,
-                          date: new Date().toISOString(),
-                      },
-                  },
+            notes: values.notes
         };
         let newCaseIds = [];
         try {
