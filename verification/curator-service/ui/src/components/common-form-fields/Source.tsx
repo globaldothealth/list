@@ -172,7 +172,9 @@ export function SourcesAutocomplete(
             <Autocomplete
                 itemType="CaseReferenceForm"
                 getOptionLabel={(option: CaseReferenceForm): string =>
-                    option.sourceUrl
+                    // option is a string if the user typed a URL and did not
+                    // select a dropdown value.
+                    typeof option === 'string' ? option : option.sourceUrl
                 }
                 getOptionSelected={(
                     option: CaseReferenceForm,
