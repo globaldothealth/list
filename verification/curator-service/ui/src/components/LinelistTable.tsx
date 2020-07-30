@@ -4,8 +4,11 @@ import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Button } from '@material-ui/core';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import TextField from '@material-ui/core/TextField';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import SearchIcon from '@material-ui/icons/SearchOutlined';
 import { Link } from 'react-router-dom';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
@@ -23,6 +26,7 @@ interface LinelistTableState {
     url: string;
     error: string;
     pageSize: number;
+    search: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -82,6 +86,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             url: '/api/cases/',
             error: '',
             pageSize: 50,
+            search: '',
         };
         // history.location.state can be updated with newCaseIds, on which we
         // must refresh the table
@@ -115,6 +120,28 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.state.error}
                     </MuiAlert>
                 )}
+                <TextField
+                    id="search-field"
+                    label="Search"
+                    variant="filled"
+                    fullWidth
+                    onKeyPress={(ev) => {
+                        if (ev.key === 'Enter') {
+                            ev.preventDefault();
+                            this.tableRef.current.onQueryChange();
+                        }
+                    }}
+                    onChange={(ev) =>
+                        this.setState({ search: ev.currentTarget.value })
+                    }
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
                 {!this.props.location.state?.bulkMessage &&
                     this.props.location.state?.newCaseIds &&
                     this.props.location.state?.newCaseIds.length > 0 &&
@@ -276,11 +303,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            const trimmedQ = query.search.trim();
+                            const trimmedQ = this.state.search.trim();
                             // TODO: We should probably use lodash.throttle on searches.
                             if (trimmedQ) {
-                                listUrl +=
-                                    '&q=' + encodeURIComponent(query.search);
+                                listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
                             this.setState({ error: '' });
                             const response = axios.get<ListResponse>(listUrl);
@@ -381,7 +407,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     }
                     title="COVID-19 cases"
                     options={{
-                        search: true,
+                        search: false,
                         filtering: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
