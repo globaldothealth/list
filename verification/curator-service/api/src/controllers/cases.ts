@@ -162,6 +162,7 @@ export default class CasesController {
             const validationResponse = await axios.post(
                 this.dataServerURL + '/api/cases/batchValidate',
                 req.body,
+                { maxContentLength: Infinity },
             );
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
@@ -173,25 +174,16 @@ export default class CasesController {
                 return;
             }
 
-            // 3. Upsert each case.
-            // Consider adding a batchUpsert endpoint on the data service if
-            // this slows us down too much.
-            const createdCasesIds = [];
-            const updatedCasesIds = [];
-            for (let index = 0; index < req.body.cases.length; index++) {
-                const c = req.body.cases[index];
-                const r = await axios.put(this.dataServerURL + '/api/cases', {
-                    ...c,
-                    curator: { email: (req.user as UserDocument).email },
-                });
-                r.status === 201
-                    ? createdCasesIds.push(r.data._id)
-                    : updatedCasesIds.push(r.data._id);
-            }
+            // 3. Batch upsert.
+            const upsertResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpsert',
+                req.body,
+                { maxContentLength: Infinity },
+            );
             res.status(200).send({
                 phase: 'UPSERT',
-                createdCaseIds: createdCasesIds,
-                updatedCaseIds: updatedCasesIds,
+                createdCaseIds: upsertResponse.data.createdCaseIds,
+                updatedCaseIds: upsertResponse.data.updatedCaseIds,
                 errors: [],
             });
             return;

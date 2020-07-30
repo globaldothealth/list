@@ -287,14 +287,18 @@ describe('Cases', () => {
             geoResolution: Resolution.Admin3,
         };
         await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
-        mockedAxios.post.mockResolvedValueOnce({
-            status: 207,
-            data: { errors: [] },
-        });
-        mockedAxios.put.mockResolvedValue({
-            data: { _id: 'abc123' },
-            status: 201,
-        });
+        mockedAxios.post
+            .mockResolvedValueOnce({
+                status: 207,
+                data: { errors: [] },
+            })
+            .mockResolvedValueOnce({
+                status: 207,
+                data: {
+                    createdCaseIds: ['abc', 'def'],
+                    updatedCaseIds: [],
+                },
+            });
         const res = await curatorRequest
             .post('/api/cases/batchUpsert')
             .send({
@@ -311,8 +315,7 @@ describe('Cases', () => {
             })
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.put).toHaveBeenCalledTimes(2);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(2);
         expect(res.body.phase).toBe('UPSERT');
         expect(res.body.createdCaseIds).toHaveLength(2);
         expect(res.body.updatedCaseIds).toHaveLength(0);
@@ -425,17 +428,18 @@ describe('Cases', () => {
             name: 'Lyon',
             geoResolution: Resolution.Admin3,
         };
-        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
-        mockedAxios.post.mockResolvedValueOnce({
-            status: 207,
-            data: { errors: [] },
-        });
-
         const code = 500;
         const message = 'Server error';
-        mockedAxios.put.mockRejectedValueOnce({
-            response: { status: code, data: message },
-        });
+        await curatorRequest.post('/api/geocode/seed').send(lyon).expect(200);
+        mockedAxios.post
+            .mockResolvedValueOnce({
+                status: 207,
+                data: { errors: [] },
+            })
+            .mockRejectedValueOnce({
+                response: { status: code, data: message },
+            });
+
         const res = await curatorRequest
             .post('/api/cases/batchUpsert')
             .send({
@@ -451,8 +455,7 @@ describe('Cases', () => {
                 ],
             })
             .expect(code);
-        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(2);
         expect(res.text).toEqual(message);
     });
 
