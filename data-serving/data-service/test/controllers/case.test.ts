@@ -1,6 +1,7 @@
 import { Case } from '../../src/model/case';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
+import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
@@ -228,6 +229,40 @@ describe('POST', () => {
 
         expect(await Case.collection.countDocuments()).toEqual(0);
         expect(res.body._id).not.toHaveLength(0);
+    });
+    it('batch upsert with no body should return 415', () => {
+        return request(app).post('/api/cases/batchUpsert').expect(415);
+    });
+    it('batch upsert with no cases should return 400', () => {
+        return request(app).post('/api/cases/batchUpsert').send({}).expect(400);
+    });
+    it('batch upsert with only valid cases should return 207 with IDs', async () => {
+        const newCaseWithoutEntryId = new Case(minimalCase);
+        const newCaseWithEntryId = new Case(fullCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+
+        const existingCaseWithEntryId = new Case(fullCase);
+        await existingCaseWithEntryId.save();
+        existingCaseWithEntryId.notes = 'new notes';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithoutEntryId,
+                    newCaseWithEntryId,
+                    existingCaseWithEntryId,
+                ],
+            })
+            .expect(207);
+        expect(res.body.createdCaseIds).toHaveLength(2);
+        expect(res.body.updatedCaseIds).toHaveLength(1);
+    });
+    it('batch upsert with any invalid case should return 422', async () => {
+        await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({ cases: [minimalCase, invalidRequest] })
+            .expect(422);
     });
     it('batch validate with no body should return 415', () => {
         return request(app).post('/api/cases/batchValidate').expect(415);
