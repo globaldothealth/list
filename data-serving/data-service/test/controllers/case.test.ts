@@ -105,11 +105,6 @@ describe('GET', () => {
             // Simulate index creation used in unit tests, in production they are
             // setup by the setup-db script and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
-            await mongoose.connect(process.env.MONGO_URL || '', {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                useFindAndModify: false,
-            });
             await mongoose.connection.collection('cases').createIndex({
                 notes: 'text',
             });
@@ -129,6 +124,46 @@ describe('GET', () => {
                 .get(`/api/cases?page=1&limit=10&q=${encodeURI('at work')}`)
                 .expect(200, /got it at work/)
                 .expect('Content-Type', /json/);
+        });
+        describe('keywords', () => {
+            beforeEach(async () => {
+                const c = new Case(minimalCase);
+                c.location.country = 'Germany';
+                c.set('demographics.occupation', 'engineer');
+                await c.save();
+            });
+            it('returns no case if no match', async () => {
+                const res = await request(app)
+                    .get('/api/cases?page=1&limit=1&q=country%3ASwitzerland')
+                    .expect(200)
+                    .expect('Content-Type', /json/);
+                expect(res.body.cases).toHaveLength(0);
+                expect(res.body.total).toEqual(0);
+            });
+            it('returns the case if keyword matches', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=country%3AGermany')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('Search for matching country and something else that does not match', async () => {
+                const res = await request(app)
+                    .get(
+                        '/api/cases?page=1&limit=1&q=country%3AGermany%occupation%3Anope',
+                    )
+                    .expect(200)
+                    .expect('Content-Type', /json/);
+                expect(res.body.cases).toHaveLength(0);
+                expect(res.body.total).toEqual(0);
+            });
+            it('Search for matching country and something else that also matches', async () => {
+                await request(app)
+                    .get(
+                        '/api/cases?page=1&limit=1&q=country%3AGermany%20occupation%3Aengineer',
+                    )
+                    .expect(200, /engineer/)
+                    .expect('Content-Type', /json/);
+            });
         });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(400, done);

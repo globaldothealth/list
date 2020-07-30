@@ -44,17 +44,29 @@ export const list = async (req: Request, res: Response): Promise<void> => {
               $text: { $search: parsedSearch.fullTextSearch },
           }
         : {};
-    // Do a fetch of documents and another fetch in parallel for total documents
-    // count used in pagination.
+    // Fill in keyword filters.
     try {
+        let q = Case.find(query);
+        let count = Case.countDocuments(query);
+        parsedSearch.filters.forEach((f) => {
+            if (f.values.length == 1) {
+                q = q.where(f.path).equals(f.values[0]);
+                count = count.where(f.path).equals(f.values[0]);
+            } else {
+                q = q.where(f.path).in(f.values);
+                count = count.where(f.path).in(f.values);
+            }
+        });
+        // Do a fetch of documents and another fetch in parallel for total documents
+        // count used in pagination.
         const [docs, total] = await Promise.all([
-            Case.find(query)
+            q
                 .sort({ 'revisionMetadata.creationMetadata.date': -1 })
                 .skip(limit * (page - 1))
                 .limit(limit + 1)
                 // We don't need mongoose docs here, just plain json.
                 .lean(),
-            Case.countDocuments(query),
+            count,
         ]);
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.
