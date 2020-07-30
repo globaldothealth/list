@@ -1,5 +1,6 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
+import { Typography, makeStyles } from '@material-ui/core';
 
 import { CaseReference } from '../Case';
 import FieldTitle from './FieldTitle';
@@ -7,7 +8,6 @@ import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
-import { Typography, makeStyles } from '@material-ui/core';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
@@ -172,7 +172,9 @@ export function SourcesAutocomplete(
             <Autocomplete
                 itemType="CaseReferenceForm"
                 getOptionLabel={(option: CaseReferenceForm): string =>
-                    option.sourceUrl
+                    // option is a string if the user typed a URL and did not
+                    // select a dropdown value.
+                    typeof option === 'string' ? option : option.sourceUrl
                 }
                 getOptionSelected={(
                     option: CaseReferenceForm,
@@ -185,8 +187,24 @@ export function SourcesAutocomplete(
                 }}
                 onChange={(
                     _: any,
-                    newValue: CaseReferenceForm | null,
+                    newValue: CaseReferenceForm | string | null,
                 ): void => {
+                    // newValue is a string if the user typed a URL and did not
+                    // select a dropdown value.
+                    if (typeof newValue === 'string') {
+                        const existingOption = options.find(
+                            (option) => option.sourceUrl === newValue,
+                        );
+                        newValue = existingOption ?? {
+                            inputValue: newValue,
+                            sourceUrl: newValue,
+                            sourceId: '',
+                            sourceName: '',
+                            additionalSources: ([] as unknown) as [
+                                { sourceUrl: string },
+                            ],
+                        };
+                    }
                     setValue(newValue);
                     setFieldValue(name, newValue);
                 }}
@@ -219,8 +237,9 @@ export function SourcesAutocomplete(
 
                     return filtered;
                 }}
+                autoSelect
+                freeSolo
                 selectOnFocus
-                clearOnBlur
                 handleHomeEndKeys
                 options={options}
                 value={value}
@@ -264,6 +283,7 @@ export function SourcesAutocomplete(
                             className={classes.sourceNameField}
                             label="Source name"
                             name={`${name}.sourceName`}
+                            helperText="Required"
                             type="text"
                             data-testid="sourceName"
                             component={TextField}
