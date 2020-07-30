@@ -18,13 +18,6 @@ _PARSED_CASE = (
             "sourceEntryId": "48765",
             "sourceUrl": _SOURCE_URL
         },
-        "revisionMetadata": {
-            "revisionNumber": 0,
-            "creationMetadata": {
-                "curator": "auto",
-                "date": date.today().strftime("%m/%d/%Y")
-            }
-        },
         "location": {
             "country": "India",
             "administrativeAreaLevel1": "Bihar",

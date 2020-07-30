@@ -43,10 +43,7 @@ const caseSchema = new mongoose.Schema(
             _id: false,
         },
         location: locationSchema,
-        revisionMetadata: {
-            type: revisionMetadataSchema,
-            required: true,
-        },
+        revisionMetadata: revisionMetadataSchema,
         notes: String,
         pathogens: [pathogenSchema],
         preexistingConditions: preexistingConditionsSchema,

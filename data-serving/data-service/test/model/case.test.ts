@@ -30,15 +30,6 @@ describe('validate', () => {
         });
     });
 
-    it('model without revision metadata is invalid', async () => {
-        const noRevisionMetadata = { ...minimalModel };
-        delete noRevisionMetadata.revisionMetadata;
-
-        return new Case(noRevisionMetadata).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
     it('minimal model is valid', async () => {
         return new Case(minimalModel).validate();
     });

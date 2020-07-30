@@ -71,14 +71,7 @@ export function addCase(opts: {
                 status: opts.symptomStatus ?? undefined,
                 values: opts.symptoms ?? [],
             },
-            notes: opts.notes,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: opts.curator || 'test',
-                    date: new Date().toJSON(),
-                },
-            },
+            notes: opts.notes
         },
     });
 }

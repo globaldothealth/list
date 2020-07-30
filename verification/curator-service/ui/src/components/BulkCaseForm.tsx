@@ -303,13 +303,6 @@ class BulkCaseForm extends React.Component<
                 limitToResolution: geoResolutionLimit,
             },
             events: events,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: this.props.user.email,
-                    date: new Date().toISOString(),
-                },
-            },
             caseCount: c.caseCount,
         };
     }
