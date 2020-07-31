@@ -86,7 +86,7 @@ const styles = (theme: Theme) =>
 
 interface BulkCaseFormProps
     extends RouteComponentProps,
-    WithStyles<typeof styles> {
+        WithStyles<typeof styles> {
     user: User;
     onModalClose: () => void;
 }
@@ -187,7 +187,7 @@ const BulkFormSchema = Yup.object().shape({
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-    > {
+> {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -214,9 +214,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                        start: c.dateHospitalized,
-                        end: c.dateHospitalized,
-                    }
+                          start: c.dateHospitalized,
+                          end: c.dateHospitalized,
+                      }
                     : undefined,
                 value: 'Yes',
             });
@@ -305,9 +305,9 @@ class BulkCaseForm extends React.Component<
                 geometry:
                     c.latitude && c.longitude
                         ? {
-                            latitude: c.latitude,
-                            longitude: c.longitude,
-                        }
+                              latitude: c.latitude,
+                              longitude: c.longitude,
+                          }
                         : undefined,
                 name: c.locationName,
                 limitToResolution: geoResolutionLimit,
@@ -357,7 +357,7 @@ class BulkCaseForm extends React.Component<
                 events,
                 geoResolutionLimit,
                 locationQuery,
-                ageRange, 
+                ageRange,
                 caseReference,
             );
         });
@@ -390,14 +390,14 @@ class BulkCaseForm extends React.Component<
             createdIds.length === 0
                 ? ''
                 : createdIds.length === 1
-                    ? '1 new case added. '
-                    : `${createdIds.length} new cases added. `;
+                ? '1 new case added. '
+                : `${createdIds.length} new cases added. `;
         const updatedMessage =
             updatedIds.length === 0
                 ? ''
                 : updatedIds.length === 1
-                    ? '1 case updated. '
-                    : `${updatedIds.length} cases updated. `;
+                ? '1 case updated. '
+                : `${updatedIds.length} cases updated. `;
         this.props.history.push({
             pathname: '/cases',
             state: {

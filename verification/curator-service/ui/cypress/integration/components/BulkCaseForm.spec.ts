@@ -52,6 +52,8 @@ describe('Bulk upload form', function () {
         cy.route('get', '/api/cases/*').as('viewCase');
         cy.get('[title="View this case details"]').click({ force: true });
         cy.wait('@viewCase');
+
+        // Case data
         cy.contains('www.bulksource.com');
         cy.contains('sourceEntryId');
         cy.contains('superuser@test.com');
