@@ -13,9 +13,10 @@ db='covid19'
 collection='cases'
 sample_rate=1
 schema_path="$SCRIPT_PATH/../../data-service/schemas/cases.schema.json"
-index_path="$SCRIPT_PATH/../../data-service/schemas/cases.index.json"
+text_index_path="$SCRIPT_PATH/../../data-service/schemas/cases.textindex.json"
+caseref_index_path="$SCRIPT_PATH/../../data-service/schemas/cases.caserefindex.json"
 
-while getopts :m:d:c:r:s flag
+while getopts :m:d:c:r:s:ti:ci flag
 do
     case "${flag}" in
         m) mongodb_connection_string=${OPTARG};;
@@ -23,7 +24,8 @@ do
         c) collection=${OPTARG};;
         r) sample_rate=${OPTARG};;
         s) schema_path=${OPTARG};;
-        i) index_path=${OPTARG};;
+        ti) text_index_path=${OPTARG};;
+        ci) caseref_index_path=${OPTARG};;
         ?) echo $USAGE; exit 1
     esac
 done
@@ -66,7 +68,8 @@ function setup_db() {
         DB=$db \
         COLL=$collection \
         SCHEMA=$schema_path \
-        INDEX=$index_path \
+        TEXTINDEX=$text_index_path \
+        CASEREFINDEX=$caseref_index_path \
         npm run --prefix $SCRIPT_PATH/../setup-db setup
 }
 
@@ -92,7 +95,8 @@ main() {
     [-c] collection: $collection
     [-r] sample rate: $sample_rate
     [-s] schema path: $schema_path
-    [-i] index path: $index_path"
+    [-ti] text index path: $text_index_path
+    [-ci] case ref index path: $text_index_path"
 
     fetch_latest_data
     convert_data

@@ -15,7 +15,7 @@ declare function quit(): void;
 interface Collection {
     remove: (query: object) => Promise<CommandResult>;
     stats: () => Promise<CollectionStats>;
-    createIndex: (spec: object, options: { name: string }) => Promise<CommandResult>;
+    createIndex: (spec: object, options: { name: string, unique?: boolean, partialFilterExpression?: any }) => Promise<CommandResult>;
     dropIndex: (name: string) => Promise<CommandResult>;
 }
 
