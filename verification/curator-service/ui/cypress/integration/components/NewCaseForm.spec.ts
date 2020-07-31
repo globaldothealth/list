@@ -290,6 +290,20 @@ describe('New case form', function () {
         cy.contains('No records to display');
     });
 
+    it('Can change source URL without changing source name', function () {
+        cy.visit('/cases/new');
+
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
+        cy.get('input[name="caseReference.sourceName"]').type('New source');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com2');
+        cy.contains('li', 'www.example.com2').click();
+        cy.get('input[name="caseReference.sourceName"]').should(
+            'have.value',
+            'New source',
+        );
+    });
+
     it('Check for required fields', function () {
         cy.visit('/cases/new');
 

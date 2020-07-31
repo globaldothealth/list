@@ -2,6 +2,8 @@ import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 import { Typography, makeStyles } from '@material-ui/core';
 
+import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
+import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import { CaseReference } from '../Case';
 import FieldTitle from './FieldTitle';
 import React from 'react';
@@ -115,7 +117,9 @@ export function SourcesAutocomplete(
 
     const [inputValue, setInputValue] = React.useState('');
     const [options, setOptions] = React.useState<CaseReferenceForm[]>([]);
-    const { setFieldValue, setTouched } = useFormikContext();
+    const { setFieldValue, setTouched, values } = useFormikContext<
+        CaseFormValues | BulkCaseFormValues
+    >();
 
     const fetch = React.useMemo(
         () =>
@@ -199,7 +203,7 @@ export function SourcesAutocomplete(
                             inputValue: newValue,
                             sourceUrl: newValue,
                             sourceId: '',
-                            sourceName: '',
+                            sourceName: values.caseReference?.sourceName ?? '',
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
@@ -228,7 +232,7 @@ export function SourcesAutocomplete(
                             inputValue: params.inputValue,
                             sourceUrl: params.inputValue,
                             sourceId: '',
-                            sourceName: '',
+                            sourceName: values.caseReference?.sourceName ?? '',
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
