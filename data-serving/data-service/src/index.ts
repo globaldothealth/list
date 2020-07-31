@@ -3,6 +3,7 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 
+import { Case } from './model/case';
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
@@ -90,6 +91,7 @@ new OpenApiValidator({
             useUnifiedTopology: true,
             useFindAndModify: false,
         });
+        await Case.ensureIndexes();
     } catch (e) {
         console.error('Failed to connect to the database. :(', e);
         process.exit(1);
