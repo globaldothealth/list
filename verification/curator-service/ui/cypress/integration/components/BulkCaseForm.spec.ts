@@ -5,6 +5,15 @@ describe('Bulk upload form', function () {
         cy.task('clearCasesDB', {});
         cy.login();
         cy.seedLocation({
+            country: 'United Kingdom',
+            admin1: 'England',
+            admin2: 'Greater London',
+            admin3: 'London',
+            geometry: { latitude: 51.5072, longitude: -0.1275 },
+            name: 'Banff, Alberta, Canada',
+            geoResolution: 'Admin3',
+        });
+        cy.seedLocation({
             country: 'Canada',
             admin1: 'Alberta',
             admin3: 'Banff',
@@ -14,7 +23,58 @@ describe('Bulk upload form', function () {
         });
     });
 
-    // TODO: Test more fields here via the case details UI.
+    it('Can upload all fields', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
+        cy.visit('/cases');
+        cy.contains('No records to display');
+
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
+        const csvFixture = '../fixtures/bulk_data_with_all_fields.csv';
+        cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@batchUpsert');
+
+        // Check that all relevant fields are visible.
+        // UTC, whereas the linelist table displays them in the browser local
+        // format.
+        cy.contains('No records to display').should('not.exist');
+        cy.contains(
+            'bulk_data_with_all_fields.csv uploaded. 1 new case added.',
+        );
+        cy.server();
+        cy.route('get', '/api/cases/*').as('viewCase');
+        cy.get('[title="View this case details"]').click({ force: true });
+        cy.wait('@viewCase');
+        cy.contains('www.bulksource.com');
+        cy.contains('sourceEntryId');
+        cy.contains('superuser@test.com');
+
+        // Demographics
+        cy.contains('42-43');
+        cy.contains('Male');
+
+        // Location
+        cy.contains('Admin3');
+        cy.contains('London, Greater London, England, United Kingdom');
+
+        // Events
+        // Confirmed case date
+        cy.contains('2020-06-23');
+        // Hospital admission
+        cy.contains('Yes');
+        cy.contains('2020-06-22');
+        // Outcome
+        cy.contains('Recovered');
+        cy.contains('2020-06-24');
+    });
+
     it('Can upload CSV with existing source', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
