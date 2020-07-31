@@ -1,37 +1,33 @@
-import { Case, GenomeSequence, Location, Travel } from './Case';
-import Scroll from 'react-scroll';
 import {
+    Button,
     Grid,
     LinearProgress,
     Paper,
     Typography,
-    Button,
 } from '@material-ui/core';
+import { Case, GenomeSequence, Location, Travel } from './Case';
+import React, { useEffect, useState } from 'react';
 
 import AppModal from './AppModal';
-import MuiAlert from '@material-ui/lab/Alert';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import React from 'react';
-import StaticMap from './StaticMap';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
-import { createStyles } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core';
-import shortId from 'shortid';
-import { withStyles } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
+import MuiAlert from '@material-ui/lab/Alert';
+import Scroll from 'react-scroll';
+import StaticMap from './StaticMap';
+import axios from 'axios';
+import { makeStyles } from '@material-ui/core';
+import shortId from 'shortid';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
-const styles = () =>
-    createStyles({
-        errorMessage: {
-            height: 'fit-content',
-            width: '100%',
-        },
-    });
+const styles = makeStyles((theme) => ({
+    errorMessage: {
+        height: 'fit-content',
+        width: '100%',
+    },
+}));
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
     id: string;
     enableEdit?: boolean;
     onModalClose: () => void;
@@ -43,48 +39,43 @@ interface State {
     loading: boolean;
 }
 
-class ViewCase extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = { loading: false };
-    }
-    componentDidMount(): void {
-        this.setState({ loading: true });
+export default function ViewCase(props: Props): JSX.Element {
+    const [c, setCase] = useState<Case>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>();
+
+    useEffect(() => {
+        setLoading(true);
         axios
-            .get<Case>(`/api/cases/${this.props.id}`)
+            .get<Case>(`/api/cases/${props.id}`)
             .then((resp) => {
-                this.setState({ case: resp.data, errorMessage: undefined });
+                setCase(resp.data);
+                setErrorMessage(undefined);
             })
             .catch((e) => {
-                this.setState({ case: undefined, errorMessage: e.message });
+                setCase(undefined);
+                setErrorMessage(e.message);
             })
-            .finally(() => this.setState({ loading: false }));
-    }
+            .finally(() => setLoading(false));
+    }, [props.id]);
 
-    render(): JSX.Element {
-        const { classes } = this.props;
-        return (
-            <AppModal title="View case" onModalClose={this.props.onModalClose}>
-                {this.state.loading && <LinearProgress />}
-                {this.state.errorMessage && (
-                    <MuiAlert
-                        className={classes.errorMessage}
-                        elevation={6}
-                        variant="filled"
-                        severity="error"
-                    >
-                        {this.state.errorMessage}
-                    </MuiAlert>
-                )}
-                {this.state.case && (
-                    <CaseDetails
-                        enableEdit={this.props.enableEdit}
-                        c={this.state.case}
-                    />
-                )}
-            </AppModal>
-        );
-    }
+    const classes = styles();
+    return (
+        <AppModal title="View case" onModalClose={props.onModalClose}>
+            {loading && <LinearProgress />}
+            {errorMessage && (
+                <MuiAlert
+                    className={classes.errorMessage}
+                    elevation={6}
+                    variant="filled"
+                    severity="error"
+                >
+                    {errorMessage}
+                </MuiAlert>
+            )}
+            {c && <CaseDetails enableEdit={props.enableEdit} c={c} />}
+        </AppModal>
+    );
 }
 
 interface CaseDetailsProps {
@@ -786,5 +777,3 @@ function createHref(rawLink: string): string {
     if (rawLink.startsWith('/')) return rawLink;
     return rawLink.match(/^https?:\/\//) ? rawLink : 'https://'.concat(rawLink);
 }
-
-export default withStyles(styles)(ViewCase);
