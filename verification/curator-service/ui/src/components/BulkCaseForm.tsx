@@ -273,7 +273,7 @@ class BulkCaseForm extends React.Component<
         if (c.ageRange?.match(/\d*-\d*/)) {
             const startEnd = c.ageRange.split('-');
             ageRangeStart = startEnd[0] ? Number(startEnd[0]) : undefined;
-            ageRangeEnd = startEnd[0] ? Number(startEnd[0]) : undefined;
+            ageRangeEnd = startEnd[1] ? Number(startEnd[1]) : undefined;
         }
         return { start: ageRangeStart, end: ageRangeEnd };
     }

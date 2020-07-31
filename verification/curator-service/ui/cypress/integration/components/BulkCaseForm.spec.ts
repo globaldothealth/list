@@ -42,8 +42,6 @@ describe('Bulk upload form', function () {
         cy.wait('@batchUpsert');
 
         // Check that all relevant fields are visible.
-        // UTC, whereas the linelist table displays them in the browser local
-        // format.
         cy.contains('No records to display').should('not.exist');
         cy.contains(
             'bulk_data_with_all_fields.csv uploaded. 1 new case added.',
