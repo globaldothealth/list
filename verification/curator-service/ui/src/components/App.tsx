@@ -10,6 +10,7 @@ import {
     useMediaQuery,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -19,6 +20,7 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import HomeIcon from '@material-ui/icons/Home';
+import LanguageIcon from '@material-ui/icons/Language';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -27,10 +29,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
-import React, { useState, useEffect } from 'react';
+import ReportIcon from '@material-ui/icons/Report';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import User from './User';
@@ -52,6 +55,68 @@ const theme = createMuiTheme({
 });
 
 const drawerWidth = 240;
+
+const menuStyles = makeStyles((theme) => ({
+    menu: {
+        marginLeft: '1em',
+    },
+    link: {
+        color: theme.palette.text.primary,
+    },
+}));
+
+function TopbarMenu(): JSX.Element {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const classes = menuStyles();
+
+    return (
+        <div className={classes.menu}>
+            <IconButton
+                aria-controls="topbar-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+            >
+                <MoreVertIcon />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={handleClose}>
+                    <a
+                        className={classes.link}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        href="https://global.health"
+                    >
+                        About Global.Health
+                    </a>
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <a
+                        className={classes.link}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        href="https://github.com/globaldothealth/list/issues/new/choose"
+                    >
+                        Report an issue
+                    </a>
+                </MenuItem>
+            </Menu>
+        </div>
+    );
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -103,6 +168,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '70%',
     },
 }));
+
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User>({
@@ -202,6 +268,7 @@ export default function App(): JSX.Element {
                                 Login
                             </Button>
                         )}
+                        <TopbarMenu />
                     </Toolbar>
                 </AppBar>
                 <Drawer
