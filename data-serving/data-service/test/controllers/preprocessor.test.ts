@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
+import {
+    createCaseRevision,
+    setRevisionMetadata,
+} from '../../src/controllers/preprocessor';
 
 import { Case } from '../../src/model/case';
+import { CaseRevision } from '../../src/model/case-revision';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
-import { setRevisionMetadata } from '../../src/controllers/preprocessor';
 import supertest from 'supertest';
 
 let mongoServer: MongoMemoryServer;
@@ -17,9 +21,10 @@ beforeAll(() => {
         .mockImplementation(() => Date.parse('2020-03-03'));
 });
 
-beforeEach(() => {
+beforeEach(async () => {
     supertest.agent(app);
-    return Case.deleteMany({});
+    await Case.deleteMany({});
+    return CaseRevision.deleteMany({});
 });
 
 afterAll(() => {
@@ -40,6 +45,7 @@ describe('create', () => {
             nextFn,
         );
 
+        expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
             ...minimalCase,
             revisionMetadata: {
@@ -50,6 +56,21 @@ describe('create', () => {
                 },
             },
         });
+    });
+    it('does not create a case revision', async () => {
+        const requestBody = {
+            ...minimalCase,
+            curator: { email: 'creator@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createCaseRevision(
+            { body: requestBody, method: 'POST' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });
 
@@ -82,6 +103,7 @@ describe('update', () => {
             nextFn,
         );
 
+        expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
             ...minimalCase,
             revisionMetadata: {
@@ -145,6 +167,40 @@ describe('update', () => {
             },
         });
     });
+    it('creates a case revision', async () => {
+        const c = new Case({
+            ...minimalCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const requestBody = {
+            ...minimalCase,
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createCaseRevision(
+            {
+                body: requestBody,
+                method: 'PUT',
+                params: { id: c._id },
+            } as Request<any>,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+    });
 });
 
 describe('upsert', () => {
@@ -167,6 +223,7 @@ describe('upsert', () => {
             nextFn,
         );
 
+        expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
             ...upsertCase,
             revisionMetadata: {
@@ -209,6 +266,7 @@ describe('upsert', () => {
             nextFn,
         );
 
+        expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
             ...upsertCase,
             revisionMetadata: {
@@ -223,5 +281,64 @@ describe('upsert', () => {
                 },
             },
         });
+    });
+    it('with no existing case does not create a case revision', async () => {
+        const upsertCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id',
+            },
+        };
+        const requestBody = {
+            ...upsertCase,
+            curator: { email: 'creator@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createCaseRevision(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+    });
+    it('with existing case creates a case revision', async () => {
+        const upsertCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id',
+            },
+        };
+        const c = new Case({
+            ...upsertCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const requestBody = {
+            ...upsertCase,
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createCaseRevision(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
     });
 });
