@@ -5,7 +5,8 @@ interface SetupDatabaseParameters {
     databaseName: string;
     collectionName: string;
     schemaPath: string;
-    indexPath: string;
+    textIndexPath: string;
+    caseRefIndexPath: string;
     /** If not specified, deletes only imported documents. Defaults to false. */
     deleteAllDocuments: boolean;
 }
@@ -15,15 +16,19 @@ const setupDatabase = async ({
     databaseName,
     collectionName,
     schemaPath,
-    indexPath,
+    textIndexPath,
+    caseRefIndexPath,
     deleteAllDocuments = false,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
         print(`Read schema from ${schemaPath}`);
 
-        const index = JSON.parse(await cat(indexPath));
-        print(`Read index from ${indexPath}`);
+        const textIndex = JSON.parse(await cat(textIndexPath));
+        print(`Read text index from ${textIndexPath}`);
+
+        const caseRefIndex = JSON.parse(await cat(caseRefIndexPath));
+        print(`Read caseRef index from ${caseRefIndexPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
@@ -68,11 +73,22 @@ const setupDatabase = async ({
         }
 
         print('Dropping indexes 👇');
-        const indexName = `${collectionName}Idx`;
-        await collection.dropIndex(indexName);
+        const textIndexName = `${collectionName}Idx`;
+        await collection.dropIndex(textIndexName);
+        const caseRefIndexName = `${collectionName}CaseRefIdx`;
+        await collection.dropIndex(caseRefIndexName);
 
         print('Creating indexes 👆');
-        await collection.createIndex(index, { name: indexName });
+        await collection.createIndex(textIndex, { name: textIndexName });
+        await collection.createIndex(caseRefIndex, {
+            name: caseRefIndexName,
+            unique: true,
+            partialFilterExpression: {
+                'caseReference.sourceEntryId': {
+                    $exists: true,
+                },
+            },
+        });
         print('Done 👍');
 
         // Print some stats -- for fun and confirmation!
