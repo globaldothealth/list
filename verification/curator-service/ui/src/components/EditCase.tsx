@@ -1,8 +1,9 @@
+import React, { useEffect, useState } from 'react';
+
 import { Case } from './Case';
 import CaseForm from './CaseForm';
 import { LinearProgress } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import React from 'react';
 import User from './User';
 import axios from 'axios';
 
@@ -18,43 +19,41 @@ interface State {
     loading: boolean;
 }
 
-class EditCase extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = { loading: false };
-    }
-    componentDidMount(): void {
-        this.setState({ loading: true });
+export default function EditCase(props: Props): JSX.Element {
+    const [c, setCase] = useState<Case>();
+    const [loading, setLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>();
+
+    useEffect(() => {
+        setLoading(true);
         axios
-            .get<Case>(`/api/cases/${this.props.id}`)
+            .get<Case>(`/api/cases/${props.id}`)
             .then((resp) => {
-                this.setState({ case: resp.data, errorMessage: undefined });
+                setCase(resp.data);
+                setErrorMessage(undefined);
             })
             .catch((e) => {
-                this.setState({ case: undefined, errorMessage: e.message });
+                setCase(undefined);
+                setErrorMessage(e.message);
             })
-            .finally(() => this.setState({ loading: false }));
-    }
+            .finally(() => setLoading(false));
+    }, [props.id]);
 
-    render(): JSX.Element {
-        return (
-            <div>
-                {this.state.loading && <LinearProgress />}
-                {this.state.errorMessage && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
-                        {this.state.errorMessage}
-                    </MuiAlert>
-                )}
-                {this.state.case && (
-                    <CaseForm
-                        user={this.props.user}
-                        initialCase={this.state.case}
-                        onModalClose={this.props.onModalClose}
-                    />
-                )}
-            </div>
-        );
-    }
+    return (
+        <div>
+            {loading && <LinearProgress />}
+            {errorMessage && (
+                <MuiAlert elevation={6} variant="filled" severity="error">
+                    {errorMessage}
+                </MuiAlert>
+            )}
+            {c && (
+                <CaseForm
+                    user={props.user}
+                    initialCase={c}
+                    onModalClose={props.onModalClose}
+                />
+            )}
+        </div>
+    );
 }
-
-export default EditCase;
