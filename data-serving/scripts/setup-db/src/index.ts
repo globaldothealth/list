@@ -28,7 +28,7 @@ const setupDatabase = async ({
         print(`Read text index from ${textIndexPath}`);
 
         const caseRefIndex = JSON.parse(await cat(caseRefIndexPath));
-        print(`Read text index from ${caseRefIndexPath}`);
+        print(`Read caseRef index from ${caseRefIndexPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
