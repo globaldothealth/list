@@ -7,6 +7,7 @@ const editMetadataSchema = new mongoose.Schema(
         curator: {
             type: String,
             required: true,
+            index: true,
         },
         date: {
             ...dateFieldInfo,
