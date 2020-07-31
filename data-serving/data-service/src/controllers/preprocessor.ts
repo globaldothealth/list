@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { CaseRevision } from '../model/case-revision';
 import { RevisionMetadata } from '../model/revision-metadata';
+import { findCasesWithCaseReferenceData } from './case';
 
 const createNewMetadata = (curatorEmail: string) => {
     return {
@@ -61,16 +62,42 @@ export const setRevisionMetadata = async (
 ) => {
     const curatorEmail = request.body.curator.email;
 
-    // Find the case if it already exists so we can update its existing
+    // Find the case(s) if it/they already exists so we can update existing
     // metadata.
-    const c = await getCase(request);
+    if (request.body.cases) {
+        // Batch upsert.
+        const existingCases = await findCasesWithCaseReferenceData(request);
+        const metadataMap = new Map(
+            existingCases
+                .filter((c) => c && c.caseReference)
+                .map((c) => [
+                    c.caseReference.sourceId +
+                        ':' +
+                        c.caseReference.sourceEntryId,
+                    createUpdateMetadata(c, curatorEmail),
+                ]),
+        );
+        // Set the request cases' revision metadata to the update metadata, if
+        // present, or create metadata otherwise.
+        request.body.cases.forEach((c: any) => {
+            c.revisionMetadata =
+                metadataMap.get(
+                    c.caseReference?.sourceId +
+                        ':' +
+                        c.caseReference?.sourceEntryId,
+                ) || createNewMetadata(curatorEmail);
+        });
+    } else {
+        // Single case update or upsert.
+        const c = await getCase(request);
 
-    // Set the correct, server-generated revisionMetadata for subsequent
-    // processors to use.
-    const revisionMetadata = c
-        ? createUpdateMetadata(c, curatorEmail)
-        : createNewMetadata(curatorEmail);
-    request.body.revisionMetadata = revisionMetadata;
+        // Set the correct, server-generated revisionMetadata for subsequent
+        // processors to use.
+        const revisionMetadata = c
+            ? createUpdateMetadata(c, curatorEmail)
+            : createNewMetadata(curatorEmail);
+        request.body.revisionMetadata = revisionMetadata;
+    }
 
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;

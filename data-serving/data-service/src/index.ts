@@ -66,7 +66,11 @@ new OpenApiValidator({
         apiRouter.get('/cases/symptoms', caseController.listSymptoms);
         apiRouter.post('/cases', setRevisionMetadata, caseController.create);
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
-        apiRouter.post('/cases/batchUpsert', caseController.batchUpsert);
+        apiRouter.post(
+            '/cases/batchUpsert',
+            setRevisionMetadata,
+            caseController.batchUpsert,
+        );
         apiRouter.put(
             '/cases',
             setRevisionMetadata,
