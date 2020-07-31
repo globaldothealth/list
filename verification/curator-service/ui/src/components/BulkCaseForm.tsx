@@ -10,14 +10,12 @@ import { Case, CaseReference, Event } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import Source, {
-    CaseReferenceForm,
-    submitSource,
-} from './common-form-fields/Source';
+import Source, { submitSource } from './common-form-fields/Source';
 import { Theme, createStyles } from '@material-ui/core/styles';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
+import BulkCaseFormValues from './bulk-case-form-fields/BulkCaseFormValues';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
@@ -96,10 +94,6 @@ interface BulkCaseFormProps
 interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
-}
-interface BulkCaseFormValues {
-    file: File | null;
-    caseReference?: CaseReferenceForm;
 }
 
 /**
