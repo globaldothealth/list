@@ -175,13 +175,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 'source url',
                                             ].join(', ')}
                                             <h5>Keywords search</h5>
-                                            Example:
+                                            Example:{' '}
                                             <i>
                                                 curator:foo@bar.com,fez@meh.org
                                                 country:Japan gender:female
                                                 occupation:"healthcare worker"
                                             </i>
-                                            values are OR'ed for the same
+                                            <br />
+                                            Values are OR'ed for the same
                                             keyword and all keywords are AND'ed.
                                             <br />
                                             Keyword values can be quoted for
