@@ -10,7 +10,7 @@ describe('Bulk upload form', function () {
             admin2: 'Greater London',
             admin3: 'London',
             geometry: { latitude: 51.5072, longitude: -0.1275 },
-            name: 'Banff, Alberta, Canada',
+            name: 'London, Greater London, England, United Kingdom',
             geoResolution: 'Admin3',
         });
         cy.seedLocation({
