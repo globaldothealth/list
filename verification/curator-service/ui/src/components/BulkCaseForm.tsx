@@ -468,7 +468,7 @@ class BulkCaseForm extends React.Component<
                                     successful entries.{' '}
                                     {/* TODO: Host the final CSV template. */}
                                     <a
-                                        href="https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE"
+                                        href="https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE/export?format=csv"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
