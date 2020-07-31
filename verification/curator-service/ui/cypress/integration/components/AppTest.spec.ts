@@ -100,7 +100,7 @@ describe('App', function () {
         cy.contains('Create new COVID-19 line list case');
         cy.url().should('eq', 'http://localhost:3002/cases/new');
         cy.get('button[aria-label="close overlay"').click();
-        cy.url().should('eq', 'http://localhost:3002/cases');
+        cy.url().should('eq', 'http://localhost:3002/');
     });
 
     it('Can open bulk upload modal from create new button', function () {
@@ -111,6 +111,23 @@ describe('App', function () {
         cy.contains('li', 'New bulk upload').click();
         cy.contains('New bulk upload');
         cy.url().should('eq', 'http://localhost:3002/cases/bulk');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
+    it('Closing modal shows previous page', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/sources');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New line list case').click();
+        cy.url().should('eq', 'http://localhost:3002/cases/new');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/sources');
+    });
+
+    it('Closing modal navigates to /cases if there is no previous location', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/cases/new');
         cy.get('button[aria-label="close overlay"').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
     });
