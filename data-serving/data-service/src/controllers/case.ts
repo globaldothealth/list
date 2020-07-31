@@ -226,7 +226,7 @@ export const batchUpsert = async (
                                 'caseReference.sourceEntryId':
                                     c.caseReference.sourceEntryId,
                             },
-                            update: { $set: { c } },
+                            update: c,
                             upsert: true,
                         },
                     };
