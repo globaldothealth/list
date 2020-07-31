@@ -1,6 +1,7 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
+import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
@@ -217,7 +218,9 @@ interface RequiredHelperTextProps {
 export function RequiredHelperText(
     props: RequiredHelperTextProps,
 ): JSX.Element {
-    const { values, touched } = useFormikContext<CaseFormValues>();
+    const { values, touched } = useFormikContext<
+        CaseFormValues | BulkCaseFormValues
+    >();
     return (
         <div>
             <FormHelperText
@@ -226,8 +229,7 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null ||
-                        values[props.name] === '')
+                        values[props.name] === null)
                 }
             >
                 Required
