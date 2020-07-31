@@ -1,10 +1,11 @@
 import * as fullCase from './fixtures/fullCase.json';
 
+import { fireEvent, render } from '@testing-library/react';
+
 import React from 'react';
+import { Router } from 'react-router-dom';
 import ViewCase from './ViewCase';
 import axios from 'axios';
-import { render, fireEvent } from '@testing-library/react';
-import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
@@ -173,7 +174,7 @@ it('does not show the edit button when not enabled', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { queryByText } = render(
+    const { queryByText, findByText } = render(
         <ViewCase
             id="abc123"
             onModalClose={(): void => {
@@ -183,6 +184,9 @@ it('does not show the edit button when not enabled', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
+    expect(
+        await findByText(/Case 5ef8e943dfe6e00030892d58/),
+    ).toBeInTheDocument();
     expect(queryByText('Edit')).toBeNull();
 });
 
