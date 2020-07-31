@@ -1,17 +1,18 @@
+import { Button, Theme, Tooltip, withStyles } from '@material-ui/core';
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { Button } from '@material-ui/core';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import TextField from '@material-ui/core/TextField';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
-import SearchIcon from '@material-ui/icons/SearchOutlined';
+import HelpIcon from '@material-ui/icons/HelpOutline';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { Link } from 'react-router-dom';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
+import SearchIcon from '@material-ui/icons/SearchOutlined';
+import TextField from '@material-ui/core/TextField';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
@@ -76,6 +77,12 @@ interface Props extends RouteComponentProps<never, never, LocationState> {
     user: User;
 }
 
+const HtmlTooltip = withStyles((theme: Theme) => ({
+    tooltip: {
+        maxWidth: '500px',
+    },
+}))(Tooltip);
+
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
     unlisten: () => void;
@@ -138,6 +145,80 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
+                            </InputAdornment>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <HtmlTooltip
+                                    title={
+                                        <React.Fragment>
+                                            <h4>Search syntax</h4>
+                                            <h5>Full text search</h5>
+                                            Example:{' '}
+                                            <i>"got infected at work" -India</i>
+                                            <br />
+                                            You can use arbitrary strings to
+                                            search over those text fields:
+                                            {[
+                                                'notes',
+                                                'curator',
+                                                'occupation',
+                                                'nationalities',
+                                                'ethnicity',
+                                                'country',
+                                                'admin1',
+                                                'admin2',
+                                                'admin3',
+                                                'place',
+                                                'location name',
+                                                'pathogen name',
+                                                'source url',
+                                            ].join(', ')}
+                                            <h5>Keywords search</h5>
+                                            Example:{' '}
+                                            <i>
+                                                curator:foo@bar.com,fez@meh.org
+                                                country:Japan gender:female
+                                                occupation:"healthcare worker"
+                                            </i>
+                                            <br />
+                                            Values are OR'ed for the same
+                                            keyword and all keywords are AND'ed.
+                                            <br />
+                                            Keyword values can be quoted for
+                                            multi-words matches and concatenated
+                                            with a comma to union them.
+                                            <br />
+                                            Only equality operator is supported.
+                                            <br />
+                                            Supported keywords are: <br />
+                                            <ul>
+                                                {[
+                                                    'curator',
+                                                    'gender',
+                                                    'nationality',
+                                                    'occupation',
+                                                    'country',
+                                                    'outcome',
+                                                    'caseid',
+                                                    'source',
+                                                    'admin1',
+                                                    'admin2',
+                                                    'admin3',
+                                                ].map(
+                                                    (e): JSX.Element => {
+                                                        return (
+                                                            <li key={e}>{e}</li>
+                                                        );
+                                                    },
+                                                )}
+                                            </ul>
+                                        </React.Fragment>
+                                    }
+                                    placement="left"
+                                >
+                                    <HelpIcon />
+                                </HtmlTooltip>
                             </InputAdornment>
                         ),
                     }}
