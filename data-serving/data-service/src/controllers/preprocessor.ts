@@ -78,7 +78,7 @@ export const setRevisionMetadata = async (
     next();
 };
 
-export const writeRevision = async (
+export const createCaseRevision = async (
     request: Request,
     response: Response,
     next: NextFunction,
@@ -87,7 +87,7 @@ export const writeRevision = async (
 
     if (c) {
         await new CaseRevision({
-            case: c
+            case: c,
         }).save();
     }
 

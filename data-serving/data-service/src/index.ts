@@ -2,7 +2,10 @@ import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
-import { setRevisionMetadata, writeRevision } from './controllers/preprocessor';
+import {
+    createCaseRevision,
+    setRevisionMetadata,
+} from './controllers/preprocessor';
 
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
@@ -66,13 +69,13 @@ new OpenApiValidator({
         apiRouter.put(
             '/cases',
             setRevisionMetadata,
-            writeRevision,
+            createCaseRevision,
             caseController.upsert,
         );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
             setRevisionMetadata,
-            writeRevision,
+            createCaseRevision,
             caseController.update,
         );
         apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
