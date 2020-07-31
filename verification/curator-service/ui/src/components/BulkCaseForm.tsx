@@ -86,7 +86,7 @@ const styles = (theme: Theme) =>
 
 interface BulkCaseFormProps
     extends RouteComponentProps,
-        WithStyles<typeof styles> {
+    WithStyles<typeof styles> {
     user: User;
     onModalClose: () => void;
 }
@@ -94,6 +94,11 @@ interface BulkCaseFormProps
 interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
+}
+
+interface AgeRange {
+    start?: number;
+    end?: number;
 }
 
 /**
@@ -113,6 +118,8 @@ interface RawParsedCase {
 
     // Demographics
     gender?: string;
+    // Convenience field to provide age range in $start-$end format.
+    ageRange?: string;
     ageRangeStart?: number;
     ageRangeEnd?: number;
 
@@ -180,7 +187,7 @@ const BulkFormSchema = Yup.object().shape({
 class BulkCaseForm extends React.Component<
     BulkCaseFormProps,
     BulkCaseFormState
-> {
+    > {
     constructor(props: BulkCaseFormProps) {
         super(props);
         this.state = {
@@ -207,9 +214,9 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                          start: c.dateHospitalized,
-                          end: c.dateHospitalized,
-                      }
+                        start: c.dateHospitalized,
+                        end: c.dateHospitalized,
+                    }
                     : undefined,
                 value: 'Yes',
             });
@@ -260,11 +267,23 @@ class BulkCaseForm extends React.Component<
             .join(', ');
     }
 
+    createAgeRange(c: RawParsedCase): AgeRange {
+        let ageRangeStart = c.ageRangeStart;
+        let ageRangeEnd = c.ageRangeEnd;
+        if (c.ageRange?.match(/\d*-\d*/)) {
+            const startEnd = c.ageRange.split('-');
+            ageRangeStart = startEnd[0] ? Number(startEnd[0]) : undefined;
+            ageRangeEnd = startEnd[0] ? Number(startEnd[0]) : undefined;
+        }
+        return { start: ageRangeStart, end: ageRangeEnd };
+    }
+
     createCaseObject(
         c: RawParsedCase,
         events: Event[],
         geoResolutionLimit: string,
         locationQuery: string,
+        ageRange: AgeRange,
         caseReference: CaseReference,
     ): CompleteParsedCase {
         return {
@@ -275,10 +294,7 @@ class BulkCaseForm extends React.Component<
             },
             demographics: {
                 gender: c.gender,
-                ageRange: {
-                    start: c.ageRangeStart,
-                    end: c.ageRangeEnd,
-                },
+                ageRange: ageRange,
             },
             location: {
                 country: c.country,
@@ -289,9 +305,9 @@ class BulkCaseForm extends React.Component<
                 geometry:
                     c.latitude && c.longitude
                         ? {
-                              latitude: c.latitude,
-                              longitude: c.longitude,
-                          }
+                            latitude: c.latitude,
+                            longitude: c.longitude,
+                        }
                         : undefined,
                 name: c.locationName,
                 limitToResolution: geoResolutionLimit,
@@ -335,11 +351,13 @@ class BulkCaseForm extends React.Component<
             const geoResolutionLimit = this.createGeoResolutionLimit(c);
             const locationQuery = this.createLocationQuery(c);
             const events = this.createEvents(c);
+            const ageRange = this.createAgeRange(c);
             return this.createCaseObject(
                 c,
                 events,
                 geoResolutionLimit,
                 locationQuery,
+                ageRange, 
                 caseReference,
             );
         });
@@ -372,14 +390,14 @@ class BulkCaseForm extends React.Component<
             createdIds.length === 0
                 ? ''
                 : createdIds.length === 1
-                ? '1 new case added. '
-                : `${createdIds.length} new cases added. `;
+                    ? '1 new case added. '
+                    : `${createdIds.length} new cases added. `;
         const updatedMessage =
             updatedIds.length === 0
                 ? ''
                 : updatedIds.length === 1
-                ? '1 case updated. '
-                : `${updatedIds.length} cases updated. `;
+                    ? '1 case updated. '
+                    : `${updatedIds.length} cases updated. `;
         this.props.history.push({
             pathname: '/cases',
             state: {
