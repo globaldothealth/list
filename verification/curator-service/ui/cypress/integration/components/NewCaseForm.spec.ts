@@ -38,7 +38,7 @@ describe('New case form', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('www.example.com');
             cy.contains('France');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
         });
     });
 
@@ -69,7 +69,7 @@ describe('New case form', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('www.new-source.com');
             cy.contains('France');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
 
             cy.visit('/sources');
             cy.contains('www.new-source.com');
@@ -102,7 +102,7 @@ describe('New case form', function () {
         cy.contains('3 cases added');
         cy.contains('No records to display').should('not.exist');
         cy.get('td:contains("www.example.com")').should('have.length', 3);
-        cy.get('td:contains("1/1/2020")').should('have.length', 3);
+        cy.get('td:contains("2020-1-1")').should('have.length', 3);
     });
 
     it('Can submit events without dates', function () {
@@ -143,7 +143,7 @@ describe('New case form', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('www.example.com');
             cy.contains('France');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
             cy.contains('Yes');
             cy.contains('Recovered');
         });
@@ -353,7 +353,7 @@ describe('New case form', function () {
             cy.contains('www.example.com');
             cy.contains('France');
             cy.contains('Paris');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
         });
     });
 });

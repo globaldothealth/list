@@ -171,7 +171,7 @@ describe('Curator', function () {
             cy.contains('Afghan, Albanian');
             cy.contains('Accountant');
             cy.contains('Frankreich');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
             cy.contains('dry cough, mild fever');
             cy.contains('Airborne infection');
             cy.contains('Test route');
@@ -330,12 +330,12 @@ describe('Curator', function () {
             cy.contains('45.7589');
             cy.contains('4.8414');
             // Events.
-            cy.contains('2020-01-01');
-            cy.contains('2020-01-02');
-            cy.contains('2020-01-03');
-            cy.contains('2020-01-04');
-            cy.contains('2020-01-05');
-            cy.contains('2020-01-06');
+            cy.contains('2020-1-1');
+            cy.contains('2020-1-2');
+            cy.contains('2020-1-3');
+            cy.contains('2020-1-4');
+            cy.contains('2020-1-5');
+            cy.contains('2020-1-6');
             cy.contains('PCR test');
             cy.contains('Recovered');
             cy.contains('Yes');
