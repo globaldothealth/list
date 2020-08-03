@@ -16,6 +16,7 @@ import Scroll from 'react-scroll';
 import StaticMap from './StaticMap';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core';
+import renderDate from './util/date';
 import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
@@ -126,8 +127,8 @@ function dateRange(range?: { start?: string; end?: string }): string {
         return '';
     }
     return range.start === range.end
-        ? `${range.start}`
-        : `${range.start} - ${range.end}`;
+        ? renderDate(range.start)
+        : `${renderDate(range.start)} - ${renderDate(range.end)}`;
 }
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
@@ -278,10 +279,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Date of creation" />
                             <RowContent
-                                content={
+                                content={renderDate(
                                     props.c.revisionMetadata?.creationMetadata
-                                        ?.date || ''
-                                }
+                                        ?.date,
+                                )}
                             />
 
                             <RowHeader title="Created by" />
@@ -296,10 +297,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 <>
                                     <RowHeader title="Date of edit" />
                                     <RowContent
-                                        content={
+                                        content={renderDate(
                                             props.c.revisionMetadata
-                                                ?.updateMetadata?.date || ''
-                                        }
+                                                ?.updateMetadata?.date,
+                                        )}
                                     />
 
                                     <RowHeader title="Edited by" />
@@ -636,7 +637,9 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
     return (
         <>
             <RowHeader title="Date of sample collection" />
-            <RowContent content={props.sequence?.sampleCollectionDate || ''} />
+            <RowContent
+                content={renderDate(props.sequence?.sampleCollectionDate)}
+            />
 
             <RowHeader title="Genome sequence repository" />
             <RowContent content={props.sequence?.repositoryUrl || ''} isLink />
