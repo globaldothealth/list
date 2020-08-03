@@ -40,6 +40,7 @@ import ViewCase from './ViewCase';
 import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { useLastLocation } from 'react-router-last-location';
 
 const theme = createMuiTheme({
     palette: {
@@ -180,6 +181,7 @@ export default function App(): JSX.Element {
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
+    const lastLocation = useLastLocation();
 
     useEffect(() => {
         setDrawerOpen(showMenu);
@@ -219,6 +221,14 @@ export default function App(): JSX.Element {
 
     const closeCreateNewPopup = (): void => {
         setCreateNewButtonAnchorEl(undefined);
+    };
+
+    const onModalClose = (): void => {
+        if (lastLocation) {
+            history.goBack();
+        } else {
+            history.push('/cases');
+        }
     };
 
     useEffect(() => {
@@ -408,9 +418,7 @@ export default function App(): JSX.Element {
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
                                     user={user}
-                                    onModalClose={(): void =>
-                                        history.push('/cases')
-                                    }
+                                    onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
@@ -418,9 +426,7 @@ export default function App(): JSX.Element {
                             <Route path="/cases/new">
                                 <CaseForm
                                     user={user}
-                                    onModalClose={(): void =>
-                                        history.push('/cases')
-                                    }
+                                    onModalClose={onModalClose}
                                 />
                             </Route>
                         )}
@@ -432,9 +438,7 @@ export default function App(): JSX.Element {
                                         <EditCase
                                             id={match.params.id}
                                             user={user}
-                                            onModalClose={(): void =>
-                                                history.push('/cases')
-                                            }
+                                            onModalClose={onModalClose}
                                         />
                                     );
                                 }}
@@ -448,9 +452,7 @@ export default function App(): JSX.Element {
                                         <ViewCase
                                             id={match.params.id}
                                             enableEdit={hasAnyRole(['curator'])}
-                                            onModalClose={(): void =>
-                                                history.push('/cases')
-                                            }
+                                            onModalClose={onModalClose}
                                         />
                                     );
                                 }}
