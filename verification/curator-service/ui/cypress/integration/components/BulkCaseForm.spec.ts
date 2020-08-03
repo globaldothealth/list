@@ -23,7 +23,7 @@ describe('Bulk upload form', function () {
         });
     });
 
-    it('Can upload all fields', function () {
+    it.only('Can upload all fields', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
         cy.visit('/cases');
@@ -59,20 +59,36 @@ describe('Bulk upload form', function () {
         // Demographics
         cy.contains('42-43');
         cy.contains('Male');
+        cy.contains('Accountant');
+        cy.contains('Bangladeshi');
+        cy.contains('British, Indian');
 
         // Location
-        cy.contains('Admin3');
         cy.contains('London, Greater London, England, United Kingdom');
+        cy.contains('Admin3');
 
         // Events
-        // Confirmed case date
+        // Confirmation
         cy.contains('2020-06-23');
+        cy.contains('PCR test');
+        // Symptom onset
+        cy.contains('2020-06-19');
         // Hospital admission
         cy.contains('Yes');
+        cy.contains('2020-06-21');
+        // ICU admission
         cy.contains('2020-06-22');
         // Outcome
         cy.contains('Recovered');
         cy.contains('2020-06-24');
+
+        // Symptoms
+        cy.contains('Symptomatic');
+        cy.contains('cough, fever');
+
+        // Preexisting conditions
+        cy.contains('Yes');
+        cy.contains('Lyme disease, COPD');
     });
 
     it('Can upload CSV with existing source', function () {
