@@ -177,7 +177,10 @@ export default class CasesController {
             // 3. Batch upsert.
             const upsertResponse = await axios.post(
                 this.dataServerURL + '/api/cases/batchUpsert',
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
                 { maxContentLength: Infinity },
             );
             res.status(200).send({

@@ -183,7 +183,10 @@ export const findCasesWithCaseReferenceData = async (
         });
 
     return providedCaseReferenceData.length > 0
-        ? await Case.find().or(providedCaseReferenceData).exec()
+        ? Case.find()
+              .or(providedCaseReferenceData)
+              .select({ _id: 1, caseReference: 1, revisionMetadata: 1 })
+              .exec()
         : [];
 };
 
