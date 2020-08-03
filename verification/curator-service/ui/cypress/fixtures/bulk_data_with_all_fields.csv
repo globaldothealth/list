@@ -1,0 +1,2 @@
+sourceEntryId,gender,ageRange,country,admin1,admin2,admin3,dateConfirmed,hospitalized,dateHospitalized,outcome,dateOutcome,caseCount
+sourceEntryId,Male,42-43,United Kingdom,England,Greater London,London,06/23/2020,true,06/22/2020,Recovered,06/24/2020,1
