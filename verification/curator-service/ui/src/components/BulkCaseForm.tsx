@@ -134,18 +134,18 @@ interface RawParsedCase {
 
     // Events
     dateConfirmed: string;
+    confirmationMethod?: string;
     hospitalized?: boolean;
     dateHospitalized?: string;
     icuAdmission?: boolean;
     dateIcuAdmission?: string;
     outcome?: string;
     dateOutcome?: string;
-    confirmationMethod?: string;
     dateSymptomOnset?: string;
 
     // Preexisting conditions
-    preexistingConditions?: string; // semicolon delimited list
     hasPreexistingConditions?: boolean;
+    preexistingConditions?: string; // semicolon delimited list
 
     // Symptoms
     symptoms?: string; // semicolon delimited list
