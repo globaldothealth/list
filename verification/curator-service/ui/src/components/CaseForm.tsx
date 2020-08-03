@@ -64,7 +64,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
             caseReference: { sourceId: '', sourceUrl: '' },
-            gender: undefined,
+            gender: '',
             minAge: undefined,
             maxAge: undefined,
             age: undefined,
@@ -73,24 +73,24 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             occupation: undefined,
             location: undefined,
             confirmedDate: null,
-            methodOfConfirmation: undefined,
+            methodOfConfirmation: '',
             onsetSymptomsDate: null,
             firstClinicalConsultationDate: null,
             selfIsolationDate: null,
-            admittedToHospital: undefined,
+            admittedToHospital: '',
             hospitalAdmissionDate: null,
-            admittedToIcu: undefined,
+            admittedToIcu: '',
             icuAdmissionDate: null,
             outcomeDate: null,
-            outcome: undefined,
-            symptomsStatus: undefined,
+            outcome: '',
+            symptomsStatus: '',
             symptoms: [],
-            hasPreexistingConditions: undefined,
+            hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
-            traveledPrior30Days: undefined,
+            traveledPrior30Days: '',
             travelHistory: [],
             genomeSequences: [],
             pathogens: [],
@@ -260,7 +260,7 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
 }
 
 function unknownToUndefined(value: string | undefined): string | undefined {
-    if (value === 'Unknown') return undefined;
+    if (value === 'Unknown' || value === '') return undefined;
     return value;
 }
 
