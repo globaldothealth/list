@@ -22,8 +22,24 @@ corresponding to this CSV format is available
 [here](https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE).
 The following fields are currently incorporated:
 
+##### Case reference
 - `sourceEntryId`: Optional. The UUID provided by the data source to identify
 the specific case.
+
+##### Demographics
+- `gender`: Optional. One of `Female`, `Male`, `Non-binary/Third gender`, or
+`Other`.
+- `ageRangeStart`: Optional. Number (years) from 0 to 120.
+- `ageRangeEnd`: Optional. Number (years) from 0 to 120.
+- `ageRange`: Optional. Convenience field accepting an age range in the format
+`start-end`. If provided in this format, will be used in lieu of
+`ageRangeStart` and `ageRangeEnd`.
+- `ethnicity`: Optional.
+- `nationalities`: Optional. Delimit multiple nationalities with a semicolon
+(e.g., `British;Indian`).
+- `occupation`: Optional.
+
+##### Location
 - `country`: **Required**. Country name text (e.g., "United States").
 - `admin1`: Optional. Meaning differs by country (e.g., this is state in the
 US).
@@ -34,17 +50,34 @@ US).
 - `admin3`: Optional. Meaning differs by country (e.g., this is municipality in the
 US).
 [See full definition here](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country).
-- `gender`: Optional. One of `Female`, `Male`, `Non-binary/Third gender`, or `Other`.
-- `ageRangeStart`: Optional. Number (years) from 0 to 120.
-- `ageRangeEnd`: Optional. Number (years) from 0 to 120.
+
+##### Events
 - `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was
 confirmed.
+- `confirmationMethod`: Optional. Mechanism by which the case was confirmed
+(e.g., `PCR test`).
 - `hospitalized`: Optional. One of `true` or `false`.
 - `dateHospitalized`: Optional. Date (MM/DD/YYYY) on which the patient was
 hospitalized.
+- `icuAdmission`: Optional. One of `true` or `false`.
+- `dateIcuAdmission`: Optional. Date (MM/DD/YYYY) on which the patient was
+admitted to the ICU.
 - `outcome`: Optional. One of either `Death` or `Recovered`.
 - `dateOutcome`: Optional. Date (MM/DD/YYYY) on which the above outcome
 transpired.
+- `dateSymptomOnset`: Optional. Date (MM/DD/YYYY) on which symptoms first
+presented in the case.
+
+##### Symptoms and preexisting conditions
+- `symptomStatus`: Optional. One of `Symptomatic`, `Asymptomatic`, or
+`Presymptomatic`.
+- `symptoms`: Optional. Delimit multiple symptoms with a semicolon (e.g.,
+`cough;fever`).
+- `hasPreexistingConditions`: Optional. One of `true` or `false`.
+- `preexistingConditions`: Optional. Delimit multiple symptoms with a semicolon
+(e.g., `Lyme disease;COPD`).
+
+##### Metadata
 - `caseCount`: Optional. Number greater than 0. If provided, `caseCount` number
 of cases will be inserted into the database: each containing identical values
 for all other columns. Cannot be provided in combination with `sourceEntryId`.
