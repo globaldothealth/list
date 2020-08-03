@@ -6,7 +6,13 @@ import {
     Typography,
     withStyles,
 } from '@material-ui/core';
-import { Case, CaseReference, Event } from './Case';
+import {
+    Case,
+    CaseReference,
+    Event,
+    Symptoms,
+    PreexistingConditions,
+} from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -122,13 +128,28 @@ interface RawParsedCase {
     ageRange?: string;
     ageRangeStart?: number;
     ageRangeEnd?: number;
+    ethnicity?: string;
+    nationalities?: string; // semicolon delimited list
+    occupation?: string;
 
     // Events
     dateConfirmed: string;
     hospitalized?: boolean;
     dateHospitalized?: string;
+    icuAdmission?: boolean;
+    dateIcuAdmission?: string;
     outcome?: string;
     dateOutcome?: string;
+    confirmationMethod?: string;
+    dateSymptomOnset?: string;
+
+    // Preexisting conditions
+    preexistingConditions?: string; // semicolon delimited list
+    hasPreexistingConditions?: boolean;
+
+    // Symptoms
+    symptoms?: string; // semicolon delimited list
+    symptomStatus?: string;
 
     // Location
     country: string;
@@ -207,6 +228,7 @@ class BulkCaseForm extends React.Component<
                     start: c.dateConfirmed,
                     end: c.dateConfirmed,
                 },
+                value: c.confirmationMethod,
             });
         }
         if (c.hospitalized === true) {
@@ -221,14 +243,37 @@ class BulkCaseForm extends React.Component<
                 value: 'Yes',
             });
         }
+        if (c.icuAdmission === true) {
+            events.push({
+                name: 'icuAdmission',
+                dateRange: c.dateIcuAdmission
+                    ? {
+                          start: c.dateIcuAdmission,
+                          end: c.dateIcuAdmission,
+                      }
+                    : undefined,
+                value: 'Yes',
+            });
+        }
         if (c.outcome) {
             events.push({
                 name: 'outcome',
-                dateRange: {
-                    start: c.dateOutcome,
-                    end: c.dateOutcome,
-                },
+                dateRange: c.dateOutcome
+                    ? {
+                          start: c.dateOutcome,
+                          end: c.dateOutcome,
+                      }
+                    : undefined,
                 value: c.outcome,
+            });
+        }
+        if (c.dateSymptomOnset) {
+            events.push({
+                name: 'onsetSymptoms',
+                dateRange: {
+                    start: c.dateSymptomOnset,
+                    end: c.dateSymptomOnset,
+                },
             });
         }
         return events;
@@ -270,7 +315,7 @@ class BulkCaseForm extends React.Component<
     createAgeRange(c: RawParsedCase): AgeRange {
         let ageRangeStart = c.ageRangeStart;
         let ageRangeEnd = c.ageRangeEnd;
-        if (c.ageRange?.match(/\d*-\d*/)) {
+        if (c.ageRange?.match(/^\d*-\d*$/)) {
             const startEnd = c.ageRange.split('-');
             ageRangeStart = startEnd[0] ? Number(startEnd[0]) : undefined;
             ageRangeEnd = startEnd[1] ? Number(startEnd[1]) : undefined;
@@ -278,6 +323,43 @@ class BulkCaseForm extends React.Component<
         return { start: ageRangeStart, end: ageRangeEnd };
     }
 
+    createSymptoms(c: RawParsedCase): Symptoms | undefined {
+        let status = c.symptomStatus;
+        if (!status && (c.symptoms || c.dateSymptomOnset)) {
+            status = 'Symptomatic';
+        }
+        return c.symptomStatus
+            ? {
+                  status: c.symptomStatus,
+                  values: c.symptoms ? c.symptoms.split(';') : [],
+              }
+            : undefined;
+    }
+
+    createPreexistingConditions(
+        c: RawParsedCase,
+    ): PreexistingConditions | undefined {
+        let booleanStatus = c.hasPreexistingConditions;
+        if (booleanStatus === undefined && c.preexistingConditions) {
+            booleanStatus = true;
+        }
+        return booleanStatus
+            ? {
+                  hasPreexistingConditions: booleanStatus,
+                  values: c.preexistingConditions
+                      ? c.preexistingConditions.split(';')
+                      : [],
+              }
+            : undefined;
+    }
+
+    /**
+     * Create an API-ready case object from parsed case data.
+     *
+     * TODO: Put the Raw->CompleteParsedCase conversion logic in a separate
+     * class, and unit test the API. Right now it's just verified via a single
+     * Cypress case.
+     */
     createCaseObject(
         c: RawParsedCase,
         events: Event[],
@@ -285,6 +367,8 @@ class BulkCaseForm extends React.Component<
         locationQuery: string,
         ageRange: AgeRange,
         caseReference: CaseReference,
+        symptoms?: Symptoms,
+        preexistingConditions?: PreexistingConditions,
     ): CompleteParsedCase {
         return {
             caseReference: {
@@ -295,6 +379,9 @@ class BulkCaseForm extends React.Component<
             demographics: {
                 gender: c.gender,
                 ageRange: ageRange,
+                ethnicity: c.ethnicity,
+                nationalities: c.nationalities?.split(';'),
+                occupation: c.occupation,
             },
             location: {
                 country: c.country,
@@ -313,6 +400,8 @@ class BulkCaseForm extends React.Component<
                 limitToResolution: geoResolutionLimit,
             },
             events: events,
+            preexistingConditions: preexistingConditions,
+            symptoms: symptoms,
             caseCount: c.caseCount,
         };
     }
@@ -352,6 +441,8 @@ class BulkCaseForm extends React.Component<
             const locationQuery = this.createLocationQuery(c);
             const events = this.createEvents(c);
             const ageRange = this.createAgeRange(c);
+            const symptoms = this.createSymptoms(c);
+            const preexistingConditions = this.createPreexistingConditions(c);
             return this.createCaseObject(
                 c,
                 events,
@@ -359,6 +450,8 @@ class BulkCaseForm extends React.Component<
                 locationQuery,
                 ageRange,
                 caseReference,
+                symptoms,
+                preexistingConditions,
             );
         });
 
