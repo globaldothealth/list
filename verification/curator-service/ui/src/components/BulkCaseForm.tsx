@@ -96,6 +96,11 @@ interface BulkCaseFormState {
     errors: CaseValidationError[];
 }
 
+interface AgeRange {
+    start?: number;
+    end?: number;
+}
+
 /**
  * Flattened case representation.
  *
@@ -113,6 +118,8 @@ interface RawParsedCase {
 
     // Demographics
     gender?: string;
+    // Convenience field to provide age range in $start-$end format.
+    ageRange?: string;
     ageRangeStart?: number;
     ageRangeEnd?: number;
 
@@ -260,11 +267,23 @@ class BulkCaseForm extends React.Component<
             .join(', ');
     }
 
+    createAgeRange(c: RawParsedCase): AgeRange {
+        let ageRangeStart = c.ageRangeStart;
+        let ageRangeEnd = c.ageRangeEnd;
+        if (c.ageRange?.match(/\d*-\d*/)) {
+            const startEnd = c.ageRange.split('-');
+            ageRangeStart = startEnd[0] ? Number(startEnd[0]) : undefined;
+            ageRangeEnd = startEnd[1] ? Number(startEnd[1]) : undefined;
+        }
+        return { start: ageRangeStart, end: ageRangeEnd };
+    }
+
     createCaseObject(
         c: RawParsedCase,
         events: Event[],
         geoResolutionLimit: string,
         locationQuery: string,
+        ageRange: AgeRange,
         caseReference: CaseReference,
     ): CompleteParsedCase {
         return {
@@ -275,10 +294,7 @@ class BulkCaseForm extends React.Component<
             },
             demographics: {
                 gender: c.gender,
-                ageRange: {
-                    start: c.ageRangeStart,
-                    end: c.ageRangeEnd,
-                },
+                ageRange: ageRange,
             },
             location: {
                 country: c.country,
@@ -335,11 +351,13 @@ class BulkCaseForm extends React.Component<
             const geoResolutionLimit = this.createGeoResolutionLimit(c);
             const locationQuery = this.createLocationQuery(c);
             const events = this.createEvents(c);
+            const ageRange = this.createAgeRange(c);
             return this.createCaseObject(
                 c,
                 events,
                 geoResolutionLimit,
                 locationQuery,
+                ageRange,
                 caseReference,
             );
         });
