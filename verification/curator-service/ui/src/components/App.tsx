@@ -121,6 +121,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     root: {
         display: 'flex',
     },
+    buttonLabel: {
+        display: 'block',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+    },
     title: {
         flexGrow: 1,
     },
@@ -261,6 +267,7 @@ export default function App(): JSX.Element {
                         </Typography>
                         {user?.email ? (
                             <Button
+                                classes={{ label: classes.buttonLabel }}
                                 variant="outlined"
                                 color="secondary"
                                 href="/auth/logout"

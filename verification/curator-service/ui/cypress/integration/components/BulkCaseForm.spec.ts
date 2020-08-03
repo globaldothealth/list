@@ -69,18 +69,18 @@ describe('Bulk upload form', function () {
 
         // Events
         // Confirmation
-        cy.contains('2020-06-23');
+        cy.contains('2020-6-23');
         cy.contains('PCR test');
         // Symptom onset
-        cy.contains('2020-06-19');
+        cy.contains('2020-6-19');
         // Hospital admission
         cy.contains('Yes');
-        cy.contains('2020-06-21');
+        cy.contains('2020-6-21');
         // ICU admission
-        cy.contains('2020-06-22');
+        cy.contains('2020-6-22');
         // Outcome
         cy.contains('Recovered');
-        cy.contains('2020-06-24');
+        cy.contains('2020-6-24');
 
         // Symptoms
         cy.contains('Symptomatic');

@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import axios from 'axios';
+import renderDate from './util/date';
 
 interface ListResponse {
     cases: Case[];
@@ -318,7 +319,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Confirmed date',
                             field: 'confirmedDate',
-                            type: 'date',
+                            render: (rowData): string =>
+                                renderDate(rowData.confirmedDate),
                         },
                         {
                             title: 'Confirmation method',
