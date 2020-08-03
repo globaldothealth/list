@@ -3,9 +3,7 @@ import * as Yup from 'yup';
 import { Button, LinearProgress, Typography } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Source, { submitSource } from './common-form-fields/Source';
-import { Theme, createStyles } from '@material-ui/core/styles';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import AppModal from './AppModal';
@@ -29,46 +27,38 @@ import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
 import User from './User';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
+import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
-import { withStyles } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
-const styles = (theme: Theme) =>
-    createStyles({
-        modalContents: {
-            backgroundColor: theme.palette.background.paper,
-            left: '300px',
-            height: '100%',
-            position: 'absolute',
-            outline: 'none',
-            // Remainder of the screen width accounting for left shift
-            width: 'calc(100vw - 300px)',
-        },
-        appBar: {
-            background: 'white',
-        },
-        tableOfContents: {
-            position: 'fixed',
-        },
-        tableOfContentsRow: {
-            alignItems: 'center',
-            display: 'flex',
-        },
-        form: {
-            paddingLeft: '18em',
-        },
-        formSection: {
-            margin: '2em 0',
-        },
-        statusMessage: {
-            marginTop: '1em',
-            maxWidth: '80%',
-        },
-        cancelButton: { marginLeft: '1em' },
-    });
+const useStyles = makeStyles((theme) => ({
+    appBar: {
+        background: 'white',
+    },
+    tableOfContents: {
+        position: 'fixed',
+    },
+    tableOfContentsRow: {
+        alignItems: 'center',
+        display: 'flex',
+    },
+    form: {
+        paddingLeft: '18em',
+    },
+    formSection: {
+        margin: '2em 0',
+    },
+    statusMessage: {
+        marginTop: '1em',
+        maxWidth: '80%',
+    },
+    cancelButton: { marginLeft: '1em' },
+}));
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
@@ -187,14 +177,10 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     };
 }
 
-interface Props extends RouteComponentProps, WithStyles<typeof styles> {
+interface Props {
     user: User;
     initialCase?: Case;
     onModalClose: () => void;
-}
-
-interface CaseFormState {
-    errorMessage: string;
 }
 
 // TODO: get 0 and 120 min/max age values from the backend.
@@ -278,15 +264,15 @@ function unknownToUndefined(value: string | undefined): string | undefined {
     return value;
 }
 
-class CaseForm extends React.Component<Props, CaseFormState> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            errorMessage: '',
-        };
-    }
+export default function CaseForm(props: Props): JSX.Element {
+    const { initialCase } = props;
+    const theme = useTheme();
+    const showTableOfContents = useMediaQuery(theme.breakpoints.up('sm'));
+    const classes = useStyles();
+    const history = useHistory();
+    const [errorMessage, setErrorMessage] = React.useState('');
 
-    filterTravel(travel: Travel[]): Travel[] {
+    const filterTravel = (travel: Travel[]): Travel[] => {
         const filteredTravel = cloneDeep(travel);
         filteredTravel?.forEach((travel) => {
             delete travel.reactId;
@@ -308,16 +294,19 @@ class CaseForm extends React.Component<Props, CaseFormState> {
             }
         });
         return filteredTravel;
-    }
-    filterGenomeSequences(genomeSequences: GenomeSequence[]): GenomeSequence[] {
+    };
+
+    const filterGenomeSequences = (
+        genomeSequences: GenomeSequence[],
+    ): GenomeSequence[] => {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
         filteredGenomeSequences?.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
         });
         return filteredGenomeSequences;
-    }
+    };
 
-    async submitCase(values: CaseFormValues): Promise<void> {
+    const submitCase = async (values: CaseFormValues): Promise<void> => {
         if (values.caseReference && values.caseReference.sourceId === '') {
             try {
                 const newCaseReference = await submitSource({
@@ -326,11 +315,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 });
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {
-                this.setState({
-                    errorMessage: `System error during source creation: ${JSON.stringify(
-                        e,
-                    )}`,
-                });
+                setErrorMessage(
+                    `System error during source creation: ${JSON.stringify(e)}`,
+                );
                 return;
             }
         }
@@ -441,19 +428,19 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         : undefined,
                 travel:
                     values.traveledPrior30Days === 'Yes'
-                        ? this.filterTravel(values.travelHistory)
+                        ? filterTravel(values.travelHistory)
                         : undefined,
             },
-            genomeSequences: this.filterGenomeSequences(values.genomeSequences),
+            genomeSequences: filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
-            notes: values.notes
+            notes: values.notes,
         };
         let newCaseIds = [];
         try {
             // Update or create depending on the presence of the initial case ID.
-            if (this.props.initialCase?._id) {
+            if (props.initialCase?._id) {
                 await axios.put(
-                    `/api/cases/${this.props.initialCase?._id}`,
+                    `/api/cases/${props.initialCase?._id}`,
                     newCase,
                 );
             } else {
@@ -470,29 +457,27 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     );
                 }
             }
-            this.setState({ errorMessage: '' });
+            setErrorMessage('');
         } catch (e) {
-            this.setState({
-                errorMessage: JSON.stringify(e),
-            });
+            setErrorMessage(JSON.stringify(e));
             return;
         }
         // Navigate to cases after successful submit
-        this.props.history.push({
+        history.push({
             pathname: '/cases',
             state: {
                 newCaseIds: newCaseIds,
-                editedCaseIds: this.props.initialCase?._id
-                    ? [this.props.initialCase._id]
+                editedCaseIds: props.initialCase?._id
+                    ? [props.initialCase._id]
                     : [],
             },
         });
-    }
+    };
 
-    tableOfContentsIcon(opts: {
+    const tableOfContentsIcon = (opts: {
         isChecked: boolean;
         hasError: boolean;
-    }): JSX.Element {
+    }): JSX.Element => {
         return opts.hasError ? (
             <ErrorIcon
                 data-testid="error-icon"
@@ -517,52 +502,49 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 }}
             ></RadioButtonUncheckedIcon>
         );
-    }
+    };
 
-    scrollTo(name: string): void {
+    const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
             duration: 100,
             smooth: true,
             offset: -64, // Account for header height
             containerId: 'scroll-container',
         });
-    }
+    };
 
-    render(): JSX.Element {
-        const { classes, initialCase } = this.props;
-        return (
-            <AppModal
-                title={
-                    this.props.initialCase
-                        ? 'Edit case'
-                        : 'Create new COVID-19 line list case'
-                }
-                onModalClose={this.props.onModalClose}
+    return (
+        <AppModal
+            title={
+                props.initialCase
+                    ? 'Edit case'
+                    : 'Create new COVID-19 line list case'
+            }
+            onModalClose={props.onModalClose}
+        >
+            <Formik
+                initialValues={initialValuesFromCase(initialCase)}
+                validationSchema={NewCaseValidation}
+                // Validating on change slows down the form too much. It will
+                // validate on blur and form submission.
+                validateOnChange={false}
+                onSubmit={(values) => submitCase(values)}
             >
-                <Formik
-                    initialValues={initialValuesFromCase(initialCase)}
-                    validationSchema={NewCaseValidation}
-                    // Validating on change slows down the form too much. It will
-                    // validate on blur and form submission.
-                    validateOnChange={false}
-                    onSubmit={(values) => this.submitCase(values)}
-                >
-                    {({
-                        submitForm,
-                        isSubmitting,
-                        values,
-                        errors,
-                        touched,
-                    }): JSX.Element => (
-                        <div>
+                {({
+                    submitForm,
+                    isSubmitting,
+                    values,
+                    errors,
+                    touched,
+                }): JSX.Element => (
+                    <div>
+                        {showTableOfContents && (
                             <nav className={classes.tableOfContents}>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('source')
-                                    }
+                                    onClick={(): void => scrollTo('source')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.caseReference !==
                                                 undefined &&
@@ -584,10 +566,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('demographics')
+                                        scrollTo('demographics')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.gender !== undefined ||
                                             (values.age !== undefined &&
@@ -619,11 +601,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('location')
-                                    }
+                                    onClick={(): void => scrollTo('location')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.location !== null &&
                                             values.location !== undefined,
@@ -637,11 +617,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('events')
-                                    }
+                                    onClick={(): void => scrollTo('events')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.confirmedDate !== null,
                                         hasError: hasErrors(
@@ -665,11 +643,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('symptoms')
-                                    }
+                                    onClick={(): void => scrollTo('symptoms')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.symptomsStatus !== undefined,
                                         hasError: hasErrors(
@@ -683,10 +659,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('preexistingConditions')
+                                        scrollTo('preexistingConditions')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.hasPreexistingConditions !==
                                             undefined,
@@ -704,10 +680,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('transmission')
+                                        scrollTo('transmission')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.transmissionRoutes?.length >
                                                 0 ||
@@ -730,10 +706,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('travelHistory')
+                                        scrollTo('travelHistory')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.travelHistory?.length > 0 ||
                                             values.traveledPrior30Days !==
@@ -752,10 +728,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('genomeSequences')
+                                        scrollTo('genomeSequences')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.genomeSequences?.length > 0,
                                         hasError: hasErrors(
@@ -768,11 +744,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('pathogens')
-                                    }
+                                    onClick={(): void => scrollTo('pathogens')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked: values.pathogens?.length > 0,
                                         hasError: hasErrors(
                                             ['pathogens'],
@@ -784,9 +758,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('notes')}
+                                    onClick={(): void => scrollTo('notes')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked: values.notes?.trim() !== '',
                                         hasError: hasErrors(
                                             ['notes'],
@@ -796,14 +770,14 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     })}
                                     {'Notes'.toLocaleUpperCase()}
                                 </div>
-                                {!this.props.initialCase && (
+                                {!props.initialCase && (
                                     <div
                                         className={classes.tableOfContentsRow}
                                         onClick={(): void =>
-                                            this.scrollTo('numCases')
+                                            scrollTo('numCases')
                                         }
                                     >
-                                        {this.tableOfContentsIcon({
+                                        {tableOfContentsIcon({
                                             isChecked: values.numCases !== 1,
                                             hasError: hasErrors(
                                                 ['numCases'],
@@ -815,99 +789,99 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     </div>
                                 )}
                             </nav>
-                            <div className={classes.form}>
-                                <Typography variant="h4">
-                                    Enter the details for{' '}
-                                    {this.props.initialCase
-                                        ? 'an existing case'
-                                        : 'a new case'}
-                                </Typography>
-                                <Typography variant="body2">
-                                    Complete all available data for the case.
-                                    Required fields are marked.
-                                </Typography>
-                                <Form>
+                        )}
+                        <div
+                            className={showTableOfContents ? classes.form : ''}
+                        >
+                            <Typography variant="h4">
+                                Enter the details for{' '}
+                                {props.initialCase
+                                    ? 'an existing case'
+                                    : 'a new case'}
+                            </Typography>
+                            <Typography variant="body2">
+                                Complete all available data for the case.
+                                Required fields are marked.
+                            </Typography>
+                            <Form>
+                                <div className={classes.formSection}>
+                                    <Source
+                                        initialValue={values.caseReference}
+                                        hasSourceEntryId={true}
+                                    ></Source>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Demographics></Demographics>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <LocationForm></LocationForm>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Events></Events>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Symptoms></Symptoms>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <PreexistingConditions></PreexistingConditions>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Transmission></Transmission>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <TravelHistory></TravelHistory>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <GenomeSequences></GenomeSequences>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Pathogens></Pathogens>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Notes></Notes>
+                                </div>
+                                {!props.initialCase && (
                                     <div className={classes.formSection}>
-                                        <Source
-                                            initialValue={values.caseReference}
-                                            hasSourceEntryId={true}
-                                        ></Source>
+                                        <NumCases></NumCases>
                                     </div>
-                                    <div className={classes.formSection}>
-                                        <Demographics></Demographics>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <LocationForm></LocationForm>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Events></Events>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Symptoms></Symptoms>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <PreexistingConditions></PreexistingConditions>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Transmission></Transmission>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <TravelHistory></TravelHistory>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <GenomeSequences></GenomeSequences>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Pathogens></Pathogens>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Notes></Notes>
-                                    </div>
-                                    {!this.props.initialCase && (
-                                        <div className={classes.formSection}>
-                                            <NumCases></NumCases>
-                                        </div>
-                                    )}
-                                    {isSubmitting && <LinearProgress />}
-                                    <br />
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        disableElevation
-                                        data-testid="submit"
-                                        disabled={isSubmitting}
-                                        onClick={submitForm}
-                                    >
-                                        {this.props.initialCase
-                                            ? 'Submit case edit'
-                                            : 'Submit case'}
-                                    </Button>
-                                    <Button
-                                        className={classes.cancelButton}
-                                        color="primary"
-                                        variant="outlined"
-                                        onClick={this.props.onModalClose}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Form>
-                                {this.state.errorMessage && (
-                                    <MuiAlert
-                                        className={classes.statusMessage}
-                                        elevation={6}
-                                        variant="filled"
-                                        severity="error"
-                                    >
-                                        {this.state.errorMessage}
-                                    </MuiAlert>
                                 )}
-                            </div>
+                                {isSubmitting && <LinearProgress />}
+                                <br />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disableElevation
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    {props.initialCase
+                                        ? 'Submit case edit'
+                                        : 'Submit case'}
+                                </Button>
+                                <Button
+                                    className={classes.cancelButton}
+                                    color="primary"
+                                    variant="outlined"
+                                    onClick={props.onModalClose}
+                                >
+                                    Cancel
+                                </Button>
+                            </Form>
+                            {errorMessage && (
+                                <MuiAlert
+                                    className={classes.statusMessage}
+                                    elevation={6}
+                                    variant="filled"
+                                    severity="error"
+                                >
+                                    {errorMessage}
+                                </MuiAlert>
+                            )}
                         </div>
-                    )}
-                </Formik>
-            </AppModal>
-        );
-    }
+                    </div>
+                )}
+            </Formik>
+        </AppModal>
+    );
 }
-
-export default withRouter(withStyles(styles)(CaseForm));
