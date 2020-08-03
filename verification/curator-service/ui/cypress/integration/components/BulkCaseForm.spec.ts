@@ -23,7 +23,7 @@ describe('Bulk upload form', function () {
         });
     });
 
-    it.only('Can upload all fields', function () {
+    it('Can upload all fields', function () {
         cy.addSource('Bulk source', 'www.bulksource.com');
 
         cy.visit('/cases');
