@@ -571,7 +571,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            values.gender !== undefined ||
+                                            values.gender !== '' ||
                                             (values.age !== undefined &&
                                                 values.age.toString() !== '') ||
                                             (values.minAge !== undefined &&
@@ -646,8 +646,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                     onClick={(): void => scrollTo('symptoms')}
                                 >
                                     {tableOfContentsIcon({
-                                        isChecked:
-                                            values.symptomsStatus !== undefined,
+                                        isChecked: values.symptomsStatus !== '',
                                         hasError: hasErrors(
                                             ['symptomsStatus', 'symptoms'],
                                             errors,
@@ -665,7 +664,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                     {tableOfContentsIcon({
                                         isChecked:
                                             values.hasPreexistingConditions !==
-                                            undefined,
+                                            '',
                                         hasError: hasErrors(
                                             [
                                                 'hasPreexistingConditions',
@@ -711,9 +710,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            values.travelHistory?.length > 0 ||
-                                            values.traveledPrior30Days !==
-                                                undefined,
+                                            values.traveledPrior30Days !== '',
                                         hasError: hasErrors(
                                             [
                                                 'traveledPrior30Days',
