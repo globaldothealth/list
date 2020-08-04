@@ -324,10 +324,6 @@ class BulkCaseForm extends React.Component<
     }
 
     createSymptoms(c: RawParsedCase): Symptoms | undefined {
-        let status = c.symptomStatus;
-        if (!status && (c.symptoms || c.dateSymptomOnset)) {
-            status = 'Symptomatic';
-        }
         return c.symptomStatus
             ? {
                   status: c.symptomStatus,
@@ -339,13 +335,9 @@ class BulkCaseForm extends React.Component<
     createPreexistingConditions(
         c: RawParsedCase,
     ): PreexistingConditions | undefined {
-        let booleanStatus = c.hasPreexistingConditions;
-        if (booleanStatus === undefined && c.preexistingConditions) {
-            booleanStatus = true;
-        }
-        return booleanStatus
+        return c.hasPreexistingConditions !== undefined
             ? {
-                  hasPreexistingConditions: booleanStatus,
+                  hasPreexistingConditions: c.hasPreexistingConditions,
                   values: c.preexistingConditions
                       ? c.preexistingConditions.split(';')
                       : [],
