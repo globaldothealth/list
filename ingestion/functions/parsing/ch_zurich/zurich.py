@@ -65,31 +65,35 @@ def parse_cases(raw_data_file, source_id, source_url):
             num_cases = int(row[_CONFIRMED_INDEX])
             if not num_cases:
                 continue
-            cases.extend([
-            {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceUrl": source_url
-                },
-                "location": _LOCATION,
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(row[_DATE_INDEX]),
-                            "end": convert_date(row[_DATE_INDEX]),
-                        },
+            try:
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceUrl": source_url
                     },
-                ],
-                "demographics": {
-                    "ageRange": {
+                    "location": _LOCATION,
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
+                            {
+                                "start": convert_date(row[_DATE_INDEX]),
+                                "end": convert_date(row[_DATE_INDEX]),
+                            },
+                        },
+                    ],
+                    "demographics": {
+                        "gender": convert_gender(row[_GENDER_INDEX]),
+                    }
+                }
+                if row[_AGE_INDEX]:
+                    case["demographics"]["ageRange"] = {
                         "start": float(row[_AGE_INDEX]),
                         "end": float(row[_AGE_INDEX]),
-                    },
-                    "gender": convert_gender(row[_GENDER_INDEX]),
-                },
-            }] * num_cases)
+                    }
+                cases.extend([case] * num_cases)
+            except ValueError as ve:
+                print(ve)
         return cases
 
 def lambda_handler(event, context):
