@@ -52,20 +52,20 @@ US).
 [See full definition here](https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country).
 
 ##### Events
-- `dateConfirmed`: **Required**. Date (MM/DD/YYYY) on which the case was
+- `dateConfirmed`: **Required**. Date (YYYY/MM/DD) on which the case was
 confirmed.
 - `confirmationMethod`: Optional. Mechanism by which the case was confirmed
 (e.g., `PCR test`).
 - `hospitalized`: Optional. One of `true` or `false`.
-- `dateHospitalized`: Optional. Date (MM/DD/YYYY) on which the patient was
+- `dateHospitalized`: Optional. Date (YYYY/MM/DD) on which the patient was
 hospitalized.
 - `icuAdmission`: Optional. One of `true` or `false`.
-- `dateIcuAdmission`: Optional. Date (MM/DD/YYYY) on which the patient was
+- `dateIcuAdmission`: Optional. Date (YYYY/MM/DD) on which the patient was
 admitted to the ICU.
 - `outcome`: Optional. One of either `Death` or `Recovered`.
-- `dateOutcome`: Optional. Date (MM/DD/YYYY) on which the above outcome
+- `dateOutcome`: Optional. Date (YYYY/MM/DD) on which the above outcome
 transpired.
-- `dateSymptomOnset`: Optional. Date (MM/DD/YYYY) on which symptoms first
+- `dateSymptomOnset`: Optional. Date (YYYY/MM/DD) on which symptoms first
 presented in the case.
 
 ##### Symptoms and preexisting conditions
