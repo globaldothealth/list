@@ -206,8 +206,8 @@ export const findCasesWithCaseReferenceData = async (
 const findCaseIdsWithCaseReferenceData = async (
     req: Request,
 ): Promise<string[]> => {
-    return (await findCasesWithCaseReferenceData(req)).map((res) =>
-        String(res['_id']),
+    return (await findCasesWithCaseReferenceData(req)).map((c) =>
+        String(c._id),
     );
 };
 
