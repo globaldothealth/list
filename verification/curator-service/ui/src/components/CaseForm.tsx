@@ -64,7 +64,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
             caseReference: { sourceId: '', sourceUrl: '' },
-            gender: undefined,
+            gender: '',
             minAge: undefined,
             maxAge: undefined,
             age: undefined,
@@ -73,24 +73,24 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             occupation: undefined,
             location: undefined,
             confirmedDate: null,
-            methodOfConfirmation: undefined,
+            methodOfConfirmation: '',
             onsetSymptomsDate: null,
             firstClinicalConsultationDate: null,
             selfIsolationDate: null,
-            admittedToHospital: undefined,
+            admittedToHospital: '',
             hospitalAdmissionDate: null,
-            admittedToIcu: undefined,
+            admittedToIcu: '',
             icuAdmissionDate: null,
             outcomeDate: null,
-            outcome: undefined,
-            symptomsStatus: undefined,
+            outcome: '',
+            symptomsStatus: '',
             symptoms: [],
-            hasPreexistingConditions: undefined,
+            hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
-            traveledPrior30Days: undefined,
+            traveledPrior30Days: '',
             travelHistory: [],
             genomeSequences: [],
             pathogens: [],
@@ -100,7 +100,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     }
     return {
         caseReference: c.caseReference,
-        gender: c.demographics?.gender,
+        gender: c.demographics?.gender || '',
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -120,9 +120,8 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
                 ?.start || null,
-        methodOfConfirmation: c.events.find(
-            (event) => event.name === 'confirmed',
-        )?.value,
+        methodOfConfirmation:
+            c.events.find((event) => event.name === 'confirmed')?.value || '',
         onsetSymptomsDate:
             c.events.find((event) => event.name === 'onsetSymptoms')?.dateRange
                 ?.start || null,
@@ -132,26 +131,28 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         selfIsolationDate:
             c.events.find((event) => event.name === 'selfIsolation')?.dateRange
                 ?.start || null,
-        admittedToHospital: c.events.find(
-            (event) => event.name === 'hospitalAdmission',
-        )?.value,
+        admittedToHospital:
+            c.events.find((event) => event.name === 'hospitalAdmission')
+                ?.value || '',
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
-        admittedToIcu: c.events.find((event) => event.name === 'icuAdmission')
-            ?.value,
+        admittedToIcu:
+            c.events.find((event) => event.name === 'icuAdmission')?.value ||
+            '',
         icuAdmissionDate:
             c.events.find((event) => event.name === 'icuAdmission')?.dateRange
                 ?.start || null,
         outcomeDate:
             c.events.find((event) => event.name === 'outcome')?.dateRange
                 ?.start || null,
-        outcome: c.events.find((event) => event.name === 'outcome')?.value,
-        symptomsStatus: c.symptoms?.status,
+        outcome:
+            c.events.find((event) => event.name === 'outcome')?.value || '',
+        symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
-                ? undefined
+                ? ''
                 : c.preexistingConditions?.hasPreexistingConditions
                 ? 'Yes'
                 : 'No',
@@ -161,7 +162,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
         traveledPrior30Days:
             c.travelHistory?.traveledPrior30Days === undefined
-                ? undefined
+                ? ''
                 : c.travelHistory.traveledPrior30Days
                 ? 'Yes'
                 : 'No',
@@ -259,8 +260,10 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
-function unknownToUndefined(value: string | undefined): string | undefined {
-    if (value === 'Unknown') return undefined;
+function unknownOrEmptyToUndefined(
+    value: string | undefined,
+): string | undefined {
+    if (value === 'Unknown' || value === '') return undefined;
     return value;
 }
 
@@ -327,7 +330,7 @@ export default function CaseForm(props: Props): JSX.Element {
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                gender: unknownToUndefined(values.gender),
+                gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
@@ -374,8 +377,7 @@ export default function CaseForm(props: Props): JSX.Element {
                 {
                     name: 'outcome',
                     dates:
-                        values.outcome !== undefined &&
-                        values.outcome !== 'Unknown'
+                        values.outcome !== '' && values.outcome !== 'Unknown'
                             ? values.outcomeDate
                             : undefined,
                     value: values.outcome,
@@ -391,11 +393,11 @@ export default function CaseForm(props: Props): JSX.Element {
                                   end: elem.dates,
                               }
                             : undefined,
-                        value: unknownToUndefined(elem.value),
+                        value: unknownOrEmptyToUndefined(elem.value),
                     };
                 }),
             symptoms: {
-                status: unknownToUndefined(values.symptomsStatus),
+                status: unknownOrEmptyToUndefined(values.symptomsStatus),
                 values:
                     values.symptomsStatus === 'Symptomatic' ||
                     values.symptomsStatus === 'Presymptomatic'
@@ -571,7 +573,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            values.gender !== undefined ||
+                                            values.gender !== '' ||
                                             (values.age !== undefined &&
                                                 values.age.toString() !== '') ||
                                             (values.minAge !== undefined &&
@@ -646,8 +648,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                     onClick={(): void => scrollTo('symptoms')}
                                 >
                                     {tableOfContentsIcon({
-                                        isChecked:
-                                            values.symptomsStatus !== undefined,
+                                        isChecked: values.symptomsStatus !== '',
                                         hasError: hasErrors(
                                             ['symptomsStatus', 'symptoms'],
                                             errors,
@@ -665,7 +666,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                     {tableOfContentsIcon({
                                         isChecked:
                                             values.hasPreexistingConditions !==
-                                            undefined,
+                                            '',
                                         hasError: hasErrors(
                                             [
                                                 'hasPreexistingConditions',
@@ -711,9 +712,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            values.travelHistory?.length > 0 ||
-                                            values.traveledPrior30Days !==
-                                                undefined,
+                                            values.traveledPrior30Days !== '',
                                         hasError: hasErrors(
                                             [
                                                 'traveledPrior30Days',

@@ -97,7 +97,6 @@ describe('Admins', () => {
         const geocode: GeocodeResult = {
             administrativeAreaLevel1: '',
             administrativeAreaLevel2: '',
-            administrativeAreaLevel3: '',
             country: 'Brasilistan',
             geoResolution: Resolution.Country,
             geometry: {
