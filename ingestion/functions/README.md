@@ -71,12 +71,17 @@ ls -l /usr/bin/python*
 modules installed, e.g. via:
 
 ```shell
+# In each parsing's subdir:
 python3.6 -m pip install -r requirements.txt
+# In the /ingestion/functions (necessary to run unit tests).
+python3.6 -m pip install -r ci-requirements.txt
 ```
 
 *NB:* Be sure you're using Python 3.6, which corresponds to the runtime of
 the Lambda functions as configured in the [SAM template](./template.yaml). See
 prerequisites, to check this.
+
+You can validate changes to the SAM template by running `sam validate`.
 
 ### Writing and editing functions
 
