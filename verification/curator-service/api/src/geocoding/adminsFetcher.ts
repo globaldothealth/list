@@ -1,8 +1,8 @@
 import { GeocodeResult, Resolution } from './geocoder';
 
 import { Admin } from '../model/admin';
-import axios from 'axios';
 import LRUCache from 'lru-cache';
+import axios from 'axios';
 
 // Mapbox boundaries types definitions, not part of the mapbox SDK.
 interface BoundariesResponse {
@@ -44,19 +44,22 @@ export default class MapboxAdminsFetcher {
 
     // Fill in missing admin levels for the given GeocodeResult.
     async fillAdmins(geocode: GeocodeResult): Promise<void> {
+        console.log('getting admins for', geocode);
         // Return early if no need to fill in admins.
         if (
-            geocode.administrativeAreaLevel1 !== '' &&
-            geocode.administrativeAreaLevel2 !== '' &&
-            geocode.administrativeAreaLevel3 !== ''
+            geocode.administrativeAreaLevel1 &&
+            geocode.administrativeAreaLevel2 &&
+            geocode.administrativeAreaLevel3
         ) {
             return;
         }
         const cachedResult = this.cache.get(geocode);
         let resp: BoundariesResponse;
         if (cachedResult) {
+            console.log('cache hit');
             resp = cachedResult;
         } else {
+            console.log('cache miss');
             // Fetch all missing admins in one query.
             const url = `https://api.mapbox.com/v4/mapbox.enterprise-boundaries-a1-v2,mapbox.enterprise-boundaries-a2-v2,mapbox.enterprise-boundaries-a3-v2/tilequery/${geocode.geometry.longitude},${geocode.geometry.latitude}.json?access_token=${this.accessToken}`;
             try {
@@ -68,6 +71,7 @@ export default class MapboxAdminsFetcher {
                 return;
             }
         }
+        console.log('resp features', resp.features);
         for (const feature of resp.features) {
             switch (feature.properties.tilequery.layer) {
                 case 'boundaries_admin_1':
