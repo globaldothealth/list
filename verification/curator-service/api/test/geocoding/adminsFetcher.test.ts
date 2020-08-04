@@ -120,4 +120,50 @@ describe('Admins', () => {
         await fetcher.fillAdmins(geocode);
         expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     });
+
+    it('ignores missing admins names', async () => {
+        await Admin.insertMany([{ id: 'USAFOO', name: 'some admin 1' }]);
+        const fetcher = new MapboxAdminsFetcher(testToken);
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {
+                features: [
+                    {
+                        properties: {
+                            id: 'USAFOO',
+                            tilequery: {
+                                layer: 'boundaries_admin_1',
+                            },
+                        },
+                    },
+                    {
+                        properties: {
+                            id: 'USABAR',
+                            tilequery: {
+                                layer: 'boundaries_admin_2',
+                            },
+                        },
+                    },
+                ],
+            },
+        });
+        const geocode: GeocodeResult = {
+            country: 'Brasilistan',
+            geoResolution: Resolution.Country,
+            geometry: {
+                latitude: 12.34,
+                longitude: 45.67,
+            },
+            name: 'the second',
+            place: 'to be',
+        };
+        await fetcher.fillAdmins(geocode);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            'https://api.mapbox.com/v4/mapbox.enterprise-boundaries-a1-v2,mapbox.enterprise-boundaries-a2-v2,mapbox.enterprise-boundaries-a3-v2/tilequery/45.67,12.34.json?access_token=test-token',
+        );
+        expect(geocode.administrativeAreaLevel1).toBe('some admin 1');
+        expect(geocode.administrativeAreaLevel2).toBeUndefined();
+        expect(geocode.administrativeAreaLevel3).toBeUndefined();
+    });
 });
