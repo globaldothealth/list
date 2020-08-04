@@ -100,7 +100,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
     }
     return {
         caseReference: c.caseReference,
-        gender: c.demographics?.gender,
+        gender: c.demographics?.gender || '',
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -120,9 +120,8 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
                 ?.start || null,
-        methodOfConfirmation: c.events.find(
-            (event) => event.name === 'confirmed',
-        )?.value,
+        methodOfConfirmation:
+            c.events.find((event) => event.name === 'confirmed')?.value || '',
         onsetSymptomsDate:
             c.events.find((event) => event.name === 'onsetSymptoms')?.dateRange
                 ?.start || null,
@@ -132,26 +131,28 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         selfIsolationDate:
             c.events.find((event) => event.name === 'selfIsolation')?.dateRange
                 ?.start || null,
-        admittedToHospital: c.events.find(
-            (event) => event.name === 'hospitalAdmission',
-        )?.value,
+        admittedToHospital:
+            c.events.find((event) => event.name === 'hospitalAdmission')
+                ?.value || '',
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
-        admittedToIcu: c.events.find((event) => event.name === 'icuAdmission')
-            ?.value,
+        admittedToIcu:
+            c.events.find((event) => event.name === 'icuAdmission')?.value ||
+            '',
         icuAdmissionDate:
             c.events.find((event) => event.name === 'icuAdmission')?.dateRange
                 ?.start || null,
         outcomeDate:
             c.events.find((event) => event.name === 'outcome')?.dateRange
                 ?.start || null,
-        outcome: c.events.find((event) => event.name === 'outcome')?.value,
-        symptomsStatus: c.symptoms?.status,
+        outcome:
+            c.events.find((event) => event.name === 'outcome')?.value || '',
+        symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
-                ? undefined
+                ? ''
                 : c.preexistingConditions?.hasPreexistingConditions
                 ? 'Yes'
                 : 'No',
@@ -161,7 +162,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
         traveledPrior30Days:
             c.travelHistory?.traveledPrior30Days === undefined
-                ? undefined
+                ? ''
                 : c.travelHistory.traveledPrior30Days
                 ? 'Yes'
                 : 'No',
@@ -374,8 +375,7 @@ export default function CaseForm(props: Props): JSX.Element {
                 {
                     name: 'outcome',
                     dates:
-                        values.outcome !== undefined &&
-                        values.outcome !== 'Unknown'
+                        values.outcome !== '' && values.outcome !== 'Unknown'
                             ? values.outcomeDate
                             : undefined,
                     value: values.outcome,
