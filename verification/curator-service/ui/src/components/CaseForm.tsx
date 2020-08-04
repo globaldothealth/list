@@ -260,7 +260,9 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
-function unknownToUndefined(value: string | undefined): string | undefined {
+function unknownOrEmptyToUndefined(
+    value: string | undefined,
+): string | undefined {
     if (value === 'Unknown' || value === '') return undefined;
     return value;
 }
@@ -328,7 +330,7 @@ export default function CaseForm(props: Props): JSX.Element {
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                gender: unknownToUndefined(values.gender),
+                gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
@@ -391,11 +393,11 @@ export default function CaseForm(props: Props): JSX.Element {
                                   end: elem.dates,
                               }
                             : undefined,
-                        value: unknownToUndefined(elem.value),
+                        value: unknownOrEmptyToUndefined(elem.value),
                     };
                 }),
             symptoms: {
-                status: unknownToUndefined(values.symptomsStatus),
+                status: unknownOrEmptyToUndefined(values.symptomsStatus),
                 values:
                     values.symptomsStatus === 'Symptomatic' ||
                     values.symptomsStatus === 'Presymptomatic'
