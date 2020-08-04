@@ -1,8 +1,8 @@
-1,4-phenylenediamine allergic contact dermatitis (ACD)
 1-chloro-2,4-dinitrobenzene allergic contact dermatitis (ACD)
-2,4-dinitrophenyl allergic contact dermatitis (ACD)
+1,4-phenylenediamine allergic contact dermatitis (ACD)
 2-aminoadipic 2-oxoadipic aciduria
 2-hydroxyglutaric aciduria
+2,4-dinitrophenyl allergic contact dermatitis (ACD)
 3-M syndrome
 3-Methylcrotonyl-CoA carboxylase deficiency (CD)
 3-methylglutaconic aciduria
@@ -22,1026 +22,10 @@
 46 XX gonadal dysgenesis (GD)
 46,XX sex reversal (SR)
 46,XY sex reversal (SR)
-ABCD syndrome (AS)
-ACTH-independent macronodular adrenal hyperplasia (MAH)
-ACTH-secreting pituitary adenoma (PA)
-ADULT syndrome (AS)
-AGAT deficiency (AD)
-AIDS phobia (AP)
-AMME complex (AC)
-APP-related cerebral amyloid angiopathy (CAA)
-ARC syndrome (AS)
 Aagenaes syndrome (AS)
 Aarskog syndrome (AS)
-Abruzzo-Erickson syndrome
-Achard syndrome (AS)
-Achenbach syndrome (AS)
-Achilles bursitis (AB)
-Acinetobacter infectious disease (AID)
-Adams-Oliver syndrome
-Addison's disease
-Adie syndrome (AS)
-African histoplasmosis (AH)
-African iron overload (AIO)
-African tick-bite fever (AF)
-Aicardi syndrome (AS)
-Aicardi-Goutieres syndrome
-Alagille syndrome (AS)
-Aland Island eye disease (AIED)
-Albright's hereditary osteodystrophy (HO)
-Alexander disease (AD)
-Alkhurma hemorrhagic fever (AHF)
-Alkuraya-Kucinskas syndrome
-Allan-Herndon-Dudley syndrome
-Alport syndrome (AS)
-Alstrom syndrome (AS)
-Alzheimer's disease
-Ambras type hypertrichosis universalis congenita (ATHUC)
-American histoplasmosis (AH)
-Andersen-Tawil syndrome
-Angelman syndrome (AS)
-Angelucci's syndrome
-Antley-Bixler syndrome
-Arenaviridae infectious disease (AID)
-Argentine hemorrhagic fever (AHF)
-Argyll Robertson pupil (ARP)
-Armfield syndrome (AS)
-Arts syndrome (AS)
-Askin's tumor
-Asperger syndrome (AS)
-Astrakhan spotted fever (ASF)
-Athabaskan brainstem dysgenesis syndrome (ABDS)
-Atlantic cod allergy (ACA)
-Atlantic salmon allergy (ASA)
-Axenfeld-Rieger syndrome
-Axenfeld-Rieger syndrome type 1 (ST)
-Axenfeld-Rieger syndrome type 2 (ST)
-Axenfeld-Rieger syndrome type 3 (ST)
-Ayme-Gripp syndrome
-B cell deficiency (CD)
-B-cell acute lymphoblastic leukemia (ALL)
-B-cell adult acute lymphocytic leukemia (AALL)
-B-cell lymphoma
-B-lymphoblastic leukemia/lymphoma
-B-lymphoblastic leukemia/lymphoma KMT2A rearranged
-B-lymphoblastic leukemia/lymphoma with BCR-ABL1
-B-lymphoblastic leukemia/lymphoma with ETV6-RUNX1
-B-lymphoblastic leukemia/lymphoma with IL3-IGH
-B-lymphoblastic leukemia/lymphoma with TCF3-PBX1
-B-lymphoblastic leukemia/lymphoma with hyperdiploidy (WH)
-B-lymphoblastic leukemia/lymphoma with hypodiploidy (WH)
-B-lymphoblastic leukemia/lymphoma with iAMP21
-B-lymphoblastic leukemia/lymphoma, BCR-ABL1–like
-Baastrup's syndrome
-Balkan hemorrhagic fever (BHF)
-Balkan nephropathy (BN)
-Ballard syndrome (BS)
-Baller-Gerold syndrome
-Balo concentric sclerosis (BCS)
-Bamforth-Lazarus syndrome
-Bannayan-Riley-Ruvalcaba syndrome (BRRS)
-Baraitser-Winter syndrome (BWS)
-Barber-Say syndrome
-Bardet-Biedl syndrome
-Barmah Forest virus disease (BFVD)
-Barre-Lieou syndrome
-Barrett's adenocarcinoma
-Barrett's esophagus
-Bart-Pumphrey syndrome (BPS)
-Barth syndrome (BS)
-Bartholin's duct cyst (DC)
-Bartholin's gland adenocarcinoma (GA)
-Bartholin's gland adenoid cystic carcinoma (GACC)
-Bartholin's gland adenoma (GA)
-Bartholin's gland adenomyoma (GA)
-Bartholin's gland adenosquamous carcinoma (GAC)
-Bartholin's gland benign neoplasm (GBN)
-Bartholin's gland cancer (GC)
-Bartholin's gland carcinoma (GC)
-Bartholin's gland disease (GD)
-Bartholin's gland small cell carcinoma (GSCC)
-Bartholin's gland squamous cell carcinoma (GSCC)
-Bartholin's gland transitional cell carcinoma (GTCC)
-Bartter disease (BD)
-Bartter disease type 1 (BDT)
-Bartter disease type 2 (BDT)
-Bartter disease type 3 (BDT)
-Bartter disease type 4a (BDT)
-Bartter disease type 4b (BDT)
-Bartter disease type 5 (BDT)
-Basilicata-Akhtar syndrome
-Beare-Stevenson cutis gyrata syndrome (CGS)
-Becker muscular dystrophy (BMD)
-Beckwith-Wiedemann syndrome
-Beemer-Langer syndrome or short-rib polydactyly type IV.
-Behcet's disease
-Behcet's syndrome arthropathy (SA)
-Behr syndrome (BS)
-Bell's palsy
-Bernard-Soulier syndrome
-Bernard-Soulier syndrome type A2 (ST)
-Bethlem myopathy (BM)
-Beukes hip dysplasia (BHD)
-Bh4-deficient hyperphenylalaninemia A
-Bietti crystalline corneoretinal dystrophy (BCCD)
-Binder syndrome (BS)
-Birk-Barel syndrome
-Birt-Hogg-Dube syndrome (BHD)
-Bjornstad syndrome (BS)
-Blau syndrome (BS)
-Blessig's cysts
-Bloch-Sulzberger syndrome or Incontinentia pigmenti
-Bloom syndrome (BS)
-Blount's disease
-Bolivian hemorrhagic fever (BHF)
-Boomerang dysplasia (BD)
-Bordetella parapertussis whooping cough (BPWC)
-Borjeson-Forssman-Lehmann syndrome (BFLS)
-Borst-Jadassohn intraepidermal carcinoma (IC)
-Bothnia retinal dystrophy (BRD)
-Bothnian type palmoplantar keratoderma (BTPK)
-Boucher-Neuhauser syndrome
-Bowen-Conradi syndrome
-Bowman's membrane folds or rupture (MFR)
-Brazilian hemorrhagic fever (BHF)
-Brill-Zinsser disease
-Brody myopathy (BM)
-Brooke-Spiegler syndrome
-Brown's tendon sheath syndrome (TSS)
-Brown-Sequard syndrome
-Brown-Vialetto-Van Laere syndrome (LS)
-Brucella abortus brucellosis (BAB)
-Brucella canis brucellosis (BCB)
-Brucella melitensis brucellosis (BMB)
-Brucella suis brucellosis (BSB)
-Bruck syndrome (BS)
-Brugada syndrome (BS)
-Brunner Syndrome (BS)
-Budd-Chiari syndrome
-Burkitt lymphoma (BL)
-Burn-McKeown syndrome
-Buruli ulcer disease (BUD)
-Buschke-Ollendorff syndrome (BOS)
-C syndrome
-C-P angle neurinoma (AN)
-C1 inhibitor deficiency (ID)
-CADASIL
-CAKUT
-CAKUT1
-CAKUT2
-CD3delta deficiency
-CD3epsilon deficiency
-CD3gamma deficiency
-CD3zeta deficiency
-CD40 ligand deficiency (LD)
-CD45 deficiency
-CEDNIK syndrome (CS)
-CHARGE syndrome (CS)
-CHILD syndrome (CS)
-CINCA Syndrome (CS)
-CLL/SLL
-CLOVES syndrome (CS)
-COACH syndrome (CS)
-CODAS syndrome (CS)
-COL4A1-related familial vascular leukoencephalopathy (FVL)
-COVID-19
-CREST syndrome (CS)
-CSF1R-related brain malformation and osteopetrosis (BMAO)
-CST3-related cerebral amyloid angiopathy (CAA)
-Caffey disease (CD)
-Camurati-Engelmann disease
-Canavan disease (CD)
-Capgras syndrome (CS)
-Caplan's syndrome
-Carey-Fineman-Ziter syndrome
-Carney complex (CC)
-Carney-Stratakis syndrome
-Caroli disease (CD)
-Carpenter syndrome (CS)
-Carrion's disease
-Carvajal syndrome (CS)
-Castleman disease (CD)
-Cauda equina syndrome (CES)
-Cayman type cerebellar ataxia (CTCA)
-Cenani-Lenz syndactyly syndrome (SS)
-Chagas disease (CD)
-Chandler syndrome (CS)
-Chapare hemorrhagic fever (CHF)
-Char syndrome (CS)
-Charcot-Marie-Tooth disease
-Charcot-Marie-Tooth disease X-linked dominant 1 (DD)
-Charcot-Marie-Tooth disease X-linked dominant 6 (DD)
-Charcot-Marie-Tooth disease X-linked recessive 2 (DR)
-Charcot-Marie-Tooth disease X-linked recessive 3 (DR)
-Charcot-Marie-Tooth disease X-linked recessive 4 (DR)
-Charcot-Marie-Tooth disease X-linked recessive 5 (DR)
-Charcot-Marie-Tooth disease axonal type 2C (DAT)
-Charcot-Marie-Tooth disease axonal type 2CC (DAT)
-Charcot-Marie-Tooth disease axonal type 2F (DAT)
-Charcot-Marie-Tooth disease axonal type 2H (DAT)
-Charcot-Marie-Tooth disease axonal type 2K (DAT)
-Charcot-Marie-Tooth disease axonal type 2L (DAT)
-Charcot-Marie-Tooth disease axonal type 2N (DAT)
-Charcot-Marie-Tooth disease axonal type 2O (DAT)
-Charcot-Marie-Tooth disease axonal type 2P (DAT)
-Charcot-Marie-Tooth disease axonal type 2Q (DAT)
-Charcot-Marie-Tooth disease axonal type 2S (DAT)
-Charcot-Marie-Tooth disease axonal type 2T (DAT)
-Charcot-Marie-Tooth disease axonal type 2U (DAT)
-Charcot-Marie-Tooth disease axonal type 2V (DAT)
-Charcot-Marie-Tooth disease axonal type 2X (DAT)
-Charcot-Marie-Tooth disease axonal type 2Z (DAT)
-Charcot-Marie-Tooth disease dominant intermediate A (DDI)
-Charcot-Marie-Tooth disease dominant intermediate B (DDI)
-Charcot-Marie-Tooth disease dominant intermediate C (DDI)
-Charcot-Marie-Tooth disease dominant intermediate D (DDI)
-Charcot-Marie-Tooth disease dominant intermediate E (DDI)
-Charcot-Marie-Tooth disease dominant intermediate F (DDI)
-Charcot-Marie-Tooth disease dominant intermediate G (DDI)
-Charcot-Marie-Tooth disease intermediate type (DIT)
-Charcot-Marie-Tooth disease recessive intermediate A (DRI)
-Charcot-Marie-Tooth disease recessive intermediate B (DRI)
-Charcot-Marie-Tooth disease recessive intermediate C (DRI)
-Charcot-Marie-Tooth disease recessive intermediate D (DRI)
-Charcot-Marie-Tooth disease type 1 (CMT1)
-Charcot-Marie-Tooth disease type 1A (CMT1A)
-Charcot-Marie-Tooth disease type 1B (CMT1B)
-Charcot-Marie-Tooth disease type 1C (CMT1C)
-Charcot-Marie-Tooth disease type 1D (CMT1D)
-Charcot-Marie-Tooth disease type 1E (CMT1E)
-Charcot-Marie-Tooth disease type 1F (CMT1F)
-Charcot-Marie-Tooth disease type 1G (CMT1G)
-Charcot-Marie-Tooth disease type 2 (CMT2)
-Charcot-Marie-Tooth disease type 2A1 (CMT2A1)
-Charcot-Marie-Tooth disease type 2A2A (CMT2A2A)
-Charcot-Marie-Tooth disease type 2A2B (CMT2A2B)
-Charcot-Marie-Tooth disease type 2B (CMT2B)
-Charcot-Marie-Tooth disease type 2B1 (CMT2B1)
-Charcot-Marie-Tooth disease type 2B2 (CMT2B2)
-Charcot-Marie-Tooth disease type 2D (CMT2D)
-Charcot-Marie-Tooth disease type 2DD (CMT2DD)
-Charcot-Marie-Tooth disease type 2E (CMT2E)
-Charcot-Marie-Tooth disease type 2EE (CMT2EE)
-Charcot-Marie-Tooth disease type 2I (CMT2I)
-Charcot-Marie-Tooth disease type 2J (CMT2J)
-Charcot-Marie-Tooth disease type 2R (CMT2R)
-Charcot-Marie-Tooth disease type 2Y (CMT2Y)
-Charcot-Marie-Tooth disease type 3 (CMT3)
-Charcot-Marie-Tooth disease type 4 (CMT4)
-Charcot-Marie-Tooth disease type 4A (CMT4A)
-Charcot-Marie-Tooth disease type 4B1 (CMT4B1)
-Charcot-Marie-Tooth disease type 4B2 (CMT4B2)
-Charcot-Marie-Tooth disease type 4B3 (CMT4B3)
-Charcot-Marie-Tooth disease type 4C (CMT4C)
-Charcot-Marie-Tooth disease type 4D (CMT4D)
-Charcot-Marie-Tooth disease type 4E (CMT4E)
-Charcot-Marie-Tooth disease type 4F (CMT4F)
-Charcot-Marie-Tooth disease type 4G (CMT4G)
-Charcot-Marie-Tooth disease type 4H (CMT4H)
-Charcot-Marie-Tooth disease type 4J (CMT4J)
-Charcot-Marie-Tooth disease type 4K (CMT4K)
-Charcot-Marie-Tooth disease type 5 (CMT5)
-Charcot-Marie-Tooth disease type 6 (CMT6)
-Charcot-Marie-Tooth disease type 7 (CMT7)
-Charcot-Marie-Tooth disease type X (CMTX)
-Charcot-Marie-Tooth disease, axonal type 2W (AT)
-Charlevoix-Saguenay spastic ataxia (SA)
-Chediak-Higashi syndrome
-Chilblain lupus (CL)
-Chlamydia pneumonia (CP)
-Christianson syndrome (CS)
-Churg-Strauss syndrome
-Clostridium difficile colitis (CDC)
-Clouston syndrome (CS)
-Coats disease (CD)
-Cockayne syndrome (CS)
-Coffin-Lowry syndrome
-Coffin-Siris syndrome
-Cogan syndrome (CS)
-Cogan-Reese syndrome
-Cohen syndrome (CS)
-Cole-Carpenter syndrome
-Colorado tick fever (CTF)
-Compton-North congenital myopathy (CM)
-Conn's syndrome
-Cor pulmonale (CP)
-Cornelia de Lange syndrome (CLS)
-Coronavirus infectious disease (CID)
-Costello syndrome (CS)
-Cowden syndrome (CS)
-Cowper gland carcinoma (CGC)
-Creutzfeldt-Jakob disease
-Cri-Du-Chat syndrome or 5p minus syndrome
-Crigler-Najjar syndrome
-Crimean-Congo hemorrhagic fever (HF)
-Crohn's colitis
-Crohn's disease
-Cronkhite-Canada syndrome
-Crouzon syndrome (CS)
-Crouzon syndrome-acanthosis nigricans syndrome (CNS)
-Cryptococcal meningitis (CM)
-Culler-Jones syndrome
-Currarino syndrome (CS)
-Cytomegalovirus retinitis (CR)
-D-2-hydroxyglutaric aciduria
-D-bifunctional protein deficiency (PD)
-D-glyceric aciduria
-D-mannitol allergy
-DIC in newborn (DN)
-DNA ligase IV deficiency (DLD)
-DOORS syndrome (DS)
-Dandy-Walker syndrome
-Danon disease (DD)
-De Quervain disease (QD)
-Dent disease (DD)
-Denys-Drash syndrome
-Desbuquois dysplasia (DD)
-DiGeorge syndrome (DS)
-Diamond-Blackfan anemia
-Dieulafoy lesion (DL)
-Donnai-Barrow syndrome
-Donohue syndrome (DS)
-Dowling-Degos disease
-Down syndrome (DS)
-Doyne honeycomb retinal dystrophy (DHRD)
-Dravet syndrome (DS)
-Dressler's syndrome
-Duane retraction syndrome (DRS)
-Duane-radial ray syndrome (RS)
-Dubin-Johnson syndrome
-Dubowitz syndrome (DS)
-Duchenne muscular dystrophy (DMD)
-Dyggve-Melchior-Clausen disease (DMC)
-EAST syndrome (ES)
-EEC syndrome (ES)
-Eastern equine encephalitis (EEE)
-Ebola hemorrhagic fever (EHF)
-Ebstein anomaly (EA)
-Edwards syndrome (ES)
-Ehlers-Danlos syndrome
-Ehlers-Danlos syndrome progeroid type (SPT)
-Ehrlich tumor carcinoma (ETC)
-Eiken syndrome (ES)
-Ellis-Van Creveld syndrome (CS)
-Elsahy-Waters syndrome
-Emery-Dreifuss muscular dystrophy (MD)
-Epstein-Barr virus hepatitis (VH)
-Erdheim-Chester disease
-Evans' syndrome
-Ewing sarcoma (ES)
-Ewing sarcoma of bone (ESB)
-FG syndrome
-Fabry disease (FD)
-Fanconi anemia (FA)
-Fanconi anemia complementation group A (FACG)
-Fanconi anemia complementation group B (FACG)
-Fanconi anemia complementation group C (FACG)
-Fanconi anemia complementation group D1 (FACG)
-Fanconi anemia complementation group D2 (FACG)
-Fanconi anemia complementation group E (FACG)
-Fanconi anemia complementation group F (FACG)
-Fanconi anemia complementation group G (FACG)
-Fanconi anemia complementation group I (FACG)
-Fanconi anemia complementation group J (FACG)
-Fanconi anemia complementation group L (FACG)
-Fanconi anemia complementation group N (FACG)
-Fanconi anemia complementation group O (FACG)
-Fanconi anemia complementation group P (FACG)
-Fanconi anemia complementation group Q (FACG)
-Fanconi anemia complementation group R (FACG)
-Fanconi anemia complementation group T (FACG)
-Fanconi anemia complementation group U (FACG)
-Fanconi anemia complementation group V (FACG)
-Fanconi syndrome (FS)
-Fanconi-like syndrome
-Far Eastern spotted fever (FESF)
-Farber lipogranulomatosis (FL)
-Fazio-Londe disease
-Feingold syndrome (FS)
-Felty's syndrome
-Ferguson-Smith tumor
-Finnish type amyloidosis (FTA)
-Fleck corneal dystrophy (FCD)
-Flinders Island spotted fever (FISF)
-Floating-Harbor syndrome or Pelletier–Leisti syndrome
-Foster-Kennedy syndrome
-Fox-Fordyce disease
-Frank-Ter Haar syndrome (HS)
-Fraser syndrome (FS)
-Frasier syndrome (FS)
-Freeman-Sheldon syndrome
-French Canadian Leigh disease (FCLD)
-Frey syndrome (FS)
-Friedreich ataxia (FA)
-Froelich syndrome (FS)
-Fuchs' endothelial dystrophy (ED)
-Fuchs' heterochromic uveitis (HU)
-Fuhrmann syndrome (FS)
-Fukuyama congenital muscular dystrophy (FCMD)
-GABA aminotransferase deficiency (GAD)
-GM1 gangliosidosis
-GM1 gangliosidosis type 1 (GT)
-GM1 gangliosidosis type 2 (GT)
-GM1 gangliosidosis type 3 (GT)
-GM2 gangliosidosis
-GM2 gangliosidosis, AB variant
-GRACILE syndrome (GS)
-GRID2-related spinocerebellar ataxia (SA)
-Galloway-Mowat syndrome
-Gamstorp-Wohlfart syndrome
-Gasserian ganglion meningioma (GGM)
-Gaucher's disease
-Gaucher's disease perinatal lethal (DPL)
-Gaucher's disease type I (DT)
-Gaucher's disease type II (DT)
-Gaucher's disease type III (DTI)
-Gerstmann syndrome (GS)
-Gerstmann-Straussler-Scheinker syndrome (GSS)
-Gilbert syndrome (GS)
-Gilles de la Tourette syndrome (GTS)
-Gillespie syndrome (GS)
-Gitelman syndrome (GS)
-Glanzmann's thrombasthenia
-Goldberg-Shprintzen syndrome
-Goldenhar syndrome (GS)
-Good syndrome (GS)
-Goodpasture syndrome (GS)
-Gordon Holmes syndrome (GHS)
-Gorham's disease
-Graves' disease
-Greenberg dysplasia (GD)
-Greig cephalopolysyndactyly syndrome (GCS)
-Griscelli syndrome (GS)
-Griscelli syndrome type 1 (GST)
-Griscelli syndrome type 2 (GST)
-Griscelli syndrome type 3 (GST)
-Grn-related frontotemporal lobar degeneration with Tdp43 inclusions (FLDWI)
-Guillain-Barre syndrome (GBS)
-Guttmacher syndrome (GS)
-HCL-V
-HELLP syndrome (HS)
-Hailey-Hailey disease or familial benign pemphigus
-Hajdu-Cheney syndrome
-Hallermann-Streiff syndrome (HSS)
-Hantavirus hemorrhagic fever with renal syndrome (HHFWRS)
-Hartnup disease (HD)
-Haverhill fever (HF)
-Heimler syndrome (HS)
-Heinz body anemia (HBA)
-Helsmoortel-Van Der Aa Syndrome (DS)
-Hennekam syndrome (HS)
-Henoch-Schoenlein purpura
-Her2-receptor negative breast cancer (NBC)
-Her2-receptor positive breast cancer (PBC)
-Hermansky-Pudlak syndrome
-Hirata disease (HD)
-Hirschsprung's disease
-Hodgkin's granuloma
-Hodgkin's lymphoma
-Hodgkin's lymphoma, lymphocytic depletion (LD)
-Hodgkin's lymphoma, lymphocytic-histiocytic predominance
-Hodgkin's lymphoma, mixed cellularity (MC)
-Hodgkin's lymphoma, nodular sclerosis (NS)
-Hodgkin's paragranuloma
-Holt-Oram syndrome
-Holzgreve-Wagner-Rehder Syndrome
-Horner's syndrome
-Huntington's disease
-IGSF1 deficiency syndrome (DS)
-IMAGe syndrome (IS)
-ITM2B-related cerebral amyloid angiopathy (CAA)
-IVIC syndrome (IS)
-IgA glomerulonephritis (IG)
-IgG4-related disease
-Indian plum allergy (IPA)
-Indian prawn allergy (IPA)
-Indian tick typhus (ITT)
-Israeli tick typhus (ITT)
-JMP syndrome (JS)
-Jaccoud's syndrome
-Jackson-Weiss syndrome (JWS)
-Jacobsen Syndrome (JS)
-Jalili syndrome (JS)
-Jansen's metaphyseal chondrodysplasia (MC)
-Japanese encephalitis (JE)
-Japanese spotted fever (JSF)
-Jervell-Lange Nielsen syndrome (NS)
-Jewett-Marshall bladder cancer (BC)
-Johanson-Blizzard syndrome
-Joubert syndrome (JS)
-Joubert syndrome with orofaciodigital defect (JSWOD)
-KBG syndrome (KS)
-Kabuki syndrome (KS)
-Kagami-Ogata syndrome
-Kahrizi syndrome (KS)
-Kallmann syndrome (KS)
-Kaposi's sarcoma
-Kartagener syndrome (KS)
-Kaufman oculocerebrofacial syndrome (KOS)
-Kawasaki disease (KD)
-Kearns-Sayre syndrome
-Keipert syndrome (KS)
-Kennedy's disease
-Keshan disease (KD)
-Kimura disease (KD)
-Kindler syndrome (KS)
-Klatskin's tumor
-Klebsiella pneumonia (KP)
-Kleefstra syndrome (KS)
-Kleine-Levin syndrome
-Klinefelter syndrome (KS)
-Klippel-Feil syndrome
-Klippel-Trenaunay syndrome
-Kluver-Bucy syndrome
-Kniest dysplasia (KD)
-Kohler's disease
-Kohlschutter-Tonz syndrome
-Koolen de Vries syndrome (KVS)
-Korean hemorrhagic fever (KHF)
-Krabbe disease (KD)
-Krukenberg carcinoma (KC)
-Kufor-Rakeb syndrome
-Kuhnt-Junius degeneration
-Kummell's disease or Delayed post-traumatic osteonecrosis
-Kunjin encephalitis (KE)
-Kyasanur forest disease (KFD)
-L-2-hydroxyglutaric aciduria
-L-cell glucagon-like peptide producing tumor (PPT)
-LADD syndrome (LS)
-La Crosse encephalitis (CE)
-Lafora disease (LD)
-Lambert-Eaton myasthenic syndrome (MS)
-Landau-Kleffner syndrome
-Langerhans cell sarcoma (LCS)
-Langerhans-cell histiocytosis
-Laron syndrome (LS)
-Larsen syndrome (LS)
-Larsen-like syndrome B3GAT3 type (ST)
-Lassa fever (LF)
-Laurence-Moon syndrome
-Laurin-Sandrow syndrome
-Leber congenital amaurosis (LCA)
-Leber hereditary optic neuropathy (LHON)
-Leber hereditary optic neuropathy and dystonia (LHONAD)
-Leber hereditary optic neuropathy with demyelinating disease of CNS (LHONWDDC)
-Leber plus disease (LPD)
-Legg-Calve-Perthes disease (LCPD)
-Legionnaires' disease
-Leigh disease (LD)
-Lemierre's syndrome
-Lennox-Gastaut syndrome
-Lenz-Majewski hyperostotic dwarfism (HD)
-Leri-Weill dyschondrosteosis
-Lesch-Nyhan syndrome
-Lewy body dementia (LBD)
-Leydig cell tumor (LCT)
-Li-Fraumeni syndrome
-Liddle syndrome (LS)
-Lisch epithelial corneal dystrophy (LECD)
-Listeria meningitis (LM)
-Littre gland carcinoma (LGC)
-Loeffler endocarditis (LE)
-Loeffler syndrome (LS)
-Loeys-Dietz syndrome
-Lown-Ganong-Levine syndrome
-Ludwig's angina
-Lutembacher's syndrome
-Lyme disease (LD)
-Lynch syndrome (LS)
-MALT lymphoma (ML)
-MASA syndrome (MS)
-MEDNIK syndrome (MS)
-MEHMO syndrome (MS)
-MELAS syndrome (MS)
-MEND syndrome (MS)
-MERRF syndrome (MS)
-MHC class I deficiency (MCD)
-MHC class II deficiency (MCD)
-MLS syndrome (MS)
-MYH-9 related disease (RD)
-Machado-Joseph disease (MJD) or spinocerebellar ataxia Type 3 (SCA3)
-Maffucci syndrome (MS)
-Marburg hemorrhagic fever (MHF)
-Marfan syndrome (MS)
-Marinesco-Sjogren syndrome
-Marshall syndrome (MS)
-Marshall-Smith syndrome
-Martsolf syndrome (MS)
-Mast syndrome (MS)
-Masters-Allen syndrome
-McCune Albright syndrome (MAS)
-McKusick-Kaufman syndrome
-Meckel syndrome (MS)
-Meckel's diverticulitis
-Meckel's diverticulum
-Meckel's diverticulum cancer (DC)
-Meesmann corneal dystrophy (MCD)
-Meester-Loeys syndrome
-Meier-Gorlin syndrome
-Meige syndrome (MS)
-Melkersson-Rosenthal syndrome
-Melnick-Needles syndrome
-Meniere's disease
-Menkes disease (MD)
-Merkel cell carcinoma (MCC)
-Middle East respiratory syndrome (MERS)
-Mikulicz disease (MD)
-Miles-Carpenter syndrome
-Miller Fisher syndrome (MFS)
-Miller-Dieker lissencephaly syndrome (LS)
-Miura type epiphyseal chondrodysplasia (MTEC)
-Miyoshi muscular dystrophy (MMD)
-Mobitz type II atrioventricular block (MTAB)
-Mobius syndrome (MS)
-Monckeberg arteriosclerosis (MA)
-Mononen-Karnes-Senac syndrome
-Mooren's ulcer
-Morgagni cataract (MC)
-Mowat-Wilson syndrome
-Moyamoya disease (MD)
-Muckle-Wells syndrome
-Muenke Syndrome (MS)
-Muir-Torre syndrome
-Mulchandani-Bhoj-Conlin syndrome (MBCS)
-Mullegama-Klein-Martinez syndrome (MKMS)
-Mullerian aplasia and hyperandrogenism (MAAH)
-Munchausen by proxy (MP)
-Murray Valley encephalitis (MVE)
-Mycobacterium avium complex disease (MACD)
-Mycoplasma pneumoniae pneumonia (MPP)
-N syndrome
-N,N'-diethylthiourea allergic contact dermatitis (ACD)
-N,N'-diphenylthiourea allergic contact dermatitis (ACD)
-NARP syndrome (NS)
-NFIA-related disorder
-NGLY1-deficiency
-NUT midline carcinoma (NMC)
-Naegeli-Franceschetti-Jadassohn syndrome (NFJS) or dermatopathia pigmentosa reticularis (DPR)
-Nager acrofacial dysostosis (NAD)
-Nance-Horan syndrome
-Nasu-Hakola disease or polycystic lipomembranous osteodysplasia with sclerosing leukoencephalopathy (PLOSL)
-Native American myopathy (NAM)
-Naxos disease (ND)
-Nelson syndrome (NS)
-Netherton syndrome (NS)
-Neu-Laxova syndrome
-Newcastle disease (ND)
-Newfoundland cone-rod dystrophy (ND)
-Nezelof syndrome (NS)
-Niemann-Pick disease
-Niemann-Pick disease type A (NPA)
-Niemann-Pick disease type B (NPB)
-Niemann-Pick disease type C1 (NPC1)
-Niemann-Pick disease type C2 (NPC2)
-Nijmegen breakage syndrome (NBS)
-Nipah virus encephalitis (NVE)
-Noonan syndrome (NS)
-Noonan syndrome with multiple lentigines (NSWML)
-Noonan syndrome-like disorder with loose anagen hair (NDWLAH)
-Norman-Roberts syndrome
-Norrie disease (ND)
-Norum disease (ND) or fish-eye disease or familial LCAT deficiency
-O'nyong'nyong fever
-Ogden syndrome (OS)
-Oguchi disease-1
-Oguchi disease-2
-Ohdo syndrome (OS)
-Oliver-McFarlane syndrome
-Ollier disease (OD)
-Omenn syndrome (OS)
-Omsk hemorrhagic fever (OHF)
-Opitz-GBBB syndrome
-Oropouche fever (OF)
-Osgood-Schlatter's disease
-PAPA syndrome (PS)
-PCWH syndrome (PS)
-PEHO syndrome (PS)
-PHARC syndrome (PS)
-PHGDH deficiency (PD)
-POEMS syndrome (PS)
-PSAT deficiency (PD)
-PSPH deficiency (PD)
-PTEN hamartoma tumor syndrome (PHTS)
-Pacinian tumor (PT)
-Paganini-Miozzo syndrome (MRXSPM)
-Paget's disease of bone (DB)
-Pallister-Hall syndrome
-Pancoast tumor (PT)
-Papillon-Lefevre disease
-Parkinson's disease
-Partington syndrome (PS)
-Patau syndrome (PS)
-Pearson syndrome (PS)
-Pediculus humanus capitis infestation (PHCI)
-Pediculus humanus corporis infestation (PHCI)
-Pelger-Huet anomaly
-Pelizaeus-Merzbacher disease (PMD)
-Pendred Syndrome (PS)
-Perlman syndrome (PS)
-Perrault syndrome (PS)
-Perrault syndrome 6 (PS)
-Perry syndrome (PS)
-Peters anomaly (PA)
-Peters plus syndrome (PPS)
-Peutz-Jeghers syndrome
-Peyronie's disease
-Pfeiffer syndrome (PS)
-Phelan-McDermid syndrome
-Phlebotomus fever (PF)
-Phlegmonous dacryocystitis (PD)
-Pick's disease
-Pierson syndrome (PS)
-Pitt-Hopkins syndrome
-Pitt-Hopkins-like syndrome 2
-Plasmodium falciparum malaria (PFM)
-Plasmodium malariae malaria (PMM)
-Plasmodium ovale malaria (POM)
-Plasmodium vivax malaria (PVM)
-Plica syndrome (PS)
-Plummer's disease or toxic multinodular goitre
-Poland syndrome (PS)
-Polyomavirus-associated nephropathy
-Pontiac fever (PF)
-Potocki-Lupski syndrome
-Potocki-Shaffer syndrome
-Potter's syndrome
-Powassan encephalitis (PE)
-Prader-Willi syndrome
-Prieto syndrome (PS)
-Prinzmetal angina (PA)
-Proteus syndrome (PS)
-Pthirus pubis infestation (PPI)
-Query fever or Q fever
-Qazi Markouizos syndrome (QMS)
-Quebec platelet disorder (QPD)
-Queensland tick typhus (QTT)
-RASopathy
-REM sleep behavior disorder (RSBD)
-RIDDLE syndrome (RS)
-Rapp-Hodgkin syndrome
-Raynaud disease (RD)
-Refsum disease (RD)
-Reis-Bucklers corneal dystrophy (CD)
-Renpenning syndrome (RS)
-Rett syndrome (RS)
-Revesz syndrome (RS)
-Reye syndrome (RS)
-Rh deficiency syndrome (DS)
-Rh isoimmunization
-Richter's syndrome
-Rickettsia parkeri spotted fever (RPSF)
-Riedel's fibrosing thyroiditis (FT)
-Rift Valley fever (RVF)
-Riley-Day syndrome
-Ritscher-Schinzel syndrome
-Ritter's disease or Staphylococcus-Scalded Skin Syndrome (SSSS) or Scalded Skin Syndrome
-Roberts syndrome (RS)
-Robinow syndrome (RS)
-Rocky Mountain spotted fever (RMSF)
-Rolandic epilepsy-paroxysmal exercise-induced dystonia-writer's cramp syndrome (RCS)
-Ross River fever (RRF)
-Rothmund-Thomson syndrome
-Rubinstein-Taybi syndrome
-Ruijs-Aalfs syndrome
-severe achondroplasia with developmental delay and acanthosis nigricans (SADDAN)
-SAPHO syndrome (SS)
-SATB2-associated syndrome
-SC phocomelia syndrome (PS)
-SHORT syndrome (SS)
-SM-AHNMD
-SOST-related sclerosing bone dysplasia (SBD)
-SPOAN syndrome (SS)
-STING-associated vasculopathy with onset in infancy (VWOI)
-Sabinas brittle hair syndrome (SBHS)
-Saethre-Chotzen syndrome
-Sakati-Nyhan syndrome
-Saldino-Noonan syndrome
-Sandhoff disease (SD)
-Saul-Wilson syndrome
-Schaaf-Yang syndrome
-Scheie syndrome (SS)
-Scheuermann's disease
-Schimke immuno-osseous dysplasia (SD)
-Schmid metaphyseal chondrodysplasia (SMC)
-Schneiderian carcinoma (SC)
-Schnitzler syndrome (SS)
-Schnyder corneal dystrophy (SCD)
-Schopf-Schulz-Passarge syndrome
-Schuurs-Hoeijmakers Syndrome
-Schwannian stroma-rich and stroma-poor composite ganglioneuroblastoma (SACG)
-Schwartz-Jampel syndrome
-Scott syndrome (SS)
-Seckel syndrome (SS)
-Sengers syndrome (SS)
-Senile atrophy of choroid (SAC)
-Senior-Loken syndrome
-Sensenbrenner syndrome (SS)
-Sertoli cell tumor (SCT)
-Sertoli cell-only syndrome (SS)
-Sertoli-Leydig cell tumor (CT)
-Sezary's disease
-Sheehan syndrome (SS)
-Shukla-Vernon syndrome
-Shwachman-Diamond syndrome
-Shwachman-Diamond type metaphyseal dysplasia (TMD)
-Shwartzman phenomenon (SP)
-Siberian tick typhus (STT)
-Silver-Russell syndrome
-Silverman-Handmaker type dyssegmental dysplasia (TDD)
-Simpson-Golabi-Behmel syndrome type 1 (ST)
-Simpson-Golabi-Behmel syndrome type 2 (ST)
-Sjogren's syndrome
-Sjogren-Larsson syndrome
-Skene gland carcinoma (SGC)
-Sly syndrome (SS)
-Smarca4-deficient sarcoma of thorax (ST)
-Smith-Lemli-Opitz syndrome (SLOS)
-Smith-Magenis syndrome
-Smith-McCort dysplasia (SMC)
-Sneddon syndrome (SS)
-Sorsby's fundus dystrophy (FD)
-Sotos syndrome (SS)
-St. Louis encephalitis (LE)
-Stargardt disease (SD)
-Stevens-Johnson syndrome
-Stickler syndrome (SS)
-Stiff-Person syndrome
-Stormorken syndrome (SS)
-Streptococcus pneumonia (SP)
-Stromme syndrome (SS)
-Sturge-Weber syndrome
-Sugarman brachydactyly (SB)
-Sveinsson chorioretinal atrophy (SCA)
-Sweeney-Cox syndrome
-T cell deficiency (CD)
-T-cell acute lymphoblastic leukemia (ALL)
-T-cell adult acute lymphocytic leukemia (AALL)
-T-cell childhood lymphoblastic lymphoma (CLL)
-T-cell immunodeficiency, congenital alopecia, and nail dystrophy (CAND)
-T-cell large granular lymphocyte leukemia (LGLL)
-T-cell lymphoblastic leukemia/lymphoma
-TARP syndrome (TS)
-TSH producing pituitary tumor (TPPT)
-Takayasu's arteritis (TAK)
-Tangier disease (TD)
-Tay-Sachs disease
-Taylor's syndrome
-Temple syndrome (TS)
-Temtamy syndrome (TS)
-Thiel-Behnke corneal dystrophy (CD)
-Tietz syndrome (TS)
-Tietze's syndrome
-Timothy grass allergy (TGA)
-Timothy syndrome (TS)
-Tn polyagglutination syndrome (PS)
-Torrance type platyspondylic dysplasia (TTPD)
-Townes-Brocks syndrome
-Treacher Collins syndrome (TCS)
-Trichomonas tenax trichomoniasis (TTT)
-Trichomonas vaginalis trichomoniasis (TVT)
-Troyer syndrome (TS)
-Turner syndrome (TS)
-UV-sensitive syndrome
-Ullrich congenital muscular dystrophy (UCMD)
-Unverricht-Lundborg syndrome
-Usher syndrome (US)
-Usher syndrome type 1 (UST)
-Usher syndrome type 1C (UST)
-Usher syndrome type 1D (UST)
-Usher syndrome type 1E (UST)
-Usher syndrome type 1F (UST)
-Usher syndrome type 1G (UST)
-Usher syndrome type 1H (UST)
-Usher syndrome type 1J (UST)
-Usher syndrome type 1K (UST)
-Usher syndrome type 2 (UST)
-Usher syndrome type 2A (UST)
-Usher syndrome type 2C (UST)
-Usher syndrome type 2D (UST)
-Usher syndrome type 3 (UST)
-Usher syndrome type 3A (UST)
-Usher syndrome type 3B (UST)
-VACTERL association (VA)
-VIPoma
-Van Esch-O'Driscoll syndrome (VS)
-Van Maldergem syndrome (VMS)
-Van den Ende-Gupta syndrome (VDS)
-Van der Woude syndrome (VDWS)
-Venezuelan equine encephalitis (VEE)
-Venezuelan hemorrhagic fever (VHF)
-Vici syndrome (VS)
-Vogt-Koyanagi-Harada disease
-Vohwinkel syndrome (VS)
-Volkmann contracture (VC)
-WAGR syndrome (WS)
-WHIM syndrome (WS)
-Waardenburg syndrome type 1 (WS1)
-Waardenburg syndrome type 2A (WS2A)
-Waardenburg syndrome type 2B (WS2B)
-Waardenburg syndrome type 2C (WS2C)
-Waardenburg syndrome type 2D (WS2D)
-Waardenburg syndrome type 2E (WS2E)
-Waardenburg syndrome type 3 (WS3)
-Waardenburg syndrome type 4A (WS4A)
-Waardenburg syndrome type 4B (WS4B)
-Waardenburg syndrome type 4C (WS4C)
-Waardenburg's syndrome
-Waisman syndrome (WS)
-Waldenstroem's macroglobulinemia
-Waldeyer's ring cancer (RC)
-Walker-Warburg syndrome
-Warburg micro syndrome (WMS)
-Warsaw breakage syndrome (WBS)
-Waterhouse-Friderichsen syndrome (WFS)
-Weaver syndrome (WS)
-Weill-Marchesani syndrome
-Weissenbacher-Zweymuller syndrome
-Werdnig-Hoffmann disease
-Werner syndrome (WS)
-Wernicke encephalopathy (WE)
-Wernicke-Korsakoff syndrome
-West Nile encephalitis (WNE)
-West Nile fever (WNF)
-West syndrome (WS)
-Western equine encephalitis (WEE)
-Weyers acrofacial dysostosis (WAD)
-Whipple disease (WD)
-White-Sutton syndrome
-Whitewater Arroyo hemorrhagic fever (WAHF)
-Williams-Beuren syndrome
-Wilson disease (WD)
-Wilson-Turner syndrome
-Wiskott-Aldrich syndrome
-Wissler-Fanconi syndrome
-Wolcott-Rallison syndrome
-Wolf-Hirschhorn syndrome
-Wolff-Parkinson-White syndrome (WPW)
-Wolffian adnexal neoplasm (WAN)
-Wolffian duct adenocarcinoma (WDA)
-Wolffian duct adenoma (WDA)
-Wolfram syndrome (WS)
-Wolfram syndrome, mitochondrial form (WMF)
-Wolman disease (WD)
-Worth syndrome (WS)
-X-linked Aarskog syndrome (AS)
-X-linked Alport syndrome (AS)
-X-linked Emery-Dreifuss muscular dystrophy (MD)
-X-linked VACTERL association (VA)
-X-linked adrenal hypoplasia congenita (AHC)
-X-linked agammaglobulinemia (XLA)
-X-linked amelogenesis imperfecta hypoplastic/hypomaturation 2 (AI)
-X-linked cardiac valvular dysplasia (CVD)
-X-linked cerebellar ataxia (CA)
-X-linked chondrodysplasia punctata (CP)
-X-linked chronic granulomatous disease (CGD)
-X-linked chronic idiopathic intestinal pseudo-obstruction (CII)
-X-linked cleft palate with or without ankyloglossia (CPWWA)
-X-linked cone-rod dystrophy
-X-linked congenital bilateral absence of vas deferens (CBAVD)
-X-linked congenital hemolytic anemia (CHA)
-X-linked congenital myopathy with fiber-type disproportion (CMWD)
-X-linked deafness
-X-linked dilated cardiomyopathy (DC)
-X-linked distal spinal muscular atrophy 3 (DSMA)
-X-linked dominant hypophosphatemic rickets (DHR)
-X-linked dyskeratosis congenita (DC)
-X-linked dystonia-parkinsonism
-X-linked endothelial corneal dystrophy (ECD)
-X-linked exudative vitreoretinopathy 2 (EV)
-X-linked hereditary ataxia (HA)
-X-linked hyper IgM syndrome (HIS)
-X-linked hypoparathyroidism
-X-linked ichthyosis
-X-linked immunodeficiency with magnesium defect, Epstein-Barr virus infection, and neoplasia (IWMVAN)
-X-linked intellectual disability-cardiomegaly-congestive heart failure syndrome (IHFS)
-X-linked intellectual disability-psychosis-macroorchidism syndrome (IS)
-X-linked juvenile retinoschisis (JR)
-X-linked lymphoproliferative syndrome (LS)
-X-linked Intellectual Disability (ID)
-X-linked mental retardation with cerebellar hypoplasia and distinctive facial appearance (MRWCHADFA)
-X-linked myopathy with excessive autophagy (MWEA)
-X-linked nephrolithiasis type I (NT)
-X-linked nonsyndromic deafness (ND)
-X-linked panhypopituitarism
-X-linked properdin deficiency (PD)
-X-linked recessive hypophosphatemic rickets (RHR)
-X-linked reticulate pigmentary disorder (RPD)
-X-linked severe combined immunodeficiency (SCI)
-X-linked sideroblastic anemia with ataxia (SAWA)
-X-linked spermatogenic failure (SF)
-X-linked spinal muscular atrophy (SMA)
-X-linked spinocerebellar ataxia (SA)
-X-linked thrombocytopenia with beta-thalassemia (TW)
-XFE progeroid syndrome (XPS)
-Xia-Gibbs Syndrome
-Y-linked deafness
-Y-linked spermatogenic failure (SF)
-Yunis-Varon syndrome
-Zellweger syndrome (ZS)
-Zika fever (ZF)
-Zika virus congenital syndrome (ZVCS)
-Zollinger-Ellison syndrome
 abacavir allergy (AA)
+ABCD syndrome (AS)
 abdominal aortic aneurysm (AAA)
 abdominal obesity-metabolic syndrome (AS)
 abdominal tuberculosis (AT)
@@ -1053,6 +37,7 @@ abnormal pupillary function (APF)
 abnormal retinal correspondence (ARC)
 abnormal threshold of rods (ATR)
 abnormality of glucagon secretion (AGS)
+Abruzzo-Erickson syndrome
 absence epilepsy (AE)
 absolute glaucoma (AG)
 acalculous cholecystitis (AC)
@@ -1069,7 +54,10 @@ accommodative spasm (AS)
 aceruloplasminemia
 achalasia
 achalasia microcephaly syndrome (AMS)
+Achard syndrome (AS)
 acheiropody
+Achenbach syndrome (AS)
+Achilles bursitis (AB)
 achondrogenesis
 achondrogenesis type IA (AT)
 achondrogenesis type IB (AT)
@@ -1084,6 +72,7 @@ acid anhydride respiratory allergy (AARA)
 acidophil adenoma (AA)
 acinar cell carcinoma (ACC)
 acinar cell cystadenocarcinoma (ACC)
+Acinetobacter infectious disease (AID)
 acinic cell breast carcinoma (ACBC)
 acne or vulgaris
 acneiform dermatitis (AD)
@@ -1123,6 +112,8 @@ acromesomelic dysplasia, Hunter-Thompson type (AT)
 acromesomelic dysplasia, Maroteaux type (AMT)
 acromicric dysplasia (AD)
 acrorenal syndrome (AS)
+ACTH-independent macronodular adrenal hyperplasia (MAH)
+ACTH-secreting pituitary adenoma (PA)
 actinic keratosis (AK)
 actinobacillosis
 actinomycosis
@@ -1208,6 +199,8 @@ acute vascular insufficiency of intestine (AVII)
 adamantinoid basal cell epithelioma (ABCE)
 adamantinoma
 adamantinous craniopharyngioma (AC)
+Adams-Oliver syndrome
+Addison's disease
 adenine phosphoribosyltransferase deficiency (APRTD)
 adenocarcinoma
 adenocarcinoma in situ (AS)
@@ -1235,6 +228,7 @@ adermatoglyphia
 adhesions of uterus (AU)
 adhesive otitis media (AOM)
 adiaspiromycosis
+Adie syndrome (AS)
 adiposis dolorosa (AD)
 adjustment disorder (AD)
 adolescence-adult electroclinical syndrome (ES)
@@ -1256,7 +250,6 @@ adrenal rest tumor (ART)
 adrenocortical carcinoma (AC)
 adrenocorticotropic hormone deficiency (ACTHD)
 adrenoleukodystrophy
-adult T-cell leukemia (AL)
 adult acute lymphocytic leukemia (AALL)
 adult acute monocytic leukemia (AAML)
 adult astrocytic tumour (AAT)
@@ -1307,25 +300,31 @@ adult respiratory distress syndrome (ARDS)
 adult spinal cord ependymoma (ASCE)
 adult spinal cord glioblastoma multiforme (ASCGM)
 adult spinal muscular atrophy (ASMA)
+ADULT syndrome (AS)
+adult T-cell leukemia (AL)
 adult teratoma (AT)
 adult type testicular granulosa cell tumor (ATTGCT)
 adult vagina botryoid rhabdomyosarcoma (AVBR)
 adult xanthogranuloma (AX)
-adult-onset Still's disease
 adult-onset ataxia and polyneuropathy (AAP)
 adult-onset autosomal dominant demyelinating leukodystrophy (ADDL)
 adult-onset leukoencephalopathy with axonal spheroids and pigmented glia (LWASAPG)
+adult-onset Still's disease
 adult-onset type II citrullinemia (TC)
 advanced sleep phase syndrome (ASPS)
 afferent loop syndrome (ALS)
 aflatoxins-related hepatocellular carcinoma (HC)
+African histoplasmosis (AH)
+African iron overload (AIO)
+African tick-bite fever (AF)
 agammaglobulinemia
 agammaglobulinemia 4
 agammaglobulinemia 5
+AGAT deficiency (AD)
 age related macular degeneration (ARMD)
 agenesis of the corpus callosum with peripheral neuropathy (ATCCWPN)
-aggressive NK-cell leukemia (AL)
 aggressive digital papillary adenocarcinoma (ADPA)
+aggressive NK-cell leukemia (AL)
 aggressive periodontitis (AP)
 aggressive systemic mastocytosis (ASM)
 agnathia-otocephaly complex
@@ -1333,9 +332,15 @@ agnosia
 agoraphobia
 agranulocytosis
 agraphia
+Aicardi syndrome (AS)
+Aicardi-Goutieres syndrome
+AIDS phobia (AP)
 ainhum
 akinetic mutism (AM)
 akinetopsia
+Alagille syndrome (AS)
+Aland Island eye disease (AIED)
+Albright's hereditary osteodystrophy (HO)
 alcohol dependence (AD)
 alcohol use disorder (AUD)
 alcohol-induced mental disorder (MD)
@@ -1353,10 +358,14 @@ aleukemic leukemia (AL)
 aleukemic leukemia cutis (ALC)
 aleukemic monocytic leukemia cutis (AMLC)
 aleutian mink disease (AMD)
+Alexander disease (AD)
 alexia
 alexithymia
 algoneurodystrophy
 alkaptonuria
+Alkhurma hemorrhagic fever (AHF)
+Alkuraya-Kucinskas syndrome
+Allan-Herndon-Dudley syndrome
 allergic asthma (AA)
 allergic bronchopulmonary aspergillosis (ABA)
 allergic conjunctivitis (AC)
@@ -1374,11 +383,13 @@ alopecia-mental retardation syndrome (APMR)
 alpha 1-antitrypsin deficiency (AD)
 alpha chain disease (ACD)
 alpha thalassemia (AT)
-alpha thalassemia-X-linked intellectual disability syndrome (ATRX)
 alpha thalassemia-intellectual disability syndrome type 1 (ADST)
+alpha thalassemia-X-linked intellectual disability syndrome (ATRX)
 alpha-2-plasmin inhibitor deficiency (ID)
 alpha-mannosidosis
 alpha-methylacyl-CoA racemase deficiency (RD)
+Alport syndrome (AS)
+Alstrom syndrome (AS)
 alternating esotropia (AE)
 alternating exotropia (AE)
 alternating hemiplegia of childhood (AHC)
@@ -1387,7 +398,9 @@ alveolar periostitis (AP)
 alveolar rhabdomyosarcoma (AR)
 alveolar soft part sarcoma (ASPS)
 alveoli adenoma (AA)
+Alzheimer's disease
 amblyopia
+Ambras type hypertrichosis universalis congenita (ATHUC)
 amebiasis
 amelanotic melanoma (AM)
 ameloblastoma
@@ -1410,9 +423,11 @@ amelogenesis imperfecta type 3B (AIT)
 amelogenesis imperfecta type 3C (AIT)
 amelogenesis imperfecta type 4 (AIT)
 amenorrhea
+American histoplasmosis (AH)
 ametropic amblyopia (AA)
 amino acid metabolic disorder (AAMD)
 aminoglycoside-induced deafness
+AMME complex (AC)
 amnestic disorder (AD)
 amodiaquine allergy (AA)
 amoxicillin allergy (AA)
@@ -1459,11 +474,10 @@ amyotrophic neuralgia (AN)
 anaerobic meningitis (AM)
 anaerobic pneumonia (AP)
 anal Buschke-Lowenstein tumor (AT)
-anal Paget's disease (AD)
-anal canal Paget's disease (ACD)
 anal canal adenocarcinoma (ACA)
 anal canal cancer (ACC)
 anal canal carcinoma (ACC)
+anal canal Paget's disease (ACD)
 anal canal squamous cell carcinoma (ACSCC)
 anal carcinoma (AC)
 anal carcinoma in situ (ACS)
@@ -1475,18 +489,22 @@ anal margin basal cell carcinoma (AMBCC)
 anal margin carcinoma (AMC)
 anal margin squamous cell carcinoma (AMSCC)
 anal neuroendocrine tumor (ANT)
+anal Paget's disease (AD)
 anal spasm (AS)
 anal squamous cell carcinoma (ASCC)
 anaplastic large cell lymphoma (ALCL)
 anatomical narrow angle borderline glaucoma (ANABG)
 anauxetic dysplasia (AD)
 ancylostomiasis
+Andersen-Tawil syndrome
 androgen insensitivity syndrome (AIS)
 androgenic alopecia (AA)
 anemia
 anemia of prematurity (AP)
 anencephaly
 aneruptive fever (AF)
+Angelman syndrome (AS)
+Angelucci's syndrome
 angiodysplasia
 angiodysplasia of intestine (AI)
 angioedema
@@ -1552,6 +570,7 @@ antidepressant type abuse (ATA)
 antiphospholipid syndrome (AS)
 antisocial personality disorder (APD)
 antithrombin III deficiency (AID)
+Antley-Bixler syndrome
 anuria
 anus adenocarcinoma (AA)
 anus basaloid carcinoma (ABC)
@@ -1586,6 +605,7 @@ apocrine adenosis of breast (AAB)
 apocrine sweat gland cancer (ASGC)
 apocrine sweat gland neoplasm (ASGN)
 apolipoprotein C-III deficiency (AD)
+APP-related cerebral amyloid angiopathy (CAA)
 apparent mineralocorticoid excess syndrome (AMES)
 appendiceal L-cell glucagon-like peptide producing tumor (APPT)
 appendiceal neoplasm (AN)
@@ -1603,8 +623,13 @@ apraxia
 apricot allergy (AA)
 aqueous misdirection (AM)
 arachnoiditis
+ARC syndrome (AS)
 arcus senilis (AS)
+Arenaviridae infectious disease (AID)
+Argentine hemorrhagic fever (AHF)
 argininosuccinic aciduria (AA)
+Argyll Robertson pupil (ARP)
+Armfield syndrome (AS)
 aromatase excess syndrome (AES)
 aromatic L-amino acid decarboxylase deficiency (AADC)
 arrhythmogenic right ventricular cardiomyopathy (ARVC)
@@ -1626,6 +651,7 @@ arthropathy
 arthus reaction (AR)
 articular cartilage disease (ACD)
 articulation disorder (AD)
+Arts syndrome (AS)
 aryepiglottic fold cancer (AFC)
 asbestos-related lung carcinoma (LC)
 asbestosis
@@ -1634,7 +660,9 @@ ascaridiasis
 ascending cholangitis (AC)
 ascending colon cancer (ACC)
 aseptic meningitis (AM)
+Askin's tumor
 aspartylglucosaminuria (AGU)
+Asperger syndrome (AS)
 aspergillosis
 asphyxia neonatorum (AN)
 asphyxiating thoracic dystrophy (ATD)
@@ -1646,6 +674,7 @@ astereognosia
 asthma
 asthma, nasal polyps, and aspirin intolerance (NAAI)
 astigmatism
+Astrakhan spotted fever (ASF)
 astroblastoma
 astrocytoma
 asymmetric motor neuropathy (AMN)
@@ -1658,8 +687,11 @@ ataxia with oculomotor apraxia type 2 (AWOAT)
 ataxia with oculomotor apraxia type 3 (AWOAT)
 ataxic cerebral palsy (ACP)
 atelosteogenesis
+Athabaskan brainstem dysgenesis syndrome (ABDS)
 atheroembolism of kidney (AK)
 atherosclerosis
+Atlantic cod allergy (ACA)
+Atlantic salmon allergy (ASA)
 atopic dermatitis (AD)
 atopic dermatitis 2 (AD)
 atopic dermatitis 3 (AD)
@@ -1686,13 +718,13 @@ atrophic vulva (AV)
 atrophy of prostate (AP)
 atrophy of testis (AT)
 attention deficit hyperactivity disorder (ADHD)
-atypical Gaucher's disease due to saposin c deficiency (ADDSD)
 atypical autism (AA)
 atypical breast papilloma (ABP)
 atypical choroid plexus papilloma (ACPP)
 atypical chronic myeloid leukemia (ACML)
 atypical depressive disorder (ADD)
 atypical follicular adenoma (AFA)
+atypical Gaucher's disease due to saposin c deficiency (ADDSD)
 atypical hemolytic-uremic syndrome (AS)
 atypical hereditary sensory neuropathy (AHSN)
 atypical neurofibroma (AN)
@@ -1745,14 +777,8 @@ autonomic nervous system neoplasm (ANSN)
 autonomic neuropathy (AN)
 autonomic peripheral neuropathy (APN)
 autosomal dominant Aarskog syndrome (ADAS)
-autosomal dominant Alport syndrome (ADAS)
-autosomal dominant Emery-Dreifuss muscular dystrophy 2 (ADMD)
-autosomal dominant Emery-Dreifuss muscular dystrophy 4 (ADMD)
-autosomal dominant Emery-Dreifuss muscular dystrophy 5 (ADMD)
-autosomal dominant Emery-Dreifuss muscular dystrophy 7 (ADMD)
-autosomal dominant Robinow syndrome (ADRS)
-autosomal dominant Wolfram syndrome (ADWS)
 autosomal dominant adult-onset proximal spinal muscular atrophy (ADPSMA)
+autosomal dominant Alport syndrome (ADAS)
 autosomal dominant auditory neuropathy (ADAN)
 autosomal dominant centronuclear myopathy (ADCM)
 autosomal dominant cerebellar ataxia (ADCA)
@@ -1764,6 +790,10 @@ autosomal dominant disease (ADD)
 autosomal dominant distal hereditary motor neuronopathy (ADDHMN)
 autosomal dominant dyskeratosis congenita (ADDC)
 autosomal dominant dystrophic epidermolysis bullosa (ADDEB)
+autosomal dominant Emery-Dreifuss muscular dystrophy 2 (ADMD)
+autosomal dominant Emery-Dreifuss muscular dystrophy 4 (ADMD)
+autosomal dominant Emery-Dreifuss muscular dystrophy 5 (ADMD)
+autosomal dominant Emery-Dreifuss muscular dystrophy 7 (ADMD)
 autosomal dominant familial periodic fever (ADFPF)
 autosomal dominant familial visceral neuropathy (ADFVN)
 autosomal dominant hyaline body myopathy (ADHBM)
@@ -1800,17 +830,16 @@ autosomal dominant polycystic kidney disease (ADPKD)
 autosomal dominant progressive external ophthalmoplegia (ADPEO)
 autosomal dominant progressive external ophthalmoplegia with mitochondrial DNA deletions (ADPEOWMDD)
 autosomal dominant pseudohypoaldosteronism type 1 (ADPT)
+autosomal dominant Robinow syndrome (ADRS)
 autosomal dominant sensory ataxia (ADSA)
 autosomal dominant sideroblastic anemia (ADSA)
 autosomal dominant type IV Ehlers-Danlos syndrome (ADTS)
 autosomal dominant vitreoretinochoroidopathy (ADV)
+autosomal dominant Wolfram syndrome (ADWS)
 autosomal dominant woolly hair (ADWH)
 autosomal genetic disease (AGD)
 autosomal hemophilia A (AH)
 autosomal recessive Alport syndrome (ARAS)
-autosomal recessive Emery-Dreifuss muscular dystrophy 3 (ARMD)
-autosomal recessive Robinow syndrome (ARRS)
-autosomal recessive Whistling face syndrome (ARWFS)
 autosomal recessive centronuclear myopathy (ARCM)
 autosomal recessive cerebellar ataxia (ARCA)
 autosomal recessive chronic granulomatous disease cytochrome b-negative (ARCGDC)
@@ -1835,6 +864,7 @@ autosomal recessive cutis laxa type IIIB (ARCL3B)
 autosomal recessive disease (ARD)
 autosomal recessive distal hereditary motor neuronopathy (ARDHMN)
 autosomal recessive dyskeratosis congenita (ARDC)
+autosomal recessive Emery-Dreifuss muscular dystrophy 3 (ARMD)
 autosomal recessive hyaline body myopathy (ARHBM)
 autosomal recessive hypercholesterolemia (ARH)
 autosomal recessive hypophosphatemic rickets (ARHR)
@@ -1873,19 +903,41 @@ autosomal recessive progressive external ophthalmoplegia (ARPEO)
 autosomal recessive progressive external ophthalmoplegia with mitochondrial DNA deletions (ARPEOWMDD)
 autosomal recessive pseudohypoaldosteronism type 1 (ARPT)
 autosomal recessive pyridoxine-refractory sideroblastic anemia (ARSA)
+autosomal recessive Robinow syndrome (ARRS)
 autosomal recessive spinocerebellar ataxia (ARSA)
 autosomal recessive type IV Ehlers-Danlos syndrome (ARTS)
+autosomal recessive Whistling face syndrome (ARWFS)
 autosomal recessive woolly hair 3 (ARWH)
 autosomal-mitochondrial sensorineural deafness (SD)
 autotopagnosia
 avian influenza (AI)
 avoidant personality disorder (APD)
+Axenfeld-Rieger syndrome
+Axenfeld-Rieger syndrome type 1 (ST)
+Axenfeld-Rieger syndrome type 2 (ST)
+Axenfeld-Rieger syndrome type 3 (ST)
 axial osteomalacia (AO)
 axillary adenitis (AA)
 axillary lipoma (AL)
 axonal neuropathy (AN)
+Ayme-Gripp syndrome
 azoospermia
 aztreonam allergy (AA)
+B cell deficiency (CD)
+B-cell acute lymphoblastic leukemia (ALL)
+B-cell adult acute lymphocytic leukemia (AALL)
+B-cell lymphoma
+B-lymphoblastic leukemia/lymphoma
+B-lymphoblastic leukemia/lymphoma KMT2A rearranged
+B-lymphoblastic leukemia/lymphoma with BCR-ABL1
+B-lymphoblastic leukemia/lymphoma with ETV6-RUNX1
+B-lymphoblastic leukemia/lymphoma with hyperdiploidy (WH)
+B-lymphoblastic leukemia/lymphoma with hypodiploidy (WH)
+B-lymphoblastic leukemia/lymphoma with iAMP21
+B-lymphoblastic leukemia/lymphoma with IL3-IGH
+B-lymphoblastic leukemia/lymphoma with TCF3-PBX1
+B-lymphoblastic leukemia/lymphoma, BCR-ABL1–like
+Baastrup's syndrome
 babesiosis
 bacillary angiomatosis (BA)
 background diabetic retinopathy (BDR)
@@ -1903,12 +955,48 @@ balanitis
 balanitis xerotica obliterans (BXO)
 balanoposthitis
 balantidiasis
+Balkan hemorrhagic fever (BHF)
+Balkan nephropathy (BN)
+Ballard syndrome (BS)
+Baller-Gerold syndrome
 balloon cell malignant melanoma (BCMM)
+Balo concentric sclerosis (BCS)
+Bamforth-Lazarus syndrome
 band keratopathy (BK)
+Bannayan-Riley-Ruvalcaba syndrome (BRRS)
+Baraitser-Winter syndrome (BWS)
+Barber-Say syndrome
 barbiturate abuse (BA)
 barbiturate dependence (BD)
+Bardet-Biedl syndrome
 baritosis
+Barmah Forest virus disease (BFVD)
+Barre-Lieou syndrome
+Barrett's adenocarcinoma
+Barrett's esophagus
+Bart-Pumphrey syndrome (BPS)
+Barth syndrome (BS)
+Bartholin's duct cyst (DC)
+Bartholin's gland adenocarcinoma (GA)
+Bartholin's gland adenoid cystic carcinoma (GACC)
+Bartholin's gland adenoma (GA)
+Bartholin's gland adenomyoma (GA)
+Bartholin's gland adenosquamous carcinoma (GAC)
+Bartholin's gland benign neoplasm (GBN)
+Bartholin's gland cancer (GC)
+Bartholin's gland carcinoma (GC)
+Bartholin's gland disease (GD)
+Bartholin's gland small cell carcinoma (GSCC)
+Bartholin's gland squamous cell carcinoma (GSCC)
+Bartholin's gland transitional cell carcinoma (GTCC)
 bartonellosis
+Bartter disease (BD)
+Bartter disease type 1 (BDT)
+Bartter disease type 2 (BDT)
+Bartter disease type 3 (BDT)
+Bartter disease type 4a (BDT)
+Bartter disease type 4b (BDT)
+Bartter disease type 5 (BDT)
 basal cell carcinoma (BCC)
 basal ganglia calcification (BGC)
 basal ganglia cerebrovascular disease (BGCD)
@@ -1920,12 +1008,21 @@ basaloid squamous cell skin carcinoma (BSCSC)
 basidiobolomycosis
 basilar artery insufficiency (BAI)
 basilar artery occlusion (BAO)
+Basilicata-Akhtar syndrome
 basophil adenoma (BA)
 basophilic adenocarcinoma (BA)
 basosquamous carcinoma (BC)
 baylisascariasis
 beach ear (BE)
+Beare-Stevenson cutis gyrata syndrome (CGS)
+Becker muscular dystrophy (BMD)
+Beckwith-Wiedemann syndrome
+Beemer-Langer syndrome or short-rib polydactyly type IV.
+Behcet's disease
+Behcet's syndrome arthropathy (SA)
+Behr syndrome (BS)
 bejel or endemic syphilis
+Bell's palsy
 benign breast adenomyoepithelioma (BBA)
 benign breast phyllodes tumor (BBPT)
 benign deep fibrous histiocytoma (BDFH)
@@ -1970,14 +1067,20 @@ benzo[d]isothiazol-3-one allergic contact dermatitis (ACD)
 benzoic acid allergic contact dermatitis (BAACD)
 benzylpenicillin allergy (BA)
 beriberi
+Bernard-Soulier syndrome
+Bernard-Soulier syndrome type A2 (ST)
 berylliosis
 bestrophinopathy
 beta thalassemia (BT)
 beta-ketothiolase deficiency
 beta-lactam allergy
 beta-mannosidosis
+Bethlem myopathy (BM)
+Beukes hip dysplasia (BHD)
+Bh4-deficient hyperphenylalaninemia A
 bicipital tenosynovitis (BT)
 bicuspid aortic valve disease (BAVD)
+Bietti crystalline corneoretinal dystrophy (BCCD)
 bilateral breast cancer (BBC)
 bilateral hyperactive labyrinth (BHL)
 bilateral hypoactive labyrinth (BHL)
@@ -2006,17 +1109,21 @@ biliary tract benign neoplasm (BTBN)
 biliary tract cancer (BTC)
 biliary tract intraductal papillary mucinous neoplasm (BTIPMN)
 bilirubin metabolic disorder (BMD)
+Binder syndrome (BS)
 binocular vision disease (BVD)
 biotin deficiency (BD)
 biotin-responsive basal ganglia disease (BGD)
 biotinidase deficiency (BD)
 biphasic synovial sarcoma (BSS)
-bipolar I disorder (BD)
 bipolar disorder (BD)
+bipolar I disorder (BD)
 bipolar ll disorder (BD)
 bird fancier's lung (BL)
 birdshot chorioretinopathy (BC)
+Birk-Barel syndrome
+Birt-Hogg-Dube syndrome (BHD)
 bizarre leiomyoma (BL)
+Bjornstad syndrome (BS)
 black piedra (BP)
 blackwater fever (BF)
 bladder adenocarcinoma (BA)
@@ -2060,24 +1167,30 @@ bladder verrucous squamous cell carcinoma (BVSCC)
 blastema predominant kidney Wilms' tumor (BPKT)
 blastoma
 blastomycosis
+Blau syndrome (BS)
 blepharitis
 blepharochalasis
 blepharocheilodontic syndrome (BS)
 blepharoconjunctivitis
 blepharophimosis
-blepharophimosis, ptosis, and epicanthus inversus syndrome (AEIS)
 blepharophimosis-intellectual disability syndrome, SBBYS type (DST)
+blepharophimosis, ptosis, and epicanthus inversus syndrome (AEIS)
 blepharospasm
+Blessig's cysts
 blind hypotensive eye (BHE)
 blind loop syndrome (BLS)
 blindness
+Bloch-Sulzberger syndrome or Incontinentia pigmenti
 blood group incompatibility (BGI)
+Bloom syndrome (BS)
+Blount's disease
 blue color blindness (BCB)
 blue cone monochromacy (BCM)
 blue drum syndrome (BDS)
 blue toe syndrome (BTS)
 blunt duct adenosis of breast (BDAB)
 body dysmorphic disorder (BDD)
+Bolivian hemorrhagic fever (BHF)
 bone ameloblastoma (BA)
 bone angioendothelial sarcoma (BAS)
 bone benign neoplasm (BBN)
@@ -2094,14 +1207,23 @@ bone osteosarcoma (BO)
 bone peripheral neuroepithelioma (BPN)
 bone sarcoma (BS)
 bone squamous cell carcinoma (BSCC)
+Boomerang dysplasia (BD)
 borderline glaucoma (BG)
 borderline leprosy (BL)
 borderline personality disorder (BPD)
+Bordetella parapertussis whooping cough (BPWC)
+Borjeson-Forssman-Lehmann syndrome (BFLS)
 borna disease (BD)
+Borst-Jadassohn intraepidermal carcinoma (IC)
+Bothnia retinal dystrophy (BRD)
+Bothnian type palmoplantar keratoderma (BTPK)
 botryoid rhabdomyosarcoma (BR)
 botulism
+Boucher-Neuhauser syndrome
 boutonneuse fever (BF)
 bowel dysfunction (BD)
+Bowen-Conradi syndrome
+Bowman's membrane folds or rupture (MFR)
 brachial plexus lesion (BPL)
 brachial plexus neoplasm (BPN)
 brachial plexus neuritis (BPN)
@@ -2153,6 +1275,7 @@ branchiooculofacial syndrome (BS)
 branchiootic syndrome (BS)
 branchiootorenal syndrome (BS)
 brawny scleritis (BS)
+Brazilian hemorrhagic fever (BHF)
 breast abscess (BA)
 breast adenocarcinoma (BA)
 breast adenoid cystic carcinoma (BACC)
@@ -2218,8 +1341,10 @@ breast scirrhous carcinoma (BSC)
 breast secretory carcinoma (BSC)
 breast signet ring cell adenocarcinoma (BSRCA)
 breast squamous cell carcinoma (BSCC)
+Brill-Zinsser disease
 brittle cornea syndrome (BCS)
 broad ligament malignant neoplasm (BLMN)
+Brody myopathy (BM)
 bronchial benign neoplasm (BBN)
 bronchial mucus gland adenoma (BMGA)
 bronchiectasis (BESC)
@@ -2233,10 +1358,22 @@ bronchus cancer (BC)
 bronchus carcinoma (BC)
 bronchus carcinoma in situ (BCS)
 bronchus mucoepidermoid carcinoma (BMC)
+Brooke-Spiegler syndrome
 brown shrimp allergy (BSA)
+Brown-Sequard syndrome
+Brown-Vialetto-Van Laere syndrome (LS)
+Brown's tendon sheath syndrome (TSS)
+Brucella abortus brucellosis (BAB)
+Brucella canis brucellosis (BCB)
+Brucella melitensis brucellosis (BMB)
+Brucella suis brucellosis (BSB)
 brucellosis
+Bruck syndrome (BS)
+Brugada syndrome (BS)
+Brunner Syndrome (BS)
 bruxism
 bubonic plague (BP)
+Budd-Chiari syndrome
 bulbar polio (BP)
 bulbomembranous urethral cancer (BUC)
 bulbospinal polio (BP)
@@ -2247,9 +1384,21 @@ bullous pemphigoid (BP)
 bullous retinoschisis (BR)
 bullous skin disease (BSD)
 buphthalmos
+Burkitt lymphoma (BL)
+Burn-McKeown syndrome
 burning mouth syndrome (BMS)
 bursitis
+Buruli ulcer disease (BUD)
+Buschke-Ollendorff syndrome (BOS)
 byssinosis
+C syndrome
+C-P angle neurinoma (AN)
+C1 inhibitor deficiency (ID)
+CADASIL
+Caffey disease (CD)
+CAKUT
+CAKUT1
+CAKUT2
 calcaneonavicular coalition (CC)
 calcific tendinitis (CT)
 calcinosis
@@ -2260,16 +1409,20 @@ campomelic dysplasia (CD)
 camptodactyly-arthropathy-coxa vara-pericarditis syndrome
 camptodactyly-tall stature-scoliosis-hearing loss syndrome (LS)
 campylobacteriosis
-cancer (CA)
+Camurati-Engelmann disease
+Canavan disease (CD)
+cancer
 cancerophobia
 candidal paronychia (CP)
 candidiasis
 cannabis abuse (CA)
 cannabis dependence (CD)
+Capgras syndrome (CS)
 capillariasis
 capillary hemangioma (CH)
 capillary leak syndrome (CLS)
 capillary lymphangioma (CL)
+Caplan's syndrome
 carbamazepine allergy (CA)
 carbamoyl phosphate synthetase I deficiency disease (CPSDD)
 carbapenem allergy (CA)
@@ -2283,8 +1436,13 @@ carcinoma of supraglottis (CS)
 carcinosarcoma
 cardia cancer (CC)
 cardiac arrest (CA)
+cardiac fibrosarcoma
 cardiac granular cell neoplasm (CGCN)
+cardiac leiomyosarcoma
+cardiac lipoma
+cardiac lymphoma
 cardiac sarcoidosis (CS)
+cardiac sarcoma
 cardiac tamponade (CT)
 cardiac tuberculosis (CT)
 cardiofaciocutaneous syndrome (CS)
@@ -2293,9 +1451,13 @@ cardiovascular cancer (CC)
 cardiovascular organ benign neoplasm (COBN)
 cardiovascular syphilis (CS)
 cardiovascular system disease (CSD)
+Carey-Fineman-Ziter syndrome
+Carney complex (CC)
+Carney-Stratakis syndrome
 carnitine palmitoyltransferase I deficiency (CPD)
 carnitine palmitoyltransferase II deficiency (CPD)
 carnitine-acylcarnitine translocase deficiency (TD)
+Caroli disease (CD)
 carotenemia
 carotid artery disease (CAD)
 carotid artery dissection (CAD)
@@ -2305,10 +1467,14 @@ carotid body cancer (CBC)
 carotid stenosis (CS)
 carp allergy (CA)
 carpal tunnel syndrome (CTS)
+Carpenter syndrome (CS)
+Carrion's disease
 cartilage cancer (CC)
 cartilage-hair hypoplasia
+Carvajal syndrome (CS)
 carvone allergic contact dermatitis (CACD)
 cascade stomach (CS)
+Castleman disease (CD)
 cat-scratch disease
 cataract (CTRCT)
 cataract juvenile-onset
@@ -2317,6 +1483,7 @@ cataract with adult i phenotype (CWAP)
 catecholaminergic polymorphic ventricular tachycardia (CPVT)
 cauda equina intradural extramedullary astrocytoma (CEIEA)
 cauda equina neoplasm (CEN)
+Cauda equina syndrome (CES)
 causalgia
 cavernous hemangioma (CH)
 cavernous hemangioma of colon (CHC)
@@ -2324,12 +1491,21 @@ cavernous hemangioma of face (CHF)
 cavernous hemangioma of orbit (CHO)
 cavernous sinus meningioma (CSM)
 cavernous sinus thrombosis (CST)
+Cayman type cerebellar ataxia (CTCA)
+CD3delta deficiency
+CD3epsilon deficiency
+CD3gamma deficiency
+CD3zeta deficiency
+CD40 ligand deficiency (LD)
+CD45 deficiency
 cecal benign neoplasm (CBN)
+cecal volvulus
 cecum adenocarcinoma (CA)
 cecum adenoma (CA)
 cecum cancer (CC)
 cecum carcinoma (CC)
 cecum lymphoma (CL)
+CEDNIK syndrome (CS)
 cefaclor allergy (CA)
 cefixime allergy (CA)
 cefotaxime allergy (CA)
@@ -2350,6 +1526,7 @@ cellular neurofibroma (CN)
 cellular phase chronic idiopathic myelofibrosis (CPCIM)
 cellular schwannoma (CS)
 cellulitis
+Cenani-Lenz syndactyly syndrome (SS)
 central breast papilloma (CBP)
 central core myopathy (CCM)
 central corneal ulcer (CCU)
@@ -2392,8 +1569,8 @@ central retinal artery occlusion (CRAO)
 central retinal vein occlusion (CRVO)
 central sleep apnea (CSA)
 centronuclear myopathy (CM)
-centronuclear myopathy X-linked (CM)
 centronuclear myopathy with fiber-type disproportion (CMWD)
+centronuclear myopathy X-linked (CM)
 cephalosporin allergy (CA)
 cercarial dermatitis (CD)
 cerebellar angioblastoma (CA)
@@ -2436,6 +1613,7 @@ cerebral meningioma (CM)
 cerebral neuroblastoma (CN)
 cerebral palsy (CP)
 cerebral primitive neuroectodermal tumor (CPNT)
+cerebral small vessel disease (CSVD)
 cerebral ventricle cancer (CVC)
 cerebritis
 cerebrocostomandibular syndrome (CS)
@@ -2445,8 +1623,6 @@ cerebrovascular disease (CD)
 cerebrum cancer (CC)
 ceruminoma
 ceruminous adenocarcinoma (CA)
-cervical Mullerian papilloma (CMP)
-cervical Wilms' tumor (CT)
 cervical adenitis (CA)
 cervical adenocarcinoma (CA)
 cervical adenofibroma (CA)
@@ -2471,6 +1647,7 @@ cervical keratinizing squamous cell carcinoma (CKSCC)
 cervical large cell neuroendocrine carcinoma (CLCNC)
 cervical lymphoepithelioma-like carcinoma (CC)
 cervical mucinous adenocarcinoma (CMA)
+cervical Mullerian papilloma (CMP)
 cervical neuroblastoma (CN)
 cervical non-keratinizing squamous cell carcinoma (CSCC)
 cervical polyp (CP)
@@ -2478,6 +1655,7 @@ cervical serous adenocarcinoma (CSA)
 cervical spinal canal and spinal cord meningioma (CSCASCM)
 cervical squamous cell carcinoma (CSCC)
 cervical verrucous carcinoma (CVC)
+cervical Wilms' tumor (CT)
 cervicitis
 cervicomedullary junction neoplasm (CJN)
 cervix carcinoma (CC)
@@ -2488,7 +1666,91 @@ cervix melanoma (CM)
 cervix small cell carcinoma (CSCC)
 cervix squamous papilloma (CSP)
 cervix uteri carcinoma in situ (CUCS)
+Chagas disease (CD)
 chancroid
+Chandler syndrome (CS)
+Chapare hemorrhagic fever (CHF)
+Char syndrome (CS)
+Charcot-Marie-Tooth disease
+Charcot-Marie-Tooth disease axonal type 2C (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2CC (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2F (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2H (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2K (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2L (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2N (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2O (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2P (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2Q (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2S (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2T (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2U (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2V (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2X (CMTDAT)
+Charcot-Marie-Tooth disease axonal type 2Z (CMTDAT)
+Charcot-Marie-Tooth disease dominant intermediate A (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate B (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate C (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate D (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate E (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate F (CMTDDI)
+Charcot-Marie-Tooth disease dominant intermediate G (CMTDDI)
+Charcot-Marie-Tooth disease intermediate type (CMTDIT)
+Charcot-Marie-Tooth disease recessive intermediate A (CMTDRI)
+Charcot-Marie-Tooth disease recessive intermediate B (CMTDRI)
+Charcot-Marie-Tooth disease recessive intermediate C (CMTDRI)
+Charcot-Marie-Tooth disease recessive intermediate D (CMTDRI)
+Charcot-Marie-Tooth disease type 1 (CMT1)
+Charcot-Marie-Tooth disease type 1A (CMT1A)
+Charcot-Marie-Tooth disease type 1B (CMT1B)
+Charcot-Marie-Tooth disease type 1C (CMT1C)
+Charcot-Marie-Tooth disease type 1D (CMT1D)
+Charcot-Marie-Tooth disease type 1E (CMT1E)
+Charcot-Marie-Tooth disease type 1F (CMT1F)
+Charcot-Marie-Tooth disease type 1G (CMT1G)
+Charcot-Marie-Tooth disease type 2 (CMT2)
+Charcot-Marie-Tooth disease type 2A1 (CMT2A1)
+Charcot-Marie-Tooth disease type 2A2A (CMT2A2A)
+Charcot-Marie-Tooth disease type 2A2B (CMT2A2B)
+Charcot-Marie-Tooth disease type 2B (CMT2B)
+Charcot-Marie-Tooth disease type 2B1 (CMT2B1)
+Charcot-Marie-Tooth disease type 2B2 (CMT2B2)
+Charcot-Marie-Tooth disease type 2D (CMT2D)
+Charcot-Marie-Tooth disease type 2DD (CMT2DD)
+Charcot-Marie-Tooth disease type 2E (CMT2E)
+Charcot-Marie-Tooth disease type 2EE (CMT2EE)
+Charcot-Marie-Tooth disease type 2I (CMT2I)
+Charcot-Marie-Tooth disease type 2J (CMT2J)
+Charcot-Marie-Tooth disease type 2R (CMT2R)
+Charcot-Marie-Tooth disease type 2Y (CMT2Y)
+Charcot-Marie-Tooth disease type 3 (CMT3)
+Charcot-Marie-Tooth disease type 4 (CMT4)
+Charcot-Marie-Tooth disease type 4A (CMT4A)
+Charcot-Marie-Tooth disease type 4B1 (CMT4B1)
+Charcot-Marie-Tooth disease type 4B2 (CMT4B2)
+Charcot-Marie-Tooth disease type 4B3 (CMT4B3)
+Charcot-Marie-Tooth disease type 4C (CMT4C)
+Charcot-Marie-Tooth disease type 4D (CMT4D)
+Charcot-Marie-Tooth disease type 4E (CMT4E)
+Charcot-Marie-Tooth disease type 4F (CMT4F)
+Charcot-Marie-Tooth disease type 4G (CMT4G)
+Charcot-Marie-Tooth disease type 4H (CMT4H)
+Charcot-Marie-Tooth disease type 4J (CMT4J)
+Charcot-Marie-Tooth disease type 4K (CMT4K)
+Charcot-Marie-Tooth disease type 5 (CMT5)
+Charcot-Marie-Tooth disease type 6 (CMT6)
+Charcot-Marie-Tooth disease type 7 (CMT7)
+Charcot-Marie-Tooth disease type X (CMTX)
+Charcot-Marie-Tooth disease X-linked dominant 1 (CMT1DD)
+Charcot-Marie-Tooth disease X-linked dominant 6 (CMT6DD)
+Charcot-Marie-Tooth disease X-linked recessive 2 (CMT2DR)
+Charcot-Marie-Tooth disease X-linked recessive 3 (CMT3DR)
+Charcot-Marie-Tooth disease X-linked recessive 4 (CMT4DR)
+Charcot-Marie-Tooth disease X-linked recessive 5 (CMT5DR)
+Charcot-Marie-Tooth disease, axonal type 2W (AT)
+CHARGE syndrome (CS)
+Charlevoix-Saguenay spastic ataxia (SA)
+Chediak-Higashi syndrome
 cheek mucosa cancer (CMC)
 cheilitis
 chemical colitis (CC)
@@ -2503,11 +1765,12 @@ chicken egg allergy (CEA)
 chickenpox
 chief cell adenoma (CCA)
 chikungunya
-childhood B-cell acute lymphoblastic leukemia (CALL)
-childhood T-cell acute lymphoblastic leukemia (CALL)
+Chilblain lupus (CL)
+CHILD syndrome (CS)
 childhood absence epilepsy (CAE)
 childhood acute lymphocytic leukemia (CALL)
 childhood acute myeloid leukemia (CAML)
+childhood B-cell acute lymphoblastic leukemia (CALL)
 childhood botryoid rhabdomyosarcoma (CBR)
 childhood brain germinoma (CBG)
 childhood brain meningioma (CBM)
@@ -2547,8 +1810,8 @@ childhood mediastinal neurogenic tumor (CMNT)
 childhood medulloblastoma (CM)
 childhood multilocular cystic kidney neoplasm (CMCKN)
 childhood oligodendroglioma (CO)
-childhood onset GLUT1 deficiency syndrome 2 (CODS)
 childhood onset epileptic encephalopathy (COEE)
+childhood onset GLUT1 deficiency syndrome 2 (CODS)
 childhood optic nerve glioma (CONG)
 childhood optic tract astrocytoma (COTA)
 childhood ovarian embryonal carcinoma (COEC)
@@ -2558,12 +1821,14 @@ childhood pilocytic astrocytoma (CPA)
 childhood pleomorphic rhabdomyosarcoma (CPR)
 childhood spinal cord tumor (CSCT)
 childhood spinal muscular atrophy (CSMA)
+childhood T-cell acute lymphoblastic leukemia (CALL)
 childhood teratocarcinoma of the testis (CTTT)
 childhood teratoma of the ovary (CTTO)
 childhood testicular mixed germ cell tumor (CTMGCT)
 childhood type dermatomyositis (CTD)
 childhood vagina botryoid rhabdomyosarcoma (CVBR)
 chlamydia
+Chlamydia pneumonia (CP)
 chloramine T respiratory allergy (CRA)
 chlorhexidine allergy (CA)
 choanal atresia (CA)
@@ -2624,6 +1889,7 @@ choroid spindle cell melanoma (CSCM)
 choroidal sclerosis (CS)
 choroideremia
 choroiditis
+Christianson syndrome (CS)
 chromium allergic contact dermatitis (CACD)
 chromoblastomycosis
 chromophil adenoma of the kidney (CATK)
@@ -2683,7 +1949,6 @@ chromosome 8q21.11 deletion syndrome (CDS)
 chromosome 9p deletion syndrome (CDS)
 chromosome Xp11.23-p11.22 duplication syndrome (CDS)
 chromosome Xp21 deletion syndrome (CDS)
-chronic NK-cell lymphocytosis (CL)
 chronic apical periodontitis (CAP)
 chronic atrial and intestinal dysrhythmia (CAAID)
 chronic atticoantral disease (CAD)
@@ -2727,6 +1992,7 @@ chronic mucocutaneous candidiasis (CMC)
 chronic myeloid leukemia (CML)
 chronic myelomonocytic leukemia (CML)
 chronic neutrophilic leukemia (CNL)
+chronic NK-cell lymphocytosis (CL)
 chronic obstructive pulmonary disease (COPD)
 chronic orbital inflammation (COI)
 chronic perichondritis of pinna (CPP)
@@ -2750,6 +2016,7 @@ chronic tympanitis (CT)
 chronic ulcer of skin (CUS)
 chronic venous insufficiency (CVI)
 chronic wasting disease (CWD)
+Churg-Strauss syndrome
 chylocele of tunica vaginalis (CTV)
 chylomicron retention disease (CRD)
 cicatricial ectropion (CE)
@@ -2762,6 +2029,7 @@ ciliary body epithelioid cell melanoma (CBECM)
 ciliary body mixed cell melanoma (CBMCM)
 ciliary body spindle cell melanoma (CBSCM)
 ciliopathy
+CINCA Syndrome (CS)
 citrullinemia
 classic citrullinemia (CC)
 classic congenital mesoblastic nephroma (CCMN)
@@ -2781,6 +2049,7 @@ clear cell hidradenoma (CCH)
 clear cell meningioma (CCM)
 clear cell renal cell carcinoma (CCRCC)
 clear cell sarcoma (CCS)
+clear cell sarcoma of the kidney (CCSK)
 clear cell squamous cell skin carcinoma (CCSCSC)
 clear cell variant infiltrating bladder urothelial carcinoma (CCVIBUC)
 cleft lip (CL)
@@ -2793,11 +2062,17 @@ clitoris cancer (CC)
 clivus chondroid chordoma (CCC)
 clivus chordoma (CC)
 clivus meningioma (CM)
+CLL/SLL
 cloacal exstrophy (CE)
 cloacogenic carcinoma (CC)
 clonorchiasis
+Clostridium difficile colitis (CDC)
+Clouston syndrome (CS)
+CLOVES syndrome (CS)
 clubfoot
 co-trimoxazole allergy
+COACH syndrome (CS)
+Coats disease (CD)
 cobalt allergic asthma (CAA)
 cobalt allergic contact dermatitis (CACD)
 cobblestone retinal degeneration (CRD)
@@ -2805,11 +2080,20 @@ cocaine abuse (CA)
 cocaine dependence (CD)
 coccidioidomycosis
 coccidiosis
+Cockayne syndrome (CS)
 cocoon syndrome (CS)
+CODAS syndrome (CS)
 coenurosis
 coenzyme Q10 deficiency disease (CDD)
+Coffin-Lowry syndrome
+Coffin-Siris syndrome
+Cogan syndrome (CS)
+Cogan-Reese syndrome
 cognitive disorder (CD)
+Cohen syndrome (CS)
+COL4A1-related familial vascular leukoencephalopathy (FVL)
 cold-induced sweating syndrome (SS)
+Cole-Carpenter syndrome
 colitis
 collagenous colitis (CC)
 collecting duct carcinoma (CDC)
@@ -2817,12 +2101,12 @@ colloid adenoma (CA)
 colloid carcinoma of the pancreas (CCTP)
 coloboma
 coloboma of optic nerve (CON)
-colon Kaposi sarcoma (CKS)
 colon adenocarcinoma (CA)
 colon adenoma (CA)
 colon cancer (CC)
 colon carcinoma (CC)
 colon carcinoma in situ (CCS)
+colon Kaposi sarcoma (CKS)
 colon leiomyoma (CL)
 colon leiomyosarcoma (CL)
 colon lymphoma (CL)
@@ -2832,13 +2116,14 @@ colon sarcoma (CS)
 colon signet ring adenocarcinoma (CSRA)
 colon small cell carcinoma (CSCC)
 colon squamous cell carcinoma (CSCC)
-colonic L-cell glucagon-like peptide producing tumor (CPPT)
 colonic benign neoplasm (CBN)
 colonic disease (CD)
+colonic L-cell glucagon-like peptide producing tumor (CPPT)
 colonic lymphangioma (CL)
 colonic pseudo-obstruction
 color agnosia (CA)
 color blindness (CB)
+Colorado tick fever (CTF)
 colorectal adenocarcinoma (CA)
 colorectal adenoma (CA)
 colorectal cancer (CC)
@@ -2846,10 +2131,10 @@ colorectal carcinoma (CC)
 columnar cell variant papillary carcinoma (CCVPC)
 combat disorder (CD)
 combined D-2- and L-2-hydroxyglutaric aciduria (CAA)
-combined T cell and B cell immunodeficiency (CCACI)
 combined malonic and methylmalonic acidemia (CMAMA)
 combined oxidative phosphorylation deficiency (COPD)
 combined saposin deficiency (CSD)
+combined T cell and B cell immunodeficiency (CCACI)
 combined thymoma (CT)
 comedo carcinoma (CC)
 commensal bacterial infectious disease (CBID)
@@ -2879,6 +2164,7 @@ complex cortical dysplasia with other brain malformations (CCDWOBM)
 complex partial epilepsy (CPE)
 complex regional pain syndrome (CRPS)
 composite lymphoma (CL)
+Compton-North congenital myopathy (CM)
 conduct disorder (CD)
 cone dystrophy (CD)
 cone-rod dystrophy
@@ -2943,11 +2229,11 @@ congenital disorder of glycosylation type IIp (CDGTI)
 congenital disorder of glycosylation type IIq (CDGTI)
 congenital dyserythropoietic anemia (CDA)
 congenital dyserythropoietic anemia type I (CDAT)
+congenital dyserythropoietic anemia type Ia (CDAT)
+congenital dyserythropoietic anemia type Ib (CDAT)
 congenital dyserythropoietic anemia type II (CDAT)
 congenital dyserythropoietic anemia type III (CDATI)
 congenital dyserythropoietic anemia type IV (CDAT)
-congenital dyserythropoietic anemia type Ia (CDAT)
-congenital dyserythropoietic anemia type Ib (CDAT)
 congenital epulis (CE)
 congenital fiber-type disproportion (CD)
 congenital fibrosarcoma (CF)
@@ -2976,8 +2262,8 @@ congenital mesoblastic nephroma (CMN)
 congenital mirror movement disorder (CMMD)
 congenital muscular dystrophy (CMD)
 congenital muscular dystrophy 1B (CMD)
-congenital muscular dystrophy due to LMNA mutation (CMDDLM)
 congenital muscular dystrophy due to integrin alpha-7 deficiency (CMDDID)
+congenital muscular dystrophy due to LMNA mutation (CMDDLM)
 congenital muscular dystrophy merosin-positive (CMD)
 congenital muscular dystrophy with cataracts and intellectual disability (CMDWCAID)
 congenital muscular dystrophy-dystroglycanopathy A14 (CM)
@@ -3028,6 +2314,7 @@ conjunctival squamous cell carcinoma (CSCC)
 conjunctival vascular disease (CVD)
 conjunctivitis
 conjunctivochalasis
+Conn's syndrome
 connective tissue benign neoplasm (CTBN)
 connective tissue cancer (CTC)
 constant exophthalmos (CE)
@@ -3045,6 +2332,7 @@ conventional leiomyosarcoma (CL)
 conventional malignant hemangiopericytoma (CMH)
 conversion disorder (CD)
 copper deficiency myelopathy (CDM)
+Cor pulmonale (CP)
 cork-handlers' disease
 cornea cancer (CC)
 cornea plana (CP)
@@ -3062,6 +2350,7 @@ corneal intraepithelial neoplasm (CIN)
 corneal neovascularization (CN)
 corneal staphyloma (CS)
 corneal ulcer (CU)
+Cornelia de Lange syndrome (CLS)
 coronary aneurysm (CA)
 coronary artery anomaly (CAA)
 coronary artery disease (CAD)
@@ -3069,6 +2358,7 @@ coronary artery vasospasm (CAV)
 coronary restenosis (CR)
 coronary stenosis (CS)
 coronary thrombosis (CT)
+Coronavirus infectious disease (CID)
 coronin-1A deficiency
 corpus callosum agenesis-intellectual disability-coloboma-micrognathia syndrome (CCS)
 corpus callosum lipoma (CCL)
@@ -3083,12 +2373,16 @@ corticosteroid allergy (CA)
 corticosteroid-binding globulin deficiency (GD)
 corticosterone methyloxidase deficiency (CMD)
 cortisone reductase deficiency (CRD)
+Costello syndrome (CS)
 cough variant asthma (CVA)
+COVID-19
 cow milk allergy (CMA)
+Cowden syndrome (CS)
+Cowper gland carcinoma (CGC)
 cowpox
 crab allergy (CA)
-cranial nerve III tumor (CNIT)
 cranial nerve disease (CND)
+cranial nerve III tumor (CNIT)
 cranial nerve malignant neoplasm (CNMN)
 cranial nerve neoplasm (CNN)
 cranial nerve palsy (CNP)
@@ -3104,19 +2398,32 @@ craniosynostosis
 crater-like holes of optic disc (HOD)
 creatine transporter deficiency (CTD)
 crescentic glomerulonephritis (CG)
+CREST syndrome (CS)
+Creutzfeldt-Jakob disease
+Cri-Du-Chat syndrome or 5p minus syndrome
 cribriform carcinoma (CC)
 cribriform variant testicular seminoma (CVTS)
+Crigler-Najjar syndrome
+Crimean-Congo hemorrhagic fever (HF)
 critical illness polyneuropathy (CIP)
+Crohn's colitis
+Crohn's disease
+Cronkhite-Canada syndrome
 croup
+Crouzon syndrome (CS)
+Crouzon syndrome-acanthosis nigricans syndrome (CNS)
 crustacean allergy (CA)
 cryoglobulinemia
+Cryptococcal meningitis (CM)
 cryptococcosis
 cryptogenic organizing pneumonia (COP)
 cryptophthalmia
 cryptorchidism
 cryptosporidiosis
-cutaneous Paget's disease (CD)
-cutaneous T cell lymphoma (CCL)
+CSF1R-related brain malformation and osteopetrosis (BMAO)
+CST3-related cerebral amyloid angiopathy (CAA)
+Culler-Jones syndrome
+Currarino syndrome (CS)
 cutaneous adenocystic carcinoma (CAC)
 cutaneous anthrax (CA)
 cutaneous candidiasis (CC)
@@ -3130,8 +2437,10 @@ cutaneous lupus erythematosus (CLE)
 cutaneous mastocytosis (CM)
 cutaneous mucoepidermoid carcinoma (CMC)
 cutaneous mycosis (CM)
+cutaneous Paget's disease (CD)
 cutaneous porphyria (CP)
 cutaneous solitary mastocytoma (CSM)
+cutaneous T cell lymphoma (CCL)
 cutis laxa (CL)
 cyclic hematopoiesis (CH)
 cyclophosphamide allergy (CA)
@@ -3159,10 +2468,18 @@ cystoid macular edema (CME)
 cystoid macular retinal degeneration (CMRD)
 cystoisosporiasis
 cytochrome-c oxidase deficiency disease (ODD)
+Cytomegalovirus retinitis (CR)
+D-2-hydroxyglutaric aciduria
+D-bifunctional protein deficiency (PD)
+D-glyceric aciduria
+D-mannitol allergy
 dacryoadenitis
 dacryocystitis
 dacryocystocele
+Dandy-Walker syndrome
+Danon disease (DD)
 dartoic leiomyoma (DL)
+De Quervain disease (QD)
 deafness-dystonia-optic neuronopathy syndrome (NS)
 deafness-intellectual disability, Martin-Probst type syndrome (TS)
 decubitus ulcer (DU)
@@ -3177,6 +2494,7 @@ degenerative disc disease (DDD)
 degenerative myopia (DM)
 dehydrated hereditary stomatocytosis (DHS)
 dehydration polycythemia (DP)
+Dejerine–Roussy syndrome (DRS) or thalamic pain syndrome
 delayed sleep phase syndrome (DSPS)
 delta chain disease (DCD)
 delusional disorder (DD)
@@ -3188,6 +2506,7 @@ dendritic cell thymoma (DCT)
 dengue disease (DD)
 dengue hemorrhagic fever (DHF)
 dengue shock syndrome (DSS)
+Dent disease (DD)
 dental abscess (DA)
 dental caries (DC)
 dental enamel hypoplasia (DEH)
@@ -3202,6 +2521,7 @@ dentin sensitivity (DS)
 dentine erosion (DE)
 dentinogenesis imperfecta (DI)
 denture stomatitis (DS)
+Denys-Drash syndrome
 dependent personality disorder (DPD)
 depersonalization disorder (DD)
 dermal unilateral segmental cavernous angioma (DUSCA)
@@ -3218,6 +2538,7 @@ dermis tumor (DT)
 dermoid cyst (DC)
 dermoid cyst of ovary (DCO)
 dermoid cyst of skin (DCS)
+Desbuquois dysplasia (DD)
 descending colon cancer (DCC)
 desmoid tumor (DT)
 desquamative interstitial pneumonia (DIP)
@@ -3240,6 +2561,7 @@ diabetic neuropathy (DN)
 diabetic peripheral angiopathy (DPA)
 diabetic polyneuropathy (DP)
 diabetic retinopathy (DR)
+Diamond-Blackfan anemia
 diaphragm disease (DD)
 diaphragma sellae meningioma (DSM)
 diaphragmatic eventration (DE)
@@ -3247,12 +2569,14 @@ diaphyseal medullary stenosis with malignant fibrous histiocytoma (DMSWMFH)
 diarrhea (D)
 diastolic heart failure (DHF)
 diastrophic dysplasia (DD)
+DIC in newborn (DN)
 dicarboxylic aminoaciduria (DA)
 diclofenac allergy (DA)
 dicrocoeliasis
 diencephalic astrocytoma (DA)
 diencephalic neoplasm (DN)
 dientamoebiasis
+Dieulafoy lesion (DL)
 differentiated thyroid gland carcinoma (DTGC)
 differentiating neuroblastoma (DN)
 diffuse alopecia areata (DAA)
@@ -3270,6 +2594,7 @@ diffuse peritoneal leiomyomatosis (DPL)
 diffuse pulmonary fibrosis (DPF)
 diffuse scleroderma (DS)
 diffuse secondary choroid atrophy (DSCA)
+DiGeorge syndrome (DS)
 dihydropyrimidinase deficiency (DD)
 dihydropyrimidine dehydrogenase deficiency (DDD)
 dilated cardiomyopathy (DC)
@@ -3342,12 +2667,21 @@ disuse amblyopia (DA)
 diversion colitis (DC)
 diverticulitis
 diverticulitis of colon (DC)
+DNA ligase IV deficiency (DLD)
 dominant optic atrophy plus syndrome (DOAPS)
 dominant pericentral pigmentary retinopathy (DPPR)
+Donnai-Barrow syndrome
+Donohue syndrome (DS)
+DOORS syndrome (DS)
 dopamine beta-hydroxylase deficiency (DD)
 double outlet right ventricle (DORV)
 double pterygium (DP)
+Dowling-Degos disease
+Down syndrome (DS)
+Doyne honeycomb retinal dystrophy (DHRD)
 dracunculiasis
+Dravet syndrome (DS)
+Dressler's syndrome
 drug allergy (DA)
 drug dependence (DD)
 drug psychosis (DP)
@@ -3357,6 +2691,11 @@ drug-induced lupus erythematosus (LE)
 drug-induced mental disorder (MD)
 dry beriberi (DB)
 dry eye syndrome (DES)
+Duane retraction syndrome (DRS)
+Duane-radial ray syndrome (RS)
+Dubin-Johnson syndrome
+Dubowitz syndrome (DS)
+Duchenne muscular dystrophy (DMD)
 ductal carcinoma in situ (DCS)
 dumping syndrome (DS)
 duodenal atresia (DA)
@@ -3367,9 +2706,11 @@ duodenal somatostatinoma (DS)
 duodenal ulcer (DU)
 duodenitis
 duodenogastric reflux (DR)
+duodentitis
 duodenum adenocarcinoma (DA)
 duodenum adenoma (DA)
 duodenum cancer (DC)
+Dyggve-Melchior-Clausen disease (DMC)
 dysbaric osteonecrosis (DO)
 dyscalculia
 dyschromatosis symmetrica hereditaria (DSH)
@@ -3377,6 +2718,7 @@ dyschromatosis universalis hereditaria (DUH)
 dysembryoplastic neuroepithelial tumor (DNT)
 dysentery
 dysgammaglobulinemia
+Dysgenetic polycystic disease of the parotid gland
 dysgerminoma
 dysgerminoma of ovary (DO)
 dysgraphia
@@ -3398,9 +2740,13 @@ early invasive cervical adenocarcinoma (EICA)
 early myoclonic encephalopathy (EME)
 early onset absence epilepsy (EOAE)
 early yaws (EY)
-early-onset Parkinson's disease
 early-onset myopathy-areflexia-respiratory distress-dysphagia syndrome
+early-onset Parkinson's disease
+EAST syndrome (ES)
+Eastern equine encephalitis (EEE)
 eating disorder (ED)
+Ebola hemorrhagic fever (EHF)
+Ebstein anomaly (EA)
 eccrine acrospiroma (EA)
 eccrine adenocarcinoma (EA)
 eccrine mixed tumor of skin (EMTS)
@@ -3426,17 +2772,27 @@ ectrodactyly, ectodermal dysplasia, and cleft lip-palate syndrome (EACS)
 ectropion
 eczema herpeticum (EH)
 eczematous dermatitis of eyelid (EDE)
+Edwards syndrome (ES)
+EEC syndrome (ES)
 egg allergy (EA)
 ego-dystonic sexual orientation (SO)
+Ehlers-Danlos syndrome
+Ehlers-Danlos syndrome progeroid type (SPT)
+Ehrlich tumor carcinoma (ETC)
 ehrlichiosis
+Eiken syndrome (ES)
+elective mutism
 electroclinical syndrome (ES)
 elephantiasis
+Ellis-Van Creveld syndrome (CS)
+Elsahy-Waters syndrome
 embryoma
 embryonal cancer (EC)
 embryonal carcinoma (EC)
 embryonal extrahepatic bile duct rhabdomyosarcoma (EEBDR)
 embryonal rhabdomyosarcoma (ER)
 embryonal testis carcinoma (ETC)
+Emery-Dreifuss muscular dystrophy (MD)
 emphysematous cholecystitis (EC)
 empty sella syndrome (ESS)
 enamel caries (EC)
@@ -3519,6 +2875,7 @@ ependymoblastoma
 epicardium cancer (EC)
 epicardium lipoma (EL)
 epicondylitis
+epidemic keratoconjunctivitis (EKC) or shipyard eye (SE)
 epidemic pleurodynia (EP)
 epidemic typhus (ET)
 epidermal appendage tumor (EAT)
@@ -3529,9 +2886,9 @@ epidermolysis bullosa acquisita (EBA)
 epidermolysis bullosa dystrophica (EBD)
 epidermolysis bullosa simplex (EBS)
 epidermolysis bullosa simplex Dowling-Meara type (EBST)
-epidermolysis bullosa simplex Ogna type (EBSOT)
 epidermolysis bullosa simplex generalized type (EBSGT)
 epidermolysis bullosa simplex localized type (EBSLT)
+epidermolysis bullosa simplex Ogna type (EBSOT)
 epidermolysis bullosa simplex with mottled pigmentation (EBSWMP)
 epidermolysis bullosa simplex with muscular dystrophy (EBSWMD)
 epidermolysis bullosa with congenital localized absence of skin and deformity of nails (EBWCLASADN)
@@ -3569,8 +2926,8 @@ episodic kinesigenic dyskinesia (EKD)
 epithelial and subepithelial dystrophy (EASD)
 epithelial basement membrane dystrophy (EBMD)
 epithelial malignant thymoma (EMT)
-epithelial predominant Wilms' tumor (EPT)
 epithelial predominant pulmonary blastoma (EPPB)
+epithelial predominant Wilms' tumor (EPT)
 epithelial recurrent erosion dystrophy (ERED)
 epithelial-myoepithelial carcinoma
 epithelial-stromal TGFBI dystrophy (TD)
@@ -3583,8 +2940,10 @@ epithelioid neurofibroma (EN)
 epithelioid sarcoma (ES)
 epithelioid trophoblastic tumor (ETT)
 epithelioid type angiomyolipoma (ETA)
+Epstein-Barr virus hepatitis (VH)
 epulis
 equatorial staphyloma (ES)
+Erdheim-Chester disease
 erysipelas
 erysipeloid
 erythema elevatum diutinum (EED)
@@ -3632,12 +2991,12 @@ essential tremor (ET)
 estrogen excess (EE)
 estrogen-receptor negative breast cancer (NBC)
 estrogen-receptor positive breast cancer (PBC)
-ethmoid sinus Schneiderian papilloma (ESSP)
 ethmoid sinus adenocarcinoma (ESA)
 ethmoid sinus adenoid cystic carcinoma (ESACC)
 ethmoid sinus cancer (ESC)
 ethmoid sinus ectopic meningioma (ESEM)
 ethmoid sinus inverted papilloma (ESIP)
+ethmoid sinus Schneiderian papilloma (ESSP)
 ethmoid sinus squamous cell carcinoma (ESSCC)
 ethmoid sinusitis (ES)
 ethmoidal sinus benign neoplasm (ESBN)
@@ -3645,7 +3004,10 @@ ethylmalonic encephalopathy (EE)
 eumycotic mycetoma (EM)
 eunuchism
 euthyroid sick syndrome (ESS)
+Evans' syndrome
 eversion of lacrimal punctum (ELP)
+Ewing sarcoma (ES)
+Ewing sarcoma of bone (ESB)
 exanthem
 exanthema subitum (ES)
 excessive tearing (ET)
@@ -3685,9 +3047,9 @@ extrahepatic biliary papillomatosis (EBP)
 extrahepatic cholestasis (EC)
 extramedullary plasmacytoma (EP)
 extraocular retinoblastoma (ER)
+extraosseous chondrosarcoma (EC)
 extraosseous Ewing sarcoma (EES)
 extraosseous Ewings sarcoma-primitive neuroepithelial tumor (EENT)
-extraosseous chondrosarcoma (EC)
 extraosseous osteosarcoma (EO)
 extrapulmonary tuberculosis (ET)
 extrapyramidal and movement disease (EAMD)
@@ -3705,6 +3067,7 @@ eye carcinoma in situ (ECS)
 eye lymphoma (EL)
 eyelid benign neoplasm (EBN)
 eyelid carcinoma (EC)
+Fabry disease (FD)
 facial dermatosis (FD)
 facial hemiatrophy (FH)
 facial nerve neoplasm (FNN)
@@ -3743,8 +3106,6 @@ fallopian tube serous papilloma (FTSP)
 fallopian tube squamous cell carcinoma (FTSCC)
 fallopian tube teratoma (FTT)
 fallopian tube transitional cell carcinoma (FTTCC)
-familial GPIHBP1 deficiency (FD)
-familial Mediterranean fever (FMF)
 familial adenomatous polyposis (FAP)
 familial adult myoclonic epilepsy (FAME)
 familial apolipoprotein A5 deficiency (FAD)
@@ -3763,6 +3124,7 @@ familial expansile osteolysis (FEO)
 familial febrile seizures (FFS)
 familial glomangioma (FG)
 familial glucocorticoid deficiency (FGD)
+familial GPIHBP1 deficiency (FD)
 familial hemiplegic migraine (FHM)
 familial hemophagocytic lymphohistiocytosis (FHL)
 familial hepatic adenoma (FHA)
@@ -3780,6 +3142,7 @@ familial juvenile hyperuricemic nephropathy (FJHN)
 familial lipase maturation factor 1 deficiency (FLMFD)
 familial lipoprotein lipase deficiency (FLLD)
 familial male-limited precocious puberty (FPP)
+familial Mediterranean fever (FMF)
 familial medullary thyroid carcinoma (FMTC)
 familial melanoma (FM)
 familial meningioma (FM)
@@ -3803,6 +3166,30 @@ familial visceral amyloidosis (FVA)
 familial woolly hair syndrome (FWHS)
 familiar fallopian tube carcinoma (FFTC)
 familiar ovarian carcinoma (FOC)
+Fanconi anemia (FA)
+Fanconi anemia complementation group A (FACG)
+Fanconi anemia complementation group B (FACG)
+Fanconi anemia complementation group C (FACG)
+Fanconi anemia complementation group D1 (FACG)
+Fanconi anemia complementation group D2 (FACG)
+Fanconi anemia complementation group E (FACG)
+Fanconi anemia complementation group F (FACG)
+Fanconi anemia complementation group G (FACG)
+Fanconi anemia complementation group I (FACG)
+Fanconi anemia complementation group J (FACG)
+Fanconi anemia complementation group L (FACG)
+Fanconi anemia complementation group N (FACG)
+Fanconi anemia complementation group O (FACG)
+Fanconi anemia complementation group P (FACG)
+Fanconi anemia complementation group Q (FACG)
+Fanconi anemia complementation group R (FACG)
+Fanconi anemia complementation group T (FACG)
+Fanconi anemia complementation group U (FACG)
+Fanconi anemia complementation group V (FACG)
+Fanconi syndrome (FS)
+Fanconi-like syndrome
+Far Eastern spotted fever (FESF)
+Farber lipogranulomatosis (FL)
 farmer's lung
 fasciitis
 fascioliasis
@@ -3814,6 +3201,9 @@ fatal infantile cardioencephalomyopathy due to cytochrome c oxidase deficiency (
 fatal infantile hypertonic myofibrillar myopathy (FIHMM)
 fatty liver disease (FLD)
 favism
+Fazio-Londe disease
+Feingold syndrome (FS)
+Felty's syndrome
 female breast axillary tail cancer (FBATC)
 female breast cancer (FBC)
 female breast carcinoma (FBC)
@@ -3832,6 +3222,7 @@ female urethral cancer (FUC)
 femoral cancer (FC)
 femoral neuropathy (FN)
 femoral vein thrombophlebitis (FVT)
+Ferguson-Smith tumor
 fetal adenoma (FA)
 fetal akinesia deformation sequence syndrome (FADSS)
 fetal alcohol spectrum disorder (FASD)
@@ -3840,6 +3231,7 @@ fetal erythroblastosis (FE)
 fetal nicotine spectrum disorder (FNSD)
 fetal valproate syndrome (FVS)
 fetishism
+FG syndrome
 fibrillary astrocytoma (FA)
 fibroblastic liposarcoma (FL)
 fibrochondrogenesis
@@ -3867,11 +3259,15 @@ filamentary keratitis (FK)
 filarial elephantiasis (FE)
 filariasis
 finger agnosia (FA)
+Finnish type amyloidosis (FTA)
 first-degree atrioventricular block (AB)
 fish allergy (FA)
 fissured tongue (FT)
 flat ductal epithelial atypia (FDEA)
 flat retinoschisis (FR)
+Fleck corneal dystrophy (FCD)
+Flinders Island spotted fever (FISF)
+Floating-Harbor syndrome or Pelletier–Leisti syndrome
 flying phobia (FP)
 focal chorioretinitis (FC)
 focal dermal hypoplasia (FDH)
@@ -3897,17 +3293,27 @@ foodborne botulism (FB)
 foramen magnum meningioma (FMM)
 form agnosia (FA)
 formaldehyde allergic contact dermatitis (FACD)
+Foster-Kennedy syndrome
 fourth cranial nerve palsy (FCNP)
+Fox-Fordyce disease
 fragile X syndrome (FS)
 fragile X-associated tremor/ataxia syndrome (FS)
+Frank-Ter Haar syndrome (HS)
+Fraser syndrome (FS)
+Frasier syndrome (FS)
+Freeman-Sheldon syndrome
 freemartinism
+French Canadian Leigh disease (FCLD)
+Frey syndrome (FS)
+Friedreich ataxia (FA)
+Froelich syndrome (FS)
 frontal convexity meningioma (FCM)
 frontal lobe epilepsy (FLE)
 frontal lobe neoplasm (FLN)
-frontal sinus Schneiderian papilloma (FSSP)
 frontal sinus benign neoplasm (FSBN)
 frontal sinus cancer (FSC)
 frontal sinus inverted papilloma (FSIP)
+frontal sinus Schneiderian papilloma (FSSP)
 frontal sinus squamous cell carcinoma (FSSCC)
 frontal sinusitis (FS)
 frontometaphyseal dysplasia (FD)
@@ -3916,7 +3322,11 @@ frontotemporal dementia and/or amyotrophic lateral sclerosis (FDALS)
 frozen shoulder (FS)
 fructose-1,6-bisphosphatase deficiency (FBP1D)
 fruit allergy (FA)
+Fuchs' endothelial dystrophy (ED)
+Fuchs' heterochromic uveitis (HU)
 fucosidosis
+Fuhrmann syndrome (FS)
+Fukuyama congenital muscular dystrophy (FCMD)
 fumarase deficiency (FD)
 functional colonic disease (FCD)
 functional diarrhea (FD)
@@ -3930,6 +3340,7 @@ fungal gastritis (FG)
 fungal meningitis (FM)
 funisitis
 fusariosis
+GABA aminotransferase deficiency (GAD)
 gait apraxia (GA)
 galactokinase deficiency (GD)
 galactose epimerase deficiency (GED)
@@ -3957,9 +3368,11 @@ gallbladder sarcoma (GS)
 gallbladder signet ring cell adenocarcinoma (GSRCA)
 gallbladder small cell carcinoma (GSCC)
 gallbladder squamous cell carcinoma (GSCC)
+Galloway-Mowat syndrome
 gamma heavy chain disease (gHCD)
 gamma-amino butyric acid metabolism disorder (GABA)
 gamma-glutamyl transpeptidase deficiency (TD)
+Gamstorp-Wohlfart syndrome
 gangliocytoma
 ganglioglioma
 ganglion or cyst of synovium/tendon/bursa (GC)
@@ -3967,6 +3380,7 @@ ganglioneuroblastoma
 ganglioneuroma
 gangliosidosis
 gas gangrene (GG)
+Gasserian ganglion meningioma (GGM)
 gastric adenocarcinoma (GA)
 gastric adenosquamous carcinoma (GAC)
 gastric antral vascular ectasia (GAVE)
@@ -3986,7 +3400,6 @@ gastric lymphoma (GL)
 gastric mucosal hypertrophy (GMH)
 gastric neuroendocrine neoplasm (GNN)
 gastric outlet obstruction (GOO)
-papillary gastric adenocarcinoma
 gastric pylorus carcinoma (GPC)
 gastric signet ring cell adenocarcinoma (GSRCA)
 gastric small cell carcinoma (GSCC)
@@ -4012,13 +3425,18 @@ gastrointestinal lymphoma (GL)
 gastrointestinal neuroendocrine benign tumor (GNBT)
 gastrointestinal neuroendocrine tumor (GNT)
 gastrointestinal stromal tumor (GST)
-gastrointestinal tract benign neoplasm (GSBN)
 gastrointestinal system cancer (GSC)
+gastrointestinal tract benign neoplasm (GSBN)
 gastrointestinal tuberculosis (GT)
 gastrointestinal tularemia (GT)
 gastrojejunal ulcer (GU)
 gastroparesis
 gastroschisis
+Gaucher's disease
+Gaucher's disease perinatal lethal (DPL)
+Gaucher's disease type I (DT)
+Gaucher's disease type II (DT)
+Gaucher's disease type III (DTI)
 gelatinous drop-like corneal dystrophy (GDCD)
 geleophysic dysplasia (GD)
 gemistocytic astrocytoma (GA)
@@ -4036,6 +3454,8 @@ germ cell benign neoplasm (GCBN)
 germ cell cancer (GCC)
 germinoma
 geroderma osteodysplasticum (GO)
+Gerstmann syndrome (GS)
+Gerstmann-Straussler-Scheinker syndrome (GSS)
 gestational choriocarcinoma (GC)
 gestational diabetes (GD)
 gestational ovarian choriocarcinoma (GOC)
@@ -4047,18 +3467,22 @@ giant cell reparative granuloma (GCRG)
 giant hemangioma (GH)
 giant papillary conjunctivitis (GPC)
 giardiasis
+Gilbert syndrome (GS)
+Gilles de la Tourette syndrome (GTS)
+Gillespie syndrome (GS)
 gingival fibromatosis (GF)
-hereditary gingival fibromatosis (HGF)
 gingival hypertrophy (GH)
 gingival overgrowth (GO)
 gingival recession (GR)
 gingivitis
+Gitelman syndrome (GS)
 glanders
 glandular cystitis (GC)
 glandular pattern ovarian yolk sac tumor (GPOYST)
 glandular tularemia (GT)
 glandular-alveolar pattern testicular yolk sac tumor (PTYST)
 glans penis cancer (GPC)
+Glanzmann's thrombasthenia
 glassy cell variant cervical adenosquamous carcinoma (GCVCAC)
 glaucoma
 glaucomatocyclitic crisis (GC)
@@ -4067,7 +3491,6 @@ glioblastoma classical subtype (GCS)
 glioblastoma mesenchymal subtype (GMS)
 glioblastoma multiforme (GM)
 glioblastoma neural subtype (GNS)
-proneural glioblastoma
 gliofibroma
 gliomatosis cerebri (GC)
 gliosarcoma
@@ -4099,8 +3522,8 @@ glutamate-cysteine ligase deficiency (LD)
 glutaric acidemia I (GA)
 gluten allergy (GA)
 glycerol kinase deficiency (GKD)
-glycine N-methyltransferase deficiency (GD)
 glycine encephalopathy (GE)
+glycine N-methyltransferase deficiency (GD)
 glycogen metabolism disorder (GMD)
 glycogen storage disease (GSD)
 glycogen storage disease I (GSD)
@@ -4119,10 +3542,18 @@ glycogen storage disease VIII (GSDV)
 glycogen storage disease XV (GSD)
 glycogen-rich clear cell breast carcinoma (CCBC)
 glycoproteinosis
+GM1 gangliosidosis
+GM1 gangliosidosis type 1 (GT)
+GM1 gangliosidosis type 2 (GT)
+GM1 gangliosidosis type 3 (GT)
+GM2 gangliosidosis
+GM2 gangliosidosis, AB variant
 gnathodiaphyseal dysplasia (GD)
 gnathomiasis
 goat milk allergy (GMA)
 goiter
+Goldberg-Shprintzen syndrome
+Goldenhar syndrome (GS)
 gonadal dysgenesis (GD)
 gonadoblastoma
 gonococcal bursitis (GB)
@@ -4133,7 +3564,12 @@ gonococcal seminal vesiculitis (GSV)
 gonococcal spondylitis (GS)
 gonococcal synovitis (GS)
 gonorrhea
+Good syndrome (GS)
+Goodpasture syndrome (GS)
+Gordon Holmes syndrome (GHS)
+Gorham's disease
 gout
+GRACILE syndrome (GS)
 grade III astrocytoma (GIA)
 granular cell leiomyosarcoma (GCL)
 granular cell tumor (GCT)
@@ -4150,44 +3586,60 @@ granulomatous hepatitis (GH)
 granulomatous myositis (GM)
 granulomatous orchitis (GO)
 granulosa cell tumor (GCT)
+Graves' disease
 gray platelet syndrome (GPS)
 gray zone lymphoma (GZL)
+Greenberg dysplasia (GD)
+Greig cephalopolysyndactyly syndrome (GCS)
+GRID2-related spinocerebellar ataxia (SA)
+Griscelli syndrome (GS)
+Griscelli syndrome type 1 (GST)
+Griscelli syndrome type 2 (GST)
+Griscelli syndrome type 3 (GST)
+Grn-related frontotemporal lobar degeneration with Tdp43 inclusions (FLDWI)
 growth hormone secreting pituitary adenoma (GHSPA)
 guanidinoacetate methyltransferase deficiency (GMD)
+Guillain-Barre syndrome (GBS)
 gum cancer (GC)
 gummatous syphilis (GS)
+Guttmacher syndrome (GS)
 gynatresia or vaginal stenosis
 gynecomastia
 gyrate atrophy (GA)
 haemonchiasis
 haemophilus meningitis (HM)
-hair disease (HD) or balding
+Hailey-Hailey disease or familial benign pemphigus
+hair disease or balding
 hair follicle neoplasm (HFN)
 hairy cell leukemia (HCL)
 hairy tongue (HT)
+Hajdu-Cheney syndrome
+Hallermann-Streiff syndrome (HSS)
 hallucinogen abuse (HA)
 hallucinogen dependence (HD)
 hand dermatosis (HD)
-hand, foot and mouth disease (FAMD)
 hand-foot-genital syndrome
+hand, foot and mouth disease (FAMD)
+Hantavirus hemorrhagic fever with renal syndrome (HHFWRS)
 hantavirus pulmonary syndrome (HPS)
 hard palate cancer (HPC)
+Hartnup disease (HD)
+Haverhill fever (HF)
 hawkinsinuria
+HCL-V
 head and neck cancer (HANC)
 head and neck carcinoma (HANC)
 head and neck squamous cell carcinoma (HANSCC)
 heart cancer (HC)
 heart conduction disease (HCD)
-cardiac fibrosarcoma
-cardiac leiomyosarcoma
-cardiac lipoma
-cardiac lymphoma
 heart malignant hemangiopericytoma (HMH)
-cardiac sarcoma
-ventricular septal defect (VSD)
 heart valve disease (HVD)
 heavy chain disease (HCD)
 heel spur (HS)
+Heimler syndrome (HS)
+Heinz body anemia (HBA)
+HELLP syndrome (HS)
+Helsmoortel-Van Der Aa Syndrome (DS)
 hemangioblastoma
 hemangioma
 hemangioma of intra-abdominal structure (HS)
@@ -4229,6 +3681,8 @@ hemopneumothorax
 hemorrhagic cystitis (HC)
 hemorrhoid
 hemosiderosis
+Hennekam syndrome (HS)
+Henoch-Schoenlein purpura
 hepatic angiomyolipoma (HA)
 hepatic coma (HC)
 hepatic encephalopathy (HE)
@@ -4257,7 +3711,8 @@ hepatoid pattern ovarian yolk sac tumor (HPOYST)
 hepatoid pattern testicular yolk sac tumor (HPTYST)
 hepatopulmonary syndrome (HS)
 hepatorenal syndrome (HRS)
-hereditary Wilms' tumor (HT)
+Her2-receptor negative breast cancer (NBC)
+Her2-receptor positive breast cancer (PBC)
 hereditary angioedema (HAE)
 hereditary arterial and articular multiple calcification syndrome (HAAAMCS)
 hereditary ataxia (HA)
@@ -4269,6 +3724,7 @@ hereditary desmoid disease (HDD)
 hereditary elliptocytosis (HE)
 hereditary folate malabsorption (HFM)
 hereditary fructose intolerance syndrome (HFI)
+hereditary gingival fibromatosis (HGF)
 hereditary hemorrhagic telangiectasia (HHT)
 hereditary hypophosphatemic rickets with hypercalciuria (HHRH)
 hereditary lymphedema (HL)
@@ -4304,13 +3760,13 @@ hereditary sensory and autonomic neuropathy type 6 (HSAANT)
 hereditary sensory and autonomic neuropathy type 7 (HSAANT)
 hereditary sensory and autonomic neuropathy type 8 (HSAANT)
 hereditary sensory neuropathy (HSN)
-hereditary sensory neuropathy X-linked (HSN)
 hereditary sensory neuropathy type 1B (HSNT)
 hereditary sensory neuropathy type 1D (HSNT)
 hereditary sensory neuropathy type 1E (HSNT)
 hereditary sensory neuropathy type 1F (HSNT)
 hereditary sensory neuropathy type 2 (HSNT)
 hereditary sensory neuropathy type 4 (HSNT)
+hereditary sensory neuropathy X-linked (HSN)
 hereditary spastic paraplegia (HSP)
 hereditary spherocytosis (HS)
 hereditary spherocytosis type 1 (HST)
@@ -4318,6 +3774,8 @@ hereditary spherocytosis type 2 (HST)
 hereditary spherocytosis type 3 (HST)
 hereditary spherocytosis type 4 (HST)
 hereditary spherocytosis type 5 (HST)
+hereditary Wilms' tumor (HT)
+Hermansky-Pudlak syndrome
 hermaphroditism
 hernia of ovary and fallopian tube (HOAFT)
 heroin dependence (HD)
@@ -4341,6 +3799,8 @@ high myopia-sensorineural deafness syndrome (HDS)
 high pressure neurological syndrome (HPNS)
 hilar lung carcinoma (HLC)
 hilar lung neoplasm (HLN)
+Hirata disease (HD)
+Hirschsprung's disease
 histidine metabolism disease (HMD)
 histidinemia
 histiocytic and dendritic cell cancer (HADCC)
@@ -4354,19 +3814,30 @@ histoplasmosis pericarditis (HP)
 histoplasmosis retinitis (HR)
 histrionic personality disorder (HPD)
 hobnail hemangioma (HH)
+Hodgkin's granuloma
+Hodgkin's lymphoma
+Hodgkin's lymphoma, lymphocytic depletion (LD)
+Hodgkin's lymphoma, lymphocytic-histiocytic predominance
+Hodgkin's lymphoma, mixed cellularity (MC)
+Hodgkin's lymphoma, nodular sclerosis (NS)
+Hodgkin's paragranuloma
 hole retinal cyst (HRC)
 holocarboxylase synthetase deficiency (HSD)
 holoprosencephaly (HPE)
+Holt-Oram syndrome
+Holzgreve-Wagner-Rehder Syndrome
 homocarnosinosis
 homocystinuria
 hordeolum (stye)
 hordeolum externum (HE)
 hormone producing pituitary cancer (HPPC)
 horned turban snail allergy (HTSA)
+Horner's syndrome
 human granulocytic anaplasmosis (HGA)
 human immunodeficiency virus infectious disease (HIV)
 human monocytic ehrlichiosis (HME)
 humeroradial synostosis (HS)
+Huntington's disease
 hyaline body myopathy (HBM)
 hyaline fibromatosis syndrome (HFS)
 hydranencephaly
@@ -4469,8 +3940,8 @@ hypomelanosis of Ito (HI)
 hypomyelinating leukodystrophy (HL)
 hypomyelinating leukoencephalopathy (HL)
 hypoparathyroidism
-hypoparathyroidism-sensorineural deafness-renal disease syndrome (DS)
 hypoparathyroidism-retardation-dysmorphism syndrome (HRD)
+hypoparathyroidism-sensorineural deafness-renal disease syndrome (DS)
 hypopharynx cancer (HC)
 hypophosphatasia (HPP)
 hypophosphatemia
@@ -4505,12 +3976,16 @@ idiopathic peripheral autonomic neuropathy (IPAN)
 idiopathic progressive polyneuropathy (IPP)
 idiopathic pulmonary fibrosis (IPF)
 idiopathic scoliosis (IS)
+IgA glomerulonephritis (IG)
+IgG4-related disease
+IGSF1 deficiency syndrome (DS)
 ileal neoplasm (IN)
 ileitis
 ileocolitis
 ileum cancer (IC)
 ileus
 iliac vein thrombophlebitis (IVT)
+IMAGe syndrome (IS)
 immature cataract (IC)
 immature teratoma of ovary (ITO)
 immune dysregulation-polyendocrinopathy-enteropathy-X-linked syndrome (IPEX)
@@ -4531,17 +4006,19 @@ impotence
 impulse control disorder (ICD)
 in situ carcinoma (SC)
 inappropriate antidiuretic hormone syndrome (IAS)
-inclusion body myopathy with Paget disease of bone and frontotemporal dementia (IBMPFD)
 inclusion body myopathy with early-onset Paget disease of bone with or without frontotemporal dementia (IBMWPDBWWFD)
+inclusion body myopathy with Paget disease of bone and frontotemporal dementia (IBMPFD)
 inclusion body myositis (IBM)
 inclusion conjunctivitis (IC)
 indeterminate leprosy (IL)
+Indian plum allergy (IPA)
+Indian prawn allergy (IPA)
+Indian tick typhus (ITT)
 indolent myeloma (IM) or asymptomatic myeloma
 indolent systemic mastocytosis (ISM)
 infancy electroclinical syndrome (IES)
 infant botulism (IB)
 infant gynecomastia (IG)
-infantile Refsum disease (IRD)
 infantile cerebellar-retinal degeneration (ICRD)
 infantile cerebral and cerebellar atrophy with postnatal progressive microcephaly (ICACAWPPM)
 infantile histiocytoid cardiomyopathy (IHC)
@@ -4549,6 +4026,7 @@ infantile hypertrophic cardiomyopathy (IHC)
 infantile hypophosphatasia (IH)
 infantile myofibromatosis (IM)
 infantile or early childhood epileptic encephalopathy (IECEE)
+infantile Refsum disease (IRD)
 infantile-onset distal myopathy (DM)
 infected hydrocele (IH)
 infectious anterior uveitis (IAU)
@@ -4574,6 +4052,7 @@ inflammatory breast carcinoma (IBC)
 inflammatory diarrhea (ID)
 inflammatory leiomyosarcoma (IL)
 inflammatory liposarcoma (IL)
+inflammatory malignant fibrous histiocytoma (Inflammatory MFH)
 inflammatory myofibroblastic tumor (IMT)
 inflammatory spondylopathy (IS)
 influenza
@@ -4724,8 +4203,18 @@ isolated microphthalmia (IM)
 isolated sulfite oxidase deficiency (ISOD)
 isoniazide allergy (IA)
 isovaleric acidemia (IA)
+Israeli tick typhus (ITT)
 isthmus cancer (IC)
+ITM2B-related cerebral amyloid angiopathy (CAA)
+IVIC syndrome (IS)
+Jaccoud's syndrome
+Jackson-Weiss syndrome (JWS)
+Jacobsen Syndrome (JS)
+Jalili syndrome (JS)
+Jansen's metaphyseal chondrodysplasia (MC)
 janus kinase-3 deficiency (JD)
+Japanese encephalitis (JE)
+Japanese spotted fever (JSF)
 jaw cancer (JC)
 jaw-winking syndrome or Marcus Gunn syndrome
 jejunal adenocarcinoma (JA)
@@ -4733,6 +4222,12 @@ jejunal cancer (JC)
 jejunal neoplasm (JN)
 jejunal somatostatinoma (JS)
 jejunoileitis
+Jervell-Lange Nielsen syndrome (NS)
+Jewett-Marshall bladder cancer (BC)
+JMP syndrome (JS)
+Johanson-Blizzard syndrome
+Joubert syndrome (JS)
+Joubert syndrome with orofaciodigital defect (JSWOD)
 jugular foramen meningioma (JFM)
 junctional epidermolysis bullosa (JEB)
 junctional epidermolysis bullosa Herlitz type (JEBHT)
@@ -4757,8 +4252,20 @@ juvenile-onset Parkinson's disease
 juxtacortical chondroma (JC)
 juxtacortical chondrosarcoma (JC)
 juxtacortical osteosarcoma (JO)
+Kabuki syndrome (KS)
+Kagami-Ogata syndrome
+Kahrizi syndrome (KS)
+Kallmann syndrome (KS)
 kaolin pneumoconiosis (KP)
+Kaposi's sarcoma
+Kartagener syndrome (KS)
 karyomegalic interstitial nephritis (KIN)
+Kaufman oculocerebrofacial syndrome (KOS)
+Kawasaki disease (KD)
+KBG syndrome (KS)
+Kearns-Sayre syndrome
+Keipert syndrome (KS)
+Kennedy's disease
 keratinizing squamous cell carcinoma (KSCC)
 keratitis
 keratoacanthoma
@@ -4771,12 +4278,12 @@ keratosis
 keratosis follicularis (KF)
 kernicterus
 kernicterus due to isoimmunization (KDI)
+Keshan disease (KD)
 ketoprofen photoallergic dermatitis (KPD)
 kidney angiomyolipoma (KA)
 kidney benign neoplasm (KBN)
 kidney cancer (KC)
 kidney carcinoma in situ (KCS)
-clear cell sarcoma of the kidney (CCSK)
 kidney cortex disease (KCD)
 kidney cortex necrosis (KCN)
 kidney disease (KD)
@@ -4786,17 +4293,39 @@ kidney hemangiopericytoma (KH)
 kidney hypertrophy (KH)
 kidney leiomyosarcoma (KL)
 kidney lipoma (KL)
-Renal liposarcoma
 kidney osteogenic sarcoma (KOS)
 kidney papillary necrosis (KPN)
-renal pelvis papillary carcinoma
-renal pelvis sarcomatoid transitional cell carcinoma
 kidney rhabdoid cancer (KRC)
 kidney sarcoma (KS)
+Kimura disease (KD)
+Kindler syndrome (KS)
+Klatskin's tumor
+Klebsiella pneumonia (KP)
+Kleefstra syndrome (KS)
+Kleine-Levin syndrome
 kleptomania
+Klinefelter syndrome (KS)
+Klippel-Feil syndrome
+Klippel-Trenaunay syndrome
+Kluver-Bucy syndrome
+Kniest dysplasia (KD)
+Kohler's disease
+Kohlschutter-Tonz syndrome
+Koolen de Vries syndrome (KVS)
+Korean hemorrhagic fever (KHF)
+Krabbe disease (KD)
+Krukenberg carcinoma (KC)
+Kufor-Rakeb syndrome
+Kuhnt-Junius degeneration
+Kummell's disease or Delayed post-traumatic osteonecrosis
+Kunjin encephalitis (KE)
 kuru
 kwashiorkor
+Kyasanur forest disease (KFD)
 kyphoscoliotic heart disease (KHD)
+L-2-hydroxyglutaric aciduria
+L-cell glucagon-like peptide producing tumor (PPT)
+La Crosse encephalitis (CE)
 labia majora carcinoma (LMC)
 labia minora cancer (LMC)
 labia minora carcinoma (LMC)
@@ -4819,8 +4348,14 @@ lacrimal system cancer (LSC)
 lactic acidosis (LA)
 lactocele
 lactose intolerance (LI)
+LADD syndrome (LS)
+Lafora disease (LD)
 lagophthalmos
 lambda 5 deficiency (LD)
+Lambert-Eaton myasthenic syndrome (MS)
+Landau-Kleffner syndrome
+Langerhans cell sarcoma (LCS)
+Langerhans-cell histiocytosis
 language disorder (LD)
 large bowel leiomyoma (LBL)
 large cell acanthoma (LCA)
@@ -4834,6 +4369,9 @@ large intestine adenocarcinoma (LIA)
 large intestine adenoma (LIA)
 large intestine cancer (LIC)
 large intestine lipoma (LIL)
+Laron syndrome (LS)
+Larsen syndrome (LS)
+Larsen-like syndrome B3GAT3 type (ST)
 laryngeal adenoid cystic carcinoma (LACC)
 laryngeal benign neoplasm (LBN)
 laryngeal carcinoma (LC)
@@ -4854,6 +4392,7 @@ larynx liposarcoma (LL)
 larynx sarcoma (LS)
 larynx squamous papilloma (LSP)
 larynx verrucous carcinoma (LVC)
+Lassa fever (LF)
 late congenital syphilis (LCS)
 late onset Parkinson's disease (LOD)
 late yaws (LY)
@@ -4870,24 +4409,39 @@ lateral sinus thrombosis (LST)
 lateral ventricle meningioma (LVM)
 latex allergy (LA)
 lattice corneal dystrophy (LCD)
+Laurence-Moon syndrome
+Laurin-Sandrow syndrome
 learning disability (LD)
+Leber congenital amaurosis (LCA)
+Leber hereditary optic neuropathy (LHON)
+Leber hereditary optic neuropathy and dystonia (LHONAD)
+Leber hereditary optic neuropathy with demyelinating disease of CNS (LHONWDDC)
+Leber plus disease (LPD)
 leech infestation (LI)
 left bundle branch hemiblock (LBBH)
 left ventricular noncompaction (LVNC)
 leg dermatosis (LD)
+Legg-Calve-Perthes disease (LCPD)
 legionellosis (Legionnaires' disease)
+Legionnaires' disease
 legume allergy (LA)
+Leigh disease (LD)
 leiomyoma
 leiomyoma cutis (LC)
 leiomyomatosis
 leiomyosarcoma
 leishmaniasis
+Lemierre's syndrome
+Lennox-Gastaut syndrome
 lens subluxation (LS)
 lens-induced iridocyclitis
+Lenz-Majewski hyperostotic dwarfism (HD)
 lepromatous leprosy (LL)
 leprosy
 leptomeninges sarcoma (LS)
 leptospirosis
+Leri-Weill dyschondrosteosis
+Lesch-Nyhan syndrome
 lesion of sciatic nerve (LSN)
 lethal congenital contracture syndrome (LCCS)
 lethal congenital glycogen storage disease of heart (LCGSDH)
@@ -4903,9 +4457,14 @@ leukoplakia of penis (LP)
 leukoplakia of vagina (LV)
 leukorrhea
 leukostasis
+Lewy body dementia (LBD)
+Leydig cell tumor (LCT)
+Li-Fraumeni syndrome
 lice infestation (LI)
 lichen nitidus (LN)
 lichen planus (LP)
+lichen sclerosus
+Liddle syndrome (LS)
 lidocaine allergy (LA)
 limb ischemia (LI)
 limb-girdle muscular dystrophy (MD)
@@ -4936,8 +4495,11 @@ lipomatous cancer (LC)
 liposarcoma
 liposarcoma of bone (LB)
 liposarcoma of the ovary (LTO)
+Lisch epithelial corneal dystrophy (LECD)
 lissencephaly
+Listeria meningitis (LM)
 listeriosis
+Littre gland carcinoma (LGC)
 livedoid vasculitis (LV)
 liver angiosarcoma (LA)
 liver benign neoplasm (LBN)
@@ -4963,10 +4525,13 @@ localized osteosarcoma (LO)
 localized pulmonary fibrosis (LPF)
 localized scleroderma (LS)
 locked-in syndrome
+Loeffler endocarditis (LE)
+Loeffler syndrome (LS)
+Loeys-Dietz syndrome
 loiasis
-long QT syndrome (LS)
 long bone adamantinoma (LBA)
 long bones of lower limb cancer (LBLLC)
+long QT syndrome (LS)
 loose anagen hair syndrome (LAHS)
 louping ill (LI)
 louse-borne relapsing fever (LBRF)
@@ -4979,6 +4544,8 @@ lower gum cancer (LGC)
 lower lip cancer (LLC)
 lower respiratory tract disease (LRTD)
 lower urinary tract calculus (LUTC)
+Lown-Ganong-Levine syndrome
+Ludwig's angina
 lujo hemorrhagic fever (LUHF)
 lumbar plexus neoplasm (LPN)
 lumbar spinal canal and spinal cord meningioma (LSCASCM)
@@ -5024,8 +4591,10 @@ lung squamous cell carcinoma (LSCC)
 lung superior sulcus carcinoma (LSSC)
 lupus erythematosus (LE)
 lupus nephritis (LN)
+Lutembacher's syndrome
 luteoma
 luxation of globe (LG)
+Lyme disease (LD)
 lymph node adenoid cystic carcinoma (LNACC)
 lymph node benign neoplasm (LNBN)
 lymph node cancer (LNC)
@@ -5058,9 +4627,11 @@ lymphopenia
 lymphoplasmacyte-rich meningioma (LPM)
 lymphoplasmacytic lymphoma (LL)
 lymphoproliferative syndrome (LS)
+Lynch syndrome (LS)
 lysinuric protein intolerance (LPI)
 lysosomal and lipase deficiency (LALD)
 lysosomal storage disease (LSD)
+Machado-Joseph disease (MJD) or spinocerebellar ataxia Type 3 (SCA3)
 macrocephaly-autism syndrome
 macrocystic neurilemmoma (MN)
 macrocystic pattern testicular yolk sac tumor (MPTYST)
@@ -5072,6 +4643,7 @@ macular degeneration (MD)
 macular holes (MH)
 macular keratitis (MK)
 macular retinal edema (MRE)
+Maffucci syndrome (MS)
 main bronchus cancer (MBC)
 major affective disorder (MAD)
 major depressive disorder (MDD)
@@ -5086,8 +4658,8 @@ male reproductive organ cancer (MROC)
 male reproductive system disease (MRSD)
 male urethral cancer (MUC)
 maleic anhydride allergic asthma (MAAA)
-malignant ACTH producing neoplasm of pituitary gland (MAPNPG)
 malignant acrospiroma (MA)
+malignant ACTH producing neoplasm of pituitary gland (MAPNPG)
 malignant adenofibroma (MA)
 malignant adenoma (MA)
 malignant adult ependymoma (MAE)
@@ -5128,7 +4700,6 @@ malignant histiocytic disease (MHD)
 malignant hypertension (MH)
 malignant hypertensive renal disease (MHRD)
 malignant hyperthermia (MH)
-inflammatory malignant fibrous histiocytoma (Inflammatory MFH)
 malignant iris melanoma (MIM)
 malignant leptomeningeal tumor (MLT)
 malignant mediastinal neurogenic neoplasm (MMNN)
@@ -5167,6 +4738,7 @@ malignant tumor of undescended testis (MTUT)
 malignant type A thymoma (MTT)
 malignant type AB thymoma (MTT)
 malignant visceral pleura tumor (MVPT)
+MALT lymphoma (ML)
 malt worker's lung (ML)
 mammary Paget's disease (MD)
 mandibular cancer (MC)
@@ -5178,18 +4750,27 @@ maple bark strippers' lung (MBL)
 maple syrup urine disease (MSUD)
 marantic endocarditis (ME)
 marasmus
+Marburg hemorrhagic fever (MHF)
+Marfan syndrome (MS)
 marginal corneal ulcer (MCU)
 marginal zone B-cell lymphoma (MZL)
+Marinesco-Sjogren syndrome
+Marshall syndrome (MS)
+Marshall-Smith syndrome
+Martsolf syndrome (MS)
+MASA syndrome (MS)
 mast cell neoplasm (MCN)
+Mast syndrome (MS)
 mast-cell leukemia
 mast-cell sarcoma
+Masters-Allen syndrome
 mastitis
 mastocytosis
 mastoiditis
 mature B-cell neoplasm (MN)
-mature T-cell and NK-cell lymphoma (MAL)
 mature cataract (MC)
 mature gastric teratoma (MGT)
+mature T-cell and NK-cell lymphoma (MAL)
 mature teratoma (MT)
 mature teratoma of the ovary (MTTO)
 maturity-onset diabetes of the young (MODY)
@@ -5207,19 +4788,25 @@ maturity-onset diabetes of the young type 7 (MODY 7)
 maturity-onset diabetes of the young type 8 (MODY 8)
 maturity-onset diabetes of the young type 9 (MODY 9)
 maxillary cancer (MC)
-maxillary sinus Schneiderian papilloma (MSSP)
 maxillary sinus adenocarcinoma (MSA)
 maxillary sinus adenoid cystic carcinoma (MSACC)
 maxillary sinus benign neoplasm (MSBN)
 maxillary sinus cancer (MSC)
 maxillary sinus cholesteatoma (MSC)
 maxillary sinus inverted papilloma (MSIP)
+maxillary sinus Schneiderian papilloma (MSSP)
 maxillary sinus squamous cell carcinoma (MSSCC)
 maxillary sinusitis (MS)
+McCune Albright syndrome (MAS)
+McKusick-Kaufman syndrome
 measles
 mechanical ectropion (ME)
 mechanical lagophthalmos (ML)
 mechanical strabismus (MS)
+Meckel syndrome (MS)
+Meckel's diverticulitis
+Meckel's diverticulum
+Meckel's diverticulum cancer (DC)
 meconium aspiration syndrome (MAS)
 median arcuate ligament syndrome (MALS)
 median neuropathy (MN)
@@ -5247,11 +4834,14 @@ mediastinum seminoma (MS)
 mediastinum synovial sarcoma (MSS)
 mediastinum teratoma (MT)
 medium chain acyl-CoA dehydrogenase deficiency (MCAD)
+MEDNIK syndrome (MS)
 medullary colon carcinoma (MCC)
 medulloadrenal hyperfunction (MH)
 medulloblastoma
 medulloepithelioma
 medullomyoblastoma
+Meesmann corneal dystrophy (MCD)
+Meester-Loeys syndrome
 mega-corpus-callosum syndrome with cerebellar hypoplasia and cortical malformations (SWCHACM)
 megacolon
 megaconial type congenital muscular dystrophy (MTCMD)
@@ -5264,7 +4854,10 @@ megalencephalic leukoencephalopathy with subcortical cysts 2A (MLWSC)
 megalencephalic leukoencephalopathy with subcortical cysts 2B (MLWSC)
 megaloblastic anemia (MA)
 megalocornea
+MEHMO syndrome (MS)
 meibomian cyst (MC) or Chalazion
+Meier-Gorlin syndrome
+Meige syndrome (MS)
 melancholia
 melanoacanthoma
 melanocytic psammomatous malignant Peripheral Nerve Sheath Tumor (MPM)
@@ -5275,12 +4868,17 @@ melanomatosis
 melanotic medulloblastoma (MM)
 melanotic neurilemmoma (MN)
 melanotic neuroectodermal tumor (MNT)
+MELAS syndrome (MS)
 melioidosis or Whitmore's disease
+Melkersson-Rosenthal syndrome
+Melnick-Needles syndrome
 melon allergy (MA)
 melorheostosis
 melphalan allergy (MA)
 membranoproliferative glomerulonephritis (MPGN)
 membranous glomerulonephritis (MG)
+MEND syndrome (MS)
+Meniere's disease
 meningeal melanocytoma (MM)
 meningeal melanoma (MM)
 meningeal melanomatosis (MM)
@@ -5293,9 +4891,12 @@ meningococcal meningitis (MM)
 meningoencephalitis
 meningothelial meningioma (MM)
 meningovascular neurosyphilis (MN)
+Menkes disease (MD)
 mental depression (MD)
 mepivacaine allergy (MA)
+Merkel cell carcinoma (MCC)
 meropenem allergy (MA)
+MERRF syndrome (MS)
 mesangial proliferative glomerulonephritis (MPG)
 mesenchymal cell neoplasm (MCN)
 mesenchymal chondrosarcoma (MC)
@@ -5331,6 +4932,8 @@ methylmalonic aciduria and homocystinuria type cblF (MAAHTC)
 methylmalonic aciduria and homocystinuria type cblG (MAAHTC)
 methylmalonic aciduria due to methylmalonyl-CoA mutase deficiency (MADMD)
 mevalonic aciduria (MA)
+MHC class I deficiency (MCD)
+MHC class II deficiency (MCD)
 microcephalic osteodysplastic primordial dwarfism type I (MOPDT)
 microcephalic osteodysplastic primordial dwarfism type II (MOPDT)
 microcephaly
@@ -5362,6 +4965,7 @@ middle ear cancer (MEC)
 middle ear carcinoma (MEC)
 middle ear cholesterol granuloma (MECG)
 middle ear squamous cell carcinoma (MESCC)
+Middle East respiratory syndrome (MERS)
 middle lobe syndrome (MLS)
 midface dysplasia (MD)
 midface hypoplasia, hearing impairment, elliptocytosis, and nephrocalcinosis (MHAN)
@@ -5369,19 +4973,22 @@ midline cystocele (MC)
 migraine
 migraine with aura (MWA)
 migraine without aura (MWA)
+Mikulicz disease (MD)
 mild pre-eclampsia
-miliaria or heat rash
+Miles-Carpenter syndrome
 miliaria crystallina (MC)
+miliaria or heat rash
 miliaria profunda (MP)
 miliaria pustulosa (MP)
 miliaria rubra (MR)
 miliary tuberculosis (MT)
 milk allergy (MA)
 milker's nodule
+Miller Fisher syndrome (MFS)
+Miller-Dieker lissencephaly syndrome (LS)
 minor vestibular glands adenoma (MVGA)
 mirror agnosia (MA)
 mite infestation (MI)
-mitochondrial DNA depletion syndrome (MDDS)
 mitochondrial complex I deficiency (MC1)
 mitochondrial complex II deficiency (MC2)
 mitochondrial complex III deficiency (MC3)
@@ -5401,6 +5008,7 @@ mitochondrial complex V (ATP synthase) deficiency nuclear type 3 (MC5DN3)
 mitochondrial complex V (ATP synthase) deficiency nuclear type 4 (MC5DN4)
 mitochondrial complex V (ATP synthase) deficiency nuclear type 6 (MC5DN6)
 mitochondrial complex V (ATP synthase) deficiency, nuclear type 1 (MC5DN1)
+mitochondrial DNA depletion syndrome (MDDS)
 mitochondrial encephalomyopathy (ME)
 mitochondrial myopathy (MM)
 mitochondrial nonsyndromic sensorineural deafness (MNSD)
@@ -5410,6 +5018,7 @@ mitral valve disease (MVD)
 mitral valve insufficiency (MVI)
 mitral valve prolapse (MVP)
 mitral valve stenosis (MVS)
+Miura type epiphyseal chondrodysplasia (MTEC)
 mixed astrocytoma-ependymoma
 mixed astrocytoma-ependymoma-oligodendroglioma
 mixed cell adenoma (MCA)
@@ -5445,12 +5054,17 @@ mixed testicular germ cell tumor (MTGCT)
 mixed type rhabdomyosarcoma (MTR)
 mixed type thymoma (MTT)
 mixed-type liposarcoma
+Miyoshi muscular dystrophy (MMD)
+MLS syndrome (MS)
+Mobitz type II atrioventricular block (MTAB)
+Mobius syndrome (MS)
 mollusc allergy (MA)
 molluscum contagiosum (MC)
 molybdenum cofactor deficiency (MCD)
 molybdenum cofactor deficiency type A (MCDT)
 molybdenum cofactor deficiency type B (MCDT)
 molybdenum cofactor deficiency type C (MCDT)
+Monckeberg arteriosclerosis (MA)
 mongolian spot (MS)
 monieziasis
 monilethrix
@@ -5462,6 +5076,7 @@ monocular exotropia (ME)
 monocytic leukemia (ML)
 monodermal teratoma (MT)
 monofixation syndrome (MS)
+Mononen-Karnes-Senac syndrome
 mononeuritis
 mononeuritis multiplex (MNM)
 mononeuritis of lower limb (MLL)
@@ -5470,7 +5085,9 @@ mononeuritis of upper limb and mononeuritis multiplex (MULAMM)
 mononeuropathy
 monophasic synovial sarcoma (MSS)
 mood disorder (MD)
+Mooren's ulcer
 morbid obesity (MO)
+Morgagni cataract (MC)
 morpheaform basal cell carcinoma (MBCC)
 morphine dependence (MD)
 mosaic variegated aneuploidy syndrome (MVAS)
@@ -5478,6 +5095,8 @@ motility-related diarrhea
 motion sickness (MS)
 motor neuritis (MN)
 motor peripheral neuropathy (MPN)
+Mowat-Wilson syndrome
+Moyamoya disease (MD)
 mu heavy chain disease (CD)
 mucin-rich endometrial endometrioid adenocarcinoma (EEA)
 mucinoses
@@ -5491,6 +5110,7 @@ mucinous lung adenocarcinoma (MLA)
 mucinous ovarian cystadenoma (MOC)
 mucinous stomach adenocarcinoma (MSA)
 mucinous tubular and spindle renal cell carcinoma (MTASRCC)
+Muckle-Wells syndrome
 mucocele of appendix (MA)
 mucocele of salivary gland (MSG)
 mucocutaneous leishmaniasis (ML)
@@ -5503,26 +5123,31 @@ mucolipidosis III gamma (MIG)
 mucolipidosis type IV (MT)
 mucopolysaccharidosis (MPS)
 mucopolysaccharidosis I (MPS1)
+mucopolysaccharidosis Ih
+mucopolysaccharidosis Ih/s
 mucopolysaccharidosis II (MPS2)
 mucopolysaccharidosis III (MPS3)
 mucopolysaccharidosis IV (MPS4)
 mucopolysaccharidosis IVA (MPS4A)
 mucopolysaccharidosis IX (MPS9)
-mucopolysaccharidosis Ih
-mucopolysaccharidosis Ih/s
-mucopolysaccharidosis VI (MPS6)
 mucopolysaccharidosis type IIIA (MPS3A)
 mucopolysaccharidosis type IIIB (MPS3B)
 mucopolysaccharidosis type IIIC (MPS3C)
 mucopolysaccharidosis type IIID (MPS3D)
 mucopolysaccharidosis type IVB (MPS4B)
+mucopolysaccharidosis VI (MPS6)
 mucormycosis
 mucosal melanoma (MM)
 mucositis
 mucosulfatidosis
+Muenke Syndrome (MS)
+Muir-Torre syndrome
+Mulchandani-Bhoj-Conlin syndrome (MBCS)
 mulibrey nanism (MN)
-multicentric Castleman disease (MCD)
+Mullegama-Klein-Martinez syndrome (MKMS)
+Mullerian aplasia and hyperandrogenism (MAAH)
 multicentric carpotarsal osteolysis syndrome (MCOS)
+multicentric Castleman disease (MCD)
 multicentric papillary thyroid carcinoma (MPTC)
 multicentric reticulohistiocytosis (MR)
 multidrug-resistant tuberculosis (MDR-TB)
@@ -5558,6 +5183,8 @@ multiple synostoses syndrome (MSS)
 multiple system atrophy (MSA)
 multisystem proteinopathy (MP)
 mumps or parotitis
+Munchausen by proxy (MP)
+Murray Valley encephalitis (MVE)
 muscle benign neoplasm (MBN)
 muscle cancer (MC)
 muscular atrophy (MA)
@@ -5569,9 +5196,9 @@ muscular dystrophy-dystroglycanopathy type B6 (MDDGB6)
 musculoskeletal system benign neoplasm (MSBN)
 musculoskeletal system cancer (MSC)
 mushroom workers' lung (ML)
-elective mutism
-selective mutism
 myasthenia gravis (MG)
+Mycobacterium avium complex disease (MACD)
+Mycoplasma pneumoniae pneumonia (MPP)
 mycosis fungoides (MF)
 mycotic corneal ulcer (MCU)
 myelitis
@@ -5589,6 +5216,7 @@ myelomeningocele
 myelophthisic anemia (MA)
 myeloproliferative disorder with eosinophilia (MDWE)
 myeloproliferative neoplasm (MN)
+MYH-9 related disease (RD)
 myiasis
 myoblastoma
 myocardial infarction (MI)
@@ -5627,10 +5255,17 @@ myxoid liposarcoma of the ovary (MLTO)
 myxomatous pattern testicular yolk sac tumor (MPTYST)
 myxopapillary ependymoma (ME)
 myxosarcoma
+N syndrome
+N,N'-diethylthiourea allergic contact dermatitis (ACD)
+N,N'-diphenylthiourea allergic contact dermatitis (ACD)
+Naegeli-Franceschetti-Jadassohn syndrome (NFJS) or dermatopathia pigmentosa reticularis (DPR)
+Nager acrofacial dysostosis (NAD)
 nail-patella syndrome (NPS)
+Nance-Horan syndrome
 nanophthalmos
 narcissistic personality disorder (NPD)
 narcolepsy or excessive uncontrollable daytime sleepiness
+NARP syndrome (NS)
 nasal cavity adenocarcinoma (NCA)
 nasal cavity benign neoplasm (NCBN)
 nasal cavity cancer (NCC)
@@ -5643,6 +5278,9 @@ nasal cavity squamous cell carcinoma (NCSCC)
 nasal vestibule papilloma (NVP)
 nasopharyngitis
 nasopharynx carcinoma (NC)
+Nasu-Hakola disease or polycystic lipomembranous osteodysplasia with sclerosing leukoencephalopathy (PLOSL)
+Native American myopathy (NAM)
+Naxos disease (ND)
 necatoriasis
 necrobiosis lipoidica (NL)
 necrosis of ear ossicle (NEO)
@@ -5652,6 +5290,7 @@ necrotizing fasciitis (NF)
 necrotizing gastritis (NG)
 necrotizing sialometaplasia (NS)
 necrotizing ulcerative gingivitis (NUG)
+Nelson syndrome (NS)
 nemaline myopathy (NM)
 neomycin sulfate allergic contact dermatitis (NSACD)
 neonatal abstinence syndrome (NAS)
@@ -5714,6 +5353,8 @@ nervous system benign neoplasm (NSBN)
 nervous system cancer (NSC)
 nervous system hibernoma (NSH)
 nested variant infiltrating bladder urothelial carcinoma (NVIBUC)
+Netherton syndrome (NS)
+Neu-Laxova syndrome
 neural tube defect (NTD)
 neurilemmoma
 neurilemmoma of the fifth cranial nerve (NTFCN)
@@ -5773,10 +5414,22 @@ neutral lipid storage disease (NLSD)
 neutropenia
 nevoid basal cell carcinoma syndrome (NBCCS)
 newborn respiratory distress syndrome (NRDS)
+Newcastle disease (ND)
+Newfoundland cone-rod dystrophy (ND)
+Nezelof syndrome (NS)
+NFIA-related disorder
+NGLY1-deficiency
 nickel allergic asthma (NAA)
 nickel allergic contact dermatitis (NACD)
 nicotine dependence (ND)
+Niemann-Pick disease
+Niemann-Pick disease type A (NPA)
+Niemann-Pick disease type B (NPB)
+Niemann-Pick disease type C1 (NPC1)
+Niemann-Pick disease type C2 (NPC2)
 night blindness (NB) or Nyctalopia
+Nijmegen breakage syndrome (NBS)
+Nipah virus encephalitis (NVE)
 nipple benign neoplasm (NBN)
 nipple carcinoma (NC)
 nipple duct carcinoma (NDC)
@@ -5796,8 +5449,6 @@ nodular tenosynovitis (NT)
 noma or cancrum oris or the face of poverty
 nominal aphasia (NA)
 non specific chronic endometritis (NSCE)
-non-Hodgkin lymphoma
-non-Langerhans-cell histiocytosis
 non-alcoholic fatty liver (FL)
 non-alcoholic fatty liver disease (FLD)
 non-alcoholic steatohepatitis
@@ -5806,14 +5457,16 @@ non-congenital cyst of kidney (CK)
 non-functioning pancreatic endocrine tumor (PET)
 non-gestational choriocarcinoma
 non-gestational ovarian choriocarcinoma (OC)
+non-Hodgkin lymphoma
 non-invasive bladder papillary urothelial neoplasm (BPUN)
 non-invasive bladder urothelial carcinoma (BUC)
+non-Langerhans-cell histiocytosis
 non-proliferative fibrocystic change of the breast (FCTB)
 non-renal secondary hyperparathyroidism (SH)
 non-secretory myeloma
 non-suppurative otitis media (OM)
-non-syndromic X-linked intellectual disability (ID)
 non-syndromic intellectual disability (ID)
+non-syndromic X-linked intellectual disability (ID)
 nonencapsulated sclerosing carcinoma (NSC)
 nonepidermolytic palmoplantar keratoderma (NPK)
 noninfectious dermatoses of eyelid (NDE)
@@ -5829,18 +5482,26 @@ nonsyndromic aplasia cutis congenita (NACC)
 nonsyndromic congenital nail disorder (NCND)
 nonsyndromic deafness (ND)
 nontoxic goiter (NG)
+Noonan syndrome (NS)
+Noonan syndrome with multiple lentigines (NSWML)
+Noonan syndrome-like disorder with loose anagen hair (NDWLAH)
 normal pressure hydrocephalus (NPH)
+Norman-Roberts syndrome
 normocytic anemia (NA)
 normophosphatemic familial tumoral calcinosis (NFTC)
+Norrie disease (ND)
+Norum disease (ND) or fish-eye disease or familial LCAT deficiency
 norwegian scabies (NS) or Crusted Scabies
 nosophobia
 notochordal cancer (NC)
 nuclear senile cataract (NSC)
 null-cell leukemia
 nut allergy (NA)
+NUT midline carcinoma (NMC)
 nutmeg liver (NL)
 nutritional deficiency disease (NDD)
 nutritional optic neuropathy (NON)
+O'nyong'nyong fever
 obesity
 oblique facial clefting (OFC)
 obsessive-compulsive disorder (OCD)
@@ -5885,6 +5546,10 @@ oculomotor nerve paralysis (ONP)
 oculopharyngeal muscular dystrophy (OMD)
 odontoclasia
 oesophagostomiasis
+Ogden syndrome (OS)
+Oguchi disease-1
+Oguchi disease-2
+Ohdo syndrome (OS)
 olecranon bursitis (OB)
 olfactory groove meningioma (OGM)
 olfactory nerve neoplasm (ONN)
@@ -5895,9 +5560,13 @@ oligodendroglioma
 oligohydramnios
 oligomeganephronia
 oligospermia
+Oliver-McFarlane syndrome
 olivopontocerebellar atrophy (OA)
+Ollier disease (OD)
+Omenn syndrome (OS)
 omodysplasia
 omphalocele
+Omsk hemorrhagic fever (OHF)
 onchocerciasis or river blindness
 oncocytic breast carcinoma (OBC)
 oophoritis
@@ -5909,6 +5578,7 @@ ophthalmoplegia
 opiate dependence (OD)
 opioid abuse (OA)
 opisthorchiasis
+Opitz-GBBB syndrome
 opportunistic mycosis (OM)
 oppositional defiant disorder (ODD)
 optic atrophy (OA)
@@ -5966,8 +5636,10 @@ orofaciodigital syndrome XVII (OSX)
 oromandibular dystonia (OD)
 oropharyngeal anthrax (OA)
 oropharynx cancer (OC)
+Oropouche fever (OF)
 orotic aciduria (OA)
 orthostatic proteinuria (OP)
+Osgood-Schlatter's disease
 osmotic diarrhea (OD)
 ossification of the posterior longitudinal ligament of spine (OTPLLS)
 ossifying fibroma (OF)
@@ -6008,11 +5680,10 @@ otospondylomegaepiphyseal dysplasia, autosomal dominant (OAD)
 otospondylomegaepiphyseal dysplasia, autosomal recessive (OAR)
 otulipenia
 outlet dysfunction constipation (ODC)
-ovarian Brenner tumor (OBT)
-ovarian Wilms' cancer (OC)
 ovarian angiosarcoma (OA)
 ovarian benign neoplasm (OBN)
 ovarian biphasic or triphasic teratoma (OBTT)
+ovarian Brenner tumor (OBT)
 ovarian cancer (OC)
 ovarian carcinoma (OC)
 ovarian carcinosarcoma (OC)
@@ -6070,6 +5741,7 @@ ovarian squamous cell carcinoma (OSCC)
 ovarian squamous cell neoplasm (OSCN)
 ovarian stromal hyperthecosis (OSH)
 ovarian surface papilloma (OSP)
+ovarian Wilms' cancer (OC)
 ovary adenocarcinoma (OA)
 ovary epithelial cancer (OEC)
 ovary leiomyosarcoma (OL)
@@ -6085,18 +5757,23 @@ oxirane allergy (OA)
 oxyphilic adenoma (OA)
 oxyphilic endometrial endometrioid adenocarcinoma (OEEA)
 pachyonychia congenita (PC)
+Pacinian tumor (PT)
+Paganini-Miozzo syndrome (MRXSPM)
+Paget's disease of bone (DB)
 pain agnosia (PA)
 pain disorder (PD)
 palindromic rheumatism (PR)
 palladium allergic contact dermatitis (PACD)
+Pallister-Hall syndrome
 palmoplantar keratoderma and congenital alopecia (PKACA)
 palmoplantar keratoderma-deafness syndrome (PS)
 palmoplantar keratoderma-esophageal carcinoma syndrome (PCS)
 palmoplantar keratosis (PK)
+Pancoast tumor (PT)
 pancreas lymphoma (PL)
 pancreas sarcoma (PS)
-pancreatic ACTH hormone producing tumor (PAHPT)
 pancreatic acinar cell adenocarcinoma (PACA)
+pancreatic ACTH hormone producing tumor (PAHPT)
 pancreatic adenocarcinoma (PA)
 pancreatic adenosquamous carcinoma (PAC)
 pancreatic agenesis (PA)
@@ -6142,6 +5819,7 @@ panniculitis
 panophthalmitis
 pantothenate kinase-associated neurodegeneration (PN)
 panuveitis
+PAPA syndrome (PS)
 papillary adenocarcinoma (PA)
 papillary adenofibroma (PA)
 papillary adenoma (PA)
@@ -6152,6 +5830,7 @@ papillary cystadenocarcinoma (PC)
 papillary ependymoma (PE)
 papillary extrahepatic bile duct adenocarcinoma (PEBDA)
 papillary follicular thyroid adenocarcinoma (PFTA)
+papillary gastric adenocarcinoma
 papillary hidradenoma (PH)
 papillary meningioma of the cerebellum (PMTC)
 papillary pattern testicular yolk sac tumor (PPTYST)
@@ -6162,6 +5841,7 @@ papillary thymic adenocarcinoma (PTA)
 papillary transitional carcinoma (PTC)
 papilledema
 papilloma
+Papillon-Lefevre disease
 parachordoma
 paracoccidioidomycosis (PCM)
 paraganglioma
@@ -6188,11 +5868,11 @@ paraphimosis
 paraplegia
 parapsoriasis
 parasagittal meningioma (PM)
-parasitic Ichthyosporea infectious disease (PIID)
 parasitic conjunctivitis (PC)
 parasitic ectoparasitic infectious disease (PEID)
 parasitic eyelid infestation (PEI)
 parasitic helminthiasis infectious disease (PHID)
+parasitic Ichthyosporea infectious disease (PIID)
 parasitic infectious disease (PID)
 parasitic protozoa infectious disease (PPID)
 parastremmatic dwarfism (PD)
@@ -6209,8 +5889,8 @@ parenchymatous neurosyphilis (PN)
 parietal foramina (PF)
 parietal lobe ependymoma (PLE)
 parietal lobe neoplasm (PLN)
+Parkinson's disease
 paronychia
-Dysgenetic polycystic disease of the parotid gland
 parotid gland adenoid cystic carcinoma (PGACC)
 parotid gland cancer (PGC)
 parotitis
@@ -6232,7 +5912,9 @@ partial optic atrophy (POA)
 partial sensory epilepsy (PSE)
 partial third-nerve palsy (PP)
 partial trisomy distal 4q (PTD)
+Partington syndrome (PS)
 pasteurellosis
+Patau syndrome (PS)
 patellar tendinitis (PT)
 patellofemoral pain syndrome (PPS)
 patent blue V allergy (PBA)
@@ -6242,12 +5924,14 @@ pathologic nystagmus (PN)
 pathological gambling (PG)
 patterned macular dystrophy (PMD)
 patulous eustachian tube (PET)
+PCWH syndrome (PS)
 peach allergy (PA)
 peanut allergy (PA)
-pediatric CNS choriocarcinoma (PCC)
-pediatric CNS embryonal cell carcinoma (PCECC)
+Pearson syndrome (PS)
 pediatric angiosarcoma (PA)
 pediatric cerebral ependymoblastoma (PCE)
+pediatric CNS choriocarcinoma (PCC)
+pediatric CNS embryonal cell carcinoma (PCECC)
 pediatric ependymoma (PE)
 pediatric epithelioid sarcoma (PES)
 pediatric extraocular retinoblastoma (PER)
@@ -6268,9 +5952,14 @@ pediatric ovarian dysgerminoma (POD)
 pediatric ovarian germ cell tumor (POGCT)
 pediatric supratentorial ependymoma (PSE)
 pediatric testicular germ cell tumor (PTGCT)
+Pediculus humanus capitis infestation (PHCI)
+Pediculus humanus corporis infestation (PHCI)
 pedophilia
 peeling skin syndrome (PSS)
+PEHO syndrome (PS)
+Pelger-Huet anomaly
 peliosis hepatis (PH)
+Pelizaeus-Merzbacher disease (PMD)
 pellagra
 pelvic inflammatory disease (PID)
 pelvic lipomatosis (PL)
@@ -6280,18 +5969,19 @@ pemphigoid gestationis (PG)
 pemphigus
 pemphigus gestationis (PG)
 pemphigus vulgaris (PV)
+Pendred Syndrome (PS)
 penicillin allergy (PA)
 penicilliosis
 penile benign neoplasm (PBN)
 penile cancer (PC)
 penile urethral cancer (PUC)
-penis Paget's disease (PD)
 penis basal cell carcinoma (PBCC)
 penis basaloid carcinoma (PBC)
 penis carcinoma (PC)
 penis carcinoma in situ (PCS)
 penis mixed squamous cell carcinoma (PMSCC)
 penis non-invasive verrucous carcinoma (PVC)
+penis Paget's disease (PD)
 penis papillary carcinoma (PPC)
 penis sarcoma (PS)
 penis squamous cell carcinoma (PSCC)
@@ -6336,7 +6026,6 @@ periosteal chondrosarcoma (PC)
 periosteal osteogenic sarcoma (POS)
 periostitis
 peripartum cardiomyopathy (PC)
-peripheral T-cell lymphoma (PL)
 peripheral artery disease (PAD)
 peripheral degeneration of cornea (PDC)
 peripheral epithelioid sarcoma (PES)
@@ -6349,6 +6038,7 @@ peripheral nervous system neoplasm (PNSN)
 peripheral osteosarcoma (PO)
 peripheral retinal degeneration (PRD)
 peripheral scars of retina (PSR)
+peripheral T-cell lymphoma (PL)
 peripheral vascular disease (PVD)
 peripheral vertigo (PV)
 peritoneal benign neoplasm (PBN)
@@ -6362,6 +6052,7 @@ perivascular epithelioid cell tumor (PECT)
 perivascular tumor (PT)
 periventricular leukomalacia (PL)
 periventricular nodular heterotopia (PNH)
+Perlman syndrome (PS)
 permanent neonatal diabetes mellitus (PNDM)
 pernicious anemia (PA)
 peroneal nerve paralysis (PNP)
@@ -6370,36 +6061,49 @@ peroxisomal acyl-CoA oxidase deficiency (POD)
 peroxisomal biogenesis disorder (PBD)
 peroxisomal disease (PD)
 peroxisome biogenesis disorder (PBD)
+Perrault syndrome (PS)
+Perrault syndrome 6 (PS)
+Perry syndrome (PS)
 persian gulf syndrome (PGS)
-persistent Mullerian duct syndrome (PMDS)
 persistent fetal circulation syndrome (PFCS)
 persistent generalized lymphadenopathy (PGL)
 persistent hyperplastic primary vitreous (PHPV)
+persistent Mullerian duct syndrome (PMDS)
 personality disorder (PD)
 pertussis or Whooping Cough
 pervasive developmental disorder (PDD)
 pes anserinus tendinitis or bursitis (PATB)
+Peters anomaly (PA)
+Peters plus syndrome (PPS)
 petroclival meningioma (PM)
 petrositis
 petrous apex meningioma (PAM)
+Peutz-Jeghers syndrome
+Peyronie's disease
+Pfeiffer syndrome (PS)
 phacogenic glaucoma (PG)
 phacolytic glaucoma (PG)
 phaeohyphomycosis
 phagocyte bactericidal dysfunction (PBD)
 phalanx chondroma (PC)
+PHARC syndrome (PS)
 pharyngitis
 pharyngoconjunctival fever (PF)
 pharynx cancer (PC)
 pharynx carcinoma in situ (PCS)
 pharynx squamous cell carcinoma (PSCC)
+Phelan-McDermid syndrome
 phencyclidine abuse (PA)
 phenobarbital allergy (PA)
 phenylketonuria
 phenytoin allergy (PA)
 pheochromocytoma
+PHGDH deficiency (PD)
 philophthalmiasis
 phimosis
 phlebitis
+Phlebotomus fever (PF)
+Phlegmonous dacryocystitis (PD)
 phlyctenulosis
 phobic disorder (PD)
 phonagnosia
@@ -6416,7 +6120,9 @@ phthisical cornea (PC)
 physical urticaria (PU)
 physiological polycythemia (PP)
 pica disease (PD)
+Pick's disease
 piebaldism
+Pierson syndrome (PS)
 pigment dispersion syndrome (PDS)
 pigmentation disease (PD)
 pigmented basal cell carcinoma (PBCC)
@@ -6442,6 +6148,8 @@ pineoblastoma
 pinguecula
 pinta disease (PD)
 piperacillin allergy (PA)
+Pitt-Hopkins syndrome
+Pitt-Hopkins-like syndrome 2
 pituitary adenoma (PA)
 pituitary apoplexy (PA)
 pituitary cancer (PC)
@@ -6472,6 +6180,10 @@ plasma cell neoplasm (PCN)
 plasmacytoid variant infiltrating bladder urothelial carcinoma (PVIBUC)
 plasmacytoma
 plasminogen deficiency type I (PDT)
+Plasmodium falciparum malaria (PFM)
+Plasmodium malariae malaria (PMM)
+Plasmodium ovale malaria (POM)
+Plasmodium vivax malaria (PVM)
 platelet storage pool deficiency (PSPD)
 platelet-type bleeding disorder (BD)
 pleomorphic adenoma (PA)
@@ -6492,7 +6204,9 @@ pleuropulmonary blastoma (PB)
 plexiform neurofibroma (PN)
 plexiform schwannoma (PS)
 plexopathy
+Plica syndrome (PS)
 plum allergy (PA)
+Plummer's disease or toxic multinodular goitre
 pneumatosis cystoides intestinalis (PCI)
 pneumoconiosis
 pneumoconiosis due to talc (PDT)
@@ -6502,7 +6216,9 @@ pneumonic plague (PP)
 pneumonic tularemia (PT)
 pneumothorax
 podoconiosis
+POEMS syndrome (PS)
 poikiloderma with neutropenia (PWN)
+Poland syndrome (PS)
 poliomyelitis
 pollen allergy (PA)
 polyarteritis nodosa (PN)
@@ -6521,6 +6237,7 @@ polymyalgia rheumatica (PR)
 polyneuropathy
 polyneuropathy due to drug (PDD)
 polyneuropathy in collagen vascular disease (PCVD)
+Polyomavirus-associated nephropathy
 polyp of corpus uteri (PCU)
 polyp of middle ear (PME)
 polyradiculoneuropathy
@@ -6528,6 +6245,7 @@ polyradiculopathy
 polyvesicular vitelline pattern ovarian yolk sac tumor (PVPOYST)
 polyvesicular vitelline pattern testicular yolk sac tumor (PVPTYST)
 pompholyx
+Pontiac fever (PF)
 pontocerebellar hypoplasia (PH)
 pontocerebellar hypoplasia type 10 (PHT)
 pontocerebellar hypoplasia type 1A (PHT)
@@ -6587,6 +6305,11 @@ postpoliomyelitis syndrome (PS)
 postsurgical hypothyroidism (PH)
 postural orthostatic tachycardia syndrome (POTS)
 potassium dichromate allergic contact dermatitis (PDACD)
+Potocki-Lupski syndrome
+Potocki-Shaffer syndrome
+Potter's syndrome
+Powassan encephalitis (PE)
+Prader-Willi syndrome
 pre-eclampsia
 pre-malignant neoplasm
 prediabetes syndrome (PS)
@@ -6603,6 +6326,7 @@ preretinal fibrosis (PF)
 presbyopia
 preterm premature rupture of the membranes (PPRTM)
 priapism
+Prieto syndrome (PS)
 primary amebic meningoencephalitis (PAM)
 primary angle-closure glaucoma (PG)
 primary autosomal recessive microcephaly (PARM)
@@ -6637,6 +6361,7 @@ primary spontaneous pneumothorax (PSP)
 primary syphilis (PS)
 primary systemic mycosis (PSM)
 primary thrombocytopenia (PT)
+Prinzmetal angina (PA)
 proctitis
 progeria
 progesterone-receptor negative breast cancer (NBC)
@@ -6667,6 +6392,7 @@ proliferative glomerulonephritis (PG)
 proliferative type fibrocystic change of breast (PTFCB)
 proliferative vasculopathy and hydranencephaly-hydrocephaly syndrome (PVAS)
 prolymphocytic leukemia (PL)
+proneural glioblastoma
 propionic acidemia (PA)
 proprotein convertase 1/3 deficiency (PCD)
 prosopagnosia
@@ -6705,12 +6431,14 @@ protein-deficiency anemia
 protein-energy malnutrition
 protein-losing enteropathy
 proteinuria
+Proteus syndrome (PS)
 prothrombin deficiency (PD)
 protoplasmic astrocytoma (PA)
 protozoal dysentery (PD)
 proximal symphalangism (PS)
 prune belly syndrome (PBS)
 psammomatous meningioma (PM)
+PSAT deficiency (PD)
 pseudo-TORCH syndrome
 pseudoachondroplasia (PSACH)
 pseudobulbar palsy (PP)
@@ -6731,11 +6459,14 @@ pseudovascular skin squamous cell carcinoma (PSSCC)
 pseudoxanthoma elasticum (PE)
 psoriasis
 psoriatic arthritis (PA)
+PSPH deficiency (PD)
 psychologic dyspareunia (PD)
 psychologic vaginismus (PV)
 psychosexual disorder (PD)
 psychotic disorder (PD)
+PTEN hamartoma tumor syndrome (PHTS)
 pterygium
+Pthirus pubis infestation (PPI)
 ptosis or Blepharoptosis
 puerperal pulmonary embolism (PPE)
 pulmonary adenocarcinoma in situ (PAS)
@@ -6814,8 +6545,12 @@ pyruvate carboxylase deficiency disease (PCDD)
 pyruvate decarboxylase deficiency (PDD)
 pyruvate kinase deficiency of red cells (PKDRC)
 pyuria
+Qazi Markouizos syndrome (QMS)
 quadriplegia
 qualitative platelet defect (QPD)
+Quebec platelet disorder (QPD)
+Queensland tick typhus (QTT)
+Query fever or Q fever
 quinidine allergy (QA)
 rabies
 radial nerve lesion (RNL)
@@ -6827,6 +6562,9 @@ rainbow trout allergy (RTA)
 ranitidine allergy (RA)
 rapadilino syndrome (RS)
 rapidly progressive glomerulonephritis (RPG)
+Rapp-Hodgkin syndrome
+RASopathy
+Raynaud disease (RD)
 reactive arthritis (RA)
 reactive cutaneous fibrous lesion (RCFL)
 reading disorder (RD)
@@ -6839,11 +6577,11 @@ rectal prolapse (RP)
 rectosigmoid cancer (RC)
 rectosigmoid junction cancer (RJC)
 rectosigmoid junction neoplasm (RJN)
-rectum Kaposi's sarcoma (RS)
 rectum adenocarcinoma (RA)
 rectum adenoma (RA)
 rectum cancer (RC)
 rectum carcinoma in situ (RCS)
+rectum Kaposi's sarcoma (RS)
 rectum leiomyoma (RL)
 rectum leiomyosarcoma (RL)
 rectum lymphoma (RL)
@@ -6864,18 +6602,20 @@ reducing body myopathy 1B (RBM)
 reflex epilepsy (RE)
 reflex sympathetic dystrophy (RSD)
 refractive error (RE)
-refractory T lymphoblastic leukemia/lymphoma (RL)
 refractory hairy cell leukemia (RHCL)
 refractory hematologic cancer (RHC)
 refractory plasma cell neoplasm (RPCN)
+refractory T lymphoblastic leukemia/lymphoma (RL)
+Refsum disease (RD)
 regional ureteric cancer (RUC)
 regular astigmatism (RA)
+Reis-Bucklers corneal dystrophy (CD)
 relapsed/refractory diffuse large B-cell lymphoma (DLL)
 relapsing fever (RF)
 relapsing polychondritis (RP)
 relapsing-remitting multiple sclerosis (MS)
+REM sleep behavior disorder (RSBD)
 remazole black respiratory allergy (RBRA)
-renal Wilms' tumor (RT)
 renal adenoma (RA)
 renal agenesis (RA)
 renal artery atheroma (RAA)
@@ -6890,21 +6630,26 @@ renal hypertension (RH)
 renal hypomagnesemia (RH)
 renal hypomagnesemia with ocular involvement (RHWOI)
 renal hypoplasia (RH)
+Renal liposarcoma
 renal oncocytoma (RO)
 renal osteodystrophy (RO)
 renal pelvis adenocarcinoma (RPA)
 renal pelvis benign neoplasm (RPBN)
 renal pelvis carcinoma (RPC)
 renal pelvis inverted papilloma (RPIP)
+renal pelvis papillary carcinoma
 renal pelvis papillary tumor (RPPT)
+renal pelvis sarcomatoid transitional cell carcinoma
 renal pelvis squamous cell carcinoma (RPSCC)
 renal pelvis transitional cell carcinoma (RPTCC)
 renal pelvis urothelial papilloma (RPUP)
 renal tuberculosis (RT)
 renal tubular acidosis (RTA)
 renal tubular transport disease (RTTD)
+renal Wilms' tumor (RT)
 renal-hepatic-pancreatic dysplasia
 renovascular hypertension (RH)
+Renpenning syndrome (RS)
 reproductive organ benign neoplasm (ROBN)
 reproductive organ cancer (ROC)
 residual stage angle-closure glaucoma (RSG)
@@ -6954,8 +6699,8 @@ retinal vasculopathy with cerebral leukodystrophy (RVWCL)
 retinal vein occlusion (RVO)
 retinitis
 retinitis pigmentosa (RP)
-retinitis pigmentosa Y-linked (RP)
 retinitis pigmentosa with or without situs inversus (RPWWSI)
+retinitis pigmentosa Y-linked (RP)
 retinitis pigmentosa-deafness syndrome (RS)
 retinoblastoma
 retinopathy of prematurity (RP)
@@ -6971,6 +6716,11 @@ retroperitoneal lymphoma (RL)
 retroperitoneal neuroblastoma (RN)
 retroperitoneal sarcoma (RS)
 retroperitoneum carcinoma (RC)
+Rett syndrome (RS)
+Revesz syndrome (RS)
+Reye syndrome (RS)
+Rh deficiency syndrome (DS)
+Rh isoimmunization
 rhabdoid cancer (RC)
 rhabdoid meningioma (RM)
 rhabdomyosarcoma
@@ -6987,27 +6737,47 @@ rhinoscleroma
 rhinosporidiosis
 rhizomelic chondrodysplasia punctata (RCP)
 riboflavin deficiency (RD)
+Richter's syndrome
 rickets
+Rickettsia parkeri spotted fever (RPSF)
 rickettsialpox
+RIDDLE syndrome (RS)
+Riedel's fibrosing thyroiditis (FT)
+Rift Valley fever (RVF)
 right atrial isomerism (RAI)
 right bundle branch block (RBBB)
 rigid spine muscular dystrophy (RSMD)
+Riley-Day syndrome
 ring corneal ulcer (RCU)
 ring dermoid of cornea (RDC)
 ring staphyloma (RS)
 rippling muscle disease (RMD)
+Ritscher-Schinzel syndrome
+Ritter's disease or Staphylococcus-Scalded Skin Syndrome (SSSS) or Scalded Skin Syndrome
+Roberts syndrome (RS)
+Robinow syndrome (RS)
+Rocky Mountain spotted fever (RMSF)
 rocuronium allergy (RA)
+Rolandic epilepsy-paroxysmal exercise-induced dystonia-writer's cramp syndrome (RCS)
 root caries (RC)
 root resorption (RR)
 rosacea
 rosacea conjunctivitis (RC)
+Ross River fever (RRF)
+Rothmund-Thomson syndrome
 round ligament malignant neoplasm (RLMN)
 rubella
 rubeosis iridis (RI)
+Rubinstein-Taybi syndrome
+Ruijs-Aalfs syndrome
 rumination disorder (RD)
+Sabinas brittle hair syndrome (SBHS)
 sacral spinal canal and spinal cord meningioma (SSCASCM)
 sacrum chordoma (SC)
+Saethre-Chotzen syndrome
 sagittal sinus thrombosis (SST)
+Sakati-Nyhan syndrome
+Saldino-Noonan syndrome
 salivary gland adenoid cystic carcinoma (SGACC)
 salivary gland cancer (SGC)
 salivary gland carcinoma (SGC)
@@ -7016,6 +6786,8 @@ salpingitis
 salpingitis isthmica nodosa (SIN)
 salpingo-oophoritis
 salt and pepper syndrome (SAPS)
+Sandhoff disease (SD)
+SAPHO syndrome (SS)
 sarcocystosis
 sarcoid meningitis (SM)
 sarcoidosis
@@ -7029,22 +6801,37 @@ sarcomatoid uterine corpus endometrioid adenocarcinoma (SUCEA)
 sarcomatosis
 sarcomatosis of the meninges (STM)
 sarcomatous intrahepatic cholangiocarcinoma (SIC)
+SATB2-associated syndrome
+Saul-Wilson syndrome
+SC phocomelia syndrome (PS)
 scabies or sarcoptic mange
 scalp dermatosis (SD)
 scalp-ear-nipple syndrome or Hereditary syndrome of lumpy scalp, odd ears and rudimentary nipples or Sen Syndrome or Finlay-Marks Syndrome
 scapuloperoneal myopathy (SM)
 scapuloperoneal spinal muscular atrophy (SSMA)
 scarlet fever (SF)
+Schaaf-Yang syndrome
+Scheie syndrome (SS)
+Scheuermann's disease
+Schimke immuno-osseous dysplasia (SD)
 schistosomiasis
 schizoaffective disorder (SD)
 schizoid personality disorder (SPD)
 schizophrenia
 schizophreniform disorder (SD)
 schizotypal personality disorder (SPD)
+Schmid metaphyseal chondrodysplasia (SMC)
 schneckenbecken dysplasia (SD)
+Schneiderian carcinoma (SC)
+Schnitzler syndrome (SS)
+Schnyder corneal dystrophy (SCD)
+Schopf-Schulz-Passarge syndrome
+Schuurs-Hoeijmakers Syndrome
+Schwannian stroma-rich and stroma-poor composite ganglioneuroblastoma (SACG)
 schwannoma of jugular foramen (SJF)
 schwannoma of twelfth cranial nerve (STCN)
 schwannoma of ureter (SU)
+Schwartz-Jampel syndrome
 sciatic neuropathy (SN)
 scimitar syndrome (SS)
 scirrhous adenocarcinoma (SA)
@@ -7065,14 +6852,15 @@ sclerosing liposarcoma (SL)
 sclerosteosis
 scoliosis
 scotoma
+Scott syndrome (SS)
 scrapie
 screw worm infectious disease (SWID)
 scrotal angioma (SA)
 scrotal carcinoma (SC)
-scrotum Paget's disease (SD)
 scrotum basal cell carcinoma (SBCC)
 scrotum melanoma (SM)
 scrotum neoplasm (SN)
+scrotum Paget's disease (SD)
 scrotum squamous cell carcinoma (SSCC)
 scrub typhus (ST)
 scurvy
@@ -7087,14 +6875,15 @@ sebaceous gland neoplasm (SGN)
 seborrheic dermatitis (SD)
 seborrheic infantile dermatitis (SID)
 seborrheic keratosis (SK)
+Seckel syndrome (SS)
 second-degree atrioventricular block (AB)
-secondary Parkinson disease (SPD)
 secondary corneal edema (SCE)
 secondary hyperparathyroidism (SH)
 secondary hyperparathyroidism of renal origin (SHRO)
 secondary hypertension (SH)
 secondary hypertrophic osteoarthropathy (SHO)
 secondary lacrimal atrophy (SLA)
+secondary Parkinson disease (SPD)
 secondary progressive multiple sclerosis (SPMS)
 secondary syphilis (SS)
 secondary vitreoretinal degeneration (SVD)
@@ -7108,6 +6897,7 @@ selective IgE deficiency disease (IgED)
 selective IgG deficiency disease (SIDD)
 selective IgM deficiency disease (SIGMD)
 selective immunoglobulin deficiency disease (SIDD)
+selective mutism
 selective pituitary thyroid hormone resistance (SPTHR)
 sella turcica neoplasm (STN)
 semantic agnosia (SA)
@@ -7117,13 +6907,17 @@ seminal vesicle chronic gonorrhea (SVCG)
 seminal vesicle cystadenoma (SVC)
 seminal vesicle tumor (SVT)
 seminoma
+Sengers syndrome (SS)
 senile angioma (SA)
+Senile atrophy of choroid (SAC)
 senile cataract (SC)
 senile degeneration of brain (SDB)
 senile ectropion (SE)
 senile entropion (SE)
 senile reticular retinal degeneration (SRRD)
+Senior-Loken syndrome
 sennetsu fever (SF)
+Sensenbrenner syndrome (SS)
 sensorineural hearing loss (SHL)
 sensory ataxic neuropathy, dysarthria, and ophthalmoparesis (SAAO)
 sensory organ benign neoplasm (SOBN)
@@ -7141,7 +6935,10 @@ serous cystadenocarcinoma (SC)
 serous glue ear (SGE)
 serous labyrinthitis (SL)
 serous surface papilloma (SSP)
-subconjunctivial setariasis
+Sertoli cell tumor (SCT)
+Sertoli cell-only syndrome (SS)
+Sertoli-Leydig cell tumor (CT)
+severe achondroplasia with developmental delay and acanthosis nigricans (SADDAN)
 severe acute respiratory syndrome (SARS)
 severe combined immunodeficiency (SCI)
 severe combined immunodeficiency with sensitivity to ionizing radiation (SCIWSIR)
@@ -7156,19 +6953,26 @@ sexual disorder (SD)
 sexual dysfunction (SD)
 sexual masochism (SM)
 sexual sadism (SS)
+Sezary's disease
+Sheehan syndrome (SS)
 shellfish allergy (SA)
 shigellosis
-epidemic keratoconjunctivitis (EKC) or shipyard eye (SE)
-short QT syndrome (SS)
 short bowel syndrome (SBS)
 short chain acyl-CoA dehydrogenase deficiency (SCDD)
+short QT syndrome (SS)
+SHORT syndrome (SS)
 short-rib thoracic dysplasia with or without polydactyly (TDWWP)
 short-rib thoracic dysplasia with polydactyly (TDWP)
 shoulder impingement syndrome (SIS)
 shrimp allergy (SA)
+Shukla-Vernon syndrome
+Shwachman-Diamond syndrome
+Shwachman-Diamond type metaphyseal dysplasia (TMD)
+Shwartzman phenomenon (SP)
 sialadenitis
 sialolithiasis
 sialuria
+Siberian tick typhus (STT)
 sick building syndrome (SBS)
 sick sinus syndrome (SSS)
 sickle cell anemia (SCA)
@@ -7178,6 +6982,7 @@ siderosis
 siderosis of eye (SE)
 sigmoid colon cancer (SCC)
 sigmoid neoplasm (SN)
+sigmoid volvulus
 signet ring cell adenocarcinoma (SRCA)
 signet ring cell intrahepatic cholangiocarcinoma (SRCIC)
 signet ring cell variant cervical mucinous adenocarcinoma (SRCVCMA)
@@ -7185,15 +6990,22 @@ signet ring lung adenocarcinoma (SRLA)
 silent myocardial infarction (SMI)
 silicosis
 silo filler's disease (SD)
+Silver-Russell syndrome
+Silverman-Handmaker type dyssegmental dysplasia (TDD)
 simple chronic conjunctivitis (SCC)
 simple partial epilepsy (SPE)
+Simpson-Golabi-Behmel syndrome type 1 (ST)
+Simpson-Golabi-Behmel syndrome type 2 (ST)
 simultanagnosia or simultagnosia
 sinusitis
 sitosterolemia
 situs inversus (SI)
+Sjogren-Larsson syndrome
+Sjogren's syndrome
 skeletal muscle cancer (SMC)
 skeletal muscle neoplasm (SMN)
 skeletal tuberculosis (ST)
+Skene gland carcinoma (SGC)
 skin amelanotic melanoma (SAM)
 skin angiosarcoma (SA)
 skin atrophy (SA)
@@ -7223,6 +7035,8 @@ slate pneumoconiosis (SP)
 sleep apnea (SA)
 sleep disorder (SD)
 sleeping sickness (SS)
+Sly syndrome (SS)
+SM-AHNMD
 small bowel fibrosarcoma (SBF)
 small cell carcinoma (SCC)
 small cell osteogenic sarcoma (SCOS)
@@ -7242,15 +7056,19 @@ small intestine lymphoma (SIL)
 small intestine neuroendocrine neoplasm (SINN)
 small-cell carcinoma of the ovary of hypercalcemic type (CTOHT)
 smallpox
+Smarca4-deficient sarcoma of thorax (ST)
+Smith-Lemli-Opitz syndrome (SLOS)
+Smith-Magenis syndrome
+Smith-McCort dysplasia (SMC)
 smoldering myeloma (SM)
 smooth muscle cancer (SMC)
 smooth muscle tumor (SMT)
 snail allergy (SA)
+Sneddon syndrome (SS)
 snowflake vitreoretinal degeneration (SVD)
 social emotional agnosia (SEA)
 social phobia (SP)
 sodium aurothiomalate allergy (SAA)
-sudoku disease (SD) or Rat-bite fever or streptobacillosis or spirillary fever or bogger or epidemic arthritic erythema
 soft palate cancer (SPC)
 soft tissue peripheral neuroepithelioma (STPN)
 solar retinopathy (SR)
@@ -7263,6 +7081,9 @@ solitary plasmacytoma of chest wall (SPCW)
 somatization disorder (SD)
 somatoform disorder (SD)
 somatostatinoma
+Sorsby's fundus dystrophy (FD)
+SOST-related sclerosing bone dysplasia (SBD)
+Sotos syndrome (SS)
 space motion sickness (SMS)
 sparganosis
 spasmodic dystonia (SD)
@@ -7283,8 +7104,8 @@ spermatocele
 spermatocytoma
 spermatogenic failure (SF)
 sphenocavernous meningioma (SM)
-sphenoid sinus Schneiderian papilloma (SSSP)
 sphenoid sinus inverted papilloma (SSIP)
+sphenoid sinus Schneiderian papilloma (SSSP)
 sphenoid sinus squamous cell carcinoma (SSSCC)
 sphenoid sinusitis (SS)
 sphenoidal sinus benign neoplasm (SSBN)
@@ -7352,6 +7173,7 @@ splenic sequestration (SS)
 splenic tuberculosis (ST)
 split hand-foot malformation (SM) or ectrodactyly
 split hand-foot malformation with sensorineural hearing loss (SMWSHL)
+SPOAN syndrome (SS)
 spondylitis or Bechterew's disease
 spondyloarthropathy or spondyloarthritis
 spondylocarpotarsal synostosis syndrome (SSS)
@@ -7362,8 +7184,8 @@ spondyloepimetaphyseal dysplasia, Missouri type (SMT)
 spondyloepimetaphyseal dysplasia, Pakistani type (SPT)
 spondyloepimetaphyseal dysplasia, Sponastrime type (SST)
 spondyloepimetaphyseal dysplasia, Strudwick type (SST)
-spondyloepiphyseal dysplasia Maroteaux type (SDMT)
 spondyloepiphyseal dysplasia congenita (SDC)
+spondyloepiphyseal dysplasia Maroteaux type (SDMT)
 spondyloepiphyseal dysplasia tarda (SDT)
 spondyloepiphyseal dysplasia with congenital joint dislocations (SDWCJD)
 spondylolisthesis
@@ -7383,9 +7205,11 @@ squamous cell neoplasm (SCN)
 squamous cell papilloma (SCP)
 squamous cell papilloma of skin (SCPS)
 squamous papillomatosis (SP)
+St. Louis encephalitis (LE)
 stable condition keratoconus (SCK)
 staphyloenterotoxemia
 staphyloma posticum (SP)
+Stargardt disease (SD)
 status asthmaticus (SA)
 status epilepticus (SE)
 steatocystoma multiplex (SM)
@@ -7399,7 +7223,11 @@ steroid inherited metabolic disorder (SIMD)
 steroid lipomatosis (SL)
 steroid-induced glaucoma
 steroid-induced glaucoma - borderline (GB)
+Stevens-Johnson syndrome
+Stickler syndrome (SS)
 stiff skin syndrome (SSS) or Congenital fascial dystrophy (CFD)
+Stiff-Person syndrome
+STING-associated vasculopathy with onset in infancy (VWOI)
 stomach cancer (SC)
 stomach carcinoma (SC)
 stomach carcinoma in situ (SCS)
@@ -7407,9 +7235,11 @@ stomach diverticulosis (SD)
 stomatitis
 stone in bladder diverticulum (SBD)
 stork bite or angel kisses or slamon patches
+Stormorken syndrome (SS)
 strabismus
 strawberry gallbladder or cholesterolosis of the gallbladder
 streptococcal meningitis (SM)
+Streptococcus pneumonia (SP)
 stress polycythemia (SP)
 stress-induced childhood-onset neurodegeneration with variable ataxia and seizures (NWVAAS)
 striated muscle rhabdoid tumor (SMRT)
@@ -7420,8 +7250,10 @@ stroma-dominant and stroma-poor composite ganglioneuroblastoma (ACG)
 stromal corneal pigmentation (SCP)
 stromal dystrophy (SD)
 stromal predominant kidney Wilms' tumor (SPKT)
+Stromme syndrome (SS)
 strongyloidiasis
 struma ovarii (SO)
+Sturge-Weber syndrome
 stuttering
 subacute bacterial endocarditis (SBE)
 subacute delirium (SD)
@@ -7435,6 +7267,7 @@ subacute thyroiditis (ST)
 subareolar duct papillomatosis (SDP)
 subclavian artery aneurysm (SAA)
 subclavian steal syndrome (SSS)
+subconjunctivial setariasis
 subcorneal pustular dermatosis (SPD)
 subcortical band heterotopia (SBH)
 subcutaneous mycosis (SM)
@@ -7468,6 +7301,8 @@ subvalvular aortic stenosis (SAS)
 succinic semialdehyde dehydrogenase deficiency (SSADHD)
 succinylcholine allergy (SA)
 sudden infant death syndrome (SIDS)
+sudoku disease (SD) or Rat-bite fever or streptobacillosis or spirillary fever or bogger or epidemic arthritic erythema
+Sugarman brachydactyly (SB)
 sulfamethoxazole allergy (SA)
 sulfasalazine allergy (SA)
 sulfhemoglobinemia
@@ -7497,15 +7332,19 @@ supratentorial cancer (SC)
 supratentorial primitive neuroectodermal tumor (SPNT)
 supravalvular aortic stenosis (SAS)
 suprofen allergy (SA)
+Sveinsson chorioretinal atrophy (SCA)
 sweat gland benign neoplasm (SGBN)
 sweat gland cancer (SGC)
 sweat gland carcinoma (SGC)
+Sweeney-Cox syndrome
 swine influenza (SI)
 sympathetic neurilemmoma (SN)
 sympathetic ophthalmia (SO)
 synchronous bilateral breast carcinoma (SBBC)
 synchronous multifocal osteogenic sarcoma (SMOS)
 syndactyly
+syndromic intellectual disability (SID)
+syndromic microphthalmia (SM)
 syndromic X-linked intellectual disability (SID)
 syndromic X-linked intellectual disability Abidi type (SIDAT)
 syndromic X-linked intellectual disability Cabezas type (SIDCT)
@@ -7523,8 +7362,6 @@ syndromic X-linked intellectual disability Snyder type (SIDST)
 syndromic X-linked intellectual disability Turner type (SIDTT)
 syndromic X-linked mental retardation (SMR)
 syndromic X-linked mental retardation Hough type (SMRHT)
-syndromic intellectual disability (SID)
-syndromic microphthalmia (SM)
 synostosis
 synovial angioma (SA)
 synovial sarcoma (SS)
@@ -7546,25 +7383,39 @@ systemic mycosis (SM)
 systemic primary carnitine deficiency disease (SPCDD)
 systemic scleroderma (SS)
 systolic heart failure (SHF)
+T cell deficiency (CD)
+T-cell acute lymphoblastic leukemia (ALL)
+T-cell adult acute lymphocytic leukemia (AALL)
+T-cell childhood lymphoblastic lymphoma (CLL)
+T-cell immunodeficiency, congenital alopecia, and nail dystrophy (CAND)
+T-cell large granular lymphocyte leukemia (LGLL)
+T-cell lymphoblastic leukemia/lymphoma
 tabes dorsalis (TD)
 tactile agnosia (TA)
 tactile epilepsy (TE)
 taeniasis
+Takayasu's arteritis (TAK)
 tall cell variant papillary carcinoma (TCVPC)
 tamoxifen-related endometrial lesion (EL)
+Tangier disease (TD)
 tanycytic ependymoma (TE)
+TARP syndrome (TS)
 tarsal tunnel syndrome (TTS)
 tarsal-carpal coalition syndrome (CS)
 tauopathy
+Tay-Sachs disease
+Taylor's syndrome
 teeth hard tissue disease (THTD)
 telangiectasia
 telangiectatic glomangioma (TG)
 telangiectatic osteogenic sarcoma (TOS)
 telogen effluvium (TE)
+Temple syndrome (TS)
 temporal arteritis (TA)
 temporal lobe epilepsy (TLE)
 temporal lobe neoplasm (TLN)
 temtamy preaxial brachydactyly syndrome (TPBS)
+Temtamy syndrome (TS)
 tendinitis
 tendon sheath lipoma (TSL)
 tenosynovial giant cell tumor (TGCT)
@@ -7575,7 +7426,6 @@ teratoma
 tertiary neurosyphilis (TN)
 tertiary syphilis (TS)
 testicular Brenner tumor (TBT)
-testicular Leydig cell tumor (TLCT)
 testicular cancer (TC)
 testicular fibroma (TF)
 testicular germ cell cancer (TGCC)
@@ -7584,6 +7434,7 @@ testicular gonadoblastoma (TG)
 testicular granulosa cell tumor (TGCT)
 testicular infarct (TI)
 testicular leukemia (TL)
+testicular Leydig cell tumor (TLCT)
 testicular lymphoma (TL)
 testicular malignant germ cell cancer (TMGCC)
 testicular monophasic choriocarcinoma (TMC)
@@ -7613,6 +7464,7 @@ theileriasis
 thelaziasis
 thiamine deficiency disease (TDD)
 thiamine-responsive megaloblastic anemia syndrome (MAS)
+Thiel-Behnke corneal dystrophy (CD)
 thiopental allergy (TA)
 thiopurine S-methyltransferase deficiency (TD)
 third cranial nerve disease (TCND)
@@ -7649,20 +7501,20 @@ thymus sarcomatoid carcinoma (TSC)
 thymus small cell carcinoma (TSCC)
 thymus squamous cell carcinoma (TSCC)
 thyrocalcitonin secretion disease (TSD)
-thyroid Hurthle cell adenoma (THCA) or thyroid eosinophilic adenoma
 thyroid adenoma (TA)
 thyroid angiosarcoma (TA)
 thyroid crisis (TC)
-thyroid gland Hurthle cell carcinoma (TGHCC)
 thyroid gland adenocarcinoma (TGA)
 thyroid gland anaplastic carcinoma (TGAC)
 thyroid gland cancer (TGC)
 thyroid gland carcinoma (TGC)
 thyroid gland follicular carcinoma (TGFC)
+thyroid gland Hurthle cell carcinoma (TGHCC)
 thyroid gland medullary carcinoma (TGMC)
 thyroid gland mucoepidermoid carcinoma (TGMC)
 thyroid gland papillary carcinoma (TGPC)
 thyroid hormone resistance syndrome (THRS)
+thyroid Hurthle cell adenoma (THCA) or thyroid eosinophilic adenoma
 thyroid hyalinizing trabecular adenoma (THTA)
 thyroid lymphoma (TL)
 thyroid malformation (TM)
@@ -7681,8 +7533,12 @@ tick infestation (TI)
 tick paralysis (TP)
 tick-borne encephalitis
 tick-borne relapsing fever (RF)
+Tietz syndrome (TS)
+Tietze's syndrome
 tiger prawn allergy (TPA)
 time agnosia (TA)
+Timothy grass allergy (TGA)
+Timothy syndrome (TS)
 tinea barbae (TB)
 tinea capitis (TC)
 tinea corporis (TC)
@@ -7694,6 +7550,7 @@ tinea nigra (TN)
 tinea pedis (TP)
 tinea profunda (TP)
 tinea unguium (TU)
+Tn polyagglutination syndrome (PS)
 tolosa-hunt syndrome
 toluene 2,4-diisocyanate allergic asthma (TAA)
 toluene meta-diisocyanate allergic asthma (TAA)
@@ -7712,11 +7569,13 @@ tooth ankylosis (TA)
 tooth erosion (TE)
 tooth resorption (TR)
 topographical agnosia (TA)
+Torrance type platyspondylic dysplasia (TTPD)
 torsion dystonia (TD)
 torsion dystonia with onset in infancy (TDWOI)
 total circumpapillary dystrophy of choroid (TCDC)
 total internal ophthalmoplegia (TIO)
 total third-nerve palsy (TP)
+Townes-Brocks syndrome
 toxascariasis
 toxic diffuse goiter (TDG)
 toxic encephalopathy (TE)
@@ -7768,10 +7627,13 @@ transthyretin amyloidosis (TA)
 transverse colon cancer (TCC)
 transvestism
 traumatic glaucoma (TG)
+Treacher Collins syndrome (TCS)
 trench fever or Wolhynia fever or shin bone fever or Quintan fever
 trichinosis
 trichodontoosseous syndrome (TS)
 trichohepatoenteric syndrome (TS)
+Trichomonas tenax trichomoniasis (TTT)
+Trichomonas vaginalis trichomoniasis (TVT)
 trichomoniasis
 trichorhinophalangeal syndrome type I (TST)
 trichorhinophalangeal syndrome type II (TST)
@@ -7804,7 +7666,9 @@ trombiculiasis
 trophoblastic neoplasm (TN)
 tropical spastic paraparesis (TSP)
 tropical sprue (TS)
+Troyer syndrome (TS)
 trypanosomiasis
+TSH producing pituitary tumor (TPPT)
 tuberculoid leprosy (TL)
 tuberculosis (TB)
 tuberculous empyema (TE)
@@ -7822,6 +7686,7 @@ tubular variant testicular seminoma (TVTS)
 tularemia
 tumor of exocrine pancreas (TEP)
 tungiasis
+Turner syndrome (TS)
 twin-to-twin transfusion syndrome (TTTS)
 tympanosclerosis
 type 1 diabetes mellitus (TDM)
@@ -7829,8 +7694,8 @@ type 1 papillary adenoma of the kidney (TPATK)
 type 2 diabetes mellitus (TDM)
 type 2 papillary adenoma of the kidney (TPATK)
 type C thymoma (TT)
-type I Ehlers-Danlos syndrome (TS)
 type I complement component 8 deficiency (TCCD)
+type I Ehlers-Danlos syndrome (TS)
 type II complement component 8 deficiency (TCCD)
 type III Ehlers-Danlos syndrome (TIS)
 typhoid fever (TF) or enteric fever
@@ -7847,6 +7712,7 @@ ulcerative blepharitis (UB)
 ulcerative colitis (UC)
 ulcerative stomatitis (US)
 ulceroglandular tularemia (UT)
+Ullrich congenital muscular dystrophy (UCMD)
 ulnar nerve lesion (UNL)
 ulnar neuropathy (UN)
 ulnar-mammary syndrome
@@ -7854,6 +7720,7 @@ umbilical hernia (UH)
 unilateral hyperactive labyrinth (UHL)
 unilateral hypoactive labyrinth (UHL)
 unilateral retinoblastoma (UR)
+Unverricht-Lundborg syndrome
 upper clivus meningioma (UCM)
 upper gum cancer (UGC)
 upper lip cancer (ULC)
@@ -7917,6 +7784,23 @@ urogenital tuberculosis (UT)
 urolithiasis or nephrolithiasis or kidney stone
 urticaria or hives
 urticaria pigmentosa (UP)
+Usher syndrome (US)
+Usher syndrome type 1 (UST)
+Usher syndrome type 1C (UST)
+Usher syndrome type 1D (UST)
+Usher syndrome type 1E (UST)
+Usher syndrome type 1F (UST)
+Usher syndrome type 1G (UST)
+Usher syndrome type 1H (UST)
+Usher syndrome type 1J (UST)
+Usher syndrome type 1K (UST)
+Usher syndrome type 2 (UST)
+Usher syndrome type 2A (UST)
+Usher syndrome type 2C (UST)
+Usher syndrome type 2D (UST)
+Usher syndrome type 3 (UST)
+Usher syndrome type 3A (UST)
+Usher syndrome type 3B (UST)
 uterine adnexa cancer (UAC)
 uterine benign neoplasm (UBN)
 uterine body mixed cancer (UBMC)
@@ -7959,6 +7843,7 @@ uterus interstitial leiomyoma (UIL)
 uterus intravascular leiomyomatosis (UIL)
 uterus leiomyosarcoma (UL)
 uterus perivascular epithelioid cell tumor (UPECT)
+UV-sensitive syndrome
 uveal cancer (UC)
 uveal coloboma-cleft lip and palate-intellectual disability (ULAD)
 uveal epithelioid cell melanoma (UECM)
@@ -7968,11 +7853,11 @@ uveoparotid fever (UF)
 uvula cancer (UC)
 uvulitis
 vaccinia
+VACTERL association (VA)
 vagina botryoid rhabdomyosarcoma (VBR)
 vagina leiomyoma (VL)
 vagina leiomyosarcoma (VL)
 vagina sarcoma (VS)
-vaginal Mullerian papilloma (VMP)
 vaginal adenoma (VA)
 vaginal adenosarcoma (VA)
 vaginal benign neoplasm (VBN)
@@ -7983,6 +7868,7 @@ vaginal discharge (VD)
 vaginal endometrial stromal sarcoma (VESS)
 vaginal endometrial stromal tumor (VEST)
 vaginal glandular tumor (VGT)
+vaginal Mullerian papilloma (VMP)
 vaginal spindle cell epithelioma (VSCE)
 vaginal squamous papilloma (VSP)
 vaginal squamous tumor (VST)
@@ -7993,6 +7879,10 @@ vaginal yolk sac tumor (VYST)
 vaginitis
 vagus nerve neoplasm (VNN)
 vallecula cancer (VC)
+Van den Ende-Gupta syndrome (VDS)
+Van der Woude syndrome (VDWS)
+Van Esch-O'Driscoll syndrome (VS)
+Van Maldergem syndrome (VMS)
 variable age at onset electroclinical syndrome (VAOES)
 variant Creutzfeldt-Jakob disease (VD)
 varicocele
@@ -8010,10 +7900,13 @@ vasculogenic impotence (VI)
 vasomotor rhinitis (VR)
 vegetable allergy (VA)
 velocardiofacial syndrome (VS) or 22q11.2 deletion syndrome or Shprintzen syndrome or craniofacial syndrome or DiGeorge syndrome or conotruncal anomaly face syndrome
+Venezuelan equine encephalitis (VEE)
+Venezuelan hemorrhagic fever (VHF)
 venous hemangioma (VH)
 venous insufficiency (VI)
 venous tributary occlusion of retina (VTOR)
 ventilation pneumonitis (VP)
+ventricular septal defect (VSD)
 ventricular septal defect (VSD)
 ventriculomegaly - cystic kidney disease (VCKD)
 verbal auditory agnosia (VAA)
@@ -8036,11 +7929,13 @@ vestibular neuronitis (VN)
 vestibular nystagmus (VN)
 vestibule of mouth cancer (VMC)
 vibratory urticaria (VU)
+Vici syndrome (VS)
 villoglandular endometrial endometrioid adenocarcinoma (VEEA)
 villoglandular variant cervical mucinous adenocarcinoma (VVCMA)
 villonodular synovitis (VS)
 villous adenocarcinoma (VA)
 villous adenoma (VA)
+VIPoma
 viral encephalitis (VE)
 viral esophagitis (VE)
 viral exanthem (VE)
@@ -8065,6 +7960,9 @@ vitreoretinal dystrophy (VD)
 vitreous abscess (VA)
 vitreous detachment (VD)
 vitreous syneresis (VS)
+Vogt-Koyanagi-Harada disease
+Vohwinkel syndrome (VS)
+Volkmann contracture (VC)
 von Economo's disease (VD) or Encephalitis lethargica
 von Hippel-Lindau disease (VD)
 von Willebrand's disease (VD)
@@ -8109,17 +8007,116 @@ vulvar trichoepithelioma (VT)
 vulvitis
 vulvovaginal candidiasis (VC)
 vulvovaginitis
+Waardenburg syndrome type 1 (WS1)
+Waardenburg syndrome type 2A (WS2A)
+Waardenburg syndrome type 2B (WS2B)
+Waardenburg syndrome type 2C (WS2C)
+Waardenburg syndrome type 2D (WS2D)
+Waardenburg syndrome type 2E (WS2E)
+Waardenburg syndrome type 3 (WS3)
+Waardenburg syndrome type 4A (WS4A)
+Waardenburg syndrome type 4B (WS4B)
+Waardenburg syndrome type 4C (WS4C)
+Waardenburg's syndrome
+WAGR syndrome (WS)
+Waisman syndrome (WS)
+Waldenstroem's macroglobulinemia
+Waldeyer's ring cancer (RC)
+Walker-Warburg syndrome
+Warburg micro syndrome (WMS)
 warfarin resistance (WR)
 warfarin sensitivity (WS)
+Warsaw breakage syndrome (WBS)
 water-clear cell adenoma (WCC)
+Waterhouse-Friderichsen syndrome (WFS)
+Weaver syndrome (WS)
+Weill-Marchesani syndrome
+Weissenbacher-Zweymuller syndrome
 well-differentiated liposarcoma (WDLS)
+Werdnig-Hoffmann disease
+Werner syndrome (WS)
+Wernicke encephalopathy (WE)
+Wernicke-Korsakoff syndrome
+West Nile encephalitis (WNE)
+West Nile fever (WNF)
+West syndrome (WS)
+Western equine encephalitis (WEE)
 wet beriberi (WB)
+Weyers acrofacial dysostosis (WAD)
 wheat allergy (WA)
+WHIM syndrome (WS)
+Whipple disease (WD)
 white piedra (WP)
 white shrimp allergy (WSA)
+White-Sutton syndrome
+Whitewater Arroyo hemorrhagic fever (WAHF)
+Williams-Beuren syndrome
+Wilson disease (WD)
+Wilson-Turner syndrome
+Wiskott-Aldrich syndrome
+Wissler-Fanconi syndrome
 withdrawal disorder (WD)
+Wolcott-Rallison syndrome
+Wolf-Hirschhorn syndrome
+Wolff-Parkinson-White syndrome (WPW)
+Wolffian adnexal neoplasm (WAN)
+Wolffian duct adenocarcinoma (WDA)
+Wolffian duct adenoma (WDA)
+Wolfram syndrome (WS)
+Wolfram syndrome, mitochondrial form (WMF)
+Wolman disease (WD)
+Worth syndrome (WS)
 wound botulism (WB)
 writing disorder (WD)
+X-linked Aarskog syndrome (AS)
+X-linked adrenal hypoplasia congenita (AHC)
+X-linked agammaglobulinemia (XLA)
+X-linked Alport syndrome (AS)
+X-linked amelogenesis imperfecta hypoplastic/hypomaturation 2 (AI)
+X-linked cardiac valvular dysplasia (CVD)
+X-linked cerebellar ataxia (CA)
+X-linked chondrodysplasia punctata (CP)
+X-linked chronic granulomatous disease (CGD)
+X-linked chronic idiopathic intestinal pseudo-obstruction (CII)
+X-linked cleft palate with or without ankyloglossia (CPWWA)
+X-linked cone-rod dystrophy
+X-linked congenital bilateral absence of vas deferens (CBAVD)
+X-linked congenital hemolytic anemia (CHA)
+X-linked congenital myopathy with fiber-type disproportion (CMWD)
+X-linked deafness
+X-linked dilated cardiomyopathy (DC)
+X-linked distal spinal muscular atrophy 3 (DSMA)
+X-linked dominant hypophosphatemic rickets (DHR)
+X-linked dyskeratosis congenita (DC)
+X-linked dystonia-parkinsonism
+X-linked Emery-Dreifuss muscular dystrophy (MD)
+X-linked endothelial corneal dystrophy (ECD)
+X-linked exudative vitreoretinopathy 2 (EV)
+X-linked hereditary ataxia (HA)
+X-linked hyper IgM syndrome (HIS)
+X-linked hypoparathyroidism
+X-linked ichthyosis
+X-linked immunodeficiency with magnesium defect, Epstein-Barr virus infection, and neoplasia (IWMVAN)
+X-linked Intellectual Disability (ID)
+X-linked intellectual disability-cardiomegaly-congestive heart failure syndrome (IHFS)
+X-linked intellectual disability-psychosis-macroorchidism syndrome (IS)
+X-linked juvenile retinoschisis (JR)
+X-linked lymphoproliferative syndrome (LS)
+X-linked mental retardation with cerebellar hypoplasia and distinctive facial appearance (MRWCHADFA)
+X-linked myopathy with excessive autophagy (MWEA)
+X-linked nephrolithiasis type I (NT)
+X-linked nonsyndromic deafness (ND)
+X-linked panhypopituitarism
+X-linked properdin deficiency (PD)
+X-linked recessive hypophosphatemic rickets (RHR)
+X-linked reticulate pigmentary disorder (RPD)
+X-linked severe combined immunodeficiency (SCI)
+X-linked sideroblastic anemia with ataxia (SAWA)
+X-linked spermatogenic failure (SF)
+X-linked spinal muscular atrophy (SMA)
+X-linked spinocerebellar ataxia (SA)
+X-linked thrombocytopenia with beta-thalassemia (TW)
+X-linked VACTERL association (VA)
 xanthinuria
 xanthogranulomatous cholecystitis (XC)
 xanthogranulomatous pyelonephritis (XP)
@@ -8135,14 +8132,17 @@ xeroderma pigmentosum group F (XPF)
 xeroderma pigmentosum group G (XPG)
 xeroderma pigmentosum variant type (XPVT)
 xerophthalmia
+XFE progeroid syndrome (XPS)
+Xia-Gibbs Syndrome
+Y-linked deafness
+Y-linked spermatogenic failure (SF)
 yaws
 yellow fever (YF)
 yellow nail syndrome (YNS)
+Yunis-Varon syndrome
 zebrafish allergy (ZA)
+Zellweger syndrome (ZS)
+Zika fever (ZF)
+Zika virus congenital syndrome (ZVCS)
+Zollinger-Ellison syndrome
 zygodactyly
-cecal volvulus
-sigmoid volvulus
-cerebral small vessel disease (CSVD)
-duodentitis
-lichen sclerosus
-Dejerine–Roussy syndrome (DRS) or thalamic pain syndrome
