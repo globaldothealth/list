@@ -1,8 +1,8 @@
 import { GeocodeResult, Resolution } from './geocoder';
 
 import { Admin } from '../model/admin';
-import axios from 'axios';
 import LRUCache from 'lru-cache';
+import axios from 'axios';
 
 // Mapbox boundaries types definitions, not part of the mapbox SDK.
 interface BoundariesResponse {
@@ -46,9 +46,9 @@ export default class MapboxAdminsFetcher {
     async fillAdmins(geocode: GeocodeResult): Promise<void> {
         // Return early if no need to fill in admins.
         if (
-            geocode.administrativeAreaLevel1 !== '' &&
-            geocode.administrativeAreaLevel2 !== '' &&
-            geocode.administrativeAreaLevel3 !== ''
+            geocode.administrativeAreaLevel1 &&
+            geocode.administrativeAreaLevel2 &&
+            geocode.administrativeAreaLevel3
         ) {
             return;
         }
