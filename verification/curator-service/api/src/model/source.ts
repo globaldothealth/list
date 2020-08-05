@@ -16,7 +16,11 @@ const sourceSchema = new mongoose.Schema({
         type: originSchema,
         required: 'Enter an origin',
     },
-    format: String,
+    format: {
+        type: String,
+        required: 'Enter a format (JSON or CSV)',
+        enum: ['JSON', 'CSV'],
+    },
     automation: {
         type: automationSchema,
         validate: automationParsingValidator,

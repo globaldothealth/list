@@ -2,5 +2,6 @@
     "name": "source name",
     "origin": {
         "url": "foo.bar"
-    }
+    },
+    "format": "JSON"
 }

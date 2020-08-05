@@ -19,6 +19,7 @@ describe('validate', () => {
         expect(errors).toBeDefined();
         expect(errors?.toString()).toMatch('Enter a name');
         expect(errors?.toString()).toMatch('Enter an origin');
+        expect(errors?.toString()).toMatch('Enter an format');
     });
 });
 
