@@ -1,13 +1,13 @@
-import json
 import csv
+import json
 import os
+import tempfile
+import unittest
+from datetime import date
+
 import pytest
 
-import tempfile
-
 from ch_zurich import zurich
-
-from datetime import date
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html"
@@ -45,7 +45,6 @@ _PARSED_CASE = (
         },
     })
 
-import unittest
 
 class CHZurichTest(unittest.TestCase):
     def test_parse(self):

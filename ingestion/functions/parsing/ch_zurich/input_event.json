@@ -1,5 +1,5 @@
 {
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "ch-zurich-test/COVID19_Fallzahlen_Kanton_ZH_alter_geschlecht.csv",
+    "s3Key": "5f2a63a48cffc70030c45b84/COVID19_Fallzahlen_Kanton_ZH_alter_geschlecht.csv",
     "sourceUrl": "https://github.com/openZH/covid_19/blob/master/fallzahlen_kanton_alter_geschlecht_csv/COVID19_Fallzahlen_Kanton_ZH_alter_geschlecht.csv"
 }
