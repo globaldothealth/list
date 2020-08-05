@@ -443,7 +443,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             const trimmedQ = this.state.search.trim();
-                            // TODO: We should probably use lodash.throttle on searches.
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
