@@ -529,6 +529,9 @@ components:
               type: string
         format:
           type: string
+          enum:
+            - JSON
+            - CSV
         automation:
           type: object
           properties:
