@@ -5,8 +5,9 @@ import pytest
 
 import tempfile
 
+from ch_zurich import zurich
+
 from datetime import date
-import zurich
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html"
