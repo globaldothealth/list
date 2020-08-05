@@ -1,4 +1,10 @@
-import { Button, Theme, Tooltip, withStyles } from '@material-ui/core';
+import {
+    Button,
+    Theme,
+    Tooltip,
+    makeStyles,
+    withStyles,
+} from '@material-ui/core';
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
@@ -94,14 +100,124 @@ const styles = (theme: Theme) =>
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
         },
-        searchBar: {
-            marginBottom: theme.spacing(2),
-            marginTop: theme.spacing(2),
-        },
-        searchBarInput: {
-            borderRadius: theme.spacing(1),
-        },
     });
+
+const searchBarStyles = makeStyles((theme: Theme) => ({
+    searchBar: {
+        marginBottom: theme.spacing(2),
+        marginTop: theme.spacing(2),
+    },
+    searchBarInput: {
+        borderRadius: theme.spacing(1),
+    },
+}));
+
+function SearchBar(props: {
+    onSearchChange: (search: string) => void;
+}): JSX.Element {
+    const [search, setSearch] = React.useState<string>('');
+
+    const classes = searchBarStyles();
+    return (
+        <TextField
+            classes={{ root: classes.searchBar }}
+            id="search-field"
+            label="Search"
+            variant="filled"
+            fullWidth
+            onKeyPress={(ev) => {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                    props.onSearchChange(search);
+                }
+            }}
+            onChange={(ev) => {
+                setSearch(ev.currentTarget.value);
+            }}
+            InputProps={{
+                disableUnderline: true,
+                classes: { root: classes.searchBarInput },
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon />
+                    </InputAdornment>
+                ),
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <HtmlTooltip
+                            title={
+                                <React.Fragment>
+                                    <h4>Search syntax</h4>
+                                    <h5>Full text search</h5>
+                                    Example:{' '}
+                                    <i>"got infected at work" -India</i>
+                                    <br />
+                                    You can use arbitrary strings to search over
+                                    those text fields:
+                                    {[
+                                        'notes',
+                                        'curator',
+                                        'occupation',
+                                        'nationalities',
+                                        'ethnicity',
+                                        'country',
+                                        'admin1',
+                                        'admin2',
+                                        'admin3',
+                                        'place',
+                                        'location name',
+                                        'pathogen name',
+                                        'source url',
+                                    ].join(', ')}
+                                    <h5>Keywords search</h5>
+                                    Example:{' '}
+                                    <i>
+                                        curator:foo@bar.com,fez@meh.org
+                                        country:Japan gender:female
+                                        occupation:"healthcare worker"
+                                    </i>
+                                    <br />
+                                    Values are OR'ed for the same keyword and
+                                    all keywords are AND'ed.
+                                    <br />
+                                    Keyword values can be quoted for multi-words
+                                    matches and concatenated with a comma to
+                                    union them.
+                                    <br />
+                                    Only equality operator is supported.
+                                    <br />
+                                    Supported keywords are: <br />
+                                    <ul>
+                                        {[
+                                            'curator',
+                                            'gender',
+                                            'nationality',
+                                            'occupation',
+                                            'country',
+                                            'outcome',
+                                            'caseid',
+                                            'source',
+                                            'admin1',
+                                            'admin2',
+                                            'admin3',
+                                        ].map(
+                                            (e): JSX.Element => {
+                                                return <li key={e}>{e}</li>;
+                                            },
+                                        )}
+                                    </ul>
+                                </React.Fragment>
+                            }
+                            placement="left"
+                        >
+                            <HelpIcon />
+                        </HtmlTooltip>
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+}
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -210,105 +326,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <TextField
-                    classes={{ root: classes.searchBar }}
-                    id="search-field"
-                    label="Search"
-                    variant="filled"
-                    fullWidth
-                    onKeyPress={(ev) => {
-                        if (ev.key === 'Enter') {
-                            ev.preventDefault();
-                            this.tableRef.current.onQueryChange();
-                        }
+                <SearchBar
+                    onSearchChange={(search: string): void => {
+                        this.setState({ search: search });
+                        this.tableRef.current.onQueryChange();
                     }}
-                    onChange={(ev) =>
-                        this.setState({ search: ev.currentTarget.value })
-                    }
-                    InputProps={{
-                        disableUnderline: true,
-                        classes: { root: classes.searchBarInput },
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <HtmlTooltip
-                                    title={
-                                        <React.Fragment>
-                                            <h4>Search syntax</h4>
-                                            <h5>Full text search</h5>
-                                            Example:{' '}
-                                            <i>"got infected at work" -India</i>
-                                            <br />
-                                            You can use arbitrary strings to
-                                            search over those text fields:
-                                            {[
-                                                'notes',
-                                                'curator',
-                                                'occupation',
-                                                'nationalities',
-                                                'ethnicity',
-                                                'country',
-                                                'admin1',
-                                                'admin2',
-                                                'admin3',
-                                                'place',
-                                                'location name',
-                                                'pathogen name',
-                                                'source url',
-                                            ].join(', ')}
-                                            <h5>Keywords search</h5>
-                                            Example:{' '}
-                                            <i>
-                                                curator:foo@bar.com,fez@meh.org
-                                                country:Japan gender:female
-                                                occupation:"healthcare worker"
-                                            </i>
-                                            <br />
-                                            Values are OR'ed for the same
-                                            keyword and all keywords are AND'ed.
-                                            <br />
-                                            Keyword values can be quoted for
-                                            multi-words matches and concatenated
-                                            with a comma to union them.
-                                            <br />
-                                            Only equality operator is supported.
-                                            <br />
-                                            Supported keywords are: <br />
-                                            <ul>
-                                                {[
-                                                    'curator',
-                                                    'gender',
-                                                    'nationality',
-                                                    'occupation',
-                                                    'country',
-                                                    'outcome',
-                                                    'caseid',
-                                                    'source',
-                                                    'admin1',
-                                                    'admin2',
-                                                    'admin3',
-                                                ].map(
-                                                    (e): JSX.Element => {
-                                                        return (
-                                                            <li key={e}>{e}</li>
-                                                        );
-                                                    },
-                                                )}
-                                            </ul>
-                                        </React.Fragment>
-                                    }
-                                    placement="left"
-                                >
-                                    <HelpIcon />
-                                </HtmlTooltip>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
+                ></SearchBar>
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
