@@ -4,7 +4,7 @@
         "url": "foo.bar",
         "license": "MIT"
     },
-    "format": "PDF",
+    "format": "CSV",
     "automation": {
         "parser": {
             "awsLambdaArn": "arn:aws:lambda:region:id:function:name"

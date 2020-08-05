@@ -63,6 +63,8 @@ interface TableRow {
     // origin
     url: string;
     // automation.parser
+
+    format?: string;
     awsLambdaArn?: string;
     // automation.schedule
     awsRuleArn?: string;
@@ -174,6 +176,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
+            format: rowData.format,
             automation: rowData.awsScheduleExpression
                 ? {
                       parser: rowData.awsLambdaArn
@@ -202,6 +205,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
+            format: rowData.format,
             automation: rowData.awsScheduleExpression
                 ? {
                       parser: rowData.awsLambdaArn
@@ -294,6 +298,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     />
                                 ),
                             },
+                            { title: 'Format', field: 'format' },
                             {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
@@ -325,6 +330,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             flattenedSources.push({
                                                 _id: s._id,
                                                 name: s.name,
+                                                format: s.format,
                                                 url: s.origin.url,
                                                 awsLambdaArn:
                                                     s.automation?.parser
