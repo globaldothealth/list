@@ -284,7 +284,6 @@ it('can edit a row', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'CSV',
             origin: {
                 url: 'origin url',
                 license: 'origin license',

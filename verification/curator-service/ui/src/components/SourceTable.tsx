@@ -45,7 +45,7 @@ interface Automation {
 interface Source {
     _id: string;
     name: string;
-    format: string;
+    format?: string;
     origin: Origin;
     automation?: Automation;
 }
@@ -64,7 +64,7 @@ interface TableRow {
     url: string;
     // automation.parser
 
-    format: string;
+    format?: string;
     awsLambdaArn?: string;
     // automation.schedule
     awsRuleArn?: string;
@@ -102,7 +102,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 !(
                     this.validateRequired(rowData.name) &&
                     this.validateRequired(rowData.url) &&
-                    this.validateRequired(rowData.format) &&
                     this.validateAutomationFields(rowData)
                 )
             ) {
@@ -142,7 +141,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 !(
                     this.validateRequired(newRowData.name) &&
                     this.validateRequired(newRowData.url) &&
-                    this.validateRequired(newRowData.format) &&
                     this.validateAutomationFields(newRowData)
                 )
             ) {

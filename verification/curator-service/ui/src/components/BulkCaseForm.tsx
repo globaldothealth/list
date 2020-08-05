@@ -10,8 +10,8 @@ import {
     Case,
     CaseReference,
     Event,
-    Symptoms,
     PreexistingConditions,
+    Symptoms,
 } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
@@ -499,6 +499,7 @@ class BulkCaseForm extends React.Component<
                 const newCaseReference = await submitSource({
                     name: values.caseReference.sourceName as string,
                     url: values.caseReference.sourceUrl,
+                    format: 'CSV',
                 });
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {
