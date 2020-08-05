@@ -1,6 +1,6 @@
+import { Case, CaseDocument } from '../model/case';
 import { Request, Response } from 'express';
 
-import { Case } from '../model/case';
 import parseSearchQuery from '../util/search';
 
 /**
@@ -165,9 +165,9 @@ export const batchValidate = async (
  *   cases, filtering on provided case reference data, in order to provide
  *   an accurate list of updated case IDs.
  */
-const findCaseIdsWithCaseReferenceData = async (
+export const findCasesWithCaseReferenceData = async (
     req: Request,
-): Promise<string[]> => {
+): Promise<CaseDocument[]> => {
     const providedCaseReferenceData = req.body.cases
         .filter(
             // Case data should be validated prior to this point.
@@ -181,15 +181,34 @@ const findCaseIdsWithCaseReferenceData = async (
                 'caseReference.sourceEntryId': c.caseReference.sourceEntryId,
             };
         });
-    const result =
-        providedCaseReferenceData.length > 0
-            ? await Case.find()
-                  .select('_id')
-                  .or(providedCaseReferenceData)
-                  .lean()
-                  .exec()
-            : [];
-    return result.map((res) => String(res['_id']));
+
+    return providedCaseReferenceData.length > 0
+        ? Case.find()
+              .or(providedCaseReferenceData)
+              .select({ _id: 1, caseReference: 1, revisionMetadata: 1 })
+              .exec()
+        : [];
+};
+
+/**
+ * Find IDs of existing cases that have {caseReference.sourceId,
+ * caseReference.sourceEntryId} combinations matching any cases in the provided
+ * request.
+ *
+ * This is used in batchUpsert. Background:
+ *
+ *   While MongoDB does return IDs of created documents, it doesn't do so
+ *   for modified documents (e.g. cases updated via upsert calls). In
+ *   order to (necessarily) provide that information, we'll query existing
+ *   cases, filtering on provided case reference data, in order to provide
+ *   an accurate list of updated case IDs.
+ */
+const findCaseIdsWithCaseReferenceData = async (
+    req: Request,
+): Promise<string[]> => {
+    return (await findCasesWithCaseReferenceData(req)).map((c) =>
+        String(c._id),
+    );
 };
 
 /**
