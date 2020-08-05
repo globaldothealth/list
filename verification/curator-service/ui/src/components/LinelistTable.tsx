@@ -15,7 +15,9 @@ import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import renderDate from './util/date';
 
 interface ListResponse {
@@ -74,7 +76,9 @@ interface LocationState {
     bulkMessage: string;
 }
 
-interface Props extends RouteComponentProps<never, never, LocationState> {
+interface Props
+    extends RouteComponentProps<never, never, LocationState>,
+        WithStyles<typeof styles> {
     user: User;
 }
 
@@ -83,6 +87,21 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
         maxWidth: '500px',
     },
 }))(Tooltip);
+
+const styles = (theme: Theme) =>
+    createStyles({
+        alert: {
+            borderRadius: theme.spacing(1),
+            marginTop: theme.spacing(2),
+        },
+        searchBar: {
+            marginBottom: theme.spacing(2),
+            marginTop: theme.spacing(2),
+        },
+        searchBarInput: {
+            borderRadius: theme.spacing(1),
+        },
+    });
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -120,15 +139,79 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     render(): JSX.Element {
-        const { history } = this.props;
+        const { history, classes } = this.props;
         return (
             <Paper>
                 {this.state.error && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        variant="filled"
+                        severity="error"
+                    >
                         {this.state.error}
                     </MuiAlert>
                 )}
+                {!this.props.location.state?.bulkMessage &&
+                    this.props.location.state?.newCaseIds &&
+                    this.props.location.state?.newCaseIds.length > 0 &&
+                    (this.props.location.state.newCaseIds.length === 1 ? (
+                        <MuiAlert
+                            classes={{ root: classes.alert }}
+                            variant="filled"
+                            action={
+                                <Link
+                                    to={`/cases/view/${this.props.location.state.newCaseIds}`}
+                                >
+                                    <Button
+                                        color="inherit"
+                                        size="small"
+                                        data-testid="view-case-btn"
+                                    >
+                                        VIEW
+                                    </Button>
+                                </Link>
+                            }
+                        >
+                            {`Case ${this.props.location.state.newCaseIds} added`}
+                        </MuiAlert>
+                    ) : (
+                        <MuiAlert
+                            classes={{ root: classes.alert }}
+                            variant="filled"
+                        >
+                            {`${this.props.location.state.newCaseIds.length} cases added`}
+                        </MuiAlert>
+                    ))}
+                {!this.props.location.state?.bulkMessage &&
+                    (this.props.location.state?.editedCaseIds?.length ?? 0) >
+                        0 && (
+                        <MuiAlert
+                            variant="filled"
+                            classes={{ root: classes.alert }}
+                            action={
+                                <Link
+                                    to={`/cases/view/${this.props.location.state.editedCaseIds}`}
+                                >
+                                    <Button color="inherit" size="small">
+                                        VIEW
+                                    </Button>
+                                </Link>
+                            }
+                        >
+                            {`Case ${this.props.location.state.editedCaseIds} edited`}
+                        </MuiAlert>
+                    )}
+                {this.props.location.state?.bulkMessage && (
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        severity="info"
+                        variant="outlined"
+                    >
+                        {this.props.location.state.bulkMessage}
+                    </MuiAlert>
+                )}
                 <TextField
+                    classes={{ root: classes.searchBar }}
                     id="search-field"
                     label="Search"
                     variant="filled"
@@ -143,6 +226,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         this.setState({ search: ev.currentTarget.value })
                     }
                     InputProps={{
+                        disableUnderline: true,
+                        classes: { root: classes.searchBarInput },
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
@@ -224,58 +309,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         ),
                     }}
                 />
-                {!this.props.location.state?.bulkMessage &&
-                    this.props.location.state?.newCaseIds &&
-                    this.props.location.state?.newCaseIds.length > 0 &&
-                    (this.props.location.state.newCaseIds.length === 1 ? (
-                        <MuiAlert
-                            elevation={6}
-                            variant="filled"
-                            action={
-                                <Link
-                                    to={`/cases/view/${this.props.location.state.newCaseIds}`}
-                                >
-                                    <Button
-                                        color="inherit"
-                                        size="small"
-                                        data-testid="view-case-btn"
-                                    >
-                                        VIEW
-                                    </Button>
-                                </Link>
-                            }
-                        >
-                            {`Case ${this.props.location.state.newCaseIds} added`}
-                        </MuiAlert>
-                    ) : (
-                        <MuiAlert elevation={6} variant="filled">
-                            {`${this.props.location.state.newCaseIds.length} cases added`}
-                        </MuiAlert>
-                    ))}
-                {!this.props.location.state?.bulkMessage &&
-                    (this.props.location.state?.editedCaseIds?.length ?? 0) >
-                        0 && (
-                        <MuiAlert
-                            elevation={6}
-                            variant="filled"
-                            action={
-                                <Link
-                                    to={`/cases/view/${this.props.location.state.editedCaseIds}`}
-                                >
-                                    <Button color="inherit" size="small">
-                                        VIEW
-                                    </Button>
-                                </Link>
-                            }
-                        >
-                            {`Case ${this.props.location.state.editedCaseIds} edited`}
-                        </MuiAlert>
-                    )}
-                {this.props.location.state?.bulkMessage && (
-                    <MuiAlert elevation={6} severity="info" variant="outlined">
-                        {this.props.location.state.bulkMessage}
-                    </MuiAlert>
-                )}
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
@@ -488,10 +521,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 });
                         })
                     }
-                    title="COVID-19 cases"
                     options={{
                         search: false,
                         filtering: false,
+                        toolbar: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
@@ -499,7 +532,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         actionsColumnIndex: -1,
-                        maxBodyHeight: 'calc(100vh - 18em)',
+                        maxBodyHeight: 'calc(100vh - 20em)',
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
                             (
@@ -609,4 +642,4 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 }
 
-export default withRouter(LinelistTable);
+export default withRouter(withStyles(styles)(LinelistTable));
