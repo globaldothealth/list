@@ -59,8 +59,7 @@ Schema updates can affect the whole stack, including:
    and check the output for errors. If one or more documents fails to import, there may be a mismatch between your
    [sample data](https://github.com/globaldothealth/list/tree/e85dacd056db71e1d7d4b56034536ccc6dbee23c/data-serving/samples)
    and your
-   [MongoDB json schema](https://github.com/globaldothealth/list/blob/ca177c1b9a940dcd0f51166db6c6f13976894dda/data-serving/data-service/schemas/cases.schema.json)
-   is.
+   [MongoDB json schema](https://github.com/globaldothealth/list/blob/ca177c1b9a940dcd0f51166db6c6f13976894dda/data-serving/data-service/schemas/cases.schema.json).
 
    `./dev/setup\_db.sh`
 
@@ -68,8 +67,7 @@ Schema updates can affect the whole stack, including:
    may be a mismatch between the data the
    [converter](https://github.com/globaldothealth/list/blob/175bbdd66e0cc02a87629969b70658783fe75518/data-serving/scripts/convert-data/convert_data.py)
    outputs and your
-   [MongoDB json schema](https://github.com/globaldothealth/list/blob/ca177c1b9a940dcd0f51166db6c6f13976894dda/data-serving/data-service/schemas/cases.schema.json)
-   is.
+   [MongoDB json schema](https://github.com/globaldothealth/list/blob/ca177c1b9a940dcd0f51166db6c6f13976894dda/data-serving/data-service/schemas/cases.schema.json).
 
    ```
    cd data-serving/scripts/data-pipeline
