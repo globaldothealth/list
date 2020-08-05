@@ -1,4 +1,10 @@
-import { Button, Theme, Tooltip, withStyles } from '@material-ui/core';
+import {
+    Button,
+    Theme,
+    Tooltip,
+    makeStyles,
+    withStyles,
+} from '@material-ui/core';
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
@@ -15,7 +21,9 @@ import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
 import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
+import { createStyles } from '@material-ui/core/styles';
 import renderDate from './util/date';
 
 interface ListResponse {
@@ -74,7 +82,9 @@ interface LocationState {
     bulkMessage: string;
 }
 
-interface Props extends RouteComponentProps<never, never, LocationState> {
+interface Props
+    extends RouteComponentProps<never, never, LocationState>,
+        WithStyles<typeof styles> {
     user: User;
 }
 
@@ -83,6 +93,131 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
         maxWidth: '500px',
     },
 }))(Tooltip);
+
+const styles = (theme: Theme) =>
+    createStyles({
+        alert: {
+            borderRadius: theme.spacing(1),
+            marginTop: theme.spacing(2),
+        },
+    });
+
+const searchBarStyles = makeStyles((theme: Theme) => ({
+    searchBar: {
+        marginBottom: theme.spacing(2),
+        marginTop: theme.spacing(2),
+    },
+    searchBarInput: {
+        borderRadius: theme.spacing(1),
+    },
+}));
+
+function SearchBar(props: {
+    onSearchChange: (search: string) => void;
+}): JSX.Element {
+    const [search, setSearch] = React.useState<string>('');
+
+    const classes = searchBarStyles();
+    return (
+        <TextField
+            classes={{ root: classes.searchBar }}
+            id="search-field"
+            label="Search"
+            variant="filled"
+            fullWidth
+            onKeyPress={(ev) => {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                    props.onSearchChange(search);
+                }
+            }}
+            onChange={(ev) => {
+                setSearch(ev.currentTarget.value);
+            }}
+            InputProps={{
+                disableUnderline: true,
+                classes: { root: classes.searchBarInput },
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon />
+                    </InputAdornment>
+                ),
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <HtmlTooltip
+                            title={
+                                <React.Fragment>
+                                    <h4>Search syntax</h4>
+                                    <h5>Full text search</h5>
+                                    Example:{' '}
+                                    <i>"got infected at work" -India</i>
+                                    <br />
+                                    You can use arbitrary strings to search over
+                                    those text fields:
+                                    {[
+                                        'notes',
+                                        'curator',
+                                        'occupation',
+                                        'nationalities',
+                                        'ethnicity',
+                                        'country',
+                                        'admin1',
+                                        'admin2',
+                                        'admin3',
+                                        'place',
+                                        'location name',
+                                        'pathogen name',
+                                        'source url',
+                                    ].join(', ')}
+                                    <h5>Keywords search</h5>
+                                    Example:{' '}
+                                    <i>
+                                        curator:foo@bar.com,fez@meh.org
+                                        country:Japan gender:female
+                                        occupation:"healthcare worker"
+                                    </i>
+                                    <br />
+                                    Values are OR'ed for the same keyword and
+                                    all keywords are AND'ed.
+                                    <br />
+                                    Keyword values can be quoted for multi-words
+                                    matches and concatenated with a comma to
+                                    union them.
+                                    <br />
+                                    Only equality operator is supported.
+                                    <br />
+                                    Supported keywords are: <br />
+                                    <ul>
+                                        {[
+                                            'curator',
+                                            'gender',
+                                            'nationality',
+                                            'occupation',
+                                            'country',
+                                            'outcome',
+                                            'caseid',
+                                            'source',
+                                            'admin1',
+                                            'admin2',
+                                            'admin3',
+                                        ].map(
+                                            (e): JSX.Element => {
+                                                return <li key={e}>{e}</li>;
+                                            },
+                                        )}
+                                    </ul>
+                                </React.Fragment>
+                            }
+                            placement="left"
+                        >
+                            <HelpIcon />
+                        </HtmlTooltip>
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+}
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -120,116 +255,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     render(): JSX.Element {
-        const { history } = this.props;
+        const { history, classes } = this.props;
         return (
             <Paper>
                 {this.state.error && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        variant="filled"
+                        severity="error"
+                    >
                         {this.state.error}
                     </MuiAlert>
                 )}
-                <TextField
-                    id="search-field"
-                    label="Search"
-                    variant="filled"
-                    fullWidth
-                    onKeyPress={(ev) => {
-                        if (ev.key === 'Enter') {
-                            ev.preventDefault();
-                            this.tableRef.current.onQueryChange();
-                        }
-                    }}
-                    onChange={(ev) =>
-                        this.setState({ search: ev.currentTarget.value })
-                    }
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <HtmlTooltip
-                                    title={
-                                        <React.Fragment>
-                                            <h4>Search syntax</h4>
-                                            <h5>Full text search</h5>
-                                            Example:{' '}
-                                            <i>"got infected at work" -India</i>
-                                            <br />
-                                            You can use arbitrary strings to
-                                            search over those text fields:
-                                            {[
-                                                'notes',
-                                                'curator',
-                                                'occupation',
-                                                'nationalities',
-                                                'ethnicity',
-                                                'country',
-                                                'admin1',
-                                                'admin2',
-                                                'admin3',
-                                                'place',
-                                                'location name',
-                                                'pathogen name',
-                                                'source url',
-                                            ].join(', ')}
-                                            <h5>Keywords search</h5>
-                                            Example:{' '}
-                                            <i>
-                                                curator:foo@bar.com,fez@meh.org
-                                                country:Japan gender:female
-                                                occupation:"healthcare worker"
-                                            </i>
-                                            <br />
-                                            Values are OR'ed for the same
-                                            keyword and all keywords are AND'ed.
-                                            <br />
-                                            Keyword values can be quoted for
-                                            multi-words matches and concatenated
-                                            with a comma to union them.
-                                            <br />
-                                            Only equality operator is supported.
-                                            <br />
-                                            Supported keywords are: <br />
-                                            <ul>
-                                                {[
-                                                    'curator',
-                                                    'gender',
-                                                    'nationality',
-                                                    'occupation',
-                                                    'country',
-                                                    'outcome',
-                                                    'caseid',
-                                                    'source',
-                                                    'admin1',
-                                                    'admin2',
-                                                    'admin3',
-                                                ].map(
-                                                    (e): JSX.Element => {
-                                                        return (
-                                                            <li key={e}>{e}</li>
-                                                        );
-                                                    },
-                                                )}
-                                            </ul>
-                                        </React.Fragment>
-                                    }
-                                    placement="left"
-                                >
-                                    <HelpIcon />
-                                </HtmlTooltip>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
                 {!this.props.location.state?.bulkMessage &&
                     this.props.location.state?.newCaseIds &&
                     this.props.location.state?.newCaseIds.length > 0 &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert
-                            elevation={6}
+                            classes={{ root: classes.alert }}
                             variant="filled"
                             action={
                                 <Link
@@ -248,7 +291,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             {`Case ${this.props.location.state.newCaseIds} added`}
                         </MuiAlert>
                     ) : (
-                        <MuiAlert elevation={6} variant="filled">
+                        <MuiAlert
+                            classes={{ root: classes.alert }}
+                            variant="filled"
+                        >
                             {`${this.props.location.state.newCaseIds.length} cases added`}
                         </MuiAlert>
                     ))}
@@ -256,8 +302,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
                         <MuiAlert
-                            elevation={6}
                             variant="filled"
+                            classes={{ root: classes.alert }}
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.editedCaseIds}`}
@@ -272,10 +318,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         </MuiAlert>
                     )}
                 {this.props.location.state?.bulkMessage && (
-                    <MuiAlert elevation={6} severity="info" variant="outlined">
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        severity="info"
+                        variant="outlined"
+                    >
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
+                <SearchBar
+                    onSearchChange={(search: string): void => {
+                        this.setState({ search: search });
+                        this.tableRef.current.onQueryChange();
+                    }}
+                ></SearchBar>
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
@@ -387,7 +443,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
                             const trimmedQ = this.state.search.trim();
-                            // TODO: We should probably use lodash.throttle on searches.
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
@@ -499,7 +554,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         actionsColumnIndex: -1,
-                        maxBodyHeight: 'calc(100vh - 18em)',
+                        maxBodyHeight: 'calc(100vh - 20em)',
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
                             (
@@ -609,4 +664,4 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 }
 
-export default withRouter(LinelistTable);
+export default withRouter(withStyles(styles)(LinelistTable));

@@ -20,6 +20,7 @@ it('loads and displays sources', async () => {
     const sourceId = 'abc123';
     const sourceName = 'source_name';
     const originUrl = 'origin url';
+    const format = 'JSON';
     const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
     const awsRuleArn = 'arn:aws:events:a:b:rule/c';
     const awsScheduleExpression = 'rate(2 hours)';
@@ -27,7 +28,7 @@ it('loads and displays sources', async () => {
         {
             _id: sourceId,
             name: sourceName,
-            format: 'format',
+            format: format,
             origin: {
                 url: originUrl,
                 license: 'origin license',
@@ -67,6 +68,7 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(sourceId))).toBeInTheDocument();
     expect(await findByText(new RegExp(sourceName))).toBeInTheDocument();
     expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
+    expect(await findByText(new RegExp(format))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
     expect(
@@ -82,7 +84,7 @@ it('API errors are displayed', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
+            format: 'JSON',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
@@ -130,7 +132,7 @@ it('can delete a row', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
+            format: 'JSON',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
@@ -159,7 +161,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -228,7 +230,7 @@ it('can add a row', async () => {
     const newSource = {
         _id: 'abc123',
         name: 'source_name',
-        format: 'format',
+        format: 'JSON',
         origin: {
             url: 'origin url',
             license: 'origin license',
@@ -282,7 +284,6 @@ it('can edit a row', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
