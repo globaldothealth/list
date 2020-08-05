@@ -75,6 +75,13 @@ Resources:
       Handler: hongkong.lambda_handler
       Runtime: python3.8
       Description: Parse case data for India
+  JapanParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/japan/
+      Handler: japan.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Japan
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -110,7 +117,6 @@ Resources:
           # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
           # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
           AWS_SESSION_TOKEN: ""
-
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
