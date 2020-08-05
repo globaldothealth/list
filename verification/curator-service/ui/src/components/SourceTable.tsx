@@ -1,6 +1,12 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import {
+    MenuItem,
+    Theme,
+    WithStyles,
+    createStyles,
+    withStyles,
+} from '@material-ui/core';
 import React, { RefObject } from 'react';
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -298,7 +304,34 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     />
                                 ),
                             },
-                            { title: 'Format', field: 'format' },
+                            {
+                                title: 'Format',
+                                field: 'format',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        select
+                                        size="small"
+                                        fullWidth
+                                        data-testid="format-select"
+                                        placeholder="Format"
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    >
+                                        {[undefined, 'JSON', 'CSV'].map(
+                                            (value) => (
+                                                <MenuItem
+                                                    key={value}
+                                                    value={value || ''}
+                                                >
+                                                    {value || 'Unknown'}
+                                                </MenuItem>
+                                            ),
+                                        )}
+                                    </TextField>
+                                ),
+                            },
                             {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
