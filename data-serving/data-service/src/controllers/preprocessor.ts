@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { CaseRevision } from '../model/case-revision';
 import { RevisionMetadata } from '../model/revision-metadata';
+import { findCasesWithCaseReferenceData } from './case';
 
 const createNewMetadata = (curatorEmail: string) => {
     return {
@@ -61,8 +62,7 @@ export const setRevisionMetadata = async (
 ) => {
     const curatorEmail = request.body.curator.email;
 
-    // Find the case if it already exists so we can update its existing
-    // metadata.
+    // Single case update or upsert.
     const c = await getCase(request);
 
     // Set the correct, server-generated revisionMetadata for subsequent
@@ -71,6 +71,42 @@ export const setRevisionMetadata = async (
         ? createUpdateMetadata(c, curatorEmail)
         : createNewMetadata(curatorEmail);
     request.body.revisionMetadata = revisionMetadata;
+
+    // Clean up the additional metadata that falls outside the `case` entity.
+    delete request.body.curator;
+
+    next();
+};
+
+export const setBatchRevisionMetadata = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const curatorEmail = request.body.curator.email;
+
+    // Find the cases if they already exists so we can update existing
+    // metadata.
+    const existingCases = await findCasesWithCaseReferenceData(request);
+    const metadataMap = new Map(
+        existingCases
+            .filter((c) => c && c.caseReference)
+            .map((c) => [
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+                createUpdateMetadata(c, curatorEmail),
+            ]),
+    );
+
+    // Set the request cases' revision metadata to the update metadata, if
+    // present, or create metadata otherwise.
+    request.body.cases.forEach((c: any) => {
+        c.revisionMetadata =
+            metadataMap.get(
+                c.caseReference?.sourceId +
+                    ':' +
+                    c.caseReference?.sourceEntryId,
+            ) || createNewMetadata(curatorEmail);
+    });
 
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;
