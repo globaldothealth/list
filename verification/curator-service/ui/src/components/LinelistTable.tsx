@@ -521,10 +521,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 });
                         })
                     }
+                    title="COVID-19 cases"
                     options={{
                         search: false,
                         filtering: false,
-                        toolbar: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
