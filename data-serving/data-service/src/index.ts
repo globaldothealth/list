@@ -4,6 +4,7 @@ import * as homeController from './controllers/home';
 import { Request, Response } from 'express';
 import {
     createCaseRevision,
+    setBatchRevisionMetadata,
     setRevisionMetadata,
 } from './controllers/preprocessor';
 
@@ -68,7 +69,7 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
-            setRevisionMetadata,
+            setBatchRevisionMetadata,
             caseController.batchUpsert,
         );
         apiRouter.put(

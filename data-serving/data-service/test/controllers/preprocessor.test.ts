@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
     createCaseRevision,
+    setBatchRevisionMetadata,
     setRevisionMetadata,
 } from '../../src/controllers/preprocessor';
 
@@ -376,7 +377,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setRevisionMetadata(
+        await setBatchRevisionMetadata(
             { body: requestBody, method: 'PUT' } as Request,
             {} as Response,
             nextFn,
