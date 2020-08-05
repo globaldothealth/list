@@ -1,6 +1,12 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import {
+    MenuItem,
+    Theme,
+    WithStyles,
+    createStyles,
+    withStyles,
+} from '@material-ui/core';
 import React, { RefObject } from 'react';
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -63,6 +69,8 @@ interface TableRow {
     // origin
     url: string;
     // automation.parser
+
+    format?: string;
     awsLambdaArn?: string;
     // automation.schedule
     awsRuleArn?: string;
@@ -174,6 +182,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
+            format: rowData.format,
             automation: rowData.awsScheduleExpression
                 ? {
                       parser: rowData.awsLambdaArn
@@ -202,6 +211,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
+            format: rowData.format,
             automation: rowData.awsScheduleExpression
                 ? {
                       parser: rowData.awsLambdaArn
@@ -295,6 +305,34 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                             },
                             {
+                                title: 'Format',
+                                field: 'format',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        select
+                                        size="small"
+                                        fullWidth
+                                        data-testid="format-select"
+                                        placeholder="Format"
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    >
+                                        {[undefined, 'JSON', 'CSV'].map(
+                                            (value) => (
+                                                <MenuItem
+                                                    key={value}
+                                                    value={value || ''}
+                                                >
+                                                    {value || 'Unknown'}
+                                                </MenuItem>
+                                            ),
+                                        )}
+                                    </TextField>
+                                ),
+                            },
+                            {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
                             },
@@ -325,6 +363,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             flattenedSources.push({
                                                 _id: s._id,
                                                 name: s.name,
+                                                format: s.format,
                                                 url: s.origin.url,
                                                 awsLambdaArn:
                                                     s.automation?.parser
