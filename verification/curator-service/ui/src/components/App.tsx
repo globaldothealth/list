@@ -51,6 +51,16 @@ const theme = createMuiTheme({
             main: '#000000',
         },
     },
+    overrides: {
+        MuiListItem: {
+            root: {
+                '&$selected': {
+                    backgroundColor: '#E8F0FE',
+                    borderRadius: '0px 100px 100px 0px',
+                },
+            },
+        },
+    },
 });
 
 const drawerWidth = 240;
@@ -145,6 +155,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
     },
     drawerPaper: {
+        border: 'none',
         width: drawerWidth,
     },
     drawerHeader: {
@@ -187,6 +198,7 @@ export default function App(): JSX.Element {
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
+    const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const lastLocation = useLastLocation();
 
     useEffect(() => {
@@ -344,7 +356,6 @@ export default function App(): JSX.Element {
                                 icon: <HomeIcon />,
                                 to: '/',
                                 displayCheck: (): boolean => true,
-                                divider: true,
                             },
                             {
                                 text: 'Linelist',
@@ -359,7 +370,6 @@ export default function App(): JSX.Element {
                                 to: '/sources',
                                 displayCheck: (): boolean =>
                                     hasAnyRole(['reader', 'curator']),
-                                divider: true,
                             },
                             {
                                 text: 'Profile',
@@ -375,13 +385,18 @@ export default function App(): JSX.Element {
                                     hasAnyRole(['admin']),
                             },
                         ].map(
-                            (item) =>
+                            (item, index) =>
                                 item.displayCheck() && (
                                     <Link key={item.text} to={item.to}>
                                         <ListItem
                                             button
                                             key={item.text}
-                                            divider={item.divider}
+                                            selected={
+                                                selectedMenuIndex === index
+                                            }
+                                            onClick={(): void =>
+                                                setSelectedMenuIndex(index)
+                                            }
                                         >
                                             <ListItemIcon>
                                                 {item.icon}
