@@ -83,12 +83,14 @@ export interface CaseReferenceForm extends CaseReference {
 export async function submitSource(opts: {
     name: string;
     url: string;
+    format?: string;
 }): Promise<CaseReference> {
     const newSource = {
         name: opts.name,
         origin: {
             url: opts.url,
         },
+        format: opts.format,
     };
     const resp = await axios.post<SourceData>('/api/sources', newSource);
     return {

@@ -76,6 +76,8 @@ def retrieve_content(source_id, url, source_format):
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
+        # TODO: Support other formats here.
+        # https://github.com/globaldothealth/list/issues/723
         if source_format == "JSON":
             data = json.dumps(r.json(), indent=4)
             extension = "json"

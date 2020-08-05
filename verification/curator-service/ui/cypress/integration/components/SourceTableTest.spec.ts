@@ -12,6 +12,7 @@ describe('Sources table', function () {
         cy.get('button[title="Add"]').click();
         cy.get('input[placeholder="Name"]').clear().type('Example source');
         cy.get('input[placeholder="URL"]').clear().type('www.example.com');
+        cy.get('input[placeholder="Format"]').clear().type('JSON');
         cy.get('button[title="Save"]').click();
 
         cy.contains('Example source');
