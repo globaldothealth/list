@@ -344,7 +344,7 @@ describe('upsert', () => {
     });
 });
 describe('batch upsert', () => {
-    it('sets create metadata', async () => {
+    it('sets create and update metadata', async () => {
         const existingCase = {
             ...minimalCase,
             caseReference: {
