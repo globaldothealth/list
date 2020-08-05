@@ -1,8 +1,8 @@
 import { GeocodeResult, Resolution } from './geocoder';
 
 import { Admin } from '../model/admin';
-import axios from 'axios';
 import LRUCache from 'lru-cache';
+import axios from 'axios';
 
 // Mapbox boundaries types definitions, not part of the mapbox SDK.
 interface BoundariesResponse {
@@ -46,9 +46,9 @@ export default class MapboxAdminsFetcher {
     async fillAdmins(geocode: GeocodeResult): Promise<void> {
         // Return early if no need to fill in admins.
         if (
-            geocode.administrativeAreaLevel1 !== '' &&
-            geocode.administrativeAreaLevel2 !== '' &&
-            geocode.administrativeAreaLevel3 !== ''
+            geocode.administrativeAreaLevel1 &&
+            geocode.administrativeAreaLevel2 &&
+            geocode.administrativeAreaLevel3
         ) {
             return;
         }
@@ -71,26 +71,22 @@ export default class MapboxAdminsFetcher {
         for (const feature of resp.features) {
             switch (feature.properties.tilequery.layer) {
                 case 'boundaries_admin_1':
-                    geocode.administrativeAreaLevel1 = await this.getName(
-                        feature.properties.id,
-                    );
+                    geocode.administrativeAreaLevel1 =
+                        (await this.getName(feature.properties.id)) ||
+                        undefined;
                 case 'boundaries_admin_2':
-                    geocode.administrativeAreaLevel2 = await this.getName(
-                        feature.properties.id,
-                    );
+                    geocode.administrativeAreaLevel2 =
+                        (await this.getName(feature.properties.id)) ||
+                        undefined;
                 case 'boundaries_admin_3':
-                    geocode.administrativeAreaLevel3 = await this.getName(
-                        feature.properties.id,
-                    );
+                    geocode.administrativeAreaLevel3 =
+                        (await this.getName(feature.properties.id)) ||
+                        undefined;
             }
         }
     }
 
     async getName(id: string): Promise<string> {
-        const admin = await Admin.findOne({ id: id }, 'name').exec();
-        if (!admin?.name) {
-            throw Error(`Could not find admin name with ID ${id}`);
-        }
-        return admin.name;
+        return (await Admin.findOne({ id: id }, 'name').exec())?.name || '';
     }
 }

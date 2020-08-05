@@ -59,8 +59,7 @@ def get_source_details(source_id, api_headers):
         r = requests.get(source_api_endpoint, headers=api_headers)
         api_json = r.json()
         print(f"Received source API response: {api_json}")
-        return api_json["origin"]["url"], "JSON", api_json.get(
-            "automation", {}).get(
+        return api_json["origin"]["url"], api_json["format"], api_json.get("automation", {}).get(
             "parser", {}).get(
             "awsLambdaArn", "")
     except Exception as e:
@@ -77,22 +76,24 @@ def retrieve_content(source_id, url, source_format):
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
         if source_format == "JSON":
-            data = json.dumps(r.json(), indent=4)
+            data = json.dumps(r.json(), indent=4).encode('utf-8')
             extension = "json"
+        elif source_format == "CSV":
+            data = r.content
+            extension = "csv"
         else:
             error_message = f"Unsupported source format: {source_format}"
             print(error_message)
             raise ValueError(error_message)
 
         key_filename_part = f"content.{extension}"
-        file = open(f"/tmp/{key_filename_part}", "w")
-        file.write(data)
-        file.close()
-        s3_object_key = (
-            f"{source_id}"
-            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-            f"{key_filename_part}")
-        return (file.name, s3_object_key)
+        with open(f"/tmp/{key_filename_part}", "wb") as f:
+            f.write(data)
+            s3_object_key = (
+                f"{source_id}"
+                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{key_filename_part}")
+            return (f.name, s3_object_key)
     except requests.RequestException as e:
         print(e)
         raise e

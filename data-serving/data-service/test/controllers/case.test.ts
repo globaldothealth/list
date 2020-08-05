@@ -306,6 +306,7 @@ describe('POST', () => {
                     newCaseWithEntryId,
                     existingCaseWithEntryId,
                 ],
+                ...curatorMetadata,
             })
             .expect(207);
         expect(res.body.createdCaseIds).toHaveLength(2);
@@ -313,10 +314,39 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
         expect(updatedCaseInDb?.notes).toEqual(existingCaseWithEntryId.notes);
     });
+    it('batch upsert should result in create and update metadata', async () => {
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+        existingCase.notes = 'new notes';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [existingCase, minimalCase],
+                ...curatorMetadata,
+            });
+
+        const newCaseInDb = await Case.findById(res.body.createdCaseIds[0]);
+        expect(newCaseInDb?.revisionMetadata.revisionNumber).toEqual(0);
+        expect(newCaseInDb?.revisionMetadata.creationMetadata.curator).toEqual(
+            curatorMetadata.curator.email,
+        );
+
+        const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        expect(updatedCaseInDb?.revisionMetadata.revisionNumber).toEqual(1);
+        expect(
+            updatedCaseInDb?.revisionMetadata.updateMetadata?.curator,
+        ).toEqual(curatorMetadata.curator.email);
+        expect(
+            updatedCaseInDb?.revisionMetadata.creationMetadata.curator,
+        ).toEqual(minimalCase.revisionMetadata.creationMetadata.curator);
+
+        expect(res.body).not.toHaveProperty('curator');
+    });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)
             .post('/api/cases/batchUpsert')
-            .send({ cases: [minimalCase, invalidRequest] })
+            .send({ cases: [minimalCase, invalidRequest], ...curatorMetadata })
             .expect(422);
     });
     it('batch validate with no body should return 415', () => {

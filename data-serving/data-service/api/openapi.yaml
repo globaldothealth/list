@@ -157,7 +157,13 @@ paths:
         content:
           application/json:
             schema:
-                $ref: "#/components/schemas/CaseArray"
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
       responses:
         "207":
           $ref: "#/components/responses/207BatchUpsertCaseResponse"

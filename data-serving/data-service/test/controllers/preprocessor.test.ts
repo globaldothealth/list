@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
     createCaseRevision,
+    setBatchRevisionMetadata,
     setRevisionMetadata,
 } from '../../src/controllers/preprocessor';
 
@@ -340,5 +341,76 @@ describe('upsert', () => {
         expect((await CaseRevision.find())[0].case.toObject()).toEqual(
             c.toObject(),
         );
+    });
+});
+describe('batch upsert', () => {
+    it('sets create and update metadata', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        const c = new Case({
+            ...existingCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const newCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_new',
+            },
+        };
+
+        const requestBody = {
+            cases: [existingCase, newCase],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await setBatchRevisionMetadata(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(requestBody).toEqual({
+            cases: [
+                {
+                    ...existingCase,
+                    revisionMetadata: {
+                        revisionNumber: 1,
+                        creationMetadata: {
+                            curator: 'creator@gmail.com',
+                            date: Date.parse('2020-01-01'),
+                        },
+                        updateMetadata: {
+                            curator: 'updater@gmail.com',
+                            date: Date.now(),
+                        },
+                    },
+                },
+                {
+                    ...newCase,
+                    revisionMetadata: {
+                        revisionNumber: 0,
+                        creationMetadata: {
+                            curator: 'updater@gmail.com',
+                            date: Date.now(),
+                        },
+                    },
+                },
+            ],
+        });
     });
 });

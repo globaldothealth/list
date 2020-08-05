@@ -71,7 +71,7 @@ export function addCase(opts: {
                 status: opts.symptomStatus ?? undefined,
                 values: opts.symptoms ?? [],
             },
-            notes: opts.notes
+            notes: opts.notes,
         },
     });
 }
@@ -117,6 +117,7 @@ export function addSource(name: string, url: string): void {
             origin: {
                 url: url,
             },
+            format: 'JSON',
         },
     });
 }

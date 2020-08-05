@@ -51,6 +51,16 @@ const theme = createMuiTheme({
             main: '#000000',
         },
     },
+    overrides: {
+        MuiListItem: {
+            root: {
+                '&$selected': {
+                    backgroundColor: '#E8F0FE',
+                    borderRadius: '0px 100px 100px 0px',
+                },
+            },
+        },
+    },
 });
 
 const drawerWidth = 240;
@@ -145,6 +155,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
     },
     drawerPaper: {
+        border: 'none',
         width: drawerWidth,
     },
     drawerHeader: {
@@ -187,11 +198,54 @@ export default function App(): JSX.Element {
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
+    const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const lastLocation = useLastLocation();
+    const history = useHistory();
+    const menuList = [
+        {
+            text: 'Home',
+            icon: <HomeIcon />,
+            to: '/',
+            displayCheck: (): boolean => true,
+        },
+        {
+            text: 'Linelist',
+            icon: <ListIcon />,
+            to: '/cases',
+            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+        },
+        {
+            text: 'Sources',
+            icon: <LinkIcon />,
+            to: '/sources',
+            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+        },
+        {
+            text: 'Profile',
+            icon: <PersonIcon />,
+            to: '/profile',
+            displayCheck: (): boolean => user?.email !== '',
+        },
+        {
+            text: 'Manage users',
+            icon: <PeopleIcon />,
+            to: '/users',
+            displayCheck: (): boolean => hasAnyRole(['admin']),
+        },
+    ];
 
     useEffect(() => {
         setDrawerOpen(showMenu);
     }, [showMenu]);
+
+    useEffect(() => {
+        const menuIndex = menuList.findIndex(
+            (menuItem) => menuItem.to === history.location.pathname,
+        );
+        if (menuIndex !== -1) {
+            setSelectedMenuIndex(menuIndex);
+        }
+    }, [history.location.pathname, menuList]);
 
     const getUser = (): void => {
         axios
@@ -242,7 +296,6 @@ export default function App(): JSX.Element {
     }, []);
 
     const classes = useStyles();
-    const history = useHistory();
     return (
         <div className={classes.root}>
             <ThemeProvider theme={theme}>
@@ -338,50 +391,16 @@ export default function App(): JSX.Element {
                         </>
                     )}
                     <List>
-                        {[
-                            {
-                                text: 'Home',
-                                icon: <HomeIcon />,
-                                to: '/',
-                                displayCheck: (): boolean => true,
-                                divider: true,
-                            },
-                            {
-                                text: 'Linelist',
-                                icon: <ListIcon />,
-                                to: '/cases',
-                                displayCheck: (): boolean =>
-                                    hasAnyRole(['reader', 'curator']),
-                            },
-                            {
-                                text: 'Sources',
-                                icon: <LinkIcon />,
-                                to: '/sources',
-                                displayCheck: (): boolean =>
-                                    hasAnyRole(['reader', 'curator']),
-                                divider: true,
-                            },
-                            {
-                                text: 'Profile',
-                                icon: <PersonIcon />,
-                                to: '/profile',
-                                displayCheck: (): boolean => user?.email !== '',
-                            },
-                            {
-                                text: 'Manage users',
-                                icon: <PeopleIcon />,
-                                to: '/users',
-                                displayCheck: (): boolean =>
-                                    hasAnyRole(['admin']),
-                            },
-                        ].map(
-                            (item) =>
+                        {menuList.map(
+                            (item, index) =>
                                 item.displayCheck() && (
                                     <Link key={item.text} to={item.to}>
                                         <ListItem
                                             button
                                             key={item.text}
-                                            divider={item.divider}
+                                            selected={
+                                                selectedMenuIndex === index
+                                            }
                                         >
                                             <ListItemIcon>
                                                 {item.icon}
