@@ -35,7 +35,7 @@ const styles = () =>
 
 type DemographicsProps = WithStyles<typeof styles>;
 
-// TODO: get values from DB.
+// If changing this list, also modify https://github.com/globaldothealth/list/blob/main/data-serving/data-service/api/openapi.yaml
 const genderValues = [
     'Unknown',
     'Male',
