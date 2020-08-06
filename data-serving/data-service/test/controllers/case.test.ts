@@ -214,6 +214,41 @@ describe('GET', () => {
             request(app).get('/api/cases/symptoms?limit=-2').expect(400, done);
         });
     });
+
+    describe('list places of transmission', () => {
+        it('should return 200 OK', () => {
+            return request(app)
+                .get('/api/cases/placesOfTransmission?limit=5')
+                .expect(200);
+        });
+        it('should show most frequently used places of transmission', async () => {
+            for (let i = 1; i <= 5; i++) {
+                const c = new Case(minimalCase);
+                c.set({
+                    transmission: {
+                        places: Array.from(
+                            Array(i),
+                            (_, index) => `place of transmission ${index + 1}`,
+                        ),
+                    },
+                });
+                await c.save();
+            }
+            const res = await request(app)
+                .get('/api/cases/placesOfTransmission?limit=3')
+                .expect(200);
+            expect(res.body.placesOfTransmission).toEqual([
+                'place of transmission 1',
+                'place of transmission 2',
+                'place of transmission 3',
+            ]);
+        });
+        it('rejects negative limit param', (done) => {
+            request(app)
+                .get('/api/cases/placesOfTransmission?limit=-2')
+                .expect(400, done);
+        });
+    });
 });
 
 describe('POST', () => {
