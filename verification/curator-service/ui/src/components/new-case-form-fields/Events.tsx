@@ -8,7 +8,6 @@ import { useFormikContext } from 'formik';
 
 const yesNoUndefined = ['Unknown', 'Yes', 'No'];
 
-// TODO: get values from DB.
 const methodsOfConfirmation = [
     'Unknown',
     'PCR test',

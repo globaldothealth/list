@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-// TODO: get values from DB
+// If changing this list, also modify https://github.com/globaldothealth/list/blob/main/data-serving/data-service/api/openapi.yaml
 const symptomStatusValues = [
     'Unknown',
     'Asymptomatic',
