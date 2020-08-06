@@ -1,14 +1,14 @@
 // Set up appmetrics-dash before importing additional dependencies.
 // This ensures that the module captures metrics for dependent systems, like
 // MongoDB.
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import Dash from 'appmetrics-dash';
 if (process.env.NODE_ENV !== 'test') {
-    Dash.attach();
+    Dash.attach({ middleware: mustHaveAnyRole(['admin']) });
 }
 
 import * as usersController from './controllers/users';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
