@@ -321,6 +321,7 @@ components:
           properties:
             gender:
               type: string
+              enum: [null, Male, Female, Non-binary/Third gender, Other]
             ageRange:
               type: object
               properties:
@@ -358,6 +359,7 @@ components:
           properties:
             status:
               type: string
+              enum: [null, Asymptomatic, Symptomatic, Presymptomatic]
             values:
               type: array
               items:
@@ -402,6 +404,7 @@ components:
                     $ref: "#/components/schemas/Location"
                   purpose:
                     type: string
+                    enum: [null, Business, Leisure, Family, Other]
                   methods:
                     type: array
                     items:
