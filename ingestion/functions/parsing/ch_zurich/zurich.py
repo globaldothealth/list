@@ -31,16 +31,6 @@ _GENDER_INDEX = 3
 _CONFIRMED_INDEX = 4
 _SOURCE_INDEX = 6
 
-def convert_date(raw_date):
-    """
-    Convert raw date field into a value interpretable by the dataserver.
-
-    The date is listed in YYYY-mm-dd format, but the data server API will
-    assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
-    """
-    date = datetime.strptime(raw_date, "%Y-%m-%d")
-    return date.strftime("%m/%d/%YZ")
-
 def convert_gender(raw_gender: str):
     if raw_gender.upper() == "M":
         return "Male"
@@ -48,7 +38,7 @@ def convert_gender(raw_gender: str):
         return "Female"
     return None
 
-def parse_cases(raw_data_file, source_id, source_url):
+def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     Parses G.h-format case data from raw API data.
 
@@ -78,8 +68,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": convert_date(row[_DATE_INDEX]),
-                                "end": convert_date(row[_DATE_INDEX]),
+                                "start": row[_DATE_INDEX],
+                                "end": row[_DATE_INDEX],
                             },
                         },
                     ],
