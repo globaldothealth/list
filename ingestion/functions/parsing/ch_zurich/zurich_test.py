@@ -21,6 +21,7 @@ _PARSED_CASE = (
             "country": "Switzerland",
             "administrativeAreaLevel1": "Zurich",
             "geoResolution": "Admin1",
+            "name": "Zurich canton",
             "geometry": {
                 "longitude": "8.651071",
                 "latitude": "47.42568"
