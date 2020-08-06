@@ -13,47 +13,27 @@ if ('lambda' not in sys.argv[0]):
             'common/python'))
 import parsing_lib
 
-
-def convert_date(raw_date):
-    """
-    Convert raw date field into a value interpretable by the dataserver.
-
-    The date is listed in dd/mm/YYYY format, but the data server API will
-    assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
-    """
-    date = datetime.strptime(raw_date, "%d/%m/%Y")
-    return date.strftime("%m/%d/%YZ")
-
-
 def convert_gender(raw_gender):
-    try:
+    if "gender" in raw_gender:
         if raw_gender["gender"] == "M":
             return "Male"
-    except KeyError:
-        return "Unknown"
-
-    try:
         if raw_gender["gender"] == "F":
             return "Female"
-    except KeyError:
-        return "Unknown"
 
 def convert_age(raw_age):
-    age_range = []
+    age_range = {}
     if raw_age["ageBracket"] != -1:
-        age_range.append(raw_age["ageBracket"]),
-        age_range.append(raw_age["ageBracket"] + 9)
+        age_range["start"] = raw_age["ageBracket"]
+        age_range["end"] = raw_age["ageBracket"] + 9
+        return age_range
     else:
-        age_range.append(""),
-        age_range.append("")
-    return age_range
-        
+        return None
 
 def convert_location(raw_entry):
     prefecture = raw_entry["detectedPrefecture"]
-    try:
-       city = raw_entry["detectedCityTown"]
-    except KeyError:
+    if "detectedCityTown" in raw_entry:
+        city = raw_entry["detectedCityTown"]
+    else:
         city = ""
     
     query_terms = ("Japan",)
@@ -62,18 +42,20 @@ def convert_location(raw_entry):
         location["administrativeAreaLevel1"] = prefecture
         query_terms = (prefecture,) + query_terms
     if city:
-        location["administrativeAreaLevel2"] = city
-        if city != "":
-            query_terms = (city,) + query_terms
+        if prefecture == "Tokyo":
+            location["administrativeAreaLevel2"] = city
+        else:
+            location["administrativeAreaLevel3"] = city
+        query_terms = (city,) + query_terms
 
     location["query"] = ", ".join(query_terms)
     return location
 
 def detect_notes(raw_notes):
-    try:
+    if "notes" in raw_notes:
         return raw_notes["notes"]
-    except KeyError:
-        return ""
+    else:
+        return None
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
@@ -107,10 +89,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     }
                 ],
                 "demographics": {
-                    "ageRange": {
-                        "start": convert_age(entry)[0],
-                        "end": convert_age(entry)[1]
-                    },
+                    "ageRange": convert_age(entry),
                     "gender": convert_gender(entry)
                 },
                 "notes": detect_notes(entry)
