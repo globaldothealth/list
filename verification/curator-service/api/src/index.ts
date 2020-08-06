@@ -1,3 +1,11 @@
+// Set up appmetrics-dash before importing additional dependencies.
+// This ensures that the module captures metrics for dependent systems, like
+// MongoDB.
+import express from 'express';
+const app = express();
+import Dash from 'appmetrics-dash';
+Dash.attach();
+
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
@@ -17,7 +25,6 @@ import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import express from 'express';
 import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
@@ -25,7 +32,6 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 
-const app = express();
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
     bodyParser.urlencoded({
