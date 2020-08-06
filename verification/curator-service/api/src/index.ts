@@ -189,6 +189,11 @@ new OpenApiValidator({
             casesController.listSymptoms,
         );
         apiRouter.get(
+            '/cases/placesOfTransmission',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.listPlacesOfTransmission,
+        );
+        apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.get,
