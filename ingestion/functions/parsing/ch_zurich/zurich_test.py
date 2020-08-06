@@ -49,6 +49,7 @@ _PARSED_CASE = (
 
 class CHZurichTest(unittest.TestCase):
     def test_parse(self):
+        # Default of 1500 is not enough to show diffs when there is one.
         self.maxDiff = 5000
         current_dir = os.path.dirname(__file__)
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
