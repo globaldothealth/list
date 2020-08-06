@@ -1,4 +1,7 @@
-
+# Tests for the parsing library common logic.
+# If you come from a unittest background and wonder at how requests_mock
+# arrives by magic here, check out
+# https://requests-mock.readthedocs.io/en/latest/pytest.html?highlight=pytest#pytest
 import boto3
 import json
 import os
@@ -97,14 +100,14 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
         Body=json.dumps(sample_data))
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases"
-    requests_mock.put(full_source_url)
+    full_source_url = f"{source_api_url}/cases/batchUpsert"
+    requests_mock.post(full_source_url, json={"createdCaseIds": list(range(10)), "updatedCaseIds": list(range(5))})
 
     response = parsing_lib.run_lambda(input_event, "", fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == full_source_url
-    assert response["count_success"] == 1
-    assert response["count_error"] == 0
+    assert response["count_created"] == 10
+    assert response["count_updated"] == 5
 
 
 @mock_s3
@@ -146,30 +149,32 @@ def test_extract_event_fields_errors_if_missing_key_field():
             {parsing_lib.S3_BUCKET_FIELD: "bucket"})
 
 
-def test_write_to_server_returns_success_count_for_each_entered_case(
+def test_write_to_server_returns_created_and_updated_count(
         requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases"
-    requests_mock.put(full_source_url)
+    full_source_url = f"{source_api_url}/cases/batchUpsert"
+    requests_mock.post(full_source_url, json={"createdCaseIds": list(range(10)), "updatedCaseIds": list(range(5))})
 
-    count_success, count_error = parsing_lib.write_to_server([_PARSED_CASE], {})
+    count_created, count_updated = parsing_lib.write_to_server([_PARSED_CASE], {})
     assert requests_mock.request_history[0].url == full_source_url
-    assert count_success == 1
-    assert count_error == 0
+    assert count_created == 10
+    assert count_updated == 5
 
 
-def test_write_to_server_returns_error_count_for_each_failed_write(
+def test_write_to_server_raises_error_for_failed_batch_upsert(
         requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases"
+    full_source_url = f"{source_api_url}/cases/batchUpsert"
     requests_mock.register_uri(
-        "PUT", source_api_url, exc=requests.exceptions.ConnectTimeout),
+        "POST", full_source_url, exc=requests.exceptions.ConnectTimeout),
 
-    count_success, count_error = parsing_lib.write_to_server([_PARSED_CASE], {})
-    assert requests_mock.request_history[0].url == full_source_url
-    assert count_success == 0
-    assert count_error == 1
+    try:
+        count_created, count_updated = parsing_lib.write_to_server([_PARSED_CASE], {})
+    except requests.exceptions.ConnectTimeout:
+        return
+    # We got the wrong exception or no exception, fail the test.
+    assert False
