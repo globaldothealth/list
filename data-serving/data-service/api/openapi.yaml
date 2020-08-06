@@ -197,6 +197,32 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /cases/placesOfTransmission:
+    get:
+      summary: Lists most frequently used places of transmission
+      operationId: listPlacesOfTransmission
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200PlacesOfTransmissionArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/{id}:
     parameters:
       - name: id
@@ -468,6 +494,13 @@ components:
           type: array
           items:
             type: string
+    PlacesOfTransmissionArray:
+      type: object
+      properties:
+        symptoms:
+          type: array
+          items:
+            type: string
     Date:
       oneOf:
         - type: string
@@ -570,6 +603,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SymptomArray"
+    "200PlacesOfTransmissionArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PlacesOfTransmissionArray"
     "201Case":
       description: Created
       content:
