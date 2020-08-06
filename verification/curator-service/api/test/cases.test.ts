@@ -116,6 +116,22 @@ describe('Cases', () => {
         );
     });
 
+    it('proxies list places of transmission calls', async () => {
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: { cases: [] },
+        });
+        await curatorRequest
+            .get('/api/cases/placesOfTransmission?limit=10')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases/placesOfTransmission?limit=10',
+        );
+    });
+
     it('list maintains error data from proxied call if available', async () => {
         const code = 404;
         const message = 'Not found';
