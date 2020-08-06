@@ -56,6 +56,7 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     user &&
                     userHasRequiredRole(user as UserDocument, requiredSet)
                 ) {
+                    req.user = user;
                     return next();
                 } else {
                     res.status(403).json(
