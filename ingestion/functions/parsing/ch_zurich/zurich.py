@@ -38,6 +38,17 @@ def convert_gender(raw_gender: str):
         return "Female"
     return None
 
+def convert_demographics(gender: str, age: str):
+    demo = {}
+    if gender:
+        demo["gender"] = convert_gender(gender)
+    if age:
+        demo["ageRange"] = {
+            "start": float(age),
+            "end": float(age),
+        }
+    return demo
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     Parses G.h-format case data from raw API data.
@@ -73,15 +84,9 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             },
                         },
                     ],
-                    "demographics": {
-                        "gender": convert_gender(row[_GENDER_INDEX]),
-                    }
+                    "demographics": convert_demographics(
+                        row[_GENDER_INDEX], row[_AGE_INDEX]),
                 }
-                if row[_AGE_INDEX]:
-                    case["demographics"]["ageRange"] = {
-                        "start": float(row[_AGE_INDEX]),
-                        "end": float(row[_AGE_INDEX]),
-                    }
                 cases.extend([case] * num_cases)
             except ValueError as ve:
                 print(ve)

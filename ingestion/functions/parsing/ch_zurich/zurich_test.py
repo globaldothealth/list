@@ -15,7 +15,7 @@ _PARSED_CASE = (
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceUrl": _SOURCE_URL
+            "sourceUrl": _SOURCE_URL,
         },
         "location": {
             "country": "Switzerland",
@@ -24,25 +24,25 @@ _PARSED_CASE = (
             "name": "Zurich canton",
             "geometry": {
                 "longitude": "8.651071",
-                "latitude": "47.42568"
-            }
+                "latitude": "47.42568",
+            },
         },
         "events": [
             {
                 "name": "confirmed",
                 "dateRange":
                         {
-                            "start": "02/27/2020Z",
-                            "end": "02/27/2020Z"
-                        }
-            }
+                            "start": "2020-02-27",
+                            "end": "2020-02-27",
+                        },
+            },
         ],
         "demographics": {
             "ageRange": {
                 "start": 33,
-                "end": 33
+                "end": 33,
             },
-            "gender": "Female"
+            "gender": "Female",
         },
     })
 
