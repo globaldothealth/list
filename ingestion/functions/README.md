@@ -133,3 +133,15 @@ sam deploy
 
 From the base `ingestion/functions` dir. The deployment configuration will be
 inferred from the `samconfig.toml` file. Follow the confirmation dialogues.
+
+
+## Parsers
+
+You can find a list of issues/FR for parsers using the [importer tag](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+label%3AImporter).
+
+Here is an overview of parsers written so far and some details about the data they collect.
+
+| Parser                      | Code                                                                                            | Remarks                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     |                                                                                                                      |
+| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided) |
