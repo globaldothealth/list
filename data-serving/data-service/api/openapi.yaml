@@ -497,7 +497,7 @@ components:
     PlacesOfTransmissionArray:
       type: object
       properties:
-        symptoms:
+        placesOfTransmission:
           type: array
           items:
             type: string
