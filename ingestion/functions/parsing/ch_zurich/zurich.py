@@ -64,8 +64,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         next(reader) # Skip the header.
         cases = []
         for row in reader:
-            num_cases = int(row[_CONFIRMED_INDEX])
-            if not num_cases:
+            num_confirmed_cases = int(row[_CONFIRMED_INDEX])
+            if not num_confirmed_cases:
                 continue
             try:
                 case = {
@@ -87,7 +87,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "demographics": convert_demographics(
                         row[_GENDER_INDEX], row[_AGE_INDEX]),
                 }
-                cases.extend([case] * num_cases)
+                cases.extend([case] * num_confirmed_cases)
             except ValueError as ve:
                 print(ve)
         return cases
