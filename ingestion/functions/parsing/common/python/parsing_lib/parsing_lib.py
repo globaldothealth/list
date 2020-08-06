@@ -39,11 +39,7 @@ def retrieve_raw_data_file(s3_bucket, s3_key):
 
 
 def write_to_server(cases, headers):
-    """
-    Upserts the provided cases via the G.h Case API.
-
-    TODO: Link out to the Case API resource documentation, once available.
-    """
+    """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{os.environ['SOURCE_API_URL']}/cases/batchUpsert"
     print(f"Sending {len(cases)} cases to {put_api_url}")
     res = requests.post(put_api_url, json={"cases": cases},
