@@ -1,5 +1,5 @@
 declare module 'appmetrics-dash' {
 
-export function attach(): void;
+export function attach(options?: { middleware: Function }): void;
 
 }
