@@ -37,6 +37,7 @@ export function addCase(opts: {
     curator?: string;
     symptomStatus?: string;
     symptoms?: string[];
+    transmissionPlaces?: string[];
 }): void {
     cy.request({
         method: 'POST',
@@ -70,6 +71,9 @@ export function addCase(opts: {
             symptoms: {
                 status: opts.symptomStatus ?? undefined,
                 values: opts.symptoms ?? [],
+            },
+            transmission: {
+                places: opts.transmissionPlaces ?? [],
             },
             notes: opts.notes,
         },
