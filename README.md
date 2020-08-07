@@ -1,4 +1,4 @@
-# Global.Health Line List
+# Global.Health List
 
 [Global.Health](http://www.global.health)'s mission is to enable rapid sharing of trusted and open public health data to
 advance the response to infectious diseases.
@@ -33,19 +33,19 @@ This repository contains the servers and scripts that support its data curation 
 - [The curator service](verification/curator-service/api) in `verification/curator-service/api` serves as the backend
   for the curator portal, which enables curators to view, enter, update, and verify cases; manage data sources and their
   ingestion; and manage portal access.
-- [The curator UI server](verification/curator-service/ui) in `verification/curator-service/ui` is the frontend for the
-  curator portal.
+- [The curator UI](verification/curator-service/ui) in `verification/curator-service/ui` is the frontend for the curator
+  portal.
 
 ## Developer documentation
 
 ### READMEs
 
 - Getting set up
-    - [Running the stack](dev/README.md)
+    - [Local development](dev/README.md)
     - [Production infrastructure set-up and management](aws/README.md)
 - Component documentation
     - [Authentication & authorization](verification/curator-service/auth.md)
-    - [Case data ingestion functions](ingestion/functions/README.md)
+    - [Data ingestion functions](ingestion/functions/README.md)
     - [Curator service](verification/curator-service/api/README.md)
     - [Curator UI](verification/curator-service/ui/README.md)
     - [Data service](data-serving/data-service/README.md)
