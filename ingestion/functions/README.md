@@ -133,3 +133,15 @@ sam deploy
 
 From the base `ingestion/functions` dir. The deployment configuration will be
 inferred from the `samconfig.toml` file. Follow the confirmation dialogues.
+
+
+## Parsers
+
+You can find a list of issues/FR for parsers using the [importer tag](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+label%3AImporter).
+
+Here is an overview of parsers written so far and some details about the data they collect.
+
+| Parser                      | Code                                                                                            | Remarks                                                                                                                                                                                                                                                                                             | FR   |
+| --------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
+| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided)                                                                                                                                                                                | #483 |
