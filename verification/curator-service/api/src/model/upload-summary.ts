@@ -7,7 +7,7 @@ export const uploadSummarySchema = new mongoose.Schema(
         error: String,
     },
     {
-        id: false,
+        _id: false,
     },
 );
 
