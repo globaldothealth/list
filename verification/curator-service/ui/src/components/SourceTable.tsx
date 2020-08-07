@@ -7,6 +7,7 @@ import {
     withStyles,
 } from '@material-ui/core';
 import React, { RefObject } from 'react';
+import MuiAlert from '@material-ui/lab/Alert';
 
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
@@ -83,6 +84,10 @@ const styles = (theme: Theme) =>
     createStyles({
         error: {
             color: 'red',
+            marginTop: theme.spacing(2),
+        },
+        alert: {
+            borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
         },
     });
@@ -252,6 +257,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return (
             <div>
                 <Paper>
+                    {this.state.error && (
+                        <MuiAlert
+                            classes={{ root: classes.alert }}
+                            variant="filled"
+                            severity="error"
+                        >
+                            {this.state.error}
+                        </MuiAlert>
+                    )}
                     <MaterialTable
                         tableRef={this.tableRef}
                         columns={[
@@ -394,6 +408,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             // https://docs.mongodb.com/manual/text-search/
                             search: false,
                             filtering: false,
+                            sorting: false,
+                            padding: 'dense',
+                            draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             maxBodyHeight: 'calc(100vh - 15em)',
@@ -416,9 +433,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                         }}
                     />
                 </Paper>
-                {this.state.error && (
-                    <div className={classes.error}>{this.state.error}</div>
-                )}
             </div>
         );
     }
