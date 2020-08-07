@@ -257,6 +257,7 @@ export const batchUpsert = async (
                     };
                 }
             }),
+            { ordered: false },
         );
         res.status(207).json({
             // Types are a little goofy here. We're grabbing the string ID from
