@@ -1,20 +1,16 @@
+import * as usersController from './controllers/users';
+
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
+import { Request, Response } from 'express';
+import session, { SessionOptions } from 'express-session';
+
+import AwsEventsClient from './clients/aws-events-client';
+import AwsLambdaClient from './clients/aws-lambda-client';
+import CasesController from './controllers/cases';
 // Set up appmetrics-dash before importing additional dependencies.
 // This ensures that the module captures metrics for dependent systems, like
 // MongoDB.
 import Dash from 'appmetrics-dash';
-if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
-    Dash.attach();
-}
-
-import * as usersController from './controllers/users';
-
-import { Request, Response } from 'express';
-import session, { SessionOptions } from 'express-session';
-
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import AwsEventsClient from './clients/aws-events-client';
-import AwsLambdaClient from './clients/aws-lambda-client';
-import CasesController from './controllers/cases';
 import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
@@ -32,6 +28,10 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
+    Dash.attach();
+}
 
 const app = express();
 

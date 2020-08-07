@@ -11,6 +11,18 @@ export const automationParsingValidator = {
     message: 'At most one of parser or regexParsing may be supplied.',
 };
 
+const dedupeStrategySchema = new mongoose.Schema({
+    // Only imports data up to the given number of days before today.
+    onlyParseCasesUpToDaysBefore: Number,
+    // Only imports data from a given day before today.
+    onlyParseCasesFromDayBefore: Number,
+});
+
+export type DedupeStrategyDocument = mongoose.Document & {
+    onlyParseCasesUpToDaysBefore: number;
+    onlyParseCasesFromDayBefore: number;
+};
+
 export const automationSchema = new mongoose.Schema({
     parser: parserSchema,
     regexParsing: regexParsingSchema,
@@ -18,10 +30,12 @@ export const automationSchema = new mongoose.Schema({
         type: scheduleSchema,
         required: true,
     },
+    dedupeStrategy: dedupeStrategySchema,
 });
 
 export type AutomationDocument = mongoose.Document & {
     parser: ParserDocument;
     regexParsing: RegexParsingDocument;
     schedule: ScheduleDocument;
+    dedupeStrategy: DedupeStrategyDocument;
 };

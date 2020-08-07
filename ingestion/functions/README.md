@@ -134,6 +134,20 @@ sam deploy
 From the base `ingestion/functions` dir. The deployment configuration will be
 inferred from the `samconfig.toml` file. Follow the confirmation dialogues.
 
+### Writing a parser where deduplication of patients cannot be done
+
+Some sources do not provide a unique ID for each case allowing us to update existing cases in subsequent parsing runs.
+
+To accomodate for that, here is the procedure to write a parser that only imports data that is three days old (a reasonable threshold chosen arbitrarily):
+
+1. write the parser and have it respect the `dedupeStrategy`.
+2. set the `onlyParseCasesUpToDaysBefore` in your source to 3
+3. Run the parser once to import all the data up to 3 days before.
+4. set the `onlyParseCasesUpToDaysBefore` in your source to 0
+5. set the `onlyParseCasesFromDayBefore` in your source to 3
+6. Set the daily cron expression in your source and have the parser run every day, only importing the data from 3 days ago.
+
+That parser will now import a day worth of data with a lag of 3 days, this is acceptable given the inability to dedupe cases.
 
 ## Parsers
 
