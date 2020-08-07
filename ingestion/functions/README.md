@@ -140,6 +140,8 @@ Some sources do not provide a unique ID for each case allowing us to update exis
 
 To accomodate for that, here is the procedure to write a parser that only imports data that is three days old (a reasonable threshold chosen arbitrarily):
 
+NOTE: This is a proposed method and being implemented in #743.
+
 1. write the parser and have it respect the `dedupeStrategy`.
 2. set the `onlyParseCasesUpToDaysBefore` in your source to 3
 3. Run the parser once to import all the data up to 3 days before.
