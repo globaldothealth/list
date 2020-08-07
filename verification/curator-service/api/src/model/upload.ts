@@ -22,7 +22,7 @@ export type UploadDocument = mongoose.Document & {
     _id: mongoose.Types.ObjectId;
     status: string;
     summary: UploadSummaryDocument;
-    created: string;
+    created: Date;
 };
 
 export const Upload = mongoose.model<UploadDocument>('Upload', uploadSchema);
