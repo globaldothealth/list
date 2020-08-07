@@ -13,15 +13,15 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/jest": "^24.9.1",
-    "@types/lodash": "^4.14.158",
+    "@types/lodash": "^4.14.159",
     "@types/mongodb": "^3.5.25",
-    "@types/node": "^12.12.53",
-    "@types/react": "^16.9.43",
+    "@types/node": "^12.12.54",
+    "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.6",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-scroll": "^1.5.5",
     "@types/shortid": "0.0.29",
-    "@types/yup": "^0.29.3",
+    "@types/yup": "^0.29.4",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "axios": "^0.19.2",
@@ -35,9 +35,9 @@
     "http-proxy-middleware": "^1.0.5",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
-    "material-table": "^1.67.1",
+    "material-table": "^1.68.0",
     "material-ui-chip-input": "^2.0.0-beta.2",
-    "mongodb": "^3.5.9",
+    "mongodb": "^3.6.0",
     "mongodb-client-encryption": "^1.1.0",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
@@ -50,7 +50,7 @@
     "shortid": "^2.2.15",
     "typeface-roboto": "0.0.75",
     "typescript": "^3.9.7",
-    "yup": "^0.29.2"
+    "yup": "^0.29.3"
   },
   "scripts": {
     "start-noenv": "react-scripts start",
@@ -82,7 +82,7 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^4.11.0",
+    "cypress": "^4.12.1",
     "cypress-file-upload": "^4.0.7",
     "jest-canvas-mock": "^2.2.0"
   },
