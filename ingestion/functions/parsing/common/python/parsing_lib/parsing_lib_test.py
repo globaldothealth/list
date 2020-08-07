@@ -129,6 +129,7 @@ def test_extract_event_fields_returns_url_bucket_and_key(input_event):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
         input_event[parsing_lib.SOURCE_URL_FIELD],
+        input_event[parsing_lib.SOURCE_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD])
 

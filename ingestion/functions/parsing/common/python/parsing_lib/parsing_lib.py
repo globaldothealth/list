@@ -10,7 +10,7 @@ SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
-S3_KEY_PATH_SEPERATOR = "/"
+SOURCE_ID_FIELD = "sourceId"
 
 s3_client = boto3.client("s3")
 
@@ -24,7 +24,7 @@ def extract_event_fields(event):
             f"{S3_KEY_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
-    return event[SOURCE_URL_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
+    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
 
 
 def retrieve_raw_data_file(s3_bucket, s3_key):
@@ -83,11 +83,6 @@ def obtain_api_credentials():
         raise e
 
 
-def extract_source_id(s3_key):
-    """Extracts the source ID based on the canonical object key format."""
-    return s3_key.split(S3_KEY_PATH_SEPERATOR, 1)[0]
-
-
 def run_lambda(event, context, parsing_function):
     """
     Encapsulates all of the work performed by a parsing Lambda.
@@ -121,10 +116,10 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, s3_bucket, s3_key = extract_event_fields(event)
+    source_url, source_id, s3_bucket, s3_key = extract_event_fields(event)
     raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
     case_data = parsing_function(
-        raw_data_file, extract_source_id(s3_key),
+        raw_data_file, source_id,
         source_url)
     api_creds = obtain_api_credentials()
     count_success, count_error = write_to_server(
