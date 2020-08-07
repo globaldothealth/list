@@ -2,7 +2,6 @@ import { Case, CaseDocument } from '../model/case';
 import { NextFunction, Request, Response } from 'express';
 
 import { CaseRevision } from '../model/case-revision';
-import { RevisionMetadata } from '../model/revision-metadata';
 import { findCasesWithCaseReferenceData } from './case';
 
 const createNewMetadata = (curatorEmail: string) => {
