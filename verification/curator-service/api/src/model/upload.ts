@@ -2,7 +2,7 @@ import { UploadSummaryDocument, uploadSummarySchema } from './upload-summary';
 
 import mongoose from 'mongoose';
 
-const uploadSchema = new mongoose.Schema({
+export const uploadSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
@@ -13,7 +13,7 @@ const uploadSchema = new mongoose.Schema({
     },
     created: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
         required: true,
     },
 });
