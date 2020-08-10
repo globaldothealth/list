@@ -72,9 +72,9 @@ modules installed, e.g. via:
 
 ```shell
 # In each parsing's subdir:
-python3.6 -m pip install -r requirements.txt
+python3.8 -m pip install -r requirements.txt
 # In the /ingestion/functions (necessary to run unit tests).
-python3.6 -m pip install -r ci-requirements.txt
+python3.8 -m pip install -r ci-requirements.txt
 ```
 
 *NB:* Be sure you're using Python 3.6, which corresponds to the runtime of
@@ -98,7 +98,7 @@ Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
 are run with the correct Python version. E.g.,
 
 ```shell
-python3.6 -m pytest test/my_test.py
+python3.8 -m pytest test/my_test.py
 ```
 
 Manual testing/execution uses the SAM CLI. Alongside your function, commit a
