@@ -30,9 +30,9 @@ class HongKongTest(unittest.TestCase):
         },
         "location": {
             "country": "China", # "One country, two systems". We only store countries here.
-            "administrativeAreaLevel1": "Hong kong",
+            "administrativeAreaLevel1": "Hong Kong",
             "geoResolution": "Admin1",
-            "name": "Hong kong",
+            "name": "Hong Kong",
             "geometry": {
                 "longitude": "114.15861",
                 "latitude": "22.27833",
@@ -53,9 +53,12 @@ class HongKongTest(unittest.TestCase):
                 },
             }, {
                 "name": "outcome",
-                "value": "discharged",
+                "value": "Recovered",
             },
         ],
+        "symptoms": {
+            "status": "Symptomatic",
+        },
         "notes": "Imported case",
         "demographics": {
             "ageRange": {
@@ -72,9 +75,9 @@ class HongKongTest(unittest.TestCase):
         },
         "location": {
             "country": "China", # "One country, two systems". We only store countries here.
-            "administrativeAreaLevel1": "Hong kong",
+            "administrativeAreaLevel1": "Hong Kong",
             "geoResolution": "Admin1",
-            "name": "Hong kong",
+            "name": "Hong Kong",
             "geometry": {
                 "longitude": "114.15861",
                 "latitude": "22.27833",
@@ -89,6 +92,7 @@ class HongKongTest(unittest.TestCase):
                 },
             }, {
                 "name": "hospitalAdmission",
+                "value": "Yes",
             }, 
         ],
         "symptoms": {
@@ -110,9 +114,9 @@ class HongKongTest(unittest.TestCase):
         },
         "location": {
             "country": "China", # "One country, two systems". We only store countries here.
-            "administrativeAreaLevel1": "Hong kong",
+            "administrativeAreaLevel1": "Hong Kong",
             "geoResolution": "Admin1",
-            "name": "Hong kong",
+            "name": "Hong Kong",
             "geometry": {
                 "longitude": "114.15861",
                 "latitude": "22.27833",
@@ -127,7 +131,7 @@ class HongKongTest(unittest.TestCase):
                 },
             }, {
                 "name": "outcome",
-                "value": "deceased",
+                "value": "Death",
             }, 
         ],
         "symptoms": {

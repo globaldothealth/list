@@ -16,9 +16,9 @@ import parsing_lib
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
     "country": "China", # "One country, two systems". We only store countries here.
-    "administrativeAreaLevel1": "Hong kong",
+    "administrativeAreaLevel1": "Hong Kong",
     "geoResolution": "Admin1",
-    "name": "Hong kong",
+    "name": "Hong Kong",
     "geometry": {
         "longitude": "114.15861",
         "latitude": "22.27833",
@@ -39,7 +39,7 @@ def convert_date(raw_date: str):
     Convert raw date field into a value interpretable by the dataserver.
     """
     # The date is inconsistently listed in dd/mm/YYYY format or in d/m/yy
-    # we pad the later to make it look the same and be parseable.
+    # we pad the latter to make it look the same and be parseable.
     day, month, year = raw_date.split("/")
     day = day.zfill(2)
     month = month.zfill(2)
@@ -105,6 +105,9 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "status": "Asymptomatic",
                 }
             elif "/" in row[_ONSET_INDEX]:
+                case["symptoms"] = {
+                    "status": "Symptomatic",
+                }
                 case["events"].append({
                     "name": "onsetSymptoms",
                     "dateRange": {
@@ -116,16 +119,17 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             if row[_OUTCOME_INDEX] == "Discharged":
                 case["events"].append({
                     "name": "outcome",
-                    "value": "discharged",
+                    "value": "Recovered",
                 })
             elif row[_OUTCOME_INDEX] == "Deceased":
                 case["events"].append({
                     "name": "outcome",
-                    "value": "deceased",
+                    "value": "Death",
                 })
             elif row[_OUTCOME_INDEX] == "Hospitalized":
                 case["events"].append({
                     "name": "hospitalAdmission",
+                    "value": "Yes"
                 })
             cases.append(case)
         return cases

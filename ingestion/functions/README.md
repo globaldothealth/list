@@ -55,7 +55,7 @@ common commands, below.
 
 1. Have valid AWS credentials configured in accordance with
 [these instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-set-up-credentials.html).
-1. Have Python 3.6 installed on your machine. To check what versions you have
+1. Have Python 3.8 installed on your machine. To check what versions you have
 installed, and to see which versions correspond to the `python` and `python3`
 commands, run the following:
 
@@ -77,7 +77,7 @@ python3.8 -m pip install -r requirements.txt
 python3.8 -m pip install -r ci-requirements.txt
 ```
 
-*NB:* Be sure you're using Python 3.6, which corresponds to the runtime of
+*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of
 the Lambda functions as configured in the [SAM template](./template.yaml). See
 prerequisites, to check this.
 
