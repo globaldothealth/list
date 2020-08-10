@@ -142,7 +142,7 @@ To accomodate for that, here is the procedure to write a parser that only import
 
 NOTE: This is a proposed method and being implemented in #743.
 
-1. write the parser, it must be able to at least understand the dates for each case it parses to be able to respect the `dateFilter` options passed to it in its input event
+1. write the parser, it must produces all cases for its input source, the `parsing/common/parsing_lib.py` library will ensure no duplicates are entered if you follow the next steps
 2. set the `dateFilter.numDaysBeforeToday` in your source to 3
 3. set the `dateFilter.op` in your source to `"LT"`
 4. run the parser once to import all the data up to 3 days before today
