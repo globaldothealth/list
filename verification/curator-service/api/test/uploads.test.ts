@@ -66,7 +66,7 @@ describe('POST', () => {
             .send({})
             .expect(400);
     });
-    it('should return 404 if parent source with ID not found', () => {
+    it('should return 404 if parent source ID not found', () => {
         return curatorRequest
             .post('/api/sources/012345678901234567890123/uploads')
             .send(minimalUpload)
