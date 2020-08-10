@@ -11,6 +11,7 @@ export const caseReferenceSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        uploadId: String,
         additionalSources: [
             {
                 sourceUrl: String,
@@ -30,6 +31,9 @@ export type CaseReferenceDocument = mongoose.Document & {
 
     /** The URL of the source of the case data at the time of ingestion. */
     sourceUrl: string;
+
+    /** The UUID of the upload by which this case was entered into the DB. */
+    uploadId: string;
 
     additionalSources: [
         {
