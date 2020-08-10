@@ -2,7 +2,7 @@ import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import React from 'react';
 import User from './User';
-import { Chip, Paper, Tooltip } from '@material-ui/core';
+import { Chip, Tooltip } from '@material-ui/core';
 
 const styles = makeStyles((theme: Theme) => ({
     root: {
