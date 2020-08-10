@@ -22,6 +22,9 @@
           "sourceUrl": {
             "bsonType": "string"
           },
+          "uploadId": {
+            "bsonType": "string"
+          },
           "additionalSources": {
             "bsonType": "array",
             "uniqueItems": true,
