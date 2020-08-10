@@ -1,12 +1,12 @@
-import boto3
 import json
 import os
-import requests
-import google.auth.transport.requests
-from google.oauth2 import service_account
-from datetime import datetime, timezone
 import tempfile
+from datetime import datetime, timezone
 
+import boto3
+import google.auth.transport.requests
+import requests
+from google.oauth2 import service_account
 
 METADATA_BUCKET = "epid-ingestion"
 OUTPUT_BUCKET = "epid-sources-raw"
