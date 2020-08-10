@@ -117,7 +117,7 @@ Next invoke the `RetrievalFunction` like this:
 
 ```shell
 sam build
-SOURCE_API_URL=http://localhost:3001/api sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
+sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
 ```
 
 If you get a 403 error, go to the [user administration page](http://localhost:3002/sources) and assign the `curator` and `reader` roles to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
@@ -132,7 +132,6 @@ Next you can invoke your parsing function:
 ```shell
 sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
 ```
-
 
 Run this from the base `ingestion/functions` dir. The `MyFunction` name should
 correspond to the name of the resource as defined in the SAM `template.yaml`;
