@@ -39,25 +39,13 @@ def retrieve_raw_data_file(s3_bucket, s3_key):
 
 
 def write_to_server(cases, headers):
-    """
-    Upserts the provided cases via the G.h Case API.
-
-    TODO: Link out to the Case API resource documentation, once available.
-    TODO: Parallelize these requests, using batchUpsert API instead.
-    """
-    count_success = 0
-    count_error = 0
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases"
+    """Upserts the provided cases via the G.h Case API."""
+    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases/batchUpsert"
     print(f"Sending {len(cases)} cases to {put_api_url}")
-    for case in cases:
-        try:
-            requests.put(put_api_url, json=case,
-                         headers=headers).raise_for_status()
-            count_success += 1
-        except Exception as e:
-            print(e)
-            count_error += 1
-    return count_success, count_error
+    res = requests.post(put_api_url, json={"cases": cases},
+                       headers=headers)
+    res_json = res.json()
+    return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
 
 
 def obtain_api_credentials():
@@ -122,6 +110,6 @@ def run_lambda(event, context, parsing_function):
         raw_data_file, source_id,
         source_url)
     api_creds = obtain_api_credentials()
-    count_success, count_error = write_to_server(
+    count_created, count_updated = write_to_server(
         case_data, api_creds)
-    return {"count_success": count_success, "count_error": count_error}
+    return {"count_created": count_created, "count_updated": count_updated}
