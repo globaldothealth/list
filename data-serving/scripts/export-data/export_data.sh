@@ -4,7 +4,6 @@
 
 readonly USAGE="Usage: $0 [-m <mongodb_connection_string>] [-c <collection>] [-o <csv|json>] [-f <field_filepath>]"
 readonly SCRIPT_PATH="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly EXPORT_FILENAME='export'
 
 mongodb_connection_string='mongodb://127.0.0.1:27017/covid19'
 collection='cases'
@@ -42,14 +41,15 @@ function read_fields() {
 }
 
 function export_data() {
-    print 'Exporting data'
+    output_file="$collection.$output_format"
+    print "Exporting data to $output_file"
 
     mongoexport \
         --uri="$mongodb_connection_string" \
         --collection="$collection" \
         --fields="$fields" \
         --type="$output_format" \
-        --out="$EXPORT_FILENAME.$output_format" 
+        --out="$output_file"
 }
 
 # Establish run order
