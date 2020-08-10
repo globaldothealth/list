@@ -78,6 +78,8 @@ export default function Profile(props: { user: User }): JSX.Element {
                                 'admins can administer roles of other users',
                                 role,
                             );
+                        default:
+                            throw Error(`Unknown role ${role}`);
                     }
                 })}
         </div>
