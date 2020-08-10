@@ -1,7 +1,7 @@
 import { Case, CaseDocument } from '../model/case';
+import { CaseRevision, CaseRevisionDocument } from '../model/case-revision';
 import { NextFunction, Request, Response } from 'express';
 
-import { CaseRevision } from '../model/case-revision';
 import { findCasesWithCaseReferenceData } from './case';
 
 const createNewMetadata = (curatorEmail: string) => {
@@ -86,7 +86,14 @@ export const setBatchRevisionMetadata = async (
 
     // Find the cases if they already exists so we can update existing
     // metadata.
-    const existingCases = await findCasesWithCaseReferenceData(request);
+    const existingCases = await findCasesWithCaseReferenceData(
+        request,
+        /* fieldsToSelect= */ {
+            _id: 1,
+            caseReference: 1,
+            revisionMetadata: 1,
+        },
+    );
     const metadataMap = new Map(
         existingCases
             .filter((c) => c && c.caseReference)
@@ -125,6 +132,24 @@ export const createCaseRevision = async (
             case: c,
         }).save();
     }
+
+    next();
+};
+
+export const createBatchCaseRevisions = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const casesToUpsert = (await findCasesWithCaseReferenceData(request)).map(
+        (c) => {
+            return {
+                case: c,
+            };
+        },
+    );
+
+    await CaseRevision.insertMany(casesToUpsert);
 
     next();
 };

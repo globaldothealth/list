@@ -343,6 +343,20 @@ describe('POST', () => {
 
         expect(res.body).not.toHaveProperty('curator');
     });
+    it('batch upsert should result in case revisions of existing cases', async () => {
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+        existingCase.notes = 'new notes';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [existingCase, minimalCase],
+                ...curatorMetadata,
+            });
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+    });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)
             .post('/api/cases/batchUpsert')
