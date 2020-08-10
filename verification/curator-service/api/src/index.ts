@@ -169,6 +169,11 @@ new OpenApiValidator({
             mustHaveAnyRole(['curator']),
             uploadsController.create,
         );
+        apiRouter.put(
+            '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            uploadsController.update,
+        );
 
         // Chain geocoders so that during dev/integration tests we can use the fake one.
         // It might also just be useful to have various geocoders plugged-in at some point.
