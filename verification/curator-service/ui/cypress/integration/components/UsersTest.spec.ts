@@ -88,6 +88,7 @@ describe('Manage users page', function () {
 
         // Profile page is updated
         cy.visit('/profile');
-        cy.contains('admin, reader');
+        cy.contains('admin');
+        cy.contains('reader');
     });
 });
