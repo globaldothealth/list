@@ -6,6 +6,7 @@ import {
 import { OriginDocument, originSchema } from './origin';
 
 import mongoose from 'mongoose';
+import { uploadSchema, UploadDocument } from './upload';
 
 const sourceSchema = new mongoose.Schema({
     name: {
@@ -21,6 +22,7 @@ const sourceSchema = new mongoose.Schema({
         type: automationSchema,
         validate: automationParsingValidator,
     },
+    uploads: [uploadSchema],
 });
 
 sourceSchema.methods.toAwsStatementId = function (): string {
@@ -44,6 +46,7 @@ export type SourceDocument = mongoose.Document & {
     origin: OriginDocument;
     format: string;
     automation: AutomationDocument;
+    uploads: [UploadDocument];
 
     toAwsStatementId(): string;
     toAwsRuleDescription(): string;
