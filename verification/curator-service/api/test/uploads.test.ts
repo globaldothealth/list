@@ -111,6 +111,12 @@ describe('POST', () => {
                 .send(minimalUpload)
                 .expect(404);
         });
+        it('should return 400 if upload ID malformed', () => {
+            return curatorRequest
+                .put('/api/sources/012345678901234567890123/uploads/abc123')
+                .send(minimalUpload)
+                .expect(400);
+        });
         it('should return 404 if upload ID not found', async () => {
             const source = await new Source(minimalSource).save();
             return curatorRequest
