@@ -1,0 +1,9 @@
+{
+    "status": "ERROR",
+    "summary": {
+        "numCreated": 0,
+        "numUpdated": 0,
+        "error": "Error summary here."
+    },
+    "created": "2020-01-13"
+}
