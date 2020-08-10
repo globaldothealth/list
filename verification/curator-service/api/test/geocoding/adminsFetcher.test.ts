@@ -16,6 +16,7 @@ let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
     await mongoose.connect(await mongoServer.getUri(), {
+        useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
