@@ -142,14 +142,14 @@ To accomodate for that, here is the procedure to write a parser that only import
 
 NOTE: This is a proposed method and being implemented in #743.
 
-1. write the parser and have it respect the `dedupeStrategy`
-2. set the `onlyParseCasesUpToDaysBefore` in your source to 3
-3. run the parser once to import all the data up to 3 days before
-4. set the `onlyParseCasesUpToDaysBefore` in your source to 0
-5. set the `onlyParseCasesFromDayBefore` in your source to 3
-6. set the daily cron expression in your source and have the parser run every day, only importing the data from 3 days ago
+1. write the parser, it must be able to at least understand the dates for each case it parses to be able to respect the `dateFilter` options passed to it in its input event
+2. set the `dateFilter.numDaysBeforeToday` in your source to 3
+3. set the `dateFilter.op` in your source to `"LT"`
+4. run the parser once to import all the data up to 3 days before today
+5. set the `dateFilter.op` in your source to `"EQ"`
+6. set the daily cron expression in your source and have the parser run every day
 
-That parser will now import a day worth of data with a lag of 3 days, this is acceptable given the inability to dedupe cases.
+That parser will now import a day worth of data with a lag of 3 days, this delay is deemed is acceptable given the inability to dedupe cases.
 
 ## Parsers
 

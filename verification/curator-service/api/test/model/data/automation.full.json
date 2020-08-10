@@ -6,7 +6,8 @@
         "awsRuleArn": "arn:aws:events:region:id:rule/name",
         "awsScheduleExpression": "cron(0 10 * * ? *)"
     },
-    "dedupeStrategy": {
-        "onlyParseCasesFromDayBefore": 3
+    "dateFilter": {
+        "numDaysBeforeToday": 3,
+        "op": "EQ"
     }
 }
