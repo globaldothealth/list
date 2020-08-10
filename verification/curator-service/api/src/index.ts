@@ -61,6 +61,7 @@ console.log(
 
 mongoose
     .connect(mongoURL, {
+        useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
