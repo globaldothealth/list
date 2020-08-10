@@ -309,6 +309,9 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
+            uploadId:
+              type: string
+              pattern: '^[a-f\d]{24}$'
             additionalSources:
               type: array
               items:
