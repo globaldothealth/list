@@ -149,7 +149,13 @@ export const createBatchCaseRevisions = async (
         },
     );
 
-    await CaseRevision.insertMany(casesToUpsert);
+    await CaseRevision.insertMany(casesToUpsert, {
+        ordered: false,
+        rawResult: true,
+        // @ts-ignore Mongoose types don't include the `lean` option from its
+        // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
+        lean: true
+    });
 
     next();
 };
