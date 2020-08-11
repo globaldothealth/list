@@ -117,7 +117,7 @@ def invoke_parser(parser_arn, source_id, s3_object_key, source_url, date_filter)
         "sourceId": source_id,
         "s3Key": s3_object_key,
         "sourceUrl": source_url,
-        "date_filter": date_filter,
+        "dateFilter": date_filter,
     }
     print(f"Invoking parser (ARN: {parser_arn}")
     response = lambda_client.invoke(
