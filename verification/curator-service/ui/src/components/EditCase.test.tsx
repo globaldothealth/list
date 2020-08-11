@@ -82,6 +82,10 @@ it('loads and displays case to edit', async () => {
             url: fullCase.caseReference.sourceUrl,
         },
     });
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/symptoms?limit=5');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/placesOfTransmission?limit=5',
+    );
     expect(
         await findByText('Enter the details for an existing case'),
     ).toBeInTheDocument();
