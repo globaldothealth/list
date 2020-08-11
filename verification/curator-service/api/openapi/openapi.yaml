@@ -335,8 +335,6 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/placesOfTransmission:
@@ -361,8 +359,6 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/occupations:
@@ -387,8 +383,6 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpsert:
