@@ -73,7 +73,7 @@ describe('Curator', function () {
         cy.get('li[data-value="Recovered"').click();
         cy.get('input[name="outcomeDate"]').type('2020-01-07');
         cy.get('div[data-testid="symptomsStatus"]').click();
-        cy.get('li[data-value="Presymptomatic"').click();
+        cy.get('li[data-value="Symptomatic"').click();
         cy.get('div[data-testid="symptoms"]').type('dry cough');
         cy.contains('li', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
@@ -341,7 +341,7 @@ describe('Curator', function () {
             cy.contains('Yes');
             //  Symptoms.
             cy.contains('dry cough, mild fever');
-            cy.contains('Presymptomatic');
+            cy.contains('Symptomatic');
             // Preexisting conditions.
             cy.contains('ABCD syndrome (AS), ADULT syndrome (AS)');
             // Transmission.

@@ -399,8 +399,7 @@ export default function CaseForm(props: Props): JSX.Element {
             symptoms: {
                 status: unknownOrEmptyToUndefined(values.symptomsStatus),
                 values:
-                    values.symptomsStatus === 'Symptomatic' ||
-                    values.symptomsStatus === 'Presymptomatic'
+                    values.symptomsStatus === 'Symptomatic'
                         ? values.symptoms
                         : [],
             },
