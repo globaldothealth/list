@@ -167,6 +167,37 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /sources/{sourceId}/uploads:
+    parameters:
+      - name: sourceId
+        in: path
+        description: The parent source ID in which to create the upload
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    post:
+      tags: [Source, Upload]
+      summary: Creates a new upload in the specified source
+      operationId: createUpload
+      requestBody:
+        description: Upload to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Upload"
+      responses:
+        "201":
+          $ref: "#/components/responses/201Upload"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases:
     get:
       tags: [Case]
@@ -514,6 +545,26 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Upload:
+      description: An instance of case data being written to the server.
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+        summary:
+          type: object
+          properties:
+            numCreated:
+              type: integer
+            numUpdated:
+              type: integer
+            error:
+              type: string
+        created: 
+          $ref: "#/components/schemas/Date"
     Source:
       description: A source of line list case data.
       type: object
@@ -561,6 +612,10 @@ components:
                   pattern: '^((rate\(((1 (minute|hour|day))|([1-9]+ (minutes|hours|days)))\))|(cron\((.+\s){5}.+\)))'
               required:
                 - awsScheduleExpression
+        uploads:
+          type: array
+          items:
+            $ref: "#/components/schemas/Upload"
     SourceArray:
       type: object
       properties:
@@ -585,6 +640,9 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
+            uploadId:
+              type: string
+              pattern: '^[a-f\d]{24}$'
             additionalSources:
               type: array
               items:
@@ -984,6 +1042,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "201Upload":
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Upload"
     "200User":
       description: OK
       content:

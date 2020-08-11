@@ -55,7 +55,7 @@ common commands, below.
 
 1. Have valid AWS credentials configured in accordance with
 [these instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-set-up-credentials.html).
-1. Have Python 3.6 installed on your machine. To check what versions you have
+1. Have Python 3.8 installed on your machine. To check what versions you have
 installed, and to see which versions correspond to the `python` and `python3`
 commands, run the following:
 
@@ -72,12 +72,12 @@ modules installed, e.g. via:
 
 ```shell
 # In each parsing's subdir:
-python3.6 -m pip install -r requirements.txt
+python3.8 -m pip install -r requirements.txt
 # In the /ingestion/functions (necessary to run unit tests).
-python3.6 -m pip install -r ci-requirements.txt
+python3.8 -m pip install -r ci-requirements.txt
 ```
 
-*NB:* Be sure you're using Python 3.6, which corresponds to the runtime of
+*NB:* Be sure you're using Python 3.8, which corresponds to the runtime of
 the Lambda functions as configured in the [SAM template](./template.yaml). See
 prerequisites, to check this.
 
@@ -98,7 +98,7 @@ Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
 are run with the correct Python version. E.g.,
 
 ```shell
-python3.6 -m pytest test/my_test.py
+python3.8 -m pytest test/my_test.py
 ```
 
 Manual testing/execution uses the SAM CLI. Alongside your function, commit a
@@ -161,3 +161,4 @@ Here is an overview of parsers written so far and some details about the data th
 | --------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
 | Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided)                                                                                                                                                                                | #483 |
+| Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)  |                                                                                                                                                                                                                                                                                                     | #518 |

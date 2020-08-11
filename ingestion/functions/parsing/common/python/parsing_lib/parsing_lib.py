@@ -1,7 +1,9 @@
-import boto3
 import os
-import requests
+import tempfile
+
+import boto3
 import google.auth.transport.requests
+import requests
 from google.oauth2 import service_account
 
 LOCAL_DATA_FILE = "/tmp/data.json"
@@ -10,7 +12,7 @@ SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
-S3_KEY_PATH_SEPERATOR = "/"
+SOURCE_ID_FIELD = "sourceId"
 
 s3_client = boto3.client("s3")
 
@@ -24,7 +26,7 @@ def extract_event_fields(event):
             f"{S3_KEY_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
-    return event[SOURCE_URL_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
+    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event[S3_BUCKET_FIELD], event[S3_KEY_FIELD]
 
 
 def retrieve_raw_data_file(s3_bucket, s3_key):
@@ -39,53 +41,36 @@ def retrieve_raw_data_file(s3_bucket, s3_key):
 
 
 def write_to_server(cases, headers):
-    """
-    Upserts the provided cases via the G.h Case API.
-
-    TODO: Link out to the Case API resource documentation, once available.
-    TODO: Parallelize these requests, using batchUpsert API instead.
-    """
-    count_success = 0
-    count_error = 0
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases"
+    """Upserts the provided cases via the G.h Case API."""
+    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases/batchUpsert"
     print(f"Sending {len(cases)} cases to {put_api_url}")
-    for case in cases:
-        try:
-            requests.put(put_api_url, json=case,
-                         headers=headers).raise_for_status()
-            count_success += 1
-        except Exception as e:
-            print(e)
-            count_error += 1
-    return count_success, count_error
+    res = requests.post(put_api_url, json={"cases": cases},
+                       headers=headers)
+    res_json = res.json()
+    return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
 
 
 def obtain_api_credentials():
     """
-    Creates HTTP headers credentialed for access to the G.h Source API.
+    Creates HTTP headers credentialed for access to the Global Health Source API.
     """
     try:
-        local_creds_file = "/tmp/creds.json"
-        print(
-            "Retrieving service account credentials from "
-            f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-        s3_client.download_file(
-            METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file)
-        credentials = service_account.Credentials.from_service_account_file(
-            local_creds_file, scopes=["email"])
-        headers = {}
-        request = google.auth.transport.requests.Request()
-        credentials.refresh(request)
-        credentials.apply(headers)
-        return headers
+        with tempfile.NamedTemporaryFile() as local_creds_file:
+            print(
+                "Retrieving service account credentials from "
+                f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
+            s3_client.download_file(
+                METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
+            credentials = service_account.Credentials.from_service_account_file(
+                local_creds_file.name, scopes=["email"])
+            headers = {}
+            request = google.auth.transport.requests.Request()
+            credentials.refresh(request)
+            credentials.apply(headers)
+            return headers
     except Exception as e:
         print(e)
         raise e
-
-
-def extract_source_id(s3_key):
-    """Extracts the source ID based on the canonical object key format."""
-    return s3_key.split(S3_KEY_PATH_SEPERATOR, 1)[0]
 
 
 def run_lambda(event, context, parsing_function):
@@ -121,12 +106,12 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, s3_bucket, s3_key = extract_event_fields(event)
+    source_url, source_id, s3_bucket, s3_key = extract_event_fields(event)
     raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
     case_data = parsing_function(
-        raw_data_file, extract_source_id(s3_key),
+        raw_data_file, source_id,
         source_url)
     api_creds = obtain_api_credentials()
-    count_success, count_error = write_to_server(
+    count_created, count_updated = write_to_server(
         case_data, api_creds)
-    return {"count_success": count_success, "count_error": count_error}
+    return {"count_created": count_created, "count_updated": count_updated}

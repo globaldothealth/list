@@ -31,6 +31,7 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import UploadsController from './controllers/uploads';
 
 const app = express();
 
@@ -60,6 +61,7 @@ console.log(
 
 mongoose
     .connect(mongoURL, {
+        useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
@@ -157,6 +159,14 @@ new OpenApiValidator({
             '/sources/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             sourcesController.del,
+        );
+
+        // Configure uploads controller.
+        const uploadsController = new UploadsController();
+        apiRouter.post(
+            '/sources/:sourceId([a-z0-9]{24})/uploads',
+            mustHaveAnyRole(['curator']),
+            uploadsController.create,
         );
 
         // Chain geocoders so that during dev/integration tests we can use the fake one.

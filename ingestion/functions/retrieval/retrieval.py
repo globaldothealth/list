@@ -1,11 +1,12 @@
-import boto3
 import json
 import os
-import requests
-import google.auth.transport.requests
-from google.oauth2 import service_account
+import tempfile
 from datetime import datetime, timezone
 
+import boto3
+import google.auth.transport.requests
+import requests
+from google.oauth2 import service_account
 
 METADATA_BUCKET = "epid-ingestion"
 OUTPUT_BUCKET = "epid-sources-raw"
@@ -31,19 +32,19 @@ def obtain_api_credentials():
     Creates HTTP headers credentialed for access to the Global Health Source API.
     """
     try:
-        local_creds_file = "/tmp/creds.json"
-        print(
-            "Retrieving service account credentials from "
-            f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-        s3_client.download_file(
-            METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file)
-        credentials = service_account.Credentials.from_service_account_file(
-            local_creds_file, scopes=["email"])
-        headers = {}
-        request = google.auth.transport.requests.Request()
-        credentials.refresh(request)
-        credentials.apply(headers)
-        return headers
+        with tempfile.NamedTemporaryFile() as local_creds_file:
+            print(
+                "Retrieving service account credentials from "
+                f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
+            s3_client.download_file(
+                METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
+            credentials = service_account.Credentials.from_service_account_file(
+                local_creds_file.name, scopes=["email"])
+            headers = {}
+            request = google.auth.transport.requests.Request()
+            credentials.refresh(request)
+            credentials.apply(headers)
+            return headers
     except Exception as e:
         print(e)
         raise e
@@ -110,10 +111,14 @@ def upload_to_s3(file_name, s3_object_key):
         raise e
 
 
-def invoke_parser(parser_arn, s3_object_key, source_url, date_filter):
-    payload = {"s3Bucket": OUTPUT_BUCKET,
-               "s3Key": s3_object_key, "sourceUrl": source_url,
-               "date_filter": date_filter}
+def invoke_parser(parser_arn, source_id, s3_object_key, source_url, date_filter):
+    payload = {
+        "s3Bucket": OUTPUT_BUCKET,
+        "sourceId": source_id,
+        "s3Key": s3_object_key,
+        "sourceUrl": source_url,
+        "date_filter": date_filter,
+    }
     print(f"Invoking parser (ARN: {parser_arn}")
     response = lambda_client.invoke(
         FunctionName=parser_arn,
@@ -156,5 +161,5 @@ def lambda_handler(event, context):
     file_name, s3_object_key = retrieve_content(source_id, url, source_format)
     upload_to_s3(file_name, s3_object_key)
     if parser_arn:
-        invoke_parser(parser_arn, s3_object_key, url, date_filter)
+        invoke_parser(parser_arn, source_id, s3_object_key, url, date_filter)
     return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}

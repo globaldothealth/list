@@ -64,7 +64,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
 
     retrieval.obtain_api_credentials.assert_called_once_with()
     retrieval.invoke_parser.assert_called_once_with(
-        lambda_arn, response["key"], origin_url, date_filter)
+        lambda_arn, valid_event['sourceId'], response["key"], origin_url, date_filter)
     assert requests_mock.request_history[0].url == full_source_url
     assert requests_mock.request_history[1].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET

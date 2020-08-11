@@ -13,5 +13,16 @@
             "awsRuleArn": "arn:aws:events:region:id:rule/name",
             "awsScheduleExpression": "cron(0 10 * * ? *)"
         }
-    }
+    },
+    "uploads": [
+        {
+            "status": "ERROR",
+            "summary": {
+                "numCreated": 0,
+                "numUpdated": 0,
+                "error": "Error summary here."
+            },
+            "created": "2020-01-13"
+        }
+    ]
 }

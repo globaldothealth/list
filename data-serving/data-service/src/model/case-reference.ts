@@ -11,6 +11,7 @@ export const caseReferenceSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        uploadId: String,
         additionalSources: [
             {
                 sourceUrl: String,
@@ -30,6 +31,15 @@ export type CaseReferenceDocument = mongoose.Document & {
 
     /** The URL of the source of the case data at the time of ingestion. */
     sourceUrl: string;
+
+    /**
+     * The UUID of the upload in which the batch of cases including this
+     * case document was entered into the DB.
+     *
+     * At present, this is only populated for cases created via automated
+     * ingestion.
+     */
+    uploadId: string;
 
     additionalSources: [
         {
