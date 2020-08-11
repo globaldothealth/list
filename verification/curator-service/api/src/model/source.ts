@@ -8,6 +8,24 @@ import { OriginDocument, originSchema } from './origin';
 import mongoose from 'mongoose';
 import { uploadSchema, UploadDocument } from './upload';
 
+const dateFilterSchema = new mongoose.Schema({
+    numDaysBeforeToday: Number,
+    op: {
+        type: String,
+        enum: [
+            // Only import cases from a given day.
+            'EQ',
+            // Import all cases strictly prior to a given day.
+            'LT',
+        ],
+    },
+});
+
+export type DateFilterDocument = mongoose.Document & {
+    numDaysBeforeToday: number;
+    op: string;
+};
+
 const sourceSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -23,6 +41,7 @@ const sourceSchema = new mongoose.Schema({
         validate: automationParsingValidator,
     },
     uploads: [uploadSchema],
+    dateFilter: dateFilterSchema,
 });
 
 sourceSchema.methods.toAwsStatementId = function (): string {
@@ -47,6 +66,7 @@ export type SourceDocument = mongoose.Document & {
     format: string;
     automation: AutomationDocument;
     uploads: [UploadDocument];
+    dateFilter: DateFilterDocument;
 
     toAwsStatementId(): string;
     toAwsRuleDescription(): string;
