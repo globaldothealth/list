@@ -424,3 +424,35 @@ export const listPlacesOfTransmission = async (
         return;
     }
 };
+
+/**
+ * List most frequently used occupations.
+ *
+ * Handles HTTP GET /api/cases/occupations.
+ */
+export const listOccupations = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit) || 5;
+    if (limit < 1) {
+        res.status(422).json('limit must be > 0');
+        return;
+    }
+    try {
+        const occupations = await Case.aggregate([
+            { $sortByCount: '$demographics.occupation' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            occupations: occupations.map(
+                (occupationObject) => occupationObject._id,
+            ),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
