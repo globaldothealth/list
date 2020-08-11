@@ -370,11 +370,7 @@ export const listSymptoms = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const symptoms = await Case.aggregate([
             { $unwind: '$symptoms.values' },
@@ -401,11 +397,7 @@ export const listPlacesOfTransmission = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const placesOfTransmission = await Case.aggregate([
             { $unwind: '$transmission.places' },
@@ -434,11 +426,7 @@ export const listOccupations = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const occupations = await Case.aggregate([
             { $sortByCount: '$demographics.occupation' },

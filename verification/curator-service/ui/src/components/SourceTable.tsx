@@ -49,12 +49,18 @@ interface Automation {
     regexParsing?: RegexParsing;
 }
 
+interface DateFilter {
+    numDaysBeforeToday?: number;
+    op?: string;
+}
+
 interface Source {
     _id: string;
     name: string;
     format?: string;
     origin: Origin;
     automation?: Automation;
+    dateFilter?: DateFilter;
 }
 
 interface SourceTableState {
@@ -76,6 +82,9 @@ interface TableRow {
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
+    // dateFilter
+    dateFilterNumDaysBeforeToday?: number;
+    dateFilterOp: string;
 }
 
 // Return type isn't meaningful.
@@ -200,6 +209,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                       },
                   }
                 : undefined,
+            dateFilter:
+                rowData.dateFilterNumDaysBeforeToday && rowData.dateFilterOp
+                    ? {
+                          numDaysBeforeToday:
+                              rowData.dateFilterNumDaysBeforeToday,
+                          op: rowData.dateFilterOp,
+                      }
+                    : undefined,
         };
     }
 
@@ -230,6 +247,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                       },
                   }
                 : undefined,
+            dateFilter:
+                rowData.dateFilterNumDaysBeforeToday || rowData.dateFilterOp
+                    ? {
+                          numDaysBeforeToday:
+                              rowData.dateFilterNumDaysBeforeToday,
+                          op: rowData.dateFilterOp,
+                      }
+                    : {},
         };
     }
 
@@ -331,18 +356,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         onChange={(event): void =>
                                             props.onChange(event.target.value)
                                         }
-                                        defaultValue={props.value}
+                                        defaultValue={props.value || ''}
                                     >
-                                        {[undefined, 'JSON', 'CSV'].map(
-                                            (value) => (
-                                                <MenuItem
-                                                    key={value}
-                                                    value={value || ''}
-                                                >
-                                                    {value || 'Unknown'}
-                                                </MenuItem>
-                                            ),
-                                        )}
+                                        {['', 'JSON', 'CSV'].map((value) => (
+                                            <MenuItem
+                                                key={`format-${value}`}
+                                                value={value || ''}
+                                            >
+                                                {value || 'Unknown'}
+                                            </MenuItem>
+                                        ))}
                                     </TextField>
                                 ),
                             },
@@ -358,6 +381,37 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             {
                                 title: 'AWS Parser ARN',
                                 field: 'awsLambdaArn',
+                            },
+                            {
+                                title: 'Date filter num days before today',
+                                field: 'dateFilterNumDaysBeforeToday',
+                            },
+                            {
+                                title: 'Date filter operator',
+                                field: 'dateFilterOp',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        select
+                                        size="small"
+                                        fullWidth
+                                        data-testid="op-select"
+                                        placeholder="Operator"
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value || ''}
+                                    >
+                                        {['', 'EQ', 'LT'].map((value) => (
+                                            <MenuItem
+                                                key={`op-${value}`}
+                                                value={value || ''}
+                                            >
+                                                {/* TODO: explain operators in display text */}
+                                                {value || 'Unknown'}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                ),
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
@@ -388,6 +442,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 awsScheduleExpression:
                                                     s.automation?.schedule
                                                         ?.awsScheduleExpression,
+                                                dateFilterNumDaysBeforeToday:
+                                                    s.dateFilter
+                                                        ?.numDaysBeforeToday,
+                                                dateFilterOp:
+                                                    s.dateFilter?.op || '',
                                             });
                                         }
                                         resolve({

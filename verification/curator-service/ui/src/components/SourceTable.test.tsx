@@ -42,6 +42,10 @@ it('loads and displays sources', async () => {
                     awsScheduleExpression: awsScheduleExpression,
                 },
             },
+            dateFilter: {
+                numDaysBeforeToday: 666,
+                op: 'EQ',
+            },
         },
     ];
     const axiosResponse = {
@@ -71,6 +75,12 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(format))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
+    expect(
+        await findByText(new RegExp(sources[0].dateFilter.op)),
+    ).toBeInTheDocument();
+    expect(
+        await findByText(String(sources[0].dateFilter.numDaysBeforeToday)),
+    ).toBeInTheDocument();
     expect(
         await findByText(
             new RegExp(awsScheduleExpression.replace(/(?=[()])/g, '\\')),
