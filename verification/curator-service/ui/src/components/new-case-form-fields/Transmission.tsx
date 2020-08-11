@@ -76,7 +76,6 @@ export default function Transmission(): JSX.Element {
                                         className={classes.chip}
                                         label={place}
                                         onClick={(): void => {
-                                            console.log('in here');
                                             if (
                                                 !values.transmissionPlaces.includes(
                                                     place,
