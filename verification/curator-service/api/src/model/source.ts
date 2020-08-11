@@ -7,24 +7,7 @@ import { OriginDocument, originSchema } from './origin';
 
 import mongoose from 'mongoose';
 import { uploadSchema, UploadDocument } from './upload';
-
-const dateFilterSchema = new mongoose.Schema({
-    numDaysBeforeToday: Number,
-    op: {
-        type: String,
-        enum: [
-            // Only import cases from a given day.
-            'EQ',
-            // Import all cases strictly prior to a given day.
-            'LT',
-        ],
-    },
-});
-
-export type DateFilterDocument = mongoose.Document & {
-    numDaysBeforeToday: number;
-    op: string;
-};
+import { dateFilterSchema, DateFilterDocument } from './date-filter';
 
 const sourceSchema = new mongoose.Schema({
     name: {
