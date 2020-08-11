@@ -20,6 +20,7 @@ s3_client = boto3.client("s3")
 
 
 def extract_event_fields(event):
+    print('Extracting fields from event', event)
     if any(
             field not in event
             for field in [SOURCE_URL_FIELD, SOURCE_ID_FIELD, S3_BUCKET_FIELD, S3_KEY_FIELD]):
