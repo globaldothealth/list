@@ -61,7 +61,7 @@ def get_source_details(source_id, api_headers):
         print(f"Received source API response: {api_json}")
         return api_json["origin"]["url"], api_json["format"], api_json.get("automation", {}).get(
             "parser", {}).get(
-            "awsLambdaArn", ""), api_json.get('dedupeStrategy', {})
+            "awsLambdaArn", ""), api_json.get('dateFilter', {})
     except Exception as e:
         print(e)
         raise e
@@ -110,10 +110,10 @@ def upload_to_s3(file_name, s3_object_key):
         raise e
 
 
-def invoke_parser(parser_arn, s3_object_key, source_url, dedupe_strategy):
+def invoke_parser(parser_arn, s3_object_key, source_url, date_filter):
     payload = {"s3Bucket": OUTPUT_BUCKET,
                "s3Key": s3_object_key, "sourceUrl": source_url,
-               "dedupe_strategy": dedupe_strategy}
+               "date_filter": date_filter}
     print(f"Invoking parser (ARN: {parser_arn}")
     response = lambda_client.invoke(
         FunctionName=parser_arn,
@@ -151,10 +151,10 @@ def lambda_handler(event, context):
 
     source_id = extract_source_id(event)
     auth_headers = obtain_api_credentials()
-    url, source_format, parser_arn, dedupe_strategy = get_source_details(
+    url, source_format, parser_arn, date_filter = get_source_details(
         source_id, auth_headers)
     file_name, s3_object_key = retrieve_content(source_id, url, source_format)
     upload_to_s3(file_name, s3_object_key)
     if parser_arn:
-        invoke_parser(parser_arn, s3_object_key, url, dedupe_strategy)
+        invoke_parser(parser_arn, s3_object_key, url, date_filter)
     return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}
