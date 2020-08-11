@@ -309,6 +309,13 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
+            uploadId:
+              description: >
+                The UUID of the upload in which the batch of cases including
+                this case document was entered into the G.h system. This field
+                is only populated for cases entered via automated ingestion.
+              type: string
+              pattern: '^[a-f\d]{24}$'
             additionalSources:
               type: array
               items:
