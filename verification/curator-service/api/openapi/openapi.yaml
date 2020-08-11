@@ -194,6 +194,48 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/{sourceId}/uploads/{id}:
+    parameters:
+      - name: sourceId
+        in: path
+        description: The parent source ID in which to find the upload
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+      - name: id
+        in: path
+        description: The ID of the upload to update
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    put:
+      tags: [Source, Upload]
+      summary: Updates an existing upload in the specified source
+      operationId: updateUpload
+      requestBody:
+        description: New upload content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Upload"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Upload"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -1093,6 +1135,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "200Upload":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Upload"
     "201Upload":
       description: Created
       content:
