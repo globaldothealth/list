@@ -5,6 +5,7 @@ import Dash from 'appmetrics-dash';
 if (process.env.NODE_ENV !== 'test') {
     Dash.attach();
 }
+
 import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
