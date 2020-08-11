@@ -20,6 +20,7 @@ import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
+import UploadsController from './controllers/uploads';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -31,7 +32,6 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import UploadsController from './controllers/uploads';
 
 const app = express();
 
@@ -215,6 +215,11 @@ new OpenApiValidator({
             '/cases/placesOfTransmission',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.listPlacesOfTransmission,
+        );
+        apiRouter.get(
+            '/cases/occupations',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
