@@ -5,13 +5,12 @@ import Dash from 'appmetrics-dash';
 if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
     Dash.attach();
 }
-
 import * as usersController from './controllers/users';
 
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
