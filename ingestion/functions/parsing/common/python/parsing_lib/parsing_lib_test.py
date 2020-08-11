@@ -229,3 +229,15 @@ def test_filter_cases_by_date_before_today(mock_today):
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"})
     assert list(cases) == [CASE_JUNE_FIFTH]
+
+
+def test_filter_cases_by_date_unsupported_op():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    try:
+        parsing_lib.filter_cases_by_date(
+            [CASE_JUNE_FIFTH],
+            {"numDaysBeforeToday": 3, "op": "NOPE"})
+    except ValueError as ve:
+        assert "NOPE" in str(ve)
+        return
+    assert "Should have raised a ValueError exception" == False

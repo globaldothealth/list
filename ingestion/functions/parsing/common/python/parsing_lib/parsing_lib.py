@@ -94,6 +94,8 @@ def filter_cases_by_date(case_data, date_filter):
             return delta_days == 0
         elif op == "LT":
             return delta_days < 0
+        else:
+            raise ValueError(f'Unsupported date filter operand: {op}')
 
     return [case for case in case_data if case_is_within_range(case, cutoff_date, op)]
             
