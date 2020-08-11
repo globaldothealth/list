@@ -193,8 +193,6 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/placesOfTransmission:
@@ -219,8 +217,30 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/occupations:
+    get:
+      summary: Lists most frequently used occupations
+      operationId: listOccupations
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200OccupationArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
   /cases/{id}:
@@ -508,6 +528,13 @@ components:
           type: array
           items:
             type: string
+    OccupationArray:
+      type: object
+      properties:
+        occupations:
+          type: array
+          items:
+            type: string
     Date:
       oneOf:
         - type: string
@@ -616,6 +643,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/PlacesOfTransmissionArray"
+    "200OccupationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OccupationArray"
     "201Case":
       description: Created
       content:
