@@ -10,13 +10,23 @@ describe('Sources table', function () {
         cy.contains('Example source').should('not.exist');
 
         cy.get('button[title="Add"]').click();
-        cy.get('input[placeholder="Name"]').clear().type('Example source');
-        cy.get('input[placeholder="URL"]').clear().type('www.example.com');
+        cy.get('input[placeholder="Name"]').type('Example source');
+        cy.get('input[placeholder="URL"]').type('www.example.com');
         cy.get('div[data-testid="format-select"]').click();
         cy.contains('li', 'JSON').click();
+        /* This doesn't work and I HAVE NO IDEA WHY PLEASE HELP.
+        cy.get('div[data-testid="op-select"]').scrollIntoView().click();
+        cy.contains('li', 'EQ').click();
+        cy.get('input[placeholder="Date filter num days before today"]')
+            .scrollIntoView()
+            .type('42');
+        */
+
         cy.get('button[title="Save"]').click();
 
         cy.contains('Example source');
+        cy.contains('www.example.com');
+        cy.contains('JSON');
     });
 
     it('Can edit a source', function () {

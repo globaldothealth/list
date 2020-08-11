@@ -606,6 +606,18 @@ components:
               type: string
         format:
           type: string
+        dateFilter:
+          type: object
+          properties:
+            numDaysBeforeToday:
+              type: number
+              # Must be positive as we subtract it to "today".
+              minimum: 1
+            op:
+              type: string
+              enum:
+              - EQ
+              - LT
         automation:
           type: object
           properties:
