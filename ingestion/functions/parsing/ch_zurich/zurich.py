@@ -35,7 +35,7 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    The date is listed in dd-mm-YYYY format, but the date filtering API
+    The date is listed in YYYY-mm-dd format, but the date filtering API
     expects mm/dd/YYYYZ format.
     """
     date = datetime.strptime(raw_date, "%Y-%m-%d")
