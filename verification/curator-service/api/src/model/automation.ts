@@ -11,6 +11,24 @@ export const automationParsingValidator = {
     message: 'At most one of parser or regexParsing may be supplied.',
 };
 
+const dateFilterSchema = new mongoose.Schema({
+    numDaysBeforeToday: Number,
+    op: {
+        type: String,
+        enum: [
+            // Only import cases from a given day.
+            'EQ',
+            // Import all cases prior to a given day.
+            'LT',
+        ],
+    },
+});
+
+export type DateFilterDocument = mongoose.Document & {
+    numDaysBeforeToday: number;
+    op: string;
+};
+
 export const automationSchema = new mongoose.Schema({
     parser: parserSchema,
     regexParsing: regexParsingSchema,
@@ -18,10 +36,12 @@ export const automationSchema = new mongoose.Schema({
         type: scheduleSchema,
         required: true,
     },
+    dateFilter: dateFilterSchema,
 });
 
 export type AutomationDocument = mongoose.Document & {
     parser: ParserDocument;
     regexParsing: RegexParsingDocument;
     schedule: ScheduleDocument;
+    dateFilter: DateFilterDocument;
 };
