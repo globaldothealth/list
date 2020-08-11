@@ -21,6 +21,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+
 if (process.env.NODE_ENV !== 'test') {
     Dash.attach();
 }

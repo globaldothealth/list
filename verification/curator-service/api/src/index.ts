@@ -1,10 +1,3 @@
-// Set up appmetrics-dash before importing additional dependencies.
-// This ensures that the module captures metrics for dependent systems, like
-// MongoDB.
-import Dash from 'appmetrics-dash';
-if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
-    Dash.attach();
-}
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
@@ -14,12 +7,17 @@ import session, { SessionOptions } from 'express-session';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
+// Set up appmetrics-dash before importing additional dependencies.
+// This ensures that the module captures metrics for dependent systems, like
+// MongoDB.
+import Dash from 'appmetrics-dash';
 import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
+import UploadsController from './controllers/uploads';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -31,7 +29,11 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import UploadsController from './controllers/uploads';
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
+    Dash.attach();
+}
+
+
 
 const app = express();
 
@@ -210,6 +212,11 @@ new OpenApiValidator({
             '/cases/placesOfTransmission',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.listPlacesOfTransmission,
+        );
+        apiRouter.get(
+            '/cases/occupations',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
