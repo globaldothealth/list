@@ -18,7 +18,7 @@ const dateFilterSchema = new mongoose.Schema({
         enum: [
             // Only import cases from a given day.
             'EQ',
-            // Import all cases prior to a given day.
+            // Import all cases strictly prior to a given day.
             'LT',
         ],
     },

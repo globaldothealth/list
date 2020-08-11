@@ -7,9 +7,9 @@ import json
 import os
 import pytest
 import requests
+import datetime
 
-from datetime import date
-from mock import MagicMock
+from mock import MagicMock, patch
 from moto import mock_s3
 
 _SOURCE_ID = "abc123"
@@ -48,6 +48,19 @@ _PARSED_CASE = (
         "notes": None
     })
 
+# Minimum case to check for date filtering.
+CASE_JUNE_FIFTH = {
+    "events": [
+        {
+            "name": "confirmed",
+            "dateRange":
+                    {
+                        "start": "06/05/2020Z",
+                        "end": "06/05/2020Z"
+                    }
+        }
+    ],
+}
 
 def fake_parsing_fn(raw_data_file, source_id, source_url):
     """For use in testing parsing_lib.run_lambda()."""
@@ -134,7 +147,8 @@ def test_extract_event_fields_returns_url_bucket_and_key(input_event):
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
-        input_event[parsing_lib.S3_KEY_FIELD])
+        input_event[parsing_lib.S3_KEY_FIELD],
+        input_event[parsing_lib.DATE_FILTER_FIELD])
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field():
@@ -179,3 +193,39 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
         return
     # We got the wrong exception or no exception, fail the test.
     assert False
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_today(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "EQ"})
+    assert list(cases) == [CASE_JUNE_FIFTH]
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_not_today(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 10, 10)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "EQ"})
+    assert cases == []
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_exactly_before_today(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "LT"})
+    assert cases == []
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_before_today(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 10)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "LT"})
+    assert list(cases) == [CASE_JUNE_FIFTH]
