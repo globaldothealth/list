@@ -49,6 +49,9 @@ def write_to_server(cases, headers):
     res = requests.post(put_api_url, json={"cases": cases},
                        headers=headers)
     res_json = res.json()
+    if res.status_code != 200:
+        raise RuntimeError(f'Error sending cases to server, status={res.status_code}, response={res_json}')
+    # TODO: Look for "errors" in res_json and handle them in some way.
     return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
 
 
@@ -79,6 +82,11 @@ def get_today():
     return datetime.datetime.today()
 
 def filter_cases_by_date(case_data, date_filter):
+    """Filter cases according ot the date_filter provided.
+
+    Returns the cases that matched the date filter or all cases if
+    no filter was requested.
+    """
     if not date_filter:
         return case_data
     now = get_today()
@@ -140,7 +148,6 @@ def run_lambda(event, context, parsing_function):
         raw_data_file, source_id,
         source_url)
     api_creds = obtain_api_credentials()
-    case_data = filter_cases_by_date(case_data, date_filter)
     count_created, count_updated = write_to_server(
-        case_data, api_creds)
+        filter_cases_by_date(case_data, date_filter), api_creds)
     return {"count_created": count_created, "count_updated": count_updated}
