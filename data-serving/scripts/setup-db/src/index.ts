@@ -23,7 +23,7 @@ const setupDatabase = async ({
         print(`Read schema from ${schemaPath}`);
 
         const indexes = JSON.parse(await cat(indexesPath));
-        print(`Read text index from ${indexesPath}`);
+        print(`Read indexes from ${indexesPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
