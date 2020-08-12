@@ -31,13 +31,13 @@
         }
     },
     {
-        "name": "eventsArrayIdx",
+        "name": "eventNamesIdx",
         "key": {
-            "events": -1
+            "events.name": -1
         }
     },
     {
-        "name": "countryArrayIdx",
+        "name": "countriesIdx",
         "key": {
             "location.country": -1
         }
