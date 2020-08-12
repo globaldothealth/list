@@ -44,7 +44,8 @@ def invalid_event():
 @mock_s3
 def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    retrieval.obtain_api_credentials = MagicMock(name="obtain_api_credentials")
+    import common_lib  # Import locally to avoid superseding mock
+    common_lib.obtain_api_credentials = MagicMock(name="obtain_api_credentials")
     retrieval.invoke_parser = MagicMock(name="invoke_parser")
     s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
     source_api_url = "http://foo.bar"
@@ -62,7 +63,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
 
     response = retrieval.lambda_handler(valid_event, "")
 
-    retrieval.obtain_api_credentials.assert_called_once_with()
+    common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         lambda_arn, valid_event['sourceId'], response["key"], origin_url, date_filter)
     assert requests_mock.request_history[0].url == full_source_url

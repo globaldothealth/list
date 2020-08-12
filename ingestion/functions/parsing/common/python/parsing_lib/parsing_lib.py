@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import tempfile
 
 import boto3
@@ -7,9 +8,8 @@ import google.auth.transport.requests
 import requests
 from google.oauth2 import service_account
 
-LOCAL_DATA_FILE = "/tmp/data.json"
-METADATA_BUCKET = "epid-ingestion"
-SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
+# TODO: Use tempfile here instead.
+LOCAL_DATA_FILE = "/tmp/rawdata"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
@@ -17,6 +17,20 @@ SOURCE_ID_FIELD = "sourceId"
 DATE_FILTER_FIELD = "dateFilter"
 
 s3_client = boto3.client("s3")
+
+# Layer code, like common_lib, is added to the path by AWS.
+# To test locally (e.g. via pytest), we have to modify sys.path.
+# pylint: disable=import-error
+if ('lambda' not in sys.argv[0]):
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            'common'))
+import common_lib
 
 
 def extract_event_fields(event):
@@ -55,28 +69,6 @@ def write_to_server(cases, headers):
     # TODO: Look for "errors" in res_json and handle them in some way.
     return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
 
-
-def obtain_api_credentials():
-    """
-    Creates HTTP headers credentialed for access to the Global Health Source API.
-    """
-    try:
-        with tempfile.NamedTemporaryFile() as local_creds_file:
-            print(
-                "Retrieving service account credentials from "
-                f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-            s3_client.download_file(
-                METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
-            credentials = service_account.Credentials.from_service_account_file(
-                local_creds_file.name, scopes=["email"])
-            headers = {}
-            request = google.auth.transport.requests.Request()
-            credentials.refresh(request)
-            credentials.apply(headers)
-            return headers
-    except Exception as e:
-        print(e)
-        raise e
 
 def get_today():
     """Return today's datetime, just here for easier mocking."""
@@ -148,7 +140,7 @@ def run_lambda(event, context, parsing_function):
     case_data = parsing_function(
         raw_data_file, source_id,
         source_url)
-    api_creds = obtain_api_credentials()
+    api_creds = common_lib.obtain_api_credentials(s3_client)
     count_created, count_updated = write_to_server(
         filter_cases_by_date(case_data, date_filter), api_creds)
     return {"count_created": count_created, "count_updated": count_updated}

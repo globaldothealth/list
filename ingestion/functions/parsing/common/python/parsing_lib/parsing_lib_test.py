@@ -104,7 +104,8 @@ def sample_data():
 @mock_s3
 def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    parsing_lib.obtain_api_credentials = MagicMock(
+    import common_lib  # Import locally to avoid superseding mock
+    common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(

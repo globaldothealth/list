@@ -4,7 +4,7 @@
     "sourceUrl": "https://foo.bar",
     "sourceId": "5f0b9a7ead3a2b003edc0e7f",
     "dateFilter": {
-        "numDaysBeforeToday": 2,
+        "numDaysBeforeToday": 3,
         "op": "EQ"
     }
 }
