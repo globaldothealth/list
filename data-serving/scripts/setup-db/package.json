@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', textIndexPath: '$TEXTINDEX', caseRefIndexPath: '$CASEREFINDEX', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js",
-    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json', textIndexPath: './../../data-service/schemas/cases.textindex.json', caseRefIndexPath: './../../data-service/schemas/cases.caserefindex.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js"
+    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', indexesPath: '$INDEXES', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js",
+    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json', indexesPath: './../../data-service/schemas/cases.indexes.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js"
   },
   "repository": {
     "type": "git",
