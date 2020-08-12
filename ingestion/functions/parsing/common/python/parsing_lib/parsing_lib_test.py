@@ -288,14 +288,15 @@ def test_finalize_upload_raises_error_for_failed_request(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
-    create_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads"
+    upload_id = "123456789012345678901234"
+    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri(
-        "POST",
-        create_upload_url,
+        "PUT",
+        update_upload_url,
         exc=requests.exceptions.ConnectTimeout)
 
     try:
-        parsing_lib.create_upload_record(_SOURCE_ID, {})
+        parsing_lib.finalize_upload(_SOURCE_ID, upload_id, 42, 0, {})
     except requests.exceptions.ConnectTimeout:
         return
 
