@@ -35,6 +35,7 @@ export function addCase(opts: {
     methodOfConfirmation?: string;
     nationalities?: string[];
     curator?: string;
+    occupation?: string;
     symptomStatus?: string;
     symptoms?: string[];
     transmissionPlaces?: string[];
@@ -49,6 +50,7 @@ export function addCase(opts: {
             },
             demographics: {
                 nationalities: opts.nationalities,
+                occupation: opts.occupation,
             },
             location: {
                 country: opts.country,
