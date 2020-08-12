@@ -29,7 +29,10 @@ import validateEnv from './util/validate-env';
 
 const app = express();
 
-app.use(expressStatusMonitor());
+if (process.env.NODE_ENV !== 'test') {
+    app.use(expressStatusMonitor());
+}
+
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
     bodyParser.urlencoded({
