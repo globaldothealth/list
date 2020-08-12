@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {
+    createBatchCaseRevisions,
     createCaseRevision,
     setBatchRevisionMetadata,
     setRevisionMetadata,
@@ -412,5 +413,50 @@ describe('batch upsert', () => {
                 },
             ],
         });
+    });
+    it('with existing cases creates case revisions', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        const c = new Case({
+            ...existingCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const newCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_new',
+            },
+        };
+
+        const requestBody = {
+            cases: [existingCase, newCase],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createBatchCaseRevisions(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
     });
 });

@@ -167,6 +167,7 @@ export const batchValidate = async (
  */
 export const findCasesWithCaseReferenceData = async (
     req: Request,
+    fieldsToSelect = {},
 ): Promise<CaseDocument[]> => {
     const providedCaseReferenceData = req.body.cases
         .filter(
@@ -185,7 +186,7 @@ export const findCasesWithCaseReferenceData = async (
     return providedCaseReferenceData.length > 0
         ? Case.find()
               .or(providedCaseReferenceData)
-              .select({ _id: 1, caseReference: 1, revisionMetadata: 1 })
+              .select(fieldsToSelect)
               .exec()
         : [];
 };
@@ -206,9 +207,12 @@ export const findCasesWithCaseReferenceData = async (
 const findCaseIdsWithCaseReferenceData = async (
     req: Request,
 ): Promise<string[]> => {
-    return (await findCasesWithCaseReferenceData(req)).map((c) =>
-        String(c._id),
-    );
+    return (
+        await findCasesWithCaseReferenceData(
+            req,
+            /* fieldsToSelect= */ { _id: 1 },
+        )
+    ).map((c) => String(c._id));
 };
 
 /**
