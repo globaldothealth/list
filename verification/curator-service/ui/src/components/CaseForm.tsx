@@ -583,7 +583,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                                     '') ||
                                             values.ethnicity !== undefined ||
                                             values.nationalities?.length > 0 ||
-                                            values.occupation !== undefined,
+                                            values.occupation !== '',
                                         hasError: hasErrors(
                                             [
                                                 'gender',
