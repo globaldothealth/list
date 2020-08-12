@@ -620,6 +620,7 @@ components:
         status:
           type: string
           enum:
+            - IN_PROGRESS
             - SUCCESS
             - ERROR
         summary:
