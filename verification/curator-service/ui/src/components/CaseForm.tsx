@@ -70,7 +70,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             age: undefined,
             ethnicity: undefined,
             nationalities: [],
-            occupation: undefined,
+            occupation: '',
             location: undefined,
             confirmedDate: null,
             methodOfConfirmation: '',
@@ -115,7 +115,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 : undefined,
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
-        occupation: c.demographics?.occupation,
+        occupation: c.demographics?.occupation ?? '',
         location: c.location,
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
@@ -334,7 +334,7 @@ export default function CaseForm(props: Props): JSX.Element {
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                occupation: values.occupation,
+                occupation: unknownOrEmptyToUndefined(values.occupation),
             },
             location: values.location,
             events: [

@@ -1,3 +1,4 @@
+import { Chip, withStyles } from '@material-ui/core';
 import { FastField, useFormikContext } from 'formik';
 import {
     FormikAutocomplete,
@@ -10,8 +11,8 @@ import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core';
 
 const styles = () =>
     createStyles({
@@ -31,6 +32,12 @@ const styles = () =>
         select: {
             width: '8em',
         },
+        chip: {
+            margin: '0.5em',
+        },
+        section: {
+            marginBottom: '1em',
+        },
     });
 
 type DemographicsProps = WithStyles<typeof styles>;
@@ -46,7 +53,21 @@ const genderValues = [
 
 function Demographics(props: DemographicsProps): JSX.Element {
     const { classes } = props;
-    const { initialValues } = useFormikContext<CaseFormValues>();
+    const { initialValues, setFieldValue } = useFormikContext<CaseFormValues>();
+    const [commonOccupations, setCommonOccupations] = React.useState([]);
+
+    React.useEffect(
+        () => {
+            axios
+                .get('/api/cases/occupations?limit=10')
+                .then((response) =>
+                    setCommonOccupations(response.data.occupations ?? []),
+                );
+        },
+        // Using [] here means this will only be called once at the beginning of the lifecycle
+        [],
+    );
+
     return (
         <Scroll.Element name="demographics">
             <fieldset>
@@ -100,6 +121,31 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/nationalities.txt"
                     />
                 </div>
+                {commonOccupations.length > 0 && (
+                    <>
+                        <div className={classes.section}>
+                            Frequently added occupations
+                        </div>
+                        <div className={classes.section}>
+                            {commonOccupations.map(
+                                (occupation) =>
+                                    occupation && (
+                                        <Chip
+                                            key={occupation}
+                                            className={classes.chip}
+                                            label={occupation}
+                                            onClick={(): void =>
+                                                setFieldValue(
+                                                    'occupation',
+                                                    occupation,
+                                                )
+                                            }
+                                        ></Chip>
+                                    ),
+                            )}
+                        </div>
+                    </>
+                )}
                 <FormikAutocomplete
                     name="occupation"
                     label="Occupation"
