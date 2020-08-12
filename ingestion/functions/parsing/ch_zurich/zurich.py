@@ -31,6 +31,16 @@ _GENDER_INDEX = 3
 _CONFIRMED_INDEX = 4
 _SOURCE_INDEX = 6
 
+def convert_date(raw_date):
+    """
+    Convert raw date field into a value interpretable by the dataserver.
+
+    The date is listed in YYYY-mm-dd format, but the date filtering API
+    expects mm/dd/YYYYZ format.
+    """
+    date = datetime.strptime(raw_date, "%Y-%m-%d")
+    return date.strftime("%m/%d/%YZ")
+
 def convert_gender(raw_gender: str):
     if raw_gender.upper() == "M":
         return "Male"
@@ -79,8 +89,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": row[_DATE_INDEX],
-                                "end": row[_DATE_INDEX],
+                                "start": convert_date(row[_DATE_INDEX]),
+                                "end": convert_date(row[_DATE_INDEX]),
                             },
                         },
                     ],

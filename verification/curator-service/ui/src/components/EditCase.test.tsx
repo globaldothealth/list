@@ -50,6 +50,22 @@ it('loads and displays case to edit', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosSymptomsResponse);
+    const axiosPlacesOfTransmissionResponse = {
+        data: { placesOfTransmission: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosPlacesOfTransmissionResponse);
+    const axiosOccupationResponse = {
+        data: { occupations: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosOccupationResponse);
 
     const { findByText, getByText, getByDisplayValue } = render(
         <MemoryRouter>
@@ -62,7 +78,7 @@ it('loads and displays case to edit', async () => {
             />
         </MemoryRouter>,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(4));
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(6));
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/abc123');
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources', {
         params: {
@@ -74,6 +90,13 @@ it('loads and displays case to edit', async () => {
             url: fullCase.caseReference.sourceUrl,
         },
     });
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/symptoms?limit=5');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/placesOfTransmission?limit=5',
+    );
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/occupations?limit=10',
+    );
     expect(
         await findByText('Enter the details for an existing case'),
     ).toBeInTheDocument();

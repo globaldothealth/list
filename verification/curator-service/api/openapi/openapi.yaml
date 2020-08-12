@@ -194,6 +194,48 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/{sourceId}/uploads/{id}:
+    parameters:
+      - name: sourceId
+        in: path
+        description: The parent source ID in which to find the upload
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+      - name: id
+        in: path
+        description: The ID of the upload to update
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    put:
+      tags: [Source, Upload]
+      summary: Updates an existing upload in the specified source
+      operationId: updateUpload
+      requestBody:
+        description: New upload content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Upload"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Upload"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -335,8 +377,54 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/placesOfTransmission:
+    get:
+      summary: Lists most frequently used places of transmission
+      operationId: listPlacesOfTransmission
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200PlacesOfTransmissionArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/occupations:
+    get:
+      summary: Lists most frequently used occupations
+      operationId: listOccupations
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200OccupationArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpsert:
@@ -552,6 +640,7 @@ components:
         status:
           type: string
           enum:
+            - IN_PROGRESS
             - SUCCESS
             - ERROR
         summary:
@@ -580,6 +669,18 @@ components:
               type: string
         format:
           type: string
+        dateFilter:
+          type: object
+          properties:
+            numDaysBeforeToday:
+              type: number
+              # Must be positive as we subtract it to "today".
+              minimum: 1
+            op:
+              type: string
+              enum:
+              - EQ
+              - LT
         automation:
           type: object
           properties:
@@ -640,6 +741,9 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
+            uploadId:
+              type: string
+              pattern: '^[a-f\d]{24}$'
             additionalSources:
               type: array
               items:
@@ -796,6 +900,20 @@ components:
       type: object
       properties:
         symptoms:
+          type: array
+          items:
+            type: string
+    PlacesOfTransmissionArray:
+      type: object
+      properties:
+        placesOfTransmission:
+          type: array
+          items:
+            type: string
+    OccupationArray:
+      type: object
+      properties:
+        occupations:
           type: array
           items:
             type: string
@@ -1007,6 +1125,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SymptomArray"
+    "200PlacesOfTransmissionArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PlacesOfTransmissionArray"
+    "200OccupationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OccupationArray"
     "201Case":
       description: Created
       content:
@@ -1039,6 +1169,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "200Upload":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Upload"
     "201Upload":
       description: Created
       content:

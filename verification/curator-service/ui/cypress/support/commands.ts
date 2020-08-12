@@ -35,8 +35,10 @@ export function addCase(opts: {
     methodOfConfirmation?: string;
     nationalities?: string[];
     curator?: string;
+    occupation?: string;
     symptomStatus?: string;
     symptoms?: string[];
+    transmissionPlaces?: string[];
 }): void {
     cy.request({
         method: 'POST',
@@ -48,6 +50,7 @@ export function addCase(opts: {
             },
             demographics: {
                 nationalities: opts.nationalities,
+                occupation: opts.occupation,
             },
             location: {
                 country: opts.country,
@@ -70,6 +73,9 @@ export function addCase(opts: {
             symptoms: {
                 status: opts.symptomStatus ?? undefined,
                 values: opts.symptoms ?? [],
+            },
+            transmission: {
+                places: opts.transmissionPlaces ?? [],
             },
             notes: opts.notes,
         },

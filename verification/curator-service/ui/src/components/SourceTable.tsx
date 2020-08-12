@@ -5,6 +5,8 @@ import {
     WithStyles,
     createStyles,
     withStyles,
+    Button,
+    Divider,
 } from '@material-ui/core';
 import React, { RefObject } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -49,12 +51,18 @@ interface Automation {
     regexParsing?: RegexParsing;
 }
 
+interface DateFilter {
+    numDaysBeforeToday?: number;
+    op?: string;
+}
+
 interface Source {
     _id: string;
     name: string;
     format?: string;
     origin: Origin;
     automation?: Automation;
+    dateFilter?: DateFilter;
 }
 
 interface SourceTableState {
@@ -76,6 +84,8 @@ interface TableRow {
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
+    // dateFilter
+    dateFilter?: DateFilter;
 }
 
 // Return type isn't meaningful.
@@ -89,6 +99,10 @@ const styles = (theme: Theme) =>
         alert: {
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
+        },
+        divider: {
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
         },
     });
 
@@ -200,6 +214,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                       },
                   }
                 : undefined,
+            dateFilter:
+                rowData.dateFilter?.numDaysBeforeToday && rowData.dateFilter?.op
+                    ? rowData.dateFilter
+                    : undefined,
         };
     }
 
@@ -230,6 +248,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                       },
                   }
                 : undefined,
+            dateFilter:
+                rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
+                    ? rowData.dateFilter
+                    : {},
         };
     }
 
@@ -331,18 +353,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         onChange={(event): void =>
                                             props.onChange(event.target.value)
                                         }
-                                        defaultValue={props.value}
+                                        defaultValue={props.value || ''}
                                     >
-                                        {[undefined, 'JSON', 'CSV'].map(
-                                            (value) => (
-                                                <MenuItem
-                                                    key={value}
-                                                    value={value || ''}
-                                                >
-                                                    {value || 'Unknown'}
-                                                </MenuItem>
-                                            ),
-                                        )}
+                                        {['', 'JSON', 'CSV'].map((value) => (
+                                            <MenuItem
+                                                key={`format-${value}`}
+                                                value={value || ''}
+                                            >
+                                                {value || 'Unknown'}
+                                            </MenuItem>
+                                        ))}
                                     </TextField>
                                 ),
                             },
@@ -358,6 +378,100 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             {
                                 title: 'AWS Parser ARN',
                                 field: 'awsLambdaArn',
+                            },
+                            {
+                                title: 'Date filtering',
+                                field: 'dateFilter',
+                                render: (rowData): JSX.Element =>
+                                    rowData.dateFilter?.op === 'EQ' ? (
+                                        <div>
+                                            Only parse data from{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            days ago
+                                        </div>
+                                    ) : rowData.dateFilter?.op === 'LT' ? (
+                                        <div>
+                                            Parse all data up to{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            ago
+                                        </div>
+                                    ) : (
+                                        <div>None</div>
+                                    ),
+                                editComponent: (props): JSX.Element => (
+                                    <>
+                                        Only parse data
+                                        <TextField
+                                            select
+                                            fullWidth
+                                            size="small"
+                                            data-testid="op-select"
+                                            placeholder="Operator"
+                                            onChange={(event): void =>
+                                                props.onChange({
+                                                    numDaysBeforeToday:
+                                                        props.value
+                                                            ?.numDaysBeforeToday,
+                                                    op: event.target.value,
+                                                })
+                                            }
+                                            value={props.value?.op || ''}
+                                        >
+                                            {[
+                                                { text: 'Unknown', value: '' },
+                                                {
+                                                    text: 'from exactly',
+                                                    value: 'EQ',
+                                                },
+                                                { text: 'up to', value: 'LT' },
+                                            ].map((pair) => (
+                                                <MenuItem
+                                                    key={`op-${pair.value}`}
+                                                    value={pair.value || ''}
+                                                >
+                                                    {pair.text}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            data-testid="num-days"
+                                            placeholder="days"
+                                            onChange={(event): void =>
+                                                props.onChange({
+                                                    numDaysBeforeToday:
+                                                        event.target.value,
+                                                    op: props.value?.op,
+                                                })
+                                            }
+                                            value={
+                                                props.value
+                                                    ?.numDaysBeforeToday || ''
+                                            }
+                                        ></TextField>
+                                        days ago
+                                        <Divider
+                                            variant="middle"
+                                            className={classes.divider}
+                                        />
+                                        <Button
+                                            variant="contained"
+                                            data-testid="clear-date-filter"
+                                            onClick={() => {
+                                                props.onChange({});
+                                            }}
+                                        >
+                                            Clear
+                                        </Button>
+                                    </>
+                                ),
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
@@ -388,6 +502,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 awsScheduleExpression:
                                                     s.automation?.schedule
                                                         ?.awsScheduleExpression,
+                                                dateFilter: s.dateFilter,
                                             });
                                         }
                                         resolve({
