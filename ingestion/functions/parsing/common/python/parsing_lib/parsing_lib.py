@@ -52,7 +52,7 @@ def create_upload_record(source_id, headers):
                         json={"status": "IN_PROGRESS", "summary": {}},
                         headers=headers)
     res_json = res.json()
-    if res.status_code != 200:
+    if res.status_code != 201:
         raise RuntimeError(
             f'Error creating upload record, status={res.status_code}, response={res_json}')
     # TODO: Look for "errors" in res_json and handle them in some way.
