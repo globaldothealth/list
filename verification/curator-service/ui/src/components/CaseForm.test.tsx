@@ -32,6 +32,22 @@ beforeEach(() => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosSymptomsResponse);
+    const axiosPlacesOfTransmissionResponse = {
+        data: { placesOfTransmission: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosPlacesOfTransmissionResponse);
+    const axiosOccupationResponse = {
+        data: { occupations: [] },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosOccupationResponse);
 });
 
 afterEach(() => {
@@ -49,7 +65,7 @@ it('renders form', async () => {
             />
         </MemoryRouter>,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(2));
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(4));
     expect(getByText('Enter the details for a new case')).toBeInTheDocument();
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(1);
@@ -70,7 +86,7 @@ it('can add and remove genome sequencing sections', async () => {
             />
         </MemoryRouter>,
     );
-    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(2));
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(4));
 
     expect(queryByTestId('genome-sequence-section')).not.toBeInTheDocument();
     await wait(() => {

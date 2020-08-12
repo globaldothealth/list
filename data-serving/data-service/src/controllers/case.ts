@@ -374,11 +374,7 @@ export const listSymptoms = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const symptoms = await Case.aggregate([
             { $unwind: '$symptoms.values' },
@@ -387,6 +383,63 @@ export const listSymptoms = async (
         ]).limit(limit);
         res.json({
             symptoms: symptoms.map((symptomObject) => symptomObject._id),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
+
+/**
+ * List most frequently used places of transmission.
+ *
+ * Handles HTTP GET /api/cases/placesOfTransmission.
+ */
+export const listPlacesOfTransmission = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const placesOfTransmission = await Case.aggregate([
+            { $unwind: '$transmission.places' },
+            { $sortByCount: '$transmission.places' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            placesOfTransmission: placesOfTransmission.map(
+                (placeOfTransmissionObject) => placeOfTransmissionObject._id,
+            ),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
+
+/**
+ * List most frequently used occupations.
+ *
+ * Handles HTTP GET /api/cases/occupations.
+ */
+export const listOccupations = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const occupations = await Case.aggregate([
+            { $sortByCount: '$demographics.occupation' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            occupations: occupations.map(
+                (occupationObject) => occupationObject._id,
+            ),
         });
         return;
     } catch (e) {

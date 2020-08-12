@@ -1,17 +1,9 @@
-// Set up appmetrics-dash before importing additional dependencies.
-// This ensures that the module captures metrics for dependent systems, like
-// MongoDB.
-import Dash from 'appmetrics-dash';
-if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
-    Dash.attach();
-}
-
 import * as usersController from './controllers/users';
 
+import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import { Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
@@ -21,20 +13,25 @@ import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
+import UploadsController from './controllers/uploads';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
+import expressStatusMonitor from 'express-status-monitor';
 import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import UploadsController from './controllers/uploads';
 
 const app = express();
+
+if (process.env.NODE_ENV !== 'test') {
+    app.use(expressStatusMonitor());
+}
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
@@ -169,6 +166,11 @@ new OpenApiValidator({
             mustHaveAnyRole(['curator']),
             uploadsController.create,
         );
+        apiRouter.put(
+            '/sources/:sourceId([a-z0-9]{24})/uploads/:id([a-z0-9]{24})',
+            mustHaveAnyRole(['curator']),
+            uploadsController.update,
+        );
 
         // Chain geocoders so that during dev/integration tests we can use the fake one.
         // It might also just be useful to have various geocoders plugged-in at some point.
@@ -206,6 +208,16 @@ new OpenApiValidator({
             '/cases/symptoms',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.listSymptoms,
+        );
+        apiRouter.get(
+            '/cases/placesOfTransmission',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.listPlacesOfTransmission,
+        );
+        apiRouter.get(
+            '/cases/occupations',
+            mustHaveAnyRole(['reader', 'curator']),
+            casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',

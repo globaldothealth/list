@@ -57,8 +57,7 @@ export default function Symptoms(): JSX.Element {
                     label="Symptom status"
                     values={symptomStatusValues}
                 ></SelectField>
-                {(values.symptomsStatus === 'Symptomatic' ||
-                    values.symptomsStatus === 'Presymptomatic') && (
+                {values.symptomsStatus === 'Symptomatic' && (
                     <>
                         {commonSymptoms.length > 0 && (
                             <>
