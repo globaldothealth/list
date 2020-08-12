@@ -14,19 +14,16 @@ describe('Sources table', function () {
         cy.get('input[placeholder="URL"]').type('www.example.com');
         cy.get('div[data-testid="format-select"]').click();
         cy.contains('li', 'JSON').click();
-        /* This doesn't work and I HAVE NO IDEA WHY PLEASE HELP.
         cy.get('div[data-testid="op-select"]').scrollIntoView().click();
-        cy.contains('li', 'EQ').click();
-        cy.get('input[placeholder="Date filter num days before today"]')
-            .scrollIntoView()
-            .type('42');
-        */
+        cy.contains('li', 'from exactly').click();
+        cy.get('input[placeholder="days"]').type('42');
 
         cy.get('button[title="Save"]').click();
 
         cy.contains('Example source');
         cy.contains('www.example.com');
         cy.contains('JSON');
+        cy.contains('Only parse data from 42 days ago');
     });
 
     it('Can edit a source', function () {
