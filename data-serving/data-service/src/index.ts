@@ -21,12 +21,15 @@ import validateEnv from './util/validate-env';
 
 const app = express();
 
+if (process.env.NODE_ENV !== 'test') {
+    app.use(expressStatusMonitor());
+}
+
 dotenv.config();
 const env = validateEnv();
 
 // Express configuration.
 app.set('port', env.PORT);
-app.use(expressStatusMonitor());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
     bodyParser.urlencoded({
