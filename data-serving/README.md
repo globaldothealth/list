@@ -1,14 +1,12 @@
 
 # All things data
 
-[toc]
-
 ## Database design
 
 G.h case data, as well as the source, user, and session data for the curator portal, is stored in a MongoDB database.
 
 We have multiple instances of MongoDB, ranging from local instances for development, to dev (for
-http://dev-curator.ghdsi.org/), to prod prod (for http://dev-curator.ghdsi.org/).
+http://dev-curator.ghdsi.org/), to prod (for http://curator.ghdsi.org/).
 
 Each instance has a `covid19` database, which in turn has collections for each type of data, e.g. `cases`, `users`, etc.
 
@@ -38,6 +36,10 @@ indexes the id of the `case` and its revision for quick lookups.
 
 We use MongoDB to generate charts that surfaced in the curator portal. These are available through the prod MongoDB
 Atlas instance.
+
+- [Cumulative dataset metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/b897bb76-e761-49b4-b106-7e97c54aeca8)
+- [Dataset freshness metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/393c3fa3-27b2-483b-9e5e-88ae5229bbad)
+- [Dataset completeness metrics](https://charts.mongodb.com/charts-covid19map-prod-dznzw/dashboards/15306e1e-efed-427b-928a-753b70f971aa)
 
 ### Importing cases
 
