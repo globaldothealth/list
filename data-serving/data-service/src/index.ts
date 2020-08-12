@@ -10,10 +10,6 @@ import {
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
-// Set up appmetrics-dash before importing additional dependencies.
-// This ensures that the module captures metrics for dependent systems, like
-// MongoDB.
-import Dash from 'appmetrics-dash';
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
@@ -23,9 +19,6 @@ import expressStatusMonitor from 'express-status-monitor';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-if (process.env.NODE_ENV !== 'test') {
-    Dash.attach();
-}
 
 const app = express();
 
