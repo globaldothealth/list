@@ -94,6 +94,8 @@ more generally about Python Lambda development
 The points at which the Lambda integration is most apparent are in testing and
 execution of code.
 
+#### Unit tests
+
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
 are run with the correct Python version. E.g.,
 
@@ -101,12 +103,33 @@ are run with the correct Python version. E.g.,
 python3.8 -m pytest test/my_test.py
 ```
 
-Manual testing/execution uses the SAM CLI. Alongside your function, commit a
-sample JSON input event (see the above documentation), and test the function
-locally by running:
+#### Manual local run
+
+**IMPORTANT**: Local runs still require access to a service account hosted on s3. Follow #754 for updates on how to run functions with your own creds.
+
+Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
+
+Go to the UI at http://localhost:3002/sources and add a new source for your parser, once you give it a name, a URL and save it, it will be given an ID.
+
+Put that ID in the `retrieval/valid_scheduled_event.json` file.
+
+Next invoke the `RetrievalFunction` like this:
 
 ```shell
 sam build
+sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
+```
+
+If you get a 403 error, go to the [user administration page](http://localhost:3002/sources) and assign the `curator` and `reader` roles to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
+
+Upon success you'll see in the output something like
+`{"bucket":"epid-sources-raw","key":"5f311a9795e338003016593a/2020/08/10/1009/content.csv"}`
+
+In your parser package's `input_event.json` set the `s3Key` as `5f311a9795e338003016593a/2020/08/10/1009/content.csv` and the `sourceId` to `5f311a9795e338003016593a`. **Set values according to the output you got, do not copy-paste what's written in this document.**
+
+Next you can invoke your parsing function:
+
+```shell
 sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
 ```
 
@@ -114,6 +137,8 @@ Run this from the base `ingestion/functions` dir. The `MyFunction` name should
 correspond to the name of the resource as defined in the SAM `template.yaml`;
 for more information on the template, read
 [this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).
+
+If all goes well you should see the number of cases created/updated (i.e. `{"count_created":4079,"count_updated":0}`).
 
 Test via unit tests and manual testing prior to sending changes. A GitHub
 action
