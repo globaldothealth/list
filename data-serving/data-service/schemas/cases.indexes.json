@@ -41,5 +41,11 @@
         "key": {
             "location.country": -1
         }
+    },
+    {
+        "name": "travelHistoryCountriesIdx",
+        "key": {
+            "travelHistory.travel.location.country": -1
+        }
     }
 ]
