@@ -5,8 +5,7 @@ interface SetupDatabaseParameters {
     databaseName: string;
     collectionName: string;
     schemaPath: string;
-    textIndexPath: string;
-    caseRefIndexPath: string;
+    indexesPath: string;
     /** If not specified, deletes only imported documents. Defaults to false. */
     deleteAllDocuments: boolean;
 }
@@ -16,19 +15,15 @@ const setupDatabase = async ({
     databaseName,
     collectionName,
     schemaPath,
-    textIndexPath,
-    caseRefIndexPath,
+    indexesPath,
     deleteAllDocuments = false,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
         print(`Read schema from ${schemaPath}`);
 
-        const textIndex = JSON.parse(await cat(textIndexPath));
-        print(`Read text index from ${textIndexPath}`);
-
-        const caseRefIndex = JSON.parse(await cat(caseRefIndexPath));
-        print(`Read caseRef index from ${caseRefIndexPath}`);
+        const indexes = JSON.parse(await cat(indexesPath));
+        print(`Read text index from ${indexesPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
@@ -72,23 +67,15 @@ const setupDatabase = async ({
             collection = await database.getCollection(collectionName);
         }
 
-        print('Dropping indexes 👇');
-        const textIndexName = `${collectionName}Idx`;
-        await collection.dropIndex(textIndexName);
-        const caseRefIndexName = `${collectionName}CaseRefIdx`;
-        await collection.dropIndex(caseRefIndexName);
+        print('Dropping all indexes 👇');
+        await collection.dropIndexes();
 
         print('Creating indexes 👆');
-        await collection.createIndex(textIndex, { name: textIndexName });
-        await collection.createIndex(caseRefIndex, {
-            name: caseRefIndexName,
-            unique: true,
-            partialFilterExpression: {
-                'caseReference.sourceEntryId': {
-                    $exists: true,
-                },
-            },
+        await database.runCommand({
+            createIndexes: collectionName,
+            indexes: indexes,
         });
+
         print('Done 👍');
 
         // Print some stats -- for fun and confirmation!

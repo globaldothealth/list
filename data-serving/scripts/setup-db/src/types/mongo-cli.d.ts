@@ -15,8 +15,7 @@ declare function quit(): void;
 interface Collection {
     remove: (query: object) => Promise<CommandResult>;
     stats: () => Promise<CollectionStats>;
-    createIndex: (spec: object, options: { name: string, unique?: boolean, partialFilterExpression?: any }) => Promise<CommandResult>;
-    dropIndex: (name: string) => Promise<CommandResult>;
+    dropIndexes: () => Promise<CommandResult>;
 }
 
 interface CollectionStats {
@@ -48,8 +47,26 @@ interface Database {
 
     getCollectionNames: () => Promise<[string]>;
 
-    runCommand: (options: { collMod: string, validator: {} }) => Promise<CommandResult>;
+    runCommand: (options: CollModOptions|CreateIndexesOptions) => Promise<CommandResult>;
 }
+
+interface CollModOptions {
+    collMod: string;
+    validator: object;
+}
+
+interface CreateIndexesOptions {
+    createIndexes: string;
+    indexes: IndexSpec;
+}
+
+interface IndexSpec {
+    name: string;
+    key: object;
+    keyPattern: object;
+    unique: boolean;
+}
+
 
 /** Options to pass with the command to create a collection. */
 interface CreateCollectionOptions {
