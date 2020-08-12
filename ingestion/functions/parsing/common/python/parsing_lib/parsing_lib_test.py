@@ -127,7 +127,8 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
     requests_mock.post(
         create_upload_url,
         json={"_id": upload_id, "status": "IN_PROGRESS",
-              "summary": {}})
+              "summary": {}},
+        status_code=201)
     update_upload_url = f"{base_upload_url}/{upload_id}"
     requests_mock.put(
         update_upload_url,
@@ -201,7 +202,8 @@ def test_create_upload_record_returns_upload_id(requests_mock):
     upload_id = "123456789012345678901234"
     requests_mock.post(
         create_upload_url,
-        json={"_id": upload_id, "status": "IN_PROGRESS", "summary": {}})
+        json={"_id": upload_id, "status": "IN_PROGRESS", "summary": {}},
+        status_code=201)
 
     response = parsing_lib.create_upload_record(_SOURCE_ID, {})
 
