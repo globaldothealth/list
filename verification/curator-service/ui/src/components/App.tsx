@@ -44,19 +44,36 @@ import { useLastLocation } from 'react-router-last-location';
 
 const theme = createMuiTheme({
     palette: {
+        background: {
+            default: '#ecf3f0',
+            paper: '#ffffff',
+        },
         primary: {
-            main: '#78A3FF',
+            main: '#0E7569',
+            contrastText: '#ffffff',
         },
         secondary: {
-            main: '#000000',
+            main: '#00C6AF',
+            contrastText: '#ffffff',
         },
+        error: {
+            main: '#FD685B',
+            contrastText: '#454545',
+        },
+    },
+    typography: {
+        fontFamily: 'Mabry Pro, sans-serif',
+    },
+    shape: {
+        borderRadius: 4,
     },
     overrides: {
         MuiListItem: {
             root: {
+                color: '#5D5D5D',
                 '&$selected': {
-                    backgroundColor: '#E8F0FE',
-                    borderRadius: '0px 100px 100px 0px',
+                    backgroundColor: '#E7EFED',
+                    color: '#0E7569',
                 },
             },
         },
@@ -93,6 +110,7 @@ function TopbarMenu(): JSX.Element {
                 aria-controls="topbar-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
+                color="inherit"
             >
                 <MoreVertIcon />
             </IconButton>
@@ -141,7 +159,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexGrow: 1,
     },
     appBar: {
-        background: 'white',
         zIndex: theme.zIndex.drawer + 1,
     },
     menuButton: {
@@ -321,7 +338,7 @@ export default function App(): JSX.Element {
                         {user?.email ? (
                             <Button
                                 classes={{ label: classes.buttonLabel }}
-                                variant="outlined"
+                                variant="contained"
                                 color="secondary"
                                 href="/auth/logout"
                             >
@@ -329,7 +346,7 @@ export default function App(): JSX.Element {
                             </Button>
                         ) : (
                             <Button
-                                variant="outlined"
+                                variant="contained"
                                 color="secondary"
                                 href={process.env.REACT_APP_LOGIN_URL}
                             >
@@ -352,9 +369,10 @@ export default function App(): JSX.Element {
                     {hasAnyRole(['curator']) && (
                         <>
                             <Button
-                                variant="outlined"
+                                variant="contained"
                                 data-testid="create-new-button"
                                 className={classes.createNewButton}
+                                color="secondary"
                                 onClick={openCreateNewPopup}
                                 startIcon={<AddIcon />}
                             >
