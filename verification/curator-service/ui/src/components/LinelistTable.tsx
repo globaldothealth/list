@@ -1,5 +1,8 @@
 import {
     Button,
+    IconButton,
+    Menu,
+    MenuItem,
     Theme,
     Tooltip,
     makeStyles,
@@ -8,19 +11,19 @@ import {
 import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Link } from 'react-router-dom';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
-import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -219,6 +222,81 @@ function SearchBar(props: {
     );
 }
 
+const rowMenuStyles = makeStyles((theme: Theme) => ({
+    menuItemTitle: {
+        marginLeft: theme.spacing(1),
+    },
+}));
+
+function RowMenu(props: {
+    rowId: string;
+    setError: (error: string) => void;
+    refreshData: () => void;
+}): JSX.Element {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const history = useHistory();
+    const classes = rowMenuStyles();
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (event?: any): void => {
+        event?.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleEdit = (event?: any): void => {
+        event?.stopPropagation();
+        history.push(`/cases/edit/${props.rowId}`);
+    };
+
+    const handleDelete = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        try {
+            props.setError('');
+            const deleteUrl = '/api/cases/' + props.rowId;
+            await axios.delete(deleteUrl);
+            handleClose();
+            props.refreshData();
+        } catch (e) {
+            props.setError(e.toString());
+            handleClose();
+        }
+    };
+
+    return (
+        <>
+            <IconButton
+                aria-controls="topbar-menu"
+                aria-haspopup="true"
+                aria-label="row menu"
+                data-testid="row menu"
+                onClick={handleClick}
+                color="inherit"
+            >
+                <MoreVertIcon />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={handleEdit}>
+                    <EditIcon />
+                    <span className={classes.menuItemTitle}>Edit</span>
+                </MenuItem>
+                <MenuItem onClick={handleDelete}>
+                    <DeleteIcon />
+                    <span className={classes.menuItemTitle}>Delete</span>
+                </MenuItem>
+            </Menu>
+        </>
+    );
+}
+
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
     unlisten: () => void;
@@ -335,6 +413,32 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
+                        ...(this.props.user.roles.includes('curator')
+                            ? [
+                                  // TODO: move to the left of selection checkboxes when possible
+                                  // https://github.com/mbrn/material-table/issues/2317
+                                  {
+                                      cellStyle: {
+                                          padding: '0',
+                                      },
+                                      render: (
+                                          rowData: TableRow,
+                                      ): JSX.Element => (
+                                          <RowMenu
+                                              rowId={rowData.id}
+                                              refreshData={(): void =>
+                                                  this.tableRef.current.onQueryChange()
+                                              }
+                                              setError={(error): void =>
+                                                  this.setState({
+                                                      error: error,
+                                                  })
+                                              }
+                                          ></RowMenu>
+                                      ),
+                                  },
+                              ]
+                            : []),
                         {
                             title: 'Case ID',
                             field: 'id',
@@ -550,10 +654,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: true,
+                        selection: this.props.user.roles.includes('curator'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
-                        actionsColumnIndex: -1,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
@@ -570,28 +673,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         this.setState({ pageSize: newPageSize });
                         this.tableRef.current.onQueryChange();
                     }}
-                    // actions cannot be a function https://github.com/mbrn/material-table/issues/676
+                    onRowClick={(_, rowData?: TableRow): void => {
+                        if (rowData) {
+                            history.push(`/cases/view/${rowData.id}`);
+                        }
+                    }}
                     actions={
                         this.props.user.roles.includes('curator')
                             ? [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="edit">
-                                              <EditIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Edit this case',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, row: any): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/edit/${id}`);
-                                      },
-                                      position: 'row',
-                                  },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
-                                  // editable section.
+                                  // RowMenu function.
                                   {
                                       icon: () => (
                                           <span aria-label="delete all">
@@ -616,47 +708,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           );
                                       },
                                   },
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
-                                      },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
                               ]
-                            : [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
-                                      },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
-                              ]
-                    }
-                    editable={
-                        this.props.user.roles.includes('curator')
-                            ? {
-                                  onRowDelete: (
-                                      rowData: TableRow,
-                                  ): Promise<unknown> =>
-                                      this.deleteCase(rowData),
-                              }
-                            : undefined
+                            : []
                     }
                 />
             </Paper>

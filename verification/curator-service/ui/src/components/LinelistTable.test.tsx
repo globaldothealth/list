@@ -141,7 +141,7 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(
+    const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
@@ -153,10 +153,8 @@ it('API errors are displayed', async () => {
     // Throw error on delete request.
     mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const deleteButton = getByText(/delete_outline/);
-    fireEvent.click(deleteButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
+    fireEvent.click(getByTestId(/row menu/));
+    fireEvent.click(getByText(/Delete/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
@@ -202,7 +200,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText } = render(
+    const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
@@ -235,10 +233,8 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetAfterDeleteResponse);
     mockedAxios.delete.mockResolvedValueOnce(axiosDeleteResponse);
 
-    const deleteButton = getByText(/delete_outline/);
-    fireEvent.click(deleteButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
+    fireEvent.click(getByTestId(/row menu/));
+    fireEvent.click(getByText(/Delete/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
     expect(mockedAxios.delete).toHaveBeenCalledWith(
         '/api/cases/' + cases[0]._id,
