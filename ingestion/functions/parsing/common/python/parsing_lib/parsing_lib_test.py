@@ -315,7 +315,7 @@ def test_finalize_upload_raises_error_for_failed_request(requests_mock):
     assert False
 
 
-@ patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
@@ -326,7 +326,7 @@ def test_filter_cases_by_date_today(mock_today):
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
-@ patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_not_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 10, 10)
@@ -337,7 +337,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     assert cases == []
 
 
-@ patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_exactly_before_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
@@ -348,7 +348,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     assert cases == []
 
 
-@ patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_before_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 10)
