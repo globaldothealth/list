@@ -131,7 +131,6 @@ describe('POST', () => {
             const newSummary = {
                 numCreated: 123456,
                 numUpdated: 789,
-                error: '',
             };
 
             const res = await curatorRequest
