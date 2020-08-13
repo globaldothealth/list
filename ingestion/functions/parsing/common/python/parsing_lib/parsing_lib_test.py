@@ -418,10 +418,10 @@ def test_complete_with_error_updates_upload_if_provided_data(requests_mock):
         upload_error = parsing_lib.UploadError.SOURCE_CONFIGURATION_ERROR
         parsing_lib.complete_with_error(
             e, upload_error, _SOURCE_ID, upload_id, {})
+    except ValueError:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
         ) == {"status": "ERROR", "summary": {"error": upload_error.name}}
-    except ValueError:
         return
     # We got the wrong exception or no exception, fail the test.
     assert "Should have raised a ValueError exception" == False
