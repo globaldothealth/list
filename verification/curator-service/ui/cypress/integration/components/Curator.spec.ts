@@ -191,7 +191,8 @@ describe('Curator', function () {
             cy.visit('/cases');
 
             // Edit the case.
-            cy.get('button[title="Edit this case"]').click({ force: true });
+            cy.get('button[data-testid="row menu"]').click();
+            cy.contains('li', 'Edit').click();
 
             // Everything should be there.
             // Source.
@@ -311,9 +312,7 @@ describe('Curator', function () {
             cy.contains('Asian');
 
             // View full details about the case
-            cy.get('button[title="View this case details"]').click({
-                force: true,
-            });
+            cy.contains('td', 'Asian').click({ force: true });
             // Case data.
             cy.contains('www.example.com');
             cy.contains('testSourceEntryID123');
