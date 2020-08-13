@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 from datetime import datetime, timezone
+from enum import Enum
 
 import boto3
 import google.auth.transport.requests
@@ -16,6 +17,79 @@ TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
+
+
+# TODO: Move this into common_lib.py after that's merged.
+class UploadError(Enum):
+    """
+    Upload error categories corresponding to the G.h Source API.
+
+    TODO: Move upload handling logic to common_lib.
+    """
+    INTERNAL_ERROR = 1
+    SOURCE_CONFIGURATION_ERROR = 2
+    SOURCE_CONFIGURATION_NOT_FOUND = 3
+    SOURCE_CONTENT_NOT_FOUND = 4
+    SOURCE_CONTENT_DOWNLOAD_ERROR = 5
+    PARSING_ERROR = 6
+    DATA_UPLOAD_ERROR = 7
+
+
+# TODO: Move this into common_lib.py after that's merged.
+def create_upload_record(source_id, headers):
+    """Creates an upload resource via the G.h Source API."""
+    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
+    print(f"Creating upload via {post_api_url}")
+    res = requests.post(post_api_url,
+                        json={"status": "IN_PROGRESS", "summary": {}},
+                        headers=headers)
+    res_json = res.json()
+    if res.status_code != 201:
+        e = RuntimeError(
+            f'Error creating upload record, status={res.status_code}, response={res_json}')
+        complete_with_error(e)
+    # TODO: Look for "errors" in res_json and handle them in some way.
+    return res_json["_id"]
+
+
+# TODO: Move this into common_lib.py after that's merged.
+def finalize_upload(
+        source_id, upload_id, headers, count_created=None, count_updated=None,
+        error=None):
+    """Records the results of an upload via the G.h Source API."""
+    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
+    print(f"Updating upload via {put_api_url}")
+    update = {
+        "status": "ERROR", "summary": {"error": error.name}} if error else {
+        "status": "SUCCESS",
+        "summary": {"numCreated": count_created, "numUpdated": count_updated}}
+    res = requests.put(put_api_url,
+                       json=update,
+                       headers=headers)
+    res_json = res.json()
+    # TODO: Look for "errors" in res_json and handle them in some way.
+    if res.status_code != 200:
+        e = RuntimeError(
+            f'Error updating upload record, status={res.status_code}, response={res_json}')
+        complete_with_error(e, UploadError.INTERNAL_ERROR,
+                            source_id, upload_id, headers)
+
+
+# TODO: Move this into common_lib.py after that's merged.
+def complete_with_error(
+        exception, upload_error=None, source_id=None, upload_id=None,
+        headers=None):
+    """
+    Logs and raises the provided exception.
+
+    If upload details are provided, updates the indicated upload with the
+    provided data.
+    """
+    print(exception)
+    if upload_error and source_id and upload_id:
+        finalize_upload(source_id, upload_id, headers,
+                        error=upload_error)
+    raise exception
 
 
 def extract_source_id(event):
@@ -50,7 +124,7 @@ def obtain_api_credentials():
         raise e
 
 
-def get_source_details(source_id, api_headers):
+def get_source_details(source_id, upload_id, api_headers):
     """
     Retrieves the content URL and format associated with the provided source ID.
     """
@@ -60,15 +134,21 @@ def get_source_details(source_id, api_headers):
         r = requests.get(source_api_endpoint, headers=api_headers)
         api_json = r.json()
         print(f"Received source API response: {api_json}")
-        return api_json["origin"]["url"], api_json["format"], api_json.get("automation", {}).get(
+        return api_json["origin"]["url"], api_json["format"], api_json.get(
+            "automation", {}).get(
             "parser", {}).get(
-            "awsLambdaArn", ""), api_json.get('dateFilter', {})
+            "awsLambdaArn", ""), api_json.get(
+            'dateFilter', {})
     except Exception as e:
-        print(e)
-        raise e
+        upload_error = (
+            UploadError.SOURCE_CONFIGURATION_NOT_FOUND
+            if r.status_code == 404 else UploadError.INTERNAL_ERROR)
+        complete_with_error(
+            e, upload_error, source_id, upload_id,
+            api_headers)
 
 
-def retrieve_content(source_id, url, source_format):
+def retrieve_content(source_id, upload_id, url, source_format, api_headers):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         data = None
@@ -76,6 +156,7 @@ def retrieve_content(source_id, url, source_format):
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
+        r.raise_for_status()
         if source_format == "JSON":
             data = json.dumps(r.json(), indent=4).encode('utf-8')
             extension = "json"
@@ -83,9 +164,10 @@ def retrieve_content(source_id, url, source_format):
             data = r.content
             extension = "csv"
         else:
-            error_message = f"Unsupported source format: {source_format}"
-            print(error_message)
-            raise ValueError(error_message)
+            e = ValueError(f"Unsupported source format: {source_format}")
+            complete_with_error(
+                e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
+                api_headers)
 
         key_filename_part = f"content.{extension}"
         with open(f"/tmp/{key_filename_part}", "wb") as f:
@@ -95,28 +177,38 @@ def retrieve_content(source_id, url, source_format):
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
                 f"{key_filename_part}")
             return (f.name, s3_object_key)
-    except requests.RequestException as e:
-        print(e)
-        raise e
+    except requests.exceptions.RequestException as e:
+        # TODO: Handle 301.
+        upload_error = (
+            UploadError.SOURCE_CONTENT_NOT_FOUND
+            if r.status_code == 404 else
+            UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
+        complete_with_error(
+            e, upload_error, source_id, upload_id,
+            api_headers)
 
 
-def upload_to_s3(file_name, s3_object_key):
+def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
     try:
         s3_client.upload_file(
             file_name, OUTPUT_BUCKET, s3_object_key)
         print(
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
     except Exception as e:
-        print(e)
-        raise e
+        complete_with_error(
+            e, UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_headers)
 
 
-def invoke_parser(parser_arn, source_id, s3_object_key, source_url, date_filter):
+def invoke_parser(
+    parser_arn, source_id, upload_id, api_headers, s3_object_key,
+        source_url, date_filter):
     payload = {
         "s3Bucket": OUTPUT_BUCKET,
         "sourceId": source_id,
         "s3Key": s3_object_key,
         "sourceUrl": source_url,
+        "uploadId": upload_id,
         "dateFilter": date_filter,
     }
     print(f"Invoking parser (ARN: {parser_arn}")
@@ -125,9 +217,9 @@ def invoke_parser(parser_arn, source_id, s3_object_key, source_url, date_filter)
         InvocationType='Event',
         Payload=json.dumps(payload))
     if "StatusCode" not in response or response["StatusCode"] != 202:
-        error_message = f"Parser invocation unsuccessful. Response: {response}"
-        print(error_message)
-        raise Exception(error_message)
+        e = Exception(f"Parser invocation unsuccessful. Response: {response}")
+        complete_with_error(e, UploadError.INTERNAL_ERROR,
+                            source_id, upload_id, api_headers)
 
 
 def lambda_handler(event, context):
@@ -156,10 +248,13 @@ def lambda_handler(event, context):
 
     source_id = extract_source_id(event)
     auth_headers = obtain_api_credentials()
+    upload_id = create_upload_record(source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
-        source_id, auth_headers)
-    file_name, s3_object_key = retrieve_content(source_id, url, source_format)
-    upload_to_s3(file_name, s3_object_key)
+        source_id, upload_id, auth_headers)
+    file_name, s3_object_key = retrieve_content(
+        source_id, upload_id, url, source_format, auth_headers)
+    upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
     if parser_arn:
-        invoke_parser(parser_arn, source_id, s3_object_key, url, date_filter)
+        invoke_parser(parser_arn, source_id, upload_id,
+                      auth_headers, s3_object_key, url, date_filter)
     return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}
