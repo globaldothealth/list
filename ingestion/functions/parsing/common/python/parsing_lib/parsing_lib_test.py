@@ -255,13 +255,18 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases/batchUpsert"
     requests_mock.register_uri(
-        "POST", full_source_url, exc=requests.exceptions.ConnectTimeout),
+        "POST", full_source_url, json={}, status_code=500),
+    upload_id = "123456789012345678901234"
+    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    requests_mock.register_uri("PUT", update_upload_url, json={})
 
     try:
-        count_created, count_updated = parsing_lib.write_to_server([
-            _PARSED_CASE], _SOURCE_ID, "upload_id",
-            {})
-    except requests.exceptions.ConnectTimeout:
+        parsing_lib.write_to_server([_PARSED_CASE], _SOURCE_ID, upload_id, {})
+    except RuntimeError:
+        assert requests_mock.request_history[0].url == full_source_url
+        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[-1].json(
+        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.DATA_UPLOAD_ERROR.name}}
         return
     # We got the wrong exception or no exception, fail the test.
     assert False
@@ -295,18 +300,22 @@ def test_finalize_upload_raises_error_for_failed_request(requests_mock):
     requests_mock.register_uri(
         "PUT",
         update_upload_url,
-        exc=requests.exceptions.ConnectTimeout)
+        [{"json": {}, "status_code": 500}, {"json": {}}])
 
     try:
         parsing_lib.finalize_upload(_SOURCE_ID, upload_id, {}, 42, 0)
-    except requests.exceptions.ConnectTimeout:
+    except RuntimeError:
+        assert requests_mock.request_history[0].url == update_upload_url
+        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[-1].json(
+        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
     assert False
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@ patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
@@ -317,7 +326,7 @@ def test_filter_cases_by_date_today(mock_today):
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@ patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_not_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 10, 10)
@@ -328,7 +337,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     assert cases == []
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@ patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_exactly_before_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
@@ -339,7 +348,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     assert cases == []
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@ patch('parsing_lib.parsing_lib.get_today')
 def test_filter_cases_by_date_before_today(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 10)
@@ -393,19 +402,16 @@ def test_complete_with_error_updates_upload_if_provided_data(requests_mock):
     os.environ["SOURCE_API_URL"] = source_api_url
     upload_id = "123456789012345678901234"
     update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
-    upload_error = parsing_lib.UploadError.SOURCE_CONFIGURATION_ERROR
-    requests_mock.put(
-        update_upload_url,
-        json={"_id": upload_id, "status": "ERROR",
-              "summary": {"error": upload_error.name}})
+    requests_mock.put(update_upload_url, json={})
     e = ValueError("Oops!")
 
     try:
+        upload_error = parsing_lib.UploadError.SOURCE_CONFIGURATION_ERROR
         parsing_lib.complete_with_error(
             e, upload_error, _SOURCE_ID, upload_id, {})
         assert requests_mock.request_history[0].url == update_upload_url
-        assert requests_mock.request_history[-1].json() == {"status": "ERROR", "summary": {
-            "error": "SOURCE_CONFIGURATION_ERROR"}}
+        assert requests_mock.request_history[-1].json(
+        ) == {"status": "ERROR", "summary": {"error": upload_error.name}}
     except ValueError:
         return
     # We got the wrong exception or no exception, fail the test.
