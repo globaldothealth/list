@@ -105,6 +105,8 @@ def sample_data():
 @mock_s3
 def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    # Mock OAuth and create local S3.
     parsing_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
@@ -112,6 +114,8 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
+
+    # Mock the batch upsert call.
     source_api_url = "http://foo.bar"
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/cases/batchUpsert"
@@ -121,6 +125,10 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
         full_source_url,
         json={"createdCaseIds": list(range(num_created)),
               "updatedCaseIds": list(range(num_updated))})
+
+    # Delete the provided upload ID to force parsing_lib to create a new upload.
+    # Mock the create and update upload calls.
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
     base_upload_url = f"{source_api_url}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
@@ -162,11 +170,12 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
         assert json.load(f) == sample_data
 
 
-def test_extract_event_fields_returns_url_bucket_and_key(input_event):
+def test_extract_event_fields_returns_all_present_fields(input_event):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
+        input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
         input_event[parsing_lib.DATE_FILTER_FIELD])
