@@ -1,4 +1,8 @@
 // Case definitions as defined by the /api/cases endpoint.
+export enum VerificationStatus {
+    Unverified = 'UNVERIFIED',
+    Verified = 'VERIFIED',
+}
 
 export interface CaseReference {
     sourceId: string;
