@@ -48,7 +48,7 @@ describe('Bulk upload form', function () {
         );
         cy.server();
         cy.route('get', '/api/cases/*').as('viewCase');
-        cy.get('[title="View this case details"]').click({ force: true });
+        cy.contains('td', 'Male').click({ force: true });
         cy.wait('@viewCase');
 
         // Case data
