@@ -19,7 +19,7 @@ the curator UI to manage case report data sources and view or update case data, 
 
 - [Homebrew](https://docs.brew.sh/Installation): To facilitate installing the below.
 - [MongoDB](https://docs.mongodb.com/manual/administration/install-community/): Make sure, after install, you can run
-  both the `mongo` and `mongoimport` CLIs. (They may need to be added to your path.)
+  both the `mongo` and `mongoimport` CLIs. (They may need to be added to your path.) If you're using homebrew, [`brew install mongodb/brew/mongodb-database-tools`](https://stackoverflow.com/a/62973387/6105673) to get `mongoimport`.
 - [Docker](https://docs.docker.com/get-docker/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
