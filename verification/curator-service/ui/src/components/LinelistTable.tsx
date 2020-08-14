@@ -8,11 +8,11 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 
+import { Case } from './Case';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
@@ -45,38 +45,15 @@ interface LinelistTableState {
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
 interface TableRow {
     id: string;
-    // demographics
-    gender: string;
-    age: [number, number]; // start, end.
-    ethnicity: string;
-    // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
-    nationalities: string;
-    occupation: string;
-    country: string;
-    adminArea1: string;
-    adminArea2: string;
-    adminArea3: string;
-    geoResolution: string;
-    locationName: string;
-    latitude: number;
-    longitude: number;
     confirmedDate: Date | null;
-    confirmationMethod: string;
-    // Represents a list as a comma and space separated string e.g. 'fever, cough'
-    symptoms: string;
-    // Represents a list as a comma and space separated string e.g. 'vertical, iatrogenic'
-    transmissionRoutes: string;
-    // Represents a list as a comma and space separated string e.g. 'gym, hospital'
-    transmissionPlaces: string;
-    // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
-    transmissionLinkedCaseIds: string;
-    travelHistory: TravelHistory;
-    pathogens: Pathogen[];
-    sourceUrl: string | null;
-    notes: string;
-    curatedBy: string;
-    outcome: string;
-    admittedToHospital: string;
+    adminArea3: string;
+    adminArea2: string;
+    adminArea1: string;
+    country: string;
+    age: [number, number]; // start, end.
+    gender: string;
+    outcome?: string;
+    sourceUrl: string;
 }
 
 interface LocationState {
@@ -445,8 +422,26 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             type: 'string',
                         },
                         {
-                            title: 'Gender',
-                            field: 'gender',
+                            title: 'Confirmed date',
+                            field: 'confirmedDate',
+                            render: (rowData): string =>
+                                renderDate(rowData.confirmedDate),
+                        },
+                        {
+                            title: 'Admin 3',
+                            field: 'adminArea3',
+                        },
+                        {
+                            title: 'Admin 2',
+                            field: 'adminArea2',
+                        },
+                        {
+                            title: 'Admin 1',
+                            field: 'adminArea1',
+                        },
+                        {
+                            title: 'Country',
+                            field: 'country',
                         },
                         {
                             title: 'Age',
@@ -457,88 +452,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
                         },
                         {
-                            title: 'Race / Ethnicity',
-                            field: 'ethnicity',
-                        },
-                        {
-                            title: 'Nationality',
-                            field: 'nationalities',
-                        },
-                        {
-                            title: 'Occupation',
-                            field: 'occupation',
-                        },
-                        {
-                            title: 'Location',
-                            field: 'locationName',
-                        },
-                        {
-                            title: 'Country',
-                            field: 'country',
-                        },
-                        {
-                            title: 'Confirmed date',
-                            field: 'confirmedDate',
-                            render: (rowData): string =>
-                                renderDate(rowData.confirmedDate),
-                        },
-                        {
-                            title: 'Confirmation method',
-                            field: 'confirmationMethod',
-                        },
-                        {
-                            title: 'Admitted to hospital',
-                            field: 'admittedToHospital',
+                            title: 'Gender',
+                            field: 'gender',
                         },
                         {
                             title: 'Outcome',
                             field: 'outcome',
                         },
                         {
-                            title: 'Symptoms',
-                            field: 'symptoms',
-                        },
-                        {
-                            title: 'Routes of transmission',
-                            field: 'transmissionRoutes',
-                        },
-                        {
-                            title: 'Places of transmission',
-                            field: 'transmissionPlaces',
-                        },
-                        {
-                            title: 'Contacted case IDs',
-                            field: 'transmissionLinkedCaseIds',
-                        },
-                        {
-                            title: 'Travel history',
-                            field: 'travelHistory',
-                            render: (rowData): string =>
-                                rowData.travelHistory?.travel
-                                    ?.map(
-                                        (travel: Travel) =>
-                                            travel.location?.name,
-                                    )
-                                    ?.join(', '),
-                        },
-                        {
-                            title: 'Pathogens',
-                            field: 'pathogens',
-                            render: (rowData): string =>
-                                rowData.pathogens
-                                    ?.map((pathogen: Pathogen) => pathogen.name)
-                                    ?.join(', '),
-                        },
-                        { title: 'Notes', field: 'notes' },
-                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                        },
-                        {
-                            title: 'Curated by',
-                            field: 'curatedBy',
-                            tooltip:
-                                'If unknown, this is most likely an imported case',
                         },
                     ]}
                     data={(query): Promise<QueryResult<TableRow>> =>
@@ -563,76 +486,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         );
                                         flattenedCases.push({
                                             id: c._id,
-                                            gender: c.demographics?.gender,
-                                            age: [
-                                                c.demographics?.ageRange?.start,
-                                                c.demographics?.ageRange?.end,
-                                            ],
-                                            ethnicity:
-                                                c.demographics?.ethnicity,
-                                            nationalities: c.demographics?.nationalities?.join(
-                                                ', ',
-                                            ),
-                                            occupation:
-                                                c.demographics?.occupation,
-                                            country: c.location.country,
-                                            adminArea1:
-                                                c.location
-                                                    ?.administrativeAreaLevel1,
-                                            adminArea2:
-                                                c.location
-                                                    ?.administrativeAreaLevel2,
-                                            adminArea3:
-                                                c.location
-                                                    ?.administrativeAreaLevel3,
-                                            latitude:
-                                                c.location?.geometry?.latitude,
-                                            longitude:
-                                                c.location?.geometry?.longitude,
-                                            geoResolution:
-                                                c.location?.geoResolution,
-                                            locationName: c.location?.name,
                                             confirmedDate: confirmedEvent
                                                 ?.dateRange?.start
                                                 ? new Date(
                                                       confirmedEvent.dateRange.start,
                                                   )
                                                 : null,
-                                            confirmationMethod:
-                                                confirmedEvent?.value || '',
-                                            symptoms: c.symptoms?.values?.join(
-                                                ', ',
-                                            ),
-                                            transmissionRoutes: c.transmission?.routes.join(
-                                                ', ',
-                                            ),
-                                            transmissionPlaces: c.transmission?.places.join(
-                                                ', ',
-                                            ),
-                                            transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
-                                                ', ',
-                                            ),
-                                            travelHistory: c.travelHistory,
-                                            pathogens: c.pathogens,
-                                            notes: c.notes,
+                                            adminArea3:
+                                                c.location
+                                                    ?.administrativeAreaLevel3,
+                                            adminArea2:
+                                                c.location
+                                                    ?.administrativeAreaLevel2,
+                                            adminArea1:
+                                                c.location
+                                                    ?.administrativeAreaLevel1,
+                                            country: c.location.country,
+                                            age: [
+                                                c.demographics?.ageRange?.start,
+                                                c.demographics?.ageRange?.end,
+                                            ],
+                                            gender: c.demographics?.gender,
+                                            outcome: c.events.find(
+                                                (event) =>
+                                                    event.name === 'outcome',
+                                            )?.value,
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
-                                            curatedBy:
-                                                c.revisionMetadata
-                                                    ?.creationMetadata
-                                                    ?.curator || 'Unknown',
-                                            admittedToHospital:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'hospitalAdmission',
-                                                )?.value || 'Unknown',
-                                            outcome:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'outcome',
-                                                )?.value || 'Unknown',
                                         });
                                     }
                                     resolve({
@@ -650,6 +530,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     title="COVID-19 cases"
                     options={{
                         search: false,
+                        emptyRowsWhenPaging: false,
                         filtering: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
