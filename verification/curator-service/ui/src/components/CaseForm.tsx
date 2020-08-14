@@ -1,13 +1,13 @@
 import * as Yup from 'yup';
 
 import { Button, LinearProgress, Typography } from '@material-ui/core';
+import { Case, VerificationStatus } from './Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import Source, { submitSource } from './common-form-fields/Source';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import AppModal from './AppModal';
-import { Case } from './Case';
 import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
@@ -330,7 +330,7 @@ export default function CaseForm(props: Props): JSX.Element {
         const newCase = {
             caseReference: {
                 ...values.caseReference,
-                verificationStatus: 'VERIFIED',
+                verificationStatus: VerificationStatus.Verified,
             },
             demographics: {
                 gender: unknownOrEmptyToUndefined(values.gender),
