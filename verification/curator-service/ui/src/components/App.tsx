@@ -7,7 +7,6 @@ import {
     Menu,
     MenuItem,
     Toolbar,
-    Typography,
     useMediaQuery,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
@@ -20,6 +19,7 @@ import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
+import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
@@ -157,7 +157,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
     },
-    title: {
+    spacer: {
         flexGrow: 1,
     },
     appBar: {
@@ -337,13 +337,8 @@ export default function App(): JSX.Element {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography
-                            variant="h6"
-                            className={classes.title}
-                            noWrap
-                        >
-                            Global Health Curator Portal
-                        </Typography>
+                        <GHListLogo />
+                        <span className={classes.spacer}></span>
                         {user?.email ? (
                             <Button
                                 classes={{ label: classes.buttonLabel }}
