@@ -750,8 +750,20 @@ components:
             sourceUrl:
               type: string
             uploadId:
+              description: >
+                The UUID of the upload in which the batch of cases including
+                this case document was entered into the G.h system. This field
+                is only populated for cases entered via automated ingestion.
               type: string
               pattern: '^[a-f\d]{24}$'
+            verificationStatus:
+              description: >
+                Whether the case document has been manually verified for
+                correctness.
+              type: string
+              enum:
+                - UNVERIFIED
+                - VERIFIED
             additionalSources:
               type: array
               items:
