@@ -666,7 +666,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E8F0FE' }
+                                ? { backgroundColor: '#E7EFED' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {

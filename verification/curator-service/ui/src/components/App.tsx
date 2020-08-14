@@ -2,6 +2,7 @@ import {
     AppBar,
     Button,
     CssBaseline,
+    Fab,
     IconButton,
     Menu,
     MenuItem,
@@ -71,6 +72,7 @@ const theme = createMuiTheme({
         MuiListItem: {
             root: {
                 color: '#5D5D5D',
+                borderRadius: '4px',
                 '&$selected': {
                     backgroundColor: '#E7EFED',
                     color: '#0E7569',
@@ -175,6 +177,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         border: 'none',
         width: drawerWidth,
     },
+    drawerContents: {
+        marginLeft: '12px',
+        marginRight: '40px',
+    },
     drawerHeader: {
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
@@ -197,8 +203,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: `calc(100% - ${drawerWidth}px)`,
     },
     createNewButton: {
-        margin: '1em',
-        width: '70%',
+        margin: '12px 0',
+        width: '100%',
+    },
+    createNewIcon: {
+        marginRight: '12px',
     },
 }));
 
@@ -338,16 +347,16 @@ export default function App(): JSX.Element {
                         {user?.email ? (
                             <Button
                                 classes={{ label: classes.buttonLabel }}
-                                variant="contained"
-                                color="secondary"
+                                variant="outlined"
+                                color="inherit"
                                 href="/auth/logout"
                             >
                                 Logout {user?.email}
                             </Button>
                         ) : (
                             <Button
-                                variant="contained"
-                                color="secondary"
+                                variant="outlined"
+                                color="inherit"
                                 href={process.env.REACT_APP_LOGIN_URL}
                             >
                                 Login
@@ -365,71 +374,77 @@ export default function App(): JSX.Element {
                         paper: classes.drawerPaper,
                     }}
                 >
-                    <div className={classes.drawerHeader}></div>
-                    {hasAnyRole(['curator']) && (
-                        <>
-                            <Button
-                                variant="contained"
-                                data-testid="create-new-button"
-                                className={classes.createNewButton}
-                                color="secondary"
-                                onClick={openCreateNewPopup}
-                                startIcon={<AddIcon />}
-                            >
-                                Create new
-                            </Button>
-                            <Menu
-                                anchorEl={createNewButtonAnchorEl}
-                                getContentAnchorEl={null}
-                                keepMounted
-                                open={Boolean(createNewButtonAnchorEl)}
-                                onClose={closeCreateNewPopup}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
-                                }}
-                            >
-                                <MenuItem
-                                    onClick={(): void => {
-                                        closeCreateNewPopup();
-                                        history.push('/cases/new');
+                    <div className={classes.drawerContents}>
+                        <div className={classes.drawerHeader}></div>
+                        {hasAnyRole(['curator']) && (
+                            <>
+                                <Fab
+                                    variant="extended"
+                                    data-testid="create-new-button"
+                                    className={classes.createNewButton}
+                                    color="secondary"
+                                    onClick={openCreateNewPopup}
+                                >
+                                    <AddIcon
+                                        className={classes.createNewIcon}
+                                    />
+                                    Create new
+                                </Fab>
+                                <Menu
+                                    anchorEl={createNewButtonAnchorEl}
+                                    getContentAnchorEl={null}
+                                    keepMounted
+                                    open={Boolean(createNewButtonAnchorEl)}
+                                    onClose={closeCreateNewPopup}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
                                     }}
                                 >
-                                    New line list case
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={(): void => {
-                                        closeCreateNewPopup();
-                                        history.push('/cases/bulk');
-                                    }}
-                                >
-                                    New bulk upload
-                                </MenuItem>
-                            </Menu>
-                        </>
-                    )}
-                    <List>
-                        {menuList.map(
-                            (item, index) =>
-                                item.displayCheck() && (
-                                    <Link key={item.text} to={item.to}>
-                                        <ListItem
-                                            button
-                                            key={item.text}
-                                            selected={
-                                                selectedMenuIndex === index
-                                            }
-                                        >
-                                            <ListItemIcon>
-                                                {item.icon}
-                                            </ListItemIcon>
-
-                                            <ListItemText primary={item.text} />
-                                        </ListItem>
-                                    </Link>
-                                ),
+                                    <MenuItem
+                                        onClick={(): void => {
+                                            closeCreateNewPopup();
+                                            history.push('/cases/new');
+                                        }}
+                                    >
+                                        New line list case
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={(): void => {
+                                            closeCreateNewPopup();
+                                            history.push('/cases/bulk');
+                                        }}
+                                    >
+                                        New bulk upload
+                                    </MenuItem>
+                                </Menu>
+                            </>
                         )}
-                    </List>
+                        <List>
+                            {menuList.map(
+                                (item, index) =>
+                                    item.displayCheck() && (
+                                        <Link key={item.text} to={item.to}>
+                                            <ListItem
+                                                button
+                                                key={item.text}
+                                                selected={
+                                                    selectedMenuIndex === index
+                                                }
+                                            >
+                                                <ListItemIcon>
+                                                    {item.icon}
+                                                </ListItemIcon>
+
+                                                <ListItemText
+                                                    primary={item.text}
+                                                />
+                                            </ListItem>
+                                        </Link>
+                                    ),
+                            )}
+                        </List>
+                    </div>
                 </Drawer>
                 <main
                     className={clsx(classes.content, {
