@@ -1,22 +1,30 @@
 import json
 import os
 import tempfile
+import sys
 from datetime import datetime, timezone
 from enum import Enum
 
 import boto3
 import google.auth.transport.requests
 import requests
-from google.oauth2 import service_account
 
-METADATA_BUCKET = "epid-ingestion"
 OUTPUT_BUCKET = "epid-sources-raw"
-SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 SOURCE_ID_FIELD = "sourceId"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
+
+# Layer code, like common_lib, is added to the path by AWS.
+# To test locally (e.g. via pytest), we have to modify sys.path.
+# pylint: disable=import-error
+if ('lambda' not in sys.argv[0]):
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'common'))
+import common_lib
 
 
 # TODO: Move this into common_lib.py after that's merged.
@@ -98,29 +106,6 @@ def extract_source_id(event):
         print(error_message)
         raise ValueError(error_message)
     return event[SOURCE_ID_FIELD]
-
-
-def obtain_api_credentials():
-    """
-    Creates HTTP headers credentialed for access to the Global Health Source API.
-    """
-    try:
-        with tempfile.NamedTemporaryFile() as local_creds_file:
-            print(
-                "Retrieving service account credentials from "
-                f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-            s3_client.download_file(
-                METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
-            credentials = service_account.Credentials.from_service_account_file(
-                local_creds_file.name, scopes=["email"])
-            headers = {}
-            request = google.auth.transport.requests.Request()
-            credentials.refresh(request)
-            credentials.apply(headers)
-            return headers
-    except Exception as e:
-        print(e)
-        raise e
 
 
 def get_source_details(source_id, upload_id, api_headers):
@@ -246,7 +231,7 @@ def lambda_handler(event, context):
     """
 
     source_id = extract_source_id(event)
-    auth_headers = obtain_api_credentials()
+    auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = create_upload_record(source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
         source_id, upload_id, auth_headers)

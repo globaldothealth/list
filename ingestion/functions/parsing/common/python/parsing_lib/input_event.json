@@ -5,7 +5,7 @@
     "sourceId": "5f0b9a7ead3a2b003edc0e7f",
     "uploadId": "123456789012345678901234",
     "dateFilter": {
-        "numDaysBeforeToday": 2,
+        "numDaysBeforeToday": 3,
         "op": "EQ"
     }
 }
