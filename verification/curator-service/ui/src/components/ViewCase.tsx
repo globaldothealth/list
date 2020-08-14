@@ -293,6 +293,15 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
+                            {/* Consider surfacing this as a top-level icon on this page. */}
+                            <RowHeader title="Verification status" />
+                            <RowContent
+                                content={
+                                    props.c.caseReference?.verificationStatus ||
+                                    'Unknown'
+                                }
+                            />
+
                             {props.c.revisionMetadata?.updateMetadata && (
                                 <>
                                     <RowHeader title="Date of edit" />
@@ -502,9 +511,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     ?.hasPreexistingConditions === undefined
                                     ? ''
                                     : props.c.preexistingConditions
-                                          .hasPreexistingConditions
-                                    ? 'Yes'
-                                    : 'No'
+                                        .hasPreexistingConditions
+                                        ? 'Yes'
+                                        : 'No'
                             }
                         />
 
@@ -573,9 +582,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                         ?.traveledPrior30Days === undefined
                                         ? ''
                                         : props.c.travelHistory
-                                              .traveledPrior30Days
-                                        ? 'Yes'
-                                        : 'No'
+                                            .traveledPrior30Days
+                                            ? 'Yes'
+                                            : 'No'
                                 }
                             />
 
@@ -746,8 +755,8 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                     {props.content}
                 </a>
             ) : (
-                props.content
-            )}
+                    props.content
+                )}
         </Grid>
     );
 }
