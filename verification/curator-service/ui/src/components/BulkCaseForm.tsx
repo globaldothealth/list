@@ -367,6 +367,7 @@ class BulkCaseForm extends React.Component<
                 sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
                 sourceUrl: caseReference.sourceUrl,
+                verificationStatus: 'VERIFIED',
             },
             demographics: {
                 gender: c.gender,

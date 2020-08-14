@@ -55,6 +55,7 @@ describe('Bulk upload form', function () {
         cy.contains('www.bulksource.com');
         cy.contains('sourceEntryId');
         cy.contains('superuser@test.com');
+        cy.contains('VERIFIED');
 
         // Demographics
         cy.contains('42-43');

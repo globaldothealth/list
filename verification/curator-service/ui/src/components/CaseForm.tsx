@@ -328,7 +328,10 @@ export default function CaseForm(props: Props): JSX.Element {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference: values.caseReference,
+            caseReference: {
+                ...values.caseReference,
+                verificationStatus: 'VERIFIED',
+            },
             demographics: {
                 gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,
