@@ -69,13 +69,13 @@ def create_upload_record(source_id, headers):
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
                         headers=headers)
-    res_json = res.json()
-    if res.status_code != 201:
-        e = RuntimeError(
-            f'Error creating upload record, status={res.status_code}, response={res_json}')
-        complete_with_error(e)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    return res_json["_id"]
+    if res and res.status_code == 201:
+        res_json = res.json()
+        # TODO: Look for "errors" in res_json and handle them in some way.
+        return res_json["_id"]
+    e = RuntimeError(
+        f'Error creating upload record, status={res.status_code}, response={res.text}')
+    complete_with_error(e)
 
 
 def prepare_cases(cases, upload_id):
@@ -95,14 +95,14 @@ def write_to_server(cases, source_id, upload_id, headers):
     print(f"Sending {len(cases)} cases to {put_api_url}")
     res = requests.post(put_api_url, json={"cases": cases},
                         headers=headers)
-    res_json = res.json()
-    if res.status_code != 200:
-        e = RuntimeError(
-            f'Error sending cases to server, status={res.status_code}, response={res_json}')
-        complete_with_error(e, UploadError.DATA_UPLOAD_ERROR,
-                            source_id, upload_id, headers)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+    if res and res.status_code == 200:
+        res_json = res.json()
+        # TODO: Look for "errors" in res_json and handle them in some way.
+        return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+    e = RuntimeError(
+        f'Error sending cases to server, status={res.status_code}, response={res.text}')
+    complete_with_error(e, UploadError.DATA_UPLOAD_ERROR,
+                        source_id, upload_id, headers)
 
 
 def finalize_upload(
@@ -118,11 +118,10 @@ def finalize_upload(
     res = requests.put(put_api_url,
                        json=update,
                        headers=headers)
-    res_json = res.json()
     # TODO: Look for "errors" in res_json and handle them in some way.
-    if res.status_code != 200:
+    if not res or res.status_code != 200:
         e = RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res_json}')
+            f'Error updating upload record, status={res.status_code}, response={res.text}')
         complete_with_error(e, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, headers)
 
