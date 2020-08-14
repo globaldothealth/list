@@ -26,6 +26,8 @@ Resources:
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
       Timeout: 60 # Seconds
+      Layers:
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
@@ -39,6 +41,20 @@ Resources:
       LayerName: parsing_lib
       Description: Common functions required for parsing
       ContentUri: parsing/common/python/parsing_lib
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.8
+  CommonLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common_lib
+      Description: Common functions between parsing and retrieval
+      ContentUri: common
       CompatibleRuntimes:
         - python3.6
         - python3.7
@@ -61,6 +77,7 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
@@ -82,6 +99,7 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
@@ -103,6 +121,7 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
