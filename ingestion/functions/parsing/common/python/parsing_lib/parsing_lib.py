@@ -16,6 +16,7 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
+UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
 
 s3_client = boto3.client("s3")
@@ -47,7 +48,7 @@ def extract_event_fields(event):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         complete_with_error(e)
-    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event[
+    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
 
 
@@ -235,10 +236,11 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, source_id, s3_bucket, s3_key, date_filter = extract_event_fields(
+    source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
         event)
     api_creds = obtain_api_credentials()
-    upload_id = create_upload_record(source_id, api_creds)
+    if not upload_id:
+        upload_id = create_upload_record(source_id, api_creds)
     try:
         raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
         case_data = parsing_function(
