@@ -8,7 +8,7 @@ export interface CaseReference {
     sourceId: string;
     sourceEntryId?: string;
     sourceUrl: string;
-    verificationStatus?: string;
+    verificationStatus?: VerificationStatus;
     additionalSources?: [
         {
             sourceUrl: string;
