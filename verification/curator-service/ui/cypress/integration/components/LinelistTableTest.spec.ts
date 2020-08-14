@@ -38,7 +38,8 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
         cy.contains('Edit case').should('not.exist');
-        cy.get('button[title="Edit this case"]').click({ force: true });
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Edit').click();
         cy.contains('Edit case');
         cy.get('button[aria-label="close overlay"').click();
         cy.contains('Edit case').should('not.exist');
@@ -53,7 +54,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
         cy.contains('View case').should('not.exist');
-        cy.get('button[title="View this case details"]').click({ force: true });
+        cy.contains('td', 'France').click({ force: true });
         cy.contains('View case');
         cy.get('button[aria-label="close overlay"').click();
         cy.contains('View case').should('not.exist');
@@ -68,8 +69,8 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.contains('some notes');
 
-        cy.get('button[title="Delete"]').click({ force: true });
-        cy.get('button[title="Save"]').click({ force: true });
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Delete').click();
 
         cy.contains('some notes').should('not.exist');
     });
