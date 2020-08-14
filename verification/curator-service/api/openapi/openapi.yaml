@@ -640,6 +640,7 @@ components:
         status:
           type: string
           enum:
+            - IN_PROGRESS
             - SUCCESS
             - ERROR
         summary:
@@ -651,6 +652,14 @@ components:
               type: integer
             error:
               type: string
+              enum:
+                - INTERNAL_ERROR
+                - SOURCE_CONFIGURATION_ERROR
+                - SOURCE_CONFIGURATION_NOT_FOUND
+                - SOURCE_CONTENT_NOT_FOUND
+                - SOURCE_CONTENT_DOWNLOAD_ERROR
+                - PARSING_ERROR
+                - DATA_UPLOAD_ERROR
         created: 
           $ref: "#/components/schemas/Date"
     Source:

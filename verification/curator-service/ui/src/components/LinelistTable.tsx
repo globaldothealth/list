@@ -1,26 +1,29 @@
 import {
     Button,
+    IconButton,
+    Menu,
+    MenuItem,
     Theme,
     Tooltip,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-import { Case, Pathogen, Travel, TravelHistory } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 
+import { Case } from './Case';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Link } from 'react-router-dom';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
-import VisibilityIcon from '@material-ui/icons/VisibilityOutlined';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -42,38 +45,15 @@ interface LinelistTableState {
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
 interface TableRow {
     id: string;
-    // demographics
-    gender: string;
-    age: [number, number]; // start, end.
-    ethnicity: string;
-    // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
-    nationalities: string;
-    occupation: string;
-    country: string;
-    adminArea1: string;
-    adminArea2: string;
-    adminArea3: string;
-    geoResolution: string;
-    locationName: string;
-    latitude: number;
-    longitude: number;
     confirmedDate: Date | null;
-    confirmationMethod: string;
-    // Represents a list as a comma and space separated string e.g. 'fever, cough'
-    symptoms: string;
-    // Represents a list as a comma and space separated string e.g. 'vertical, iatrogenic'
-    transmissionRoutes: string;
-    // Represents a list as a comma and space separated string e.g. 'gym, hospital'
-    transmissionPlaces: string;
-    // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
-    transmissionLinkedCaseIds: string;
-    travelHistory: TravelHistory;
-    pathogens: Pathogen[];
-    sourceUrl: string | null;
-    notes: string;
-    curatedBy: string;
-    outcome: string;
-    admittedToHospital: string;
+    adminArea3: string;
+    adminArea2: string;
+    adminArea1: string;
+    country: string;
+    age: [number, number]; // start, end.
+    gender: string;
+    outcome?: string;
+    sourceUrl: string;
 }
 
 interface LocationState {
@@ -219,6 +199,81 @@ function SearchBar(props: {
     );
 }
 
+const rowMenuStyles = makeStyles((theme: Theme) => ({
+    menuItemTitle: {
+        marginLeft: theme.spacing(1),
+    },
+}));
+
+function RowMenu(props: {
+    rowId: string;
+    setError: (error: string) => void;
+    refreshData: () => void;
+}): JSX.Element {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const history = useHistory();
+    const classes = rowMenuStyles();
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (event?: any): void => {
+        event?.stopPropagation();
+        setAnchorEl(null);
+    };
+
+    const handleEdit = (event?: any): void => {
+        event?.stopPropagation();
+        history.push(`/cases/edit/${props.rowId}`);
+    };
+
+    const handleDelete = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        try {
+            props.setError('');
+            const deleteUrl = '/api/cases/' + props.rowId;
+            await axios.delete(deleteUrl);
+            handleClose();
+            props.refreshData();
+        } catch (e) {
+            props.setError(e.toString());
+            handleClose();
+        }
+    };
+
+    return (
+        <>
+            <IconButton
+                aria-controls="topbar-menu"
+                aria-haspopup="true"
+                aria-label="row menu"
+                data-testid="row menu"
+                onClick={handleClick}
+                color="inherit"
+            >
+                <MoreVertIcon />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={handleEdit}>
+                    <EditIcon />
+                    <span className={classes.menuItemTitle}>Edit</span>
+                </MenuItem>
+                <MenuItem onClick={handleDelete}>
+                    <DeleteIcon />
+                    <span className={classes.menuItemTitle}>Delete</span>
+                </MenuItem>
+            </Menu>
+        </>
+    );
+}
+
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
     unlisten: () => void;
@@ -335,14 +390,58 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
+                        ...(this.props.user.roles.includes('curator')
+                            ? [
+                                  // TODO: move to the left of selection checkboxes when possible
+                                  // https://github.com/mbrn/material-table/issues/2317
+                                  {
+                                      cellStyle: {
+                                          padding: '0',
+                                      },
+                                      render: (
+                                          rowData: TableRow,
+                                      ): JSX.Element => (
+                                          <RowMenu
+                                              rowId={rowData.id}
+                                              refreshData={(): void =>
+                                                  this.tableRef.current.onQueryChange()
+                                              }
+                                              setError={(error): void =>
+                                                  this.setState({
+                                                      error: error,
+                                                  })
+                                              }
+                                          ></RowMenu>
+                                      ),
+                                  },
+                              ]
+                            : []),
                         {
                             title: 'Case ID',
                             field: 'id',
                             type: 'string',
                         },
                         {
-                            title: 'Gender',
-                            field: 'gender',
+                            title: 'Confirmed date',
+                            field: 'confirmedDate',
+                            render: (rowData): string =>
+                                renderDate(rowData.confirmedDate),
+                        },
+                        {
+                            title: 'Admin 3',
+                            field: 'adminArea3',
+                        },
+                        {
+                            title: 'Admin 2',
+                            field: 'adminArea2',
+                        },
+                        {
+                            title: 'Admin 1',
+                            field: 'adminArea1',
+                        },
+                        {
+                            title: 'Country',
+                            field: 'country',
                         },
                         {
                             title: 'Age',
@@ -353,88 +452,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
                         },
                         {
-                            title: 'Race / Ethnicity',
-                            field: 'ethnicity',
-                        },
-                        {
-                            title: 'Nationality',
-                            field: 'nationalities',
-                        },
-                        {
-                            title: 'Occupation',
-                            field: 'occupation',
-                        },
-                        {
-                            title: 'Location',
-                            field: 'locationName',
-                        },
-                        {
-                            title: 'Country',
-                            field: 'country',
-                        },
-                        {
-                            title: 'Confirmed date',
-                            field: 'confirmedDate',
-                            render: (rowData): string =>
-                                renderDate(rowData.confirmedDate),
-                        },
-                        {
-                            title: 'Confirmation method',
-                            field: 'confirmationMethod',
-                        },
-                        {
-                            title: 'Admitted to hospital',
-                            field: 'admittedToHospital',
+                            title: 'Gender',
+                            field: 'gender',
                         },
                         {
                             title: 'Outcome',
                             field: 'outcome',
                         },
                         {
-                            title: 'Symptoms',
-                            field: 'symptoms',
-                        },
-                        {
-                            title: 'Routes of transmission',
-                            field: 'transmissionRoutes',
-                        },
-                        {
-                            title: 'Places of transmission',
-                            field: 'transmissionPlaces',
-                        },
-                        {
-                            title: 'Contacted case IDs',
-                            field: 'transmissionLinkedCaseIds',
-                        },
-                        {
-                            title: 'Travel history',
-                            field: 'travelHistory',
-                            render: (rowData): string =>
-                                rowData.travelHistory?.travel
-                                    ?.map(
-                                        (travel: Travel) =>
-                                            travel.location?.name,
-                                    )
-                                    ?.join(', '),
-                        },
-                        {
-                            title: 'Pathogens',
-                            field: 'pathogens',
-                            render: (rowData): string =>
-                                rowData.pathogens
-                                    ?.map((pathogen: Pathogen) => pathogen.name)
-                                    ?.join(', '),
-                        },
-                        { title: 'Notes', field: 'notes' },
-                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                        },
-                        {
-                            title: 'Curated by',
-                            field: 'curatedBy',
-                            tooltip:
-                                'If unknown, this is most likely an imported case',
                         },
                     ]}
                     data={(query): Promise<QueryResult<TableRow>> =>
@@ -459,76 +486,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         );
                                         flattenedCases.push({
                                             id: c._id,
-                                            gender: c.demographics?.gender,
-                                            age: [
-                                                c.demographics?.ageRange?.start,
-                                                c.demographics?.ageRange?.end,
-                                            ],
-                                            ethnicity:
-                                                c.demographics?.ethnicity,
-                                            nationalities: c.demographics?.nationalities?.join(
-                                                ', ',
-                                            ),
-                                            occupation:
-                                                c.demographics?.occupation,
-                                            country: c.location.country,
-                                            adminArea1:
-                                                c.location
-                                                    ?.administrativeAreaLevel1,
-                                            adminArea2:
-                                                c.location
-                                                    ?.administrativeAreaLevel2,
-                                            adminArea3:
-                                                c.location
-                                                    ?.administrativeAreaLevel3,
-                                            latitude:
-                                                c.location?.geometry?.latitude,
-                                            longitude:
-                                                c.location?.geometry?.longitude,
-                                            geoResolution:
-                                                c.location?.geoResolution,
-                                            locationName: c.location?.name,
                                             confirmedDate: confirmedEvent
                                                 ?.dateRange?.start
                                                 ? new Date(
                                                       confirmedEvent.dateRange.start,
                                                   )
                                                 : null,
-                                            confirmationMethod:
-                                                confirmedEvent?.value || '',
-                                            symptoms: c.symptoms?.values?.join(
-                                                ', ',
-                                            ),
-                                            transmissionRoutes: c.transmission?.routes.join(
-                                                ', ',
-                                            ),
-                                            transmissionPlaces: c.transmission?.places.join(
-                                                ', ',
-                                            ),
-                                            transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
-                                                ', ',
-                                            ),
-                                            travelHistory: c.travelHistory,
-                                            pathogens: c.pathogens,
-                                            notes: c.notes,
+                                            adminArea3:
+                                                c.location
+                                                    ?.administrativeAreaLevel3,
+                                            adminArea2:
+                                                c.location
+                                                    ?.administrativeAreaLevel2,
+                                            adminArea1:
+                                                c.location
+                                                    ?.administrativeAreaLevel1,
+                                            country: c.location.country,
+                                            age: [
+                                                c.demographics?.ageRange?.start,
+                                                c.demographics?.ageRange?.end,
+                                            ],
+                                            gender: c.demographics?.gender,
+                                            outcome: c.events.find(
+                                                (event) =>
+                                                    event.name === 'outcome',
+                                            )?.value,
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
-                                            curatedBy:
-                                                c.revisionMetadata
-                                                    ?.creationMetadata
-                                                    ?.curator || 'Unknown',
-                                            admittedToHospital:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'hospitalAdmission',
-                                                )?.value || 'Unknown',
-                                            outcome:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'outcome',
-                                                )?.value || 'Unknown',
                                         });
                                     }
                                     resolve({
@@ -546,14 +530,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     title="COVID-19 cases"
                     options={{
                         search: false,
+                        emptyRowsWhenPaging: false,
                         filtering: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: true,
+                        selection: this.props.user.roles.includes('curator'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
-                        actionsColumnIndex: -1,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
@@ -563,35 +547,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E8F0FE' }
+                                ? { backgroundColor: '#E7EFED' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
                         this.setState({ pageSize: newPageSize });
                         this.tableRef.current.onQueryChange();
                     }}
-                    // actions cannot be a function https://github.com/mbrn/material-table/issues/676
+                    onRowClick={(_, rowData?: TableRow): void => {
+                        if (rowData) {
+                            history.push(`/cases/view/${rowData.id}`);
+                        }
+                    }}
                     actions={
                         this.props.user.roles.includes('curator')
                             ? [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="edit">
-                                              <EditIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Edit this case',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, row: any): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/edit/${id}`);
-                                      },
-                                      position: 'row',
-                                  },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
-                                  // editable section.
+                                  // RowMenu function.
                                   {
                                       icon: () => (
                                           <span aria-label="delete all">
@@ -616,47 +589,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           );
                                       },
                                   },
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
-                                      },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
                               ]
-                            : [
-                                  {
-                                      icon: () => (
-                                          <span aria-label="details">
-                                              <VisibilityIcon />
-                                          </span>
-                                      ),
-                                      onClick: (e, row): void => {
-                                          // Somehow the templating system doesn't think row has an id property but it has.
-                                          const id = (row as TableRow).id;
-                                          history.push(`/cases/view/${id}`);
-                                      },
-                                      tooltip: 'View this case details',
-                                      position: 'row',
-                                  },
-                              ]
-                    }
-                    editable={
-                        this.props.user.roles.includes('curator')
-                            ? {
-                                  onRowDelete: (
-                                      rowData: TableRow,
-                                  ): Promise<unknown> =>
-                                      this.deleteCase(rowData),
-                              }
-                            : undefined
+                            : []
                     }
                 />
             </Paper>

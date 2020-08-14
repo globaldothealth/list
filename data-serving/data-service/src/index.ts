@@ -1,16 +1,9 @@
-// Set up appmetrics-dash before importing additional dependencies.
-// This ensures that the module captures metrics for dependent systems, like
-// MongoDB.
-import Dash from 'appmetrics-dash';
-if (process.env.NODE_ENV !== 'test') {
-    Dash.attach();
-}
-
 import * as caseController from './controllers/case';
 import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    createBatchCaseRevisions,
     createCaseRevision,
     setBatchRevisionMetadata,
     setRevisionMetadata,
@@ -22,11 +15,16 @@ import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
+import expressStatusMonitor from 'express-status-monitor';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 
 const app = express();
+
+if (process.env.NODE_ENV !== 'test') {
+    app.use(expressStatusMonitor());
+}
 
 dotenv.config();
 const env = validateEnv();
@@ -83,6 +81,7 @@ new OpenApiValidator({
         apiRouter.post(
             '/cases/batchUpsert',
             setBatchRevisionMetadata,
+            createBatchCaseRevisions,
             caseController.batchUpsert,
         );
         apiRouter.put(

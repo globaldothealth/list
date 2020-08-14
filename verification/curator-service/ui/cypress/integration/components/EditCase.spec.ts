@@ -13,10 +13,7 @@ describe('Edit case', function () {
     it('can edit a case', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
-            methodOfConfirmation: 'PCR test',
-            nationalities: ['Andorrean', 'French'],
         });
         cy.addSource('Test source', 'www.example.com');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
@@ -24,8 +21,6 @@ describe('Edit case', function () {
             cy.visit(`cases/edit/${resp.body.cases[0]._id}`);
             // Check that we have something from the original case.
             cy.contains('France');
-            cy.contains('Andorrean');
-            cy.contains('French');
             cy.contains('Female').should('not.exist');
             cy.contains('21').should('not.exist');
             // Change a few things.
@@ -44,8 +39,7 @@ describe('Edit case', function () {
             cy.contains('Female');
             cy.contains('21');
             // What's untouched should stay as is.
-            cy.contains('Andorrean');
-            cy.contains('French');
+            cy.contains('France');
         });
     });
 });
