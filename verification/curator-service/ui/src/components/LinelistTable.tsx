@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { Case } from './Case';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
@@ -211,7 +211,6 @@ function RowMenu(props: {
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const history = useHistory();
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -224,21 +223,16 @@ function RowMenu(props: {
         setAnchorEl(null);
     };
 
-    const handleEdit = (event?: any): void => {
-        event?.stopPropagation();
-        history.push(`/cases/edit/${props.rowId}`);
-    };
-
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
             props.setError('');
             const deleteUrl = '/api/cases/' + props.rowId;
             await axios.delete(deleteUrl);
-            handleClose();
             props.refreshData();
         } catch (e) {
             props.setError(e.toString());
+        } finally {
             handleClose();
         }
     };
@@ -261,10 +255,12 @@ function RowMenu(props: {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleEdit}>
-                    <EditIcon />
-                    <span className={classes.menuItemTitle}>Edit</span>
-                </MenuItem>
+                <Link onClick={handleClose} to={`/cases/edit/${props.rowId}`}>
+                    <MenuItem>
+                        <EditIcon />
+                        <span className={classes.menuItemTitle}>Edit</span>
+                    </MenuItem>
+                </Link>
                 <MenuItem onClick={handleDelete}>
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
