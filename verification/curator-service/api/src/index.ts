@@ -161,6 +161,11 @@ new OpenApiValidator({
 
         // Configure uploads controller.
         const uploadsController = new UploadsController();
+        apiRouter.get(
+            '/sources/uploads',
+            mustHaveAnyRole(['curator']),
+            uploadsController.list,
+        );
         apiRouter.post(
             '/sources/:sourceId([a-z0-9]{24})/uploads',
             mustHaveAnyRole(['curator']),
