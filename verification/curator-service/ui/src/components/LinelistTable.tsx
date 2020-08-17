@@ -148,6 +148,7 @@ function SearchBar(props: {
                                         'location name',
                                         'pathogen name',
                                         'source url',
+                                        'upload ID',
                                     ].join(', ')}
                                     <h5>Keywords search</h5>
                                     Example:{' '}
@@ -177,6 +178,7 @@ function SearchBar(props: {
                                             'outcome',
                                             'caseid',
                                             'source',
+                                            'uploadid',
                                             'admin1',
                                             'admin2',
                                             'admin3',
