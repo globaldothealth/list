@@ -673,6 +673,7 @@ components:
                 - SOURCE_CONTENT_NOT_FOUND
                 - SOURCE_CONTENT_DOWNLOAD_ERROR
                 - PARSING_ERROR
+                - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
         created: 
           $ref: "#/components/schemas/Date"

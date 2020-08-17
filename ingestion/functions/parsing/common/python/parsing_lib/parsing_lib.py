@@ -50,6 +50,7 @@ class UploadError(Enum):
     SOURCE_CONTENT_DOWNLOAD_ERROR = 5
     PARSING_ERROR = 6
     DATA_UPLOAD_ERROR = 7
+    VALIDATION_ERROR = 8
 
 
 def extract_event_fields(event):
@@ -117,7 +118,13 @@ def write_to_server(cases, source_id, upload_id, headers):
         return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
     e = RuntimeError(
         f'Error sending cases to server, status={res.status_code}, response={res.text}')
-    complete_with_error(e, UploadError.DATA_UPLOAD_ERROR,
+    # 207 encompasses both geocoding and case schema validation errors.
+    # We can consider separating geocoding issues, but for now classifying it
+    # as a validation problem is pretty reasonable.
+    upload_error = (UploadError.VALIDATION_ERROR
+                    if res.status_code == 207 else
+                    UploadError.DATA_UPLOAD_ERROR)
+    complete_with_error(e, upload_error,
                         source_id, upload_id, headers)
 
 
@@ -140,6 +147,7 @@ def finalize_upload(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
         complete_with_error(e, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, headers)
+
 
 def get_today():
     """Return today's datetime, just here for easier mocking."""
