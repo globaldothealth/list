@@ -261,6 +261,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
+                            <RowHeader title="Data upload ID" />
+                            <RowContent
+                                content={props.c.caseReference?.uploadId || ''}
+                            />
+
                             {props.c.caseReference?.additionalSources && (
                                 <>
                                     <RowHeader title="other sources" />
@@ -511,9 +516,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     ?.hasPreexistingConditions === undefined
                                     ? ''
                                     : props.c.preexistingConditions
-                                        .hasPreexistingConditions
-                                        ? 'Yes'
-                                        : 'No'
+                                          .hasPreexistingConditions
+                                    ? 'Yes'
+                                    : 'No'
                             }
                         />
 
@@ -582,9 +587,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                         ?.traveledPrior30Days === undefined
                                         ? ''
                                         : props.c.travelHistory
-                                            .traveledPrior30Days
-                                            ? 'Yes'
-                                            : 'No'
+                                              .traveledPrior30Days
+                                        ? 'Yes'
+                                        : 'No'
                                 }
                             />
 
@@ -755,8 +760,8 @@ function RowContent(props: { content: string; isLink?: boolean }): JSX.Element {
                     {props.content}
                 </a>
             ) : (
-                    props.content
-                )}
+                props.content
+            )}
         </Grid>
     );
 }
