@@ -54,6 +54,26 @@ describe('unauthenticated access', () => {
     });
 });
 
+describe('GET', () => {
+    it('should list all uploads', async () => {
+        const source = await new Source(fullSource).save();
+        const source2 = await new Source(fullSource).save();
+
+        const res = await curatorRequest
+            .get('/api/sources/uploads')
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.uploads).toHaveLength(2);
+        expect(res.body.uploads[0]._id).toEqual(
+            source.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[1]._id).toEqual(
+            source2.uploads[0]._id.toString(),
+        );
+    });
+});
+
 describe('POST', () => {
     it('should return 415 if input missing body', () => {
         return curatorRequest
