@@ -281,6 +281,30 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     assert False
 
 
+def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_errors(
+        requests_mock):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    source_api_url = "http://foo.bar"
+    os.environ["SOURCE_API_URL"] = source_api_url
+    full_source_url = f"{source_api_url}/cases/batchUpsert"
+    requests_mock.register_uri(
+        "POST", full_source_url, json={}, status_code=207),
+    upload_id = "123456789012345678901234"
+    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    requests_mock.register_uri("PUT", update_upload_url, json={})
+
+    try:
+        parsing_lib.write_to_server([_PARSED_CASE], _SOURCE_ID, upload_id, {})
+    except RuntimeError:
+        assert requests_mock.request_history[0].url == full_source_url
+        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[-1].json(
+        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.VALIDATION_ERROR.name}}
+        return
+    # We got the wrong exception or no exception, fail the test.
+    assert False
+
+
 def test_finalize_upload_invokes_update_api(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
