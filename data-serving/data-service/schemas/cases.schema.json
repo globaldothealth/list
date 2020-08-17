@@ -25,6 +25,9 @@
           "uploadId": {
             "bsonType": "string"
           },
+          "verificationStatus": {
+            "bsonType": "string"
+          },
           "additionalSources": {
             "bsonType": "array",
             "uniqueItems": true,
@@ -37,7 +40,7 @@
                 }
               }
             }
-          } 
+          }
         }
       },
       "demographics": {
