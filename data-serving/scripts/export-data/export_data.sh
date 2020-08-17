@@ -44,12 +44,19 @@ function export_data() {
     output_file="$collection.$output_format"
     print "Exporting data to $output_file"
 
+    extra_flags=""
+    if [[ $output_format == 'json' ]]; then
+        # For exporting valid JSON.
+        extra_flags='--jsonArray'
+    fi
+
     mongoexport \
         --uri="$mongodb_connection_string" \
         --collection="$collection" \
         --fields="$fields" \
         --type="$output_format" \
-        --out="$output_file"
+        --out="$output_file" \
+        "$extra_flags"
 }
 
 # Establish run order
