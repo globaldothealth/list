@@ -396,22 +396,18 @@ export default function App(): JSX.Element {
                                         horizontal: 'left',
                                     }}
                                 >
-                                    <MenuItem
-                                        onClick={(): void => {
-                                            closeCreateNewPopup();
-                                            history.push('/cases/new');
-                                        }}
+                                    <Link
+                                        to="/cases/new"
+                                        onClick={closeCreateNewPopup}
                                     >
-                                        New line list case
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={(): void => {
-                                            closeCreateNewPopup();
-                                            history.push('/cases/bulk');
-                                        }}
+                                        <MenuItem>New line list case</MenuItem>
+                                    </Link>
+                                    <Link
+                                        to="/cases/bulk"
+                                        onClick={closeCreateNewPopup}
                                     >
-                                        New bulk upload
-                                    </MenuItem>
+                                        <MenuItem>New bulk upload</MenuItem>
+                                    </Link>
                                 </Menu>
                             </>
                         )}
