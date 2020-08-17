@@ -22,15 +22,21 @@ jobs:
   integration-tests:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        browser: ["chrome", "firefox"]
+    name: Cypress tests on ${{ matrix.browser }}
+
     steps:
       - uses: actions/checkout@v2
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
-      - name: Cypress integration tests
-        run: |
-          npm ci
-          npm run cypress-run
-        working-directory: verification/curator-service/ui
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: verification/curator-service/ui
+          browser: ${{ matrix.browser }}
+          wait-on: 'http://localhost:3002'
+          wait-on-timeout: 300
         env:
           CI: true
       # Screenshots are only available on failures.
