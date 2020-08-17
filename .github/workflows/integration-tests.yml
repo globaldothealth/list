@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         browser: ["chrome", "firefox"]
-    name: Cypress tests on v${{ matrix.browser }}
+    name: Cypress tests on ${{ matrix.browser }}
 
     steps:
       - uses: actions/checkout@v2
