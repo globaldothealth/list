@@ -183,6 +183,13 @@ interface UploadSummary {
     error?: string;
 }
 
+interface Upload {
+    _id: string;
+    status: string;
+    summary: UploadSummary;
+    created: Date;
+}
+
 // See description below for usage. This is a mapped partial type that
 // reproduces the fields of <T>, including for nested fields. The non-
 // recursive variant of this is easier to understand, and is explained here:
@@ -425,14 +432,14 @@ class BulkCaseForm extends React.Component<
     }
 
     async createUpload(caseReference: CaseReference): Promise<string> {
-        const response = await axios.post(
+        const response = await axios.post<Upload>(
             `/api/sources/${caseReference.sourceId}/uploads`,
             {
                 status: 'IN_PROGRESS',
                 summary: {},
             },
         );
-        return response.data['_id'];
+        return response.data._id;
     }
 
     async finalizeUpload(
