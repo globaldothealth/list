@@ -177,6 +177,12 @@ interface BatchUpsertResponse {
     errors: BatchUpsertError[];
 }
 
+interface UploadSummary {
+    numCreated?: number;
+    numUpdated?: number;
+    error?: string;
+}
+
 // See description below for usage. This is a mapped partial type that
 // reproduces the fields of <T>, including for nested fields. The non-
 // recursive variant of this is easier to understand, and is explained here:
@@ -360,6 +366,7 @@ class BulkCaseForm extends React.Component<
         locationQuery: string,
         ageRange: AgeRange,
         caseReference: CaseReference,
+        uploadId: string,
         symptoms?: Symptoms,
         preexistingConditions?: PreexistingConditions,
     ): CompleteParsedCase {
@@ -368,6 +375,7 @@ class BulkCaseForm extends React.Component<
                 sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
                 sourceUrl: caseReference.sourceUrl,
+                uploadId: uploadId,
                 verificationStatus: VerificationStatus.Verified,
             },
             demographics: {
@@ -416,11 +424,35 @@ class BulkCaseForm extends React.Component<
         return response.data;
     }
 
+    async createUpload(caseReference: CaseReference): Promise<string> {
+        const response = await axios.post(
+            `/api/sources/${caseReference.sourceId}/uploads`,
+            {
+                status: 'IN_PROGRESS',
+                summary: {},
+            },
+        );
+        return response.data['_id'];
+    }
+
+    async finalizeUpload(
+        sourceId: string,
+        uploadId: string,
+        status: string,
+        summary: UploadSummary,
+    ): Promise<void> {
+        await axios.put(`/api/sources/${sourceId}/uploads/${uploadId}`, {
+            status: status,
+            summary: summary,
+        });
+    }
+
     async uploadData(
         results: ParseResult<RawParsedCase>,
         caseReference: CaseReference,
         filename: string,
     ): Promise<void> {
+        const uploadId = await this.createUpload(caseReference);
         const cases = results.data.map((c) => {
             // papaparse uses null to fill values that are empty in the CSV.
             // I'm not clear how it does so -- since our types aren't union
@@ -444,6 +476,7 @@ class BulkCaseForm extends React.Component<
                 locationQuery,
                 ageRange,
                 caseReference,
+                uploadId,
                 symptoms,
                 preexistingConditions,
             );
@@ -458,6 +491,12 @@ class BulkCaseForm extends React.Component<
                     e,
                 )}`,
             });
+            await this.finalizeUpload(
+                caseReference.sourceId,
+                uploadId,
+                'ERROR',
+                { error: 'DATA_UPLOAD_ERROR' },
+            );
             return;
         }
         const validationErrors = upsertResponse.errors.map(
@@ -469,10 +508,20 @@ class BulkCaseForm extends React.Component<
                 errors: validationErrors,
                 errorMessage: '',
             });
+            await this.finalizeUpload(
+                caseReference.sourceId,
+                uploadId,
+                'ERROR',
+                { error: 'VALIDATION_ERROR' },
+            );
             return;
         }
         const createdIds = upsertResponse.createdCaseIds;
         const updatedIds = upsertResponse.updatedCaseIds;
+        await this.finalizeUpload(caseReference.sourceId, uploadId, 'SUCCESS', {
+            numCreated: createdIds.length,
+            numUpdated: updatedIds.length,
+        });
         const createdMessage =
             createdIds.length === 0
                 ? ''
