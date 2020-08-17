@@ -305,6 +305,7 @@ describe('Curator', function () {
             cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
             cy.contains('test notes on new line');
+            cy.contains('VERIFIED');
             // Demographics.
             cy.contains('21');
             cy.contains('Male');

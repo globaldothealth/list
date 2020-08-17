@@ -362,6 +362,14 @@ components:
                 is only populated for cases entered via automated ingestion.
               type: string
               pattern: '^[a-f\d]{24}$'
+            verificationStatus:
+              description: >
+                Whether the case document has been manually verified for
+                correctness.
+              type: string
+              enum:
+                - UNVERIFIED
+                - VERIFIED
             additionalSources:
               type: array
               items:

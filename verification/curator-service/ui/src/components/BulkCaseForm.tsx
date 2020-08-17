@@ -12,6 +12,7 @@ import {
     Event,
     PreexistingConditions,
     Symptoms,
+    VerificationStatus,
 } from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
@@ -367,6 +368,7 @@ class BulkCaseForm extends React.Component<
                 sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
                 sourceUrl: caseReference.sourceUrl,
+                verificationStatus: VerificationStatus.Verified,
             },
             demographics: {
                 gender: c.gender,

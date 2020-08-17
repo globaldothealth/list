@@ -18,6 +18,7 @@ S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
 UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
+UNVERIFIED_STATUS = "UNVERIFIED"
 
 s3_client = boto3.client("s3")
 
@@ -100,6 +101,7 @@ def prepare_cases(cases, upload_id):
     """
     for case in cases:
         case["caseReference"]["uploadId"] = upload_id
+        case["caseReference"]["verificationStatus"] = UNVERIFIED_STATUS
     return cases
 
 
