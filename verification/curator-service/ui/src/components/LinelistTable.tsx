@@ -8,11 +8,11 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
+import { Case, VerificationStatus } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { Case } from './Case';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
@@ -28,6 +28,8 @@ import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 import renderDate from './util/date';
+import VerificationStatusIndicator from './VerificationStatusIndicator';
+import VerificationStatusHeader from './VerificationStatusHeader';
 
 interface ListResponse {
     cases: Case[];
@@ -43,7 +45,7 @@ interface LinelistTableState {
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
-interface TableRow {
+export interface TableRow {
     id: string;
     confirmedDate: Date | null;
     adminArea3: string;
@@ -54,6 +56,7 @@ interface TableRow {
     gender: string;
     outcome?: string;
     sourceUrl: string;
+    verificationStatus?: VerificationStatus;
 }
 
 interface LocationState {
@@ -79,6 +82,10 @@ const styles = (theme: Theme) =>
         alert: {
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
+        },
+        centeredContent: {
+            display: 'flex',
+            justifyContent: 'center',
         },
     });
 
@@ -415,6 +422,25 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                               ]
                             : []),
                         {
+                            title: (
+                                <div className={classes.centeredContent}>
+                                    <VerificationStatusHeader />
+                                </div>
+                            ),
+                            field: 'verificationStatus',
+                            // The return type in the material-table dts is any.
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            render: (rowData): any => {
+                                return (
+                                    <div className={classes.centeredContent}>
+                                        <VerificationStatusIndicator
+                                            status={rowData.verificationStatus}
+                                        />
+                                    </div>
+                                );
+                            },
+                        },
+                        {
                             title: 'Case ID',
                             field: 'id',
                             type: 'string',
@@ -511,6 +537,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             )?.value,
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
+                                            verificationStatus:
+                                                c.caseReference
+                                                    ?.verificationStatus,
                                         });
                                     }
                                     resolve({
