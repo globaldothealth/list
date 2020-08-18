@@ -1,0 +1,5 @@
+{
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "germany-test-id/content.json",
+    "sourceUrl": "https://foo.bar"
+}
