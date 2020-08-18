@@ -243,7 +243,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "notes": "Case 55; mainland China travel via the Lok Ma Chau border crossing",
         "caseReference": {
@@ -310,7 +318,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f1",
@@ -350,7 +366,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f2",
@@ -390,7 +414,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f3",
@@ -429,7 +461,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f4",
@@ -480,7 +520,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "notes": "C960191",
         "caseReference": {
@@ -1078,7 +1126,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e107",
@@ -1170,7 +1226,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e109",
@@ -1218,7 +1282,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
@@ -1266,7 +1338,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
@@ -1296,6 +1376,7 @@
             "gender": "Male"
         },
         "location": {
+            "country": "Mexico",
             "geometry": {
                 "latitude": 20.566667000000002,
                 "longitude": -103.68333299999999
@@ -1328,7 +1409,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "004-30461",
@@ -1366,7 +1455,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e111",
@@ -1409,7 +1506,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e111",
@@ -1452,7 +1557,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e112",
@@ -1494,7 +1607,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e112",
@@ -1652,7 +1773,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-105113",
@@ -1861,7 +1990,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-127500",
@@ -2426,7 +2563,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-39507",
@@ -2539,7 +2684,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-443718",
@@ -2800,7 +2953,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-56534",
@@ -2997,7 +3158,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-662637",
@@ -3040,7 +3209,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-686962",
@@ -3081,7 +3258,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-711285",
@@ -3140,7 +3325,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "007-73561",
