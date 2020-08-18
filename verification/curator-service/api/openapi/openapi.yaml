@@ -174,7 +174,7 @@ paths:
       operationId: listUploads
       responses:
         "200":
-          $ref: "#/components/responses/200UploadArray"
+          $ref: "#/components/responses/200UploadsArray"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -677,13 +677,21 @@ components:
                 - DATA_UPLOAD_ERROR
         created: 
           $ref: "#/components/schemas/Date"
-    UploadArray:
+    UploadsArray:
       type: object
       properties:
         uploads:
           type: array
           items:
-            $ref: "#/components/schemas/Upload"
+            description: An upload with source data.
+            type: object
+            properties:
+              sourceName:
+                type: string
+              sourceUrl:
+                type: string
+              upload:
+                $ref: "#/components/schemas/Upload"
     Source:
       description: A source of line list case data.
       type: object
@@ -1217,12 +1225,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Upload"
-    "200UploadArray":
+    "200UploadsArray":
       description: OK
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/UploadArray"
+            $ref: "#/components/schemas/UploadsArray"
     "201Upload":
       description: Created
       content:
