@@ -64,7 +64,7 @@ export default class UploadsController {
                 { $unwind: '$uploads' },
                 {
                     $project: {
-                        _id: 0,
+                        _id: false,
                         sourceName: '$name',
                         sourceUrl: '$origin.url',
                         upload: '$uploads',
