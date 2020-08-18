@@ -167,6 +167,20 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /sources/uploads:
+    get:
+      tags: [Source, Upload]
+      summary: Lists all uploads for all sources
+      operationId: listUploads
+      responses:
+        "200":
+          $ref: "#/components/responses/200UploadArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
   /sources/{sourceId}/uploads:
     parameters:
       - name: sourceId
@@ -194,6 +208,48 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/{sourceId}/uploads/{id}:
+    parameters:
+      - name: sourceId
+        in: path
+        description: The parent source ID in which to find the upload
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+      - name: id
+        in: path
+        description: The ID of the upload to update
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    put:
+      tags: [Source, Upload]
+      summary: Updates an existing upload in the specified source
+      operationId: updateUpload
+      requestBody:
+        description: New upload content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Upload"
+      responses:
+        "200":
+          $ref: "#/components/responses/200Upload"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -335,8 +391,6 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/placesOfTransmission:
@@ -361,8 +415,30 @@ paths:
           $ref: "#/components/responses/400"
         "403":
           $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/occupations:
+    get:
+      summary: Lists most frequently used occupations
+      operationId: listOccupations
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200OccupationArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpsert:
@@ -578,6 +654,7 @@ components:
         status:
           type: string
           enum:
+            - IN_PROGRESS
             - SUCCESS
             - ERROR
         summary:
@@ -589,8 +666,24 @@ components:
               type: integer
             error:
               type: string
+              enum:
+                - INTERNAL_ERROR
+                - SOURCE_CONFIGURATION_ERROR
+                - SOURCE_CONFIGURATION_NOT_FOUND
+                - SOURCE_CONTENT_NOT_FOUND
+                - SOURCE_CONTENT_DOWNLOAD_ERROR
+                - PARSING_ERROR
+                - VALIDATION_ERROR
+                - DATA_UPLOAD_ERROR
         created: 
           $ref: "#/components/schemas/Date"
+    UploadArray:
+      type: object
+      properties:
+        uploads:
+          type: array
+          items:
+            $ref: "#/components/schemas/Upload"
     Source:
       description: A source of line list case data.
       type: object
@@ -679,8 +772,20 @@ components:
             sourceUrl:
               type: string
             uploadId:
+              description: >
+                The UUID of the upload in which the batch of cases including
+                this case document was entered into the G.h system. This field
+                is only populated for cases entered via automated ingestion.
               type: string
               pattern: '^[a-f\d]{24}$'
+            verificationStatus:
+              description: >
+                Whether the case document has been manually verified for
+                correctness.
+              type: string
+              enum:
+                - UNVERIFIED
+                - VERIFIED
             additionalSources:
               type: array
               items:
@@ -844,6 +949,13 @@ components:
       type: object
       properties:
         placesOfTransmission:
+          type: array
+          items:
+            type: string
+    OccupationArray:
+      type: object
+      properties:
+        occupations:
           type: array
           items:
             type: string
@@ -1061,6 +1173,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/PlacesOfTransmissionArray"
+    "200OccupationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OccupationArray"
     "201Case":
       description: Created
       content:
@@ -1093,6 +1211,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "200Upload":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Upload"
+    "200UploadArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UploadArray"
     "201Upload":
       description: Created
       content:

@@ -144,7 +144,6 @@ describe('New case form', function () {
             cy.contains('www.example.com');
             cy.contains('France');
             cy.contains('2020-1-1');
-            cy.contains('Yes');
             cy.contains('Recovered');
         });
     });
@@ -196,7 +195,7 @@ describe('New case form', function () {
         });
     });
 
-    it('Can add symptoms from chips', function () {
+    it('Can add fields from chips', function () {
         cy.seedLocation({
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
@@ -208,6 +207,8 @@ describe('New case form', function () {
             country: 'France',
             notes: 'some notes',
             sourceUrl: 'www.example.com',
+            occupation: 'Actor',
+            transmissionPlaces: ['Gym', 'Hospital'],
             symptomStatus: 'Symptomatic',
             symptoms: [
                 'fever',
@@ -222,6 +223,15 @@ describe('New case form', function () {
             country: 'France',
             notes: 'some notes',
             sourceUrl: 'www.example.com',
+            occupation: 'Horse trainer',
+            transmissionPlaces: [
+                'Airplane',
+                'Factory',
+                'Gym',
+                'Hospital',
+                'Hotel',
+                'Office',
+            ],
             symptomStatus: 'Symptomatic',
             symptoms: ['fever', 'cough'],
         });
@@ -230,6 +240,9 @@ describe('New case form', function () {
         cy.contains('Create new COVID-19 line list case');
         cy.get('div[data-testid="caseReference"]').type('www.example.com');
         cy.contains('li', 'www.example.com').click();
+        cy.contains('Actor');
+        cy.contains('Horse trainer');
+        cy.get('span:contains("Horse trainer")').click();
         cy.get('div[data-testid="location"]').type('France');
         cy.contains('li', 'France').click();
         cy.get('input[name="confirmedDate"]').type('2020-01-01');
@@ -242,54 +255,6 @@ describe('New case form', function () {
         cy.contains('arthritis');
         cy.get('span:contains("fever")').click();
         cy.get('span:contains("anxiety")').click();
-        cy.server();
-        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
-        cy.get('button[data-testid="submit"]').click();
-        cy.wait('@addCase');
-        cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
-            cy.contains(`Case ${resp.body.cases[0]._id} added`);
-            cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
-            cy.contains('fever');
-            cy.contains('anxiety');
-            cy.contains('cough').should('not.exist');
-        });
-    });
-
-    it('Can add places of transmission from chips', function () {
-        cy.seedLocation({
-            country: 'France',
-            geometry: { latitude: 45.75889, longitude: 4.84139 },
-            name: 'France',
-            geoResolution: 'Country',
-        });
-        cy.addSource('Test source', 'www.example.com');
-        cy.addCase({
-            country: 'France',
-            notes: 'some notes',
-            sourceUrl: 'www.example.com',
-            transmissionPlaces: ['Gym', 'Hospital'],
-        });
-        cy.addCase({
-            country: 'France',
-            notes: 'some notes',
-            sourceUrl: 'www.example.com',
-            transmissionPlaces: [
-                'Airplane',
-                'Factory',
-                'Gym',
-                'Hospital',
-                'Hotel',
-                'Office',
-            ],
-        });
-
-        cy.visit('/cases/new');
-        cy.contains('Create new COVID-19 line list case');
-        cy.get('div[data-testid="caseReference"]').type('www.example.com');
-        cy.contains('li', 'www.example.com').click();
-        cy.get('div[data-testid="location"]').type('France');
-        cy.contains('li', 'France').click();
-        cy.get('input[name="confirmedDate"]').type('2020-01-01');
         cy.contains('Gym');
         cy.contains('Hospital');
         cy.contains('Airplane');
@@ -304,6 +269,11 @@ describe('New case form', function () {
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             cy.contains(`Case ${resp.body.cases[0]._id} added`);
             cy.visit(`/cases/view/${resp.body.cases[0]._id}`);
+            cy.contains('Horse trainer');
+            cy.contains('Actor').should('not.exist');
+            cy.contains('fever');
+            cy.contains('anxiety');
+            cy.contains('cough').should('not.exist');
             cy.contains('Gym');
             cy.contains('Hospital');
             cy.contains('Factory').should('not.exist');
@@ -393,6 +363,7 @@ describe('New case form', function () {
         cy.contains('li', 'Admin3').click();
         cy.get('input[name="location.country"]').type('France');
         cy.get('input[name="location.name"]').type('Paris');
+        cy.get('input[name="location.administrativeAreaLevel3"]').type('Paris');
         cy.get('input[name="location.geometry.latitude"]').type('12.34');
         cy.get('input[name="location.geometry.longitude"]').type('45.67');
         cy.get('input[name="confirmedDate"]').type('2020-01-01');

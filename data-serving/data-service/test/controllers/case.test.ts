@@ -249,6 +249,63 @@ describe('GET', () => {
                 .expect(400, done);
         });
     });
+
+    describe('list occupations', () => {
+        it('should return 200 OK', () => {
+            return request(app)
+                .get('/api/cases/occupations?limit=5')
+                .expect(200);
+        });
+        it('should show most frequently used occupations', async () => {
+            for (let i = 1; i <= 4; i++) {
+                const c = new Case(minimalCase);
+                c.set({
+                    demographics: {
+                        occupation: 'occupation 1',
+                    },
+                });
+                await c.save();
+            }
+            for (let i = 1; i <= 3; i++) {
+                const c = new Case(minimalCase);
+                c.set({
+                    demographics: {
+                        occupation: 'occupation 2',
+                    },
+                });
+                await c.save();
+            }
+            for (let i = 1; i <= 2; i++) {
+                const c = new Case(minimalCase);
+                c.set({
+                    demographics: {
+                        occupation: 'occupation 3',
+                    },
+                });
+                await c.save();
+            }
+            const c = new Case(minimalCase);
+            c.set({
+                demographics: {
+                    occupation: 'occupation 4',
+                },
+            });
+            await c.save();
+            const res = await request(app)
+                .get('/api/cases/occupations?limit=3')
+                .expect(200);
+            expect(res.body.occupations).toEqual([
+                'occupation 1',
+                'occupation 2',
+                'occupation 3',
+            ]);
+        });
+        it('rejects negative limit param', (done) => {
+            request(app)
+                .get('/api/cases/occupations?limit=-2')
+                .expect(400, done);
+        });
+    });
 });
 
 describe('POST', () => {
@@ -377,6 +434,20 @@ describe('POST', () => {
         ).toEqual(minimalCase.revisionMetadata.creationMetadata.curator);
 
         expect(res.body).not.toHaveProperty('curator');
+    });
+    it('batch upsert should result in case revisions of existing cases', async () => {
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+        existingCase.notes = 'new notes';
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [existingCase, minimalCase],
+                ...curatorMetadata,
+            });
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
     });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)

@@ -167,6 +167,7 @@ export const batchValidate = async (
  */
 export const findCasesWithCaseReferenceData = async (
     req: Request,
+    fieldsToSelect = {},
 ): Promise<CaseDocument[]> => {
     const providedCaseReferenceData = req.body.cases
         .filter(
@@ -185,7 +186,7 @@ export const findCasesWithCaseReferenceData = async (
     return providedCaseReferenceData.length > 0
         ? Case.find()
               .or(providedCaseReferenceData)
-              .select({ _id: 1, caseReference: 1, revisionMetadata: 1 })
+              .select(fieldsToSelect)
               .exec()
         : [];
 };
@@ -206,9 +207,12 @@ export const findCasesWithCaseReferenceData = async (
 const findCaseIdsWithCaseReferenceData = async (
     req: Request,
 ): Promise<string[]> => {
-    return (await findCasesWithCaseReferenceData(req)).map((c) =>
-        String(c._id),
-    );
+    return (
+        await findCasesWithCaseReferenceData(
+            req,
+            /* fieldsToSelect= */ { _id: 1 },
+        )
+    ).map((c) => String(c._id));
 };
 
 /**
@@ -370,11 +374,7 @@ export const listSymptoms = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const symptoms = await Case.aggregate([
             { $unwind: '$symptoms.values' },
@@ -401,11 +401,7 @@ export const listPlacesOfTransmission = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
-    const limit = Number(req.query.limit) || 5;
-    if (limit < 1) {
-        res.status(422).json('limit must be > 0');
-        return;
-    }
+    const limit = Number(req.query.limit);
     try {
         const placesOfTransmission = await Case.aggregate([
             { $unwind: '$transmission.places' },
@@ -415,6 +411,34 @@ export const listPlacesOfTransmission = async (
         res.json({
             placesOfTransmission: placesOfTransmission.map(
                 (placeOfTransmissionObject) => placeOfTransmissionObject._id,
+            ),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
+
+/**
+ * List most frequently used occupations.
+ *
+ * Handles HTTP GET /api/cases/occupations.
+ */
+export const listOccupations = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const occupations = await Case.aggregate([
+            { $sortByCount: '$demographics.occupation' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            occupations: occupations.map(
+                (occupationObject) => occupationObject._id,
             ),
         });
         return;

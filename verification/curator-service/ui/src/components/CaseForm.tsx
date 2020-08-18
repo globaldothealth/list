@@ -1,13 +1,13 @@
 import * as Yup from 'yup';
 
 import { Button, LinearProgress, Typography } from '@material-ui/core';
+import { Case, VerificationStatus } from './Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
 import Source, { submitSource } from './common-form-fields/Source';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import AppModal from './AppModal';
-import { Case } from './Case';
 import CaseFormValues from './new-case-form-fields/CaseFormValues';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Demographics from './new-case-form-fields/Demographics';
@@ -70,7 +70,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             age: undefined,
             ethnicity: undefined,
             nationalities: [],
-            occupation: undefined,
+            occupation: '',
             location: undefined,
             confirmedDate: null,
             methodOfConfirmation: '',
@@ -115,7 +115,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 : undefined,
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
-        occupation: c.demographics?.occupation,
+        occupation: c.demographics?.occupation ?? '',
         location: c.location,
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
@@ -328,13 +328,16 @@ export default function CaseForm(props: Props): JSX.Element {
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
-            caseReference: values.caseReference,
+            caseReference: {
+                ...values.caseReference,
+                verificationStatus: VerificationStatus.Verified,
+            },
             demographics: {
                 gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                occupation: values.occupation,
+                occupation: unknownOrEmptyToUndefined(values.occupation),
             },
             location: values.location,
             events: [
@@ -583,7 +586,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                                     '') ||
                                             values.ethnicity !== undefined ||
                                             values.nationalities?.length > 0 ||
-                                            values.occupation !== undefined,
+                                            values.occupation !== '',
                                         hasError: hasErrors(
                                             [
                                                 'gender',

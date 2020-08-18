@@ -1,0 +1,62 @@
+[
+    {
+        "name": "textIdx",
+        "key": {
+            "notes": "text",
+            "revisionMetadata.creationMetadata.curator": "text",
+            "demographics.occupation": "text",
+            "demographics.nationalities": "text",
+            "demographics.ethnicity": "text",
+            "location.country": "text",
+            "location.administrativeAreaLevel1": "text",
+            "location.administrativeAreaLevel2": "text",
+            "location.administrativeAreaLevel3": "text",
+            "location.place": "text",
+            "location.name": "text",
+            "pathogen.name": "text",
+            "caseReference.sourceUrl": "text"
+        }
+    },
+    {
+        "name": "casesCaseRefIdx",
+        "key": {
+            "caseReference.sourceId": -1,
+            "caseReference.sourceEntryId": -1
+        },
+        "unique": true,
+        "partialFilterExpression": {
+            "caseReference.sourceEntryId": {
+                "$exists": true
+            }
+        }
+    },
+    {
+        "name": "uploadIdIdx",
+        "key": {
+            "caseReference.uploadId": -1
+        },
+        "partialFilterExpression": {
+            "caseReference.uploadId": {
+                "$exists": true
+            }
+        }
+    },
+    {
+        "name": "eventNamesIdx",
+        "key": {
+            "events.name": -1
+        }
+    },
+    {
+        "name": "countriesIdx",
+        "key": {
+            "location.country": -1
+        }
+    },
+    {
+        "name": "travelHistoryCountriesIdx",
+        "key": {
+            "travelHistory.travel.location.country": -1
+        }
+    }
+]

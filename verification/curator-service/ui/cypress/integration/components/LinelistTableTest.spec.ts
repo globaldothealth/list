@@ -16,29 +16,23 @@ describe('Linelist table', function () {
     it('Display case properly', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
-            methodOfConfirmation: 'PCR test',
-            curator: 'test@bar.com',
         });
         cy.visit('/cases');
-        cy.contains('PCR test');
-        cy.contains('some notes');
         cy.contains('France');
         cy.contains('www.example.com');
-        cy.contains('test@bar.com');
     });
 
     it('Can open and close the edit modal', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
         cy.contains('Edit case').should('not.exist');
-        cy.get('button[title="Edit this case"]').click({ force: true });
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Edit').click();
         cy.contains('Edit case');
         cy.get('button[aria-label="close overlay"').click();
         cy.contains('Edit case').should('not.exist');
@@ -47,13 +41,12 @@ describe('Linelist table', function () {
     it('Can open and close the details modal', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
         cy.contains('View case').should('not.exist');
-        cy.get('button[title="View this case details"]').click({ force: true });
+        cy.contains('td', 'France').click({ force: true });
         cy.contains('View case');
         cy.get('button[aria-label="close overlay"').click();
         cy.contains('View case').should('not.exist');
@@ -62,16 +55,15 @@ describe('Linelist table', function () {
     it('Can delete a case', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
 
-        cy.get('button[title="Delete"]').click({ force: true });
-        cy.get('button[title="Save"]').click({ force: true });
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Delete').click();
 
-        cy.contains('some notes').should('not.exist');
+        cy.contains('France').should('not.exist');
     });
 
     it('Can delete multiple cases', function () {

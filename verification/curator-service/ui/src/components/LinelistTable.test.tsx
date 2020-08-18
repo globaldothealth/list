@@ -35,7 +35,7 @@ it('loads and displays cases', async () => {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
             },
-            demographics: { ageRange: { start: 1, end: 3 } },
+            demographics: { ageRange: { start: 1, end: 3 }, gender: 'Female' },
             location: {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
@@ -94,13 +94,14 @@ it('loads and displays cases', async () => {
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    expect(await findByText(/some notes/)).toBeInTheDocument();
-    expect(await findByText(/some place name/)).toBeInTheDocument();
+    expect(await findByText('www.example.com')).toBeInTheDocument();
+    expect(await findByText('some admin 1')).toBeInTheDocument();
+    expect(await findByText('some admin 2')).toBeInTheDocument();
+    expect(await findByText('some admin 3')).toBeInTheDocument();
+    expect(await findByText('France')).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
-    expect(await findByText('PCR test')).toBeInTheDocument();
-    expect(await findByText('foo@bar.com')).toBeInTheDocument();
+    expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('Recovered')).toBeInTheDocument();
-    expect(await findByText('Yes')).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
@@ -141,22 +142,20 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(
+    const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
     );
 
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     // Throw error on delete request.
     mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const deleteButton = getByText(/delete_outline/);
-    fireEvent.click(deleteButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
+    fireEvent.click(getByTestId(/row menu/));
+    fireEvent.click(getByText(/Delete/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
@@ -202,14 +201,14 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { getByText, findByText } = render(
+    const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     // Delete case
@@ -235,10 +234,8 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetAfterDeleteResponse);
     mockedAxios.delete.mockResolvedValueOnce(axiosDeleteResponse);
 
-    const deleteButton = getByText(/delete_outline/);
-    fireEvent.click(deleteButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
+    fireEvent.click(getByTestId(/row menu/));
+    fireEvent.click(getByText(/Delete/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
     expect(mockedAxios.delete).toHaveBeenCalledWith(
         '/api/cases/' + cases[0]._id,
@@ -308,7 +305,7 @@ it('cannot edit data as a reader only', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     const deleteButton = queryByText(/delete_outline/);

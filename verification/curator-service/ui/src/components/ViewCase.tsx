@@ -261,6 +261,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
+                            <RowHeader title="Data upload ID" />
+                            <RowContent
+                                content={props.c.caseReference?.uploadId || ''}
+                            />
+
                             {props.c.caseReference?.additionalSources && (
                                 <>
                                     <RowHeader title="other sources" />
@@ -290,6 +295,15 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 content={
                                     props.c.revisionMetadata?.creationMetadata
                                         ?.curator || ''
+                                }
+                            />
+
+                            {/* Consider surfacing this as a top-level icon on this page. */}
+                            <RowHeader title="Verification status" />
+                            <RowContent
+                                content={
+                                    props.c.caseReference?.verificationStatus ||
+                                    'Unknown'
                                 }
                             />
 
