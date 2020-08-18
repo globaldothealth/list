@@ -12,6 +12,8 @@ import { Case, VerificationStatus } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
+import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
@@ -314,6 +316,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
+    setCaseVerification(
+        rowData: TableRow,
+        verificationStatus: VerificationStatus,
+    ): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const updateUrl = this.state.url + rowData.id;
+            this.setState({ error: '' });
+            const response = axios.put(updateUrl, {
+                'caseReference.verificationStatus': verificationStatus,
+            });
+            response.then(resolve).catch((e) => {
+                this.setState({ error: e.toString() });
+                reject(e);
+            });
+        });
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -598,11 +617,61 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     actions={
                         this.props.user.roles.includes('curator')
                             ? [
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <VerifiedIcon data-testid="verify-action" />
+                                      ),
+                                      tooltip: 'Verify selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          const updatePromises: Promise<
+                                              unknown
+                                          >[] = [];
+                                          rows.forEach((row: TableRow) =>
+                                              updatePromises.push(
+                                                  this.setCaseVerification(
+                                                      row,
+                                                      VerificationStatus.Verified,
+                                                  ),
+                                              ),
+                                          );
+                                          Promise.all(updatePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      tooltip: 'Unverify selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          const updatePromises: Promise<
+                                              unknown
+                                          >[] = [];
+                                          rows.forEach((row: TableRow) =>
+                                              updatePromises.push(
+                                                  this.setCaseVerification(
+                                                      row,
+                                                      VerificationStatus.Unverified,
+                                                  ),
+                                              ),
+                                          );
+                                          Promise.all(updatePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
+                                      },
+                                  },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
                                   // RowMenu function.
                                   {
-                                      icon: () => (
+                                      icon: (): JSX.Element => (
                                           <span aria-label="delete all">
                                               <DeleteIcon />
                                           </span>
