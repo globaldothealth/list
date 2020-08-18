@@ -144,6 +144,7 @@
                         "administrativeAreaLevel1": "Hubei",
                         "administrativeAreaLevel2": "Wuhan City",
                         "geoResolution": "Admin2",
+                        "name": "Wuhan City",
                         "geometry": {
                             "latitude": {
                                 "$numberDouble": "30.592849"
@@ -246,6 +247,7 @@
         },
         "notes": "Case 55; mainland China travel via the Lok Ma Chau border crossing",
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f0",
             "sourceUrl": "https://www.scmp.com/news/hong-kong/health-environment/article/3050681/coronavirus-hong-kong-confirms-three-news-cases"
         },
         "travelHistory": {
@@ -265,6 +267,7 @@
                             "latitude": 37.59841,
                             "longitude": 104.1868
                         },
+                        "name": "China",
                         "geoResolution": "Country"
                     }
                 }
@@ -290,7 +293,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -310,6 +313,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f1",
             "sourceUrl": "https://twitter.com/DHSCgovuk/status/1238837700943323136"
         },
         "importedCase": {
@@ -349,6 +353,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f2",
             "sourceUrl": "http://wjw.hubei.gov.cn/fbjd/dtyw/202002/t20200218_2091007.shtml"
         },
         "importedCase": {
@@ -368,7 +373,7 @@
                 "latitude": -29.122,
                 "longitude": 25.031470000000002
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -388,6 +393,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f3",
             "sourceUrl": "github.com/dsfsi/covid19za"
         },
         "importedCase": {
@@ -406,7 +412,7 @@
                 "latitude": 26.667959999999997,
                 "longitude": 29.77867
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -426,6 +432,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f4",
             "sourceUrl": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/",
             "additionalSources": [
                 {
@@ -456,7 +463,7 @@
                 "latitude": 9.333330000000046,
                 "longitude": 123.66667000000007
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -477,6 +484,7 @@
         },
         "notes": "C960191",
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f5",
             "sourceUrl": "PH Data Drop"
         },
         "importedCase": {
@@ -496,7 +504,7 @@
                 "latitude": 18.940170000000023,
                 "longitude": 72.83483000000007
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -515,10 +523,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f6",
             "sourceUrl": "https://covid19-phdmah.hub.arcgis.com/"
         },
         "importedCase": {
@@ -540,7 +554,7 @@
                 "latitude": 18.940170000000023,
                 "longitude": 72.83483000000007
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -559,10 +573,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e1f7",
             "sourceUrl": "https://t.me/indiacovid/4560"
         },
         "importedCase": {
@@ -584,7 +604,7 @@
                 "latitude": 21.185780000000022,
                 "longitude": 72.83679000000006
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -603,10 +623,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e100",
             "sourceUrl": "https://twitter.com/PIBAhmedabad/status/1261669285484793857"
         },
         "importedCase": {
@@ -628,7 +654,7 @@
                 "latitude": 19.03681000000006,
                 "longitude": 73.01582000000008
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -647,7 +673,12 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "importedCase": {
@@ -668,7 +699,7 @@
                 "latitude": 23.027760000000058,
                 "longitude": 72.60027000000008
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -687,10 +718,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e101",
             "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/"
         },
         "importedCase": {
@@ -712,7 +749,7 @@
                 "latitude": 13.083620000000053,
                 "longitude": 80.28252000000003
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -731,10 +768,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e102",
             "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-25-05-20-COVID-19-6-PM.pdf"
         },
         "importedCase": {
@@ -756,7 +799,7 @@
                 "latitude": 20.826760000000036,
                 "longitude": 71.04510000000005
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -775,10 +818,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e103",
             "sourceUrl": "mohfw.gov.in"
         },
         "importedCase": {
@@ -800,7 +849,7 @@
                 "latitude": 18.940170000000023,
                 "longitude": 72.83483000000007
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -819,10 +868,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e104",
             "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay29.pdf"
         },
         "importedCase": {
@@ -844,7 +899,7 @@
                 "latitude": 19.200000000000045,
                 "longitude": 72.96667000000008
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -863,10 +918,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e104",
             "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay31.pdf"
         },
         "importedCase": {
@@ -888,7 +949,7 @@
                 "latitude": 19.03681000000006,
                 "longitude": 73.01582000000008
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -907,10 +968,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e105",
             "sourceUrl": "https://twitter.com/ANI/status/1254410536969809922"
         },
         "importedCase": {
@@ -938,7 +1005,7 @@
                 "latitude": 12.682240000000036,
                 "longitude": 79.98008000000004
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -957,10 +1024,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e106",
             "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-21-05-20-COVID-19-6-PM.pdf"
         },
         "importedCase": {
@@ -1004,6 +1077,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e107",
             "sourceUrl": "https://m.weibo.cn/status/4468161329843481"
         },
         "importedCase": {
@@ -1044,10 +1118,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e108",
             "sourceUrl": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
         },
         "importedCase": {
@@ -1089,6 +1169,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e109",
             "sourceUrl": "https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14"
         },
         "importedCase": {
@@ -1116,7 +1197,7 @@
                 "latitude": 51.222120000000075,
                 "longitude": 4.397690000000068
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1136,6 +1217,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
             "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
         },
         "importedCase": {
@@ -1163,7 +1245,7 @@
                 "latitude": 50.99142331000007,
                 "longitude": 5.429156289000048
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1183,6 +1265,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
             "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
         },
         "importedCase": {
@@ -1209,7 +1292,7 @@
                 "latitude": 20.566667000000002,
                 "longitude": -103.68333299999999
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Admin1"
         },
         "events": [
@@ -1278,6 +1361,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e111",
             "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus"
         },
         "importedCase": {
@@ -1320,6 +1404,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e111",
             "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus"
         },
         "importedCase": {
@@ -1362,6 +1447,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e112",
             "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
         },
         "importedCase": {
@@ -1403,6 +1489,7 @@
             "revisionNumber": 0
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e112",
             "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
         },
         "importedCase": {
@@ -1422,7 +1509,7 @@
                 "latitude": 40.41955000000007,
                 "longitude": -3.6919599999999377
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1441,10 +1528,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e113",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -1464,7 +1557,7 @@
                 "latitude": 40.41955000000007,
                 "longitude": -3.6919599999999377
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1483,10 +1576,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e113",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -1513,7 +1612,7 @@
                 "latitude": 49.30069000000003,
                 "longitude": 10.572080000000028
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1582,10 +1681,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e113",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -1605,7 +1710,7 @@
                 "latitude": 47.30796174000005,
                 "longitude": 13.267656657000032
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1624,10 +1729,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e114",
             "sourceUrl": "https://github.com/statistikat/coronaDAT/raw/master/archive/20200408/data/20200408_230000.rds"
         },
         "importedCase": {
@@ -1668,10 +1779,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e115",
             "sourceUrl": "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/bekraftade-fall-i-sverige"
         },
         "importedCase": {
@@ -1749,7 +1866,7 @@
                 "latitude": 35.88999000000007,
                 "longitude": -5.317839999999933
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1768,10 +1885,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e116",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -1812,10 +1935,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200531.csv"
         },
         "importedCase": {
@@ -1857,10 +1986,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200316.csv"
         },
         "importedCase": {
@@ -1902,10 +2037,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv"
         },
         "importedCase": {
@@ -1926,7 +2067,7 @@
                 "latitude": 45.165410000000065,
                 "longitude": 10.79242000000005
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -1945,10 +2086,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200326.csv"
         },
         "importedCase": {
@@ -1990,10 +2137,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200331.csv"
         },
         "importedCase": {
@@ -2035,10 +2188,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv"
         },
         "importedCase": {
@@ -2080,10 +2239,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200411.csv"
         },
         "importedCase": {
@@ -2125,10 +2290,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2170,10 +2341,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2201,7 +2378,7 @@
                 "latitude": 51.98134561000006,
                 "longitude": 8.950931642000057
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -2271,10 +2448,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2374,10 +2557,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2398,7 +2587,7 @@
                 "latitude": 43.04282494800003,
                 "longitude": 46.87255601000004
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -2417,10 +2606,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2462,10 +2657,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2507,10 +2708,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e118",
             "sourceUrl": "stopcoronavirus.rf"
         },
         "importedCase": {
@@ -2537,7 +2744,7 @@
                 "latitude": 49.45299347400004,
                 "longitude": 8.110168411000075
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -2607,10 +2814,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200415.csv"
         },
         "importedCase": {
@@ -2652,10 +2865,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200423.csv"
         },
         "importedCase": {
@@ -2697,10 +2916,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e117",
             "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200507.csv"
         },
         "importedCase": {
@@ -2799,7 +3024,7 @@
                 "latitude": 60.00000000000006,
                 "longitude": 100.00000000000006
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -2843,7 +3068,7 @@
                 "latitude": 48.420540542000026,
                 "longitude": 8.017447066000045
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -2913,10 +3138,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e119",
             "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
         },
         "importedCase": {
@@ -2958,10 +3189,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e119",
             "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
         },
         "importedCase": {
@@ -3003,10 +3240,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e119",
             "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
         },
         "importedCase": {
@@ -3048,10 +3291,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e119",
             "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
         },
         "importedCase": {
@@ -3072,7 +3321,7 @@
                 "latitude": 37.463095115000044,
                 "longitude": -4.576205755999979
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -3091,10 +3340,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3134,10 +3389,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3177,10 +3438,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3200,7 +3467,7 @@
                 "latitude": 41.79850998500007,
                 "longitude": 1.5289057830000274
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -3219,10 +3486,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3242,7 +3515,7 @@
                 "latitude": 41.79850998500007,
                 "longitude": 1.5289057830000274
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -3261,10 +3534,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3284,7 +3563,7 @@
                 "latitude": 41.43312000000003,
                 "longitude": 1.8611000000000217
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -3303,10 +3582,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "TR"
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e120",
             "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
         },
         "importedCase": {
@@ -3326,7 +3611,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3345,10 +3630,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e121",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -3367,7 +3658,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3386,10 +3677,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e121",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -3408,7 +3705,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3427,10 +3724,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e121",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -3449,7 +3752,7 @@
                 "latitude": 53.59231,
                 "longitude": 28.065179999999998
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3468,10 +3771,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e121",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/"
         },
         "importedCase": {
@@ -3490,7 +3799,7 @@
                 "latitude": 53.59231,
                 "longitude": 28.065179999999998
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3509,10 +3818,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e121",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/"
         },
         "importedCase": {
@@ -3553,10 +3868,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3599,10 +3920,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3645,10 +3972,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3669,7 +4002,7 @@
                 "latitude": 44.24848,
                 "longitude": 20.7733
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3688,10 +4021,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e123",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/serbia/"
         },
         "importedCase": {
@@ -3710,7 +4049,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3729,10 +4068,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3773,10 +4118,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3819,10 +4170,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3843,7 +4200,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3862,10 +4219,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e125",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -3884,7 +4247,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3903,10 +4266,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3925,7 +4294,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3944,10 +4313,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -3966,7 +4341,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -3985,10 +4360,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -4027,10 +4408,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -4050,7 +4437,7 @@
                 "latitude": 54.37002,
                 "longitude": -2.95214
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -4069,10 +4456,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e122",
             "sourceUrl": "https://coronavirus.data.gov.uk/"
         },
         "importedCase": {
@@ -4091,7 +4484,7 @@
                 "latitude": 49.09008,
                 "longitude": 31.36637
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -4110,10 +4503,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e127",
             "sourceUrl": "https://www.kyivpost.com/ukraine-politics/covid-19-in-ukraine-340-dead-13691-cases-507-new-infections.html"
         },
         "importedCase": {
@@ -4132,7 +4531,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -4151,10 +4550,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e125",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -4173,7 +4578,7 @@
                 "latitude": 39.10205,
                 "longitude": 35.17355
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Country"
         },
         "events": [
@@ -4192,10 +4597,16 @@
         "revisionMetadata": {
             "revisionNumber": 0,
             "creationMetadata": {
-                "curator": "ZW"
+                "curator": "ZW",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
             }
         },
         "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e125",
             "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
         },
         "importedCase": {
@@ -4221,7 +4632,7 @@
                 "latitude": 6.3464100000000485,
                 "longitude": -75.50799999999998
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4277,7 +4688,7 @@
                 "latitude": -12.066669999999931,
                 "longitude": -77.13332999999994
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4321,7 +4732,7 @@
                 "latitude": -34.610859,
                 "longitude": -58.486392
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4377,7 +4788,7 @@
                 "latitude": -11.93297999999993,
                 "longitude": -77.04084999999998
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4421,7 +4832,7 @@
                 "latitude": -13.40199999999993,
                 "longitude": -76.15811999999994
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4465,7 +4876,7 @@
                 "latitude": -12.038179999999954,
                 "longitude": -76.89317999999997
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4509,7 +4920,7 @@
                 "latitude": -6.548049999999932,
                 "longitude": -79.86393999999996
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4553,7 +4964,7 @@
                 "latitude": -8.081809999999962,
                 "longitude": -79.02201999999994
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
@@ -4597,7 +5008,7 @@
                 "latitude": -12.071769999999958,
                 "longitude": -77.11783999999994
             },
-            "name": "",
+            "name": "Non-empty name",
             "geoResolution": "Point"
         },
         "events": [
