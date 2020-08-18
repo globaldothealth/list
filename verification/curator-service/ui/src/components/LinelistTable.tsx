@@ -535,6 +535,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         maxBodyHeight: 'calc(100vh - 20em)',
+                        headerStyle: {
+                            zIndex: 1,
+                        },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
                             (
