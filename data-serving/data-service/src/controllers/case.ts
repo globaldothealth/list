@@ -1,6 +1,7 @@
+import { Case, CaseDocument } from '../model/case';
 import { Request, Response } from 'express';
 
-import { Case } from '../model/case';
+import parseSearchQuery from '../util/search';
 
 /**
  * Get a specific case.
@@ -33,24 +34,39 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     // Filter query param looks like &q=some%20search%20query
-    const searchQuery = String(req.query.q || '').trim();
-    const query = searchQuery
+    if (typeof req.query.q !== 'string' && typeof req.query.q !== 'undefined') {
+        res.status(422).json('q must be a unique string');
+        return;
+    }
+    const parsedSearch = parseSearchQuery(req.query.q || '');
+    const queryOpts = parsedSearch.fullTextSearch
         ? {
-              $text: { $search: searchQuery },
+              $text: { $search: parsedSearch.fullTextSearch },
           }
         : {};
-
-    // Do a fetch of documents and another fetch in parallel for total documents
-    // count used in pagination.
+    // Fill in keyword filters.
     try {
+        const casesQuery = Case.find(queryOpts);
+        const countQuery = Case.countDocuments(queryOpts);
+        parsedSearch.filters.forEach((f) => {
+            if (f.values.length == 1) {
+                casesQuery.where(f.path).equals(f.values[0]);
+                countQuery.where(f.path).equals(f.values[0]);
+            } else {
+                casesQuery.where(f.path).in(f.values);
+                countQuery.where(f.path).in(f.values);
+            }
+        });
+        // Do a fetch of documents and another fetch in parallel for total documents
+        // count used in pagination.
         const [docs, total] = await Promise.all([
-            Case.find(query)
+            casesQuery
                 .sort({ 'revisionMetadata.creationMetadata.date': -1 })
                 .skip(limit * (page - 1))
                 .limit(limit + 1)
                 // We don't need mongoose docs here, just plain json.
                 .lean(),
-            Case.countDocuments(query),
+            countQuery,
         ]);
         // If we have more items than limit, add a response param
         // indicating that there is more to fetch on the next page.
@@ -73,21 +89,29 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Create a case.
+ * Create one or many identical cases.
  *
  * Handles HTTP POST /api/cases.
  */
 export const create = async (req: Request, res: Response): Promise<void> => {
+    const numCases = Number(req.query.num_cases) || 1;
     try {
-        // TODO: Don't consume req.body directly; add layer between API and
-        // storage.
         const c = new Case(req.body);
+
         let result;
         if (req.query.validate_only) {
             await c.validate();
             result = c;
         } else {
-            result = await c.save();
+            if (numCases === 1) {
+                result = await c.save();
+            } else {
+                const cases = Array.from(
+                    { length: numCases },
+                    () => new Case(req.body),
+                );
+                result = { cases: await Case.insertMany(cases) };
+            }
         }
         res.status(201).json(result);
     } catch (err) {
@@ -123,6 +147,138 @@ export const batchValidate = async (
         res.status(207).json({ errors: errors });
         return;
     } catch (err) {
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
+ * Find IDs of existing cases that have {caseReference.sourceId,
+ * caseReference.sourceEntryId} combinations matching any cases in the provided
+ * request.
+ *
+ * This is used in batchUpsert. Background:
+ *
+ *   While MongoDB does return IDs of created documents, it doesn't do so
+ *   for modified documents (e.g. cases updated via upsert calls). In
+ *   order to (necessarily) provide that information, we'll query existing
+ *   cases, filtering on provided case reference data, in order to provide
+ *   an accurate list of updated case IDs.
+ */
+export const findCasesWithCaseReferenceData = async (
+    req: Request,
+    fieldsToSelect = {},
+): Promise<CaseDocument[]> => {
+    const providedCaseReferenceData = req.body.cases
+        .filter(
+            // Case data should be validated prior to this point.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (c: any) =>
+                c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
+        )
+        .map((c: any) => {
+            return {
+                'caseReference.sourceId': c.caseReference.sourceId,
+                'caseReference.sourceEntryId': c.caseReference.sourceEntryId,
+            };
+        });
+
+    return providedCaseReferenceData.length > 0
+        ? Case.find()
+              .or(providedCaseReferenceData)
+              .select(fieldsToSelect)
+              .exec()
+        : [];
+};
+
+/**
+ * Find IDs of existing cases that have {caseReference.sourceId,
+ * caseReference.sourceEntryId} combinations matching any cases in the provided
+ * request.
+ *
+ * This is used in batchUpsert. Background:
+ *
+ *   While MongoDB does return IDs of created documents, it doesn't do so
+ *   for modified documents (e.g. cases updated via upsert calls). In
+ *   order to (necessarily) provide that information, we'll query existing
+ *   cases, filtering on provided case reference data, in order to provide
+ *   an accurate list of updated case IDs.
+ */
+const findCaseIdsWithCaseReferenceData = async (
+    req: Request,
+): Promise<string[]> => {
+    return (
+        await findCasesWithCaseReferenceData(
+            req,
+            /* fieldsToSelect= */ { _id: 1 },
+        )
+    ).map((c) => String(c._id));
+};
+
+/**
+ * Batch upserts cases.
+ *
+ * Handles HTTP POST /api/cases/batchUpsert.
+ *
+ * Note that this method is _not_ atomic, and that validation _should_ be
+ * performed prior to invocation. Upserted cases are not validated, and while
+ * any validation issues for created cases will cause the API to return 422,
+ * all provided cases without validation errors will be written.
+ *
+ * TODO: Wrap batchValidate in this method.
+ */
+export const batchUpsert = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    try {
+        const toBeUpsertedCaseIds = await findCaseIdsWithCaseReferenceData(req);
+        const bulkWriteResult = await Case.bulkWrite(
+            // Case data should be validated prior to this point.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            req.body.cases.map((c: any) => {
+                if (
+                    c.caseReference?.sourceId &&
+                    c.caseReference?.sourceEntryId
+                ) {
+                    return {
+                        updateOne: {
+                            filter: {
+                                'caseReference.sourceId':
+                                    c.caseReference.sourceId,
+                                'caseReference.sourceEntryId':
+                                    c.caseReference.sourceEntryId,
+                            },
+                            update: c,
+                            upsert: true,
+                        },
+                    };
+                } else {
+                    return {
+                        insertOne: {
+                            document: c,
+                        },
+                    };
+                }
+            }),
+            { ordered: false },
+        );
+        res.status(207).json({
+            // Types are a little goofy here. We're grabbing the string ID from
+            // what MongoDB returns, which is data in the form of:
+            //   { index0 (string): _id0 (ObjectId), ..., indexN: _idN}
+            createdCaseIds: Object.entries(bulkWriteResult.insertedIds)
+                .concat(Object.entries(bulkWriteResult.upsertedIds))
+                .map((kv) => String(kv[1])),
+            updatedCaseIds: toBeUpsertedCaseIds,
+        });
+        return;
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            res.status(422).json(err.message);
+            return;
+        }
+        console.warn(err);
         res.status(500).json(err.message);
         return;
     }
@@ -207,4 +363,88 @@ export const del = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     res.status(204).end();
+};
+
+/**
+ * List most frequently used symptoms.
+ *
+ * Handles HTTP GET /api/cases/symptoms.
+ */
+export const listSymptoms = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const symptoms = await Case.aggregate([
+            { $unwind: '$symptoms.values' },
+            { $sortByCount: '$symptoms.values' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            symptoms: symptoms.map((symptomObject) => symptomObject._id),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
+
+/**
+ * List most frequently used places of transmission.
+ *
+ * Handles HTTP GET /api/cases/placesOfTransmission.
+ */
+export const listPlacesOfTransmission = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const placesOfTransmission = await Case.aggregate([
+            { $unwind: '$transmission.places' },
+            { $sortByCount: '$transmission.places' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            placesOfTransmission: placesOfTransmission.map(
+                (placeOfTransmissionObject) => placeOfTransmissionObject._id,
+            ),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
+};
+
+/**
+ * List most frequently used occupations.
+ *
+ * Handles HTTP GET /api/cases/occupations.
+ */
+export const listOccupations = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    const limit = Number(req.query.limit);
+    try {
+        const occupations = await Case.aggregate([
+            { $sortByCount: '$demographics.occupation' },
+            { $sort: { count: -1, _id: 1 } },
+        ]).limit(limit);
+        res.json({
+            occupations: occupations.map(
+                (occupationObject) => occupationObject._id,
+            ),
+        });
+        return;
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e.message);
+        return;
+    }
 };

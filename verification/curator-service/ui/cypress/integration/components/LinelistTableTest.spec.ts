@@ -2,7 +2,11 @@
 describe('Linelist table', function () {
     beforeEach(() => {
         cy.task('clearCasesDB', {});
-        cy.login();
+        cy.login({
+            email: 'test@bar.com',
+            name: 'test',
+            roles: ['admin', 'curator', 'reader'],
+        });
     });
 
     afterEach(() => {
@@ -108,9 +112,9 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
-        cy.get('input[placeholder="Search"]').type('Uruguay');
+        cy.get('input[id="search-field"]').type('Uruguay{enter}');
         cy.contains('France').should('not.exist');
-        cy.get('input[placeholder="Search"]').clear().type('France');
+        cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
     });
 });

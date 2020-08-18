@@ -6,11 +6,11 @@ export interface GeocodeResult {
     };
     country: string;
     // First administrative division (state in the US, Länder in Germany, ...).
-    administrativeAreaLevel1: string | undefined;
+    administrativeAreaLevel1?: string;
     // Second administrative division (county in the US, departments in France, ...).
-    administrativeAreaLevel2: string | undefined;
+    administrativeAreaLevel2?: string;
     // Third administrative division (cities usually).
-    administrativeAreaLevel3: string | undefined;
+    administrativeAreaLevel3?: string;
     // A precise location, such as an establishment or POI.
     place: string | undefined;
     // Human readable place name.

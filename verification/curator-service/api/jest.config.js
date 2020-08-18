@@ -4,7 +4,7 @@ module.exports = {
             tsConfig: 'tsconfig.json',
         },
     },
-    moduleFileExtensions: ['ts', 'js'],
+    moduleFileExtensions: ['ts', 'js', 'node'],
     preset: '@shelf/jest-mongodb',
     transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest',

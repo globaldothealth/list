@@ -33,10 +33,10 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const hasTravelledValues = [undefined, 'Yes', 'No'];
+const hasTravelledValues = ['Unknown', 'Yes', 'No'];
 
-// TODO: get values from DB.
-const travelPurposes = [undefined, 'Business', 'Leisure', 'Family', 'Other'];
+// If changing this list, also modify https://github.com/globaldothealth/list/blob/main/data-serving/data-service/api/openapi.yaml
+const travelPurposes = ['Unknown', 'Business', 'Leisure', 'Family', 'Other'];
 
 const travelMethods = [
     'Bus',

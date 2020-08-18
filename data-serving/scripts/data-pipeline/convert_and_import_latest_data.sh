@@ -3,7 +3,7 @@
 # Executes a pipeline to fetch the latest line-list data, convert it into the
 # MongoDB schema format, and import it into the MongoDD database.
 
-readonly USAGE="Usage: $0 [-m <mongodb_connection_string>] [-d <database>] [-c <collection>] [-r <sample_rate>] [-s <schema_path>]"
+readonly USAGE="Usage: $0 [-m <mongodb_connection_string>] [-d <database>] [-c <collection>] [-r <sample_rate>] [-s <schema_path>] [-i <indexes_path>]"
 readonly SCRIPT_PATH="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly NCOV2019_REPO_PATH='/tmp/nCoV2019'
 readonly CONVERTED_DATA_PATH='cases.json'
@@ -13,9 +13,9 @@ db='covid19'
 collection='cases'
 sample_rate=1
 schema_path="$SCRIPT_PATH/../../data-service/schemas/cases.schema.json"
-index_path="$SCRIPT_PATH/../../data-service/schemas/cases.index.json"
+indexes_path="$SCRIPT_PATH/../../data-service/schemas/cases.indexes.json"
 
-while getopts :m:d:c:r:s flag
+while getopts :m:d:c:r:s:i flag
 do
     case "${flag}" in
         m) mongodb_connection_string=${OPTARG};;
@@ -23,7 +23,7 @@ do
         c) collection=${OPTARG};;
         r) sample_rate=${OPTARG};;
         s) schema_path=${OPTARG};;
-        i) index_path=${OPTARG};;
+        i) indexes_path=${OPTARG};;
         ?) echo $USAGE; exit 1
     esac
 done
@@ -66,7 +66,7 @@ function setup_db() {
         DB=$db \
         COLL=$collection \
         SCHEMA=$schema_path \
-        INDEX=$index_path \
+        INDEXES=$indexes_path \
         npm run --prefix $SCRIPT_PATH/../setup-db setup
 }
 
@@ -92,7 +92,7 @@ main() {
     [-c] collection: $collection
     [-r] sample rate: $sample_rate
     [-s] schema path: $schema_path
-    [-i] index path: $index_path"
+    [-i] indexes path: $indexes_path"
 
     fetch_latest_data
     convert_data

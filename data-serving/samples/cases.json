@@ -239,9 +239,6 @@
                         "$date": "2020-02-14T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "critical condition, intubated as of 14.02.2020"
             }
         ],
         "revisionMetadata": {
@@ -513,9 +510,6 @@
                         "$date": "2020-05-05T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -560,9 +554,6 @@
                         "$date": "2020-05-11T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -607,9 +598,6 @@
                         "$date": "2020-05-16T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -654,9 +642,6 @@
                         "$date": "2020-05-19T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Recovered"
             }
         ],
         "revisionMetadata": {
@@ -697,9 +682,6 @@
                         "$date": "2020-05-22T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Recovered"
             }
         ],
         "revisionMetadata": {
@@ -744,9 +726,6 @@
                         "$date": "2020-05-25T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Recovered"
             }
         ],
         "revisionMetadata": {
@@ -791,9 +770,6 @@
                         "$date": "2020-05-28T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -838,9 +814,6 @@
                         "$date": "2020-05-29T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Recovered"
             }
         ],
         "revisionMetadata": {
@@ -885,9 +858,6 @@
                         "$date": "2020-05-31T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Recovered"
             }
         ],
         "revisionMetadata": {
@@ -932,9 +902,6 @@
                         "$date": "2020-04-26T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -985,9 +952,6 @@
                         "$date": "2020-05-21T00:00:00Z"
                     }
                 }
-            },
-            {
-                "name": "Hospitalized"
             }
         ],
         "revisionMetadata": {
@@ -2242,17 +2206,6 @@
         },
         "events": [
             {
-                "name": "confirmed",
-                "dateRange": {
-                    "start": {
-                        "$date": "2020-03-29T00:00:00Z"
-                    },
-                    "end": {
-                        "$date": "2020-03-29T00:00:00Z"
-                    }
-                }
-            },
-            {
                 "name": "onsetSymptoms",
                 "dateRange": {
                     "start": {
@@ -2260,6 +2213,17 @@
                     },
                     "end": {
                         "$date": "2020-03-21T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-03-29T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-03-29T00:00:00Z"
                     }
                 }
             }
@@ -2345,7 +2309,7 @@
         },
         "events": [
             {
-                "name": "confirmed",
+                "name": "onsetSymptoms",
                 "dateRange": {
                     "start": {
                         "$date": "2020-03-24T00:00:00Z"
@@ -2356,7 +2320,7 @@
                 }
             },
             {
-                "name": "onsetSymptoms",
+                "name": "confirmed",
                 "dateRange": {
                     "start": {
                         "$date": "2020-03-24T00:00:00Z"
@@ -2816,6 +2780,16 @@
         ],
         "revisionMetadata": {
             "revisionNumber": 0
+        },
+        "importedCase": {
+            "ID": "007-686962",
+            "city": "Moscow",
+            "province": "Central",
+            "country": "Russia",
+            "date_confirmation": "13.05.2020",
+            "chronic_disease_binary": "False",
+            "admin_id": "6363.0",
+            "travel_history_binary": "False"
         }
     },
     {
@@ -2925,7 +2899,7 @@
         },
         "events": [
             {
-                "name": "admissionHospital",
+                "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
                         "$date": "2020-05-12T00:00:00Z"
@@ -2970,7 +2944,7 @@
         },
         "events": [
             {
-                "name": "admissionHospital",
+                "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
                         "$date": "2020-04-05T00:00:00Z"
@@ -3015,7 +2989,7 @@
         },
         "events": [
             {
-                "name": "admissionHospital",
+                "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
                         "$date": "2020-04-07T00:00:00Z"
@@ -3060,7 +3034,7 @@
         },
         "events": [
             {
-                "name": "admissionHospital",
+                "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
                         "$date": "2020-03-27T00:00:00Z"
@@ -4252,17 +4226,6 @@
         },
         "events": [
             {
-                "name": "confirmed",
-                "dateRange": {
-                    "start": {
-                        "$date": "2020-04-17T00:00:00Z"
-                    },
-                    "end": {
-                        "$date": "2020-04-17T00:00:00Z"
-                    }
-                }
-            },
-            {
                 "name": "onsetSymptoms",
                 "dateRange": {
                     "start": {
@@ -4270,6 +4233,17 @@
                     },
                     "end": {
                         "$date": "2020-04-16T00:00:00Z"
+                    }
+                }
+            },
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-04-17T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-04-17T00:00:00Z"
                     }
                 }
             }

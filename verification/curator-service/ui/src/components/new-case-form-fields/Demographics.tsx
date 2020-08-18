@@ -1,17 +1,18 @@
+import { Chip, withStyles } from '@material-ui/core';
 import { FastField, useFormikContext } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
+import {
+    FormikAutocomplete,
+    SelectField,
+} from '../common-form-fields/FormikFields';
 
 import CaseFormValues from './CaseFormValues';
 import FieldTitle from '../common-form-fields/FieldTitle';
-import FormControl from '@material-ui/core/FormControl';
-import { FormikAutocomplete } from '../common-form-fields/FormikFields';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
 import Scroll from 'react-scroll';
+import { TextField } from 'formik-material-ui';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core';
 
 const styles = () =>
     createStyles({
@@ -31,13 +32,19 @@ const styles = () =>
         select: {
             width: '8em',
         },
+        chip: {
+            margin: '0.5em',
+        },
+        section: {
+            marginBottom: '1em',
+        },
     });
 
 type DemographicsProps = WithStyles<typeof styles>;
 
-// TODO: get values from DB.
+// If changing this list, also modify https://github.com/globaldothealth/list/blob/main/data-serving/data-service/api/openapi.yaml
 const genderValues = [
-    undefined,
+    'Unknown',
     'Male',
     'Female',
     'Non-binary/Third gender',
@@ -46,33 +53,30 @@ const genderValues = [
 
 function Demographics(props: DemographicsProps): JSX.Element {
     const { classes } = props;
-    const { initialValues } = useFormikContext<CaseFormValues>();
+    const { initialValues, setFieldValue } = useFormikContext<CaseFormValues>();
+    const [commonOccupations, setCommonOccupations] = React.useState([]);
+
+    React.useEffect(
+        () => {
+            axios
+                .get('/api/cases/occupations?limit=10')
+                .then((response) =>
+                    setCommonOccupations(response.data.occupations ?? []),
+                );
+        },
+        // Using [] here means this will only be called once at the beginning of the lifecycle
+        [],
+    );
+
     return (
         <Scroll.Element name="demographics">
             <fieldset>
                 <FieldTitle title="Demographics"></FieldTitle>
-                <FormControl>
-                    <div className={classes.fieldRow}>
-                        <InputLabel htmlFor="gender">Gender</InputLabel>
-                        <FastField
-                            as="select"
-                            name="gender"
-                            type="text"
-                            data-testid="gender"
-                            className={classes.select}
-                            component={Select}
-                        >
-                            {genderValues.map((gender) => (
-                                <MenuItem
-                                    key={gender ?? 'undefined'}
-                                    value={gender}
-                                >
-                                    {gender ?? 'Unknown'}
-                                </MenuItem>
-                            ))}
-                        </FastField>
-                    </div>
-                </FormControl>
+                <SelectField
+                    name="gender"
+                    label="Gender"
+                    values={genderValues}
+                ></SelectField>
                 <div className={`${classes.fieldRow} ${classes.ageRow}`}>
                     <FastField
                         className={classes.ageField}
@@ -114,16 +118,41 @@ function Demographics(props: DemographicsProps): JSX.Element {
                         label="Nationality"
                         initialValue={initialValues.nationalities}
                         multiple={true}
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/nationalities.txt"
+                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/nationalities.txt"
                     />
                 </div>
+                {commonOccupations.length > 0 && (
+                    <>
+                        <div className={classes.section}>
+                            Frequently added occupations
+                        </div>
+                        <div className={classes.section}>
+                            {commonOccupations.map(
+                                (occupation) =>
+                                    occupation && (
+                                        <Chip
+                                            key={occupation}
+                                            className={classes.chip}
+                                            label={occupation}
+                                            onClick={(): void =>
+                                                setFieldValue(
+                                                    'occupation',
+                                                    occupation,
+                                                )
+                                            }
+                                        ></Chip>
+                                    ),
+                            )}
+                        </div>
+                    </>
+                )}
                 <FormikAutocomplete
                     name="occupation"
                     label="Occupation"
                     initialValue={initialValues.occupation}
                     multiple={false}
                     freeSolo
-                    optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/occupations.txt"
+                    optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/occupations.txt"
                 />
             </fieldset>
         </Scroll.Element>

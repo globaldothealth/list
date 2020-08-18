@@ -6,7 +6,7 @@ import Scroll from 'react-scroll';
 import { SelectField } from '../common-form-fields/FormikFields';
 import { useFormikContext } from 'formik';
 
-const hasPreexistingConditionsValues = [undefined, 'Yes', 'No'];
+const hasPreexistingConditionsValues = ['Unknown', 'Yes', 'No'];
 export default function PreexistingConditions(): JSX.Element {
     const { values, initialValues } = useFormikContext<CaseFormValues>();
     return (
@@ -24,7 +24,7 @@ export default function PreexistingConditions(): JSX.Element {
                         label="Preexisting conditions"
                         initialValue={initialValues.preexistingConditions}
                         multiple
-                        optionsLocation="https://raw.githubusercontent.com/open-covid-data/healthmap-gdo-temp/main/suggest/preexisting_conditions.txt"
+                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/preexisting_conditions.txt"
                     />
                 )}
             </fieldset>

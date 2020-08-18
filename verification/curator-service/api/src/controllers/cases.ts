@@ -1,9 +1,10 @@
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
+import { UserDocument } from '../model/user';
 import axios from 'axios';
 
-class InvalidParamError extends Error {}
+class InvalidParamError extends Error { }
 
 /**
  * CasesController forwards requests to the data service.
@@ -13,9 +14,60 @@ export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
         private readonly geocoders: Geocoder[],
-    ) {}
+    ) { }
 
     list = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const response = await axios.get(
+                this.dataServerURL + '/api' + req.url,
+            );
+            res.status(response.status).json(response.data);
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    listSymptoms = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const response = await axios.get(
+                this.dataServerURL + '/api' + req.url,
+            );
+            res.status(response.status).json(response.data);
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    listPlacesOfTransmission = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        try {
+            const response = await axios.get(
+                this.dataServerURL + '/api' + req.url,
+            );
+            res.status(response.status).json(response.data);
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    listOccupations = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
                 this.dataServerURL + '/api' + req.url,
@@ -52,7 +104,7 @@ export default class CasesController {
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
             );
-            res.status(response.status).json(response.data);
+            res.status(response.status).end();
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {
@@ -67,7 +119,10 @@ export default class CasesController {
         try {
             const response = await axios.put(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {
@@ -90,7 +145,10 @@ export default class CasesController {
             }
             const response = await axios.put(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {
@@ -128,8 +186,8 @@ export default class CasesController {
             if (geocodeErrors.length > 0) {
                 res.status(207).send({
                     phase: 'GEOCODE',
-                    numUpserted: 0,
-                    numErrors: geocodeErrors.length,
+                    createdCaseIds: [],
+                    updatedCaseIds: [],
                     errors: geocodeErrors,
                 });
                 return;
@@ -139,28 +197,31 @@ export default class CasesController {
             const validationResponse = await axios.post(
                 this.dataServerURL + '/api/cases/batchValidate',
                 req.body,
+                { maxContentLength: Infinity },
             );
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
-                    numUpserted: 0,
-                    numErrors: validationResponse.data.errors.length,
+                    createdCaseIds: [],
+                    updatedCaseIds: [],
                     errors: validationResponse.data.errors,
                 });
                 return;
             }
 
-            // 3. Upsert each case.
-            // Consider adding a batchUpsert endpoint on the data service if
-            // this slows us down too much.
-            for (let index = 0; index < req.body.cases.length; index++) {
-                const c = req.body.cases[index];
-                await axios.put(this.dataServerURL + '/api/cases', c);
-            }
+            // 3. Batch upsert.
+            const upsertResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpsert',
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
+                { maxContentLength: Infinity },
+            );
             res.status(200).send({
                 phase: 'UPSERT',
-                numUpserted: req.body.cases.length,
-                numErrors: 0,
+                createdCaseIds: upsertResponse.data.createdCaseIds,
+                updatedCaseIds: upsertResponse.data.updatedCaseIds,
                 errors: [],
             });
             return;
@@ -184,7 +245,10 @@ export default class CasesController {
             }
             const response = await axios.post(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
             );
             res.status(response.status).json(response.data);
         } catch (err) {

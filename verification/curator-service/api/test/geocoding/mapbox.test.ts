@@ -5,11 +5,15 @@ import { GeocodeResult, Resolution } from '../../src/geocoding/geocoder';
 import Geocoder from '../../src/geocoding/mapbox';
 import { MapiRequest } from '@mapbox/mapbox-sdk/lib/classes/mapi-request';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
+import axios from 'axios';
 
 // Typings defined by DefinitelyTyped are not fully compatible with the response we get.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const features: any[] = [];
 let callCount = 0;
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 jest.mock('@mapbox/mapbox-sdk/services/geocoding', () => {
     return jest.fn().mockImplementation(() => {
@@ -34,12 +38,19 @@ jest.mock('@mapbox/mapbox-sdk/services/geocoding', () => {
 
 beforeEach(() => {
     jest.clearAllMocks();
-    features.splice(0);
+    features.splice(0, features.length);
     callCount = 0;
 });
 
 describe('geocode', () => {
     it('succeeds', async () => {
+        mockedAxios.get.mockResolvedValueOnce({
+            status: 200,
+            statusText: 'OK',
+            data: {
+                features: [],
+            },
+        });
         features.push(lyon);
         const geocoder = new Geocoder('token', 'mapbox.places');
         let feats = await geocoder.geocode('some query', {
@@ -47,9 +58,6 @@ describe('geocode', () => {
         });
         expect(feats).toHaveLength(1);
         const wantFeature: GeocodeResult = {
-            administrativeAreaLevel1: 'Rhône',
-            administrativeAreaLevel2: '',
-            administrativeAreaLevel3: 'Lyon',
             country: 'France',
             geometry: { latitude: 45.75889, longitude: 4.84139 },
             place: '',

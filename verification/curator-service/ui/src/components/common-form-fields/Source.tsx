@@ -1,17 +1,11 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Typography,
-} from '@material-ui/core';
 import { FastField, Field, useFormikContext } from 'formik';
+import { Typography, makeStyles } from '@material-ui/core';
 
-import { CaseReference as CaseRef } from '../Case';
+import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
+import CaseFormValues from '../new-case-form-fields/CaseFormValues';
+import { CaseReference } from '../Case';
 import FieldTitle from './FieldTitle';
-import { TextField as MUITextField } from '@material-ui/core';
 import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
@@ -20,7 +14,8 @@ import axios from 'axios';
 import { throttle } from 'lodash';
 
 interface SourceProps {
-    initialValue?: CaseRef;
+    borderless?: boolean;
+    initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
 }
 
@@ -34,9 +29,13 @@ export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         return (
             <Scroll.Element name="source">
-                <fieldset>
+                <fieldset
+                    style={{
+                        borderStyle: this.props.borderless ? 'none' : 'solid',
+                    }}
+                >
                     <FieldTitle
-                        title="Source"
+                        title="Data Source"
                         tooltip={tooltipText}
                     ></FieldTitle>
                     <SourcesAutocomplete
@@ -64,6 +63,7 @@ interface OriginData {
 
 interface SourceData {
     _id: string;
+    name: string;
     origin: OriginData;
 }
 
@@ -72,62 +72,56 @@ interface ListSourcesResponse {
 }
 
 interface SourceAutocompleteProps {
-    initialValue?: CaseReference;
+    initialValue?: CaseReferenceForm;
 }
 
-interface AdditionalSource {
-    sourceUrl: string;
-}
-
-interface CaseReference extends CaseRef {
+export interface CaseReferenceForm extends CaseReference {
     inputValue?: string;
+    sourceName?: string;
 }
 
-const filter = createFilterOptions<CaseReference>();
+export async function submitSource(opts: {
+    name: string;
+    url: string;
+    format?: string;
+}): Promise<CaseReference> {
+    const newSource = {
+        name: opts.name,
+        origin: {
+            url: opts.url,
+        },
+        format: opts.format,
+    };
+    const resp = await axios.post<SourceData>('/api/sources', newSource);
+    return {
+        sourceId: resp.data._id,
+        sourceUrl: opts.url,
+        additionalSources: ([] as unknown) as [{ sourceUrl: string }],
+    };
+}
+
+const filter = createFilterOptions<CaseReferenceForm>();
+
+const useStyles = makeStyles(() => ({
+    sourceNameField: {
+        marginTop: '1em',
+    },
+}));
 
 export function SourcesAutocomplete(
     props: SourceAutocompleteProps,
 ): JSX.Element {
+    const classes = useStyles();
     const name = 'caseReference';
-    const [open, toggleOpen] = React.useState(false);
-    const [value, setValue] = React.useState<CaseReference | null>(
+    const [value, setValue] = React.useState<CaseReferenceForm | null>(
         props.initialValue ? props.initialValue : null,
     );
-    const [dialogValue, setDialogValue] = React.useState({
-        url: '',
-        name: '',
-    });
-
-    const handleClose = (): void => {
-        setDialogValue({
-            url: '',
-            name: '',
-        });
-        toggleOpen(false);
-    };
-
-    const handleDialogSubmit = async (): Promise<void> => {
-        const newSource = {
-            name: dialogValue.name,
-            origin: {
-                url: dialogValue.url,
-            },
-        };
-        const resp = await axios.post<SourceData>('/api/sources', newSource);
-        const newValue = {
-            sourceId: resp.data._id,
-            sourceUrl: dialogValue.url,
-            additionalSources: ([] as unknown) as [{ sourceUrl: string }],
-        };
-
-        setValue(newValue);
-        setFieldValue(name, newValue);
-        handleClose();
-    };
 
     const [inputValue, setInputValue] = React.useState('');
-    const [options, setOptions] = React.useState<CaseReference[]>([]);
-    const { setFieldValue, setTouched } = useFormikContext();
+    const [options, setOptions] = React.useState<CaseReferenceForm[]>([]);
+    const { setFieldValue, setTouched, values } = useFormikContext<
+        CaseFormValues | BulkCaseFormValues
+    >();
 
     const fetch = React.useMemo(
         () =>
@@ -154,7 +148,7 @@ export function SourcesAutocomplete(
 
         fetch({ url: inputValue }, (results?: SourceData[]) => {
             if (active) {
-                let newOptions = [] as CaseReference[];
+                let newOptions = [] as CaseReferenceForm[];
 
                 if (results) {
                     newOptions = [
@@ -162,6 +156,7 @@ export function SourcesAutocomplete(
                         ...results.map((source) => ({
                             sourceId: source._id,
                             sourceUrl: source.origin.url,
+                            sourceName: source.name,
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
@@ -181,13 +176,15 @@ export function SourcesAutocomplete(
     return (
         <React.Fragment>
             <Autocomplete
-                itemType="CaseReference"
-                getOptionLabel={(option: CaseReference): string =>
-                    option.sourceUrl
+                itemType="CaseReferenceForm"
+                getOptionLabel={(option: CaseReferenceForm): string =>
+                    // option is a string if the user typed a URL and did not
+                    // select a dropdown value.
+                    typeof option === 'string' ? option : option.sourceUrl
                 }
                 getOptionSelected={(
-                    option: CaseReference,
-                    value: CaseReference,
+                    option: CaseReferenceForm,
+                    value: CaseReferenceForm,
                 ): boolean => {
                     return (
                         option.sourceId === value.sourceId &&
@@ -195,40 +192,49 @@ export function SourcesAutocomplete(
                     );
                 }}
                 onChange={(
-                    event: any,
-                    newValue: CaseReference | null,
+                    _: any,
+                    newValue: CaseReferenceForm | string | null,
                 ): void => {
+                    // newValue is a string if the user typed a URL and did not
+                    // select a dropdown value.
                     if (typeof newValue === 'string') {
-                        // Timeout to avoid instant validation of the dialog's form.
-                        setTimeout(() => {
-                            toggleOpen(true);
-                            setDialogValue({
-                                url: newValue,
-                                name: '',
-                            });
-                        });
-                    } else if (newValue && newValue.inputValue) {
-                        toggleOpen(true);
-                        setDialogValue({
-                            url: newValue.inputValue,
-                            name: '',
-                        });
-                    } else {
-                        setValue(newValue);
-                        setFieldValue(name, newValue);
+                        const existingOption = options.find(
+                            (option) => option.sourceUrl === newValue,
+                        );
+                        newValue = existingOption ?? {
+                            inputValue: newValue,
+                            sourceUrl: newValue,
+                            sourceId: '',
+                            sourceName: values.caseReference?.sourceName ?? '',
+                            additionalSources: ([] as unknown) as [
+                                { sourceUrl: string },
+                            ],
+                        };
                     }
+                    setValue(newValue);
+                    setFieldValue(name, newValue);
                 }}
                 filterOptions={(
-                    options: CaseReference[],
+                    options: CaseReferenceForm[],
                     params,
-                ): CaseReference[] => {
-                    const filtered = filter(options, params) as CaseReference[];
+                ): CaseReferenceForm[] => {
+                    const filtered = filter(
+                        options,
+                        params,
+                    ) as CaseReferenceForm[];
 
-                    if (params.inputValue !== '') {
+                    if (
+                        params.inputValue !== '' &&
+                        !filtered.find(
+                            (caseRef) =>
+                                caseRef.sourceUrl === params.inputValue,
+                        )
+                    ) {
                         filtered.push({
                             inputValue: params.inputValue,
-                            sourceUrl: `Add "${params.inputValue}"`,
+                            sourceUrl: params.inputValue,
                             sourceId: '',
+                            sourceName: values.caseReference?.sourceName ?? '',
                             additionalSources: ([] as unknown) as [
                                 { sourceUrl: string },
                             ],
@@ -237,8 +243,9 @@ export function SourcesAutocomplete(
 
                     return filtered;
                 }}
+                autoSelect
+                freeSolo
                 selectOnFocus
-                clearOnBlur
                 handleHomeEndKeys
                 options={options}
                 value={value}
@@ -256,7 +263,7 @@ export function SourcesAutocomplete(
                             // dropdown values. Thus we use an unused form value here.
                             name="unused"
                             data-testid={name}
-                            label="Source URL"
+                            label="Paste URL for data source or search"
                             placeholder="https://..."
                             component={TextField}
                             fullWidth
@@ -264,7 +271,7 @@ export function SourcesAutocomplete(
                         <RequiredHelperText name={name}></RequiredHelperText>
                     </div>
                 )}
-                renderOption={(option: CaseReference): React.ReactNode => {
+                renderOption={(option: CaseReferenceForm): React.ReactNode => {
                     return (
                         <span>
                             <Typography variant="body2">
@@ -274,64 +281,22 @@ export function SourcesAutocomplete(
                     );
                 }}
             />
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <form>
-                    <DialogTitle id="form-dialog-title">
-                        Add a new source
-                    </DialogTitle>
-                    <DialogContent>
-                        <MUITextField
-                            autoFocus
-                            margin="dense"
-                            id="url"
-                            value={dialogValue.url}
-                            onChange={(event): void =>
-                                setDialogValue({
-                                    ...dialogValue,
-                                    url: event.target.value,
-                                })
-                            }
-                            label="URL"
+            {/* If this is a new source, show option to add name */}
+            {inputValue &&
+                !options.find((option) => option.sourceUrl === inputValue) && (
+                    <>
+                        <FastField
+                            className={classes.sourceNameField}
+                            label="Source name"
+                            name={`${name}.sourceName`}
+                            helperText="Required"
                             type="text"
+                            data-testid="sourceName"
+                            component={TextField}
+                            fullWidth
                         />
-                        <MUITextField
-                            margin="dense"
-                            id="name"
-                            value={dialogValue.name}
-                            onChange={(event): void =>
-                                setDialogValue({
-                                    ...dialogValue,
-                                    name: event.target.value,
-                                })
-                            }
-                            label="Name"
-                            type="text"
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose} color="primary">
-                            Cancel
-                        </Button>
-                        {
-                            // Don't use submit type for this button.
-                            // It'll trigger the outer form submit.
-                            // We could make this dialog use a nested Formik
-                            // declaration/context, but no need for now.
-                        }
-                        <Button
-                            onClick={handleDialogSubmit}
-                            color="primary"
-                            data-testid="sourceAdd"
-                        >
-                            Add
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+                    </>
+                )}
         </React.Fragment>
     );
 }

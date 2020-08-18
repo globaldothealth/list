@@ -7,6 +7,7 @@ const editMetadataSchema = new mongoose.Schema(
         curator: {
             type: String,
             required: true,
+            index: true,
         },
         date: {
             ...dateFieldInfo,
@@ -48,3 +49,8 @@ export type RevisionMetadataDocument = mongoose.Document & {
     creationMetadata: EditMetadataDocument;
     updateMetadata?: EditMetadataDocument;
 };
+
+export const RevisionMetadata = mongoose.model<RevisionMetadataDocument>(
+    'RevisionMetadata',
+    revisionMetadataSchema,
+);

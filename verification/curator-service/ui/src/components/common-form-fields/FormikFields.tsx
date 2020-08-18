@@ -1,6 +1,7 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
+import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
@@ -47,9 +48,12 @@ export function FormikAutocomplete(
     const [open, setOpen] = React.useState(false);
     const [options, setOptions] = React.useState<string[]>([]);
     const loading = open && options.length === 0;
-    const { setFieldValue, setTouched, initialValues } = useFormikContext<
-        CaseFormValues
-    >();
+    const {
+        setFieldValue,
+        setTouched,
+        initialValues,
+        values,
+    } = useFormikContext<CaseFormValues>();
 
     React.useEffect(() => {
         let active = true;
@@ -102,6 +106,7 @@ export function FormikAutocomplete(
             onClose={(): void => {
                 setOpen(false);
             }}
+            value={hasKey(values, props.name) ? values[props.name] : undefined}
             options={options}
             filterOptions={(options: string[], params): string[] => {
                 const filtered = filter(options, params) as string[];
@@ -138,7 +143,7 @@ export function FormikAutocomplete(
 interface SelectFieldProps {
     name: string;
     label: string;
-    values: (string | undefined)[];
+    values: string[];
     required?: boolean;
 }
 
@@ -159,8 +164,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
                 component={Select}
             >
                 {props.values.map((value) => (
-                    <MenuItem key={value ?? 'undefined'} value={value}>
-                        {value ?? 'Unknown'}
+                    <MenuItem key={value} value={value}>
+                        {value}
                     </MenuItem>
                 ))}
             </FastField>
@@ -195,7 +200,9 @@ export function DateField(props: DateFieldProps): JSX.Element {
                     initialFocusedDate={Date.parse(
                         props.initialFocusedDate ?? '',
                     )}
+                    invalidDateMessage="Invalid date format (YYYY/MM/DD)"
                     component={KeyboardDatePicker}
+                    helperText="YYYY/MM/DD"
                 />
             </MuiPickersUtilsProvider>
             {props.required && (
@@ -212,7 +219,9 @@ interface RequiredHelperTextProps {
 export function RequiredHelperText(
     props: RequiredHelperTextProps,
 ): JSX.Element {
-    const { values, touched } = useFormikContext<CaseFormValues>();
+    const { values, touched } = useFormikContext<
+        CaseFormValues | BulkCaseFormValues
+    >();
     return (
         <div>
             <FormHelperText
@@ -221,8 +230,7 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null ||
-                        values[props.name] === '')
+                        values[props.name] === null)
                 }
             >
                 Required

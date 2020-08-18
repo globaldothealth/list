@@ -22,7 +22,7 @@ import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
-const caseSchema = new mongoose.Schema(
+export const caseSchema = new mongoose.Schema(
     {
         caseReference: {
             type: caseReferenceSchema,
@@ -43,10 +43,7 @@ const caseSchema = new mongoose.Schema(
             _id: false,
         },
         location: locationSchema,
-        revisionMetadata: {
-            type: revisionMetadataSchema,
-            required: true,
-        },
+        revisionMetadata: revisionMetadataSchema,
         notes: String,
         pathogens: [pathogenSchema],
         preexistingConditions: preexistingConditionsSchema,
@@ -70,7 +67,7 @@ const caseSchema = new mongoose.Schema(
     },
 );
 
-type CaseDocument = mongoose.Document & {
+export type CaseDocument = mongoose.Document & {
     _id: ObjectId;
     caseReference: CaseReferenceDocument;
     demographics: DemographicsDocument;

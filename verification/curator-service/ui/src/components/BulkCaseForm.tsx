@@ -1,22 +1,33 @@
 import * as Yup from 'yup';
 
-import { Button, withStyles } from '@material-ui/core';
-import { Case, CaseReference, Event } from './Case';
+import {
+    Button,
+    CircularProgress,
+    Typography,
+    withStyles,
+} from '@material-ui/core';
+import {
+    Case,
+    CaseReference,
+    Event,
+    PreexistingConditions,
+    Symptoms,
+} from './Case';
 import { Form, Formik } from 'formik';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import axios, { AxiosResponse } from 'axios';
+import Source, { submitSource } from './common-form-fields/Source';
+import { Theme, createStyles } from '@material-ui/core/styles';
 
 import Alert from '@material-ui/lab/Alert';
 import AppModal from './AppModal';
-import CaptionedProgress from './bulk-case-form-fields/CaptionedProgress';
+import BulkCaseFormValues from './bulk-case-form-fields/BulkCaseFormValues';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import React from 'react';
-import Source from './common-form-fields/Source';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import { createStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 
 interface User {
     _id: string;
@@ -27,27 +38,55 @@ interface User {
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
-        container: {
-            display: 'flex',
+        headerBlurb: {
+            maxWidth: '70%',
+            paddingBottom: '3em',
+            paddingTop: '1em',
+        },
+        headerText: {
+            marginTop: '2em',
         },
         form: {
-            paddingLeft: '2em',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            paddingLeft: '3em',
+            paddingRight: '4em',
         },
         formSection: {
-            margin: '2em 0',
+            paddingBottom: '2em',
+        },
+        allFormSections: {
+            marginBottom: '2em',
+            maxWidth: '60%',
+            paddingLeft: '1em',
+            paddingRight: '1em',
+            paddingTop: '0.5em',
         },
         statusMessage: {
             marginTop: '2em',
             maxWidth: '80%',
         },
-        uploadButton: {
-            marginRight: '2em',
+        uploadFeedback: {
+            paddingBottom: '4em',
         },
-        uploadDiv: {
-            display: 'flex',
+        uploadBar: {
             alignItems: 'center',
+            display: 'flex',
+            height: '4em',
+            marginTop: 'auto',
+        },
+        cancelButton: {
+            marginLeft: '1em',
+        },
+        progressIndicator: {
+            alignItems: 'center',
+            display: 'flex',
+        },
+        progressText: {
+            marginLeft: '1em',
         },
     });
 
@@ -61,13 +100,11 @@ interface BulkCaseFormProps
 interface BulkCaseFormState {
     errorMessage: string;
     errors: CaseValidationError[];
-    uploadProgress: number;
-    uploadTotalRequests: number;
 }
 
-interface BulkCaseFormValues {
-    file: File | null;
-    caseReference?: CaseReference;
+interface AgeRange {
+    start?: number;
+    end?: number;
 }
 
 /**
@@ -87,15 +124,32 @@ interface RawParsedCase {
 
     // Demographics
     gender?: string;
+    // Convenience field to provide age range in $start-$end format.
+    ageRange?: string;
     ageRangeStart?: number;
     ageRangeEnd?: number;
+    ethnicity?: string;
+    nationalities?: string; // semicolon delimited list
+    occupation?: string;
 
     // Events
     dateConfirmed: string;
+    confirmationMethod?: string;
     hospitalized?: boolean;
     dateHospitalized?: string;
+    icuAdmission?: boolean;
+    dateIcuAdmission?: string;
     outcome?: string;
     dateOutcome?: string;
+    dateSymptomOnset?: string;
+
+    // Preexisting conditions
+    hasPreexistingConditions?: boolean;
+    preexistingConditions?: string; // semicolon delimited list
+
+    // Symptoms
+    symptoms?: string; // semicolon delimited list
+    symptomStatus?: string;
 
     // Location
     country: string;
@@ -108,6 +162,18 @@ interface RawParsedCase {
 
     // Bulk upload specific data
     caseCount?: number;
+}
+
+interface BatchUpsertError {
+    index: number;
+    message: string;
+}
+
+interface BatchUpsertResponse {
+    phase: string;
+    createdCaseIds: string[];
+    updatedCaseIds: string[];
+    errors: BatchUpsertError[];
 }
 
 // See description below for usage. This is a mapped partial type that
@@ -132,7 +198,10 @@ type RecursivePartial<T> = {
 type CompleteParsedCase = RecursivePartial<Case> & { caseCount?: number };
 
 const BulkFormSchema = Yup.object().shape({
-    caseReference: Yup.object().required('Required field'),
+    caseReference: Yup.object().shape({
+        sourceUrl: Yup.string().required('Required'),
+        sourceName: Yup.string().required('Required'),
+    }),
     file: Yup.mixed().required('Please upload a file'),
 });
 
@@ -145,8 +214,6 @@ class BulkCaseForm extends React.Component<
         this.state = {
             errorMessage: '',
             errors: [],
-            uploadProgress: 0,
-            uploadTotalRequests: 0,
         };
     }
 
@@ -161,6 +228,7 @@ class BulkCaseForm extends React.Component<
                     start: c.dateConfirmed,
                     end: c.dateConfirmed,
                 },
+                value: c.confirmationMethod,
             });
         }
         if (c.hospitalized === true) {
@@ -175,14 +243,37 @@ class BulkCaseForm extends React.Component<
                 value: 'Yes',
             });
         }
+        if (c.icuAdmission === true) {
+            events.push({
+                name: 'icuAdmission',
+                dateRange: c.dateIcuAdmission
+                    ? {
+                          start: c.dateIcuAdmission,
+                          end: c.dateIcuAdmission,
+                      }
+                    : undefined,
+                value: 'Yes',
+            });
+        }
         if (c.outcome) {
             events.push({
                 name: 'outcome',
-                dateRange: {
-                    start: c.dateOutcome,
-                    end: c.dateOutcome,
-                },
+                dateRange: c.dateOutcome
+                    ? {
+                          start: c.dateOutcome,
+                          end: c.dateOutcome,
+                      }
+                    : undefined,
                 value: c.outcome,
+            });
+        }
+        if (c.dateSymptomOnset) {
+            events.push({
+                name: 'onsetSymptoms',
+                dateRange: {
+                    start: c.dateSymptomOnset,
+                    end: c.dateSymptomOnset,
+                },
             });
         }
         return events;
@@ -221,12 +312,55 @@ class BulkCaseForm extends React.Component<
             .join(', ');
     }
 
+    createAgeRange(c: RawParsedCase): AgeRange {
+        let ageRangeStart = c.ageRangeStart;
+        let ageRangeEnd = c.ageRangeEnd;
+        if (c.ageRange?.match(/^\d*-\d*$/)) {
+            const startEnd = c.ageRange.split('-');
+            ageRangeStart = startEnd[0] ? Number(startEnd[0]) : undefined;
+            ageRangeEnd = startEnd[1] ? Number(startEnd[1]) : undefined;
+        }
+        return { start: ageRangeStart, end: ageRangeEnd };
+    }
+
+    createSymptoms(c: RawParsedCase): Symptoms | undefined {
+        return c.symptomStatus
+            ? {
+                  status: c.symptomStatus,
+                  values: c.symptoms ? c.symptoms.split(';') : [],
+              }
+            : undefined;
+    }
+
+    createPreexistingConditions(
+        c: RawParsedCase,
+    ): PreexistingConditions | undefined {
+        return c.hasPreexistingConditions !== undefined
+            ? {
+                  hasPreexistingConditions: c.hasPreexistingConditions,
+                  values: c.preexistingConditions
+                      ? c.preexistingConditions.split(';')
+                      : [],
+              }
+            : undefined;
+    }
+
+    /**
+     * Create an API-ready case object from parsed case data.
+     *
+     * TODO: Put the Raw->CompleteParsedCase conversion logic in a separate
+     * class, and unit test the API. Right now it's just verified via a single
+     * Cypress case.
+     */
     createCaseObject(
         c: RawParsedCase,
         events: Event[],
         geoResolutionLimit: string,
         locationQuery: string,
+        ageRange: AgeRange,
         caseReference: CaseReference,
+        symptoms?: Symptoms,
+        preexistingConditions?: PreexistingConditions,
     ): CompleteParsedCase {
         return {
             caseReference: {
@@ -236,10 +370,10 @@ class BulkCaseForm extends React.Component<
             },
             demographics: {
                 gender: c.gender,
-                ageRange: {
-                    start: c.ageRangeStart,
-                    end: c.ageRangeEnd,
-                },
+                ageRange: ageRange,
+                ethnicity: c.ethnicity,
+                nationalities: c.nationalities?.split(';'),
+                occupation: c.occupation,
             },
             location: {
                 country: c.country,
@@ -258,66 +392,26 @@ class BulkCaseForm extends React.Component<
                 limitToResolution: geoResolutionLimit,
             },
             events: events,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: this.props.user.email,
-                    date: new Date().toISOString(),
-                },
-            },
+            preexistingConditions: preexistingConditions,
+            symptoms: symptoms,
             caseCount: c.caseCount,
         };
     }
 
-    incrementProgress(): void {
-        const incrementPercent = 100 / this.state.uploadTotalRequests;
-        this.setState({
-            uploadProgress: this.state.uploadProgress + incrementPercent,
-        });
-    }
-
-    /**
-     * Determine the number of remote requests required to upload the provided
-     * row.
-     *
-     * Each row is validated, accounting for one request, and incurs a further
-     * `caseCount` requests to write rows to the server.
-     */
-    getUploadTotalRequests(cases: CompleteParsedCase[]): number {
-        return cases
-            .map((c) => {
-                return 1 + (c.caseCount ? c.caseCount : 1);
-            })
-            .reduce((accumulator, currentValue) => {
-                return accumulator + currentValue;
-            }, 0);
-    }
-
-    upsertCase(c: CompleteParsedCase): Promise<AxiosResponse<Case>> {
-        return axios.put('/api/cases', c);
-    }
-
-    /**
-     * Provides any validation errors associated with the provided cases.
-     *
-     * TODO: Find a way to parallelize these requests. We need the AxiosResponse
-     * value; so we can't use Promise.allSettled().
-     */
-    async validateCases(
+    async batchUpsertCases(
         cases: CompleteParsedCase[],
-    ): Promise<CaseValidationError[]> {
-        const validationErrors: CaseValidationError[] = [];
-        for (let i = 0; i < cases.length; i++) {
-            try {
-                await axios.post('/api/cases?validate_only=true', cases[i]);
-            } catch (e) {
-                validationErrors.push(
-                    new CaseValidationError(i + 1, e.response.data),
-                );
-            }
-            this.incrementProgress();
-        }
-        return validationErrors;
+    ): Promise<BatchUpsertResponse> {
+        const casesToSend = cases.flatMap((c) =>
+            Array.from({ length: c.caseCount || 1 }, () => c),
+        );
+        const response = await axios.post<BatchUpsertResponse>(
+            '/api/cases/batchUpsert',
+            {
+                cases: casesToSend,
+            },
+            { maxContentLength: Infinity },
+        );
+        return response.data;
     }
 
     async uploadData(
@@ -338,18 +432,35 @@ class BulkCaseForm extends React.Component<
             const geoResolutionLimit = this.createGeoResolutionLimit(c);
             const locationQuery = this.createLocationQuery(c);
             const events = this.createEvents(c);
+            const ageRange = this.createAgeRange(c);
+            const symptoms = this.createSymptoms(c);
+            const preexistingConditions = this.createPreexistingConditions(c);
             return this.createCaseObject(
                 c,
                 events,
                 geoResolutionLimit,
                 locationQuery,
+                ageRange,
                 caseReference,
+                symptoms,
+                preexistingConditions,
             );
         });
-        this.setState({
-            uploadTotalRequests: this.getUploadTotalRequests(cases),
-        });
-        const validationErrors = await this.validateCases(cases);
+
+        let upsertResponse: BatchUpsertResponse;
+        try {
+            upsertResponse = await this.batchUpsertCases(cases);
+        } catch (e) {
+            this.setState({
+                errorMessage: `System error during upload: ${JSON.stringify(
+                    e,
+                )}`,
+            });
+            return;
+        }
+        const validationErrors = upsertResponse.errors.map(
+            (e) => new CaseValidationError(e.index + 1, e.message),
+        );
         this.setState({ errors: validationErrors });
         if (validationErrors.length > 0) {
             this.setState({
@@ -358,27 +469,8 @@ class BulkCaseForm extends React.Component<
             });
             return;
         }
-        const createdIds: string[] = [];
-        const updatedIds: string[] = [];
-        for (const c of cases) {
-            try {
-                const casesToUpsert = c.caseCount ? c.caseCount : 1;
-                for (let i = 0; i < casesToUpsert; i++) {
-                    const response = await this.upsertCase(c);
-                    this.incrementProgress();
-                    response.status === 201
-                        ? createdIds.push(response.data._id)
-                        : updatedIds.push(response.data._id);
-                }
-            } catch (e) {
-                this.setState({
-                    errorMessage: `System error during upload: ${JSON.stringify(
-                        e,
-                    )}`,
-                });
-                return;
-            }
-        }
+        const createdIds = upsertResponse.createdCaseIds;
+        const updatedIds = upsertResponse.updatedCaseIds;
         const createdMessage =
             createdIds.length === 0
                 ? ''
@@ -402,6 +494,23 @@ class BulkCaseForm extends React.Component<
     }
 
     async submitCases(values: BulkCaseFormValues): Promise<unknown> {
+        if (values.caseReference && values.caseReference.sourceId === '') {
+            try {
+                const newCaseReference = await submitSource({
+                    name: values.caseReference.sourceName as string,
+                    url: values.caseReference.sourceUrl,
+                    format: 'CSV',
+                });
+                values.caseReference.sourceId = newCaseReference.sourceId;
+            } catch (e) {
+                this.setState({
+                    errorMessage: `System error during source creation: ${JSON.stringify(
+                        e,
+                    )}`,
+                });
+                return;
+            }
+        }
         if (values.file && values.caseReference) {
             const parsePromise = (
                 file: File,
@@ -443,50 +552,97 @@ class BulkCaseForm extends React.Component<
                         await this.submitCases(values);
                     }}
                 >
-                    {({ isSubmitting, submitForm, values }): JSX.Element => (
-                        <div className={classes.container}>
-                            <Form className={classes.form}>
-                                <div className={classes.formSection}>
-                                    <Source
-                                        initialValue={values.caseReference}
-                                    ></Source>
-                                </div>
-                                <div className={classes.formSection}>
-                                    <FileUpload></FileUpload>
-                                </div>
-                                <div className={classes.uploadDiv}>
-                                    <Button
-                                        className={classes.uploadButton}
-                                        variant="contained"
-                                        color="primary"
-                                        data-testid="submit"
-                                        disabled={isSubmitting}
-                                        onClick={submitForm}
+                    {({ isSubmitting, submitForm }): JSX.Element => (
+                        <div className={classes.form}>
+                            <div className={classes.headerText}>
+                                <Typography
+                                    data-testid="header-title"
+                                    variant="h5"
+                                >
+                                    Upload bulk data
+                                </Typography>
+                                <Typography
+                                    className={classes.headerBlurb}
+                                    data-testid="header-blurb"
+                                    variant="body2"
+                                >
+                                    Add new cases or make changes to existing
+                                    ones by uploading a CSV file. The CSV needs
+                                    to follow the case template format for
+                                    successful entries.{' '}
+                                    {/* TODO: Host the final CSV template. */}
+                                    <a
+                                        href="https://docs.google.com/spreadsheets/d/1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE/export?format=csv"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
                                     >
-                                        Upload cases
-                                    </Button>
-                                    {isSubmitting && (
-                                        <CaptionedProgress
-                                            data-testid="progress"
-                                            value={this.state.uploadProgress}
+                                        Download case template (.csv)
+                                    </a>
+                                </Typography>
+                            </div>
+                            <Form>
+                                <fieldset className={classes.allFormSections}>
+                                    <div className={classes.formSection}>
+                                        <Source borderless={true} />
+                                    </div>
+                                    <div className={classes.formSection}>
+                                        <FileUpload></FileUpload>
+                                    </div>
+                                </fieldset>
+                                {/* TODO: Host the final instructions doc. */}
+                                <a
+                                    href="https://github.com/globaldothealth/list/tree/main/verification/curator-service/ui#bulk-upload-process"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    Need help? Detailed instructions here
+                                </a>
+                                <div className={classes.uploadFeedback}>
+                                    {this.state.errors.length > 0 && (
+                                        <ValidationErrorList
+                                            errors={this.state.errors}
+                                            maxDisplayErrors={10}
                                         />
                                     )}
+                                    {this.state.errorMessage && (
+                                        <Alert
+                                            className={classes.statusMessage}
+                                            severity="error"
+                                        >
+                                            {this.state.errorMessage}
+                                        </Alert>
+                                    )}
                                 </div>
-                                {this.state.errors.length > 0 && (
-                                    <ValidationErrorList
-                                        errors={this.state.errors}
-                                        maxDisplayErrors={10}
-                                    />
-                                )}
-                                {this.state.errorMessage && (
-                                    <Alert
-                                        className={classes.statusMessage}
-                                        severity="error"
-                                    >
-                                        {this.state.errorMessage}
-                                    </Alert>
-                                )}
                             </Form>
+                            <div className={classes.uploadBar}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    Upload Cases
+                                </Button>
+                                <Button
+                                    className={classes.cancelButton}
+                                    color="primary"
+                                    disabled={isSubmitting}
+                                    onClick={this.props.onModalClose}
+                                    variant="outlined"
+                                >
+                                    Cancel
+                                </Button>
+                                <span style={{ flexGrow: 1 }}></span>
+                                {isSubmitting && (
+                                    <div className={classes.progressIndicator}>
+                                        <CircularProgress data-testid="progress" />
+                                        <span className={classes.progressText}>
+                                            <strong>Uploading cases</strong>
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </Formik>
