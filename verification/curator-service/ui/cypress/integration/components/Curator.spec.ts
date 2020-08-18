@@ -164,6 +164,7 @@ describe('Curator', function () {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.contains(`Case ${resp.body.cases[0]._id} added`);
             cy.contains('No records to display').should('not.exist');
+            cy.get('svg[data-testid="verified-svg"').should('exist');
             cy.contains('www.example.com');
             cy.contains('Female');
             cy.contains('21');
