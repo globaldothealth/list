@@ -22,8 +22,14 @@ it('loads and displays alerts', async () => {
             {
                 _id: '5ef8e943dfe6e00030892d59',
                 status: 'IN_PROGRESS',
-                summary: { numCreated: 2, numUpdated: 3 },
+                summary: { numCreated: 2 },
                 created: '2020-01-02',
+            },
+            {
+                _id: '5ef8e943dfe6e00030892d60',
+                status: 'IN_PROGRESS',
+                summary: { numUpdated: 2 },
+                created: '2020-01-03',
             },
         ],
     };
@@ -41,11 +47,15 @@ it('loads and displays alerts', async () => {
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/sources/uploads');
 
     expect(await findByText('Alerts')).toBeInTheDocument();
-    expect(getAllByText('New source verification required')).toHaveLength(2);
-    expect(getByText('Please verify 5 cases added')).toBeInTheDocument();
+    expect(getAllByText('New source verification required')).toHaveLength(3);
+    expect(
+        getByText('Please verify 5 cases added and 3 cases updated'),
+    ).toBeInTheDocument();
     expect(getByText('2020-1-1')).toBeInTheDocument();
     expect(getByText('Please verify 2 cases added')).toBeInTheDocument();
     expect(getByText('2020-1-2')).toBeInTheDocument();
+    expect(getByText('Please verify 2 cases updated')).toBeInTheDocument();
+    expect(getByText('2020-1-3')).toBeInTheDocument();
 });
 
 it('loads with no alerts', async () => {
