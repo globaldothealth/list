@@ -22,9 +22,9 @@ interface Upload {
 }
 
 interface UploadSummary {
-    numCreated: number;
-    numUpdated: number;
-    error: string;
+    numCreated?: number;
+    numUpdated?: number;
+    error?: string;
 }
 
 export default function Alerts(): JSX.Element {
@@ -44,6 +44,21 @@ export default function Alerts(): JSX.Element {
                 console.error(e);
             });
     }, []);
+
+    const bodyMessage = (numCreated?: number, numUpdated?: number): string => {
+        numCreated = numCreated ?? 0;
+        numUpdated = numUpdated ?? 0;
+        if (numCreated > 0 && numUpdated > 0) {
+            return `Please verify ${numCreated} cases added and ${numUpdated} cases updated`;
+        }
+        if (numCreated > 0) {
+            return `Please verify ${numCreated} cases added`;
+        }
+        if (numUpdated > 0) {
+            return `Please verify ${numUpdated} cases updated`;
+        }
+        return '';
+    };
 
     return (
         <Paper className={classes.container} elevation={2}>
@@ -66,7 +81,10 @@ export default function Alerts(): JSX.Element {
                         New source verification required
                     </Typography>
                     <Typography variant="body2">
-                        Please verify {upload.summary.numCreated} cases added
+                        {bodyMessage(
+                            upload.summary.numCreated,
+                            upload.summary.numUpdated,
+                        )}
                     </Typography>
                     <Typography variant="caption">
                         {renderDate(upload.created)}

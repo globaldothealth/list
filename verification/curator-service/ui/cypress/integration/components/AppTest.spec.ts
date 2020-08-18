@@ -106,8 +106,14 @@ describe('App', function () {
             {
                 _id: '5ef8e943dfe6e00030892d59',
                 status: 'SUCCESS',
-                summary: { numCreated: 2, numUpdated: 3 },
+                summary: { numCreated: 2 },
                 created: '2020-01-02',
+            },
+            {
+                _id: '5ef8e943dfe6e00030892d59',
+                status: 'SUCCESS',
+                summary: { numUpdated: 3 },
+                created: '2020-01-03',
             },
         ]);
         cy.visit('/');
@@ -117,10 +123,14 @@ describe('App', function () {
         cy.contains('Alerts').should('not.be.visible');
         cy.get('button[aria-label="toggle alerts panel"').click();
         cy.contains('Alerts').should('be.visible');
-        cy.contains('Please verify 5 cases added').should('be.visible');
+        cy.contains('Please verify 5 cases added and 3 cases updated').should(
+            'be.visible',
+        );
         cy.contains('2020-1-1').should('be.visible');
         cy.contains('Please verify 2 cases added').should('be.visible');
         cy.contains('2020-1-2').should('be.visible');
+        cy.contains('Please verify 3 cases updated').should('be.visible');
+        cy.contains('2020-1-3').should('be.visible');
         cy.get('button[aria-label="toggle alerts panel"').click();
         cy.contains('Alerts').should('not.be.visible');
     });
