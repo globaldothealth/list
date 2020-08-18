@@ -1,47 +1,35 @@
-import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import { RequiredHelperText } from '../common-form-fields/FormikFields';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Button, Typography } from '@material-ui/core';
 import { useFormikContext } from 'formik';
 
-const tooltip = (
-    <React.Fragment>
-        {'Select a CSV file to upload in the format described '}
-        <a
-            href={
-                'https://github.com/open-covid-data/healthmap-gdo-temp/tree/main/verification/curator-service/ui#bulk-upload-process'
-            }
-            rel="noopener noreferrer"
-            target="_blank"
-        >
-            {'here'}
-        </a>
-        {'.'}
-    </React.Fragment>
-);
-
 const useStyles = makeStyles(() => ({
-    csvInput: {
-        padding: '15px',
+    borderless: {
+        borderStyle: 'none',
+    },
+    helperText: {
+        paddingBottom: '1em',
+    },
+    fileNameText: {
+        paddingLeft: '2em',
     },
 }));
 
 export default function FileUpload(): JSX.Element {
+    const [fileName, setFileName] = React.useState('');
     const { setFieldValue } = useFormikContext();
     const classes = useStyles();
     const name = 'file';
     return (
-        <fieldset>
-            <FieldTitle
-                title="CSV Data"
-                tooltip={tooltip}
-                interactive
-            ></FieldTitle>
+        <fieldset className={classes.borderless}>
+            <Typography className={classes.helperText} variant="body2">
+                Choose the file to upload
+            </Typography>
             <input
-                className={classes.csvInput}
                 data-testid="csv-input"
-                id="file"
+                id="file-upload-input"
                 name={name}
+                style={{ display: 'none' }}
                 type="file"
                 accept=".csv"
                 onChange={(
@@ -51,15 +39,24 @@ export default function FileUpload(): JSX.Element {
                         event.currentTarget.files;
                     if (uploadedFiles) {
                         setFieldValue(name, uploadedFiles[0]);
+                        setFileName(uploadedFiles[0]?.name ?? '');
                         if (uploadedFiles.length > 1) {
                             console.warn(
                                 `Attempted to upload ${uploadedFiles.length} ` +
-                                'files. Only one file allowed per upload.',
+                                    'files. Only one file allowed per upload.',
                             );
                         }
                     }
                 }}
             />
+            <label htmlFor="file-upload-input">
+                <Button variant="contained" color="primary" component="span">
+                    Choose file
+                </Button>
+                {fileName && (
+                    <span className={classes.fileNameText}>{fileName}</span>
+                )}
+            </label>
             <RequiredHelperText name={name}></RequiredHelperText>
         </fieldset>
     );

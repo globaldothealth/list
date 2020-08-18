@@ -49,20 +49,22 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
     source_api_url = "http://foo.bar"
     origin_url = "http://bar.baz/"
+    date_filter = {"numDaysBeforeToday": 2, "op": "EQ"}
     os.environ["SOURCE_API_URL"] = source_api_url
     full_source_url = f"{source_api_url}/sources/{valid_event['sourceId']}"
     lambda_arn = "arn"
     requests_mock.get(
         full_source_url,
-        json={"origin": {"url": origin_url},
-              "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
+        json={"origin": {"url": origin_url}, "format": "JSON",
+              "automation": {"parser": {"awsLambdaArn": lambda_arn}},
+              "dateFilter": date_filter})
     requests_mock.get(origin_url, json={"data": "yes"})
 
     response = retrieval.lambda_handler(valid_event, "")
 
     retrieval.obtain_api_credentials.assert_called_once_with()
     retrieval.invoke_parser.assert_called_once_with(
-        lambda_arn, response["key"], origin_url)
+        lambda_arn, valid_event['sourceId'], response["key"], origin_url, date_filter)
     assert requests_mock.request_history[0].url == full_source_url
     assert requests_mock.request_history[1].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
@@ -80,17 +82,17 @@ def test_extract_source_id_raises_error_if_event_lacks_id(invalid_event):
         retrieval.extract_source_id(invalid_event)
 
 
-def test_get_source_details_returns_url_and_json_format(requests_mock):
+def test_get_source_details_returns_url_and_format(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
     source_id = "id"
     content_url = "http://bar.baz"
     os.environ["SOURCE_API_URL"] = source_api_url
     requests_mock.get(f"{source_api_url}/sources/{source_id}",
-                      json={"origin": {"url": content_url}})
+                      json={"format": "CSV", "origin": {"url": content_url}})
     result = retrieval.get_source_details(source_id, {})
     assert result[0] == content_url
-    assert result[1] == "JSON"
+    assert result[1] == "CSV"
     assert result[2] == ""
 
 
@@ -103,7 +105,7 @@ def test_get_source_details_returns_parser_arn_if_present(requests_mock):
     lambda_arn = "lambdaArn"
     requests_mock.get(
         f"{source_api_url}/sources/{source_id}",
-        json={"origin": {"url": content_url},
+        json={"origin": {"url": content_url}, "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
     result = retrieval.get_source_details(source_id, {})
     assert result[2] == lambda_arn
@@ -121,6 +123,18 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     with open("/tmp/content.json", "r") as f:
         assert json.load(f)["data"] == "yes"
 
+def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    format = "CSV"
+    requests_mock.get(content_url, content=b"foo,bar")
+    retrieval.retrieve_content(source_id, content_url, format)
+    assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open("/tmp/content.csv", "r") as f:
+        assert f.read() == "foo,bar"
+
 
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
@@ -132,9 +146,9 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     assert source_id in result[1]
 
 
-def test_retrieve_content_raises_error_for_non_json_format(requests_mock):
+def test_retrieve_content_raises_error_for_non_supported_format(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    bad_format = "CSV"
+    bad_format = "PDF"
     content_url = "http://foo.bar/"
     requests_mock.get(content_url)
     with pytest.raises(ValueError, match=bad_format):

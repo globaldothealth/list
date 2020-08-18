@@ -18,6 +18,7 @@ describe('Edit case', function () {
             methodOfConfirmation: 'PCR test',
             nationalities: ['Andorrean', 'French'],
         });
+        cy.addSource('Test source', 'www.example.com');
         cy.request({ method: 'GET', url: '/api/cases' }).then((resp) => {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.visit(`cases/edit/${resp.body.cases[0]._id}`);

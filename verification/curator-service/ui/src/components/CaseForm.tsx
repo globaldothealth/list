@@ -1,10 +1,9 @@
 import * as Yup from 'yup';
 
-import { Button, LinearProgress } from '@material-ui/core';
+import { Button, LinearProgress, Typography } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { Theme, createStyles } from '@material-ui/core/styles';
+import Source, { submitSource } from './common-form-fields/Source';
 import { green, grey, red } from '@material-ui/core/colors';
 
 import AppModal from './AppModal';
@@ -18,97 +17,90 @@ import GenomeSequences from './new-case-form-fields/GenomeSequences';
 import LocationForm from './new-case-form-fields/LocationForm';
 import MuiAlert from '@material-ui/lab/Alert';
 import Notes from './new-case-form-fields/Notes';
+import NumCases from './new-case-form-fields/NumCases';
 import Pathogens from './new-case-form-fields/Pathogens';
 import PreexistingConditions from './new-case-form-fields/PreexistingConditions';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import React from 'react';
 import Scroll from 'react-scroll';
-import Source from './common-form-fields/Source';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
 import User from './User';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
+import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
-import { withStyles } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
-const styles = (theme: Theme) =>
-    createStyles({
-        modalContents: {
-            backgroundColor: theme.palette.background.paper,
-            left: '300px',
-            height: '100%',
-            position: 'absolute',
-            outline: 'none',
-            // Remainder of the screen width accounting for left shift
-            width: 'calc(100vw - 300px)',
-        },
-        appBar: {
-            background: 'white',
-        },
-        tableOfContents: {
-            position: 'fixed',
-        },
-        tableOfContentsRow: {
-            alignItems: 'center',
-            display: 'flex',
-        },
-        form: {
-            paddingLeft: '18em',
-        },
-        formSection: {
-            margin: '2em 0',
-        },
-        statusMessage: {
-            marginTop: '1em',
-            maxWidth: '80%',
-        },
-        cancelButton: { marginLeft: '1em' },
-    });
+const useStyles = makeStyles((theme) => ({
+    appBar: {
+        background: 'white',
+    },
+    tableOfContents: {
+        position: 'fixed',
+    },
+    tableOfContentsRow: {
+        alignItems: 'center',
+        display: 'flex',
+    },
+    form: {
+        paddingLeft: '18em',
+    },
+    formSection: {
+        margin: '2em 0',
+    },
+    statusMessage: {
+        marginTop: '1em',
+        maxWidth: '80%',
+    },
+    cancelButton: { marginLeft: '1em' },
+}));
 
 function initialValuesFromCase(c?: Case): CaseFormValues {
     if (!c) {
         return {
-            caseReference: undefined,
-            gender: undefined,
+            caseReference: { sourceId: '', sourceUrl: '' },
+            gender: '',
             minAge: undefined,
             maxAge: undefined,
             age: undefined,
             ethnicity: undefined,
             nationalities: [],
-            occupation: undefined,
+            occupation: '',
             location: undefined,
             confirmedDate: null,
-            methodOfConfirmation: undefined,
+            methodOfConfirmation: '',
             onsetSymptomsDate: null,
             firstClinicalConsultationDate: null,
             selfIsolationDate: null,
-            admittedToHospital: undefined,
+            admittedToHospital: '',
             hospitalAdmissionDate: null,
-            admittedToIcu: undefined,
+            admittedToIcu: '',
             icuAdmissionDate: null,
             outcomeDate: null,
-            outcome: undefined,
-            symptomsStatus: undefined,
+            outcome: '',
+            symptomsStatus: '',
             symptoms: [],
-            hasPreexistingConditions: undefined,
+            hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
             transmissionPlaces: [],
             transmissionLinkedCaseIds: [],
-            traveledPrior30Days: undefined,
+            traveledPrior30Days: '',
             travelHistory: [],
             genomeSequences: [],
             pathogens: [],
             notes: '',
+            numCases: 1,
         };
     }
     return {
         caseReference: c.caseReference,
-        gender: c.demographics?.gender,
+        gender: c.demographics?.gender || '',
         minAge:
             c.demographics?.ageRange?.start !== c.demographics?.ageRange?.end
                 ? c.demographics?.ageRange?.start
@@ -123,14 +115,13 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
                 : undefined,
         ethnicity: c.demographics?.ethnicity,
         nationalities: c.demographics?.nationalities,
-        occupation: c.demographics?.occupation,
+        occupation: c.demographics?.occupation ?? '',
         location: c.location,
         confirmedDate:
             c.events.find((event) => event.name === 'confirmed')?.dateRange
                 ?.start || null,
-        methodOfConfirmation: c.events.find(
-            (event) => event.name === 'confirmed',
-        )?.value,
+        methodOfConfirmation:
+            c.events.find((event) => event.name === 'confirmed')?.value || '',
         onsetSymptomsDate:
             c.events.find((event) => event.name === 'onsetSymptoms')?.dateRange
                 ?.start || null,
@@ -140,26 +131,28 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         selfIsolationDate:
             c.events.find((event) => event.name === 'selfIsolation')?.dateRange
                 ?.start || null,
-        admittedToHospital: c.events.find(
-            (event) => event.name === 'hospitalAdmission',
-        )?.value,
+        admittedToHospital:
+            c.events.find((event) => event.name === 'hospitalAdmission')
+                ?.value || '',
         hospitalAdmissionDate:
             c.events.find((event) => event.name === 'hospitalAdmission')
                 ?.dateRange?.start || null,
-        admittedToIcu: c.events.find((event) => event.name === 'icuAdmission')
-            ?.value,
+        admittedToIcu:
+            c.events.find((event) => event.name === 'icuAdmission')?.value ||
+            '',
         icuAdmissionDate:
             c.events.find((event) => event.name === 'icuAdmission')?.dateRange
                 ?.start || null,
         outcomeDate:
             c.events.find((event) => event.name === 'outcome')?.dateRange
                 ?.start || null,
-        outcome: c.events.find((event) => event.name === 'outcome')?.value,
-        symptomsStatus: c.symptoms?.status,
+        outcome:
+            c.events.find((event) => event.name === 'outcome')?.value || '',
+        symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
-                ? undefined
+                ? ''
                 : c.preexistingConditions?.hasPreexistingConditions
                 ? 'Yes'
                 : 'No',
@@ -169,7 +162,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         transmissionLinkedCaseIds: c.transmission?.linkedCaseIds,
         traveledPrior30Days:
             c.travelHistory?.traveledPrior30Days === undefined
-                ? undefined
+                ? ''
                 : c.travelHistory.traveledPrior30Days
                 ? 'Yes'
                 : 'No',
@@ -181,23 +174,26 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
         }),
         pathogens: c.pathogens,
         notes: c.notes,
+        numCases: undefined,
     };
 }
 
-interface Props extends RouteComponentProps, WithStyles<typeof styles> {
+interface Props {
     user: User;
     initialCase?: Case;
     onModalClose: () => void;
 }
 
-interface CaseFormState {
-    errorMessage: string;
-}
-
 // TODO: get 0 and 120 min/max age values from the backend.
 const NewCaseValidation = Yup.object().shape(
     {
-        caseReference: Yup.object().required('Required'),
+        caseReference: Yup.object().shape({
+            sourceUrl: Yup.string().required('Required'),
+            sourceName: Yup.string().when('sourceId', {
+                is: (sourceId) => !sourceId,
+                then: Yup.string().required('Required'),
+            }),
+        }),
         minAge: Yup.number()
             .min(0, 'Age must be between 0 and 120')
             .max(120, 'Age must be between 0 and 120')
@@ -243,6 +239,9 @@ const NewCaseValidation = Yup.object().shape(
         ),
         confirmedDate: Yup.string().nullable().required('Required'),
         location: Yup.object().required('Required'),
+        numCases: Yup.number()
+            .nullable()
+            .min(1, 'Must enter one or more cases'),
     },
     [['maxAge', 'minAge']],
 );
@@ -261,15 +260,22 @@ function hasErrors(fields: string[], errors: any, touched: any): boolean {
     return false;
 }
 
-class CaseForm extends React.Component<Props, CaseFormState> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            errorMessage: '',
-        };
-    }
+function unknownOrEmptyToUndefined(
+    value: string | undefined,
+): string | undefined {
+    if (value === 'Unknown' || value === '') return undefined;
+    return value;
+}
 
-    filterTravel(travel: Travel[]): Travel[] {
+export default function CaseForm(props: Props): JSX.Element {
+    const { initialCase } = props;
+    const theme = useTheme();
+    const showTableOfContents = useMediaQuery(theme.breakpoints.up('sm'));
+    const classes = useStyles();
+    const history = useHistory();
+    const [errorMessage, setErrorMessage] = React.useState('');
+
+    const filterTravel = (travel: Travel[]): Travel[] => {
         const filteredTravel = cloneDeep(travel);
         filteredTravel?.forEach((travel) => {
             delete travel.reactId;
@@ -286,29 +292,49 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                     delete travel.dateRange.end;
                 }
             }
+            if (travel.purpose === 'Unknown') {
+                travel.purpose = undefined;
+            }
         });
         return filteredTravel;
-    }
-    filterGenomeSequences(genomeSequences: GenomeSequence[]): GenomeSequence[] {
+    };
+
+    const filterGenomeSequences = (
+        genomeSequences: GenomeSequence[],
+    ): GenomeSequence[] => {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
         filteredGenomeSequences?.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
         });
         return filteredGenomeSequences;
-    }
+    };
 
-    async submitCase(values: CaseFormValues): Promise<void> {
+    const submitCase = async (values: CaseFormValues): Promise<void> => {
+        if (values.caseReference && values.caseReference.sourceId === '') {
+            try {
+                const newCaseReference = await submitSource({
+                    name: values.caseReference.sourceName as string,
+                    url: values.caseReference.sourceUrl,
+                });
+                values.caseReference.sourceId = newCaseReference.sourceId;
+            } catch (e) {
+                setErrorMessage(
+                    `System error during source creation: ${JSON.stringify(e)}`,
+                );
+                return;
+            }
+        }
         const ageRange = values.age
             ? { start: values.age, end: values.age }
             : { start: values.minAge, end: values.maxAge };
         const newCase = {
             caseReference: values.caseReference,
             demographics: {
-                gender: values.gender,
+                gender: unknownOrEmptyToUndefined(values.gender),
                 ageRange: ageRange,
                 ethnicity: values.ethnicity,
                 nationalities: values.nationalities,
-                occupation: values.occupation,
+                occupation: unknownOrEmptyToUndefined(values.occupation),
             },
             location: values.location,
             events: [
@@ -342,13 +368,16 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 },
                 {
                     name: 'icuAdmission',
-                    dates: values.icuAdmissionDate,
+                    dates:
+                        values.admittedToIcu === 'Yes'
+                            ? values.icuAdmissionDate
+                            : undefined,
                     value: values.admittedToIcu,
                 },
                 {
                     name: 'outcome',
                     dates:
-                        values.outcome !== undefined
+                        values.outcome !== '' && values.outcome !== 'Unknown'
                             ? values.outcomeDate
                             : undefined,
                     value: values.outcome,
@@ -364,12 +393,15 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                   end: elem.dates,
                               }
                             : undefined,
-                        value: elem.value,
+                        value: unknownOrEmptyToUndefined(elem.value),
                     };
                 }),
             symptoms: {
-                status: values.symptomsStatus,
-                values: values.symptoms,
+                status: unknownOrEmptyToUndefined(values.symptomsStatus),
+                values:
+                    values.symptomsStatus === 'Symptomatic'
+                        ? values.symptoms
+                        : [],
             },
             preexistingConditions: {
                 hasPreexistingConditions:
@@ -378,7 +410,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         : values.hasPreexistingConditions === 'No'
                         ? false
                         : undefined,
-                values: values.preexistingConditions,
+                values:
+                    values.hasPreexistingConditions === 'Yes'
+                        ? values.preexistingConditions
+                        : [],
             },
             transmission: {
                 routes: values.transmissionRoutes,
@@ -392,66 +427,58 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                         : values.traveledPrior30Days === 'No'
                         ? false
                         : undefined,
-                travel: this.filterTravel(values.travelHistory),
+                travel:
+                    values.traveledPrior30Days === 'Yes'
+                        ? filterTravel(values.travelHistory)
+                        : undefined,
             },
-            genomeSequences: this.filterGenomeSequences(values.genomeSequences),
+            genomeSequences: filterGenomeSequences(values.genomeSequences),
             pathogens: values.pathogens,
             notes: values.notes,
-            revisionMetadata: this.props.initialCase
-                ? {
-                      revisionNumber:
-                          this.props.initialCase.revisionMetadata
-                              .revisionNumber + 1,
-                      creationMetadata: this.props.initialCase.revisionMetadata
-                          .creationMetadata,
-                      updateMetadata: {
-                          curator: this.props.user.email,
-                          date: new Date().toISOString(),
-                      },
-                  }
-                : {
-                      revisionNumber: 0,
-                      creationMetadata: {
-                          curator: this.props.user.email,
-                          date: new Date().toISOString(),
-                      },
-                  },
         };
-        let newCaseId = '';
+        let newCaseIds = [];
         try {
             // Update or create depending on the presence of the initial case ID.
-            if (this.props.initialCase?._id) {
+            if (props.initialCase?._id) {
                 await axios.put(
-                    `/api/cases/${this.props.initialCase?._id}`,
+                    `/api/cases/${props.initialCase?._id}`,
                     newCase,
                 );
             } else {
-                const postResponse = await axios.post('/api/cases', newCase);
-                newCaseId = postResponse.data._id;
+                const numCases = values.numCases ?? 1;
+                const postResponse = await axios.post(
+                    `/api/cases?num_cases=${numCases}`,
+                    newCase,
+                );
+                if (numCases === 1) {
+                    newCaseIds = [postResponse.data._id];
+                } else {
+                    newCaseIds = postResponse.data.cases.map(
+                        (c: Case) => c._id,
+                    );
+                }
             }
-            this.setState({ errorMessage: '' });
+            setErrorMessage('');
         } catch (e) {
-            this.setState({
-                errorMessage: JSON.stringify(e),
-            });
+            setErrorMessage(JSON.stringify(e));
             return;
         }
         // Navigate to cases after successful submit
-        this.props.history.push({
+        history.push({
             pathname: '/cases',
             state: {
-                newCaseIds: newCaseId ? [newCaseId] : [],
-                editedCaseIds: this.props.initialCase?._id
-                    ? [this.props.initialCase._id]
+                newCaseIds: newCaseIds,
+                editedCaseIds: props.initialCase?._id
+                    ? [props.initialCase._id]
                     : [],
             },
         });
-    }
+    };
 
-    tableOfContentsIcon(opts: {
+    const tableOfContentsIcon = (opts: {
         isChecked: boolean;
         hasError: boolean;
-    }): JSX.Element {
+    }): JSX.Element => {
         return opts.hasError ? (
             <ErrorIcon
                 data-testid="error-icon"
@@ -476,55 +503,59 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                 }}
             ></RadioButtonUncheckedIcon>
         );
-    }
+    };
 
-    scrollTo(name: string): void {
+    const scrollTo = (name: string): void => {
         Scroll.scroller.scrollTo(name, {
             duration: 100,
             smooth: true,
             offset: -64, // Account for header height
             containerId: 'scroll-container',
         });
-    }
+    };
 
-    render(): JSX.Element {
-        const { classes, initialCase } = this.props;
-        return (
-            <AppModal
-                title={
-                    this.props.initialCase
-                        ? 'Edit case'
-                        : 'Create new COVID-19 line list case'
-                }
-                onModalClose={this.props.onModalClose}
+    return (
+        <AppModal
+            title={
+                props.initialCase
+                    ? 'Edit case'
+                    : 'Create new COVID-19 line list case'
+            }
+            onModalClose={props.onModalClose}
+        >
+            <Formik
+                initialValues={initialValuesFromCase(initialCase)}
+                validationSchema={NewCaseValidation}
+                // Validating on change slows down the form too much. It will
+                // validate on blur and form submission.
+                validateOnChange={false}
+                onSubmit={(values) => submitCase(values)}
             >
-                <Formik
-                    initialValues={initialValuesFromCase(initialCase)}
-                    validationSchema={NewCaseValidation}
-                    // Validating on change slows down the form too much. It will
-                    // validate on blur and form submission.
-                    validateOnChange={false}
-                    onSubmit={(values) => this.submitCase(values)}
-                >
-                    {({
-                        submitForm,
-                        isSubmitting,
-                        values,
-                        errors,
-                        touched,
-                    }): JSX.Element => (
-                        <div>
+                {({
+                    submitForm,
+                    isSubmitting,
+                    values,
+                    errors,
+                    touched,
+                }): JSX.Element => (
+                    <div>
+                        {showTableOfContents && (
                             <nav className={classes.tableOfContents}>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('source')
-                                    }
+                                    onClick={(): void => scrollTo('source')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
+                                            values.caseReference !==
+                                                undefined &&
                                             values.caseReference !== null &&
-                                            values.caseReference !== undefined,
+                                            values.caseReference.sourceUrl !==
+                                                null &&
+                                            values.caseReference.sourceUrl !==
+                                                undefined &&
+                                            values.caseReference.sourceUrl !==
+                                                '',
                                         hasError: hasErrors(
                                             ['caseReference'],
                                             errors,
@@ -536,12 +567,12 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('demographics')
+                                        scrollTo('demographics')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
-                                            values.gender !== undefined ||
+                                            values.gender !== '' ||
                                             (values.age !== undefined &&
                                                 values.age.toString() !== '') ||
                                             (values.minAge !== undefined &&
@@ -552,7 +583,7 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                                     '') ||
                                             values.ethnicity !== undefined ||
                                             values.nationalities?.length > 0 ||
-                                            values.occupation !== undefined,
+                                            values.occupation !== '',
                                         hasError: hasErrors(
                                             [
                                                 'gender',
@@ -571,11 +602,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('location')
-                                    }
+                                    onClick={(): void => scrollTo('location')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.location !== null &&
                                             values.location !== undefined,
@@ -589,26 +618,11 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('events')
-                                    }
+                                    onClick={(): void => scrollTo('events')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
-                                            values.confirmedDate !== null ||
-                                            values.methodOfConfirmation !==
-                                                undefined ||
-                                            values.onsetSymptomsDate !== null ||
-                                            values.firstClinicalConsultationDate !==
-                                                null ||
-                                            values.selfIsolationDate !== null ||
-                                            values.admittedToHospital !==
-                                                undefined ||
-                                            values.hospitalAdmissionDate !==
-                                                null ||
-                                            values.icuAdmissionDate !== null ||
-                                            values.outcomeDate !== null ||
-                                            values.outcome !== undefined,
+                                            values.confirmedDate !== null,
                                         hasError: hasErrors(
                                             [
                                                 'confirmedDate',
@@ -630,15 +644,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('symptoms')
-                                    }
+                                    onClick={(): void => scrollTo('symptoms')}
                                 >
-                                    {this.tableOfContentsIcon({
-                                        isChecked:
-                                            values.symptomsStatus !==
-                                                undefined ||
-                                            values.symptoms?.length > 0,
+                                    {tableOfContentsIcon({
+                                        isChecked: values.symptomsStatus !== '',
                                         hasError: hasErrors(
                                             ['symptomsStatus', 'symptoms'],
                                             errors,
@@ -650,15 +659,13 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('preexistingConditions')
+                                        scrollTo('preexistingConditions')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.hasPreexistingConditions !==
-                                                undefined ||
-                                            values.preexistingConditions
-                                                ?.length > 0,
+                                            '',
                                         hasError: hasErrors(
                                             [
                                                 'hasPreexistingConditions',
@@ -673,10 +680,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('transmission')
+                                        scrollTo('transmission')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.transmissionRoutes?.length >
                                                 0 ||
@@ -699,14 +706,12 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('travelHistory')
+                                        scrollTo('travelHistory')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
-                                            values.travelHistory?.length > 0 ||
-                                            values.traveledPrior30Days !==
-                                                undefined,
+                                            values.traveledPrior30Days !== '',
                                         hasError: hasErrors(
                                             [
                                                 'traveledPrior30Days',
@@ -721,10 +726,10 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 <div
                                     className={classes.tableOfContentsRow}
                                     onClick={(): void =>
-                                        this.scrollTo('genomeSequences')
+                                        scrollTo('genomeSequences')
                                     }
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked:
                                             values.genomeSequences?.length > 0,
                                         hasError: hasErrors(
@@ -737,11 +742,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void =>
-                                        this.scrollTo('pathogens')
-                                    }
+                                    onClick={(): void => scrollTo('pathogens')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked: values.pathogens?.length > 0,
                                         hasError: hasErrors(
                                             ['pathogens'],
@@ -753,9 +756,9 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
-                                    onClick={(): void => this.scrollTo('notes')}
+                                    onClick={(): void => scrollTo('notes')}
                                 >
-                                    {this.tableOfContentsIcon({
+                                    {tableOfContentsIcon({
                                         isChecked: values.notes?.trim() !== '',
                                         hasError: hasErrors(
                                             ['notes'],
@@ -765,85 +768,118 @@ class CaseForm extends React.Component<Props, CaseFormState> {
                                     })}
                                     {'Notes'.toLocaleUpperCase()}
                                 </div>
-                            </nav>
-                            <div className={classes.form}>
-                                <Form>
-                                    <div className={classes.formSection}>
-                                        <Source
-                                            initialValue={values.caseReference}
-                                            hasSourceEntryId={true}
-                                        ></Source>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Demographics></Demographics>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <LocationForm></LocationForm>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Events></Events>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Symptoms></Symptoms>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <PreexistingConditions></PreexistingConditions>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Transmission></Transmission>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <TravelHistory></TravelHistory>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <GenomeSequences></GenomeSequences>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Pathogens></Pathogens>
-                                    </div>
-                                    <div className={classes.formSection}>
-                                        <Notes></Notes>
-                                    </div>
-                                    {isSubmitting && <LinearProgress />}
-                                    <br />
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        disableElevation
-                                        data-testid="submit"
-                                        disabled={isSubmitting}
-                                        onClick={submitForm}
+                                {!props.initialCase && (
+                                    <div
+                                        className={classes.tableOfContentsRow}
+                                        onClick={(): void =>
+                                            scrollTo('numCases')
+                                        }
                                     >
-                                        {this.props.initialCase
-                                            ? 'Edit case'
-                                            : 'Submit case'}
-                                    </Button>
-                                    <Button
-                                        className={classes.cancelButton}
-                                        color="primary"
-                                        variant="outlined"
-                                        onClick={this.props.onModalClose}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Form>
-                                {this.state.errorMessage && (
-                                    <MuiAlert
-                                        className={classes.statusMessage}
-                                        elevation={6}
-                                        variant="filled"
-                                        severity="error"
-                                    >
-                                        {this.state.errorMessage}
-                                    </MuiAlert>
+                                        {tableOfContentsIcon({
+                                            isChecked: values.numCases !== 1,
+                                            hasError: hasErrors(
+                                                ['numCases'],
+                                                errors,
+                                                touched,
+                                            ),
+                                        })}
+                                        {'Number of cases'.toLocaleUpperCase()}
+                                    </div>
                                 )}
-                            </div>
+                            </nav>
+                        )}
+                        <div
+                            className={showTableOfContents ? classes.form : ''}
+                        >
+                            <Typography variant="h4">
+                                Enter the details for{' '}
+                                {props.initialCase
+                                    ? 'an existing case'
+                                    : 'a new case'}
+                            </Typography>
+                            <Typography variant="body2">
+                                Complete all available data for the case.
+                                Required fields are marked.
+                            </Typography>
+                            <Form>
+                                <div className={classes.formSection}>
+                                    <Source
+                                        initialValue={values.caseReference}
+                                        hasSourceEntryId={true}
+                                    ></Source>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Demographics></Demographics>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <LocationForm></LocationForm>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Events></Events>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Symptoms></Symptoms>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <PreexistingConditions></PreexistingConditions>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Transmission></Transmission>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <TravelHistory></TravelHistory>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <GenomeSequences></GenomeSequences>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Pathogens></Pathogens>
+                                </div>
+                                <div className={classes.formSection}>
+                                    <Notes></Notes>
+                                </div>
+                                {!props.initialCase && (
+                                    <div className={classes.formSection}>
+                                        <NumCases></NumCases>
+                                    </div>
+                                )}
+                                {isSubmitting && <LinearProgress />}
+                                <br />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disableElevation
+                                    data-testid="submit"
+                                    disabled={isSubmitting}
+                                    onClick={submitForm}
+                                >
+                                    {props.initialCase
+                                        ? 'Submit case edit'
+                                        : 'Submit case'}
+                                </Button>
+                                <Button
+                                    className={classes.cancelButton}
+                                    color="primary"
+                                    variant="outlined"
+                                    onClick={props.onModalClose}
+                                >
+                                    Cancel
+                                </Button>
+                            </Form>
+                            {errorMessage && (
+                                <MuiAlert
+                                    className={classes.statusMessage}
+                                    elevation={6}
+                                    variant="filled"
+                                    severity="error"
+                                >
+                                    {errorMessage}
+                                </MuiAlert>
+                            )}
                         </div>
-                    )}
-                </Formik>
-            </AppModal>
-        );
-    }
+                    </div>
+                )}
+            </Formik>
+        </AppModal>
+    );
 }
-
-export default withRouter(withStyles(styles)(CaseForm));

@@ -62,6 +62,7 @@ describe('GET', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         const res = await curatorRequest
             .get('/api/sources')
@@ -76,10 +77,12 @@ describe('GET', () => {
         const relevantSource = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         await new Source({
             name: 'test-source',
             origin: { url: 'http://bar.baz' },
+            format: 'JSON',
         }).save();
 
         const res = await curatorRequest
@@ -96,6 +99,7 @@ describe('GET', () => {
             await new Source({
                 name: `test-source-${i}`,
                 origin: { url: 'http://foo.bar' },
+                format: 'JSON',
             }).save();
         }
         // Fetch first page.
@@ -117,7 +121,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
 
-        // Fetch inexistant page.
+        // Fetch nonexistent page.
         res = await curatorRequest
             .get('/api/sources?page=42&limit=10')
             .expect(200)
@@ -128,15 +132,16 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
     it('rejects negative page param', (done) => {
-        curatorRequest.get('/api/sources?page=-7').expect(422, done);
+        curatorRequest.get('/api/sources?page=-7').expect(400, done);
     });
     it('rejects negative limit param', (done) => {
-        curatorRequest.get('/api/sources?page=1&limit=-2').expect(422, done);
+        curatorRequest.get('/api/sources?page=1&limit=-2').expect(400, done);
     });
     it('one existing item should return 200', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         const res = await curatorRequest
             .get(`/api/sources/${source.id}`)
@@ -151,6 +156,7 @@ describe('PUT', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         const res = await curatorRequest
             .put(`/api/sources/${source.id}`)
@@ -167,6 +173,7 @@ describe('PUT', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         const scheduleExpression = 'rate(1 hour)';
         const res = await curatorRequest
@@ -193,6 +200,7 @@ describe('PUT', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
             automation: {
                 schedule: {
                     awsRuleArn: 'arn:aws:events:a:b:rule/c',
@@ -213,15 +221,20 @@ describe('PUT', () => {
             source.set('name', newName).toAwsRuleDescription(),
         );
     });
-    it('cannot update an inexistent source', (done) => {
+    it('cannot update an nonexistent source', (done) => {
         curatorRequest
-            .put('/api/sources/424242424242424242424242')
+            .put('/api/sources/5ea86423bae6982635d2e1f8')
+            .send({
+                name: 'test-source',
+                origin: { url: 'http://foo.bar' },
+            })
             .expect(404, done);
     });
     it('should not update to an invalid source', async () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         const res = await curatorRequest
             .put(`/api/sources/${source.id}`)
@@ -236,6 +249,7 @@ describe('POST', () => {
         const source = {
             name: 'some_name',
             origin: { url: 'http://what.ever' },
+            format: 'JSON',
         };
         const res = await curatorRequest
             .post('/api/sources')
@@ -250,6 +264,7 @@ describe('POST', () => {
         const source = {
             name: 'some_name',
             origin: { url: 'http://what.ever' },
+            format: 'JSON',
             automation: {
                 schedule: { awsScheduleExpression: scheduleExpression },
             },
@@ -271,9 +286,17 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
+    it('should not create an incomplete source', async () => {
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send({})
+            .expect(400);
+    });
     it('should not create invalid source', async () => {
-        const res = await curatorRequest.post('/api/sources').expect(422);
-        expect(res.body).toMatch('Enter a name');
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send({ origin: { url: 2 } })
+            .expect(422);
     });
 });
 
@@ -282,6 +305,7 @@ describe('DELETE', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
         }).save();
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
         expect(mockDeleteRule).not.toHaveBeenCalled();
@@ -290,6 +314,7 @@ describe('DELETE', () => {
         const source = await new Source({
             name: 'test-source',
             origin: { url: 'http://foo.bar' },
+            format: 'JSON',
             automation: {
                 schedule: {
                     awsRuleArn: 'arn:aws:events:a:b:rule/c',

@@ -13,7 +13,7 @@ from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
                      parse_longitude, parse_range, parse_sex, parse_string_list,
                      parse_url)
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from utils import format_iso_8601_date, log_error
 
 
@@ -115,7 +115,7 @@ def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
     })
 
 
-def convert_event(id: str, dates: Any, field_name: str, event_name: str) -> Dict[str, Any]:
+def convert_event(id: str, dates: Any, value: str, field_name: str, event_name: str) -> Dict[str, Any]:
     '''
     Converts a single event date column to the new event object with a name and
     range of dates.
@@ -148,16 +148,20 @@ def convert_event(id: str, dates: Any, field_name: str, event_name: str) -> Dict
         return None
 
     try:
-        return {
+        event = {
             'name': str(event_name),
             'dateRange': convert_date_range(dates)
         }
+
+        if value:
+          event['value'] = value
+
+        return event
     except ValueError as e:
         log_error(id, field_name, f'event[name="{event_name}"]', dates, e)
 
 
-def convert_events(id: str, event_dates: Dict[str, Any],
-                   outcome: str) -> List[Dict[str, Any]]:
+def convert_events(id: str, events: List[Tuple[Any, Any, str, str]]) -> List[Dict[str, Any]]:
     '''
     Converts event date columns to the new events array. Also includes the
     outcome field as an event, even though we don't have an associated date.
@@ -182,13 +186,7 @@ def convert_events(id: str, event_dates: Dict[str, Any],
         }]
         where the date strings are ISO 8601 date representations.
     '''
-    events = list(map(lambda i: convert_event(
-        id, i[0], i[1], i[2]), event_dates))
-
-    # The old data model had an outcome string, which will become an event in
-    # the new data model, but it won't have a date associated with it.
-    if outcome:
-        events.append({'name': str(outcome)})
+    events = [convert_event(id, i[0], i[1], i[2], i[3]) for i in events]
 
     # Filter out None values.
     events = [e for e in events if e]

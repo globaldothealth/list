@@ -5,7 +5,7 @@ interface SetupDatabaseParameters {
     databaseName: string;
     collectionName: string;
     schemaPath: string;
-    indexPath: string;
+    indexesPath: string;
     /** If not specified, deletes only imported documents. Defaults to false. */
     deleteAllDocuments: boolean;
 }
@@ -15,15 +15,15 @@ const setupDatabase = async ({
     databaseName,
     collectionName,
     schemaPath,
-    indexPath,
+    indexesPath,
     deleteAllDocuments = false,
 }: SetupDatabaseParameters): Promise<void> => {
     try {
         const schema = JSON.parse(await cat(schemaPath));
         print(`Read schema from ${schemaPath}`);
 
-        const index = JSON.parse(await cat(indexPath));
-        print(`Read index from ${indexPath}`);
+        const indexes = JSON.parse(await cat(indexesPath));
+        print(`Read indexes from ${indexesPath}`);
 
         // Connect to the default MongoDb instance.
         const connection: Connection = new Mongo(connectionString);
@@ -67,12 +67,15 @@ const setupDatabase = async ({
             collection = await database.getCollection(collectionName);
         }
 
-        print('Dropping indexes 👇');
-        const indexName = `${collectionName}Idx`;
-        await collection.dropIndex(indexName);
+        print('Dropping all indexes 👇');
+        await collection.dropIndexes();
 
         print('Creating indexes 👆');
-        await collection.createIndex(index, { name: indexName });
+        await database.runCommand({
+            createIndexes: collectionName,
+            indexes: indexes,
+        });
+
         print('Done 👍');
 
         // Print some stats -- for fun and confirmation!

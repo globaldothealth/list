@@ -12,8 +12,14 @@ declare global {
                 methodOfConfirmation?: string;
                 nationalities?: string[];
                 curator?: string;
+                symptomStatus?: string;
+                symptoms?: string[];
             }) => void;
-            login: () => void;
+            login: (opts: {
+                name: string;
+                email: string;
+                roles: string[];
+            }) => void;
             addSource: (name: string, url: string) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;
@@ -29,6 +35,10 @@ export function addCase(opts: {
     methodOfConfirmation?: string;
     nationalities?: string[];
     curator?: string;
+    occupation?: string;
+    symptomStatus?: string;
+    symptoms?: string[];
+    transmissionPlaces?: string[];
 }): void {
     cy.request({
         method: 'POST',
@@ -40,6 +50,7 @@ export function addCase(opts: {
             },
             demographics: {
                 nationalities: opts.nationalities,
+                occupation: opts.occupation,
             },
             location: {
                 country: opts.country,
@@ -59,14 +70,14 @@ export function addCase(opts: {
                     value: opts.methodOfConfirmation,
                 },
             ],
-            notes: opts.notes,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: opts.curator || 'test',
-                    date: new Date().toJSON(),
-                },
+            symptoms: {
+                status: opts.symptomStatus ?? undefined,
+                values: opts.symptoms ?? [],
             },
+            transmission: {
+                places: opts.transmissionPlaces ?? [],
+            },
+            notes: opts.notes,
         },
     });
 }
@@ -112,6 +123,7 @@ export function addSource(name: string, url: string): void {
             origin: {
                 url: url,
             },
+            format: 'JSON',
         },
     });
 }

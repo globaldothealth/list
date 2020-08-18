@@ -17,6 +17,9 @@ kustomization.yaml
 # MongoDB global configs
 globalConfig.json
 
+# Mapbox secrets.
+boundaries.json
+
 # Created by https://www.gitignore.io/api/osx,linux,python,pycharm,windows,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=osx,linux,python,pycharm,windows,visualstudiocode,node
 

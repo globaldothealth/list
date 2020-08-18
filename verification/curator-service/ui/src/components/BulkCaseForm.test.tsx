@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 it('renders source and csv upload widgets', async () => {
-    const { getByRole, getByTestId, getByText } = render(
+    const { getAllByRole, getByRole, getByTestId, getByText } = render(
         <MemoryRouter>
             <BulkCaseForm
                 user={user}
@@ -48,16 +48,38 @@ it('renders source and csv upload widgets', async () => {
     );
     await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
-    const inputField = getByTestId('csv-input');
+    // Header text
+    expect(getByTestId('header-title')).toBeInTheDocument();
+    expect(getByTestId('header-blurb')).toBeInTheDocument();
 
+    // Source selection
+    const sourceComponent = getByTestId('caseReference');
+    expect(getByRole('combobox')).toContainElement(sourceComponent);
+
+    // File upload
+    const inputField = getByTestId('csv-input');
     expect(inputField).toBeInTheDocument();
     expect(inputField.getAttribute('type')).toBe('file');
     expect(inputField.getAttribute('accept')).toContain('.csv');
 
-    const sourceComponent = getByTestId('caseReference');
-    expect(getByRole('combobox')).toContainElement(sourceComponent);
+    // Reference links
+    const links = getAllByRole('link');
+    expect(links).toHaveLength(2);
+    expect(links[0]).toHaveAttribute(
+        'href',
+        expect.stringMatching(
+            /docs.google.com.*1J-C7dq1rNNV8KdE1IZ-hUR6lsz7AdlvQhx6DWp36bjE/i,
+        ),
+    );
+    expect(links[1]).toHaveAttribute(
+        'href',
+        expect.stringMatching(
+            /github.com\/globaldothealth\/list.*bulk-upload-process/i,
+        ),
+    );
 
-    expect(getByText(/Upload cases/)).toBeInTheDocument();
+    expect(getByText(/upload cases/i)).toBeEnabled();
+    expect(getByText(/cancel/i)).toBeEnabled();
 });
 
 it('displays spinner post upload', async () => {
@@ -92,7 +114,11 @@ it('displays spinner post upload', async () => {
     mockedAxios.put.mockResolvedValueOnce(axiosResponse);
 
     fireEvent.change(inputField);
-    fireEvent.click(getByText(/Upload cases/));
+    fireEvent.click(getByText(/upload cases/i));
+
+    expect(getByText(/upload cases/i)).toBeDisabled();
+    expect(getByText(/cancel/i)).toBeDisabled();
     expect(getByTestId('progress')).toBeInTheDocument();
+    expect(getByText(/uploading cases/i)).toBeInTheDocument();
     waitForElementToBeRemoved(() => getByTestId('progress'));
 });

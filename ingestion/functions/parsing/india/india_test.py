@@ -2,6 +2,7 @@
 import json
 import os
 import pytest
+import tempfile
 
 from datetime import date
 
@@ -13,13 +14,6 @@ _PARSED_CASE = (
             "sourceId": _SOURCE_ID,
             "sourceEntryId": "48765",
             "sourceUrl": _SOURCE_URL
-        },
-        "revisionMetadata": {
-            "revisionNumber": 0,
-            "creationMetadata": {
-                "curator": "auto",
-                "date": date.today().strftime("%m/%d/%Y")
-            }
         },
         "location": {
             "country": "India",
@@ -60,9 +54,9 @@ def sample_data():
 
 def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
     from india import india  # Import locally to avoid superseding mock
-    data_file = "/tmp/data.json"
-    with open(data_file, "w") as f:
+    with tempfile.NamedTemporaryFile("w") as f:
         json.dump(sample_data, f)
+        f.flush()
 
-    result, = india.parse_cases(data_file, _SOURCE_ID, _SOURCE_URL)
-    assert result == _PARSED_CASE
+        result, = india.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL)
+        assert result == _PARSED_CASE

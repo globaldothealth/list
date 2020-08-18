@@ -40,6 +40,13 @@ paths:
           required: false
           schema:
             type: string
+          examples:
+            "full text search":
+              value: "this -butnotthis"
+              summary: Full text search with items that must or must not be present.
+            keywords:
+              value: "curator:foo@bar.com,baz@meh.com country:france"
+              summary: "values are OR'ed for the same keyword and all keywords are AND'ed. Keyword values can be quoted for multi-words matches and concatenated with a comma to union them. Only equality operator is supported. Supported keywords are: curator, gender, nationality, occupation, country, outcome, caseid, source, admin1, admin2, admin3"
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -52,7 +59,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     post:
-      summary: Creates a new case
+      summary: Creates one (or multiple identical) new cases
       operationId: createCase
       requestBody:
         description: Case to add
@@ -70,9 +77,18 @@ paths:
             type: boolean
             default: false
           allowEmptyValue: true
+        - name: num_cases
+          in: query
+          description: The number of cases to create
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
       responses:
         "201":
-          $ref: "#/components/responses/201Case"
+          $ref: "#/components/responses/201Create"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -96,8 +112,12 @@ paths:
             schema:
               allOf:
                 - $ref: "#/components/schemas/Case"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
               required:
                 - caseReference
+                - curator
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -125,6 +145,102 @@ paths:
       responses:
         "207":
           $ref: "#/components/responses/207BatchValidateCaseResponse"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpsert:
+    post:
+      summary: Batch upserts cases
+      operationId: batchUpsertCases
+      requestBody:
+        description: Cases to upsert
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
+      responses:
+        "207":
+          $ref: "#/components/responses/207BatchUpsertCaseResponse"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/symptoms:
+    get:
+      summary: Lists most frequently used symptoms
+      operationId: listSymptoms
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200SymptomArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/placesOfTransmission:
+    get:
+      summary: Lists most frequently used places of transmission
+      operationId: listPlacesOfTransmission
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200PlacesOfTransmissionArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/occupations:
+    get:
+      summary: Lists most frequently used occupations
+      operationId: listOccupations
+      parameters:
+        - name: limit
+          in: query
+          description: The number of items to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 5
+      responses:
+        "200":
+          $ref: "#/components/responses/200OccupationArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
   /cases/{id}:
@@ -161,7 +277,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Case"
+              allOf:
+                - $ref: "#/components/schemas/Case"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -208,6 +330,20 @@ components:
               - message
       required:
         - errors
+    BatchUpsertCaseResponse:
+      description: Response to batch upsert case API requests
+      properties:
+        createdCaseIds:
+          type: array
+          items:
+            type: string
+        updatedCaseIds:
+          type: array
+          items:
+            type: string
+      required:
+        - createdCaseIds
+        - updatedCaseIds
     Case:
       description: A single line-list case.
       properties:
@@ -219,6 +355,13 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
+            uploadId:
+              description: >
+                The UUID of the upload in which the batch of cases including
+                this case document was entered into the G.h system. This field
+                is only populated for cases entered via automated ingestion.
+              type: string
+              pattern: '^[a-f\d]{24}$'
             additionalSources:
               type: array
               items:
@@ -231,6 +374,7 @@ components:
           properties:
             gender:
               type: string
+              enum: [null, Male, Female, Non-binary/Third gender, Other]
             ageRange:
               type: object
               properties:
@@ -268,6 +412,7 @@ components:
           properties:
             status:
               type: string
+              enum: [null, Asymptomatic, Symptomatic, Presymptomatic]
             values:
               type: array
               items:
@@ -312,6 +457,7 @@ components:
                     $ref: "#/components/schemas/Location"
                   purpose:
                     type: string
+                    enum: [null, Business, Leisure, Family, Other]
                   methods:
                     type: array
                     items:
@@ -357,6 +503,8 @@ components:
               $ref: "#/components/schemas/EditMetadata"
             editMetadata:
               $ref: "#/components/schemas/EditMetadata"
+          required:
+            - revisionNumber
     CaseArray:
       type: object
       properties:
@@ -366,6 +514,27 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    SymptomArray:
+      type: object
+      properties:
+        symptoms:
+          type: array
+          items:
+            type: string
+    PlacesOfTransmissionArray:
+      type: object
+      properties:
+        placesOfTransmission:
+          type: array
+          items:
+            type: string
+    OccupationArray:
+      type: object
+      properties:
+        occupations:
+          type: array
+          items:
+            type: string
     Date:
       oneOf:
         - type: string
@@ -418,8 +587,17 @@ components:
           required:
             - latitude
             - longitude
+    Curator:
+      description: The logged-in user who submitted the case.
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
     NewCase:
-      description: A "#/components/schemas/Case" with additional required fields for newly-created cases
+      description: >
+        A "#/components/schemas/Case" with additional required fields for
+        newly-created cases.
       allOf:
         - $ref: "#/components/schemas/Case"
       properties:
@@ -433,11 +611,13 @@ components:
             - geoResolution
             - geometry
             - name
+        curator:
+          $ref: "#/components/schemas/Curator"
       required:
         - caseReference
         - location
         - events
-        - revisionMetadata
+        - curator
   responses:
     "200Case":
       description: OK
@@ -451,18 +631,50 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200SymptomArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SymptomArray"
+    "200PlacesOfTransmissionArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PlacesOfTransmissionArray"
+    "200OccupationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OccupationArray"
     "201Case":
       description: Created
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Case"
+    "201Create":
+      description: Created
+      content:
+        application/json:
+          schema:
+            anyOf:
+              - $ref: "#/components/schemas/Case"
+              - $ref: "#/components/schemas/CaseArray"
     "207BatchValidateCaseResponse":
       description: Multi-status
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/BatchValidateCaseResponse'
+    "207BatchUpsertCaseResponse":
+      description: Multi-status
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BatchUpsertCaseResponse'
     "400":
       description: Malformed request
     "403":

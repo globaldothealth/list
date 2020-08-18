@@ -1,5 +1,3 @@
-import enterSource from '../utils/enterSource';
-
 /* eslint-disable no-undef */
 describe('Curator', function () {
     beforeEach(() => {
@@ -36,7 +34,9 @@ describe('Curator', function () {
         // Input full case.
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New line list case').click();
-        enterSource('www.example.com');
+        cy.get('div[data-testid="caseReference"]').type('www.example.com');
+        cy.contains('li', 'www.example.com').click();
+        cy.get('input[name="caseReference.sourceName"]').type('Example source');
         cy.get('div[data-testid="sourceEntryId"]')
             .click()
             .type('testSourceEntryID123');
@@ -73,7 +73,7 @@ describe('Curator', function () {
         cy.get('li[data-value="Recovered"').click();
         cy.get('input[name="outcomeDate"]').type('2020-01-07');
         cy.get('div[data-testid="symptomsStatus"]').click();
-        cy.get('li[data-value="Presymptomatic"').click();
+        cy.get('li[data-value="Symptomatic"').click();
         cy.get('div[data-testid="symptoms"]').type('dry cough');
         cy.contains('li', 'dry cough').click();
         cy.get('div[data-testid="symptoms"]').type('mild fever');
@@ -155,7 +155,7 @@ describe('Curator', function () {
         cy.contains('li', 'Ebola').click();
         cy.get('textarea[name="notes"]').type('test notes\non new line');
         cy.server();
-        cy.route('POST', '/api/cases').as('addCase');
+        cy.route('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
 
@@ -171,7 +171,7 @@ describe('Curator', function () {
             cy.contains('Afghan, Albanian');
             cy.contains('Accountant');
             cy.contains('Frankreich');
-            cy.contains('1/1/2020');
+            cy.contains('2020-1-1');
             cy.contains('dry cough, mild fever');
             cy.contains('Airborne infection');
             cy.contains('Test route');
@@ -183,6 +183,12 @@ describe('Curator', function () {
             cy.contains('test notes');
             cy.contains('on new line');
             cy.contains('superuser@');
+
+            // View the case from the message bar.
+            cy.get('button[data-testid="view-case-btn"').click({ force: true });
+            cy.contains('View case');
+            // Go back to linelist.
+            cy.visit('/cases');
 
             // Edit the case.
             cy.get('button[title="Edit this case"]').click({ force: true });
@@ -324,20 +330,20 @@ describe('Curator', function () {
             cy.contains('45.7589');
             cy.contains('4.8414');
             // Events.
-            cy.contains('2020-01-01');
-            cy.contains('2020-01-02');
-            cy.contains('2020-01-03');
-            cy.contains('2020-01-04');
-            cy.contains('2020-01-05');
-            cy.contains('2020-01-06');
+            cy.contains('2020-1-1');
+            cy.contains('2020-1-2');
+            cy.contains('2020-1-3');
+            cy.contains('2020-1-4');
+            cy.contains('2020-1-5');
+            cy.contains('2020-1-6');
             cy.contains('PCR test');
             cy.contains('Recovered');
             cy.contains('Yes');
             //  Symptoms.
             cy.contains('dry cough, mild fever');
-            cy.contains('Presymptomatic');
+            cy.contains('Symptomatic');
             // Preexisting conditions.
-            cy.contains('ABCD syndrome, ADULT syndrome');
+            cy.contains('ABCD syndrome (AS), ADULT syndrome (AS)');
             // Transmission.
             cy.contains('Airborne infection');
             cy.contains('Test route');
