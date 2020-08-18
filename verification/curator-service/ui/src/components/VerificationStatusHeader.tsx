@@ -5,7 +5,7 @@ import { ReactComponent as VerificationHeaderSvg } from './assets/verification_h
 
 export default function VerificationStatusHeader(): JSX.Element {
     return (
-        <Tooltip title="Coming soon: toggle verification status">
+        <Tooltip title="Coming soon">
             <IconButton>
                 <VerificationHeaderSvg />
             </IconButton>
