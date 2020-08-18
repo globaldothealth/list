@@ -18,7 +18,10 @@ import assertString from '../util/assert-string';
  */
 export default class AwsLambdaClient {
     private readonly lambdaClient: AWS.Lambda;
-    constructor(awsRegion: string) {
+    constructor(
+        private readonly retrievalFunctionArn: string,
+        awsRegion: string,
+    ) {
         AWS.config.update({ region: awsRegion });
         this.lambdaClient = new AWS.Lambda({
             apiVersion: '2015-03-31',
@@ -64,5 +67,21 @@ export default class AwsLambdaClient {
         await this.lambdaClient
             .removePermission(removePermissionParams)
             .promise();
+    };
+
+    invokeRetrieval = async (sourceId: string): Promise<string> => {
+        console.log('Triggering retrieval of source', sourceId);
+        try {
+            const res = await this.lambdaClient
+                .invoke({
+                    FunctionName: this.retrievalFunctionArn,
+                    Payload: JSON.stringify({ sourceId: sourceId }),
+                })
+                .promise();
+            console.log('Got res:', res);
+            return res.FunctionError || res.Payload?.toString() || '';
+        } catch (e) {
+            return e.message;
+        }
     };
 }

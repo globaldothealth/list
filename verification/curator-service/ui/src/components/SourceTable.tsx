@@ -11,10 +11,12 @@ import {
 import React, { RefObject } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
 
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import User from './User';
 
 interface ListResponse {
     sources: Source[];
@@ -107,7 +109,9 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
 class SourceTable extends React.Component<Props, SourceTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -272,6 +276,23 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
     validateRequired(field: string | undefined): boolean {
         return field?.trim() !== '';
+    }
+
+    triggerRetrieval(id: string): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const url = this.state.url + id + '/retrieve';
+            this.setState({ error: '' });
+            const response = axios.post(url);
+            response
+                .then((resp) => {
+                    console.log(resp);
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({ error: e.toString() });
+                    reject(e);
+                });
+        });
     }
 
     render(): JSX.Element {
@@ -524,6 +545,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             search: false,
                             filtering: false,
                             sorting: false,
+                            selection: this.props.user.roles.includes(
+                                'curator',
+                            ),
+                            emptyRowsWhenPaging: false,
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,
@@ -546,6 +571,34 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 rowData: TableRow,
                             ): Promise<unknown> => this.deleteSource(rowData),
                         }}
+                        actions={
+                            this.props.user.roles.includes('curator')
+                                ? [
+                                      {
+                                          icon: () => (
+                                              <span aria-label="retrieve">
+                                                  <CloudDownloadIcon />
+                                              </span>
+                                          ),
+                                          tooltip: 'Trigger retrieval',
+                                          onClick: (
+                                              _: any,
+                                              rows: any,
+                                          ): void => {
+                                              const promises = rows.map(
+                                                  (row: TableRow) =>
+                                                      this.triggerRetrieval(
+                                                          row._id,
+                                                      ),
+                                              );
+                                              Promise.all(promises).then(() => {
+                                                  this.tableRef.current.onQueryChange();
+                                              });
+                                          },
+                                      },
+                                  ]
+                                : []
+                        }
                     />
                 </Paper>
             </div>
