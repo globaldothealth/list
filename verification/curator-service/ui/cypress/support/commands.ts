@@ -20,7 +20,7 @@ declare global {
                 email: string;
                 roles: string[];
             }) => void;
-            addSource: (name: string, url: string) => void;
+            addSource: (name: string, url: string, uploads?: []) => void;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             seedLocation: (loc: any) => void;
             clearSeededLocations: () => void;
@@ -114,7 +114,7 @@ export function clearSeededLocations(): void {
     });
 }
 
-export function addSource(name: string, url: string): void {
+export function addSource(name: string, url: string, uploads?: []): void {
     cy.request({
         method: 'POST',
         url: '/api/sources',
@@ -123,6 +123,7 @@ export function addSource(name: string, url: string): void {
             origin: {
                 url: url,
             },
+            uploads: uploads,
             format: 'JSON',
         },
     });
