@@ -422,6 +422,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                               ]
                             : []),
                         {
+                            cellStyle: {
+                                padding: '0',
+                            },
+                            headerStyle: {
+                                padding: '0',
+                            },
                             title: (
                                 <div className={classes.centeredContent}>
                                     <VerificationStatusHeader />
