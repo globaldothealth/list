@@ -70,7 +70,6 @@ export default class AwsLambdaClient {
     };
 
     invokeRetrieval = async (sourceId: string): Promise<string> => {
-        console.log('Triggering retrieval of source', sourceId);
         try {
             const res = await this.lambdaClient
                 .invoke({
@@ -78,8 +77,7 @@ export default class AwsLambdaClient {
                     Payload: JSON.stringify({ sourceId: sourceId }),
                 })
                 .promise();
-            console.log('Got res:', res);
-            return res.FunctionError || res.Payload?.toString() || '';
+            return res.Payload?.toString() || 'Unknown error';
         } catch (e) {
             return e.message;
         }

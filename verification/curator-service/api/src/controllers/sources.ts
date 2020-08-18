@@ -214,7 +214,6 @@ export default class SourcesController {
 
     /** Trigger retrieval of the source's content in S3. */
     retrieve = async (req: Request, res: Response): Promise<void> => {
-        console.log('Handler to trigger retrieval');
         try {
             const output = await this.lambdaClient.invokeRetrieval(
                 req.params.id,
