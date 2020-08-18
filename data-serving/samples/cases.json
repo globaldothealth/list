@@ -681,6 +681,10 @@
                 }
             }
         },
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e101",
+            "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/"
+        },
         "importedCase": {
             "ID": "002-210974",
             "province": "Maharashtra",
@@ -1280,6 +1284,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 39.0,
@@ -1599,6 +1607,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 15.0,
@@ -1802,6 +1814,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 35.0,
@@ -2365,6 +2381,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 60.0,
@@ -2472,6 +2492,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 60.0,
@@ -2732,6 +2756,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 80.0
@@ -2940,6 +2968,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "location": {
             "administrativeAreaLevel2": "Moscow",
             "administrativeAreaLevel1": "Central",
@@ -2979,6 +3011,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "location": {
             "administrativeAreaLevel2": "Moscow",
             "administrativeAreaLevel1": "Central",
@@ -3018,6 +3054,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "location": {
             "country": "Russia",
             "geometry": {
@@ -3055,6 +3095,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 35.0,
@@ -3124,6 +3168,17 @@
         },
         "events": [
             {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    }
+                }
+            },
+            {
                 "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
@@ -3174,6 +3229,17 @@
             "geoResolution": "Admin2"
         },
         "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    }
+                }
+            },
             {
                 "name": "hospitalAdmission",
                 "dateRange": {
@@ -3226,6 +3292,17 @@
         },
         "events": [
             {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    }
+                }
+            },
+            {
                 "name": "hospitalAdmission",
                 "dateRange": {
                     "start": {
@@ -3276,6 +3353,17 @@
             "geoResolution": "Admin2"
         },
         "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    },
+                    "end": {
+                        "$date": "2020-05-12T00:00:00Z"
+                    }
+                }
+            },
             {
                 "name": "hospitalAdmission",
                 "dateRange": {
@@ -4619,6 +4707,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 55.0,
@@ -4660,7 +4752,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "009-10214",
@@ -4675,6 +4775,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 20.0,
@@ -4705,7 +4809,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "009-3454",
@@ -4719,6 +4831,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 22.0,
@@ -4760,7 +4876,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "009-58865",
@@ -4775,6 +4899,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 28.0,
@@ -4805,7 +4933,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-111367",
@@ -4819,6 +4955,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 37.0,
@@ -4849,7 +4989,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-135692",
@@ -4863,6 +5011,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 45.0,
@@ -4893,7 +5045,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-160015",
@@ -4907,6 +5067,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 68.0,
@@ -4937,7 +5101,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-26450",
@@ -4951,6 +5123,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 52.0,
@@ -4981,7 +5157,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-50775",
@@ -4995,6 +5179,10 @@
         }
     },
     {
+        "caseReference": {
+            "sourceId": "5ea86423bae6982635d2e110",
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+        },
         "demographics": {
             "ageRange": {
                 "start": 56.0,
@@ -5025,7 +5213,15 @@
             }
         ],
         "revisionMetadata": {
-            "revisionNumber": 0
+            "revisionNumber": 0,
+            "creationMetadata": {
+                "curator": "TR",
+                "date": {
+                    "$date": {
+                        "$numberLong": "1587614400000"
+                    }
+                }
+            }
         },
         "importedCase": {
             "ID": "010-751",
