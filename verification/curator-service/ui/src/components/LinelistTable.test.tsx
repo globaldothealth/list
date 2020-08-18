@@ -34,6 +34,8 @@ it('loads and displays cases', async () => {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
+                uploadId: '012345678901234567890123',
+                verificationStatus: 'VERIFIED',
             },
             demographics: { ageRange: { start: 1, end: 3 }, gender: 'Female' },
             location: {
@@ -86,7 +88,7 @@ it('loads and displays cases', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(
+    const { findByText, findByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
@@ -102,6 +104,7 @@ it('loads and displays cases', async () => {
     expect(await findByText('1-3')).toBeInTheDocument();
     expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('Recovered')).toBeInTheDocument();
+    expect(await findByTestId('verified-svg')).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
