@@ -45,7 +45,7 @@ interface LinelistTableState {
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
-export interface TableRow {
+interface TableRow {
     id: string;
     confirmedDate: Date | null;
     adminArea3: string;
