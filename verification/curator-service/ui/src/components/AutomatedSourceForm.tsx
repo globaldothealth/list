@@ -5,10 +5,13 @@ import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
 import FieldTitle from './common-form-fields/FieldTitle';
+import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
 import { RequiredHelperText } from './common-form-fields/FormikFields';
 import { TextField } from 'formik-material-ui';
 import User from './User';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({
     headerBlurb: {
@@ -43,9 +46,6 @@ const useStyles = makeStyles(() => ({
         marginTop: '2em',
         maxWidth: '80%',
     },
-    uploadFeedback: {
-        paddingBottom: '4em',
-    },
     uploadBar: {
         alignItems: 'center',
         display: 'flex',
@@ -53,13 +53,6 @@ const useStyles = makeStyles(() => ({
         marginTop: 'auto',
     },
     cancelButton: {
-        marginLeft: '1em',
-    },
-    progressIndicator: {
-        alignItems: 'center',
-        display: 'flex',
-    },
-    progressText: {
         marginLeft: '1em',
     },
 }));
@@ -81,11 +74,24 @@ const AutomatedSourceFormSchema = Yup.object().shape({
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
     const classes = useStyles();
+    const history = useHistory();
+    const [errorMessage, setErrorMessage] = React.useState('');
+
     const createSource = async (
         values: AutomatedSourceFormValues,
     ): Promise<void> => {
-        alert(JSON.stringify(values));
-        return;
+        const newSource = { name: values.name, origin: { url: values.url } };
+        try {
+            await axios.post('/api/sources', newSource);
+            setErrorMessage('');
+        } catch (e) {
+            setErrorMessage(JSON.stringify(e));
+            return;
+        }
+        // Navigate to sources after successful submit
+        history.push({
+            pathname: '/sources',
+        });
     };
 
     return (
@@ -148,6 +154,16 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                 </div>
                             </fieldset>
                         </Form>
+                        {errorMessage && (
+                            <MuiAlert
+                                className={classes.statusMessage}
+                                elevation={6}
+                                variant="filled"
+                                severity="error"
+                            >
+                                {errorMessage}
+                            </MuiAlert>
+                        )}
                         <div className={classes.uploadBar}>
                             <Button
                                 variant="contained"
