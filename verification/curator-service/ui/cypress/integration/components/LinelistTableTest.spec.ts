@@ -96,7 +96,7 @@ describe('Linelist table', function () {
         cy.contains('United Kingdom').should('not.exist');
     });
 
-    it.only('Can toggle case verification status', function () {
+    it('Can toggle case verification status', function () {
         cy.addCase({
             country: 'France',
         });
