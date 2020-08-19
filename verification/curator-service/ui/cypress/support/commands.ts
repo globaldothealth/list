@@ -37,6 +37,7 @@ export function addCase(opts: {
     symptomStatus?: string;
     symptoms?: string[];
     transmissionPlaces?: string[];
+    uploadId?: string;
 }): void {
     cy.request({
         method: 'POST',
@@ -45,6 +46,7 @@ export function addCase(opts: {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
+                uploadId: opts.uploadId,
             },
             demographics: {
                 nationalities: opts.nationalities,
