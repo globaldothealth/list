@@ -7,13 +7,13 @@ declare global {
         interface Chainable {
             addCase: (opts: {
                 country: string;
-                notes: string;
-                sourceUrl: string;
                 methodOfConfirmation?: string;
                 nationalities?: string[];
-                curator?: string;
+                notes?: string;
+                occupation?: string;
                 symptomStatus?: string;
                 symptoms?: string[];
+                transmissionPlaces?: string[];
             }) => void;
             login: (opts: {
                 name: string;
@@ -30,11 +30,9 @@ declare global {
 
 export function addCase(opts: {
     country: string;
-    notes: string;
-    sourceUrl: string;
     methodOfConfirmation?: string;
     nationalities?: string[];
-    curator?: string;
+    notes?: string;
     occupation?: string;
     symptomStatus?: string;
     symptoms?: string[];
