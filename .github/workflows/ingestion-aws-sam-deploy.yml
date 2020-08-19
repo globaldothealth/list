@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-    - '.github/workflows/ingestion-aws-sam-build.yml'
+    - '.github/workflows/ingestion-aws-sam-deploy.yml'
 
 jobs:
   sam-deploy:
