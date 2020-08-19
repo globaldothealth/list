@@ -11,7 +11,7 @@ const user = {
 };
 
 it('renders form', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText } = render(
         <MemoryRouter>
             <AutomatedSourceForm
                 user={user}
@@ -22,8 +22,15 @@ it('renders form', async () => {
         </MemoryRouter>,
     );
 
-    expect(getByText('New automated data source')).toBeInTheDocument();
-    expect(
-        getByText('Provide details about the automated data source'),
-    ).toBeInTheDocument();
+    // Header text
+    expect(getByTestId('header-title')).toBeInTheDocument();
+    expect(getByTestId('header-blurb')).toBeInTheDocument();
+
+    // Source fields
+    expect(getByTestId('name')).toBeInTheDocument();
+    expect(getByTestId('url')).toBeInTheDocument();
+
+    // Buttons
+    expect(getByText(/create source/i)).toBeEnabled();
+    expect(getByText(/cancel/i)).toBeEnabled();
 });
