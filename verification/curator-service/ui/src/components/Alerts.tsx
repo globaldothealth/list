@@ -27,6 +27,16 @@ interface UploadSummary {
     error?: string;
 }
 
+interface UploadData {
+    sourceName: string;
+    sourceUrl: string;
+    upload: Upload;
+}
+
+interface ListUploadsResponse {
+    uploads: UploadData[];
+}
+
 export default function Alerts(): JSX.Element {
     const classes = useStyles();
     const [uploads, setUploads] = React.useState<Upload[]>([]);
@@ -34,9 +44,13 @@ export default function Alerts(): JSX.Element {
 
     React.useEffect(() => {
         axios
-            .get('/api/sources/uploads')
+            .get<ListUploadsResponse>('/api/sources/uploads')
             .then((resp) => {
-                setUploads(resp.data.uploads);
+                setUploads(
+                    resp.data.uploads.map(
+                        (uploadResponse) => uploadResponse.upload,
+                    ),
+                );
             })
             .catch((e) => {
                 setUploads([]);
