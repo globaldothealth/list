@@ -29,7 +29,6 @@ declare global {
 }
 
 export function addCase(opts: {
-    uploadId?: string;
     country: string;
     notes: string;
     sourceUrl: string;
@@ -40,6 +39,7 @@ export function addCase(opts: {
     symptomStatus?: string;
     symptoms?: string[];
     transmissionPlaces?: string[];
+    uploadId?: string;
 }): void {
     cy.request({
         method: 'POST',
