@@ -11,30 +11,42 @@ afterEach(() => {
 });
 
 it('loads and displays alerts', async () => {
-    const uploads = {
+    const response = {
         uploads: [
             {
-                _id: '5ef8e943dfe6e00030892d58',
-                status: 'IN_PROGRESS',
-                summary: { numCreated: 5, numUpdated: 3 },
-                created: '2020-01-01',
+                sourceName: 'sourceName',
+                sourceUrl: 'sourceUrl',
+                upload: {
+                    _id: '5ef8e943dfe6e00030892d58',
+                    status: 'IN_PROGRESS',
+                    summary: { numCreated: 5, numUpdated: 3 },
+                    created: '2020-01-01',
+                },
             },
             {
-                _id: '5ef8e943dfe6e00030892d59',
-                status: 'IN_PROGRESS',
-                summary: { numCreated: 2 },
-                created: '2020-01-02',
+                sourceName: 'sourceName',
+                sourceUrl: 'sourceUrl',
+                upload: {
+                    _id: '5ef8e943dfe6e00030892d59',
+                    status: 'IN_PROGRESS',
+                    summary: { numCreated: 2 },
+                    created: '2020-01-02',
+                },
             },
             {
-                _id: '5ef8e943dfe6e00030892d60',
-                status: 'IN_PROGRESS',
-                summary: { numUpdated: 2 },
-                created: '2020-01-03',
+                sourceName: 'sourceName',
+                sourceUrl: 'sourceUrl',
+                upload: {
+                    _id: '5ef8e943dfe6e00030892d60',
+                    status: 'IN_PROGRESS',
+                    summary: { numUpdated: 2 },
+                    created: '2020-01-03',
+                },
             },
         ],
     };
     const axiosResponse = {
-        data: uploads,
+        data: response,
         status: 200,
         statusText: 'OK',
         config: {},
