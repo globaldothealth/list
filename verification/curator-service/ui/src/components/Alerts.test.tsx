@@ -15,7 +15,7 @@ it('loads and displays alerts', async () => {
         uploads: [
             {
                 sourceName: 'sourceName',
-                sourceUrl: 'sourceUrl',
+                sourceUrl: 'sourceUrl1',
                 upload: {
                     _id: '5ef8e943dfe6e00030892d58',
                     status: 'IN_PROGRESS',
@@ -25,7 +25,7 @@ it('loads and displays alerts', async () => {
             },
             {
                 sourceName: 'sourceName',
-                sourceUrl: 'sourceUrl',
+                sourceUrl: 'sourceUrl2',
                 upload: {
                     _id: '5ef8e943dfe6e00030892d59',
                     status: 'IN_PROGRESS',
@@ -35,7 +35,7 @@ it('loads and displays alerts', async () => {
             },
             {
                 sourceName: 'sourceName',
-                sourceUrl: 'sourceUrl',
+                sourceUrl: 'sourceUrl3',
                 upload: {
                     _id: '5ef8e943dfe6e00030892d60',
                     status: 'IN_PROGRESS',
@@ -61,12 +61,24 @@ it('loads and displays alerts', async () => {
     expect(await findByText('Alerts')).toBeInTheDocument();
     expect(getAllByText('New source verification required')).toHaveLength(3);
     expect(
-        getByText('Please verify 5 cases added and 3 cases updated'),
+        getByText(/Please verify 5 cases added and 3 cases updated from/),
     ).toBeInTheDocument();
+    expect(getByText('sourceUrl1')).toHaveAttribute(
+        'href',
+        'https://sourceUrl1',
+    );
     expect(getByText('2020-1-1')).toBeInTheDocument();
-    expect(getByText('Please verify 2 cases added')).toBeInTheDocument();
+    expect(getByText(/Please verify 2 cases added from/)).toBeInTheDocument();
+    expect(getByText('sourceUrl2')).toHaveAttribute(
+        'href',
+        'https://sourceUrl2',
+    );
     expect(getByText('2020-1-2')).toBeInTheDocument();
-    expect(getByText('Please verify 2 cases updated')).toBeInTheDocument();
+    expect(getByText(/Please verify 2 cases updated from/)).toBeInTheDocument();
+    expect(getByText('sourceUrl3')).toHaveAttribute(
+        'href',
+        'https://sourceUrl3',
+    );
     expect(getByText('2020-1-3')).toBeInTheDocument();
 });
 
