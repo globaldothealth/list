@@ -7,6 +7,7 @@ const addPermissionSpy = jest
     .fn()
     .mockResolvedValue({ Statement: 'statement' });
 const removePermissionSpy = jest.fn().mockResolvedValue({});
+const invokeSpy = jest.fn().mockResolvedValue({});
 
 beforeAll(() => {
     AWSMock.setSDKInstance(AWS);
@@ -15,9 +16,11 @@ beforeAll(() => {
 beforeEach(() => {
     addPermissionSpy.mockClear();
     removePermissionSpy.mockClear();
+    invokeSpy.mockClear();
     AWSMock.mock('Lambda', 'addPermission', addPermissionSpy);
     AWSMock.mock('Lambda', 'removePermission', removePermissionSpy);
-    client = new AwsLambdaClient('us-east-1');
+    AWSMock.mock('Lambda', 'invoke', invokeSpy);
+    client = new AwsLambdaClient('some-arn', 'us-east-1');
 });
 
 afterEach(() => {
@@ -79,5 +82,14 @@ describe('removePermission', () => {
         return expect(
             client.removePermission('functionName', 'statementId'),
         ).rejects.toThrow(expectedError);
+    });
+});
+
+describe('invokeRetrieval', () => {
+    it('invoke retrieval for the given source', async () => {
+        await expect(
+            client.invokeRetrieval('some-source-id'),
+        ).resolves.not.toThrow();
+        expect(invokeSpy).toHaveBeenCalledTimes(1);
     });
 });
