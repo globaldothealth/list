@@ -1,5 +1,9 @@
 /* eslint-disable no-undef */
 describe('App', function () {
+    beforeEach(() => {
+        cy.task('clearSourcesDB', {});
+    });
+
     it('takes user to home page when home button is clicked', function () {
         cy.login();
         cy.visit('/cases');

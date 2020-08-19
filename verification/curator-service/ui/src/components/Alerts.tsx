@@ -1,16 +1,26 @@
 import { Paper, Typography, makeStyles } from '@material-ui/core';
 
+import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import React from 'react';
 import axios from 'axios';
+import createHref from './util/links';
 import renderDate from './util/date';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({
     container: {
-        width: '300px',
+        width: '360px',
     },
     section: {
         borderBottom: '1px solid #DADCE0',
         padding: '12px 24px',
+    },
+    textContainer: {
+        alignItems: 'center',
+        display: 'flex',
+    },
+    newSourceText: {
+        flex: 1,
     },
 }));
 
@@ -39,21 +49,16 @@ interface ListUploadsResponse {
 
 export default function Alerts(): JSX.Element {
     const classes = useStyles();
-    const [uploads, setUploads] = React.useState<Upload[]>([]);
+    const [uploadData, setUploadData] = React.useState<UploadData[]>([]);
     const [errorMessage, setErrorMessage] = React.useState<string>('');
+    const history = useHistory();
 
     React.useEffect(() => {
         axios
             .get<ListUploadsResponse>('/api/sources/uploads')
-            .then((resp) => {
-                setUploads(
-                    resp.data.uploads.map(
-                        (uploadResponse) => uploadResponse.upload,
-                    ),
-                );
-            })
+            .then((resp) => setUploadData(resp.data.uploads))
             .catch((e) => {
-                setUploads([]);
+                setUploadData([]);
                 setErrorMessage('There was an error loading alerts');
                 console.error(e);
             });
@@ -74,6 +79,15 @@ export default function Alerts(): JSX.Element {
         return '';
     };
 
+    const showUploadCases = (id: string): void => {
+        history.push({
+            pathname: '/cases',
+            state: {
+                searchQuery: `uploadid:${id}`,
+            },
+        });
+    };
+
     return (
         <Paper className={classes.container} elevation={2}>
             <div className={classes.section}>
@@ -84,24 +98,43 @@ export default function Alerts(): JSX.Element {
                     <Typography variant="body2">{errorMessage}</Typography>
                 </div>
             )}
-            {!errorMessage && uploads.length === 0 && (
+            {!errorMessage && uploadData.length === 0 && (
                 <div className={classes.section}>
                     <Typography variant="body2">No alerts</Typography>
                 </div>
             )}
-            {uploads.map((upload) => (
-                <div key={upload._id} className={classes.section}>
-                    <Typography variant="subtitle1">
-                        New source verification required
+            {uploadData.map((uploadData) => (
+                <div
+                    key={uploadData.upload._id}
+                    className={classes.section}
+                    onClick={(): void => showUploadCases(uploadData.upload._id)}
+                >
+                    <Typography
+                        classes={{ root: classes.textContainer }}
+                        variant="subtitle1"
+                    >
+                        <span className={classes.newSourceText}>
+                            New source verification required
+                        </span>
+                        <ArrowForwardIos fontSize="small" />
                     </Typography>
                     <Typography variant="body2">
                         {bodyMessage(
-                            upload.summary.numCreated,
-                            upload.summary.numUpdated,
+                            uploadData.upload.summary.numCreated,
+                            uploadData.upload.summary.numUpdated,
                         )}
+                        {' from '}
+                        <a
+                            href={createHref(uploadData.sourceUrl)}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            onClick={(e): void => e.stopPropagation()}
+                        >
+                            {uploadData.sourceUrl}
+                        </a>
                     </Typography>
                     <Typography variant="caption">
-                        {renderDate(upload.created)}
+                        {renderDate(uploadData.upload.created)}
                     </Typography>
                 </div>
             ))}
