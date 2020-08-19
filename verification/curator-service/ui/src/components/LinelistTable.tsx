@@ -24,12 +24,12 @@ import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
+import VerificationStatusHeader from './VerificationStatusHeader';
+import VerificationStatusIndicator from './VerificationStatusIndicator';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 import renderDate from './util/date';
-import VerificationStatusIndicator from './VerificationStatusIndicator';
-import VerificationStatusHeader from './VerificationStatusHeader';
 
 interface ListResponse {
     cases: Case[];
@@ -63,6 +63,7 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
+    searchQuery: string;
 }
 
 interface Props
@@ -100,9 +101,13 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
 }));
 
 function SearchBar(props: {
+    searchQuery: string;
     onSearchChange: (search: string) => void;
 }): JSX.Element {
-    const [search, setSearch] = React.useState<string>('');
+    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    React.useEffect(() => {
+        setSearch(props.searchQuery ?? '');
+    }, [props.searchQuery]);
 
     const classes = searchBarStyles();
     return (
@@ -122,6 +127,7 @@ function SearchBar(props: {
                 setSearch(ev.currentTarget.value);
             }}
             InputProps={{
+                value: search,
                 disableUnderline: true,
                 classes: { root: classes.searchBarInput },
                 startAdornment: (
@@ -281,7 +287,8 @@ function RowMenu(props: {
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
-    unlisten: () => void;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unlisten: () => void = () => {};
 
     constructor(props: Props) {
         super(props);
@@ -289,13 +296,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             url: '/api/cases/',
             error: '',
             pageSize: 50,
-            search: '',
+            search: this.props.location.state?.searchQuery ?? '',
         };
-        // history.location.state can be updated with newCaseIds, on which we
+    }
+
+    componentDidMount(): void {
+        // history.location.state can be updated with new values on which we
         // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) =>
-            this.tableRef.current?.onQueryChange(),
-        );
+        this.unlisten = this.props.history.listen((_, __) => {
+            this.setState({
+                search: this.props.history.location.state?.searchQuery ?? '',
+            });
+            this.tableRef.current?.onQueryChange();
+        });
     }
 
     componentWillUnmount(): void {
@@ -387,6 +400,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     </MuiAlert>
                 )}
                 <SearchBar
+                    searchQuery={this.state.search}
                     onSearchChange={(search: string): void => {
                         this.setState({ search: search });
                         this.tableRef.current.onQueryChange();

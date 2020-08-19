@@ -29,6 +29,7 @@ declare global {
 }
 
 export function addCase(opts: {
+    uploadId?: string;
     country: string;
     notes: string;
     sourceUrl: string;
@@ -47,6 +48,7 @@ export function addCase(opts: {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
+                uploadId: opts.uploadId,
             },
             demographics: {
                 nationalities: opts.nationalities,
