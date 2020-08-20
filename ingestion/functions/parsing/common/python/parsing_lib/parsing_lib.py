@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import tempfile
 
 import boto3
@@ -9,16 +10,31 @@ import requests
 from enum import Enum
 from google.oauth2 import service_account
 
-LOCAL_DATA_FILE = "/tmp/data.json"
-METADATA_BUCKET = "epid-ingestion"
-SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
+# TODO: Use tempfile here instead.
+LOCAL_DATA_FILE = "/tmp/rawdata"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
+UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
+UNVERIFIED_STATUS = "UNVERIFIED"
 
 s3_client = boto3.client("s3")
+
+# Layer code, like common_lib, is added to the path by AWS.
+# To test locally (e.g. via pytest), we have to modify sys.path.
+# pylint: disable=import-error
+if ('lambda' not in sys.argv[0]):
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            'common'))
+import common_lib
 
 
 class UploadError(Enum):
@@ -34,6 +50,7 @@ class UploadError(Enum):
     SOURCE_CONTENT_DOWNLOAD_ERROR = 5
     PARSING_ERROR = 6
     DATA_UPLOAD_ERROR = 7
+    VALIDATION_ERROR = 8
 
 
 def extract_event_fields(event):
@@ -47,7 +64,7 @@ def extract_event_fields(event):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         complete_with_error(e)
-    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event[
+    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
 
 
@@ -68,13 +85,13 @@ def create_upload_record(source_id, headers):
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
                         headers=headers)
-    res_json = res.json()
-    if res.status_code != 201:
-        e = RuntimeError(
-            f'Error creating upload record, status={res.status_code}, response={res_json}')
-        complete_with_error(e)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    return res_json["_id"]
+    if res and res.status_code == 201:
+        res_json = res.json()
+        # TODO: Look for "errors" in res_json and handle them in some way.
+        return res_json["_id"]
+    e = RuntimeError(
+        f'Error creating upload record, status={res.status_code}, response={res.text}')
+    complete_with_error(e)
 
 
 def prepare_cases(cases, upload_id):
@@ -85,6 +102,7 @@ def prepare_cases(cases, upload_id):
     """
     for case in cases:
         case["caseReference"]["uploadId"] = upload_id
+        case["caseReference"]["verificationStatus"] = UNVERIFIED_STATUS
     return cases
 
 
@@ -94,14 +112,20 @@ def write_to_server(cases, source_id, upload_id, headers):
     print(f"Sending {len(cases)} cases to {put_api_url}")
     res = requests.post(put_api_url, json={"cases": cases},
                         headers=headers)
-    res_json = res.json()
-    if res.status_code != 200:
-        e = RuntimeError(
-            f'Error sending cases to server, status={res.status_code}, response={res_json}')
-        complete_with_error(e, UploadError.DATA_UPLOAD_ERROR,
-                            source_id, upload_id, headers)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+    if res and res.status_code == 200:
+        res_json = res.json()
+        # TODO: Look for "errors" in res_json and handle them in some way.
+        return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+    e = RuntimeError(
+        f'Error sending cases to server, status={res.status_code}, response={res.text}')
+    # 207 encompasses both geocoding and case schema validation errors.
+    # We can consider separating geocoding issues, but for now classifying it
+    # as a validation problem is pretty reasonable.
+    upload_error = (UploadError.VALIDATION_ERROR
+                    if res.status_code == 207 else
+                    UploadError.DATA_UPLOAD_ERROR)
+    complete_with_error(e, upload_error,
+                        source_id, upload_id, headers)
 
 
 def finalize_upload(
@@ -117,35 +141,12 @@ def finalize_upload(
     res = requests.put(put_api_url,
                        json=update,
                        headers=headers)
-    res_json = res.json()
     # TODO: Look for "errors" in res_json and handle them in some way.
-    if res.status_code != 200:
+    if not res or res.status_code != 200:
         e = RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res_json}')
+            f'Error updating upload record, status={res.status_code}, response={res.text}')
         complete_with_error(e, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, headers)
-
-
-def obtain_api_credentials():
-    """
-    Creates HTTP headers credentialed for access to the Global Health Source API.
-    """
-    try:
-        with tempfile.NamedTemporaryFile() as local_creds_file:
-            print(
-                "Retrieving service account credentials from "
-                f"s3://{METADATA_BUCKET}/{SERVICE_ACCOUNT_CRED_FILE}")
-            s3_client.download_file(
-                METADATA_BUCKET, SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
-            credentials = service_account.Credentials.from_service_account_file(
-                local_creds_file.name, scopes=["email"])
-            headers = {}
-            request = google.auth.transport.requests.Request()
-            credentials.refresh(request)
-            credentials.apply(headers)
-            return headers
-    except Exception as e:
-        complete_with_error(e)
 
 
 def get_today():
@@ -235,10 +236,11 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, source_id, s3_bucket, s3_key, date_filter = extract_event_fields(
+    source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
         event)
-    api_creds = obtain_api_credentials()
-    upload_id = create_upload_record(source_id, api_creds)
+    api_creds = common_lib.obtain_api_credentials(s3_client)
+    if not upload_id:
+        upload_id = create_upload_record(source_id, api_creds)
     try:
         raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
         case_data = parsing_function(

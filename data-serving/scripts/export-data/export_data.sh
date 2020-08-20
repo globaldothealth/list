@@ -49,7 +49,8 @@ function export_data() {
         --collection="$collection" \
         --fields="$fields" \
         --type="$output_format" \
-        --out="$output_file"
+        --out="$output_file" \
+        --jsonArray
 }
 
 # Establish run order

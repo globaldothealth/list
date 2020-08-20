@@ -26,19 +26,32 @@ Resources:
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
       Timeout: 60 # Seconds
+      Layers:
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
   ParsingLibLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: parsing_lib
       Description: Common functions required for parsing
       ContentUri: parsing/common/python/parsing_lib
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.8
+  CommonLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common_lib
+      Description: Common functions between parsing and retrieval
+      ContentUri: common
       CompatibleRuntimes:
         - python3.6
         - python3.7
@@ -61,13 +74,11 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
   HongKongParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -89,13 +100,11 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -110,13 +119,11 @@ Resources:
       Timeout: 60 # Seconds
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
       Environment:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:

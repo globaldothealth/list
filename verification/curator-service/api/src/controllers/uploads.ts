@@ -57,4 +57,25 @@ export default class UploadsController {
             return;
         }
     };
+
+    list = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const uploads = await Source.aggregate([
+                { $unwind: '$uploads' },
+                {
+                    $project: {
+                        _id: false,
+                        sourceName: '$name',
+                        sourceUrl: '$origin.url',
+                        upload: '$uploads',
+                    },
+                },
+            ]);
+            res.json({ uploads: uploads });
+            return;
+        } catch (err) {
+            res.status(500).json(err.message);
+            return;
+        }
+    };
 }

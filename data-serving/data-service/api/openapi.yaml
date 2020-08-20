@@ -46,7 +46,12 @@ paths:
               summary: Full text search with items that must or must not be present.
             keywords:
               value: "curator:foo@bar.com,baz@meh.com country:france"
-              summary: "values are OR'ed for the same keyword and all keywords are AND'ed. Keyword values can be quoted for multi-words matches and concatenated with a comma to union them. Only equality operator is supported. Supported keywords are: curator, gender, nationality, occupation, country, outcome, caseid, source, admin1, admin2, admin3"
+              summary: >
+                values are OR'ed for the same keyword and all keywords are AND'ed.
+                Keyword values can be quoted for multi-words matches and concatenated
+                with a comma to union them. Only equality operator is supported.
+                Supported keywords are: curator, gender, nationality, occupation,
+                country, outcome, caseid, uploadid, source, admin1, admin2, admin3
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -362,6 +367,14 @@ components:
                 is only populated for cases entered via automated ingestion.
               type: string
               pattern: '^[a-f\d]{24}$'
+            verificationStatus:
+              description: >
+                Whether the case document has been manually verified for
+                correctness.
+              type: string
+              enum:
+                - UNVERIFIED
+                - VERIFIED
             additionalSources:
               type: array
               items:

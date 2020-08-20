@@ -167,6 +167,20 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /sources/uploads:
+    get:
+      tags: [Source, Upload]
+      summary: Lists all uploads for all sources
+      operationId: listUploads
+      responses:
+        "200":
+          $ref: "#/components/responses/200UploadsArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "500":
+          $ref: "#/components/responses/500"
   /sources/{sourceId}/uploads:
     parameters:
       - name: sourceId
@@ -659,9 +673,25 @@ components:
                 - SOURCE_CONTENT_NOT_FOUND
                 - SOURCE_CONTENT_DOWNLOAD_ERROR
                 - PARSING_ERROR
+                - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
         created: 
           $ref: "#/components/schemas/Date"
+    UploadsArray:
+      type: object
+      properties:
+        uploads:
+          type: array
+          items:
+            description: An upload with source data.
+            type: object
+            properties:
+              sourceName:
+                type: string
+              sourceUrl:
+                type: string
+              upload:
+                $ref: "#/components/schemas/Upload"
     Source:
       description: A source of line list case data.
       type: object
@@ -750,8 +780,20 @@ components:
             sourceUrl:
               type: string
             uploadId:
+              description: >
+                The UUID of the upload in which the batch of cases including
+                this case document was entered into the G.h system. This field
+                is only populated for cases entered via automated ingestion.
               type: string
               pattern: '^[a-f\d]{24}$'
+            verificationStatus:
+              description: >
+                Whether the case document has been manually verified for
+                correctness.
+              type: string
+              enum:
+                - UNVERIFIED
+                - VERIFIED
             additionalSources:
               type: array
               items:
@@ -1183,6 +1225,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Upload"
+    "200UploadsArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UploadsArray"
     "201Upload":
       description: Created
       content:
