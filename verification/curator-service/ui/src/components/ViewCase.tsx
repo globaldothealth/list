@@ -15,6 +15,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Scroll from 'react-scroll';
 import StaticMap from './StaticMap';
 import axios from 'axios';
+import createHref from './util/links';
 import { makeStyles } from '@material-ui/core';
 import renderDate from './util/date';
 import shortId from 'shortid';
@@ -261,6 +262,11 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
+                            <RowHeader title="Data upload ID" />
+                            <RowContent
+                                content={props.c.caseReference?.uploadId || ''}
+                            />
+
                             {props.c.caseReference?.additionalSources && (
                                 <>
                                     <RowHeader title="other sources" />
@@ -290,6 +296,15 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 content={
                                     props.c.revisionMetadata?.creationMetadata
                                         ?.curator || ''
+                                }
+                            />
+
+                            {/* Consider surfacing this as a top-level icon on this page. */}
+                            <RowHeader title="Verification status" />
+                            <RowContent
+                                content={
+                                    props.c.caseReference?.verificationStatus ||
+                                    'Unknown'
                                 }
                             />
 
@@ -770,13 +785,4 @@ function MultilinkRowContent(props: {
             ))}
         </Grid>
     );
-}
-
-/**
- * Prepare raw link strings for use in <a> href values.
- */
-function createHref(rawLink: string): string {
-    // Don't modify relative links.
-    if (rawLink.startsWith('/')) return rawLink;
-    return rawLink.match(/^https?:\/\//) ? rawLink : 'https://'.concat(rawLink);
 }

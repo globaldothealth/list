@@ -34,8 +34,10 @@ it('loads and displays cases', async () => {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
+                uploadId: '012345678901234567890123',
+                verificationStatus: 'VERIFIED',
             },
-            demographics: { ageRange: { start: 1, end: 3 } },
+            demographics: { ageRange: { start: 1, end: 3 }, gender: 'Female' },
             location: {
                 country: 'France',
                 administrativeAreaLevel1: 'some admin 1',
@@ -86,7 +88,7 @@ it('loads and displays cases', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(
+    const { findByText, findByTestId } = render(
         <MemoryRouter>
             <LinelistTable user={curator} />
         </MemoryRouter>,
@@ -94,13 +96,15 @@ it('loads and displays cases', async () => {
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    expect(await findByText(/some notes/)).toBeInTheDocument();
-    expect(await findByText(/some place name/)).toBeInTheDocument();
+    expect(await findByText('www.example.com')).toBeInTheDocument();
+    expect(await findByText('some admin 1')).toBeInTheDocument();
+    expect(await findByText('some admin 2')).toBeInTheDocument();
+    expect(await findByText('some admin 3')).toBeInTheDocument();
+    expect(await findByText('France')).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
-    expect(await findByText('PCR test')).toBeInTheDocument();
-    expect(await findByText('foo@bar.com')).toBeInTheDocument();
+    expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('Recovered')).toBeInTheDocument();
-    expect(await findByText('Yes')).toBeInTheDocument();
+    expect(await findByTestId('verified-svg')).toBeInTheDocument();
 });
 
 it('API errors are displayed', async () => {
@@ -147,7 +151,7 @@ it('API errors are displayed', async () => {
         </MemoryRouter>,
     );
 
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     // Throw error on delete request.
@@ -207,7 +211,7 @@ it('can delete a row', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     // Delete case
@@ -304,7 +308,7 @@ it('cannot edit data as a reader only', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
-    const row = await findByText(/some notes/);
+    const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
     const deleteButton = queryByText(/delete_outline/);

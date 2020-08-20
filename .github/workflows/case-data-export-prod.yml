@@ -1,6 +1,11 @@
 name: Export prod case data
 
 on:
+  push:
+    # Update the data when the export script changes.
+    branches: [main]
+    paths:
+      - "data-serving/scripts/export-data/**"
   schedule:
     # Every day at 6AM UTC (data is typically ingested at 5AM UTC).
     - cron: "0 6 * * *"

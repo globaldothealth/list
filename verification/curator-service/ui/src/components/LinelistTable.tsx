@@ -8,10 +8,12 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-import { Case, Pathogen, Travel, TravelHistory } from './Case';
+import { Case, VerificationStatus } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
+import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
@@ -24,6 +26,8 @@ import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
+import VerificationStatusHeader from './VerificationStatusHeader';
+import VerificationStatusIndicator from './VerificationStatusIndicator';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -45,44 +49,23 @@ interface LinelistTableState {
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
 interface TableRow {
     id: string;
-    // demographics
-    gender: string;
-    age: [number, number]; // start, end.
-    ethnicity: string;
-    // Represents a list as a comma and space separated string e.g. 'Afghan, Albanian'
-    nationalities: string;
-    occupation: string;
-    country: string;
-    adminArea1: string;
-    adminArea2: string;
-    adminArea3: string;
-    geoResolution: string;
-    locationName: string;
-    latitude: number;
-    longitude: number;
     confirmedDate: Date | null;
-    confirmationMethod: string;
-    // Represents a list as a comma and space separated string e.g. 'fever, cough'
-    symptoms: string;
-    // Represents a list as a comma and space separated string e.g. 'vertical, iatrogenic'
-    transmissionRoutes: string;
-    // Represents a list as a comma and space separated string e.g. 'gym, hospital'
-    transmissionPlaces: string;
-    // Represents a list as a comma and space separated string e.g. 'caseId, caseId2'
-    transmissionLinkedCaseIds: string;
-    travelHistory: TravelHistory;
-    pathogens: Pathogen[];
-    sourceUrl: string | null;
-    notes: string;
-    curatedBy: string;
-    outcome: string;
-    admittedToHospital: string;
+    adminArea3: string;
+    adminArea2: string;
+    adminArea1: string;
+    country: string;
+    age: [number, number]; // start, end.
+    gender: string;
+    outcome?: string;
+    sourceUrl: string;
+    verificationStatus?: VerificationStatus;
 }
 
 interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
+    searchQuery: string;
 }
 
 interface Props
@@ -103,6 +86,10 @@ const styles = (theme: Theme) =>
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
         },
+        centeredContent: {
+            display: 'flex',
+            justifyContent: 'center',
+        },
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
@@ -116,9 +103,13 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
 }));
 
 function SearchBar(props: {
+    searchQuery: string;
     onSearchChange: (search: string) => void;
 }): JSX.Element {
-    const [search, setSearch] = React.useState<string>('');
+    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    React.useEffect(() => {
+        setSearch(props.searchQuery ?? '');
+    }, [props.searchQuery]);
 
     const classes = searchBarStyles();
     return (
@@ -138,6 +129,7 @@ function SearchBar(props: {
                 setSearch(ev.currentTarget.value);
             }}
             InputProps={{
+                value: search,
                 disableUnderline: true,
                 classes: { root: classes.searchBarInput },
                 startAdornment: (
@@ -171,6 +163,7 @@ function SearchBar(props: {
                                         'location name',
                                         'pathogen name',
                                         'source url',
+                                        'upload ID',
                                     ].join(', ')}
                                     <h5>Keywords search</h5>
                                     Example:{' '}
@@ -200,6 +193,7 @@ function SearchBar(props: {
                                             'outcome',
                                             'caseid',
                                             'source',
+                                            'uploadid',
                                             'admin1',
                                             'admin2',
                                             'admin3',
@@ -234,7 +228,6 @@ function RowMenu(props: {
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const history = useHistory();
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -247,21 +240,16 @@ function RowMenu(props: {
         setAnchorEl(null);
     };
 
-    const handleEdit = (event?: any): void => {
-        event?.stopPropagation();
-        history.push(`/cases/edit/${props.rowId}`);
-    };
-
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
             props.setError('');
             const deleteUrl = '/api/cases/' + props.rowId;
             await axios.delete(deleteUrl);
-            handleClose();
             props.refreshData();
         } catch (e) {
             props.setError(e.toString());
+        } finally {
             handleClose();
         }
     };
@@ -284,10 +272,12 @@ function RowMenu(props: {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleEdit}>
-                    <EditIcon />
-                    <span className={classes.menuItemTitle}>Edit</span>
-                </MenuItem>
+                <Link onClick={handleClose} to={`/cases/edit/${props.rowId}`}>
+                    <MenuItem>
+                        <EditIcon />
+                        <span className={classes.menuItemTitle}>Edit</span>
+                    </MenuItem>
+                </Link>
                 <MenuItem onClick={handleDelete}>
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
@@ -299,7 +289,8 @@ function RowMenu(props: {
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     tableRef: RefObject<any> = React.createRef();
-    unlisten: () => void;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unlisten: () => void = () => {};
 
     constructor(props: Props) {
         super(props);
@@ -307,13 +298,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             url: '/api/cases/',
             error: '',
             pageSize: 50,
-            search: '',
+            search: this.props.location.state?.searchQuery ?? '',
         };
-        // history.location.state can be updated with newCaseIds, on which we
+    }
+
+    componentDidMount(): void {
+        // history.location.state can be updated with new values on which we
         // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) =>
-            this.tableRef.current?.onQueryChange(),
-        );
+        this.unlisten = this.props.history.listen((_, __) => {
+            this.setState({
+                search: this.props.history.location.state?.searchQuery ?? '',
+            });
+            this.tableRef.current?.onQueryChange();
+        });
     }
 
     componentWillUnmount(): void {
@@ -325,6 +322,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             const deleteUrl = this.state.url + rowData.id;
             this.setState({ error: '' });
             const response = axios.delete(deleteUrl);
+            response.then(resolve).catch((e) => {
+                this.setState({ error: e.toString() });
+                reject(e);
+            });
+        });
+    }
+
+    setCaseVerification(
+        rowData: TableRow,
+        verificationStatus: VerificationStatus,
+    ): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const updateUrl = this.state.url + rowData.id;
+            this.setState({ error: '' });
+            const response = axios.put(updateUrl, {
+                'caseReference.verificationStatus': verificationStatus,
+            });
             response.then(resolve).catch((e) => {
                 this.setState({ error: e.toString() });
                 reject(e);
@@ -405,6 +419,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     </MuiAlert>
                 )}
                 <SearchBar
+                    searchQuery={this.state.search}
                     onSearchChange={(search: string): void => {
                         this.setState({ search: search });
                         this.tableRef.current.onQueryChange();
@@ -440,13 +455,56 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                               ]
                             : []),
                         {
+                            cellStyle: {
+                                padding: '0',
+                            },
+                            headerStyle: {
+                                padding: '0',
+                            },
+                            title: (
+                                <div className={classes.centeredContent}>
+                                    <VerificationStatusHeader />
+                                </div>
+                            ),
+                            field: 'verificationStatus',
+                            // The return type in the material-table dts is any.
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            render: (rowData): any => {
+                                return (
+                                    <div className={classes.centeredContent}>
+                                        <VerificationStatusIndicator
+                                            status={rowData.verificationStatus}
+                                        />
+                                    </div>
+                                );
+                            },
+                        },
+                        {
                             title: 'Case ID',
                             field: 'id',
                             type: 'string',
                         },
                         {
-                            title: 'Gender',
-                            field: 'gender',
+                            title: 'Confirmed date',
+                            field: 'confirmedDate',
+                            render: (rowData): string =>
+                                renderDate(rowData.confirmedDate),
+                        },
+                        {
+                            title: 'Admin 3',
+                            field: 'adminArea3',
+                        },
+                        {
+                            title: 'Admin 2',
+                            field: 'adminArea2',
+                        },
+                        {
+                            title: 'Admin 1',
+                            field: 'adminArea1',
+                        },
+                        {
+                            title: 'Country',
+                            field: 'country',
                         },
                         {
                             title: 'Age',
@@ -457,88 +515,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
                         },
                         {
-                            title: 'Race / Ethnicity',
-                            field: 'ethnicity',
-                        },
-                        {
-                            title: 'Nationality',
-                            field: 'nationalities',
-                        },
-                        {
-                            title: 'Occupation',
-                            field: 'occupation',
-                        },
-                        {
-                            title: 'Location',
-                            field: 'locationName',
-                        },
-                        {
-                            title: 'Country',
-                            field: 'country',
-                        },
-                        {
-                            title: 'Confirmed date',
-                            field: 'confirmedDate',
-                            render: (rowData): string =>
-                                renderDate(rowData.confirmedDate),
-                        },
-                        {
-                            title: 'Confirmation method',
-                            field: 'confirmationMethod',
-                        },
-                        {
-                            title: 'Admitted to hospital',
-                            field: 'admittedToHospital',
+                            title: 'Gender',
+                            field: 'gender',
                         },
                         {
                             title: 'Outcome',
                             field: 'outcome',
                         },
                         {
-                            title: 'Symptoms',
-                            field: 'symptoms',
-                        },
-                        {
-                            title: 'Routes of transmission',
-                            field: 'transmissionRoutes',
-                        },
-                        {
-                            title: 'Places of transmission',
-                            field: 'transmissionPlaces',
-                        },
-                        {
-                            title: 'Contacted case IDs',
-                            field: 'transmissionLinkedCaseIds',
-                        },
-                        {
-                            title: 'Travel history',
-                            field: 'travelHistory',
-                            render: (rowData): string =>
-                                rowData.travelHistory?.travel
-                                    ?.map(
-                                        (travel: Travel) =>
-                                            travel.location?.name,
-                                    )
-                                    ?.join(', '),
-                        },
-                        {
-                            title: 'Pathogens',
-                            field: 'pathogens',
-                            render: (rowData): string =>
-                                rowData.pathogens
-                                    ?.map((pathogen: Pathogen) => pathogen.name)
-                                    ?.join(', '),
-                        },
-                        { title: 'Notes', field: 'notes' },
-                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                        },
-                        {
-                            title: 'Curated by',
-                            field: 'curatedBy',
-                            tooltip:
-                                'If unknown, this is most likely an imported case',
                         },
                     ]}
                     data={(query): Promise<QueryResult<TableRow>> =>
@@ -563,76 +549,36 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         );
                                         flattenedCases.push({
                                             id: c._id,
-                                            gender: c.demographics?.gender,
-                                            age: [
-                                                c.demographics?.ageRange?.start,
-                                                c.demographics?.ageRange?.end,
-                                            ],
-                                            ethnicity:
-                                                c.demographics?.ethnicity,
-                                            nationalities: c.demographics?.nationalities?.join(
-                                                ', ',
-                                            ),
-                                            occupation:
-                                                c.demographics?.occupation,
-                                            country: c.location.country,
-                                            adminArea1:
-                                                c.location
-                                                    ?.administrativeAreaLevel1,
-                                            adminArea2:
-                                                c.location
-                                                    ?.administrativeAreaLevel2,
-                                            adminArea3:
-                                                c.location
-                                                    ?.administrativeAreaLevel3,
-                                            latitude:
-                                                c.location?.geometry?.latitude,
-                                            longitude:
-                                                c.location?.geometry?.longitude,
-                                            geoResolution:
-                                                c.location?.geoResolution,
-                                            locationName: c.location?.name,
                                             confirmedDate: confirmedEvent
                                                 ?.dateRange?.start
                                                 ? new Date(
                                                       confirmedEvent.dateRange.start,
                                                   )
                                                 : null,
-                                            confirmationMethod:
-                                                confirmedEvent?.value || '',
-                                            symptoms: c.symptoms?.values?.join(
-                                                ', ',
-                                            ),
-                                            transmissionRoutes: c.transmission?.routes.join(
-                                                ', ',
-                                            ),
-                                            transmissionPlaces: c.transmission?.places.join(
-                                                ', ',
-                                            ),
-                                            transmissionLinkedCaseIds: c.transmission?.linkedCaseIds.join(
-                                                ', ',
-                                            ),
-                                            travelHistory: c.travelHistory,
-                                            pathogens: c.pathogens,
-                                            notes: c.notes,
+                                            adminArea3:
+                                                c.location
+                                                    ?.administrativeAreaLevel3,
+                                            adminArea2:
+                                                c.location
+                                                    ?.administrativeAreaLevel2,
+                                            adminArea1:
+                                                c.location
+                                                    ?.administrativeAreaLevel1,
+                                            country: c.location.country,
+                                            age: [
+                                                c.demographics?.ageRange?.start,
+                                                c.demographics?.ageRange?.end,
+                                            ],
+                                            gender: c.demographics?.gender,
+                                            outcome: c.events.find(
+                                                (event) =>
+                                                    event.name === 'outcome',
+                                            )?.value,
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
-                                            curatedBy:
-                                                c.revisionMetadata
-                                                    ?.creationMetadata
-                                                    ?.curator || 'Unknown',
-                                            admittedToHospital:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'hospitalAdmission',
-                                                )?.value || 'Unknown',
-                                            outcome:
-                                                c.events.find(
-                                                    (event) =>
-                                                        event.name ===
-                                                        'outcome',
-                                                )?.value || 'Unknown',
+                                            verificationStatus:
+                                                c.caseReference
+                                                    ?.verificationStatus,
                                         });
                                     }
                                     resolve({
@@ -650,6 +596,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     title="COVID-19 cases"
                     options={{
                         search: false,
+                        emptyRowsWhenPaging: false,
                         filtering: false,
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
@@ -658,6 +605,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         maxBodyHeight: 'calc(100vh - 20em)',
+                        headerStyle: {
+                            zIndex: 1,
+                        },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) =>
                             (
@@ -666,7 +616,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E8F0FE' }
+                                ? { backgroundColor: '#E7EFED' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
@@ -681,11 +631,61 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     actions={
                         this.props.user.roles.includes('curator')
                             ? [
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <VerifiedIcon data-testid="verify-action" />
+                                      ),
+                                      tooltip: 'Verify selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          const updatePromises: Promise<
+                                              unknown
+                                          >[] = [];
+                                          rows.forEach((row: TableRow) =>
+                                              updatePromises.push(
+                                                  this.setCaseVerification(
+                                                      row,
+                                                      VerificationStatus.Verified,
+                                                  ),
+                                              ),
+                                          );
+                                          Promise.all(updatePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      tooltip: 'Unverify selected rows',
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: (_: any, rows: any): void => {
+                                          const updatePromises: Promise<
+                                              unknown
+                                          >[] = [];
+                                          rows.forEach((row: TableRow) =>
+                                              updatePromises.push(
+                                                  this.setCaseVerification(
+                                                      row,
+                                                      VerificationStatus.Unverified,
+                                                  ),
+                                              ),
+                                          );
+                                          Promise.all(updatePromises).then(
+                                              () => {
+                                                  this.tableRef.current.onQueryChange();
+                                              },
+                                          );
+                                      },
+                                  },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
                                   // RowMenu function.
                                   {
-                                      icon: () => (
+                                      icon: (): JSX.Element => (
                                           <span aria-label="delete all">
                                               <DeleteIcon />
                                           </span>

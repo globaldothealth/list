@@ -3,6 +3,7 @@
     "sourceEntryId": "entryId",
     "sourceUrl": "cdc.gov",
     "uploadId": "012345678901234567890123",
+    "verificationStatus": "VERIFIED",
     "additionalSources": [
         {
             "sourceUrl": "twitter.com/a-tweet"

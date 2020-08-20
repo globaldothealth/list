@@ -16,27 +16,20 @@ describe('Linelist table', function () {
     it('Display case properly', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
-            methodOfConfirmation: 'PCR test',
-            curator: 'test@bar.com',
         });
         cy.visit('/cases');
-        cy.contains('PCR test');
-        cy.contains('some notes');
         cy.contains('France');
         cy.contains('www.example.com');
-        cy.contains('test@bar.com');
     });
 
     it('Can open and close the edit modal', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
         cy.contains('Edit case').should('not.exist');
         cy.get('button[data-testid="row menu"]').click();
         cy.contains('li', 'Edit').click();
@@ -48,11 +41,10 @@ describe('Linelist table', function () {
     it('Can open and close the details modal', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
         cy.contains('View case').should('not.exist');
         cy.contains('td', 'France').click({ force: true });
         cy.contains('View case');
@@ -63,16 +55,15 @@ describe('Linelist table', function () {
     it('Can delete a case', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
             sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
-        cy.contains('some notes');
+        cy.contains('France');
 
         cy.get('button[data-testid="row menu"]').click();
         cy.contains('li', 'Delete').click();
 
-        cy.contains('some notes').should('not.exist');
+        cy.contains('France').should('not.exist');
     });
 
     it('Can delete multiple cases', function () {
@@ -103,6 +94,45 @@ describe('Linelist table', function () {
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
         cy.contains('United Kingdom').should('not.exist');
+    });
+
+    it('Can toggle case verification status', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.server();
+        cy.route('PUT', '/api/cases/*').as('updateCase');
+        // Mark them verified.
+        cy.get('button[title="Verify selected rows"]').click();
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.get('[data-testid="verified-svg"]').should('have.length', 3);
+
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.server();
+        cy.route('PUT', '/api/cases/*').as('updateCase');
+        // Mark them unverified.
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
     });
 
     it('Can search', function () {
