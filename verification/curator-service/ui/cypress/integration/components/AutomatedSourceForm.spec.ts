@@ -23,6 +23,7 @@ describe('Automated source form', function () {
         cy.wait('@createSource');
 
         // Check that all relevant fields are visible.
+        cy.url().should('include', '/sources');
         cy.contains('No records to display').should('not.exist');
         cy.contains(url);
         cy.contains(name);
