@@ -142,7 +142,7 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
         r = requests.get(url, headers=headers)
         r.raise_for_status()
         if source_format == "JSON":
-            data = json.dumps(r.json(), indent=4).encode('utf-8')
+            data = r.content
             extension = "json"
         elif source_format == "CSV":
             data = r.content
