@@ -223,8 +223,6 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<
         CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
-    console.log(values);
-    console.log(touched);
     return (
         <div>
             <FormHelperText

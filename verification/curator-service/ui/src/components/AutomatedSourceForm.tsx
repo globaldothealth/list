@@ -7,7 +7,6 @@ import AppModal from './AppModal';
 import FieldTitle from './common-form-fields/FieldTitle';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
-import { RequiredHelperText } from './common-form-fields/FormikFields';
 import { TextField } from 'formik-material-ui';
 import User from './User';
 import axios from 'axios';
@@ -63,13 +62,13 @@ interface Props {
 }
 
 export interface AutomatedSourceFormValues {
-    url: string | null;
-    name: string | null;
+    url: string;
+    name: string;
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
-    url: Yup.string().nullable().required('Required'),
-    name: Yup.string().nullable().required('Required'),
+    url: Yup.string().required('Required'),
+    name: Yup.string().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -102,7 +101,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedSourceFormSchema}
                 validateOnChange={false}
-                initialValues={{ url: null, name: null }}
+                initialValues={{ url: '', name: '' }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
                 }}
@@ -120,9 +119,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                             >
                                 Add new cases through automated ingestion from a
                                 data source. G.h List will check for updates
-                                every 15 minutes from this new source. After you
-                                create this source follow these instructions to
-                                set up automation.
+                                every 15 minutes from this new source.
                             </Typography>
                         </div>
                         <Form>
@@ -139,7 +136,6 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         component={TextField}
                                         fullWidth
                                     />
-                                    <RequiredHelperText name="url" />
                                 </div>
                                 <div className={classes.formSection}>
                                     <FastField
@@ -150,7 +146,6 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         component={TextField}
                                         fullWidth
                                     />
-                                    <RequiredHelperText name="name" />
                                 </div>
                             </fieldset>
                         </Form>
