@@ -1,6 +1,6 @@
 {
     "s3Bucket": "epid-sources-raw",
     "sourceUrl": "https://foo.bar",
-    "s3Key": "5f2acbe8df34a7051c8b01f4/2020/08/07/1659/japan/content.json",
-    "sourceId": "5f2acbe8df34a7051c8b01f4"
+    "s3Key": "5f3d37acf6cb0300299f5c6e/2020/08/20/0902/content.json",
+    "sourceId": "5f3d37acf6cb0300299f5c6e"
 }

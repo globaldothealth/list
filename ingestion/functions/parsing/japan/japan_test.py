@@ -23,9 +23,6 @@ _PARSED_CASE = (
             }
         },
         "location": {
-            "country": "Japan",
-            "administrativeAreaLevel1": "Hokkaido",
-            "administrativeAreaLevel3": "Sapporo",
             "query": "Sapporo, Hokkaido, Japan"
         },
         "events": [

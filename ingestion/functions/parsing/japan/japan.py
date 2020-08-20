@@ -30,26 +30,13 @@ def convert_age(raw_age):
         return None
 
 def convert_location(raw_entry):
-    prefecture = raw_entry["detectedPrefecture"]
-    if "detectedCityTown" in raw_entry:
-        city = raw_entry["detectedCityTown"]
-    else:
-        city = ""
-    
-    query_terms = ("Japan",)
-    location = {"country": "Japan"}
-    if prefecture:
-        location["administrativeAreaLevel1"] = prefecture
-        query_terms = (prefecture,) + query_terms
-    if city:
-        if prefecture == "Tokyo":
-            location["administrativeAreaLevel2"] = city
-        else:
-            location["administrativeAreaLevel3"] = city
-        query_terms = (city,) + query_terms
-
-    location["query"] = ", ".join(query_terms)
-    return location
+    query_terms = [
+        term for term in [
+            raw_entry.get("detectedCityTown", ""),
+            raw_entry.get("detectedPrefecture", ""),
+            "Japan"]
+        if term and term != "Unspecified"]
+    return {"query":  ", ".join(query_terms)}
 
 def detect_notes(raw_notes):
     if "notes" in raw_notes:
