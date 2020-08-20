@@ -6,6 +6,11 @@ import {
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
 
+export interface RetrievalPayload {
+    bucket: string;
+    key: string;
+}
+
 /**
  * Client to interact with the AWS Lambda API.
  *
@@ -69,17 +74,30 @@ export default class AwsLambdaClient {
             .promise();
     };
 
-    invokeRetrieval = async (sourceId: string): Promise<string> => {
+    /**
+     * Invoke retrieval function lambda synchrnously, returning its output. */
+    invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
         try {
             const res = await this.lambdaClient
                 .invoke({
                     FunctionName: this.retrievalFunctionArn,
-                    Payload: JSON.stringify({ sourceId: sourceId }),
+                    Payload: JSON.stringify({
+                        sourceId: sourceId,
+                    }),
                 })
                 .promise();
-            return res.Payload?.toString() || 'Unknown error';
+            if (res.FunctionError) {
+                throw Error(
+                    `Retrieving source "${sourceId}" content: ${res.FunctionError}`,
+                );
+            }
+            // When res.FunctionError is empty, res.Payload is always defined.
+            return JSON.parse(
+                res.Payload?.toString() || '',
+            ) as RetrievalPayload;
         } catch (e) {
-            return e.message;
+            console.error(e);
+            throw e;
         }
     };
 }

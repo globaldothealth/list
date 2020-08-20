@@ -722,9 +722,9 @@ components:
       description: Output of the retrieval lambda function.
       type: object
       properties:
-        key:
-          type: string
         bucket:
+          type: string
+        key:
           type: string
     Source:
       description: A source of line list case data.
