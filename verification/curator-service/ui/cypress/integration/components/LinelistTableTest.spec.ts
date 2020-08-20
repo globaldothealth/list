@@ -96,6 +96,45 @@ describe('Linelist table', function () {
         cy.contains('United Kingdom').should('not.exist');
     });
 
+    it('Can toggle case verification status', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.server();
+        cy.route('PUT', '/api/cases/*').as('updateCase');
+        // Mark them verified.
+        cy.get('button[title="Verify selected rows"]').click();
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.get('[data-testid="verified-svg"]').should('have.length', 3);
+
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.server();
+        cy.route('PUT', '/api/cases/*').as('updateCase');
+        // Mark them unverified.
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.wait('@updateCase');
+        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+    });
+
     it('Can search', function () {
         cy.addCase({
             country: 'France',

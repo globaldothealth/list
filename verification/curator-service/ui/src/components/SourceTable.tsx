@@ -1,17 +1,17 @@
-import MaterialTable, { QueryResult } from 'material-table';
 import {
+    Button,
+    Divider,
     MenuItem,
     Theme,
     WithStyles,
     createStyles,
     withStyles,
-    Button,
-    Divider,
 } from '@material-ui/core';
+import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import MuiAlert from '@material-ui/lab/Alert';
 
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
@@ -554,6 +554,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             maxBodyHeight: 'calc(100vh - 15em)',
+                            headerStyle: {
+                                zIndex: 1,
+                            },
                         }}
                         onChangeRowsPerPage={(newPageSize: number) => {
                             this.setState({ pageSize: newPageSize });

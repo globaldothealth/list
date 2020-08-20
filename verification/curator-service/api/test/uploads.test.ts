@@ -65,12 +65,16 @@ describe('GET', () => {
             .expect(200);
 
         expect(res.body.uploads).toHaveLength(2);
-        expect(res.body.uploads[0]._id).toEqual(
+        expect(res.body.uploads[0].upload._id).toEqual(
             source.uploads[0]._id.toString(),
         );
-        expect(res.body.uploads[1]._id).toEqual(
+        expect(res.body.uploads[0].sourceName).toEqual(source.name);
+        expect(res.body.uploads[0].sourceUrl).toEqual(source.origin.url);
+        expect(res.body.uploads[1].upload._id).toEqual(
             source2.uploads[0]._id.toString(),
         );
+        expect(res.body.uploads[1].sourceName).toEqual(source2.name);
+        expect(res.body.uploads[1].sourceUrl).toEqual(source2.origin.url);
     });
 });
 

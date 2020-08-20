@@ -62,7 +62,14 @@ export default class UploadsController {
         try {
             const uploads = await Source.aggregate([
                 { $unwind: '$uploads' },
-                { $replaceRoot: { newRoot: '$uploads' } },
+                {
+                    $project: {
+                        _id: false,
+                        sourceName: '$name',
+                        sourceUrl: '$origin.url',
+                        upload: '$uploads',
+                    },
+                },
             ]);
             res.json({ uploads: uploads });
             return;

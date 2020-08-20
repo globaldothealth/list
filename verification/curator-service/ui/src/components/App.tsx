@@ -6,6 +6,7 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Popper,
     Toolbar,
     useMediaQuery,
 } from '@material-ui/core';
@@ -14,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
+import Alerts from './Alerts';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
@@ -30,6 +32,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
@@ -85,9 +88,6 @@ const theme = createMuiTheme({
 const drawerWidth = 240;
 
 const menuStyles = makeStyles((theme) => ({
-    menu: {
-        marginLeft: '1em',
-    },
     link: {
         color: theme.palette.text.primary,
     },
@@ -107,7 +107,7 @@ function TopbarMenu(): JSX.Element {
     const classes = menuStyles();
 
     return (
-        <div className={classes.menu}>
+        <>
             <IconButton
                 aria-controls="topbar-menu"
                 aria-haspopup="true"
@@ -143,7 +143,7 @@ function TopbarMenu(): JSX.Element {
                     </a>
                 </MenuItem>
             </Menu>
-        </div>
+        </>
     );
 }
 
@@ -165,6 +165,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     menuButton: {
         marginRight: theme.spacing(2),
+    },
+    alertsButton: {
+        marginLeft: '0.5em',
     },
     hide: {
         display: 'none',
@@ -220,6 +223,12 @@ export default function App(): JSX.Element {
         roles: [],
     });
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+    const [
+        alertsAnchorEl,
+        setAlertsAnchorEl,
+    ] = React.useState<null | HTMLElement>(null);
+    const alertsRef = React.createRef<HTMLDivElement>();
+    const alertsOpen = Boolean(alertsAnchorEl);
     const [
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
@@ -301,6 +310,10 @@ export default function App(): JSX.Element {
         setDrawerOpen(!drawerOpen);
     };
 
+    const toggleAlertsPanel = (): void => {
+        setAlertsAnchorEl(alertsAnchorEl ? null : alertsRef.current);
+    };
+
     const openCreateNewPopup = (event: any): void => {
         setCreateNewButtonAnchorEl(event.currentTarget);
     };
@@ -327,7 +340,7 @@ export default function App(): JSX.Element {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar>
+                    <Toolbar ref={alertsRef}>
                         <IconButton
                             color="inherit"
                             aria-label="toggle drawer"
@@ -356,6 +369,16 @@ export default function App(): JSX.Element {
                             >
                                 Login
                             </Button>
+                        )}
+                        {hasAnyRole(['curator']) && (
+                            <IconButton
+                                color="inherit"
+                                aria-label="toggle alerts panel"
+                                onClick={toggleAlertsPanel}
+                                className={classes.alertsButton}
+                            >
+                                <NotificationsIcon />
+                            </IconButton>
                         )}
                         <TopbarMenu />
                     </Toolbar>
@@ -437,6 +460,18 @@ export default function App(): JSX.Element {
                         </List>
                     </div>
                 </Drawer>
+                {hasAnyRole(['curator']) && (
+                    <Popper
+                        anchorEl={alertsAnchorEl}
+                        open={alertsOpen}
+                        placement="bottom-end"
+                        // zIndex necessary to show above table headers
+                        style={{ zIndex: 10 }}
+                        keepMounted
+                    >
+                        <Alerts />
+                    </Popper>
+                )}
                 <main
                     className={clsx(classes.content, {
                         [classes.contentShift]: drawerOpen,
