@@ -285,6 +285,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             const response = axios.post(url);
             response
                 .then((resp) => {
+                    // TODO: Show snackbar confirmation or something.
                     console.log(resp);
                     resolve();
                 })
