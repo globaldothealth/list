@@ -1,5 +1,9 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
+import {
+    KeyboardDatePicker,
+    MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
 
 import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
@@ -7,9 +11,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
 import { FormHelperText } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import MenuItem from '@material-ui/core/MenuItem';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import React from 'react';
 import { Select } from 'formik-material-ui';
 import { TextField } from 'formik-material-ui';
@@ -184,14 +186,19 @@ interface DateFieldProps {
 }
 
 export function DateField(props: DateFieldProps): JSX.Element {
+    const {
+        setFieldValue,
+        setTouched,
+        setFieldError,
+        errors,
+        values,
+    } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <div className={classes.fieldRow}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                {/* Don't use FastField here */}
-                <Field
+                <KeyboardDatePicker
                     className={classes.field}
-                    name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
                     minDate={new Date('2019/12/01')}
@@ -201,7 +208,37 @@ export function DateField(props: DateFieldProps): JSX.Element {
                         props.initialFocusedDate ?? '',
                     )}
                     invalidDateMessage="Invalid date format (YYYY/MM/DD)"
-                    component={KeyboardDatePicker}
+                    value={
+                        hasKey(values, props.name) ? values[props.name] : null
+                    }
+                    onError={(error): void => {
+                        // If there is an error that hasn't already been set, set it
+                        if (
+                            error &&
+                            (!hasKey(errors, props.name) ||
+                                errors[props.name] !== error.toString())
+                        ) {
+                            setFieldError(props.name, error.toString());
+                        }
+                    }}
+                    onBlur={(): void => setTouched({ [props.name]: true })}
+                    onChange={(date, _): void => {
+                        let utcDate = null;
+                        if (date) {
+                            // The datepicker sometimes returns the date at the
+                            // user's current time and timezone. We need to convert
+                            // it to a UTC date.
+                            // https://github.com/mui-org/material-ui-pickers/issues/1348
+                            utcDate = new Date(
+                                Date.UTC(
+                                    date.getFullYear(),
+                                    date.getMonth(),
+                                    date.getDate(),
+                                ),
+                            );
+                        }
+                        setFieldValue(props.name, utcDate);
+                    }}
                     helperText="YYYY/MM/DD"
                 />
             </MuiPickersUtilsProvider>
