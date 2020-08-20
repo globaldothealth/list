@@ -107,6 +107,8 @@ python3.8 -m pytest test/my_test.py
 
 **IMPORTANT**: Local runs still require access to a service account hosted on s3. Follow #754 for updates on how to run functions with your own creds.
 
+You need AWS sam CLi installed on your system, [follow the instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on their website to install it.
+
 Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
 
 Go to the UI at http://localhost:3002/sources and add a new source for your parser, once you give it a name, a URL and save it, it will be given an ID.
