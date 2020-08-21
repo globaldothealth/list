@@ -517,8 +517,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             this.tableRef.current.onQueryChange();
                         }}
                         editable={{
-                            // Don't allow adding, but do allow editing.
-                            onRowAdd: undefined,
                             onRowUpdate: (
                                 newRowData: TableRow,
                                 oldRowData: TableRow | undefined,
