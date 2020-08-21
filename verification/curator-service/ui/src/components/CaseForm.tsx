@@ -32,6 +32,7 @@ import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
 import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
+import { toUTCDate } from './util/date';
 import { useHistory } from 'react-router-dom';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
@@ -292,6 +293,12 @@ export default function CaseForm(props: Props): JSX.Element {
                     delete travel.dateRange.end;
                 }
             }
+            if (travel.dateRange?.start) {
+                travel.dateRange.start = toUTCDate(travel.dateRange.start);
+            }
+            if (travel.dateRange?.end) {
+                travel.dateRange.end = toUTCDate(travel.dateRange.end);
+            }
             if (travel.purpose === 'Unknown') {
                 travel.purpose = undefined;
             }
@@ -305,6 +312,11 @@ export default function CaseForm(props: Props): JSX.Element {
         const filteredGenomeSequences = cloneDeep(genomeSequences);
         filteredGenomeSequences?.forEach((genomeSequence) => {
             delete genomeSequence.reactId;
+            if (genomeSequence.sampleCollectionDate) {
+                genomeSequence.sampleCollectionDate = toUTCDate(
+                    genomeSequence.sampleCollectionDate,
+                );
+            }
         });
         return filteredGenomeSequences;
     };
@@ -392,8 +404,8 @@ export default function CaseForm(props: Props): JSX.Element {
                         name: elem.name,
                         dateRange: elem.dates
                             ? {
-                                  start: elem.dates,
-                                  end: elem.dates,
+                                  start: toUTCDate(elem.dates),
+                                  end: toUTCDate(elem.dates),
                               }
                             : undefined,
                         value: unknownOrEmptyToUndefined(elem.value),
