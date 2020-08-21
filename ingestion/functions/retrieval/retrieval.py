@@ -194,7 +194,7 @@ def invoke_parser(
         "uploadId": upload_id,
         "dateFilter": date_filter,
     }
-    print(f"Invoking parser (ARN: {parser_arn}")
+    print(f"Invoking parser (ARN: {parser_arn})")
     response = lambda_client.invoke(
         FunctionName=parser_arn,
         InvocationType='Event',
