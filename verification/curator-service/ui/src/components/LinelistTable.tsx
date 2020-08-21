@@ -638,16 +638,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
-                                          const updatePromises: Promise<
-                                              unknown
-                                          >[] = [];
-                                          rows.forEach((row: TableRow) =>
-                                              updatePromises.push(
+                                          const updatePromises = rows.map(
+                                              (row: TableRow) =>
                                                   this.setCaseVerification(
                                                       row,
                                                       VerificationStatus.Verified,
                                                   ),
-                                              ),
                                           );
                                           Promise.all(updatePromises).then(
                                               () => {
@@ -663,16 +659,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
-                                          const updatePromises: Promise<
-                                              unknown
-                                          >[] = [];
-                                          rows.forEach((row: TableRow) =>
-                                              updatePromises.push(
+                                          const updatePromises = rows.map(
+                                              (row: TableRow) =>
                                                   this.setCaseVerification(
                                                       row,
                                                       VerificationStatus.Unverified,
                                                   ),
-                                              ),
                                           );
                                           Promise.all(updatePromises).then(
                                               () => {
@@ -693,13 +685,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Delete selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
-                                          const deletePromises: Promise<
-                                              unknown
-                                          >[] = [];
-                                          rows.forEach((row: TableRow) =>
-                                              deletePromises.push(
+                                          const deletePromises = rows.map(
+                                              (row: TableRow) =>
                                                   this.deleteCase(row),
-                                              ),
                                           );
                                           Promise.all(deletePromises).then(
                                               () => {

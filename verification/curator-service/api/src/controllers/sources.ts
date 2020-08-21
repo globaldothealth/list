@@ -2,9 +2,11 @@ import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
+import AwsLambdaClient from '../clients/aws-lambda-client';
 
 export default class SourcesController {
     constructor(
+        private readonly lambdaClient: AwsLambdaClient,
         private readonly awsEventsClient: AwsEventsClient,
         private readonly retrievalFunctionArn: string,
     ) {}
@@ -207,6 +209,19 @@ export default class SourcesController {
         }
         source.remove();
         res.status(204).end();
+        return;
+    };
+
+    /** Trigger retrieval of the source's content in S3. */
+    retrieve = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const output = await this.lambdaClient.invokeRetrieval(
+                req.params.id,
+            );
+            res.json(output);
+        } catch (err) {
+            res.status(500).json(err.message);
+        }
         return;
     };
 }

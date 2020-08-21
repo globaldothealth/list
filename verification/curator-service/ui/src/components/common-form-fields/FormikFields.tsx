@@ -1,6 +1,7 @@
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import { FastField, Field, useFormikContext } from 'formik';
 
+import { AutomatedSourceFormValues } from '../AutomatedSourceForm';
 import BulkCaseFormValues from '../bulk-case-form-fields/BulkCaseFormValues';
 import CaseFormValues from '../new-case-form-fields/CaseFormValues';
 import DateFnsUtils from '@date-io/date-fns';
@@ -220,7 +221,7 @@ export function RequiredHelperText(
     props: RequiredHelperTextProps,
 ): JSX.Element {
     const { values, touched } = useFormikContext<
-        CaseFormValues | BulkCaseFormValues
+        CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
     return (
         <div>

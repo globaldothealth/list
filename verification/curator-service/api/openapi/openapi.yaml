@@ -167,6 +167,30 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /sources/{id}/retrieve:
+    parameters:
+      - name: id
+        in: path
+        description: The source ID for which to retrieve content
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    post:
+      tags: [Source]
+      summary: Trigger a retrieval of the content for the specified source
+      operationId: retrieve
+      responses:
+        "200":
+          $ref: "#/components/responses/200Retrieval"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /sources/uploads:
     get:
       tags: [Source, Upload]
@@ -692,6 +716,14 @@ components:
                 type: string
               upload:
                 $ref: "#/components/schemas/Upload"
+    Retrieval:
+      description: Output of the retrieval lambda function.
+      type: object
+      properties:
+        bucket:
+          type: string
+        key:
+          type: string
     Source:
       description: A source of line list case data.
       type: object
@@ -1219,6 +1251,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "200Retrieval":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Retrieval"
     "200Upload":
       description: OK
       content:
