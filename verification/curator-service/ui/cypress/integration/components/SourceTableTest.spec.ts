@@ -4,6 +4,15 @@ describe('Sources table', function () {
         cy.task('clearSourcesDB', {});
     });
 
+    it('cannot trigger retrieval if not a curator', function () {
+        cy.login();
+        cy.addSource('Example source', 'www.example.com');
+        cy.login({ roles: ['reader'] });
+        cy.visit('/sources');
+        cy.contains('Example source');
+        cy.contains('Curation actions').should('not.exist');
+    });
+
     it('Can edit a source', function () {
         cy.login();
         cy.addSource('Example source', 'www.example.com');
