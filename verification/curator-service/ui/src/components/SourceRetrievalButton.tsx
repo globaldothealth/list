@@ -8,6 +8,7 @@ import axios from 'axios';
 interface RetrievalResult {
     bucket: string;
     key: string;
+    upload_id: string;
 }
 
 /**
@@ -62,6 +63,8 @@ export default function SourceRetrievalButton(props: {
                     Key: {result?.key}
                     <br />
                     Bucket: {result?.bucket}
+                    <br />
+                    Upload ID: {result?.upload_id}
                 </div>
             )}
             {error && <MuiAlert severity="error">{error}</MuiAlert>}
