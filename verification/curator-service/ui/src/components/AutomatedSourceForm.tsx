@@ -7,10 +7,16 @@ import AppModal from './AppModal';
 import FieldTitle from './common-form-fields/FieldTitle';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
+import { SelectField } from './common-form-fields/FormikFields';
 import { TextField } from 'formik-material-ui';
 import User from './User';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+
+enum Format {
+    Csv = 'CSV',
+    Json = 'JSON',
+}
 
 const useStyles = makeStyles(() => ({
     headerBlurb: {
@@ -64,11 +70,13 @@ interface Props {
 export interface AutomatedSourceFormValues {
     url: string;
     name: string;
+    format: string;
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
     url: Yup.string().required('Required'),
     name: Yup.string().required('Required'),
+    format: Yup.string().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -79,7 +87,11 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
     const createSource = async (
         values: AutomatedSourceFormValues,
     ): Promise<void> => {
-        const newSource = { name: values.name, origin: { url: values.url } };
+        const newSource = {
+            name: values.name,
+            origin: { url: values.url },
+            format: values.format,
+        };
         try {
             await axios.post('/api/sources', newSource);
             setErrorMessage('');
@@ -101,7 +113,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedSourceFormSchema}
                 validateOnChange={false}
-                initialValues={{ url: '', name: '' }}
+                initialValues={{ url: '', name: '', format: '' }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
                 }}
@@ -129,6 +141,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                 </div>
                                 <div className={classes.formSection}>
                                     <FastField
+                                        helperText="Required"
                                         label="Data Source URL"
                                         name="url"
                                         type="text"
@@ -139,12 +152,21 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                 </div>
                                 <div className={classes.formSection}>
                                     <FastField
+                                        helperText="Required"
                                         label="Data Source Name"
                                         name="name"
                                         type="text"
                                         data-testid="name"
                                         component={TextField}
                                         fullWidth
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <SelectField
+                                        name="format"
+                                        label="Data Source Format"
+                                        values={Object.values(Format)}
+                                        required
                                     />
                                 </div>
                             </fieldset>
