@@ -15,13 +15,6 @@ _PARSED_CASE = (
             "sourceEntryId": "HKD130",
             "sourceUrl": _SOURCE_URL
         },
-        "revisionMetadata": {
-            "revisionNumber": 0,
-            "creationMetadata": {
-                "curator": "auto",
-                "date": date.today().strftime("%m/%d/%Y")
-            }
-        },
         "location": {
             "query": "Sapporo, Hokkaido, Japan"
         },

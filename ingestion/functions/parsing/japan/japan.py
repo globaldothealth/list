@@ -57,13 +57,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "sourceEntryId": entry["patientId"],
                     "sourceUrl": source_url
                 },
-                "revisionMetadata": {
-                    "revisionNumber": 0,
-                    "creationMetadata": {
-                        "curator": "auto",
-                        "date": date.today().strftime("%m/%d/%Y")
-                    }
-                },
                 "location": convert_location(entry),
                 "events": [
                     {
