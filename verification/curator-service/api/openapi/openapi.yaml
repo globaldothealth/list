@@ -724,6 +724,8 @@ components:
           type: string
         key:
           type: string
+        upload_id:
+          type: string
     Source:
       description: A source of line list case data.
       type: object

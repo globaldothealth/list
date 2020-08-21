@@ -195,15 +195,16 @@ def invoke_parser(
         "dateFilter": date_filter,
     }
     print(f"Invoking parser (ARN: {parser_arn})")
+    # This is asynchronous due to the "Event" invocation type.
     response = lambda_client.invoke(
         FunctionName=parser_arn,
         InvocationType='Event',
         Payload=json.dumps(payload))
+    print(f"Parser response: {response}")
     if "StatusCode" not in response or response["StatusCode"] != 202:
         e = Exception(f"Parser invocation unsuccessful. Response: {response}")
         complete_with_error(e, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, api_headers)
-    return json.loads(response.get('Payload', ''))
 
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
@@ -237,14 +238,12 @@ def lambda_handler(event, context):
     file_name, s3_object_key = retrieve_content(
         source_id, upload_id, url, source_format, auth_headers)
     upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
-    parser_output = None
     if parser_arn:
-        parser_output = invoke_parser(
+        invoke_parser(
             parser_arn, source_id, upload_id, auth_headers, s3_object_key, url,
             date_filter)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
         "upload_id": upload_id,
-        "parser_output": parser_output,
     }

@@ -9,6 +9,7 @@ import assertString from '../util/assert-string';
 export interface RetrievalPayload {
     bucket: string;
     key: string;
+    upload_id: string;
 }
 
 /**
