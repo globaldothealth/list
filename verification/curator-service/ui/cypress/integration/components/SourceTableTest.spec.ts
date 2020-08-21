@@ -2,10 +2,10 @@
 describe('Sources table', function () {
     beforeEach(() => {
         cy.task('clearSourcesDB', {});
-        cy.login();
     });
 
     it('Can add a source', function () {
+        cy.login();
         cy.visit('/sources');
         cy.contains('Example source').should('not.exist');
 
@@ -24,9 +24,20 @@ describe('Sources table', function () {
         cy.contains('www.example.com');
         cy.contains('JSON');
         cy.contains('Only parse data from 42 days ago');
+        cy.contains('Curation actions');
+    });
+
+    it('cannot trigger retrieval if not a curator', function () {
+        cy.login();
+        cy.addSource('Example source', 'www.example.com');
+        cy.login({ roles: ['reader'] });
+        cy.visit('/sources');
+        cy.contains('Example source');
+        cy.contains('Curation actions').should('not.exist');
     });
 
     it('Can edit a source', function () {
+        cy.login();
         cy.addSource('Example source', 'www.example.com');
         cy.visit('/sources');
         cy.contains('Example source');
@@ -40,6 +51,7 @@ describe('Sources table', function () {
     });
 
     it('Can delete a source', function () {
+        cy.login();
         cy.addSource('Example source', 'www.example.com');
         cy.visit('/sources');
         cy.contains('Example source');

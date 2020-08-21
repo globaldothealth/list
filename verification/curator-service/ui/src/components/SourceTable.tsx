@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
 import User from './User';
+import SourceRetrievalButton from './SourceRetrievalButton';
 
 interface ListResponse {
     sources: Source[];
@@ -474,6 +475,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             Clear
                                         </Button>
                                     </>
+                                ),
+                            },
+                            {
+                                title: 'Curation actions',
+                                render: (row): JSX.Element => (
+                                    <SourceRetrievalButton sourceId={row._id} />
+                                ),
+                                editable: 'never',
+                                hidden: !this.props.user.roles.includes(
+                                    'curator',
                                 ),
                             },
                         ]}

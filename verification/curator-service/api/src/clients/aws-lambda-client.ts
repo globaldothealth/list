@@ -88,6 +88,7 @@ export default class AwsLambdaClient {
                 })
                 .promise();
             if (res.FunctionError) {
+                console.error(res);
                 throw Error(
                     `Retrieving source "${sourceId}" content: ${res.FunctionError}`,
                 );
