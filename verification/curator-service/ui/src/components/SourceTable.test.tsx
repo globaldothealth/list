@@ -5,9 +5,17 @@ import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
 import SourceTable from './SourceTable';
 import axios from 'axios';
+import User from './User';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const curator: User = {
+    _id: 'testUser',
+    name: 'Alice Smith',
+    email: 'foo@bar.com',
+    roles: ['admin', 'curator'],
+};
 
 afterEach(() => {
     mockedAxios.get.mockClear();
@@ -60,7 +68,7 @@ it('loads and displays sources', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<SourceTable />);
+    const { findByText } = render(<SourceTable user={curator} />);
 
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -119,7 +127,7 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
 
     // Throw error on add request.
     mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
@@ -168,7 +176,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -227,7 +235,9 @@ it('can add a row', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText, queryByText } = render(
+        <SourceTable user={curator} />,
+    );
 
     // Check table is empty on load
     const row = queryByText(/abc123/);
@@ -318,7 +328,9 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText, queryByText } = render(
+        <SourceTable user={curator} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
