@@ -14,11 +14,7 @@ _METADATA_BUCKET = "epid-ingestion"
 
 
 class UploadError(Enum):
-    """
-    Upload error categories corresponding to the G.h Source API.
-
-    TODO: Move upload handling logic to common_lib.
-    """
+    """Upload error categories corresponding to the G.h Source API."""
     INTERNAL_ERROR = 1
     SOURCE_CONFIGURATION_ERROR = 2
     SOURCE_CONFIGURATION_NOT_FOUND = 3
