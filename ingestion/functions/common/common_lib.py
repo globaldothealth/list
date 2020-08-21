@@ -1,12 +1,86 @@
 # Common utilities between parsing and retrieval lambdas.
 
+import os
 import tempfile
+import requests
 
 import google
+
+from enum import Enum
 from google.oauth2 import service_account
 
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
+
+
+class UploadError(Enum):
+    """
+    Upload error categories corresponding to the G.h Source API.
+
+    TODO: Move upload handling logic to common_lib.
+    """
+    INTERNAL_ERROR = 1
+    SOURCE_CONFIGURATION_ERROR = 2
+    SOURCE_CONFIGURATION_NOT_FOUND = 3
+    SOURCE_CONTENT_NOT_FOUND = 4
+    SOURCE_CONTENT_DOWNLOAD_ERROR = 5
+    PARSING_ERROR = 6
+    DATA_UPLOAD_ERROR = 7
+    VALIDATION_ERROR = 8
+
+
+def create_upload_record(source_id, headers):
+    """Creates an upload resource via the G.h Source API."""
+    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
+    print(f"Creating upload via {post_api_url}")
+    res = requests.post(post_api_url,
+                        json={"status": "IN_PROGRESS", "summary": {}},
+                        headers=headers)
+    if res and res.status_code == 201:
+        res_json = res.json()
+        # TODO: Look for "errors" in res_json and handle them in some way.
+        return res_json["_id"]
+    e = RuntimeError(
+        f'Error creating upload record, status={res.status_code}, response={res.text}')
+    complete_with_error(e)
+
+
+def finalize_upload(
+        source_id, upload_id, headers, count_created=None, count_updated=None,
+        error=None):
+    """Records the results of an upload via the G.h Source API."""
+    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
+    print(f"Updating upload via {put_api_url}")
+    update = {
+        "status": "ERROR", "summary": {"error": error.name}} if error else {
+        "status": "SUCCESS",
+        "summary": {"numCreated": count_created, "numUpdated": count_updated}}
+    res = requests.put(put_api_url,
+                       json=update,
+                       headers=headers)
+    # TODO: Look for "errors" in res_json and handle them in some way.
+    if not res or res.status_code != 200:
+        e = RuntimeError(
+            f'Error updating upload record, status={res.status_code}, response={res.text}')
+        complete_with_error(e, UploadError.INTERNAL_ERROR,
+                            source_id, upload_id, headers)
+
+
+def complete_with_error(
+        exception, upload_error=None, source_id=None, upload_id=None,
+        headers=None):
+    """
+    Logs and raises the provided exception.
+
+    If upload details are provided, updates the indicated upload with the
+    provided data.
+    """
+    print(exception)
+    if upload_error and source_id and upload_id:
+        finalize_upload(source_id, upload_id, headers,
+                        error=upload_error)
+    raise exception
+
 
 def obtain_api_credentials(s3_client):
     """
@@ -17,8 +91,9 @@ def obtain_api_credentials(s3_client):
             print(
                 "Retrieving service account credentials from "
                 f"s3://{_METADATA_BUCKET}/{_SERVICE_ACCOUNT_CRED_FILE}")
-            s3_client.download_file(
-                _METADATA_BUCKET, _SERVICE_ACCOUNT_CRED_FILE, local_creds_file.name)
+            s3_client.download_file(_METADATA_BUCKET,
+                                    _SERVICE_ACCOUNT_CRED_FILE,
+                                    local_creds_file.name)
             credentials = service_account.Credentials.from_service_account_file(
                 local_creds_file.name, scopes=["email"])
             headers = {}
