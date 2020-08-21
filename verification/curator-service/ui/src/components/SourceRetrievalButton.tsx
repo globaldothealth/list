@@ -20,7 +20,7 @@ export default function SourceRetrievalButton(props: {
         <>
             <Button
                 variant="outlined"
-                data-testid="trigger-retrieval-btn"
+                data-testid={`trigger-retrieval-btn-${props.sourceId}`}
                 startIcon={
                     retrieving ? (
                         <CircularProgress size="1em" />
