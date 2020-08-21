@@ -25,7 +25,7 @@ Resources:
         - AWSLambdaFullAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref CommonLibLayer
       Environment:
@@ -71,7 +71,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
@@ -86,11 +86,18 @@ Resources:
       Handler: hongkong.lambda_handler
       Runtime: python3.8
       Description: Parse case data for India
+  JapanParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/japan/
+      Handler: japan.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Japan
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
@@ -109,7 +116,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
@@ -117,7 +124,6 @@ Resources:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
-
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:

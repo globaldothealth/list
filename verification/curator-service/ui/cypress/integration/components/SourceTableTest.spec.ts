@@ -2,10 +2,10 @@
 describe('Sources table', function () {
     beforeEach(() => {
         cy.task('clearSourcesDB', {});
-        cy.login();
     });
 
     it('Can edit a source', function () {
+        cy.login();
         cy.addSource('Example source', 'www.example.com');
         cy.visit('/sources');
         cy.contains('Example source');
@@ -19,6 +19,7 @@ describe('Sources table', function () {
     });
 
     it('Can delete a source', function () {
+        cy.login();
         cy.addSource('Example source', 'www.example.com');
         cy.visit('/sources');
         cy.contains('Example source');
