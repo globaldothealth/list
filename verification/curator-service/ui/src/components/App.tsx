@@ -363,14 +363,14 @@ export default function App(): JSX.Element {
                                 Logout {user?.email}
                             </Button>
                         ) : (
-                                <Button
-                                    variant="outlined"
-                                    color="inherit"
-                                    href={process.env.REACT_APP_LOGIN_URL}
-                                >
-                                    Login
-                                </Button>
-                            )}
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                href={process.env.REACT_APP_LOGIN_URL}
+                            >
+                                Login
+                            </Button>
+                        )}
                         {hasAnyRole(['curator']) && (
                             <IconButton
                                 color="inherit"
@@ -495,7 +495,7 @@ export default function App(): JSX.Element {
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
                             <Route exact path="/sources">
-                                <SourceTable />
+                                <SourceTable user={user} />
                             </Route>
                         )}
                         {user.email && (

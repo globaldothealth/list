@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
-class InvalidParamError extends Error { }
+class InvalidParamError extends Error {}
 
 /**
  * CasesController forwards requests to the data service.
@@ -14,7 +14,7 @@ export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
         private readonly geocoders: Geocoder[],
-    ) { }
+    ) {}
 
     list = async (req: Request, res: Response): Promise<void> => {
         try {
