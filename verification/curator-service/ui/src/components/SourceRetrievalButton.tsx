@@ -64,6 +64,7 @@ export default function SourceRetrievalButton(props: {
                     <br />
                     Bucket: {result?.bucket}
                     <br />
+                    {/* TODO: We could redirect the user to the upload page once we have it */}
                     Upload ID: {result?.upload_id}
                 </div>
             )}
