@@ -24,7 +24,8 @@ Resources:
       Policies:
         - AWSLambdaFullAccess
         - S3WritePolicy:
-            BucketName: !Ref RawSourcesBucket
+          BucketName: !Ref RawSourcesBucket
+      Timeout: 300
       Layers:
         - !Ref CommonLibLayer
       Environment:
@@ -70,6 +71,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
@@ -95,6 +97,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
@@ -113,6 +116,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
