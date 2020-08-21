@@ -92,6 +92,7 @@ describe('invokeRetrieval', () => {
         const payload: RetrievalPayload = {
             key: 'some key',
             bucket: 'some bucket',
+            upload_id: 'foo',
         };
         invokeSpy.mockResolvedValueOnce({
             Payload: JSON.stringify(payload),
