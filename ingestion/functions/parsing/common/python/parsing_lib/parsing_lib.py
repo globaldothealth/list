@@ -35,22 +35,7 @@ if ('lambda' not in sys.argv[0]):
             os.pardir,
             'common'))
 import common_lib
-
-
-class UploadError(Enum):
-    """
-    Upload error categories corresponding to the G.h Source API.
-
-    TODO: Move upload handling logic to common_lib.
-    """
-    INTERNAL_ERROR = 1
-    SOURCE_CONFIGURATION_ERROR = 2
-    SOURCE_CONFIGURATION_NOT_FOUND = 3
-    SOURCE_CONTENT_NOT_FOUND = 4
-    SOURCE_CONTENT_DOWNLOAD_ERROR = 5
-    PARSING_ERROR = 6
-    DATA_UPLOAD_ERROR = 7
-    VALIDATION_ERROR = 8
+from common_lib import UploadError
 
 
 def extract_event_fields(event):
@@ -63,7 +48,7 @@ def extract_event_fields(event):
             f"Required fields {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
-        complete_with_error(e)
+        common_lib.complete_with_error(e)
     return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
 
@@ -75,23 +60,7 @@ def retrieve_raw_data_file(s3_bucket, s3_key):
         s3_client.download_file(s3_bucket, s3_key, local_data_file)
         return local_data_file
     except Exception as e:
-        complete_with_error(e)
-
-
-def create_upload_record(source_id, headers):
-    """Creates an upload resource via the G.h Source API."""
-    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
-    print(f"Creating upload via {post_api_url}")
-    res = requests.post(post_api_url,
-                        json={"status": "IN_PROGRESS", "summary": {}},
-                        headers=headers)
-    if res and res.status_code == 201:
-        res_json = res.json()
-        # TODO: Look for "errors" in res_json and handle them in some way.
-        return res_json["_id"]
-    e = RuntimeError(
-        f'Error creating upload record, status={res.status_code}, response={res.text}')
-    complete_with_error(e)
+        common_lib.complete_with_error(e)
 
 
 def prepare_cases(cases, upload_id):
@@ -124,29 +93,8 @@ def write_to_server(cases, source_id, upload_id, headers):
     upload_error = (UploadError.VALIDATION_ERROR
                     if res.status_code == 207 else
                     UploadError.DATA_UPLOAD_ERROR)
-    complete_with_error(e, upload_error,
-                        source_id, upload_id, headers)
-
-
-def finalize_upload(
-        source_id, upload_id, headers, count_created=None, count_updated=None,
-        error=None):
-    """Records the results of an upload via the G.h Source API."""
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
-    print(f"Updating upload via {put_api_url}")
-    update = {
-        "status": "ERROR", "summary": {"error": error.name}} if error else {
-        "status": "SUCCESS",
-        "summary": {"numCreated": count_created, "numUpdated": count_updated}}
-    res = requests.put(put_api_url,
-                       json=update,
-                       headers=headers)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    if not res or res.status_code != 200:
-        e = RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, headers)
+    common_lib.complete_with_error(e, upload_error,
+                                   source_id, upload_id, headers)
 
 
 def get_today():
@@ -180,27 +128,11 @@ def filter_cases_by_date(
             return delta_days < 0
         else:
             e = ValueError(f'Unsupported date filter operand: {op}')
-            complete_with_error(
+            common_lib.complete_with_error(
                 e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
                 api_creds)
 
     return [case for case in case_data if case_is_within_range(case, cutoff_date, op)]
-
-
-def complete_with_error(
-        exception, upload_error=None, source_id=None, upload_id=None,
-        headers=None):
-    """
-    Logs and raises the provided exception.
-
-    If upload details are provided, updates the indicated upload with the
-    provided data.
-    """
-    print(exception)
-    if upload_error and source_id and upload_id:
-        finalize_upload(source_id, upload_id, headers,
-                        error=upload_error)
-    raise exception
 
 
 def run_lambda(event, context, parsing_function):
@@ -240,7 +172,7 @@ def run_lambda(event, context, parsing_function):
         event)
     api_creds = common_lib.obtain_api_credentials(s3_client)
     if not upload_id:
-        upload_id = create_upload_record(source_id, api_creds)
+        upload_id = common_lib.create_upload_record(source_id, api_creds)
     try:
         raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
         case_data = parsing_function(
@@ -255,9 +187,9 @@ def run_lambda(event, context, parsing_function):
                 api_creds),
             source_id, upload_id,
             api_creds)
-        finalize_upload(source_id, upload_id, api_creds, count_created,
-                        count_updated)
+        common_lib.finalize_upload(
+            source_id, upload_id, api_creds, count_created, count_updated)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, api_creds)
+        common_lib.complete_with_error(e, UploadError.INTERNAL_ERROR,
+                                       source_id, upload_id, api_creds)
