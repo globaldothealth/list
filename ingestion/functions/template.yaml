@@ -24,7 +24,7 @@ Resources:
       Policies:
         - AWSLambdaFullAccess
         - S3WritePolicy:
-          BucketName: !Ref RawSourcesBucket
+            BucketName: !Ref RawSourcesBucket
       Timeout: 300
       Layers:
         - !Ref CommonLibLayer
