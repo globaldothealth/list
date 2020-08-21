@@ -49,7 +49,9 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     import common_lib  # Import locally to avoid superseding mock
     common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials", return_value={})
-    retrieval.invoke_parser = MagicMock(name="invoke_parser")
+    retrieval.invoke_parser = MagicMock(
+        name="invoke_parser",
+        return_value={"count_created": 2})
     s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
 
     # Set up mock request values used in multiple requests.
@@ -90,6 +92,8 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     assert requests_mock.request_history[2].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
     assert source_id in response["key"]
+    assert response["parser_output"] == {"count_created": 2}
+    assert response["upload_id"] == upload_id
 
 
 def test_extract_source_id_returns_id_field(valid_event):
