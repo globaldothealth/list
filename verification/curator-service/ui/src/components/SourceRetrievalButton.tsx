@@ -10,6 +10,14 @@ interface RetrievalResult {
     key: string;
 }
 
+/**
+ * SourceRetrievalButton is a button that when clicked triggers a fetch of the
+ * content of a given source identified by its ID.
+ * When successful, details about the retrieval (and parsing if it occurred) is
+ * displayed alongside it.
+ * Retrieval is synchronously so during that time, the button is disabled and a
+ * loading spinner is shown.
+ */
 export default function SourceRetrievalButton(props: {
     sourceId: string;
 }): JSX.Element {
