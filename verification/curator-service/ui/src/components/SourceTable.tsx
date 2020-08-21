@@ -10,7 +10,6 @@ import {
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
