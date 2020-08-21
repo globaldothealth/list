@@ -29,6 +29,7 @@ it('renders form', async () => {
     // Source fields
     expect(getByTestId('name')).toBeInTheDocument();
     expect(getByTestId('url')).toBeInTheDocument();
+    expect(getByTestId('format')).toBeInTheDocument();
 
     // Buttons
     expect(getByText(/create source/i)).toBeEnabled();
