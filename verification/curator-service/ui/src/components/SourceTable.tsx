@@ -125,27 +125,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         };
     }
 
-    addSource(rowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            if (
-                !(
-                    this.validateRequired(rowData.name) &&
-                    this.validateRequired(rowData.url) &&
-                    this.validateAutomationFields(rowData)
-                )
-            ) {
-                return reject();
-            }
-            const newSource = this.createSourceFromRowData(rowData);
-            this.setState({ error: '' });
-            const response = axios.post(this.state.url, newSource);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
-    }
-
     deleteSource(rowData: TableRow): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const deleteUrl = this.state.url + rowData._id;
@@ -553,8 +532,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             this.tableRef.current.onQueryChange();
                         }}
                         editable={{
-                            onRowAdd: (rowData: TableRow): Promise<unknown> =>
-                                this.addSource(rowData),
                             onRowUpdate: (
                                 newRowData: TableRow,
                                 oldRowData: TableRow | undefined,
