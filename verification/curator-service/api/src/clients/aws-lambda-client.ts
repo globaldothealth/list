@@ -75,7 +75,8 @@ export default class AwsLambdaClient {
     };
 
     /**
-     * Invoke retrieval function lambda synchrnously, returning its output. */
+     * Invoke retrieval function lambda synchronously, returning its output.
+     */
     invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
         try {
             const res = await this.lambdaClient

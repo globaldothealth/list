@@ -107,7 +107,7 @@ describe('invokeRetrieval', () => {
             expectedError,
         );
     });
-    it('throws when error zhen function is not run properly', async () => {
+    it('throws when function is not run properly', async () => {
         invokeSpy.mockResolvedValueOnce({
             FunctionError: 'Func error',
         });

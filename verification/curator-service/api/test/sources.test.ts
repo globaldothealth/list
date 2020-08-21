@@ -4,6 +4,7 @@ const mockDeleteRule = jest.fn().mockResolvedValue({});
 const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
+const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
 
 import * as baseUser from './users/base.json';
 
@@ -17,6 +18,11 @@ import supertest from 'supertest';
 jest.mock('../src/clients/aws-events-client', () => {
     return jest.fn().mockImplementation(() => {
         return { deleteRule: mockDeleteRule, putRule: mockPutRule };
+    });
+});
+jest.mock('../src/clients/aws-lambda-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { invokeRetrieval: mockInvoke };
     });
 });
 let mongoServer: MongoMemoryServer;
@@ -334,5 +340,13 @@ describe('DELETE', () => {
         curatorRequest
             .delete('/api/sources/424242424242424242424242')
             .expect(404, done);
+    });
+
+    describe('retrieval', () => {
+        it('can be invoked', (done) => {
+            curatorRequest
+                .post('/api/sources/424242424242424242424242/retrieve')
+                .expect(200, done);
+        });
     });
 });
