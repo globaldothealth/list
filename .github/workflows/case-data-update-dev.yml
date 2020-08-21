@@ -9,7 +9,6 @@ on:
       - "data-serving/scripts/convert-data/**"
 
 jobs:
-  # NOTE: This job should be kept in sync with the prod version.
   update-case-data-dev:
     runs-on: ubuntu-latest
 
