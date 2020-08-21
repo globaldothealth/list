@@ -16,6 +16,7 @@ import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
 import Alerts from './Alerts';
+import AutomatedSourceForm from './AutomatedSourceForm';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
@@ -431,6 +432,14 @@ export default function App(): JSX.Element {
                                     >
                                         <MenuItem>New bulk upload</MenuItem>
                                     </Link>
+                                    <Link
+                                        to="/sources/automated"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>
+                                            New automated source
+                                        </MenuItem>
+                                    </Link>
                                 </Menu>
                             </>
                         )}
@@ -485,7 +494,7 @@ export default function App(): JSX.Element {
                             </Route>
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/sources">
+                            <Route exact path="/sources">
                                 <SourceTable user={user} />
                             </Route>
                         )}
@@ -499,6 +508,14 @@ export default function App(): JSX.Element {
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
+                        {hasAnyRole(['curator']) && (
+                            <Route path="/sources/automated">
+                                <AutomatedSourceForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
                         {hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm

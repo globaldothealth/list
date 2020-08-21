@@ -141,11 +141,10 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
         r.raise_for_status()
+        data = r.content
         if source_format == "JSON":
-            data = json.dumps(r.json(), indent=4).encode('utf-8')
             extension = "json"
         elif source_format == "CSV":
-            data = r.content
             extension = "csv"
         else:
             e = ValueError(f"Unsupported source format: {source_format}")
