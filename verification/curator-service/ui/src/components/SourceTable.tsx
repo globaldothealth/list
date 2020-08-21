@@ -15,6 +15,7 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import User from './User';
 
 interface ListResponse {
     sources: Source[];
@@ -107,7 +108,9 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
 class SourceTable extends React.Component<Props, SourceTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -524,6 +527,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             search: false,
                             filtering: false,
                             sorting: false,
+                            emptyRowsWhenPaging: false,
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,

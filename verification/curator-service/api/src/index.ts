@@ -112,7 +112,10 @@ app.use(passport.session());
 app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
-const awsLambdaClient = new AwsLambdaClient(env.AWS_SERVICE_REGION);
+const awsLambdaClient = new AwsLambdaClient(
+    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+    env.AWS_SERVICE_REGION,
+);
 const awsEventsClient = new AwsEventsClient(
     env.AWS_SERVICE_REGION,
     awsLambdaClient,
@@ -130,6 +133,7 @@ new OpenApiValidator({
 
         // Configure sources controller.
         const sourcesController = new SourcesController(
+            awsLambdaClient,
             awsEventsClient,
             env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
         );
@@ -157,6 +161,11 @@ new OpenApiValidator({
             '/sources/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             sourcesController.del,
+        );
+        apiRouter.post(
+            '/sources/:id([a-z0-9]{24})/retrieve',
+            mustHaveAnyRole(['curator']),
+            sourcesController.retrieve,
         );
 
         // Configure uploads controller.
