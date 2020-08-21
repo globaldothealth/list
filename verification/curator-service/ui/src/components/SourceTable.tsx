@@ -278,24 +278,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return field?.trim() !== '';
     }
 
-    triggerRetrieval(id: string): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const url = this.state.url + id + '/retrieve';
-            this.setState({ error: '' });
-            const response = axios.post(url);
-            response
-                .then((resp) => {
-                    // TODO: Show snackbar confirmation or something.
-                    console.log(resp);
-                    resolve();
-                })
-                .catch((e) => {
-                    this.setState({ error: e.toString() });
-                    reject(e);
-                });
-        });
-    }
-
     render(): JSX.Element {
         const { classes } = this.props;
         return (
@@ -546,9 +528,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             search: false,
                             filtering: false,
                             sorting: false,
-                            selection: this.props.user.roles.includes(
-                                'curator',
-                            ),
                             emptyRowsWhenPaging: false,
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
@@ -575,34 +554,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 rowData: TableRow,
                             ): Promise<unknown> => this.deleteSource(rowData),
                         }}
-                        actions={
-                            this.props.user.roles.includes('curator')
-                                ? [
-                                      {
-                                          icon: () => (
-                                              <span aria-label="retrieve">
-                                                  <CloudDownloadIcon />
-                                              </span>
-                                          ),
-                                          tooltip: 'Trigger retrieval',
-                                          onClick: (
-                                              _: any,
-                                              rows: any,
-                                          ): void => {
-                                              const promises = rows.map(
-                                                  (row: TableRow) =>
-                                                      this.triggerRetrieval(
-                                                          row._id,
-                                                      ),
-                                              );
-                                              Promise.all(promises).then(() => {
-                                                  this.tableRef.current.onQueryChange();
-                                              });
-                                          },
-                                      },
-                                  ]
-                                : []
-                        }
                     />
                 </Paper>
             </div>
