@@ -120,15 +120,21 @@ it('API errors are displayed', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     const { getByText, findByText } = render(<SourceTable />);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/sources/?limit=10&page=1',
+    );
+    const row = await findByText(/abc123/);
+    expect(row).toBeInTheDocument();
 
-    // Throw error on add request.
-    mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
+    // Throw error on delete request.
+    mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
+    const deleteButton = getByText(/delete_outline/);
+    fireEvent.click(deleteButton);
     const confirmButton = getByText(/check/);
     fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
     expect(error).toBeInTheDocument();
@@ -212,78 +218,6 @@ it('can delete a row', async () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     const noRec = await findByText(/No records to display/);
     expect(noRec).toBeInTheDocument();
-});
-
-it('can add a row', async () => {
-    const axiosGetResponse = {
-        data: {
-            sources: [],
-            total: 0,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
-
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
-
-    // Check table is empty on load
-    const row = queryByText(/abc123/);
-    expect(row).not.toBeInTheDocument();
-
-    // Add a row
-    const newSource = {
-        _id: 'abc123',
-        name: 'source_name',
-        format: 'JSON',
-        origin: {
-            url: 'origin url',
-            license: 'origin license',
-        },
-        automation: {
-            parser: {
-                awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
-            },
-            schedule: {
-                awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                awsScheduleExpression: 'rate(2 hours)',
-            },
-        },
-    };
-    const axiosPostResponse = {
-        data: {
-            source: newSource,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    const axiosGetAfterAddResponse = {
-        data: {
-            sources: [newSource],
-            total: 1,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
-    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
-
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-
-    // Check table is reloaded
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = await findByText(/abc123/);
-    expect(newRow).toBeInTheDocument();
 });
 
 it('can edit a row', async () => {
