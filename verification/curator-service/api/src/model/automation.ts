@@ -14,10 +14,7 @@ export const automationParsingValidator = {
 export const automationSchema = new mongoose.Schema({
     parser: parserSchema,
     regexParsing: regexParsingSchema,
-    schedule: {
-        type: scheduleSchema,
-        required: true,
-    },
+    schedule: scheduleSchema,
 });
 
 export type AutomationDocument = mongoose.Document & {

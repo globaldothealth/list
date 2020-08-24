@@ -248,6 +248,24 @@ describe('PUT', () => {
             .expect(422);
         expect(res.body).toMatch('Enter a name');
     });
+    it('should be able to set a parser without schedule', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar' },
+            format: 'JSON',
+        }).save();
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                automation: {
+                    parser: {
+                        awsLambdaArn:
+                            'arn:aws:lambda:us-east-1:612888738066:function:some-func',
+                    },
+                },
+            })
+            .expect(200, /arn/);
+    });
 });
 
 describe('POST', () => {
@@ -293,13 +311,10 @@ describe('POST', () => {
         );
     });
     it('should not create an incomplete source', async () => {
-        const res = await curatorRequest
-            .post('/api/sources')
-            .send({})
-            .expect(400);
+        await curatorRequest.post('/api/sources').send({}).expect(400);
     });
     it('should not create invalid source', async () => {
-        const res = await curatorRequest
+        await curatorRequest
             .post('/api/sources')
             .send({ origin: { url: 2 } })
             .expect(422);
