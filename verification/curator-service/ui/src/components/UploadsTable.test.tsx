@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
 
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import UploadsTable from './UploadsTable';
 import axios from 'axios';
@@ -42,7 +43,11 @@ it('loads and displays uploads', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<UploadsTable />);
+    const { findByText } = render(
+        <MemoryRouter>
+            <UploadsTable />
+        </MemoryRouter>,
+    );
 
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -61,7 +66,11 @@ it('loads and displays uploads', async () => {
 it('API errors are displayed', async () => {
     mockedAxios.get.mockRejectedValueOnce(new Error('Request failed'));
 
-    const { findByText } = render(<UploadsTable />);
+    const { findByText } = render(
+        <MemoryRouter>
+            <UploadsTable />
+        </MemoryRouter>,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/uploads?limit=10&page=1',
