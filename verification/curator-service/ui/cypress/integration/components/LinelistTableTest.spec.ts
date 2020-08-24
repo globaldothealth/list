@@ -66,7 +66,7 @@ describe('Linelist table', function () {
         cy.contains('France').should('not.exist');
     });
 
-    it.only('Can delete multiple cases', function () {
+    it('Can delete multiple cases', function () {
         cy.addCase({
             country: 'France',
         });
