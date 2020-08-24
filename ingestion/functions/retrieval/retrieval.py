@@ -206,6 +206,17 @@ def invoke_parser(
         complete_with_error(e, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, api_headers)
 
+def get_today():
+    """Return today's datetime, just here for easier mocking."""
+    return datetime.today()
+
+def format_source_url(url: str) -> str:
+    """
+    Formats the given url with the date formatting params contained in it if any.
+    Cf. https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+    """
+    return get_today().strftime(url)
+
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
 
@@ -235,6 +246,7 @@ def lambda_handler(event, context):
     upload_id = create_upload_record(source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
         source_id, upload_id, auth_headers)
+    url = format_source_url(url)
     file_name, s3_object_key = retrieve_content(
         source_id, upload_id, url, source_format, auth_headers)
     upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
