@@ -531,16 +531,24 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             this.setState({ pageSize: newPageSize });
                             this.tableRef.current.onQueryChange();
                         }}
-                        editable={{
-                            onRowUpdate: (
-                                newRowData: TableRow,
-                                oldRowData: TableRow | undefined,
-                            ): Promise<unknown> =>
-                                this.editSource(newRowData, oldRowData),
-                            onRowDelete: (
-                                rowData: TableRow,
-                            ): Promise<unknown> => this.deleteSource(rowData),
-                        }}
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowUpdate: (
+                                          newRowData: TableRow,
+                                          oldRowData: TableRow | undefined,
+                                      ): Promise<unknown> =>
+                                          this.editSource(
+                                              newRowData,
+                                              oldRowData,
+                                          ),
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteSource(rowData),
+                                  }
+                                : undefined
+                        }
                     />
                 </Paper>
             </div>
