@@ -30,6 +30,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels.environment
             - name: DATASERVER_URL
               value: "http://data-dev"
             - name: DB_CONNECTION_STRING
