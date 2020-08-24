@@ -45,11 +45,6 @@ def test_format_url_leaves_unchanged_if_no_format_params():
     url = "http://foo.bar"
     assert retrieval.format_source_url(url) == url
 
-def test_format_url_removes_non_time_format_param():
-    from retrieval import retrieval  # Import locally to avoid superseding mock
-    url = "http://foo.bar/%(nope"
-    assert retrieval.format_source_url(url) == "http://foo.bar/(nope"
-
 @patch('retrieval.retrieval.get_today')
 def test_format_url(mock_today):
     from retrieval import retrieval  # Import locally to avoid superseding mock
