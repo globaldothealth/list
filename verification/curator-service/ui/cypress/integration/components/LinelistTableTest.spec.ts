@@ -80,16 +80,41 @@ describe('Linelist table', function () {
         cy.contains('France');
         cy.contains('Germany');
         cy.contains('United Kingdom');
+        cy.server();
+        cy.contains('th', 'Case ID')
+            .invoke('index')
+            .then((i) => {
+                // There's one more column in data rows than in the header.
+                const caseIdIndex = i + 1;
+                cy.get(`[index="0"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('DELETE', `/api/cases/${$td.text()}`).as(
+                            'deleteCase0',
+                        );
+                    },
+                );
+                cy.get(`[index="1"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('DELETE', `/api/cases/${$td.text()}`).as(
+                            'deleteCase1',
+                        );
+                    },
+                );
+                cy.get(`[index="2"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('DELETE', `/api/cases/${$td.text()}`).as(
+                            'deleteCase2',
+                        );
+                    },
+                );
+            });
 
         // Three row checkboxes and a header checkbox
         cy.get('input[type="checkbox"]').should('have.length', 4);
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.get('input[type="checkbox"]').eq(3).click();
-        cy.server();
-        cy.route('DELETE', '/api/cases/*').as('deleteCase');
         cy.get('button[title="Delete selected rows"]').click();
-        cy.wait('@deleteCase');
-        cy.wait('@deleteCase');
+        cy.wait(['@deleteCase0', '@deleteCase2']);
 
         cy.contains('France').should('not.exist');
         cy.contains('Germany');
