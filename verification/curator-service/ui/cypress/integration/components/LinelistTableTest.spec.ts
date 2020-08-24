@@ -143,6 +143,8 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
+        cy.get('input[id="search-field"]').click();
+        cy.get('li').contains('country:').click();
         cy.get('input[id="search-field"]').type('Uruguay{enter}');
         cy.contains('France').should('not.exist');
         cy.get('input[id="search-field"]').clear().type('France{enter}');

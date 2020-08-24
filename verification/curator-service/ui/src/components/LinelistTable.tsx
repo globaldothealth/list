@@ -128,6 +128,7 @@ function SearchBar(props: {
                 'admin2:',
                 'admin3:',
             ]}
+            id="search-field"
             freeSolo
             renderInput={(params) => (
                 <TextField
@@ -195,7 +196,6 @@ function SearchBar(props: {
                         ),
                     }}
                     classes={{ root: classes.searchBar }}
-                    id="search-field"
                     fullWidth
                     onKeyPress={(ev) => {
                         if (ev.key === 'Enter') {
