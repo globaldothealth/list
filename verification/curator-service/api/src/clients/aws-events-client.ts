@@ -17,6 +17,7 @@ export default class AwsEventsClient {
     constructor(
         awsRegion: string,
         private readonly lambdaClient: AwsLambdaClient,
+        private readonly serviceEnv: string,
     ) {
         AWS.config.update({ region: awsRegion });
         this.cloudWatchEventsClient = new AWS.CloudWatchEvents({
@@ -62,7 +63,10 @@ export default class AwsEventsClient {
                         {
                             Arn: targetArn,
                             Id: targetId,
-                            Input: JSON.stringify({ sourceId: sourceId }),
+                            Input: JSON.stringify({
+                                env: this.serviceEnv,
+                                sourceId: sourceId,
+                            }),
                         },
                     ],
                 };
