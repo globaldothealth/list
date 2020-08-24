@@ -131,22 +131,22 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 );
                                 response
                                     .then((result) => {
-                                        const flattenedSources: TableRow[] = [];
-                                        const uploadData = result.data.uploads;
-                                        for (const u of uploadData) {
-                                            flattenedSources.push({
-                                                id: u.upload._id,
-                                                created: u.upload.created,
-                                                status: u.upload.status,
-                                                sourceUrl: u.sourceUrl,
-                                                numCreated:
-                                                    u.upload.summary
-                                                        .numCreated ?? 0,
-                                                numUpdated:
-                                                    u.upload.summary
-                                                        .numUpdated ?? 0,
-                                            });
-                                        }
+                                        const flattenedSources = result.data.uploads.map(
+                                            (u) => {
+                                                return {
+                                                    id: u.upload._id,
+                                                    created: u.upload.created,
+                                                    status: u.upload.status,
+                                                    sourceUrl: u.sourceUrl,
+                                                    numCreated:
+                                                        u.upload.summary
+                                                            .numCreated ?? 0,
+                                                    numUpdated:
+                                                        u.upload.summary
+                                                            .numUpdated ?? 0,
+                                                };
+                                            },
+                                        );
                                         resolve({
                                             data: flattenedSources,
                                             page: query.page,
