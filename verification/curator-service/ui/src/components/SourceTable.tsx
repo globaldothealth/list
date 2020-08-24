@@ -49,7 +49,7 @@ interface Schedule {
 
 interface Automation {
     parser?: Parser;
-    schedule: Schedule;
+    schedule?: Schedule;
     regexParsing?: RegexParsing;
 }
 
@@ -243,12 +243,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      *
      * Rule ARN isn't necessarily present, because it isn't supplied in create
      * requests. It might be present for updates, and if so, the schedule
-     * expression field must be present. Likewise, if parser Lambda ARN is
-     * present, the schedule expression field must be present.
+     * expression field must be present.
      */
     validateAutomationFields(rowData: TableRow): boolean {
         return (
-            (!rowData.awsRuleArn && !rowData.awsLambdaArn) ||
+            !rowData.awsRuleArn ||
             this.validateRequired(rowData.awsScheduleExpression)
         );
     }
