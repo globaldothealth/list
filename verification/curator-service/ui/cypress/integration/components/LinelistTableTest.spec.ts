@@ -108,30 +108,52 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+        cy.server();
+        cy.contains('th', 'Case ID')
+            .invoke('index')
+            .then((i) => {
+                // There's one more column in data rows than in the header.
+                const caseIdIndex = i + 1;
+                cy.get(`[index="0"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('PUT', `/api/cases/${$td.text()}`).as(
+                            'updateCase0',
+                        );
+                    },
+                );
+                cy.get(`[index="1"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('PUT', `/api/cases/${$td.text()}`).as(
+                            'updateCase1',
+                        );
+                    },
+                );
+                cy.get(`[index="2"] > :nth-child(${caseIdIndex})`).then(
+                    ($td) => {
+                        cy.route('PUT', `/api/cases/${$td.text()}`).as(
+                            'updateCase2',
+                        );
+                    },
+                );
+            });
 
         // Three row checkboxes and a header checkbox
         cy.get('input[type="checkbox"]').should('have.length', 4);
 
         // Select all rows.
         cy.get('input[type="checkbox"]').eq(0).click();
-        cy.server();
-        cy.route('PUT', '/api/cases/*').as('updateCase');
+
         // Mark them verified.
         cy.get('button[title="Verify selected rows"]').click();
-        cy.wait('@updateCase');
-        cy.wait('@updateCase');
-        cy.wait('@updateCase');
+        cy.wait(['@updateCase0', '@updateCase1', '@updateCase2']);
         cy.get('[data-testid="verified-svg"]').should('have.length', 3);
 
         // Select all rows.
         cy.get('input[type="checkbox"]').eq(0).click();
-        cy.server();
-        cy.route('PUT', '/api/cases/*').as('updateCase');
+
         // Mark them unverified.
         cy.get('button[title="Unverify selected rows"]').click();
-        cy.wait('@updateCase');
-        cy.wait('@updateCase');
-        cy.wait('@updateCase');
+        cy.wait(['@updateCase0', '@updateCase1', '@updateCase2']);
         cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
     });
 
