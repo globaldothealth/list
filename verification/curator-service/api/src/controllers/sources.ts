@@ -28,14 +28,9 @@ export default class SourcesController {
             res.status(422).json('limit must be > 0');
             return;
         }
-        const filter = req.query.url
-            ? {
-                  'origin.url': new RegExp(req.query.url as string, 'i'),
-              }
-            : {};
         try {
             const [docs, total] = await Promise.all([
-                Source.find(filter)
+                Source.find()
                     .skip(limit * (page - 1))
                     .limit(limit + 1),
                 Source.countDocuments({}),

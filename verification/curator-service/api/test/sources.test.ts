@@ -79,27 +79,6 @@ describe('GET', () => {
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });
-    it('list should filter by url if supplied', async () => {
-        const relevantSource = await new Source({
-            name: 'test-source',
-            origin: { url: 'http://foo.bar' },
-            format: 'JSON',
-        }).save();
-        await new Source({
-            name: 'test-source',
-            origin: { url: 'http://bar.baz' },
-            format: 'JSON',
-        }).save();
-
-        const res = await curatorRequest
-            .get('/api/sources?url=foo')
-            .expect(200)
-            .expect('Content-Type', /json/);
-
-        expect(await relevantSource.collection.countDocuments()).toEqual(2);
-        expect(res.body.sources).toHaveLength(1);
-        expect(res.body.sources[0]._id).toEqual(relevantSource.id);
-    });
     it('list should paginate', async () => {
         for (const i of Array.from(Array(15).keys())) {
             await new Source({

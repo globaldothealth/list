@@ -56,14 +56,6 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
-        - name: url
-          in: query
-          description: Origin URL substring on which to filter the result set
-          required: false
-          allowEmptyValue: true
-          allowReserved: true
-          schema:
-            type: string
         - name: access_token
           in: query
           required: false
