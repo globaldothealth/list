@@ -168,43 +168,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
     }
 
     /**
-     * Creates a source from the provided table row data.
-     *
-     * For new sources, an AWS rule ARN won't be defined (instead, it's created
-     * by the server upon receiving the create request). A schedule expression
-     * may be supplied, and indicates the intent to create a corresponding AWS
-     * scheduled event rule to automate source ingestion. If a schedule
-     * expression is supplied, it's also possible that a parser Lambda ARN is
-     * supplied.
-     */
-    createSourceFromRowData(rowData: TableRow): Source {
-        return {
-            _id: rowData._id,
-            name: rowData.name,
-            origin: {
-                url: rowData.url,
-            },
-            format: rowData.format,
-            automation: rowData.awsScheduleExpression
-                ? {
-                      parser: rowData.awsLambdaArn
-                          ? {
-                                awsLambdaArn: rowData.awsLambdaArn,
-                            }
-                          : undefined,
-                      schedule: {
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
-                : undefined,
-            dateFilter:
-                rowData.dateFilter?.numDaysBeforeToday && rowData.dateFilter?.op
-                    ? rowData.dateFilter
-                    : undefined,
-        };
-    }
-
-    /**
      * Updates a source from the provided table row data.
      *
      * Unlike for creation, an AWS rule ARN may be supplied alongside a
@@ -218,19 +181,23 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 url: rowData.url,
             },
             format: rowData.format,
-            automation: rowData.awsScheduleExpression
-                ? {
-                      parser: rowData.awsLambdaArn
-                          ? {
-                                awsLambdaArn: rowData.awsLambdaArn,
-                            }
-                          : undefined,
-                      schedule: {
-                          awsRuleArn: rowData.awsRuleArn,
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
-                : undefined,
+            automation:
+                rowData.awsScheduleExpression || rowData.awsLambdaArn
+                    ? {
+                          parser: rowData.awsLambdaArn
+                              ? {
+                                    awsLambdaArn: rowData.awsLambdaArn,
+                                }
+                              : undefined,
+                          schedule: rowData.awsScheduleExpression
+                              ? {
+                                    awsRuleArn: rowData.awsRuleArn,
+                                    awsScheduleExpression:
+                                        rowData.awsScheduleExpression,
+                                }
+                              : undefined,
+                      }
+                    : undefined,
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
