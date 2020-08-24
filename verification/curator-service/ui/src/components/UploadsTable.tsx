@@ -7,6 +7,7 @@ import {
     withStyles,
 } from '@material-ui/core/styles';
 
+import { Link } from 'react-router-dom';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Paper } from '@material-ui/core';
 import axios from 'axios';
@@ -114,10 +115,34 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                             {
                                 title: '# created cases',
                                 field: 'numCreated',
+                                render: (rowData): JSX.Element => (
+                                    <Link
+                                        to={{
+                                            pathname: '/cases',
+                                            state: {
+                                                searchQuery: `uploadid:${rowData.id}`,
+                                            },
+                                        }}
+                                    >
+                                        {rowData.numCreated}
+                                    </Link>
+                                ),
                             },
                             {
                                 title: '# updated cases',
                                 field: 'numUpdated',
+                                render: (rowData): JSX.Element => (
+                                    <Link
+                                        to={{
+                                            pathname: '/cases',
+                                            state: {
+                                                searchQuery: `uploadid:${rowData.id}`,
+                                            },
+                                        }}
+                                    >
+                                        {rowData.numUpdated}
+                                    </Link>
+                                ),
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
