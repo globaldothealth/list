@@ -37,8 +37,10 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
+import PublishIcon from '@material-ui/icons/Publish';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
+import UploadsTable from './UploadsTable';
 import User from './User';
 import Users from './Users';
 import ViewCase from './ViewCase';
@@ -254,6 +256,12 @@ export default function App(): JSX.Element {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
+            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+        },
+        {
+            text: 'Uploads',
+            icon: <PublishIcon />,
+            to: '/uploads',
             displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
         },
         {
@@ -496,6 +504,11 @@ export default function App(): JSX.Element {
                         {hasAnyRole(['curator', 'reader']) && (
                             <Route exact path="/sources">
                                 <SourceTable user={user} />
+                            </Route>
+                        )}
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route exact path="/uploads">
+                                <UploadsTable />
                             </Route>
                         )}
                         {user.email && (
