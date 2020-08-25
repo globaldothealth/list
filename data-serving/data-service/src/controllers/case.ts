@@ -352,6 +352,28 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Deletes multiple cases.
+ *
+ * Handles HTTP DELETE /api/cases.
+ */
+export const batchDel = async (req: Request, res: Response): Promise<void> => {
+    Case.deleteMany(
+        {
+            _id: {
+                $in: req.body.caseIds,
+            },
+        },
+        (err) => {
+            if (err) {
+                res.status(500).json(err.message);
+                return;
+            }
+            res.status(204).end();
+        },
+    );
+};
+
+/**
  * Delete a specific case.
  *
  * Handles HTTP DELETE /api/cases/:id.

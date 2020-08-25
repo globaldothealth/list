@@ -413,6 +413,32 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    delete:
+      summary: Deletes multiple cases
+      tags: [Case]
+      operationId: deleteCases
+      requestBody:
+        description: Cases to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "204":
+          description: Cases deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used sypmtoms
