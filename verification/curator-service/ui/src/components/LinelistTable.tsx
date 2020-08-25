@@ -7,7 +7,6 @@ import {
     Tooltip,
     makeStyles,
     withStyles,
-    Grid,
 } from '@material-ui/core';
 import { Case, VerificationStatus } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
@@ -23,7 +22,6 @@ import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
