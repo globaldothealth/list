@@ -3,6 +3,11 @@
 This script is a thin wrapper around `mongoexport` to help export data to either csv or json files. It abstracts away
 some of `mongoexport`'s format-dependent inconsistencies and uses reasonable defaults for our project.
 
+## Export data dictionary
+
+The dictionary can be found in this same directory in the case_fields.yaml file.
+This file contains all the fields exported from Mongo DB and their associated description to be sure that they are kept in sync.
+
 ## How to run it
 
 You'll need Python3 (tested on 3.8 but any version 3+ should work really) and pyyaml installed:
