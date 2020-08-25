@@ -171,4 +171,25 @@ describe('Linelist table', function () {
         cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
     });
+
+    it('Can select all rows across pages', function () {
+        for (let i = 0; i < 52; i++) {
+            cy.addCase({
+                country: 'France',
+                notes: 'some notes',
+                sourceUrl: 'foo.bar',
+            });
+        }
+        cy.visit('/cases');
+        cy.get('input[type="checkbox"]').should('have.length', 51);
+        cy.contains('1 row selected').should('not.exist');
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.contains('1 row selected');
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.contains('50 rows selected');
+        cy.contains('Select all 52 rows').click();
+        cy.contains('52 rows selected');
+        cy.contains('Unselect all 52 rows').click();
+        cy.contains('52 rows selected').should('not.exist');
+    });
 });
