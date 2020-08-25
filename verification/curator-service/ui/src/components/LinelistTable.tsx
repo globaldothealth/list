@@ -21,7 +21,6 @@ import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -93,12 +92,18 @@ const styles = (theme: Theme) =>
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
-    searchBar: {
-        marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(2),
-    },
     searchBarInput: {
-        borderRadius: theme.spacing(1),
+        borderRadius: '8px',
+    },
+    searchRoot: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+        display: 'flex',
+        alignItems: 'center',
+    },
+    tooltip: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
     },
 }));
 
@@ -114,106 +119,102 @@ function SearchBar(props: {
 
     const classes = searchBarStyles();
     return (
-        <Autocomplete
-            options={[
-                'curator:',
-                'gender:',
-                'nationality:',
-                'occupation:',
-                'country:',
-                'outcome:',
-                'caseid:',
-                'source:',
-                'uploadid:',
-                'admin1:',
-                'admin2:',
-                'admin3:',
-            ]}
-            id="search-field"
-            freeSolo
-            value={search}
-            onKeyPress={(ev) => {
-                if (ev.key === 'Enter') {
-                    ev.preventDefault();
-                    props.onSearchChange(search);
-                    setOpen(false);
+        <div className={classes.searchRoot}>
+            <Autocomplete
+                options={[
+                    'curator:',
+                    'gender:',
+                    'nationality:',
+                    'occupation:',
+                    'country:',
+                    'outcome:',
+                    'caseid:',
+                    'source:',
+                    'uploadid:',
+                    'admin1:',
+                    'admin2:',
+                    'admin3:',
+                ]}
+                id="search-field"
+                freeSolo
+                value={search}
+                onKeyPress={(ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        props.onSearchChange(search);
+                        setOpen(false);
+                    }
+                }}
+                onChange={(ev, val) => {
+                    setSearch(val || '');
+                }}
+                open={open}
+                onClose={() => setOpen(false)}
+                onOpen={() => setOpen(true)}
+                fullWidth
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Search"
+                        variant="filled"
+                        InputProps={{
+                            ...params.InputProps,
+                            disableUnderline: true,
+                            classes: { root: classes.searchBarInput },
+                        }}
+                    />
+                )}
+            />
+            <HtmlTooltip
+                className={classes.tooltip}
+                title={
+                    <React.Fragment>
+                        <h4>Search syntax</h4>
+                        <h5>Full text search</h5>
+                        Example: <i>"got infected at work" -India</i>
+                        <br />
+                        You can use arbitrary strings to search over those text
+                        fields:
+                        {[
+                            'notes',
+                            'curator',
+                            'occupation',
+                            'nationalities',
+                            'ethnicity',
+                            'country',
+                            'admin1',
+                            'admin2',
+                            'admin3',
+                            'place',
+                            'location name',
+                            'pathogen name',
+                            'source url',
+                            'upload ID',
+                        ].join(', ')}
+                        <h5>Keywords search</h5>
+                        Example:{' '}
+                        <i>
+                            curator:foo@bar.com,fez@meh.org country:Japan
+                            gender:female occupation:"healthcare worker"
+                        </i>
+                        <br />
+                        Values are OR'ed for the same keyword and all keywords
+                        are AND'ed.
+                        <br />
+                        Keyword values can be quoted for multi-words matches and
+                        concatenated with a comma to union them.
+                        <br />
+                        Only equality operator is supported.
+                        <br />
+                        Supported keywords are shown when the search bar is
+                        clicked.
+                    </React.Fragment>
                 }
-            }}
-            onChange={(ev, val) => {
-                setSearch(val || '');
-            }}
-            open={open}
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
-            renderInput={(params) => (
-                <TextField
-                    {...params}
-                    label="Search"
-                    variant="filled"
-                    InputProps={{
-                        ...params.InputProps,
-                        disableUnderline: true,
-                        classes: { root: classes.searchBarInput },
-                        startAdornment: <SearchIcon />,
-                        endAdornment: (
-                            <HtmlTooltip
-                                title={
-                                    <React.Fragment>
-                                        <h4>Search syntax</h4>
-                                        <h5>Full text search</h5>
-                                        Example:{' '}
-                                        <i>"got infected at work" -India</i>
-                                        <br />
-                                        You can use arbitrary strings to search
-                                        over those text fields:
-                                        {[
-                                            'notes',
-                                            'curator',
-                                            'occupation',
-                                            'nationalities',
-                                            'ethnicity',
-                                            'country',
-                                            'admin1',
-                                            'admin2',
-                                            'admin3',
-                                            'place',
-                                            'location name',
-                                            'pathogen name',
-                                            'source url',
-                                            'upload ID',
-                                        ].join(', ')}
-                                        <h5>Keywords search</h5>
-                                        Example:{' '}
-                                        <i>
-                                            curator:foo@bar.com,fez@meh.org
-                                            country:Japan gender:female
-                                            occupation:"healthcare worker"
-                                        </i>
-                                        <br />
-                                        Values are OR'ed for the same keyword
-                                        and all keywords are AND'ed.
-                                        <br />
-                                        Keyword values can be quoted for
-                                        multi-words matches and concatenated
-                                        with a comma to union them.
-                                        <br />
-                                        Only equality operator is supported.
-                                        <br />
-                                        Supported keywords are shown when the
-                                        search bar is clicked.
-                                    </React.Fragment>
-                                }
-                                placement="left"
-                            >
-                                <HelpIcon />
-                            </HtmlTooltip>
-                        ),
-                    }}
-                    classes={{ root: classes.searchBar }}
-                    fullWidth
-                />
-            )}
-        />
+                placement="left"
+            >
+                <HelpIcon />
+            </HtmlTooltip>
+        </div>
     );
 }
 
