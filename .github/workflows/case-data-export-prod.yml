@@ -28,11 +28,17 @@ jobs:
           sudo dpkg --purge mongodb-org-database-tools-extra
           sudo apt-get update
           sudo apt-get install -f -y --allow-downgrades mongodb-org=4.2.6 mongodb-org-server=4.2.6 mongodb-org-shell=4.2.6 mongodb-org-mongos=4.2.6 mongodb-org-tools=4.2.6 libcurl3
-
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r data-serving/scripts/export-data/requirements.txt
       - name: Create gzip of CSV and JSON prod case data
         run: |
-          ./data-serving/scripts/export-data/export_data.sh -m "${{ secrets.DB_CONNECTION_URL_PROD }}"
-          ./data-serving/scripts/export-data/export_data.sh -m "${{ secrets.DB_CONNECTION_URL_PROD }}" -o json
+          python3 data-serving/scripts/export-data/export.py -mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format csv
+          python3 data-serving/scripts/export-data/export.py -mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format json
           tar -cvzf data/cases.tar.gz cases.csv cases.json
 
       - name: Commit files
