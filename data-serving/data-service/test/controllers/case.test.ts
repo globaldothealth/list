@@ -747,4 +747,15 @@ describe('DELETE', () => {
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
+    it('delete multiple items should return 200 OK', async () => {
+        const c = await new Case(minimalCase).save();
+        const c2 = await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        await request(app)
+            .delete('/api/cases')
+            .send({ caseIds: [c._id, c2._id] })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(0);
+    });
 });
