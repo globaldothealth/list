@@ -736,7 +736,7 @@ describe('PUT', () => {
 });
 
 describe('DELETE', () => {
-    it('delete present item should return 200 OK', async () => {
+    it('delete present item should return 204 OK', async () => {
         const c = new Case(minimalCase);
         await c.save();
 
@@ -747,7 +747,7 @@ describe('DELETE', () => {
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
-    it('delete multiple items should return 200 OK', async () => {
+    it('delete multiple items should return 204 OK', async () => {
         const c = await new Case(minimalCase).save();
         const c2 = await new Case(minimalCase).save();
         expect(await Case.collection.countDocuments()).toEqual(2);
