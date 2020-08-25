@@ -107,6 +107,7 @@ function SearchBar(props: {
     onSearchChange: (search: string) => void;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    const [open, setOpen] = React.useState(false);
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
@@ -130,6 +131,20 @@ function SearchBar(props: {
             ]}
             id="search-field"
             freeSolo
+            value={search}
+            onKeyPress={(ev) => {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                    props.onSearchChange(search);
+                    setOpen(false);
+                }
+            }}
+            onChange={(ev, val) => {
+                setSearch(val || '');
+            }}
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
             renderInput={(params) => (
                 <TextField
                     {...params}
@@ -137,7 +152,6 @@ function SearchBar(props: {
                     variant="filled"
                     InputProps={{
                         ...params.InputProps,
-                        value: search,
                         disableUnderline: true,
                         classes: { root: classes.searchBarInput },
                         startAdornment: <SearchIcon />,
@@ -197,15 +211,6 @@ function SearchBar(props: {
                     }}
                     classes={{ root: classes.searchBar }}
                     fullWidth
-                    onKeyPress={(ev) => {
-                        if (ev.key === 'Enter') {
-                            ev.preventDefault();
-                            props.onSearchChange(search);
-                        }
-                    }}
-                    onChange={(ev) => {
-                        setSearch(ev.currentTarget.value);
-                    }}
                 />
             )}
         />
