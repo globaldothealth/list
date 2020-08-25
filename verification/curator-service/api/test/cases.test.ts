@@ -260,7 +260,7 @@ describe('Cases', () => {
         expect(mockedAxios.delete).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases',
             {
-                caseIds: ['5e99f21a1c9d440000ceb088'],
+                data: { caseIds: ['5e99f21a1c9d440000ceb088'] },
             },
         );
     });
