@@ -138,6 +138,7 @@ paths:
           $ref: "#/components/responses/500"
     delete:
       summary: Deletes multiple cases
+      tags: [Case]
       operationId: deleteCases
       requestBody:
         description: Cases to delete
