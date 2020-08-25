@@ -702,7 +702,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       onClick: (_: any, rows: any): void => {
                                           if (
                                               this.state.totalNumRows ===
-                                              this.state.numSelectedRows
+                                                  this.state.numSelectedRows &&
+                                              this.state.numSelectedRows >
+                                                  this.state.pageSize
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
@@ -733,7 +735,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       onClick: (_: any, rows: any): void => {
                                           if (
                                               this.state.totalNumRows ===
-                                              this.state.numSelectedRows
+                                                  this.state.numSelectedRows &&
+                                              this.state.numSelectedRows >
+                                                  this.state.pageSize
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
@@ -772,7 +776,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ): Promise<void> => {
                                           if (
                                               this.state.totalNumRows ===
-                                              this.state.numSelectedRows
+                                                  this.state.numSelectedRows &&
+                                              this.state.numSelectedRows >
+                                                  this.state.pageSize
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
