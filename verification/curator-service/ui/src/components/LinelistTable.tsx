@@ -12,9 +12,8 @@ import { Case, VerificationStatus } from './Case';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
-import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 
+import { Autocomplete } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
@@ -24,14 +23,15 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
+import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 import renderDate from './util/date';
-import { Autocomplete } from '@material-ui/lab';
 
 interface ListResponse {
     cases: Case[];
@@ -685,16 +685,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ),
                                       tooltip: 'Delete selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
-                                          const deletePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.deleteCase(row),
-                                          );
-                                          Promise.all(deletePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
+                                          await axios.delete('/api/cases', {
+                                              data: {
+                                                  caseIds: rows.map(
+                                                      (row: TableRow) => row.id,
+                                                  ),
                                               },
-                                          );
+                                          });
+                                          this.tableRef.current.onQueryChange();
                                       },
                                   },
                               ]

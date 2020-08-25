@@ -103,7 +103,7 @@ export default class CasesController {
         try {
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
-                req.body,
+                { data: req.body },
             );
             res.status(response.status).end();
         } catch (err) {
