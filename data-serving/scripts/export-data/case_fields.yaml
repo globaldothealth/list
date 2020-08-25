@@ -1,0 +1,39 @@
+- name: _id
+  description: Unique ID of the case
+- name: caseReference.sourceId
+  description: Unique ID of the source for this case
+- name: caseReference.sourceUrl
+  description: URL of the raw source for this case
+- name: demographics.ageRange.start
+  description: Minimum age bracket, included
+- name: demographics.ageRange.end
+  description: Minimum age bracket, excluded if different than start age
+- name: demographics.gender
+- name: demographics.occupation
+- name: demographics.nationalities
+- name: demographics.ethnicity
+- name: genomeSequences
+- name: location.country
+- name: location.administrativeAreaLevel1
+- name: location.administrativeAreaLevel2
+- name: location.administrativeAreaLevel3
+- name: location.geoResolution
+- name: location.name
+- name: location.geometry.latitude
+- name: location.geometry.longitude
+- name: events
+- name: symptoms.status
+- name: symptoms.values
+- name: preexistingConditions.hasPreexistingConditions
+- name: preexistingConditions.values
+- name: travelHistory.traveledPrior30Days
+- name: travelHistory.travel
+- name: pathogens
+- name: notes
+- name: revisionMetadata.revisionNumber
+- name: revisionMetadata.creationMetadata.curator
+- name: revisionMetadata.creationMetadata.date
+- name: revisionMetadata.creationMetadata.notes
+- name: revisionMetadata.updateMetadata.curator
+- name: revisionMetadata.updateMetadata.date
+- name: revisionMetadata.updateMetadata.notes
