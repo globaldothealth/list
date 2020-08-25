@@ -1186,9 +1186,8 @@ components:
         name:
           type: string
           description: >
-            Name that is enough describe by itself the location most
-            unambiguously
-          example: Lyon, France
+            Full name of the location
+          example: Lyon, Auvergne-Rhône-Alpes, France
         geoResolution: 
           type: string
           description: How granular the location is
