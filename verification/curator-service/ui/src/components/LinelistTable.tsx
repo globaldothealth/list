@@ -101,6 +101,10 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         alignItems: 'center',
     },
+    tooltip: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+    },
 }));
 
 function SearchBar(props: {
@@ -162,6 +166,7 @@ function SearchBar(props: {
                 )}
             />
             <HtmlTooltip
+                className={classes.tooltip}
                 title={
                     <React.Fragment>
                         <h4>Search syntax</h4>
