@@ -143,7 +143,8 @@ def test_run_lambda_e2e(
         Body=json.dumps(sample_data))
 
     # Mock the batch upsert call.
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     num_created = 10
     num_updated = 5
@@ -258,7 +259,8 @@ def test_write_to_server_returns_created_and_updated_count(
 def test_write_to_server_raises_error_for_failed_batch_upsert(
         requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
         "POST", full_source_url, json={}, status_code=500),
@@ -283,7 +285,8 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
 def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_errors(
         requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
         "POST", full_source_url, json={}, status_code=207),
@@ -352,6 +355,7 @@ def test_filter_cases_by_date_before_today(mock_today):
 def test_filter_cases_by_date_unsupported_op(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     source_api_url = "http://foo.bar"
+    # TODO: Complete removal of URL env var.
     os.environ["SOURCE_API_URL"] = source_api_url
     upload_id = "123456789012345678901234"
     update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
