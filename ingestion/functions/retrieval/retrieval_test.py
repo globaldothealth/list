@@ -1,11 +1,11 @@
 import boto3
+import datetime
 import json
 import os
 import pytest
 
 from moto import mock_s3
-from unittest.mock import MagicMock
-
+from unittest.mock import MagicMock, patch
 
 @pytest.fixture()
 def aws_credentials():
@@ -40,6 +40,17 @@ def invalid_event():
     with open(file_path) as event_file:
         return json.load(event_file)
 
+def test_format_url_leaves_unchanged_if_no_format_params():
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    url = "http://foo.bar"
+    assert retrieval.format_source_url(url) == url
+
+@patch('retrieval.retrieval.get_today')
+def test_format_url(mock_today):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    url = "http://foo.bar/%Y-%m-%d.json"
+    assert retrieval.format_source_url(url) == "http://foo.bar/2020-06-08.json"
 
 @mock_s3
 def test_lambda_handler_e2e(valid_event, requests_mock, s3):
@@ -90,6 +101,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3):
     assert requests_mock.request_history[2].url == origin_url
     assert response["bucket"] == retrieval.OUTPUT_BUCKET
     assert source_id in response["key"]
+    assert response["upload_id"] == upload_id
 
 
 def test_extract_source_id_returns_id_field(valid_event):

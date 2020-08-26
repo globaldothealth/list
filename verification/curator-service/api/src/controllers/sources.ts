@@ -113,7 +113,10 @@ export default class SourcesController {
     private async updateAutomationScheduleAwsResources(
         source: SourceDocument,
     ): Promise<void> {
-        if (source.isModified('automation.schedule.awsScheduleExpression')) {
+        // Careful here, source.isModified('automation.schedule.awsScheduleExpression')
+        // will return true even when just the parser is updated which is
+        // error prone, prefer isModified() without dotted.paths if possible.
+        if (source.automation?.schedule?.isModified('awsScheduleExpression')) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
                     source.toAwsRuleName(),

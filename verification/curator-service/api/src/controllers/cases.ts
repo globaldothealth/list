@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
-class InvalidParamError extends Error {}
+class InvalidParamError extends Error { }
 
 /**
  * CasesController forwards requests to the data service.
@@ -14,7 +14,7 @@ export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
         private readonly geocoders: Geocoder[],
-    ) {}
+    ) { }
 
     list = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -89,6 +89,23 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    batchDel = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const response = await axios.delete(
+                this.dataServerURL + '/api' + req.url,
+                { data: req.body },
+            );
+            res.status(response.status).end();
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {

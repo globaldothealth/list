@@ -247,6 +247,37 @@ describe('Cases', () => {
         expect(res.text).toEqual(message);
     });
 
+    it('proxies delete many calls', async () => {
+        mockedAxios.delete.mockResolvedValueOnce({
+            status: 204,
+            statusText: 'Cases deleted',
+        });
+        await curatorRequest
+            .delete('/api/cases')
+            .send({ caseIds: ['5e99f21a1c9d440000ceb088'] })
+            .expect(204);
+        expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.delete).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases',
+            {
+                data: { caseIds: ['5e99f21a1c9d440000ceb088'] },
+            },
+        );
+    });
+
+    it('delete many maintains error data from proxied call if available', async () => {
+        const code = 500;
+        const message = 'Internal Server Error';
+        mockedAxios.delete.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+        const res = await curatorRequest
+            .delete('/api/cases')
+            .send({ caseIds: ['5e99f21a1c9d440000ceb088'] })
+            .expect(code);
+        expect(res.text).toEqual(message);
+    });
+
     it('proxies upsert calls and geocodes', async () => {
         const lyon: GeocodeResult = {
             administrativeAreaLevel1: 'Rhône',
