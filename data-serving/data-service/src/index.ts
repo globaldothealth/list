@@ -96,6 +96,7 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.update,
         );
+        apiRouter.delete('/cases', caseController.batchDel);
         apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
         app.use('/api', apiRouter);
     });
