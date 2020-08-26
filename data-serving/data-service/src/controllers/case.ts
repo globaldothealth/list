@@ -374,10 +374,6 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
         );
         return;
     }
-    if (req.body.query.trim() === '') {
-        res.status(422).json('query must not be empty');
-        return;
-    }
     const parsedSearch = parseSearchQuery(req.body.query);
     const queryOpts = parsedSearch.fullTextSearch
         ? {

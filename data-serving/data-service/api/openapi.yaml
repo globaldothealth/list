@@ -168,8 +168,11 @@ paths:
                   items:
                     type: string
                 query:
-                  description: Cases matching this query will be deleted
+                  description: >
+                    Cases matching this query will be deleted. Must contain
+                    non-whitespace characters.
                   type: string
+                  pattern: ^(?!\s*$).+
               oneOf:
                 - required: [caseIds]
                 - required: [query]
