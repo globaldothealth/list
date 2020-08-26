@@ -2,6 +2,7 @@ import { Case, CaseDocument } from '../model/case';
 import { Request, Response } from 'express';
 
 import parseSearchQuery from '../util/search';
+import { runInNewContext } from 'vm';
 
 /**
  * Get a specific case.
@@ -357,20 +358,40 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
  * Handles HTTP DELETE /api/cases.
  */
 export const batchDel = async (req: Request, res: Response): Promise<void> => {
-    Case.deleteMany(
-        {
-            _id: {
-                $in: req.body.caseIds,
+    if (req.body.caseIds !== undefined) {
+        Case.deleteMany(
+            {
+                _id: {
+                    $in: req.body.caseIds,
+                },
             },
-        },
-        (err) => {
-            if (err) {
-                res.status(500).json(err.message);
-                return;
-            }
-            res.status(204).end();
-        },
-    );
+            (err) => {
+                if (err) {
+                    res.status(500).json(err.message);
+                    return;
+                }
+                res.status(204).end();
+            },
+        );
+        return;
+    }
+    if (req.body.query.trim() === '') {
+        res.status(422).json('query must not be empty');
+        return;
+    }
+    const parsedSearch = parseSearchQuery(req.body.query);
+    const queryOpts = parsedSearch.fullTextSearch
+        ? {
+              $text: { $search: parsedSearch.fullTextSearch },
+          }
+        : {};
+    Case.deleteMany(queryOpts, (err) => {
+        if (err) {
+            res.status(500).json(err.message);
+            return;
+        }
+        res.status(204).end();
+    });
 };
 
 /**

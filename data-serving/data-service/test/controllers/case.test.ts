@@ -747,7 +747,29 @@ describe('DELETE', () => {
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
-    it('delete multiple items should return 204 OK', async () => {
+    it('delete multiple cases cannot specify caseIds and query', async () => {
+        const c = await new Case(minimalCase).save();
+        const c2 = await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        await request(app)
+            .delete('/api/cases')
+            .send({ caseIds: [c._id, c2._id], query: 'test' })
+            .expect(400);
+    });
+    it('delete multiple cases cannot send without request body', async () => {
+        await request(app).delete('/api/cases').expect(415);
+    });
+    it('delete multiple cases cannot send empty request body', async () => {
+        await request(app).delete('/api/cases').send({}).expect(400);
+    });
+    it('delete multiple cases cannot send empty query', async () => {
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: ' ' })
+            .expect(422);
+    });
+    it('delete multiple cases with caseIds should return 204 OK', async () => {
         const c = await new Case(minimalCase).save();
         const c2 = await new Case(minimalCase).save();
         expect(await Case.collection.countDocuments()).toEqual(2);
@@ -757,5 +779,33 @@ describe('DELETE', () => {
             .send({ caseIds: [c._id, c2._id] })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(0);
+    });
+    it('delete multiple cases with query should return 204 OK', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        const c = new Case(minimalCase);
+        c.notes = 'got it at work';
+        await c.save();
+        await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        // Unmatched query deletes no cases
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at home' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        // Deletes matched queries
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at work' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(1);
     });
 });
