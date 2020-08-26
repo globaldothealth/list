@@ -63,15 +63,16 @@ def get_source_details(env, source_id, upload_id, api_headers):
         e = RuntimeError(
             f"Error retrieving source details, status={r.status_code}, response={r.text}")
         common_lib.complete_with_error(
-            e, upload_error, source_id, upload_id,
+            e, env, upload_error, source_id, upload_id,
             api_headers)
     except ValueError as e:
         common_lib.complete_with_error(
-            e, UploadError.INTERNAL_ERROR, source_id, upload_id,
+            e, env, UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
 
-def retrieve_content(source_id, upload_id, url, source_format, api_headers):
+def retrieve_content(
+        env, source_id, upload_id, url, source_format, api_headers):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         data = None
@@ -88,8 +89,8 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
         else:
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
-                e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
-                api_headers)
+                e, env, UploadError.SOURCE_CONFIGURATION_ERROR, source_id,
+                upload_id, api_headers)
 
         key_filename_part = f"content.{extension}"
         with open(f"/tmp/{key_filename_part}", "wb") as f:
@@ -106,11 +107,12 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
             if r.status_code == 404 else
             UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
         common_lib.complete_with_error(
-            e, upload_error, source_id, upload_id,
+            e, env, upload_error, source_id, upload_id,
             api_headers)
 
 
-def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
+def upload_to_s3(
+        file_name, s3_object_key, env, source_id, upload_id, api_headers):
     try:
         s3_client.upload_file(
             file_name, OUTPUT_BUCKET, s3_object_key)
@@ -118,7 +120,7 @@ def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
     except Exception as e:
         common_lib.complete_with_error(
-            e, UploadError.INTERNAL_ERROR, source_id, upload_id,
+            e, env, UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
 
@@ -143,7 +145,7 @@ def invoke_parser(
     print(f"Parser response: {response}")
     if "StatusCode" not in response or response["StatusCode"] != 202:
         e = Exception(f"Parser invocation unsuccessful. Response: {response}")
-        common_lib.complete_with_error(e, UploadError.INTERNAL_ERROR,
+        common_lib.complete_with_error(e, env, UploadError.INTERNAL_ERROR,
                                        source_id, upload_id, api_headers)
 
 
@@ -186,13 +188,14 @@ def lambda_handler(event, context):
 
     env, source_id = extract_event_fields(event)
     auth_headers = common_lib.obtain_api_credentials(s3_client)
-    upload_id = common_lib.create_upload_record(source_id, auth_headers)
+    upload_id = common_lib.create_upload_record(env, source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
         env, source_id, upload_id, auth_headers)
     url = format_source_url(url)
     file_name, s3_object_key = retrieve_content(
-        source_id, upload_id, url, source_format, auth_headers)
-    upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
+        env, source_id, upload_id, url, source_format, auth_headers)
+    upload_to_s3(file_name, s3_object_key, env,
+                 source_id, upload_id, auth_headers)
     if parser_arn:
         invoke_parser(env, parser_arn, source_id, upload_id,
                       auth_headers, s3_object_key, url, date_filter)
