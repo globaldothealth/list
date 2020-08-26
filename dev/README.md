@@ -50,9 +50,8 @@ roles=["admin", "curator", "reader"];' verification/scripts/roles.js
 
 Once you've done all of the prereqs above, go ahead and:
 
-1. Start the MongoDB daemon with `mongod`
-1. Run `./dev/setup_db.sh` to set up the collection and load up some toy data
 1. Run `./dev/run_stack.sh`
+1. Run `./dev/setup_db.sh` to set up the collection and load up some toy data
 1. Navigate to `localhost:3002`
 1. Experience success
 

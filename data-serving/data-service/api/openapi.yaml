@@ -4,15 +4,23 @@ info:
   description: Server for CRUD operations on Global Health line-list data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
+    name: Healthmap
+    url: http://www.diseasedaily.org/about
     email: info@healthmap.org
   license:
     name: MIT
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
+tags:
+  - name: Case
+    description: Case related operations
+  - name: Suggest
+    description: Suggestion for input of cases
 paths:
   /cases:
     get:
       summary: Lists cases
+      tags: [Case]
       operationId: listCases
       parameters:
         - name: page
@@ -65,6 +73,7 @@ paths:
           $ref: "#/components/responses/500"
     post:
       summary: Creates one (or multiple identical) new cases
+      tags: [Case]
       operationId: createCase
       requestBody:
         description: Case to add
@@ -104,6 +113,7 @@ paths:
           $ref: "#/components/responses/500"
     put:
       summary: Upserts a case
+      tags: [Case]
       description: >
         Creates or updates a case, depending on whether the provided values for
         the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
@@ -136,9 +146,36 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    delete:
+      summary: Deletes multiple cases
+      tags: [Case]
+      operationId: deleteCases
+      requestBody:
+        description: Cases to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "204":
+          description: Cases deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/batchValidate:
     post:
       summary: Batch validates cases
+      tags: [Case]
       operationId: batchValidateCases
       requestBody:
         description: Cases to validate
@@ -155,6 +192,7 @@ paths:
   /cases/batchUpsert:
     post:
       summary: Batch upserts cases
+      tags: [Case]
       operationId: batchUpsertCases
       requestBody:
         description: Cases to upsert
@@ -180,6 +218,7 @@ paths:
     get:
       summary: Lists most frequently used symptoms
       operationId: listSymptoms
+      tags: [Suggest]
       parameters:
         - name: limit
           in: query
@@ -204,6 +243,7 @@ paths:
     get:
       summary: Lists most frequently used places of transmission
       operationId: listPlacesOfTransmission
+      tags: [Suggest]
       parameters:
         - name: limit
           in: query
@@ -227,6 +267,7 @@ paths:
   /cases/occupations:
     get:
       summary: Lists most frequently used occupations
+      tags: [Suggest]
       operationId: listOccupations
       parameters:
         - name: limit
@@ -260,6 +301,7 @@ paths:
     get:
       summary: Gets a specific case
       operationId: getCase
+      tags: [Case]
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -276,6 +318,7 @@ paths:
     put:
       summary: Updates a specific case
       operationId: updateCase
+      tags: [Case]
       requestBody:
         description: Case to update
         required: true
@@ -305,6 +348,7 @@ paths:
     delete:
       summary: Deletes a specific case
       operationId: deleteCase
+      tags: [Case]
       responses:
         "204":
           description: Case deleted

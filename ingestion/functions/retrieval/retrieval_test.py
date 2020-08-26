@@ -76,7 +76,8 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
 
     # Set up mock request values used in multiple requests.
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     source_id = valid_event['sourceId']
     upload_id = "012345678901234567890123"
     origin_url = "http://bar.baz/"
@@ -165,7 +166,8 @@ def test_get_source_details_returns_parser_arn_if_present(
 def test_get_source_details_raises_error_if_source_not_found(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     source_id = "id"
     get_source_url = f"{_SOURCE_API_URL}/sources/{source_id}"
     requests_mock.get(get_source_url, status_code=404)
@@ -189,7 +191,8 @@ def test_get_source_details_raises_error_if_source_not_found(
 def test_get_source_details_raises_error_if_other_errors_getting_source(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL  # Still needed for now.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     source_id = "sourceId"
     get_source_url = f"{_SOURCE_API_URL}/sources/{source_id}"
     requests_mock.get(get_source_url, status_code=500)
