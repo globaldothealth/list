@@ -62,6 +62,8 @@ describe('Linelist table', function () {
 
         cy.get('button[data-testid="row menu"]').click();
         cy.contains('li', 'Delete').click();
+        cy.contains('Are you sure you want to delete this case?');
+        cy.contains('Yes').click();
 
         cy.contains('France').should('not.exist');
     });
@@ -88,6 +90,8 @@ describe('Linelist table', function () {
         cy.server();
         cy.route('DELETE', `/api/cases`).as('deleteCases');
         cy.get('button[title="Delete selected rows"]').click();
+        cy.contains('Are you sure you want to delete 2 cases?');
+        cy.contains('Yes').click();
         cy.wait('@deleteCases');
 
         cy.contains('France').should('not.exist');
