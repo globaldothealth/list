@@ -334,6 +334,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
+    hasSelectedRowsAcrossPages(): boolean {
+        return (
+            this.state.totalNumRows === this.state.numSelectedRows &&
+            this.state.numSelectedRows > this.state.pageSize
+        );
+    }
+
     setCaseVerification(
         rowData: TableRow,
         verificationStatus: VerificationStatus,
@@ -701,10 +708,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
                                           if (
-                                              this.state.totalNumRows ===
-                                                  this.state.numSelectedRows &&
-                                              this.state.numSelectedRows >
-                                                  this.state.pageSize
+                                              this.hasSelectedRowsAcrossPages()
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
@@ -734,10 +738,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
                                           if (
-                                              this.state.totalNumRows ===
-                                                  this.state.numSelectedRows &&
-                                              this.state.numSelectedRows >
-                                                  this.state.pageSize
+                                              this.hasSelectedRowsAcrossPages()
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
@@ -775,10 +776,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           rows: any,
                                       ): Promise<void> => {
                                           if (
-                                              this.state.totalNumRows ===
-                                                  this.state.numSelectedRows &&
-                                              this.state.numSelectedRows >
-                                                  this.state.pageSize
+                                              this.hasSelectedRowsAcrossPages()
                                           ) {
                                               // TODO: Implement action for all rows
                                               alert(
