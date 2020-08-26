@@ -1,5 +1,10 @@
 import {
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     IconButton,
     Menu,
     MenuItem,
@@ -9,25 +14,24 @@ import {
     withStyles,
 } from '@material-ui/core';
 import { Case, VerificationStatus } from './Case';
-import MaterialTable, { QueryResult } from 'material-table';
+import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
-import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 
+import { Autocomplete } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import HelpIcon from '@material-ui/icons/HelpOutline';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import SearchIcon from '@material-ui/icons/SearchOutlined';
 import TextField from '@material-ui/core/TextField';
+import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
@@ -44,6 +48,13 @@ interface LinelistTableState {
     error: string;
     pageSize: number;
     search: string;
+    // The rows which are selected on the current page.
+    selectedRowsCurrentPage: TableRow[];
+    // The total number of rows selected. This can be larger than
+    // selectedRowsCurrentPage.length if rows across all pages are selected.
+    numSelectedRows: number;
+    totalNumRows: number;
+    deleteDialogOpen: boolean;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -93,12 +104,18 @@ const styles = (theme: Theme) =>
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
-    searchBar: {
-        marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(2),
-    },
     searchBarInput: {
-        borderRadius: theme.spacing(1),
+        borderRadius: '8px',
+    },
+    searchRoot: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+        display: 'flex',
+        alignItems: 'center',
+    },
+    tooltip: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
     },
 }));
 
@@ -107,112 +124,109 @@ function SearchBar(props: {
     onSearchChange: (search: string) => void;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    const [open, setOpen] = React.useState(false);
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
 
     const classes = searchBarStyles();
     return (
-        <TextField
-            classes={{ root: classes.searchBar }}
-            id="search-field"
-            label="Search"
-            variant="filled"
-            fullWidth
-            onKeyPress={(ev) => {
-                if (ev.key === 'Enter') {
-                    ev.preventDefault();
-                    props.onSearchChange(search);
+        <div className={classes.searchRoot}>
+            <Autocomplete
+                options={[
+                    'curator:',
+                    'gender:',
+                    'nationality:',
+                    'occupation:',
+                    'country:',
+                    'outcome:',
+                    'caseid:',
+                    'source:',
+                    'uploadid:',
+                    'admin1:',
+                    'admin2:',
+                    'admin3:',
+                ]}
+                id="search-field"
+                freeSolo
+                value={search}
+                onKeyPress={(ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        props.onSearchChange(search);
+                        setOpen(false);
+                    }
+                }}
+                onChange={(ev, val) => {
+                    setSearch(val || '');
+                }}
+                open={open}
+                onClose={() => setOpen(false)}
+                onOpen={() => setOpen(true)}
+                fullWidth
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Search"
+                        variant="filled"
+                        InputProps={{
+                            ...params.InputProps,
+                            disableUnderline: true,
+                            classes: { root: classes.searchBarInput },
+                        }}
+                    />
+                )}
+            />
+            <HtmlTooltip
+                className={classes.tooltip}
+                title={
+                    <React.Fragment>
+                        <h4>Search syntax</h4>
+                        <h5>Full text search</h5>
+                        Example: <i>"got infected at work" -India</i>
+                        <br />
+                        You can use arbitrary strings to search over those text
+                        fields:
+                        {[
+                            'notes',
+                            'curator',
+                            'occupation',
+                            'nationalities',
+                            'ethnicity',
+                            'country',
+                            'admin1',
+                            'admin2',
+                            'admin3',
+                            'place',
+                            'location name',
+                            'pathogen name',
+                            'source url',
+                            'upload ID',
+                        ].join(', ')}
+                        <h5>Keywords search</h5>
+                        Example:{' '}
+                        <i>
+                            curator:foo@bar.com,fez@meh.org country:Japan
+                            gender:female occupation:"healthcare worker"
+                        </i>
+                        <br />
+                        Values are OR'ed for the same keyword and all keywords
+                        are AND'ed.
+                        <br />
+                        Keyword values can be quoted for multi-words matches and
+                        concatenated with a comma to union them.
+                        <br />
+                        Only equality operator is supported.
+                        <br />
+                        Supported keywords are shown when the search bar is
+                        clicked.
+                    </React.Fragment>
                 }
-            }}
-            onChange={(ev) => {
-                setSearch(ev.currentTarget.value);
-            }}
-            InputProps={{
-                value: search,
-                disableUnderline: true,
-                classes: { root: classes.searchBarInput },
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <SearchIcon />
-                    </InputAdornment>
-                ),
-                endAdornment: (
-                    <InputAdornment position="end">
-                        <HtmlTooltip
-                            title={
-                                <React.Fragment>
-                                    <h4>Search syntax</h4>
-                                    <h5>Full text search</h5>
-                                    Example:{' '}
-                                    <i>"got infected at work" -India</i>
-                                    <br />
-                                    You can use arbitrary strings to search over
-                                    those text fields:
-                                    {[
-                                        'notes',
-                                        'curator',
-                                        'occupation',
-                                        'nationalities',
-                                        'ethnicity',
-                                        'country',
-                                        'admin1',
-                                        'admin2',
-                                        'admin3',
-                                        'place',
-                                        'location name',
-                                        'pathogen name',
-                                        'source url',
-                                        'upload ID',
-                                    ].join(', ')}
-                                    <h5>Keywords search</h5>
-                                    Example:{' '}
-                                    <i>
-                                        curator:foo@bar.com,fez@meh.org
-                                        country:Japan gender:female
-                                        occupation:"healthcare worker"
-                                    </i>
-                                    <br />
-                                    Values are OR'ed for the same keyword and
-                                    all keywords are AND'ed.
-                                    <br />
-                                    Keyword values can be quoted for multi-words
-                                    matches and concatenated with a comma to
-                                    union them.
-                                    <br />
-                                    Only equality operator is supported.
-                                    <br />
-                                    Supported keywords are: <br />
-                                    <ul>
-                                        {[
-                                            'curator',
-                                            'gender',
-                                            'nationality',
-                                            'occupation',
-                                            'country',
-                                            'outcome',
-                                            'caseid',
-                                            'source',
-                                            'uploadid',
-                                            'admin1',
-                                            'admin2',
-                                            'admin3',
-                                        ].map(
-                                            (e): JSX.Element => {
-                                                return <li key={e}>{e}</li>;
-                                            },
-                                        )}
-                                    </ul>
-                                </React.Fragment>
-                            }
-                            placement="left"
-                        >
-                            <HelpIcon />
-                        </HtmlTooltip>
-                    </InputAdornment>
-                ),
-            }}
-        />
+                placement="left"
+            >
+                <HelpIcon />
+            </HtmlTooltip>
+        </div>
     );
 }
 
@@ -228,6 +242,9 @@ function RowMenu(props: {
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
+        false,
+    );
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -240,6 +257,11 @@ function RowMenu(props: {
         setAnchorEl(null);
     };
 
+    const openDeleteDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setDeleteDialogOpen(true);
+    };
+
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
@@ -250,6 +272,7 @@ function RowMenu(props: {
         } catch (e) {
             props.setError(e.toString());
         } finally {
+            setDeleteDialogOpen(false);
             handleClose();
         }
     };
@@ -278,11 +301,42 @@ function RowMenu(props: {
                         <span className={classes.menuItemTitle}>Edit</span>
                     </MenuItem>
                 </Link>
-                <MenuItem onClick={handleDelete}>
+                <MenuItem onClick={openDeleteDialog}>
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
                 </MenuItem>
             </Menu>
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={(): void => setDeleteDialogOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>
+                    Are you sure you want to delete this case?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Case {props.rowId} will be permanently deleted and can
+                        not be recovered.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={(): void => {
+                            setDeleteDialogOpen(false);
+                        }}
+                        color="primary"
+                        autoFocus
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="primary">
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
@@ -299,7 +353,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             error: '',
             pageSize: 50,
             search: this.props.location.state?.searchQuery ?? '',
+            selectedRowsCurrentPage: [],
+            numSelectedRows: 0,
+            totalNumRows: 0,
+            deleteDialogOpen: false,
         };
+        this.deleteCases = this.deleteCases.bind(this);
     }
 
     componentDidMount(): void {
@@ -317,16 +376,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.unlisten();
     }
 
-    deleteCase(rowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const deleteUrl = this.state.url + rowData.id;
-            this.setState({ error: '' });
-            const response = axios.delete(deleteUrl);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
+    async deleteCases(): Promise<void> {
+        if (this.hasSelectedRowsAcrossPages()) {
+            // TODO: Implement action for all rows
+            alert('Action not yet implemented when all rows selected');
+            return;
+        }
+        try {
+            await axios.delete('/api/cases', {
+                data: {
+                    caseIds: this.state.selectedRowsCurrentPage.map(
+                        (row: TableRow) => row.id,
+                    ),
+                },
             });
-        });
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString() });
+        } finally {
+            this.setState({ deleteDialogOpen: false });
+        }
+    }
+
+    hasSelectedRowsAcrossPages(): boolean {
+        return (
+            this.state.totalNumRows === this.state.numSelectedRows &&
+            this.state.numSelectedRows > this.state.pageSize
+        );
     }
 
     setCaseVerification(
@@ -425,6 +501,46 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         this.tableRef.current.onQueryChange();
                     }}
                 ></SearchBar>
+                <Dialog
+                    open={this.state.deleteDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ deleteDialogOpen: false })
+                    }
+                    // Stops the click being propagated to the table which
+                    // would trigger the onRowClick action.
+                    onClick={(e): void => e.stopPropagation()}
+                >
+                    <DialogTitle>
+                        Are you sure you want to delete{' '}
+                        {this.state.numSelectedRows === 1
+                            ? '1 case'
+                            : `${this.state.numSelectedRows} cases`}
+                        ?
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            {this.state.numSelectedRows === 1
+                                ? '1 case'
+                                : `${this.state.numSelectedRows} cases`}{' '}
+                            will be permanently deleted and can not be
+                            recovered.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={(): void => {
+                                this.setState({ deleteDialogOpen: false });
+                            }}
+                            color="primary"
+                            autoFocus
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={this.deleteCases} color="primary">
+                            Yes
+                        </Button>
+                    </DialogActions>
+                </Dialog>
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
@@ -581,6 +697,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ?.verificationStatus,
                                         });
                                     }
+                                    this.setState({
+                                        totalNumRows: result.data.total,
+                                    });
                                     resolve({
                                         data: flattenedCases,
                                         page: query.page,
@@ -594,6 +713,28 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         })
                     }
                     title="COVID-19 cases"
+                    components={{
+                        Toolbar: (props): JSX.Element => (
+                            <MTableToolbar
+                                {...props}
+                                toolbarButtonAlignment="left"
+                            />
+                        ),
+                    }}
+                    onSelectionChange={(rows): void =>
+                        this.setState({
+                            selectedRowsCurrentPage: rows,
+                            numSelectedRows: rows.length,
+                        })
+                    }
+                    localization={{
+                        toolbar: {
+                            nRowsSelected:
+                                this.state.numSelectedRows === 1
+                                    ? '1 row selected'
+                                    : `${this.state.numSelectedRows} rows selected`,
+                        },
+                    }}
                     options={{
                         search: false,
                         emptyRowsWhenPaging: false,
@@ -633,11 +774,55 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   {
                                       icon: (): JSX.Element => (
+                                          <Button variant="outlined">
+                                              {this.state.totalNumRows ===
+                                              this.state.numSelectedRows
+                                                  ? 'Unselect'
+                                                  : 'Select'}{' '}
+                                              all {this.state.totalNumRows} rows
+                                          </Button>
+                                      ),
+                                      tooltip: `
+                                      ${
+                                          this.state.totalNumRows ===
+                                          this.state.numSelectedRows
+                                              ? 'Unselect'
+                                              : 'Select'
+                                      } all rows across pages`,
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
+                                          const shouldSelectAll =
+                                              this.state.totalNumRows !==
+                                              this.state.numSelectedRows;
+                                          await this.tableRef.current.onAllSelected(
+                                              shouldSelectAll,
+                                          );
+                                          this.setState({
+                                              numSelectedRows: shouldSelectAll
+                                                  ? this.state.totalNumRows
+                                                  : 0,
+                                          });
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
                                       ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          if (
+                                              this.hasSelectedRowsAcrossPages()
+                                          ) {
+                                              // TODO: Implement action for all rows
+                                              alert(
+                                                  'Action not yet implemented when all rows selected',
+                                              );
+                                              return;
+                                          }
                                           const updatePromises = rows.map(
                                               (row: TableRow) =>
                                                   this.setCaseVerification(
@@ -659,6 +844,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          if (
+                                              this.hasSelectedRowsAcrossPages()
+                                          ) {
+                                              // TODO: Implement action for all rows
+                                              alert(
+                                                  'Action not yet implemented when all rows selected',
+                                              );
+                                              return;
+                                          }
                                           const updatePromises = rows.map(
                                               (row: TableRow) =>
                                                   this.setCaseVerification(
@@ -683,17 +877,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           </span>
                                       ),
                                       tooltip: 'Delete selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
-                                          const deletePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.deleteCase(row),
-                                          );
-                                          Promise.all(deletePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
-                                              },
-                                          );
+                                      onClick: (): void => {
+                                          this.setState({
+                                              deleteDialogOpen: true,
+                                          });
                                       },
                                   },
                               ]

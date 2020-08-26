@@ -260,6 +260,11 @@ new OpenApiValidator({
             casesController.update,
         );
         apiRouter.delete(
+            '/cases',
+            mustHaveAnyRole(['curator']),
+            casesController.batchDel,
+        );
+        apiRouter.delete(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             casesController.del,
