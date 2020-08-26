@@ -37,13 +37,11 @@ type WrapperDocument = mongoose.Document & { automation: AutomationDocument };
 const Wrapper = mongoose.model<WrapperDocument>('Wrapper', wrapperSchema);
 
 describe('validate', () => {
-    it('an automation without a schedule is invalid', async () => {
+    it('an automation without a schedule is valid', async () => {
         const missingSchedule = { ...fullModel };
         delete missingSchedule.schedule;
 
-        return new Automation(missingSchedule).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
+        return new Automation(missingSchedule).validate();
     });
 
     it('an automation with both a parser and regexParsing is invalid', async () => {

@@ -1,11 +1,11 @@
 /* eslint-disable no-undef */
-describe('Alerts', function () {
+describe('Uploads table', function () {
     beforeEach(() => {
+        cy.login();
         cy.task('clearSourcesDB', {});
-        cy.login({ roles: ['curator'] });
     });
 
-    it('clicking alert takes user to linelist filtered for uploadid', function () {
+    it('displays uploads properly', function () {
         cy.addSource('New source', 'www.example.com', [
             {
                 _id: '5ef8e943dfe6e00030892d58',
@@ -20,6 +20,21 @@ describe('Alerts', function () {
                 created: '2020-01-02',
             },
         ]);
+        cy.visit('/uploads');
+        cy.contains('www.example.com');
+        cy.contains('5ef8e943dfe6e00030892d58');
+        cy.contains('2020-1-1');
+        cy.contains('IN_PROGRESS');
+        cy.contains('5');
+        cy.contains('3');
+        cy.contains('5ef8e943dfe6e00030892d59');
+        cy.contains('2020-1-2');
+        cy.contains('SUCCESS');
+        cy.contains('2');
+        cy.contains('0');
+    });
+
+    it('can navigate to filtered linelist', function () {
         cy.addCase({ uploadId: '5ef8e943dfe6e00030892d58', country: 'France' });
         cy.addCase({
             uploadId: '5ef8e943dfe6e00030892d59',
@@ -29,10 +44,22 @@ describe('Alerts', function () {
             uploadId: '5ef8e943dfe6e00030892d60',
             country: 'Germany',
         });
-        cy.visit('/');
-
-        cy.get('button[aria-label="toggle alerts panel"').click();
-        cy.contains('Please verify 5 cases added and 3 cases updated').click();
+        cy.addSource('New source', 'www.example.com', [
+            {
+                _id: '5ef8e943dfe6e00030892d58',
+                status: 'IN_PROGRESS',
+                summary: { numCreated: 5, numUpdated: 3 },
+                created: '2020-01-01',
+            },
+            {
+                _id: '5ef8e943dfe6e00030892d59',
+                status: 'SUCCESS',
+                summary: { numCreated: 2 },
+                created: '2020-01-02',
+            },
+        ]);
+        cy.visit('/uploads');
+        cy.contains('a', '5').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
         cy.get('input[id="search-field"]').should(
             'have.value',
@@ -42,7 +69,9 @@ describe('Alerts', function () {
         cy.contains('United Kingdom').should('not.exist');
         cy.contains('Germany').should('not.exist');
 
-        cy.contains('Please verify 2 cases added').click();
+        cy.visit('/uploads');
+        cy.contains('a', '2').click();
+        cy.url().should('eq', 'http://localhost:3002/cases');
         cy.get('input[id="search-field"]').should(
             'have.value',
             'uploadid:5ef8e943dfe6e00030892d59',

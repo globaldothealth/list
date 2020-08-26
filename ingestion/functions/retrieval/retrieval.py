@@ -1,13 +1,12 @@
 import json
 import os
-import tempfile
 import sys
-from datetime import datetime, timezone
-from enum import Enum
 
 import boto3
 import google.auth.transport.requests
 import requests
+
+from datetime import datetime, timezone
 
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
@@ -25,78 +24,7 @@ if ('lambda' not in sys.argv[0]):
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir, 'common'))
 import common_lib
-
-
-# TODO: Move this into common_lib.py after that's merged.
-class UploadError(Enum):
-    """
-    Upload error categories corresponding to the G.h Source API.
-
-    TODO: Move upload handling logic to common_lib.
-    """
-    INTERNAL_ERROR = 1
-    SOURCE_CONFIGURATION_ERROR = 2
-    SOURCE_CONFIGURATION_NOT_FOUND = 3
-    SOURCE_CONTENT_NOT_FOUND = 4
-    SOURCE_CONTENT_DOWNLOAD_ERROR = 5
-    PARSING_ERROR = 6
-    DATA_UPLOAD_ERROR = 7
-
-
-# TODO: Move this into common_lib.py after that's merged.
-def create_upload_record(source_id, headers):
-    """Creates an upload resource via the G.h Source API."""
-    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
-    print(f"Creating upload via {post_api_url}")
-    res = requests.post(post_api_url,
-                        json={"status": "IN_PROGRESS", "summary": {}},
-                        headers=headers)
-    if res and res.status_code == 201:
-        res_json = res.json()
-        # TODO: Look for "errors" in res_json and handle them in some way.
-        return res_json["_id"]
-    e = RuntimeError(
-        f'Error creating upload record, status={res.status_code}, response={res.text}')
-    complete_with_error(e)
-
-
-# TODO: Move this into common_lib.py after that's merged.
-def finalize_upload(
-        source_id, upload_id, headers, count_created=None, count_updated=None,
-        error=None):
-    """Records the results of an upload via the G.h Source API."""
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
-    print(f"Updating upload via {put_api_url}")
-    update = {
-        "status": "ERROR", "summary": {"error": error.name}} if error else {
-        "status": "SUCCESS",
-        "summary": {"numCreated": count_created, "numUpdated": count_updated}}
-    res = requests.put(put_api_url,
-                       json=update,
-                       headers=headers)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    if not res or res.status_code != 200:
-        e = RuntimeError(
-            f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, headers)
-
-
-# TODO: Move this into common_lib.py after that's merged.
-def complete_with_error(
-        exception, upload_error=None, source_id=None, upload_id=None,
-        headers=None):
-    """
-    Logs and raises the provided exception.
-
-    If upload details are provided, updates the indicated upload with the
-    provided data.
-    """
-    print(exception)
-    if upload_error and source_id and upload_id:
-        finalize_upload(source_id, upload_id, headers,
-                        error=upload_error)
-    raise exception
+from common_lib import UploadError
 
 
 def extract_source_id(event):
@@ -127,7 +55,7 @@ def get_source_details(source_id, upload_id, api_headers):
         upload_error = (
             UploadError.SOURCE_CONFIGURATION_NOT_FOUND
             if r.status_code == 404 else UploadError.INTERNAL_ERROR)
-        complete_with_error(
+        common_lib.complete_with_error(
             e, upload_error, source_id, upload_id,
             api_headers)
 
@@ -148,7 +76,7 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
             extension = "csv"
         else:
             e = ValueError(f"Unsupported source format: {source_format}")
-            complete_with_error(
+            common_lib.complete_with_error(
                 e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
                 api_headers)
 
@@ -166,7 +94,7 @@ def retrieve_content(source_id, upload_id, url, source_format, api_headers):
             UploadError.SOURCE_CONTENT_NOT_FOUND
             if r.status_code == 404 else
             UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
-        complete_with_error(
+        common_lib.complete_with_error(
             e, upload_error, source_id, upload_id,
             api_headers)
 
@@ -178,7 +106,7 @@ def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
         print(
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
     except Exception as e:
-        complete_with_error(
+        common_lib.complete_with_error(
             e, UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
@@ -194,16 +122,29 @@ def invoke_parser(
         "uploadId": upload_id,
         "dateFilter": date_filter,
     }
-    print(f"Invoking parser (ARN: {parser_arn}")
+    print(f"Invoking parser (ARN: {parser_arn})")
+    # This is asynchronous due to the "Event" invocation type.
     response = lambda_client.invoke(
         FunctionName=parser_arn,
         InvocationType='Event',
         Payload=json.dumps(payload))
+    print(f"Parser response: {response}")
     if "StatusCode" not in response or response["StatusCode"] != 202:
         e = Exception(f"Parser invocation unsuccessful. Response: {response}")
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, api_headers)
+        common_lib.complete_with_error(e, UploadError.INTERNAL_ERROR,
+                                       source_id, upload_id, api_headers)
 
+
+def get_today():
+    """Return today's datetime, just here for easier mocking."""
+    return datetime.today()
+
+def format_source_url(url: str) -> str:
+    """
+    Formats the given url with the date formatting params contained in it if any.
+    Cf. https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+    """
+    return get_today().strftime(url)
 
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
@@ -231,13 +172,19 @@ def lambda_handler(event, context):
 
     source_id = extract_source_id(event)
     auth_headers = common_lib.obtain_api_credentials(s3_client)
-    upload_id = create_upload_record(source_id, auth_headers)
+    upload_id = common_lib.create_upload_record(source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
         source_id, upload_id, auth_headers)
+    url = format_source_url(url)
     file_name, s3_object_key = retrieve_content(
         source_id, upload_id, url, source_format, auth_headers)
     upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
     if parser_arn:
-        invoke_parser(parser_arn, source_id, upload_id,
-                      auth_headers, s3_object_key, url, date_filter)
-    return {"bucket": OUTPUT_BUCKET, "key": s3_object_key}
+        invoke_parser(
+            parser_arn, source_id, upload_id, auth_headers, s3_object_key, url,
+            date_filter)
+    return {
+        "bucket": OUTPUT_BUCKET,
+        "key": s3_object_key,
+        "upload_id": upload_id,
+    }

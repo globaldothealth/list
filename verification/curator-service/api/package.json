@@ -15,7 +15,7 @@
     "start": "node dist/server.js",
     "test": "jest --forceExit --coverage --verbose --detectOpenHandles",
     "test-silent": "jest --forceExit --silent --detectOpenHandles",
-    "test-watch": "jest --watch --silent --detectOpenHandles"
+    "test-watch": "jest --watch --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
