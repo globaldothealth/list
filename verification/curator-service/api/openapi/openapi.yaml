@@ -4,11 +4,30 @@ info:
   description: Server for CRUD operations on Global Health data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
+    name: Healthmap
+    url: http://www.diseasedaily.org/about
     email: info@healthmap.org
   license:
     name: MIT
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
+tags:
+  - name: Case
+    description: Case related operations
+  - name: Suggest
+    description: Suggestion for input of cases
+  - name: Geocode
+    description: Geolocation of a case
+  - name: User
+    description: User of the system
+  - name: Source
+    description: A source of case data
+  - name: Upload
+    description: >
+      A bundle of case data that were uploaded as part of a batch upload
+      or an automated ingestion pipeline
+  - name: Auth
+    description: Authentication-related operations
 paths:
   /auth/register:
     post:
@@ -65,6 +84,7 @@ paths:
           schema:
             type: string
         - name: access_token
+          description: Bearer token used by automated ingestion lambdas.
           in: query
           required: false
           schema:
@@ -413,9 +433,36 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    delete:
+      summary: Deletes multiple cases
+      tags: [Case]
+      operationId: deleteCases
+      requestBody:
+        description: Cases to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "204":
+          description: Cases deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used sypmtoms
+      tags: [Suggest]
       operationId: listSymptoms
       parameters:
         - name: limit
@@ -440,6 +487,7 @@ paths:
   /cases/placesOfTransmission:
     get:
       summary: Lists most frequently used places of transmission
+      tags: [Suggest]
       operationId: listPlacesOfTransmission
       parameters:
         - name: limit
@@ -464,6 +512,7 @@ paths:
   /cases/occupations:
     get:
       summary: Lists most frequently used occupations
+      tags: [Suggest]
       operationId: listOccupations
       parameters:
         - name: limit
@@ -594,7 +643,7 @@ paths:
           description: OK
   /geocode/suggest:
     get:
-      tags: [Geocode]
+      tags: [Suggest, Geocode]
       summary: Suggests geocodes for a given query string
       operationId: suggestGeocodes
       parameters:
@@ -831,8 +880,10 @@ components:
             sourceId:
               type: string
               pattern: '^[a-f\d]{24}$'
+              description: UUID of the source this case was extracted from
             sourceUrl:
               type: string
+              description: URL of the source this case was extracted from
             uploadId:
               description: >
                 The UUID of the upload in which the batch of cases including
@@ -850,6 +901,7 @@ components:
                 - VERIFIED
             additionalSources:
               type: array
+              description: List of additional URLs that described a case
               items:
                 type: object
                 properties:
@@ -860,14 +912,20 @@ components:
           properties:
             gender:
               type: string
+              enum: [null, Male, Female, Non-binary/Third gender, Other]
             ageRange:
               type: object
+              description: >
+                Age bracket, start is included, end is excluded if different
+                than start.
               properties:
                 start:
                   type: number
                 end:
                   type: number
             ethnicity:
+              description: >
+                Social group that has a common national or cultural tradition.
               type: string
             nationalities:
               type: array
@@ -899,6 +957,7 @@ components:
                 type: string
         symptoms:
           type: object
+          description: Symptoms that the patient had if any
           properties:
             status:
               type: string
@@ -908,6 +967,7 @@ components:
                 type: string
         preexistingConditions:
           type: object
+          description: Any preexisting condition that the patient had
           properties:
             hasPreexistingConditions:
               type: boolean
@@ -917,6 +977,7 @@ components:
                 type: string
         transmission:
           type: object
+          description: How this case got infected and by who if known
           properties:
             routes:
               type: array
@@ -932,6 +993,7 @@ components:
                 type: string
         travelHistory:
           type: object
+          description: Travel history of the patient if known
           properties:
             traveledPrior30Days:
               type: boolean
@@ -952,6 +1014,7 @@ components:
                       type: string
         genomeSequences:
           type: array
+          description: Genome sequence of the pathogen
           items:
             type: object
             properties:
@@ -969,6 +1032,7 @@ components:
                 minimum: 0
         pathogens:
           type: array
+          description: Pathogens associated with the case
           items:
             type: object
             properties:
@@ -980,8 +1044,12 @@ components:
                 minimum: 0
         notes:
           type: string
+          description: >
+            Anything that does not fit in a schema but worth mentioning about
+            the case
         revisionMetadata:
           type: object
+          description: Various revisions of this case over time
           properties:
             revisionNumber:
               type: integer
@@ -1082,18 +1150,20 @@ components:
       required:
         - origin
     User:
-      description: A user
+      description: A user of the system (researcher, policy maker, etc)
       type: object
       properties:
         allOf:
           $ref: "#/components/schemas/RoleArray"
         name:
           type: string
+          description: Full name of the user if provided by the OAuth provider
         email:
           type: string
           format: email
         googleID:
           type: string
+          description: Unique identifier for the google account of the user
       required:
         - email
     UserArray:
@@ -1107,6 +1177,7 @@ components:
           type: integer
     Role:
       type: string
+      description: Role of a user in the system
       enum:
         - admin
         - curator
@@ -1124,18 +1195,31 @@ components:
       properties:
         country:
           type: string
+          description: English full name of a country
         administrativeAreaLevel1:
           type: string
+          description: First administrative subdivision of a country
         administrativeAreaLevel2:
           type: string
+          description: Second administrative subdivision of a country
         administrativeAreaLevel3:
           type: string
+          description: Third administrative subdivision of a country
         place:
           type: string
+          description: Name of the place this location refers to
+          example: Boston Children's Hospital
         name:
           type: string
+          description: >
+            Full name of the location
+          example: Lyon, Auvergne-Rhône-Alpes, France
         geoResolution: 
           type: string
+          description: How granular the location is
+          example:
+            - Country
+            - Admin2
         geometry:
           type: object
           properties:
@@ -1334,3 +1418,7 @@ components:
 servers:
   - url: http://localhost:3001/api
     description: Local server
+  - url: http://dev-curator.ghdsi.org/api
+    description: Development server
+  - url: http://curator.ghdsi.org/api
+    description: Production server
