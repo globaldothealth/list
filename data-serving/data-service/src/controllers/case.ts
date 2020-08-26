@@ -380,7 +380,16 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
               $text: { $search: parsedSearch.fullTextSearch },
           }
         : {};
-    Case.deleteMany(queryOpts, (err) => {
+
+    const casesQuery = Case.find(queryOpts);
+    parsedSearch.filters.forEach((f) => {
+        if (f.values.length == 1) {
+            casesQuery.where(f.path).equals(f.values[0]);
+        } else {
+            casesQuery.where(f.path).in(f.values);
+        }
+    });
+    Case.deleteMany(casesQuery, (err) => {
         if (err) {
             res.status(500).json(err.message);
             return;

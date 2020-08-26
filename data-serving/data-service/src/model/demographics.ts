@@ -43,3 +43,8 @@ export type DemographicsDocument = mongoose.Document & {
     nationalities: [string];
     ethnicity: string;
 };
+
+export const Demographics = mongoose.model<DemographicsDocument>(
+    'Demographics',
+    demographicsSchema,
+);
