@@ -159,6 +159,7 @@ it('API errors are displayed', async () => {
 
     fireEvent.click(getByTestId(/row menu/));
     fireEvent.click(getByText(/Delete/));
+    fireEvent.click(getByText(/Yes/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
@@ -239,6 +240,7 @@ it('can delete a row', async () => {
 
     fireEvent.click(getByTestId(/row menu/));
     fireEvent.click(getByText(/Delete/));
+    fireEvent.click(getByText(/Yes/));
     expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
     expect(mockedAxios.delete).toHaveBeenCalledWith(
         '/api/cases/' + cases[0]._id,
@@ -248,6 +250,62 @@ it('can delete a row', async () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     const noRec = await findByText(/No records to display/);
     expect(noRec).toBeInTheDocument();
+});
+
+it('can cancel delete action', async () => {
+    const cases = [
+        {
+            _id: 'abc123',
+            caseReference: {
+                sourceId: 'CDC',
+                sourceUrl: 'www.example.com',
+            },
+            importedCase: {
+                outcome: 'Recovered',
+            },
+            location: {
+                country: 'France',
+                geoResolution: 'Country',
+            },
+            events: [
+                {
+                    name: 'confirmed',
+                    dateRange: {
+                        start: new Date().toJSON(),
+                    },
+                },
+            ],
+            notes: 'some notes',
+        },
+    ];
+    const axiosGetResponse = {
+        data: {
+            cases: cases,
+            total: 15,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
+
+    // Load table
+    const { getByText, findByText, getByTestId } = render(
+        <MemoryRouter>
+            <LinelistTable user={curator} />
+        </MemoryRouter>,
+    );
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    const row = await findByText('www.example.com');
+    expect(row).toBeInTheDocument();
+
+    fireEvent.click(getByTestId(/row menu/));
+    fireEvent.click(getByText(/Delete/));
+    fireEvent.click(getByText(/Cancel/));
+    expect(mockedAxios.delete).toHaveBeenCalledTimes(0);
+    expect(row).toBeInTheDocument();
 });
 
 it('cannot edit data as a reader only', async () => {
@@ -294,7 +352,7 @@ it('cannot edit data as a reader only', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
 
     // Load table
-    const { findByText, queryByText, queryByLabelText } = render(
+    const { findByText, queryByTestId } = render(
         <MemoryRouter>
             <LinelistTable
                 user={{
@@ -311,10 +369,5 @@ it('cannot edit data as a reader only', async () => {
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
-    const deleteButton = queryByText(/delete_outline/);
-    expect(deleteButton).not.toBeInTheDocument();
-    const addButton = queryByText(/add_box/);
-    expect(addButton).not.toBeInTheDocument();
-    const editButton = queryByLabelText(/edit/);
-    expect(editButton).not.toBeInTheDocument();
+    expect(queryByTestId(/row menu/)).not.toBeInTheDocument();
 });
