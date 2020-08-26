@@ -21,7 +21,7 @@ jobs:
           wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
           echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5DC22404A6F9F1CA 656408E390CFB1F5
-          sudo dpkg --purge mongodb-org-tools mongodb-org-database-tools-extra
+          sudo apt-get remove mongodb*
           sudo apt-get update
           sudo apt-get install -f -y --allow-downgrades mongodb-org=4.2.6 mongodb-org-server=4.2.6 mongodb-org-shell=4.2.6 mongodb-org-mongos=4.2.6 mongodb-org-tools=4.2.6 libcurl3
 
