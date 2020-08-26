@@ -1,5 +1,6 @@
 import { Case } from '../../src/model/case';
 import { CaseRevision } from '../../src/model/case-revision';
+import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
@@ -793,21 +794,40 @@ describe('DELETE', () => {
 
         const c = new Case(minimalCase);
         c.notes = 'got it at work';
+        c.demographics = new Demographics({ gender: 'Female' });
         await c.save();
+        const c2 = new Case(minimalCase);
+        c2.demographics = new Demographics({ gender: 'Female' });
+        await c2.save();
         await new Case(minimalCase).save();
-        expect(await Case.collection.countDocuments()).toEqual(2);
+        expect(await Case.collection.countDocuments()).toEqual(3);
 
         // Unmatched query deletes no cases
         await request(app)
             .delete('/api/cases')
             .send({ query: 'at home' })
             .expect(204);
-        expect(await Case.collection.countDocuments()).toEqual(2);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at work gender:Male' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'gender:Male' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(3);
 
         // Deletes matched queries
         await request(app)
             .delete('/api/cases')
-            .send({ query: 'at work' })
+            .send({ query: 'at work gender:Female' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(2);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(1);
     });
