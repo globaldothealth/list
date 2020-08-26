@@ -12,6 +12,12 @@ _SOURCE_API_URL = "http://foo.bar"
 
 @pytest.fixture()
 def mock_source_api_url_fixture():
+    """
+    Supplies a predetermined endpoint for G.h HTTP requests.
+
+    Because the retrieval library is imported locally, this fixture can't
+    be set to autouse.
+    """
     import common_lib
     common_lib.get_source_api_url = MagicMock(
         name="get_source_api_url", return_value=_SOURCE_API_URL)

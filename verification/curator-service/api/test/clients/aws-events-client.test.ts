@@ -3,7 +3,7 @@ import AWSMock from 'aws-sdk-mock';
 import AwsEventsClient from '../../src/clients/aws-events-client';
 import AwsLambdaClient from '../../src/clients/aws-lambda-client';
 
-const ENV = 'test';
+const _ENV = 'test';
 
 let client: AwsEventsClient;
 const addInvokeFromEventPermissionSpy = jest.fn().mockResolvedValue({});
@@ -46,7 +46,7 @@ beforeEach(() => {
     client = new AwsEventsClient(
         'us-east-1',
         new AwsLambdaClient('some-arn', 'us-east-1'),
-        ENV,
+        _ENV,
     );
 });
 
@@ -90,7 +90,7 @@ describe('putRule', () => {
                         Arn: targetArn,
                         Id: targetId,
                         Input: JSON.stringify({
-                            env: ENV,
+                            env: _ENV,
                             sourceId: sourceId,
                         }),
                     },
