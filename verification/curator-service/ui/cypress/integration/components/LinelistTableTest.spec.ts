@@ -173,7 +173,7 @@ describe('Linelist table', function () {
     });
 
     it('Can select all rows across pages', function () {
-        for (let i = 0; i < 52; i++) {
+        for (let i = 0; i < 7; i++) {
             cy.addCase({
                 country: 'France',
                 notes: 'some notes',
@@ -181,15 +181,17 @@ describe('Linelist table', function () {
             });
         }
         cy.visit('/cases');
-        cy.get('input[type="checkbox"]').should('have.length', 51);
+        cy.contains('rows').click();
+        cy.get('li').contains('5').click();
+        cy.get('input[type="checkbox"]').should('have.length', 6);
         cy.contains('1 row selected').should('not.exist');
         cy.get('input[type="checkbox"]').eq(1).click();
         cy.contains('1 row selected');
         cy.get('input[type="checkbox"]').eq(0).click();
-        cy.contains('50 rows selected');
-        cy.contains('Select all 52 rows').click();
-        cy.contains('52 rows selected');
-        cy.contains('Unselect all 52 rows').click();
-        cy.contains('52 rows selected').should('not.exist');
+        cy.contains('5 rows selected');
+        cy.contains('Select all 7 rows').click();
+        cy.contains('7 rows selected');
+        cy.contains('Unselect all 7 rows').click();
+        cy.contains('7 rows selected').should('not.exist');
     });
 });
