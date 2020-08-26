@@ -764,10 +764,13 @@ describe('DELETE', () => {
         await request(app).delete('/api/cases').send({}).expect(400);
     });
     it('delete multiple cases cannot send empty query', async () => {
+        await request(app).delete('/api/cases').send({ query: '' }).expect(400);
+    });
+    it('delete multiple cases cannot send whitespace only query', async () => {
         await request(app)
             .delete('/api/cases')
             .send({ query: ' ' })
-            .expect(422);
+            .expect(400);
     });
     it('delete multiple cases with caseIds should return 204 OK', async () => {
         const c = await new Case(minimalCase).save();
