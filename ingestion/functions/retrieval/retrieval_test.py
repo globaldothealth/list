@@ -49,15 +49,6 @@ def valid_event():
         return json.load(event_file)
 
 
-@pytest.fixture()
-def invalid_event():
-    """Loads invalid CloudWatch ScheduledEvent from file."""
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "invalid_scheduled_event.json")
-    with open(file_path) as event_file:
-        return json.load(event_file)
-
-
 def test_format_url_leaves_unchanged_if_no_format_params():
     from retrieval import retrieval  # Import locally to avoid superseding mock
     url = "http://foo.bar"
