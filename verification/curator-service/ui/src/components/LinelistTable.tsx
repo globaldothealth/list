@@ -9,7 +9,7 @@ import {
     withStyles,
 } from '@material-ui/core';
 import { Case, VerificationStatus } from './Case';
-import MaterialTable, { QueryResult } from 'material-table';
+import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
@@ -43,6 +43,8 @@ interface LinelistTableState {
     error: string;
     pageSize: number;
     search: string;
+    numSelectedRows: number;
+    totalNumRows: number;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -301,6 +303,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             error: '',
             pageSize: 50,
             search: this.props.location.state?.searchQuery ?? '',
+            numSelectedRows: 0,
+            totalNumRows: 0,
         };
     }
 
@@ -329,6 +333,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 reject(e);
             });
         });
+    }
+
+    hasSelectedRowsAcrossPages(): boolean {
+        return (
+            this.state.totalNumRows === this.state.numSelectedRows &&
+            this.state.numSelectedRows > this.state.pageSize
+        );
     }
 
     setCaseVerification(
@@ -583,6 +594,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ?.verificationStatus,
                                         });
                                     }
+                                    this.setState({
+                                        totalNumRows: result.data.total,
+                                    });
                                     resolve({
                                         data: flattenedCases,
                                         page: query.page,
@@ -596,6 +610,25 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         })
                     }
                     title="COVID-19 cases"
+                    components={{
+                        Toolbar: (props): JSX.Element => (
+                            <MTableToolbar
+                                {...props}
+                                toolbarButtonAlignment="left"
+                            />
+                        ),
+                    }}
+                    onSelectionChange={(rows): void =>
+                        this.setState({ numSelectedRows: rows.length })
+                    }
+                    localization={{
+                        toolbar: {
+                            nRowsSelected:
+                                this.state.numSelectedRows === 1
+                                    ? '1 row selected'
+                                    : `${this.state.numSelectedRows} rows selected`,
+                        },
+                    }}
                     options={{
                         search: false,
                         emptyRowsWhenPaging: false,
@@ -635,11 +668,55 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   {
                                       icon: (): JSX.Element => (
+                                          <Button variant="outlined">
+                                              {this.state.totalNumRows ===
+                                              this.state.numSelectedRows
+                                                  ? 'Unselect'
+                                                  : 'Select'}{' '}
+                                              all {this.state.totalNumRows} rows
+                                          </Button>
+                                      ),
+                                      tooltip: `
+                                      ${
+                                          this.state.totalNumRows ===
+                                          this.state.numSelectedRows
+                                              ? 'Unselect'
+                                              : 'Select'
+                                      } all rows across pages`,
+                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
+                                          const shouldSelectAll =
+                                              this.state.totalNumRows !==
+                                              this.state.numSelectedRows;
+                                          await this.tableRef.current.onAllSelected(
+                                              shouldSelectAll,
+                                          );
+                                          this.setState({
+                                              numSelectedRows: shouldSelectAll
+                                                  ? this.state.totalNumRows
+                                                  : 0,
+                                          });
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
                                       ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          if (
+                                              this.hasSelectedRowsAcrossPages()
+                                          ) {
+                                              // TODO: Implement action for all rows
+                                              alert(
+                                                  'Action not yet implemented when all rows selected',
+                                              );
+                                              return;
+                                          }
                                           const updatePromises = rows.map(
                                               (row: TableRow) =>
                                                   this.setCaseVerification(
@@ -661,6 +738,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: (_: any, rows: any): void => {
+                                          if (
+                                              this.hasSelectedRowsAcrossPages()
+                                          ) {
+                                              // TODO: Implement action for all rows
+                                              alert(
+                                                  'Action not yet implemented when all rows selected',
+                                              );
+                                              return;
+                                          }
                                           const updatePromises = rows.map(
                                               (row: TableRow) =>
                                                   this.setCaseVerification(
@@ -690,6 +776,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
+                                          if (
+                                              this.hasSelectedRowsAcrossPages()
+                                          ) {
+                                              // TODO: Implement action for all rows
+                                              alert(
+                                                  'Action not yet implemented when all rows selected',
+                                              );
+                                              return;
+                                          }
                                           await axios.delete('/api/cases', {
                                               data: {
                                                   caseIds: rows.map(
