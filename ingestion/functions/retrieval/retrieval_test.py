@@ -21,6 +21,7 @@ def mock_source_api_url_fixture():
     import common_lib
     common_lib.get_source_api_url = MagicMock(
         name="get_source_api_url", return_value=_SOURCE_API_URL)
+    return common_lib
 
 
 @pytest.fixture()
@@ -77,6 +78,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     from retrieval import retrieval  # Import locally to avoid superseding mock
 
     # Mock/stub retrieving credentials, invoking the parser lambda, and S3.
+    common_lib = mock_source_api_url_fixture
     common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials", return_value={})
     retrieval.invoke_parser = MagicMock(name="invoke_parser")
