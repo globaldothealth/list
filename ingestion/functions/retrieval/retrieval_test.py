@@ -77,7 +77,6 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     from retrieval import retrieval  # Import locally to avoid superseding mock
 
     # Mock/stub retrieving credentials, invoking the parser lambda, and S3.
-    import common_lib  # Import locally to avoid superseding mock
     common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials", return_value={})
     retrieval.invoke_parser = MagicMock(name="invoke_parser")

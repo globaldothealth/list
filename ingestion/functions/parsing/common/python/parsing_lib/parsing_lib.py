@@ -12,6 +12,8 @@ from google.oauth2 import service_account
 
 # TODO: Use tempfile here instead.
 LOCAL_DATA_FILE = "/tmp/rawdata"
+
+ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
@@ -41,15 +43,17 @@ from common_lib import UploadError
 def extract_event_fields(event):
     print('Extracting fields from event', event)
     if any(
-            field not in event
-            for field
-            in [SOURCE_URL_FIELD, SOURCE_ID_FIELD, S3_BUCKET_FIELD, S3_KEY_FIELD]):
+        field not in event
+        for field
+        in
+        [ENV_FIELD, SOURCE_URL_FIELD, SOURCE_ID_FIELD, S3_BUCKET_FIELD,
+         S3_KEY_FIELD]):
         error_message = (
-            f"Required fields {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
+            f"Required fields {ENV_FIELD}; {SOURCE_URL_FIELD}; {S3_BUCKET_FIELD}; "
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
 
 
@@ -75,9 +79,9 @@ def prepare_cases(cases, upload_id):
     return cases
 
 
-def write_to_server(cases, source_id, upload_id, headers):
+def write_to_server(cases, env, source_id, upload_id, headers):
     """Upserts the provided cases via the G.h Case API."""
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/cases/batchUpsert"
+    put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     print(f"Sending {len(cases)} cases to {put_api_url}")
     res = requests.post(put_api_url, json={"cases": cases},
                         headers=headers)
@@ -168,7 +172,7 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
+    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
         event)
     api_creds = common_lib.obtain_api_credentials(s3_client)
     if not upload_id:
@@ -185,7 +189,7 @@ def run_lambda(event, context, parsing_function):
                 date_filter,
                 source_id, upload_id,
                 api_creds),
-            source_id, upload_id,
+            env, source_id, upload_id,
             api_creds)
         common_lib.finalize_upload(
             source_id, upload_id, api_creds, count_created, count_updated)
