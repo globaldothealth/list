@@ -2,7 +2,6 @@ import { Case, CaseDocument } from '../model/case';
 import { Request, Response } from 'express';
 
 import parseSearchQuery from '../util/search';
-import { runInNewContext } from 'vm';
 
 /**
  * Get a specific case.
