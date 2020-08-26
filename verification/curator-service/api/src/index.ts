@@ -119,6 +119,7 @@ const awsLambdaClient = new AwsLambdaClient(
 const awsEventsClient = new AwsEventsClient(
     env.AWS_SERVICE_REGION,
     awsLambdaClient,
+    env.SERVICE_ENV,
 );
 
 // API validation.

@@ -112,3 +112,16 @@ def test_complete_with_error_updates_upload_if_provided_data(requests_mock):
         return
     # We got the wrong exception or no exception, fail the test.
     assert "Should have raised a ValueError exception" == False
+
+
+def test_get_source_api_url_returns_mapped_value():
+    for key, value in common_lib._ENV_TO_SOURCE_API_URL.items():
+        assert common_lib.get_source_api_url(key) == value
+
+
+def test_get_source_api_url_raises_error_for_unmapped_env():
+    try:
+        common_lib.get_source_api_url('not-an-env')
+    except ValueError:
+        return
+    assert "Should have raised a ValueError exception" == False
