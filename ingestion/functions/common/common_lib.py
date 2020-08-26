@@ -1,4 +1,11 @@
-# Common utilities between parsing and retrieval lambdas.
+"""
+Common utilities between parsing and retrieval lambdas.
+
+TODO: Considering structuring this as a class (if that's workable with AWS
+Lambda layers). Many methods accept similar parameters, in order to accomplish
+API calls, and it's information that could be easily encoded as state in an
+object.
+"""
 
 import os
 import tempfile
