@@ -309,6 +309,8 @@ function RowMenu(props: {
             <Dialog
                 open={deleteDialogOpen}
                 onClose={(): void => setDeleteDialogOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
             >
                 <DialogTitle>
@@ -380,15 +382,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             alert('Action not yet implemented when all rows selected');
             return;
         }
-        await axios.delete('/api/cases', {
-            data: {
-                caseIds: this.state.selectedRowsCurrentPage.map(
-                    (row: TableRow) => row.id,
-                ),
-            },
-        });
-        this.setState({ deleteDialogOpen: false });
-        this.tableRef.current.onQueryChange();
+        try {
+            await axios.delete('/api/cases', {
+                data: {
+                    caseIds: this.state.selectedRowsCurrentPage.map(
+                        (row: TableRow) => row.id,
+                    ),
+                },
+            });
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString() });
+        } finally {
+            this.setState({ deleteDialogOpen: false });
+        }
     }
 
     hasSelectedRowsAcrossPages(): boolean {
@@ -499,6 +506,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     onClose={(): void =>
                         this.setState({ deleteDialogOpen: false })
                     }
+                    // Stops the click being propagated to the table which
+                    // would trigger the onRowClick action.
                     onClick={(e): void => e.stopPropagation()}
                 >
                     <DialogTitle>
