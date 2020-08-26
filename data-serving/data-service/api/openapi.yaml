@@ -163,11 +163,12 @@ paths:
               type: object
               properties:
                 caseIds:
+                  description: Cases corresponding to these ids will be deleted
                   type: array
                   items:
                     type: string
                 query:
-                  description: Case ids matching this query will be deleted.
+                  description: Cases matching this query will be deleted
                   type: string
               oneOf:
                 - required: [caseIds]
