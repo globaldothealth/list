@@ -9,6 +9,11 @@ import google
 from enum import Enum
 from google.oauth2 import service_account
 
+_ENV_TO_SOURCE_API_URL = {
+    "local": "http://localhost:3001/api",
+    "dev": "https://dev-curator.ghdsi.org/api",
+    "prod": "https://curator.ghdsi.org/api"
+}
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
 
@@ -100,3 +105,12 @@ def obtain_api_credentials(s3_client):
     except Exception as e:
         print(e)
         raise e
+
+
+def get_source_api_url(env):
+    """
+    Returns the URL at which to reach the Source API for the provided environment.
+    """
+    if env not in _ENV_TO_SOURCE_API_URL:
+        raise ValueError(f"No source API URL found for provided env: {env}")
+    return _ENV_TO_SOURCE_API_URL[env]
