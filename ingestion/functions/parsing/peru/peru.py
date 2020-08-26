@@ -69,41 +69,41 @@ def parse_cases(raw_data_file, source_id, source_url):
            aggregate data. We need to add handling logic; until we've done so,
            this filter is used to process strictly line list data.
     """
-    with open(raw_data_file, "r") as f:
-        cases = pd.read_csv(raw_data_file,sep=',',encoding='ISO-8859-1')
-        return [
-            {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceEntryId": entry["UUID"],
-                    "sourceUrl": source_url
-                },
-                "revisionMetadata": {
-                    "revisionNumber": 0,
-                    "creationMetadata": {
-                        "curator": "auto",
-                        "date": date.today().strftime("%m/%d/%Y")
-                    }
-                },
-                "location": convert_location(entry),
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(entry["FECHA_RESULTADO"]),
-                            "end": convert_date(entry["FECHA_RESULTADO"])
-                        }
-                    }
-                ],
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["EDAD"]),
-                        "end": float(entry["EDAD"])
-                    },
-                    "gender": convert_gender(entry["SEXO"])
+    
+    cases = pd.read_csv(raw_data_file,sep=',',encoding='ISO-8859-1')
+    return [
+        {
+            "caseReference": {
+                "sourceId": source_id,
+                "sourceEntryId": entry["UUID"],
+                "sourceUrl": source_url
+            },
+            "revisionMetadata": {
+                "revisionNumber": 0,
+                "creationMetadata": {
+                    "curator": "auto",
+                    "date": date.today().strftime("%m/%d/%Y")
                 }
-            } for i,entry in cases.iterrows()]
+            },
+            "location": convert_location(entry),
+            "events": [
+                {
+                    "name": "confirmed",
+                    "dateRange":
+                    {
+                        "start": convert_date(entry["FECHA_RESULTADO"]),
+                        "end": convert_date(entry["FECHA_RESULTADO"])
+                    }
+                }
+            ],
+            "demographics": {
+                "ageRange": {
+                    "start": float(entry["EDAD"]),
+                    "end": float(entry["EDAD"])
+                },
+                "gender": convert_gender(entry["SEXO"])
+            }
+        } for i,entry in cases.iterrows()]
 
 
 
