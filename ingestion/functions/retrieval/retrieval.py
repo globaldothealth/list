@@ -8,6 +8,7 @@ import requests
 
 from datetime import datetime, timezone
 
+ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
@@ -27,36 +28,46 @@ import common_lib
 from common_lib import UploadError
 
 
-def extract_source_id(event):
-    if SOURCE_ID_FIELD not in event:
+def extract_event_fields(event):
+    print('Extracting fields from event', event)
+    if any(
+            field not in event
+            for field
+            in [ENV_FIELD, SOURCE_ID_FIELD]):
         error_message = (
-            f"Required field {SOURCE_ID_FIELD} not found in input event json.")
+            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
-    return event[SOURCE_ID_FIELD]
+    return event[ENV_FIELD], event[SOURCE_ID_FIELD]
 
 
-def get_source_details(source_id, upload_id, api_headers):
+def get_source_details(env, source_id, upload_id, api_headers):
     """
     Retrieves the content URL and format associated with the provided source ID.
     """
     try:
-        source_api_endpoint = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}"
+        source_api_endpoint = f"{common_lib.get_source_api_url(env)}/sources/{source_id}"
         print(f"Requesting source configuration from {source_api_endpoint}")
         r = requests.get(source_api_endpoint, headers=api_headers)
-        api_json = r.json()
-        print(f"Received source API response: {api_json}")
-        return api_json["origin"]["url"], api_json["format"], api_json.get(
-            "automation", {}).get(
-            "parser", {}).get(
-            "awsLambdaArn", ""), api_json.get(
-            'dateFilter', {})
-    except Exception as e:
+        if r and r.status_code == 200:
+            api_json = r.json()
+            print(f"Received source API response: {api_json}")
+            return api_json["origin"]["url"], api_json["format"], api_json.get(
+                "automation", {}).get(
+                "parser", {}).get(
+                "awsLambdaArn", ""), api_json.get(
+                'dateFilter', {})
         upload_error = (
             UploadError.SOURCE_CONFIGURATION_NOT_FOUND
             if r.status_code == 404 else UploadError.INTERNAL_ERROR)
+        e = RuntimeError(
+            f"Error retrieving source details, status={r.status_code}, response={r.text}")
         common_lib.complete_with_error(
             e, upload_error, source_id, upload_id,
+            api_headers)
+    except ValueError as e:
+        common_lib.complete_with_error(
+            e, UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
 
@@ -112,9 +123,10 @@ def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
 
 
 def invoke_parser(
-    parser_arn, source_id, upload_id, api_headers, s3_object_key,
+    env, parser_arn, source_id, upload_id, api_headers, s3_object_key,
         source_url, date_filter):
     payload = {
+        "env": env,
         "s3Bucket": OUTPUT_BUCKET,
         "sourceId": source_id,
         "s3Key": s3_object_key,
@@ -139,12 +151,14 @@ def get_today():
     """Return today's datetime, just here for easier mocking."""
     return datetime.today()
 
+
 def format_source_url(url: str) -> str:
     """
     Formats the given url with the date formatting params contained in it if any.
     Cf. https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
     """
     return get_today().strftime(url)
+
 
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
@@ -170,19 +184,18 @@ def lambda_handler(event, context):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_id = extract_source_id(event)
+    env, source_id = extract_event_fields(event)
     auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(source_id, auth_headers)
     url, source_format, parser_arn, date_filter = get_source_details(
-        source_id, upload_id, auth_headers)
+        env, source_id, upload_id, auth_headers)
     url = format_source_url(url)
     file_name, s3_object_key = retrieve_content(
         source_id, upload_id, url, source_format, auth_headers)
     upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
     if parser_arn:
-        invoke_parser(
-            parser_arn, source_id, upload_id, auth_headers, s3_object_key, url,
-            date_filter)
+        invoke_parser(env, parser_arn, source_id, upload_id,
+                      auth_headers, s3_object_key, url, date_filter)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
