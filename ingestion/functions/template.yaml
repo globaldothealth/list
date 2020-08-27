@@ -124,6 +124,25 @@ Resources:
         Variables:
           SOURCE_API_URL:
             Ref: SourceApiUrl
+  BrazilAmapaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_amapa/
+      Handler: amapa.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for the Amapa State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
+      Environment:
+        Variables:
+          SOURCE_API_URL:
+            Ref: SourceApiUrl
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
