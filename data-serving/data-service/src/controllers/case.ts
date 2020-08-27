@@ -1,4 +1,5 @@
 import { Case, CaseDocument } from '../model/case';
+import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
 
 import parseSearchQuery from '../util/search';
@@ -30,18 +31,20 @@ const casesMatchingSearchQuery = (opts: {
               $text: { $search: parsedSearch.fullTextSearch },
           }
         : {};
-    const casesQuery = opts.count
-        ? Case.countDocuments(queryOpts)
-        : Case.find(queryOpts);
+
+    const casesQuery = Case.find(queryOpts);
+    const countQuery = Case.countDocuments(queryOpts);
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
             casesQuery.where(f.path).equals(f.values[0]);
+            countQuery.where(f.path).equals(f.values[0]);
         } else {
             casesQuery.where(f.path).in(f.values);
+            countQuery.where(f.path).in(f.values);
         }
     });
-    return casesQuery;
+    return opts.count ? countQuery : casesQuery;
 };
 
 /**
@@ -69,11 +72,11 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         const casesQuery = casesMatchingSearchQuery({
             searchQuery: req.query.q || '',
             count: false,
-        });
+        }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
         const countQuery = casesMatchingSearchQuery({
             searchQuery: req.query.q || '',
             count: true,
-        });
+        }) as Query<number>;
         // Do a fetch of documents and another fetch in parallel for total documents
         // count used in pagination.
         const [docs, total] = await Promise.all([
