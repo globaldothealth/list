@@ -107,7 +107,7 @@ def convert_notes(raw_commorbidities:str, raw_notes_neighbourhood: str, raw_note
         """ 
         Immunosupression is not necessarily a disease as defined in the Disease Ontology 
         (i.e. could be drug-induced, or the result of many diseases) so I have put this in notes instead
-        or pre-existing conditions.
+        of pre-existing conditions.
         """
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
