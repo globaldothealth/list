@@ -27,7 +27,6 @@ _ADMIN2 = 3
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
-
     """
     date = datetime.strptime(raw_date, "%Y/%m/%d %H:%M:%S")
     return date.strftime("%m/%d/%YZ")
@@ -38,7 +37,6 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "W":
         return "Female"
-    return None
 
 
 def convert_demographics(gender: str, age: str):
@@ -76,12 +74,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 case = {
                     "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                     "location": {
-                        "country": "Germany",
-                        "administrativeAreaLevel1": row[_ADMIN1],
-                        "administrativeAreaLevel2": row[_ADMIN2],
-                        "geoResolution": "Admin2",
-                        "name": row[_ADMIN2],
                         "query": ", ".join(("Germany", row[_ADMIN1], row[_ADMIN2])),
+                        "limitToResolution": "Admin2"
                     },
                     "events": [
                         {
@@ -99,7 +93,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 # Death and recovery counts are always equal to case counts for the row.
                 if int(row[_DEATHCOUNT]) > 0:
                     case["events"].append({"name": "outcome", "value": "Death"})
-                if int(row[_RECOVERYCOUNT]) > 0:
+                elif int(row[_RECOVERYCOUNT]) > 0:
                     case["events"].append({"name": "outcome", "value": "Recovered"})
                 cases.extend([case] * num_confirmed_cases)
             except ValueError as ve:
