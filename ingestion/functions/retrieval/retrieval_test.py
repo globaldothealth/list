@@ -63,7 +63,6 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(url) == "http://foo.bar/2020-06-08.json"
 
 
-@mock_s3
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
                             mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
@@ -325,7 +324,6 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
     assert "Should have raised an exception." == False
 
 
-@mock_s3
 def test_upload_to_s3_writes_indicated_file_to_key(s3):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     local_file = "/tmp/data.txt"

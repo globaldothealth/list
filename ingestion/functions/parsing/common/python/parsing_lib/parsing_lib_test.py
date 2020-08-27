@@ -128,7 +128,6 @@ def sample_data():
         return json.load(event_file)
 
 
-@mock_s3
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
         mock_source_api_url_fixture):
@@ -179,7 +178,6 @@ def test_run_lambda_e2e(
     assert response["count_updated"] == num_updated
 
 
-@mock_s3
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
