@@ -110,6 +110,27 @@ Resources:
           # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
           # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
           AWS_SESSION_TOKEN: ""
+  GermanyParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/germany/
+      Handler: germany.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Germany
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 60 # Seconds
+      Layers:
+        - !Ref ParsingLibLayer
+      Environment:
+        Variables:
+          SOURCE_API_URL:
+            Ref: SourceApiUrl
+          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
+          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
+          AWS_SESSION_TOKEN: ""
 
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
