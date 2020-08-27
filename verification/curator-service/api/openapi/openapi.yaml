@@ -434,7 +434,11 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     delete:
-      summary: Deletes multiple cases
+      summary: >
+        Deletes multiple cases. It is required to supply exactly one of either 
+        caseIds or query in the request body. If caseIds are supplied, cases 
+        corresponding to those caseIds will be deleted. If query is supplied, 
+        all cases that match the query will be deleted.
       tags: [Case]
       operationId: deleteCases
       requestBody:
@@ -443,11 +447,22 @@ paths:
         content:
           application/json:
             schema:
+              type: object
               properties:
                 caseIds:
+                  description: Cases corresponding to these ids will be deleted
                   type: array
                   items:
                     type: string
+                query:
+                  description: >
+                    Cases matching this query will be deleted. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: ^(?!\s*$).+
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
       responses:
         "204":
           description: Cases deleted
