@@ -1,10 +1,7 @@
 {
+    "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f32be3fe3f3ef002e849307/2020/08/11/1552/content.csv",
+    "s3Key": "5f32be3fe3f3ef002e849307/2020/08/12/0815/content.csv",
     "sourceUrl": "https://github.com/openZH/covid_19/blob/master/fallzahlen_kanton_alter_geschlecht_csv/COVID19_Fallzahlen_Kanton_ZH_alter_geschlecht.csv",
-    "sourceId": "5f32be3fe3f3ef002e849307",
-    "dateFilter": {
-        "numDaysBeforeToday": 3,
-        "op": "LT"
-    }
+    "sourceId": "5f32be3fe3f3ef002e849307"
 }

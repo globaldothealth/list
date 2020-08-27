@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Lambda functions for Global Health ingestion
 
-Parameters:
-  SourceApiUrl:
-    Type: String
-    Description: Address at which to retrieve source details
-    Default: "http://localhost:3001/api"
-
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -25,20 +19,29 @@ Resources:
         - AWSLambdaFullAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
-      Timeout: 60 # Seconds
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
+      Timeout: 300
+      Layers:
+        - !Ref CommonLibLayer
   ParsingLibLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: parsing_lib
       Description: Common functions required for parsing
       ContentUri: parsing/common/python/parsing_lib
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.8
+  CommonLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common_lib
+      Description: Common functions between parsing and retrieval
+      ContentUri: common
       CompatibleRuntimes:
         - python3.6
         - python3.7
@@ -58,37 +61,40 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
+        - !Ref CommonLibLayer
   HongKongParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: parsing/hongkong/
       Handler: hongkong.lambda_handler
       Runtime: python3.8
-      Description: Parse case data for India
+      Description: Parse case data for HongKong
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
+        - !Ref CommonLibLayer
+  JapanParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/japan/
+      Handler: japan.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Japan
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -100,7 +106,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
       Environment:

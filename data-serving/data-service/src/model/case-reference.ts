@@ -12,6 +12,7 @@ export const caseReferenceSchema = new mongoose.Schema(
             required: true,
         },
         uploadId: String,
+        verificationStatus: String,
         additionalSources: [
             {
                 sourceUrl: String,
@@ -40,6 +41,9 @@ export type CaseReferenceDocument = mongoose.Document & {
      * ingestion.
      */
     uploadId: string;
+
+    /** Whether the case document has been manually verified for correctness. */
+    verificationStatus: string;
 
     additionalSources: [
         {

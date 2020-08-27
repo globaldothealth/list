@@ -6,6 +6,12 @@ import {
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
 
+export interface RetrievalPayload {
+    bucket: string;
+    key: string;
+    upload_id: string;
+}
+
 /**
  * Client to interact with the AWS Lambda API.
  *
@@ -18,7 +24,10 @@ import assertString from '../util/assert-string';
  */
 export default class AwsLambdaClient {
     private readonly lambdaClient: AWS.Lambda;
-    constructor(awsRegion: string) {
+    constructor(
+        private readonly retrievalFunctionArn: string,
+        awsRegion: string,
+    ) {
         AWS.config.update({ region: awsRegion });
         this.lambdaClient = new AWS.Lambda({
             apiVersion: '2015-03-31',
@@ -64,5 +73,34 @@ export default class AwsLambdaClient {
         await this.lambdaClient
             .removePermission(removePermissionParams)
             .promise();
+    };
+
+    /**
+     * Invoke retrieval function lambda synchronously, returning its output.
+     */
+    invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
+        try {
+            const res = await this.lambdaClient
+                .invoke({
+                    FunctionName: this.retrievalFunctionArn,
+                    Payload: JSON.stringify({
+                        sourceId: sourceId,
+                    }),
+                })
+                .promise();
+            if (res.FunctionError) {
+                console.error(res);
+                throw Error(
+                    `Retrieving source "${sourceId}" content: ${res.FunctionError}`,
+                );
+            }
+            // When res.FunctionError is empty, res.Payload is always defined.
+            return JSON.parse(
+                res.Payload?.toString() || '',
+            ) as RetrievalPayload;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
     };
 }

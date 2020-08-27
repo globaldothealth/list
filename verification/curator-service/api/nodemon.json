@@ -1,7 +1,8 @@
 {
   "watch": [
-    "src"
+    "src",
+    "openapi"
   ],
-  "ext": "ts",
+  "ext": "ts,yaml",
   "exec": "tsc -p tsconfig.build.json && node ./dist/server.js"
 }

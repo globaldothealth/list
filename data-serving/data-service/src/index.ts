@@ -44,7 +44,17 @@ app.get('/', homeController.get);
 
 // API documentation.
 const swaggerDocument = YAML.load('./api/openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+        // Hide the useless "SWAGGER" black bar at the top.
+        customCss: '.swagger-ui .topbar { display: none }',
+        // Make it look nicer.
+        customCssUrl:
+            'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+    }),
+);
 
 // Basic health check handler.
 app.get('/health', (req: Request, res: Response) => {
@@ -96,6 +106,7 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.update,
         );
+        apiRouter.delete('/cases', caseController.batchDel);
         apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
         app.use('/api', apiRouter);
     });
