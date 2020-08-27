@@ -42,8 +42,21 @@ REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 Give your curator service user all the permissions to access the portal and make CRUD updates. From the project root:
 
 ```shell
-mongo "mongodb://localhost:27017/covid19" --eval 'var email="<YOUR-GOOGLE-LOGIN>"; var
+mongo "mongodb://localhost:27017/covid19" --eval 'var email="<your-google-email>"; var
 roles=["admin", "curator", "reader"];' verification/scripts/roles.js
+```
+
+Or if you don't have mongo installed on your system, just issue that command
+from the mongo container running mongod:
+
+```shell
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec mongo mongo covid19 --eval 'var email="<your-google-email>"; var roles=["admin", "curator", "reader"];' /verification/scripts/roles.js
+```
+
+If for some obscure reason the commands above do not work, here is how to update a user in mongo directly:
+
+```mongo
+db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'reader', 'curator']}})
 ```
 
 ### Let's run this thing!
