@@ -39,11 +39,18 @@ REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 
 #### Permissions
 
-Give your curator service user all the permissions to access the portal and make CRUD updates. From the project root:
+Give your user all the permissions to access the portal and make CRUD updates.
 
 ```shell
-mongo "mongodb://localhost:27017/covid19" --eval 'var email="<YOUR-GOOGLE-LOGIN>"; var
-roles=["admin", "curator", "reader"];' verification/scripts/roles.js
+./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL
+```
+
+Note that the user must be logged-in into the portal before you can issue this command.
+
+If for some obscure reason the command above do not work, here is how to update a user in mongo directly:
+
+```mongo
+db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'reader', 'curator']}})
 ```
 
 ### Let's run this thing!

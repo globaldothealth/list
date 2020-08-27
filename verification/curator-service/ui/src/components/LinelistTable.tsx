@@ -1,5 +1,10 @@
 import {
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     IconButton,
     Menu,
     MenuItem,
@@ -43,8 +48,13 @@ interface LinelistTableState {
     error: string;
     pageSize: number;
     search: string;
+    // The rows which are selected on the current page.
+    selectedRowsCurrentPage: TableRow[];
+    // The total number of rows selected. This can be larger than
+    // selectedRowsCurrentPage.length if rows across all pages are selected.
     numSelectedRows: number;
     totalNumRows: number;
+    deleteDialogOpen: boolean;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -232,6 +242,9 @@ function RowMenu(props: {
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
+        false,
+    );
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -244,6 +257,11 @@ function RowMenu(props: {
         setAnchorEl(null);
     };
 
+    const openDeleteDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setDeleteDialogOpen(true);
+    };
+
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
@@ -254,6 +272,7 @@ function RowMenu(props: {
         } catch (e) {
             props.setError(e.toString());
         } finally {
+            setDeleteDialogOpen(false);
             handleClose();
         }
     };
@@ -282,11 +301,42 @@ function RowMenu(props: {
                         <span className={classes.menuItemTitle}>Edit</span>
                     </MenuItem>
                 </Link>
-                <MenuItem onClick={handleDelete}>
+                <MenuItem onClick={openDeleteDialog}>
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
                 </MenuItem>
             </Menu>
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={(): void => setDeleteDialogOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>
+                    Are you sure you want to delete this case?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Case {props.rowId} will be permanently deleted and can
+                        not be recovered.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={(): void => {
+                            setDeleteDialogOpen(false);
+                        }}
+                        color="primary"
+                        autoFocus
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete} color="primary">
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
@@ -303,9 +353,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             error: '',
             pageSize: 50,
             search: this.props.location.state?.searchQuery ?? '',
+            selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
+            deleteDialogOpen: false,
         };
+        this.deleteCases = this.deleteCases.bind(this);
     }
 
     componentDidMount(): void {
@@ -323,16 +376,27 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.unlisten();
     }
 
-    deleteCase(rowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const deleteUrl = this.state.url + rowData.id;
-            this.setState({ error: '' });
-            const response = axios.delete(deleteUrl);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
+    async deleteCases(): Promise<void> {
+        let requestBody;
+        if (this.hasSelectedRowsAcrossPages()) {
+            requestBody = { data: { query: this.state.search } };
+        } else {
+            requestBody = {
+                data: {
+                    caseIds: this.state.selectedRowsCurrentPage.map(
+                        (row: TableRow) => row.id,
+                    ),
+                },
+            };
+        }
+        try {
+            await axios.delete('/api/cases', requestBody);
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString() });
+        } finally {
+            this.setState({ deleteDialogOpen: false });
+        }
     }
 
     hasSelectedRowsAcrossPages(): boolean {
@@ -438,6 +502,46 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         this.tableRef.current.onQueryChange();
                     }}
                 ></SearchBar>
+                <Dialog
+                    open={this.state.deleteDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ deleteDialogOpen: false })
+                    }
+                    // Stops the click being propagated to the table which
+                    // would trigger the onRowClick action.
+                    onClick={(e): void => e.stopPropagation()}
+                >
+                    <DialogTitle>
+                        Are you sure you want to delete{' '}
+                        {this.state.numSelectedRows === 1
+                            ? '1 case'
+                            : `${this.state.numSelectedRows} cases`}
+                        ?
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            {this.state.numSelectedRows === 1
+                                ? '1 case'
+                                : `${this.state.numSelectedRows} cases`}{' '}
+                            will be permanently deleted and can not be
+                            recovered.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={(): void => {
+                                this.setState({ deleteDialogOpen: false });
+                            }}
+                            color="primary"
+                            autoFocus
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={this.deleteCases} color="primary">
+                            Yes
+                        </Button>
+                    </DialogActions>
+                </Dialog>
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
@@ -619,7 +723,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         ),
                     }}
                     onSelectionChange={(rows): void =>
-                        this.setState({ numSelectedRows: rows.length })
+                        this.setState({
+                            selectedRowsCurrentPage: rows,
+                            numSelectedRows: rows.length,
+                        })
                     }
                     localization={{
                         toolbar: {
@@ -761,40 +868,29 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           );
                                       },
                                   },
-                                  // This action is for deleting selected rows.
-                                  // The action for deleting single rows is in the
-                                  // RowMenu function.
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <span aria-label="delete all">
-                                              <DeleteIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Delete selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: async (
-                                          _: any,
-                                          rows: any,
-                                      ): Promise<void> => {
-                                          if (
-                                              this.hasSelectedRowsAcrossPages()
-                                          ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
-                                              );
-                                              return;
-                                          }
-                                          await axios.delete('/api/cases', {
-                                              data: {
-                                                  caseIds: rows.map(
-                                                      (row: TableRow) => row.id,
-                                                  ),
-                                              },
-                                          });
-                                          this.tableRef.current.onQueryChange();
-                                      },
-                                  },
+                                  // Only allow deleting all rows if there is a search query.
+                                  ...(this.state.totalNumRows !==
+                                      this.state.numSelectedRows ||
+                                  this.state.search.trim() !== ''
+                                      ? [
+                                            // This action is for deleting selected rows.
+                                            // The action for deleting single rows is in the
+                                            // RowMenu function.
+                                            {
+                                                icon: (): JSX.Element => (
+                                                    <span aria-label="delete all">
+                                                        <DeleteIcon />
+                                                    </span>
+                                                ),
+                                                tooltip: 'Delete selected rows',
+                                                onClick: (): void => {
+                                                    this.setState({
+                                                        deleteDialogOpen: true,
+                                                    });
+                                                },
+                                            },
+                                        ]
+                                      : []),
                               ]
                             : []
                     }
