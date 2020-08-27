@@ -1220,12 +1220,9 @@ components:
               type: string
             limitToResolution:
               type: string
-              enum:
-                - Point
-                - Admin3
-                - Admin2
-                - Admin1
-                - Country
+              description: >
+                Comma-separated list of resolutions to restrict geocoding to.
+                Allowed values are: Point, Admin3, Admin2, Admin1, Country.
       required:
         - caseReference
         - location
