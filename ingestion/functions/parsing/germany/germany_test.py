@@ -18,12 +18,8 @@ _PARSED_CASE = [
          "sourceUrl":"foo.bar"
       },
       "location":{
-         "country":"Germany",
-         "administrativeAreaLevel1":"Schleswig-Holstein",
-         "administrativeAreaLevel2":"SK Flensburg",
-         "geoResolution":"Admin2",
-         "name":"SK Flensburg",
-         "query":"Germany, Schleswig-Holstein, SK Flensburg"
+         "query":"Germany, Schleswig-Holstein, SK Flensburg",
+         "limitToResolution": "Admin2"
       },
       "events":[
          {
