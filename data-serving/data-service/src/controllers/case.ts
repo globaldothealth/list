@@ -17,6 +17,33 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     res.json(c);
 };
 
+// Returns a mongoose query for all cases matching the given search query.
+// If count is true, it returns a query for the number of cases matching
+// the search query.
+const casesMatchingSearchQuery = (opts: {
+    searchQuery: string;
+    count: boolean;
+}) => {
+    const parsedSearch = parseSearchQuery(opts.searchQuery);
+    const queryOpts = parsedSearch.fullTextSearch
+        ? {
+              $text: { $search: parsedSearch.fullTextSearch },
+          }
+        : {};
+    const casesQuery = opts.count
+        ? Case.countDocuments(queryOpts)
+        : Case.find(queryOpts);
+    // Fill in keyword filters.
+    parsedSearch.filters.forEach((f) => {
+        if (f.values.length == 1) {
+            casesQuery.where(f.path).equals(f.values[0]);
+        } else {
+            casesQuery.where(f.path).in(f.values);
+        }
+    });
+    return casesQuery;
+};
+
 /**
  * List all cases.
  *
@@ -38,24 +65,14 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.status(422).json('q must be a unique string');
         return;
     }
-    const parsedSearch = parseSearchQuery(req.query.q || '');
-    const queryOpts = parsedSearch.fullTextSearch
-        ? {
-              $text: { $search: parsedSearch.fullTextSearch },
-          }
-        : {};
-    // Fill in keyword filters.
     try {
-        const casesQuery = Case.find(queryOpts);
-        const countQuery = Case.countDocuments(queryOpts);
-        parsedSearch.filters.forEach((f) => {
-            if (f.values.length == 1) {
-                casesQuery.where(f.path).equals(f.values[0]);
-                countQuery.where(f.path).equals(f.values[0]);
-            } else {
-                casesQuery.where(f.path).in(f.values);
-                countQuery.where(f.path).in(f.values);
-            }
+        const casesQuery = casesMatchingSearchQuery({
+            searchQuery: req.query.q || '',
+            count: false,
+        });
+        const countQuery = casesMatchingSearchQuery({
+            searchQuery: req.query.q || '',
+            count: true,
         });
         // Do a fetch of documents and another fetch in parallel for total documents
         // count used in pagination.
@@ -374,20 +391,10 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
         );
         return;
     }
-    const parsedSearch = parseSearchQuery(req.body.query);
-    const queryOpts = parsedSearch.fullTextSearch
-        ? {
-              $text: { $search: parsedSearch.fullTextSearch },
-          }
-        : {};
 
-    const casesQuery = Case.find(queryOpts);
-    parsedSearch.filters.forEach((f) => {
-        if (f.values.length == 1) {
-            casesQuery.where(f.path).equals(f.values[0]);
-        } else {
-            casesQuery.where(f.path).in(f.values);
-        }
+    const casesQuery = casesMatchingSearchQuery({
+        searchQuery: req.body.query,
+        count: false,
     });
     Case.deleteMany(casesQuery, (err) => {
         if (err) {
