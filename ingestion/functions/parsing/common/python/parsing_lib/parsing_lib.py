@@ -97,7 +97,7 @@ def write_to_server(cases, env, source_id, upload_id, headers):
     upload_error = (UploadError.VALIDATION_ERROR
                     if res.status_code == 207 else
                     UploadError.DATA_UPLOAD_ERROR)
-    common_lib.complete_with_error(e, upload_error,
+    common_lib.complete_with_error(e, env, upload_error,
                                    source_id, upload_id, headers)
 
 
@@ -107,7 +107,7 @@ def get_today():
 
 
 def filter_cases_by_date(
-        case_data, date_filter, source_id, upload_id, api_creds):
+        case_data, date_filter, env, source_id, upload_id, api_creds):
     """Filter cases according ot the date_filter provided.
 
     Returns the cases that matched the date filter or all cases if
@@ -133,8 +133,8 @@ def filter_cases_by_date(
         else:
             e = ValueError(f'Unsupported date filter operand: {op}')
             common_lib.complete_with_error(
-                e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
-                api_creds)
+                e, env, UploadError.SOURCE_CONFIGURATION_ERROR, source_id,
+                upload_id, api_creds)
 
     return [case for case in case_data if case_is_within_range(case, cutoff_date, op)]
 
@@ -176,7 +176,7 @@ def run_lambda(event, context, parsing_function):
         event)
     api_creds = common_lib.obtain_api_credentials(s3_client)
     if not upload_id:
-        upload_id = common_lib.create_upload_record(source_id, api_creds)
+        upload_id = common_lib.create_upload_record(env, source_id, api_creds)
     try:
         raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
         case_data = parsing_function(
@@ -187,13 +187,13 @@ def run_lambda(event, context, parsing_function):
             filter_cases_by_date(
                 final_cases,
                 date_filter,
-                source_id, upload_id,
+                env, source_id, upload_id,
                 api_creds),
             env, source_id, upload_id,
             api_creds)
         common_lib.finalize_upload(
-            source_id, upload_id, api_creds, count_created, count_updated)
+            env, source_id, upload_id, api_creds, count_created, count_updated)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
-        common_lib.complete_with_error(e, UploadError.INTERNAL_ERROR,
+        common_lib.complete_with_error(e, env, UploadError.INTERNAL_ERROR,
                                        source_id, upload_id, api_creds)

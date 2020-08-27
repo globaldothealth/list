@@ -1,4 +1,11 @@
-# Common utilities between parsing and retrieval lambdas.
+"""
+Common utilities between parsing and retrieval lambdas.
+
+TODO: Considering structuring this as a class (if that's workable with AWS
+Lambda layers). Many methods accept similar parameters, in order to accomplish
+API calls, and it's information that could be easily encoded as state in an
+object.
+"""
 
 import os
 import tempfile
@@ -30,9 +37,9 @@ class UploadError(Enum):
     VALIDATION_ERROR = 8
 
 
-def create_upload_record(source_id, headers):
+def create_upload_record(env, source_id, headers):
     """Creates an upload resource via the G.h Source API."""
-    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
+    post_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads"
     print(f"Creating upload via {post_api_url}")
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
@@ -47,10 +54,10 @@ def create_upload_record(source_id, headers):
 
 
 def finalize_upload(
-        source_id, upload_id, headers, count_created=None, count_updated=None,
-        error=None):
+        env, source_id, upload_id, headers, count_created=None,
+        count_updated=None, error=None):
     """Records the results of an upload via the G.h Source API."""
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
+    put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
     print(f"Updating upload via {put_api_url}")
     update = {
         "status": "ERROR", "summary": {"error": error.name}} if error else {
@@ -63,12 +70,12 @@ def finalize_upload(
     if not res or res.status_code != 200:
         e = RuntimeError(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
+        complete_with_error(e, env, UploadError.INTERNAL_ERROR,
                             source_id, upload_id, headers)
 
 
 def complete_with_error(
-        exception, upload_error=None, source_id=None, upload_id=None,
+        exception, env=None, upload_error=None, source_id=None, upload_id=None,
         headers=None):
     """
     Logs and raises the provided exception.
@@ -77,8 +84,8 @@ def complete_with_error(
     provided data.
     """
     print(exception)
-    if upload_error and source_id and upload_id:
-        finalize_upload(source_id, upload_id, headers,
+    if env and upload_error and source_id and upload_id:
+        finalize_upload(env, source_id, upload_id, headers,
                         error=upload_error)
     raise exception
 

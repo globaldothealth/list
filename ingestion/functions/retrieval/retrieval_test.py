@@ -18,10 +18,10 @@ def mock_source_api_url_fixture():
     Because the retrieval library is imported locally, this fixture can't
     be set to autouse.
     """
-    import common_lib
-    common_lib.get_source_api_url = MagicMock(
-        name="get_source_api_url", return_value=_SOURCE_API_URL)
-    return common_lib
+    import common_lib  # pylint: disable=import-error
+    with patch('common_lib.get_source_api_url') as mock:
+        mock.return_value = _SOURCE_API_URL
+        yield common_lib
 
 
 @pytest.fixture()
@@ -63,7 +63,6 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(url) == "http://foo.bar/2020-06-08.json"
 
 
-@mock_s3
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
                             mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
@@ -219,7 +218,8 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     content_url = "http://foo.bar/"
     format = "JSON"
     requests_mock.get(content_url, json={"data": "yes"})
-    retrieval.retrieve_content(source_id, "upload_id", content_url, format, {})
+    retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.json", "r") as f:
@@ -232,7 +232,8 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     content_url = "http://foo.bar/"
     format = "CSV"
     requests_mock.get(content_url, content=b"foo,bar")
-    retrieval.retrieve_content(source_id, "upload_id", content_url, format, {})
+    retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.csv", "r") as f:
@@ -245,27 +246,25 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     content_url = "http://foo.bar/"
     requests_mock.get(content_url, json={"data": "yes"})
     result = retrieval.retrieve_content(
-        source_id, "upload_id", content_url, "JSON", {})
+        "env", source_id, "upload_id", content_url, "JSON", {})
     assert "/tmp/" in result[0]
     assert source_id in result[1]
 
 
-def test_retrieve_content_raises_error_for_non_supported_format(requests_mock):
+def test_retrieve_content_raises_error_for_non_supported_format(
+        requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     content_url = "http://foo.bar/"
     requests_mock.get(content_url)
-    source_api_url = "http://bar.baz"
-    # TODO: Complete removal of URL env var.
-    os.environ["SOURCE_API_URL"] = source_api_url
     source_id = "source_id"
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
     requests_mock.put(update_upload_url, json={})
     bad_format = "PDF"
 
     try:
         retrieval.retrieve_content(
-            source_id, upload_id, content_url, bad_format, {})
+            "env", source_id, upload_id, content_url, bad_format, {})
     except ValueError:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -278,21 +277,18 @@ def test_retrieve_content_raises_error_for_non_supported_format(requests_mock):
 
 
 def test_retrieve_content_raises_error_for_source_content_not_found(
-        requests_mock):
+        requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     content_url = "http://foo.bar/"
     requests_mock.get(content_url, status_code=404)
-    source_api_url = "http://bar.baz"
-    # TODO: Complete removal of URL env var.
-    os.environ["SOURCE_API_URL"] = source_api_url
     source_id = "source_id"
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
     requests_mock.put(update_upload_url, json={})
 
     try:
         retrieval.retrieve_content(
-            source_id, upload_id, content_url, "JSON", {})
+            "env", source_id, upload_id, content_url, "JSON", {})
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -305,21 +301,18 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
 
 
 def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
-        requests_mock):
+        requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    content_url = "http://foo.bar/"
+    content_url = "http://bar.baz/"
     requests_mock.get(content_url, status_code=500)
-    source_api_url = "http://bar.baz"
-    # TODO: Complete removal of URL env var.
-    os.environ["SOURCE_API_URL"] = source_api_url
     source_id = "source_id"
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
     requests_mock.put(update_upload_url, json={})
 
     try:
         retrieval.retrieve_content(
-            source_id, upload_id, content_url, "JSON", {})
+            "env", source_id, upload_id, content_url, "JSON", {})
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -331,7 +324,6 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
     assert "Should have raised an exception." == False
 
 
-@mock_s3
 def test_upload_to_s3_writes_indicated_file_to_key(s3):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     local_file = "/tmp/data.txt"
@@ -342,27 +334,24 @@ def test_upload_to_s3_writes_indicated_file_to_key(s3):
     s3.create_bucket(Bucket=expected_s3_bucket)
     expected_s3_key = "objectkey"
     retrieval.upload_to_s3(local_file, expected_s3_key,
-                           "", "", {})  # api creds
+                           "", "", "", {})  # api creds
     actual_object = s3.get_object(
         Bucket=expected_s3_bucket, Key=expected_s3_key)
     s3_data = actual_object['Body'].read().decode("utf-8")
     assert s3_data == expected_data
 
 
-@mock_s3
-def test_upload_to_s3_raises_error_on_s3_error(requests_mock, s3):
+def test_upload_to_s3_raises_error_on_s3_error(
+        requests_mock, s3, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    # TODO: Complete removal of URL env var.
-    os.environ["SOURCE_API_URL"] = source_api_url
     upload_id = "123456789012345678901234"
     source_id = "source_id"
-    update_upload_url = f"{source_api_url}/sources/{source_id}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
     requests_mock.put(update_upload_url, json={})
 
     try:
         retrieval.upload_to_s3("not a file name", "not an s3 key",
-                               source_id, upload_id, {})  # api creds
+                               "env", source_id, upload_id, {})  # api creds
     except Exception:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(

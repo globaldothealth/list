@@ -88,10 +88,10 @@ def mock_source_api_url_fixture():
             os.pardir,
             os.pardir,
             'common'))
-    import common_lib
-    common_lib.get_source_api_url = MagicMock(
-        name="get_source_api_url", return_value=_SOURCE_API_URL)
-    return common_lib
+    import common_lib  # pylint: disable=import-error
+    with patch('common_lib.get_source_api_url') as mock:
+        mock.return_value = _SOURCE_API_URL
+        yield common_lib
 
 
 @pytest.fixture()
@@ -128,7 +128,6 @@ def sample_data():
         return json.load(event_file)
 
 
-@mock_s3
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
         mock_source_api_url_fixture):
@@ -179,7 +178,6 @@ def test_run_lambda_e2e(
     assert response["count_updated"] == num_updated
 
 
-@mock_s3
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
@@ -315,7 +313,7 @@ def test_filter_cases_by_date_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -326,7 +324,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert cases == []
 
 
@@ -337,7 +335,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert cases == []
 
 
@@ -348,17 +346,15 @@ def test_filter_cases_by_date_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
-def test_filter_cases_by_date_unsupported_op(requests_mock):
+def test_filter_cases_by_date_unsupported_op(
+        requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    # TODO: Complete removal of URL env var.
-    os.environ["SOURCE_API_URL"] = source_api_url
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.put(
         update_upload_url,
         json={"_id": upload_id, "status": "ERROR",
@@ -368,7 +364,7 @@ def test_filter_cases_by_date_unsupported_op(requests_mock):
         parsing_lib.filter_cases_by_date(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
-            _SOURCE_ID, upload_id, {})  # api_creds
+            "env", _SOURCE_ID, upload_id, {})  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
         assert requests_mock.request_history[0].url == update_upload_url
