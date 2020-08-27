@@ -23,9 +23,6 @@ const styles = (theme: Theme) =>
             // Remainder of the screen width accounting for left shift
             width: 'calc(100vw - 15%)',
         },
-        appBar: {
-            background: 'white',
-        },
         container: {
             height: 'calc(100% - 80px)',
             overflow: 'auto',
@@ -46,7 +43,7 @@ class AppModal extends React.Component<Props, {}> {
             <>
                 <Modal open={true}>
                     <div className={classes.modalContents}>
-                        <AppBar position="relative" className={classes.appBar}>
+                        <AppBar position="relative">
                             <Toolbar>
                                 <IconButton
                                     color="inherit"

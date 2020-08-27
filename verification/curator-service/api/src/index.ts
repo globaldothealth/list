@@ -112,10 +112,14 @@ app.use(passport.session());
 app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
-const awsLambdaClient = new AwsLambdaClient(env.AWS_SERVICE_REGION);
+const awsLambdaClient = new AwsLambdaClient(
+    env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+    env.AWS_SERVICE_REGION,
+);
 const awsEventsClient = new AwsEventsClient(
     env.AWS_SERVICE_REGION,
     awsLambdaClient,
+    env.SERVICE_ENV,
 );
 
 // API validation.
@@ -130,6 +134,7 @@ new OpenApiValidator({
 
         // Configure sources controller.
         const sourcesController = new SourcesController(
+            awsLambdaClient,
             awsEventsClient,
             env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
         );
@@ -158,9 +163,19 @@ new OpenApiValidator({
             mustHaveAnyRole(['curator']),
             sourcesController.del,
         );
+        apiRouter.post(
+            '/sources/:id([a-z0-9]{24})/retrieve',
+            mustHaveAnyRole(['curator']),
+            sourcesController.retrieve,
+        );
 
         // Configure uploads controller.
         const uploadsController = new UploadsController();
+        apiRouter.get(
+            '/sources/uploads',
+            mustHaveAnyRole(['curator']),
+            uploadsController.list,
+        );
         apiRouter.post(
             '/sources/:sourceId([a-z0-9]{24})/uploads',
             mustHaveAnyRole(['curator']),
@@ -245,6 +260,11 @@ new OpenApiValidator({
             casesController.update,
         );
         apiRouter.delete(
+            '/cases',
+            mustHaveAnyRole(['curator']),
+            casesController.batchDel,
+        );
+        apiRouter.delete(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             casesController.del,
@@ -281,7 +301,17 @@ new OpenApiValidator({
 
         // API documentation.
         const swaggerDocument = YAML.load('./openapi/openapi.yaml');
-        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+        app.use(
+            '/api-docs',
+            swaggerUi.serve,
+            swaggerUi.setup(swaggerDocument, {
+                // Hide the useless "SWAGGER" black bar at the top.
+                customCss: '.swagger-ui .topbar { display: none }',
+                // Make it look nicer.
+                customCssUrl:
+                    'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+            }),
+        );
 
         // Serve static UI content if static directory was specified.
         if (env.STATIC_DIR) {

@@ -6,17 +6,17 @@ describe('Bulk upload form', function () {
         cy.login();
         cy.seedLocation({
             country: 'United Kingdom',
-            admin1: 'England',
-            admin2: 'Greater London',
-            admin3: 'London',
+            administrativeAreaLevel1: 'England',
+            administrativeAreaLevel2: 'Greater London',
+            administrativeAreaLevel3: 'London',
             geometry: { latitude: 51.5072, longitude: -0.1275 },
             name: 'London, Greater London, England, United Kingdom',
             geoResolution: 'Admin3',
         });
         cy.seedLocation({
             country: 'Canada',
-            admin1: 'Alberta',
-            admin3: 'Banff',
+            administrativeAreaLevel1: 'Alberta',
+            administrativeAreaLevel3: 'Banff',
             geometry: { latitude: 51.1784, longitude: 115.5708 },
             name: 'Banff, Alberta, Canada',
             geoResolution: 'Admin3',
@@ -48,13 +48,18 @@ describe('Bulk upload form', function () {
         );
         cy.server();
         cy.route('get', '/api/cases/*').as('viewCase');
-        cy.get('[title="View this case details"]').click({ force: true });
+        cy.contains('td', 'Male').click({ force: true });
         cy.wait('@viewCase');
 
         // Case data
         cy.contains('www.bulksource.com');
         cy.contains('sourceEntryId');
         cy.contains('superuser@test.com');
+        cy.contains('Data upload ID')
+            .parent()
+            .parent()
+            .contains(/[a-f\d]{24}/);
+        cy.contains('VERIFIED');
 
         // Demographics
         cy.contains('42-43');
@@ -113,16 +118,12 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display').should('not.exist');
         cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('www.bulksource.com');
-        cy.contains('Male');
-        cy.contains('42');
+        cy.contains('2020-6-23');
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
-        cy.contains('th', 'Admitted to hospital')
-            .invoke('index')
-            .then((i) => {
-                cy.get('td').eq(i).should('have.text', 'Yes');
-            });
+        cy.contains('Male');
+        cy.contains('42');
     });
 
     it('Can upload CSV with new source', function () {
@@ -148,16 +149,12 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display').should('not.exist');
         cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('www.new-source.com');
-        cy.contains('Male');
-        cy.contains('42');
+        cy.contains('2020-6-23');
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
-        cy.contains('th', 'Admitted to hospital')
-            .invoke('index')
-            .then((i) => {
-                cy.get('td').eq(i).should('have.text', 'Yes');
-            });
+        cy.contains('Male');
+        cy.contains('42');
 
         cy.visit('/sources');
         cy.contains('www.new-source.com');

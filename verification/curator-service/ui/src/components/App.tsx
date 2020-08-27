@@ -2,11 +2,11 @@ import {
     AppBar,
     Button,
     CssBaseline,
+    Fab,
     IconButton,
     Menu,
     MenuItem,
     Toolbar,
-    Typography,
     useMediaQuery,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
@@ -14,11 +14,13 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
+import AutomatedSourceForm from './AutomatedSourceForm';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
+import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
@@ -32,8 +34,10 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
+import PublishIcon from '@material-ui/icons/Publish';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
+import UploadsTable from './UploadsTable';
 import User from './User';
 import Users from './Users';
 import ViewCase from './ViewCase';
@@ -71,6 +75,7 @@ const theme = createMuiTheme({
         MuiListItem: {
             root: {
                 color: '#5D5D5D',
+                borderRadius: '4px',
                 '&$selected': {
                     backgroundColor: '#E7EFED',
                     color: '#0E7569',
@@ -83,9 +88,6 @@ const theme = createMuiTheme({
 const drawerWidth = 240;
 
 const menuStyles = makeStyles((theme) => ({
-    menu: {
-        marginLeft: '1em',
-    },
     link: {
         color: theme.palette.text.primary,
     },
@@ -105,7 +107,7 @@ function TopbarMenu(): JSX.Element {
     const classes = menuStyles();
 
     return (
-        <div className={classes.menu}>
+        <>
             <IconButton
                 aria-controls="topbar-menu"
                 aria-haspopup="true"
@@ -141,7 +143,7 @@ function TopbarMenu(): JSX.Element {
                     </a>
                 </MenuItem>
             </Menu>
-        </div>
+        </>
     );
 }
 
@@ -155,7 +157,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
     },
-    title: {
+    spacer: {
         flexGrow: 1,
     },
     appBar: {
@@ -174,6 +176,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     drawerPaper: {
         border: 'none',
         width: drawerWidth,
+    },
+    drawerContents: {
+        marginLeft: '12px',
+        marginRight: '40px',
     },
     drawerHeader: {
         // necessary for content to be below app bar
@@ -197,8 +203,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: `calc(100% - ${drawerWidth}px)`,
     },
     createNewButton: {
-        margin: '1em',
-        width: '70%',
+        margin: '12px 0',
+        width: '100%',
+    },
+    createNewIcon: {
+        marginRight: '12px',
     },
 }));
 
@@ -235,6 +244,12 @@ export default function App(): JSX.Element {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
+            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+        },
+        {
+            text: 'Uploads',
+            icon: <PublishIcon />,
+            to: '/uploads',
             displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
         },
         {
@@ -328,26 +343,21 @@ export default function App(): JSX.Element {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography
-                            variant="h6"
-                            className={classes.title}
-                            noWrap
-                        >
-                            Global Health Curator Portal
-                        </Typography>
+                        <GHListLogo />
+                        <span className={classes.spacer}></span>
                         {user?.email ? (
                             <Button
                                 classes={{ label: classes.buttonLabel }}
-                                variant="contained"
-                                color="secondary"
+                                variant="outlined"
+                                color="inherit"
                                 href="/auth/logout"
                             >
                                 Logout {user?.email}
                             </Button>
                         ) : (
                             <Button
-                                variant="contained"
-                                color="secondary"
+                                variant="outlined"
+                                color="inherit"
                                 href={process.env.REACT_APP_LOGIN_URL}
                             >
                                 Login
@@ -365,71 +375,81 @@ export default function App(): JSX.Element {
                         paper: classes.drawerPaper,
                     }}
                 >
-                    <div className={classes.drawerHeader}></div>
-                    {hasAnyRole(['curator']) && (
-                        <>
-                            <Button
-                                variant="contained"
-                                data-testid="create-new-button"
-                                className={classes.createNewButton}
-                                color="secondary"
-                                onClick={openCreateNewPopup}
-                                startIcon={<AddIcon />}
-                            >
-                                Create new
-                            </Button>
-                            <Menu
-                                anchorEl={createNewButtonAnchorEl}
-                                getContentAnchorEl={null}
-                                keepMounted
-                                open={Boolean(createNewButtonAnchorEl)}
-                                onClose={closeCreateNewPopup}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
-                                }}
-                            >
-                                <MenuItem
-                                    onClick={(): void => {
-                                        closeCreateNewPopup();
-                                        history.push('/cases/new');
+                    <div className={classes.drawerContents}>
+                        <div className={classes.drawerHeader}></div>
+                        {hasAnyRole(['curator']) && (
+                            <>
+                                <Fab
+                                    variant="extended"
+                                    data-testid="create-new-button"
+                                    className={classes.createNewButton}
+                                    color="secondary"
+                                    onClick={openCreateNewPopup}
+                                >
+                                    <AddIcon
+                                        className={classes.createNewIcon}
+                                    />
+                                    Create new
+                                </Fab>
+                                <Menu
+                                    anchorEl={createNewButtonAnchorEl}
+                                    getContentAnchorEl={null}
+                                    keepMounted
+                                    open={Boolean(createNewButtonAnchorEl)}
+                                    onClose={closeCreateNewPopup}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
                                     }}
                                 >
-                                    New line list case
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={(): void => {
-                                        closeCreateNewPopup();
-                                        history.push('/cases/bulk');
-                                    }}
-                                >
-                                    New bulk upload
-                                </MenuItem>
-                            </Menu>
-                        </>
-                    )}
-                    <List>
-                        {menuList.map(
-                            (item, index) =>
-                                item.displayCheck() && (
-                                    <Link key={item.text} to={item.to}>
-                                        <ListItem
-                                            button
-                                            key={item.text}
-                                            selected={
-                                                selectedMenuIndex === index
-                                            }
-                                        >
-                                            <ListItemIcon>
-                                                {item.icon}
-                                            </ListItemIcon>
-
-                                            <ListItemText primary={item.text} />
-                                        </ListItem>
+                                    <Link
+                                        to="/cases/new"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>New line list case</MenuItem>
                                     </Link>
-                                ),
+                                    <Link
+                                        to="/cases/bulk"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>New bulk upload</MenuItem>
+                                    </Link>
+                                    <Link
+                                        to="/sources/automated"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>
+                                            New automated source
+                                        </MenuItem>
+                                    </Link>
+                                </Menu>
+                            </>
                         )}
-                    </List>
+                        <List>
+                            {menuList.map(
+                                (item, index) =>
+                                    item.displayCheck() && (
+                                        <Link key={item.text} to={item.to}>
+                                            <ListItem
+                                                button
+                                                key={item.text}
+                                                selected={
+                                                    selectedMenuIndex === index
+                                                }
+                                            >
+                                                <ListItemIcon>
+                                                    {item.icon}
+                                                </ListItemIcon>
+
+                                                <ListItemText
+                                                    primary={item.text}
+                                                />
+                                            </ListItem>
+                                        </Link>
+                                    ),
+                            )}
+                        </List>
+                    </div>
                 </Drawer>
                 <main
                     className={clsx(classes.content, {
@@ -444,8 +464,13 @@ export default function App(): JSX.Element {
                             </Route>
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/sources">
-                                <SourceTable />
+                            <Route exact path="/sources">
+                                <SourceTable user={user} />
+                            </Route>
+                        )}
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route exact path="/uploads">
+                                <UploadsTable />
                             </Route>
                         )}
                         {user.email && (
@@ -458,6 +483,14 @@ export default function App(): JSX.Element {
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
+                        {hasAnyRole(['curator']) && (
+                            <Route path="/sources/automated">
+                                <AutomatedSourceForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
                         {hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
