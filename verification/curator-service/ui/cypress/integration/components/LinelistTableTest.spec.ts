@@ -193,9 +193,48 @@ describe('Linelist table', function () {
         cy.contains('1 row selected');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('5 rows selected');
+        cy.get('button[title="Delete selected rows"]');
         cy.contains('Select all 7 rows').click();
         cy.contains('7 rows selected');
+        // Delete is not available when all rows are selected and there is
+        // no search query
+        cy.get('button[title="Delete selected rows"]').should('not.exist');
+
         cy.contains('Unselect all 7 rows').click();
         cy.contains('7 rows selected').should('not.exist');
+    });
+
+    it('Can delete all cases across rows for a search result', function () {
+        for (let i = 0; i < 7; i++) {
+            cy.addCase({
+                country: 'France',
+            });
+        }
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('rows').click();
+        cy.get('li').contains('5').click();
+        cy.get('input[id="search-field"]').click();
+        cy.get('li').contains('country:').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.contains('Select all 7 rows').click();
+        cy.server();
+        cy.route('DELETE', `/api/cases`).as('deleteCases');
+        cy.get('button[title="Delete selected rows"]').click();
+        cy.contains('Are you sure you want to delete 7 cases?');
+        cy.contains('Yes').click();
+        cy.wait('@deleteCases');
+
+        cy.contains('No records to display');
+        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.contains('France').should('not.exist');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
     });
 });

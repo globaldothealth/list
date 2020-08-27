@@ -1,4 +1,5 @@
 import { Case, CaseDocument } from '../model/case';
+import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
 
 import parseSearchQuery from '../util/search';
@@ -15,6 +16,35 @@ export const get = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     res.json(c);
+};
+
+// Returns a mongoose query for all cases matching the given search query.
+// If count is true, it returns a query for the number of cases matching
+// the search query.
+const casesMatchingSearchQuery = (opts: {
+    searchQuery: string;
+    count: boolean;
+}) => {
+    const parsedSearch = parseSearchQuery(opts.searchQuery);
+    const queryOpts = parsedSearch.fullTextSearch
+        ? {
+              $text: { $search: parsedSearch.fullTextSearch },
+          }
+        : {};
+
+    const casesQuery = Case.find(queryOpts);
+    const countQuery = Case.countDocuments(queryOpts);
+    // Fill in keyword filters.
+    parsedSearch.filters.forEach((f) => {
+        if (f.values.length == 1) {
+            casesQuery.where(f.path).equals(f.values[0]);
+            countQuery.where(f.path).equals(f.values[0]);
+        } else {
+            casesQuery.where(f.path).in(f.values);
+            countQuery.where(f.path).in(f.values);
+        }
+    });
+    return opts.count ? countQuery : casesQuery;
 };
 
 /**
@@ -38,25 +68,15 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.status(422).json('q must be a unique string');
         return;
     }
-    const parsedSearch = parseSearchQuery(req.query.q || '');
-    const queryOpts = parsedSearch.fullTextSearch
-        ? {
-              $text: { $search: parsedSearch.fullTextSearch },
-          }
-        : {};
-    // Fill in keyword filters.
     try {
-        const casesQuery = Case.find(queryOpts);
-        const countQuery = Case.countDocuments(queryOpts);
-        parsedSearch.filters.forEach((f) => {
-            if (f.values.length == 1) {
-                casesQuery.where(f.path).equals(f.values[0]);
-                countQuery.where(f.path).equals(f.values[0]);
-            } else {
-                casesQuery.where(f.path).in(f.values);
-                countQuery.where(f.path).in(f.values);
-            }
-        });
+        const casesQuery = casesMatchingSearchQuery({
+            searchQuery: req.query.q || '',
+            count: false,
+        }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
+        const countQuery = casesMatchingSearchQuery({
+            searchQuery: req.query.q || '',
+            count: true,
+        }) as Query<number>;
         // Do a fetch of documents and another fetch in parallel for total documents
         // count used in pagination.
         const [docs, total] = await Promise.all([
@@ -357,20 +377,35 @@ export const upsert = async (req: Request, res: Response): Promise<void> => {
  * Handles HTTP DELETE /api/cases.
  */
 export const batchDel = async (req: Request, res: Response): Promise<void> => {
-    Case.deleteMany(
-        {
-            _id: {
-                $in: req.body.caseIds,
+    if (req.body.caseIds !== undefined) {
+        Case.deleteMany(
+            {
+                _id: {
+                    $in: req.body.caseIds,
+                },
             },
-        },
-        (err) => {
-            if (err) {
-                res.status(500).json(err.message);
-                return;
-            }
-            res.status(204).end();
-        },
-    );
+            (err) => {
+                if (err) {
+                    res.status(500).json(err.message);
+                    return;
+                }
+                res.status(204).end();
+            },
+        );
+        return;
+    }
+
+    const casesQuery = casesMatchingSearchQuery({
+        searchQuery: req.body.query,
+        count: false,
+    });
+    Case.deleteMany(casesQuery, (err) => {
+        if (err) {
+            res.status(500).json(err.message);
+            return;
+        }
+        res.status(204).end();
+    });
 };
 
 /**
