@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import {
-    createBatchCaseRevisions,
+    createBatchUpsertCaseRevisions,
     createCaseRevision,
-    setBatchRevisionMetadata,
+    setBatchUpdateRevisionMetadata,
+    setBatchUpsertRevisionMetadata,
     setRevisionMetadata,
 } from '../../src/controllers/preprocessor';
 
@@ -378,7 +379,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setBatchRevisionMetadata(
+        await setBatchUpsertRevisionMetadata(
             { body: requestBody, method: 'PUT' } as Request,
             {} as Response,
             nextFn,
@@ -447,7 +448,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await createBatchCaseRevisions(
+        await createBatchUpsertCaseRevisions(
             { body: requestBody, method: 'PUT' } as Request,
             {} as Response,
             nextFn,
@@ -457,6 +458,159 @@ describe('batch upsert', () => {
         expect(await CaseRevision.collection.countDocuments()).toEqual(1);
         expect((await CaseRevision.find())[0].case.toObject()).toEqual(
             c.toObject(),
+        );
+    });
+});
+describe('batch update', () => {
+    it('sets update metadata', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        const c = new Case({
+            ...existingCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const existingCase2 = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists2',
+            },
+        };
+        const c2 = new Case({
+            ...existingCase2,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c2.save();
+
+        const requestBody = {
+            cases: [
+                { ...existingCase, _id: c._id },
+                { ...existingCase2, _id: c2._id },
+            ],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await setBatchUpdateRevisionMetadata(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(requestBody).toEqual({
+            cases: [
+                {
+                    ...existingCase,
+                    _id: c._id,
+                    revisionMetadata: {
+                        revisionNumber: 1,
+                        creationMetadata: {
+                            curator: 'creator@gmail.com',
+                            date: Date.parse('2020-01-01'),
+                        },
+                        updateMetadata: {
+                            curator: 'updater@gmail.com',
+                            date: Date.now(),
+                        },
+                    },
+                },
+                {
+                    ...existingCase2,
+                    _id: c2._id,
+                    revisionMetadata: {
+                        revisionNumber: 1,
+                        creationMetadata: {
+                            curator: 'creator@gmail.com',
+                            date: Date.parse('2020-01-01'),
+                        },
+                        updateMetadata: {
+                            curator: 'updater@gmail.com',
+                            date: Date.now(),
+                        },
+                    },
+                },
+            ],
+        });
+    });
+    it('with existing cases creates case revisions', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        const c = new Case({
+            ...existingCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const existingCase2 = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists2',
+            },
+        };
+        const c2 = new Case({
+            ...existingCase2,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c2.save();
+
+        const requestBody = {
+            cases: [
+                { ...existingCase, _id: c._id },
+                { ...existingCase2, _id: c2._id },
+            ],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createBatchUpsertCaseRevisions(
+            { body: requestBody, method: 'PUT' } as Request,
+            {} as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+        expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+            c2.toObject(),
         );
     });
 });

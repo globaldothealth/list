@@ -555,6 +555,50 @@ describe('PUT', () => {
             .send(curatorMetadata)
             .expect(404);
     });
+    it('update many items should return 200 OK', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+        const c2 = new Case(minimalCase);
+        await c2.save();
+        await new Case(minimalCase).save();
+
+        const newNotes = 'abc';
+        const newNotes2 = 'cba';
+        const res = await request(app)
+            .put('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [
+                    { _id: c._id, notes: newNotes },
+                    { _id: c2._id, notes: newNotes2 },
+                ],
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(2);
+        const cases = await Case.find();
+        expect(cases[0].notes).toEqual(newNotes);
+        expect(cases[1].notes).toEqual(newNotes2);
+    });
+    it('update many items without _id should return 422', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+        const c2 = new Case(minimalCase);
+        await c2.save();
+        await new Case(minimalCase).save();
+
+        const newNotes = 'abc';
+        const newNotes2 = 'cba';
+        await request(app)
+            .put('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [{ _id: c._id, notes: newNotes }, { notes: newNotes2 }],
+            })
+            .expect('Content-Type', /json/)
+            .expect(422);
+    });
     it('upsert present item should return 200 OK', async () => {
         const c = new Case(minimalCase);
         const sourceId = '5ea86423bae6982635d2e1f8';

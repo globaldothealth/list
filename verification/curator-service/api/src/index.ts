@@ -255,6 +255,11 @@ new OpenApiValidator({
             casesController.upsert,
         );
         apiRouter.put(
+            '/cases/batchUpdate',
+            mustHaveAnyRole(['curator']),
+            casesController.batchUpdate,
+        );
+        apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             casesController.update,
