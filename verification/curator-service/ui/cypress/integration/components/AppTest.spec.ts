@@ -1,5 +1,9 @@
 /* eslint-disable no-undef */
 describe('App', function () {
+    beforeEach(() => {
+        cy.task('clearSourcesDB', {});
+    });
+
     it('takes user to home page when home button is clicked', function () {
         cy.login();
         cy.visit('/cases');
@@ -111,6 +115,18 @@ describe('App', function () {
         cy.contains('li', 'New bulk upload').click();
         cy.contains('New bulk upload');
         cy.url().should('eq', 'http://localhost:3002/cases/bulk');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
+    it('Can open new automated source modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New automated source').click();
+        cy.contains('New automated data source');
+        cy.url().should('eq', 'http://localhost:3002/sources/automated');
         cy.get('button[aria-label="close overlay"').click();
         cy.url().should('eq', 'http://localhost:3002/');
     });

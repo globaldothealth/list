@@ -19,7 +19,7 @@ the curator UI to manage case report data sources and view or update case data, 
 
 - [Homebrew](https://docs.brew.sh/Installation): To facilitate installing the below.
 - [MongoDB](https://docs.mongodb.com/manual/administration/install-community/): Make sure, after install, you can run
-  both the `mongo` and `mongoimport` CLIs. (They may need to be added to your path.)
+  both the `mongo` and `mongoimport` CLIs. (They may need to be added to your path.) If you're using homebrew, [`brew install mongodb/brew/mongodb-database-tools`](https://stackoverflow.com/a/62973387/6105673) to get `mongoimport`.
 - [Docker](https://docs.docker.com/get-docker/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
@@ -39,20 +39,26 @@ REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 
 #### Permissions
 
-Give your curator service user all the permissions to access the portal and make CRUD updates. From the project root:
+Give your user all the permissions to access the portal and make CRUD updates.
 
 ```shell
-mongo "mongodb://localhost:27017/covid19" --eval 'var email="<YOUR-GOOGLE-LOGIN>"; var
-roles=["admin", "curator", "reader"];' verification/scripts/roles.js
+./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL
+```
+
+Note that the user must be logged-in into the portal before you can issue this command.
+
+If for some obscure reason the command above do not work, here is how to update a user in mongo directly:
+
+```mongo
+db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'reader', 'curator']}})
 ```
 
 ### Let's run this thing!
 
 Once you've done all of the prereqs above, go ahead and:
 
-1. Start the MongoDB daemon with `mongod`
-1. Run `./dev/setup_db.sh` to set up the collection and load up some toy data
 1. Run `./dev/run_stack.sh`
+1. Run `./dev/setup_db.sh` to set up the collection and load up some toy data
 1. Navigate to `localhost:3002`
 1. Experience success
 

@@ -57,4 +57,47 @@ export default class UploadsController {
             return;
         }
     };
+
+    list = async (req: Request, res: Response): Promise<void> => {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        try {
+            const [uploads, total] = await Promise.all([
+                Source.aggregate([
+                    { $unwind: '$uploads' },
+                    { $skip: limit * (page - 1) },
+                    { $limit: limit + 1 },
+                    {
+                        $project: {
+                            _id: false,
+                            sourceName: '$name',
+                            sourceUrl: '$origin.url',
+                            upload: '$uploads',
+                        },
+                    },
+                ]),
+                Source.aggregate([
+                    { $unwind: '$uploads' },
+                    { $count: 'total' },
+                ]),
+            ]);
+            // If we have more items than limit, add a response param
+            // indicating that there is more to fetch on the next page.
+            if (uploads.length == limit + 1) {
+                uploads.splice(limit);
+                res.json({
+                    uploads: uploads,
+                    nextPage: page + 1,
+                    ...total[0],
+                });
+                return;
+            }
+            // If we fetched all available data, just return it.
+            res.json({ uploads: uploads, ...total[0] });
+            return;
+        } catch (err) {
+            res.status(500).json(err.message);
+            return;
+        }
+    };
 }

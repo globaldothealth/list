@@ -164,25 +164,13 @@ describe('Curator', function () {
             expect(resp.body.cases).to.have.lengthOf(1);
             cy.contains(`Case ${resp.body.cases[0]._id} added`);
             cy.contains('No records to display').should('not.exist');
+            cy.get('svg[data-testid="verified-svg"').should('exist');
             cy.contains('www.example.com');
             cy.contains('Female');
             cy.contains('21');
-            cy.contains('Asian');
-            cy.contains('Afghan, Albanian');
-            cy.contains('Accountant');
             cy.contains('Frankreich');
             cy.contains('2020-1-1');
-            cy.contains('dry cough, mild fever');
-            cy.contains('Airborne infection');
-            cy.contains('Test route');
-            cy.contains('Airplane');
-            cy.contains('Test place');
-            cy.contains('testcaseid12345678987654, testcaseid12345678987655');
-            cy.contains('Germany, United Kingdom');
-            cy.contains('Bartonella, Ebola');
-            cy.contains('test notes');
-            cy.contains('on new line');
-            cy.contains('superuser@');
+            cy.contains('Recovered');
 
             // View the case from the message bar.
             cy.get('button[data-testid="view-case-btn"').click({ force: true });
@@ -191,7 +179,8 @@ describe('Curator', function () {
             cy.visit('/cases');
 
             // Edit the case.
-            cy.get('button[title="Edit this case"]').click({ force: true });
+            cy.get('button[data-testid="row menu"]').click();
+            cy.contains('li', 'Edit').click();
 
             // Everything should be there.
             // Source.
@@ -308,17 +297,16 @@ describe('Curator', function () {
             cy.contains('No records to display').should('not.exist');
             cy.contains('Male');
             // What's untouched should stay as is.
-            cy.contains('Asian');
+            cy.contains('21');
 
             // View full details about the case
-            cy.get('button[title="View this case details"]').click({
-                force: true,
-            });
+            cy.contains('td', 'www.example.com').click({ force: true });
             // Case data.
             cy.contains('www.example.com');
             cy.contains('testSourceEntryID123');
             cy.contains('superuser@test.com');
             cy.contains('test notes on new line');
+            cy.contains('VERIFIED');
             // Demographics.
             cy.contains('21');
             cy.contains('Male');

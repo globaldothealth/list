@@ -8,14 +8,19 @@ on:
     - 'ingestion/functions/**'
 
 jobs:
-  build:
+  sam-build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/functions
     steps:
     - uses: actions/checkout@v2
-    - name: sam build
-      uses: youyo/aws-sam-action/python3.8@master
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
       with:
-        sam_command: build -t ingestion/functions/template.yaml
+        python-version: 3.8
+    - name: sam build
+      run: sam build
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

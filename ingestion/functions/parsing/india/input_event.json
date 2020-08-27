@@ -1,4 +1,5 @@
 {
+    "env": "local",
     "s3Bucket": "epid-sources-raw",
     "s3Key": "5f0b9a7ead3a2b003edc0e7f/2020/07/12/2320/content.json",
     "sourceUrl": "https://foo.bar",
