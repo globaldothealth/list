@@ -99,6 +99,23 @@ export default class CasesController {
         }
     };
 
+    batchDel = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const response = await axios.delete(
+                this.dataServerURL + '/api' + req.url,
+                { data: req.body },
+            );
+            res.status(response.status).end();
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
     del = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.delete(

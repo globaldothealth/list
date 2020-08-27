@@ -31,6 +31,17 @@
         }
     },
     {
+        "name": "uploadIdIdx",
+        "key": {
+            "caseReference.uploadId": -1
+        },
+        "partialFilterExpression": {
+            "caseReference.uploadId": {
+                "$exists": true
+            }
+        }
+    },
+    {
         "name": "eventNamesIdx",
         "key": {
             "events.name": -1

@@ -144,7 +144,6 @@ describe('New case form', function () {
             cy.contains('www.example.com');
             cy.contains('France');
             cy.contains('2020-1-1');
-            cy.contains('Yes');
             cy.contains('Recovered');
         });
     });
@@ -364,6 +363,7 @@ describe('New case form', function () {
         cy.contains('li', 'Admin3').click();
         cy.get('input[name="location.country"]').type('France');
         cy.get('input[name="location.name"]').type('Paris');
+        cy.get('input[name="location.administrativeAreaLevel3"]').type('Paris');
         cy.get('input[name="location.geometry.latitude"]').type('12.34');
         cy.get('input[name="location.geometry.longitude"]').type('45.67');
         cy.get('input[name="confirmedDate"]').type('2020-01-01');

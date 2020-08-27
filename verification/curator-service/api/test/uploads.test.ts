@@ -54,6 +54,71 @@ describe('unauthenticated access', () => {
     });
 });
 
+describe('GET', () => {
+    it('should list all uploads', async () => {
+        const source = await new Source(fullSource).save();
+        const source2 = await new Source(fullSource).save();
+
+        const res = await curatorRequest
+            .get('/api/sources/uploads')
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.uploads).toHaveLength(2);
+        expect(res.body.uploads[0].upload._id).toEqual(
+            source.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[0].sourceName).toEqual(source.name);
+        expect(res.body.uploads[0].sourceUrl).toEqual(source.origin.url);
+        expect(res.body.uploads[1].upload._id).toEqual(
+            source2.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[1].sourceName).toEqual(source2.name);
+        expect(res.body.uploads[1].sourceUrl).toEqual(source2.origin.url);
+    });
+    it('list should paginate', async () => {
+        Array.from(Array(15)).forEach(
+            async () => await new Source(fullSource).save(),
+        );
+        // Fetch first page.
+        let res = await curatorRequest
+            .get('/api/sources/uploads?page=1&limit=10')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.uploads).toHaveLength(10);
+        // Second page is expected.
+        expect(res.body.nextPage).toEqual(2);
+
+        // Fetch second page.
+        res = await curatorRequest
+            .get(`/api/sources/uploads?page=${res.body.nextPage}&limit=10`)
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.uploads).toHaveLength(5);
+        // No continuation expected.
+        expect(res.body.nextPage).toBeUndefined();
+        expect(res.body.total).toEqual(15);
+
+        // Fetch nonexistent page.
+        res = await curatorRequest
+            .get('/api/sources/uploads?page=42&limit=10')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.uploads).toHaveLength(0);
+        // No continuation expected.
+        expect(res.body.nextPage).toBeUndefined();
+        expect(res.body.total).toEqual(15);
+    });
+    it('rejects negative page param', (done) => {
+        curatorRequest.get('/api/sources/uploads?page=-7').expect(400, done);
+    });
+    it('rejects negative limit param', (done) => {
+        curatorRequest
+            .get('/api/sources/uploads?page=1&limit=-2')
+            .expect(400, done);
+    });
+});
+
 describe('POST', () => {
     it('should return 415 if input missing body', () => {
         return curatorRequest

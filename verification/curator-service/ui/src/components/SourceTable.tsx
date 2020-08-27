@@ -1,20 +1,22 @@
-import MaterialTable, { QueryResult } from 'material-table';
 import {
+    Button,
+    Divider,
     MenuItem,
     Theme,
     WithStyles,
     createStyles,
     withStyles,
-    Button,
-    Divider,
 } from '@material-ui/core';
+import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
-import MuiAlert from '@material-ui/lab/Alert';
 
+import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import User from './User';
+import SourceRetrievalButton from './SourceRetrievalButton';
 
 interface ListResponse {
     sources: Source[];
@@ -47,7 +49,7 @@ interface Schedule {
 
 interface Automation {
     parser?: Parser;
-    schedule: Schedule;
+    schedule?: Schedule;
     regexParsing?: RegexParsing;
 }
 
@@ -107,7 +109,9 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
 class SourceTable extends React.Component<Props, SourceTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -119,27 +123,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             error: '',
             pageSize: 10,
         };
-    }
-
-    addSource(rowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            if (
-                !(
-                    this.validateRequired(rowData.name) &&
-                    this.validateRequired(rowData.url) &&
-                    this.validateAutomationFields(rowData)
-                )
-            ) {
-                return reject();
-            }
-            const newSource = this.createSourceFromRowData(rowData);
-            this.setState({ error: '' });
-            const response = axios.post(this.state.url, newSource);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
     }
 
     deleteSource(rowData: TableRow): Promise<unknown> {
@@ -185,43 +168,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
     }
 
     /**
-     * Creates a source from the provided table row data.
-     *
-     * For new sources, an AWS rule ARN won't be defined (instead, it's created
-     * by the server upon receiving the create request). A schedule expression
-     * may be supplied, and indicates the intent to create a corresponding AWS
-     * scheduled event rule to automate source ingestion. If a schedule
-     * expression is supplied, it's also possible that a parser Lambda ARN is
-     * supplied.
-     */
-    createSourceFromRowData(rowData: TableRow): Source {
-        return {
-            _id: rowData._id,
-            name: rowData.name,
-            origin: {
-                url: rowData.url,
-            },
-            format: rowData.format,
-            automation: rowData.awsScheduleExpression
-                ? {
-                      parser: rowData.awsLambdaArn
-                          ? {
-                                awsLambdaArn: rowData.awsLambdaArn,
-                            }
-                          : undefined,
-                      schedule: {
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
-                : undefined,
-            dateFilter:
-                rowData.dateFilter?.numDaysBeforeToday && rowData.dateFilter?.op
-                    ? rowData.dateFilter
-                    : undefined,
-        };
-    }
-
-    /**
      * Updates a source from the provided table row data.
      *
      * Unlike for creation, an AWS rule ARN may be supplied alongside a
@@ -235,19 +181,23 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 url: rowData.url,
             },
             format: rowData.format,
-            automation: rowData.awsScheduleExpression
-                ? {
-                      parser: rowData.awsLambdaArn
-                          ? {
-                                awsLambdaArn: rowData.awsLambdaArn,
-                            }
-                          : undefined,
-                      schedule: {
-                          awsRuleArn: rowData.awsRuleArn,
-                          awsScheduleExpression: rowData.awsScheduleExpression,
-                      },
-                  }
-                : undefined,
+            automation:
+                rowData.awsScheduleExpression || rowData.awsLambdaArn
+                    ? {
+                          parser: rowData.awsLambdaArn
+                              ? {
+                                    awsLambdaArn: rowData.awsLambdaArn,
+                                }
+                              : undefined,
+                          schedule: rowData.awsScheduleExpression
+                              ? {
+                                    awsRuleArn: rowData.awsRuleArn,
+                                    awsScheduleExpression:
+                                        rowData.awsScheduleExpression,
+                                }
+                              : undefined,
+                      }
+                    : undefined,
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
@@ -260,12 +210,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
      *
      * Rule ARN isn't necessarily present, because it isn't supplied in create
      * requests. It might be present for updates, and if so, the schedule
-     * expression field must be present. Likewise, if parser Lambda ARN is
-     * present, the schedule expression field must be present.
+     * expression field must be present.
      */
     validateAutomationFields(rowData: TableRow): boolean {
         return (
-            (!rowData.awsRuleArn && !rowData.awsLambdaArn) ||
+            !rowData.awsRuleArn ||
             this.validateRequired(rowData.awsScheduleExpression)
         );
     }
@@ -473,6 +422,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     </>
                                 ),
                             },
+                            {
+                                title: 'Curation actions',
+                                render: (row): JSX.Element => (
+                                    <SourceRetrievalButton sourceId={row._id} />
+                                ),
+                                editable: 'never',
+                                hidden: !this.props.user.roles.includes(
+                                    'curator',
+                                ),
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -524,28 +483,38 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             search: false,
                             filtering: false,
                             sorting: false,
+                            emptyRowsWhenPaging: false,
                             padding: 'dense',
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
                             maxBodyHeight: 'calc(100vh - 15em)',
+                            headerStyle: {
+                                zIndex: 1,
+                            },
                         }}
                         onChangeRowsPerPage={(newPageSize: number) => {
                             this.setState({ pageSize: newPageSize });
                             this.tableRef.current.onQueryChange();
                         }}
-                        editable={{
-                            onRowAdd: (rowData: TableRow): Promise<unknown> =>
-                                this.addSource(rowData),
-                            onRowUpdate: (
-                                newRowData: TableRow,
-                                oldRowData: TableRow | undefined,
-                            ): Promise<unknown> =>
-                                this.editSource(newRowData, oldRowData),
-                            onRowDelete: (
-                                rowData: TableRow,
-                            ): Promise<unknown> => this.deleteSource(rowData),
-                        }}
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowUpdate: (
+                                          newRowData: TableRow,
+                                          oldRowData: TableRow | undefined,
+                                      ): Promise<unknown> =>
+                                          this.editSource(
+                                              newRowData,
+                                              oldRowData,
+                                          ),
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteSource(rowData),
+                                  }
+                                : undefined
+                        }
                     />
                 </Paper>
             </div>

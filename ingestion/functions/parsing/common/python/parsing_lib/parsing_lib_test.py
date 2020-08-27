@@ -7,11 +7,13 @@ import json
 import os
 import pytest
 import requests
+import sys
 import datetime
 
 from mock import MagicMock, patch
 from moto import mock_s3
 
+_SOURCE_API_URL = "http://bar.baz"
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
 _PARSED_CASE = (
@@ -69,6 +71,30 @@ def fake_parsing_fn(raw_data_file, source_id, source_url):
 
 
 @pytest.fixture()
+def mock_source_api_url_fixture():
+    """
+    Supplies a predetermined endpoint for G.h HTTP requests.
+
+    Return the common_lib module, for any case-specific mocks.
+
+    Because the parsing library is imported locally, this fixture can't
+    be set to autouse.
+    """
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            'common'))
+    import common_lib  # pylint: disable=import-error
+    with patch('common_lib.get_source_api_url') as mock:
+        mock.return_value = _SOURCE_API_URL
+        yield common_lib
+
+
+@pytest.fixture()
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
     os.environ["AWS_ACCESS_KEY_ID"] = "testing"
@@ -102,26 +128,34 @@ def sample_data():
         return json.load(event_file)
 
 
-@mock_s3
-def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
+def test_run_lambda_e2e(
+    input_event, sample_data, requests_mock, s3,
+        mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    parsing_lib.obtain_api_credentials = MagicMock(
+    common_lib = mock_source_api_url_fixture
+    common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases/batchUpsert"
+
+    # Mock the batch upsert call.
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     num_created = 10
     num_updated = 5
     requests_mock.post(
         full_source_url,
         json={"createdCaseIds": list(range(num_created)),
               "updatedCaseIds": list(range(num_updated))})
-    base_upload_url = f"{source_api_url}/sources/{input_event['sourceId']}/uploads"
+
+    # Delete the provided upload ID to force parsing_lib to create a new upload.
+    # Mock the create and update upload calls.
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
+    base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
     requests_mock.post(
@@ -144,7 +178,6 @@ def test_run_lambda_e2e(input_event, sample_data, requests_mock, s3):
     assert response["count_updated"] == num_updated
 
 
-@mock_s3
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
@@ -162,106 +195,81 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
         assert json.load(f) == sample_data
 
 
-def test_extract_event_fields_returns_url_bucket_and_key(input_event):
+def test_extract_event_fields_returns_all_present_fields(input_event):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
+        input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
+        input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
         input_event[parsing_lib.DATE_FILTER_FIELD])
 
 
-def test_extract_event_fields_errors_if_missing_bucket_field():
+def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
-        parsing_lib.extract_event_fields({parsing_lib.S3_KEY_FIELD: "key"})
+        del input_event[parsing_lib.S3_BUCKET_FIELD]
+        parsing_lib.extract_event_fields(input_event)
 
 
-def test_extract_event_fields_errors_if_missing_key_field():
+def test_extract_event_fields_errors_if_missing_key_field(input_event):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
-        parsing_lib.extract_event_fields(
-            {parsing_lib.S3_BUCKET_FIELD: "bucket"})
+    with pytest.raises(ValueError, match=parsing_lib.S3_KEY_FIELD):
+        del input_event[parsing_lib.S3_KEY_FIELD]
+        parsing_lib.extract_event_fields(input_event)
 
 
-def test_prepare_cases_adds_upload_id(requests_mock):
+def test_extract_event_fields_errors_if_missing_env_field(input_event):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    with pytest.raises(ValueError, match=parsing_lib.ENV_FIELD):
+        del input_event[parsing_lib.ENV_FIELD]
+        parsing_lib.extract_event_fields(input_event)
+
+
+def test_prepare_cases_adds_upload_id_and_verification_status(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         upload_id)
     assert result[0]["caseReference"]["uploadId"] == upload_id
-
-
-def test_create_upload_record_returns_upload_id(requests_mock):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    create_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads"
-    upload_id = "123456789012345678901234"
-    requests_mock.post(
-        create_upload_url,
-        json={"_id": upload_id, "status": "IN_PROGRESS", "summary": {}},
-        status_code=201)
-
-    response = parsing_lib.create_upload_record(_SOURCE_ID, {})
-
-    assert requests_mock.request_history[0].url == create_upload_url
-    assert response == upload_id
-
-
-def test_create_upload_record_raises_error_for_failed_request(requests_mock):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    create_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads"
-    requests_mock.register_uri(
-        "POST",
-        create_upload_url,
-        exc=requests.exceptions.ConnectTimeout)
-
-    try:
-        parsing_lib.create_upload_record(_SOURCE_ID, {})
-    except requests.exceptions.ConnectTimeout:
-        return
-
-    # We got the wrong exception or no exception, fail the test.
-    assert False
+    assert result[0]["caseReference"]["verificationStatus"] == parsing_lib.UNVERIFIED_STATUS
 
 
 def test_write_to_server_returns_created_and_updated_count(
-        requests_mock):
+        requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases/batchUpsert"
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.post(
         full_source_url,
         json={"createdCaseIds": list(range(10)),
               "updatedCaseIds": list(range(5))})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        [_PARSED_CASE], _SOURCE_ID, "upload_id", {})
+        [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {})
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == 10
     assert count_updated == 5
 
 
 def test_write_to_server_raises_error_for_failed_batch_upsert(
-        requests_mock):
+        requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    full_source_url = f"{source_api_url}/cases/batchUpsert"
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
         "POST", full_source_url, json={}, status_code=500),
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
 
     try:
-        parsing_lib.write_to_server([_PARSED_CASE], _SOURCE_ID, upload_id, {})
+        parsing_lib.write_to_server(
+            [_PARSED_CASE],
+            "env", _SOURCE_ID, upload_id, {})
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -272,45 +280,28 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     assert False
 
 
-def test_finalize_upload_invokes_update_api(requests_mock):
+def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_errors(
+        requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
-    num_created = 42
-    num_updated = 0
-    requests_mock.put(
-        update_upload_url,
-        json={"_id": upload_id, "status": "SUCCESS",
-              "summary": {"numCreated": num_created, "numUpdated": num_updated}})
-
-    parsing_lib.finalize_upload(
-        _SOURCE_ID, upload_id, {}, num_created, num_updated)
-
-    assert requests_mock.request_history[0].url == update_upload_url
-
-
-def test_finalize_upload_raises_error_for_failed_request(requests_mock):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    # TODO: Complete removal of URL env var.
+    os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
+    full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
-        "PUT",
-        update_upload_url,
-        [{"json": {}, "status_code": 500}, {"json": {}}])
+        "POST", full_source_url, json={}, status_code=207),
+    upload_id = "123456789012345678901234"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    requests_mock.register_uri("PUT", update_upload_url, json={})
 
     try:
-        parsing_lib.finalize_upload(_SOURCE_ID, upload_id, {}, 42, 0)
+        parsing_lib.write_to_server(
+            [_PARSED_CASE],
+            "env", _SOURCE_ID, upload_id, {})
     except RuntimeError:
-        assert requests_mock.request_history[0].url == update_upload_url
+        assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.INTERNAL_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.VALIDATION_ERROR.name}}
         return
-
     # We got the wrong exception or no exception, fail the test.
     assert False
 
@@ -322,7 +313,7 @@ def test_filter_cases_by_date_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -333,7 +324,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert cases == []
 
 
@@ -344,7 +335,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert cases == []
 
 
@@ -355,16 +346,15 @@ def test_filter_cases_by_date_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
-def test_filter_cases_by_date_unsupported_op(requests_mock):
+def test_filter_cases_by_date_unsupported_op(
+        requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
     upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
+    update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.put(
         update_upload_url,
         json={"_id": upload_id, "status": "ERROR",
@@ -374,45 +364,11 @@ def test_filter_cases_by_date_unsupported_op(requests_mock):
         parsing_lib.filter_cases_by_date(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
-            _SOURCE_ID, upload_id, {})  # api_creds
+            "env", _SOURCE_ID, upload_id, {})  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json() == {"status": "ERROR", "summary": {
             "error": "SOURCE_CONFIGURATION_ERROR"}}
         return
-    assert "Should have raised a ValueError exception" == False
-
-
-def test_complete_with_error_raises_exception():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    e = ValueError("Oops!")
-    try:
-        parsing_lib.complete_with_error(e)
-    except ValueError:
-        return
-
-    # We got the wrong exception or no exception, fail the test.
-    assert False
-
-
-def test_complete_with_error_updates_upload_if_provided_data(requests_mock):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    source_api_url = "http://foo.bar"
-    os.environ["SOURCE_API_URL"] = source_api_url
-    upload_id = "123456789012345678901234"
-    update_upload_url = f"{source_api_url}/sources/{_SOURCE_ID}/uploads/{upload_id}"
-    requests_mock.put(update_upload_url, json={})
-    e = ValueError("Oops!")
-
-    try:
-        upload_error = parsing_lib.UploadError.SOURCE_CONFIGURATION_ERROR
-        parsing_lib.complete_with_error(
-            e, upload_error, _SOURCE_ID, upload_id, {})
-        assert requests_mock.request_history[0].url == update_upload_url
-        assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": upload_error.name}}
-    except ValueError:
-        return
-    # We got the wrong exception or no exception, fail the test.
     assert "Should have raised a ValueError exception" == False

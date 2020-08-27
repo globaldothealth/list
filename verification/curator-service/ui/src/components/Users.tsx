@@ -138,6 +138,9 @@ export default class Users extends React.Component<Props, UsersState> {
                         draggable: false, // No need to be able to drag and drop headers.
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        headerStyle: {
+                            zIndex: 1,
+                        },
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
                         this.setState({ pageSize: newPageSize });
