@@ -1,5 +1,8 @@
 version: "3.7"
 services:
+  mongo:
+    volumes:
+      - ../verification/scripts:/verification/scripts
   curator:
     command: "npm run dev"
     volumes:
