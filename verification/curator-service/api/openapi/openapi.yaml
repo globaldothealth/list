@@ -985,7 +985,7 @@ components:
                 type: string
                 description: >
                   For outcome event, value can be Death or Recovered.
-                  For icuAdmission and hospitalAdmission, value can be Yes if the patient was hospitalized.
+                  For icuAdmission and hospitalAdmission, value can be Yes or No.
                 example: Recovered
           example:
             - name: confirmed
@@ -1048,7 +1048,7 @@ components:
                 type: string
               example:
                 - Airplane
-                - Bub
+                - Bus
                 - Gym
             linkedCaseIds:
               type: array
