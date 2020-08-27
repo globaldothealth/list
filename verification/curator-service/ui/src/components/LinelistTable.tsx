@@ -868,7 +868,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           );
                                       },
                                   },
-                                  // Only allow deleting all rows if there is a search query
+                                  // Only allow deleting all rows if there is a search query.
                                   ...(this.state.totalNumRows !==
                                       this.state.numSelectedRows ||
                                   this.state.search.trim() !== ''
