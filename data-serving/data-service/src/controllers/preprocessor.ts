@@ -77,7 +77,7 @@ export const setRevisionMetadata = async (
     next();
 };
 
-export const setBatchRevisionMetadata = async (
+export const setBatchUpsertRevisionMetadata = async (
     request: Request,
     response: Response,
     next: NextFunction,
@@ -113,6 +113,46 @@ export const setBatchRevisionMetadata = async (
                     c.caseReference?.sourceEntryId,
             ) || createNewMetadata(curatorEmail);
     });
+    // Clean up the additional metadata that falls outside the `case` entity.
+    delete request.body.curator;
+
+    next();
+};
+
+export const setBatchUpdateRevisionMetadata = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const curatorEmail = request.body.curator.email;
+
+    const existingCases = await Case.find({
+        _id: {
+            $in: request.body.cases.map((c: any) => c._id),
+        },
+    })
+        .select({
+            _id: 1,
+            caseReference: 1,
+            revisionMetadata: 1,
+        })
+        .exec();
+
+    const metadataMap = new Map(
+        existingCases
+            .filter((c) => c && c.caseReference)
+            .map((c) => [
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+                createUpdateMetadata(c, curatorEmail),
+            ]),
+    );
+
+    // Set the request cases' revision metadata to the update metadata.
+    request.body.cases.forEach((c: any) => {
+        c.revisionMetadata = metadataMap.get(
+            c.caseReference?.sourceId + ':' + c.caseReference?.sourceEntryId,
+        );
+    });
 
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;
@@ -136,7 +176,7 @@ export const createCaseRevision = async (
     next();
 };
 
-export const createBatchCaseRevisions = async (
+export const createBatchUpsertCaseRevisions = async (
     request: Request,
     response: Response,
     next: NextFunction,
@@ -154,7 +194,35 @@ export const createBatchCaseRevisions = async (
         rawResult: true,
         // @ts-ignore Mongoose types don't include the `lean` option from its
         // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
-        lean: true
+        lean: true,
+    });
+
+    next();
+};
+
+export const createBatchUpdateCaseRevisions = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    const casesToUpdate = (
+        await Case.find({
+            _id: {
+                $in: request.body.cases.map((c: any) => c._id),
+            },
+        }).exec()
+    ).map((c) => {
+        return {
+            case: c,
+        };
+    });
+
+    await CaseRevision.insertMany(casesToUpdate, {
+        ordered: false,
+        rawResult: true,
+        // @ts-ignore Mongoose types don't include the `lean` option from its
+        // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
+        lean: true,
     });
 
     next();

@@ -522,6 +522,53 @@ describe('Cases', () => {
         expect(res.text).toEqual(message);
     });
 
+    it('proxies valid batch update calls', async () => {
+        mockedAxios.put.mockResolvedValueOnce({
+            status: 200,
+            data: { numModified: 2 },
+        });
+        const res = await curatorRequest
+            .put('/api/cases/batchUpdate')
+            .send({
+                cases: [
+                    {
+                        age: '42',
+                    },
+                    {
+                        age: '42',
+                    },
+                ],
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(res.body.numModified).toEqual(2);
+    });
+
+    it('batch update forwards server errors from proxied update', async () => {
+        const code = 500;
+        const message = 'Server error';
+        mockedAxios.put.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+
+        const res = await curatorRequest
+            .put('/api/cases/batchUpdate')
+            .send({
+                cases: [
+                    {
+                        age: '42',
+                    },
+                    {
+                        age: '42',
+                    },
+                ],
+            })
+            .expect(code);
+        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(res.text).toEqual(message);
+    });
+
     it('proxies create calls and geocode', async () => {
         const lyon: GeocodeResult = {
             administrativeAreaLevel1: 'Rhône',

@@ -229,6 +229,31 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    put:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used symptoms
@@ -377,6 +402,13 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    BatchUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchValidateCaseResponse:
       description: Response to batch validate case API requests
       properties:
@@ -703,6 +735,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200BatchUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchUpdateResponse"
     "200SymptomArray":
       description: OK
       content:
