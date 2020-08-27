@@ -301,7 +301,17 @@ new OpenApiValidator({
 
         // API documentation.
         const swaggerDocument = YAML.load('./openapi/openapi.yaml');
-        app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+        app.use(
+            '/api-docs',
+            swaggerUi.serve,
+            swaggerUi.setup(swaggerDocument, {
+                // Hide the useless "SWAGGER" black bar at the top.
+                customCss: '.swagger-ui .topbar { display: none }',
+                // Make it look nicer.
+                customCssUrl:
+                    'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+            }),
+        );
 
         // Serve static UI content if static directory was specified.
         if (env.STATIC_DIR) {
