@@ -377,19 +377,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     async deleteCases(): Promise<void> {
+        let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            // TODO: Implement action for all rows
-            alert('Action not yet implemented when all rows selected');
-            return;
-        }
-        try {
-            await axios.delete('/api/cases', {
+            requestBody = { data: { query: this.state.search } };
+        } else {
+            requestBody = {
                 data: {
                     caseIds: this.state.selectedRowsCurrentPage.map(
                         (row: TableRow) => row.id,
                     ),
                 },
-            });
+            };
+        }
+        try {
+            await axios.delete('/api/cases', requestBody);
             this.tableRef.current.onQueryChange();
         } catch (e) {
             this.setState({ error: e.toString() });
@@ -867,22 +868,29 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           );
                                       },
                                   },
-                                  // This action is for deleting selected rows.
-                                  // The action for deleting single rows is in the
-                                  // RowMenu function.
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <span aria-label="delete all">
-                                              <DeleteIcon />
-                                          </span>
-                                      ),
-                                      tooltip: 'Delete selected rows',
-                                      onClick: (): void => {
-                                          this.setState({
-                                              deleteDialogOpen: true,
-                                          });
-                                      },
-                                  },
+                                  // Only allow deleting all rows if there is a search query.
+                                  ...(this.state.totalNumRows !==
+                                      this.state.numSelectedRows ||
+                                  this.state.search.trim() !== ''
+                                      ? [
+                                            // This action is for deleting selected rows.
+                                            // The action for deleting single rows is in the
+                                            // RowMenu function.
+                                            {
+                                                icon: (): JSX.Element => (
+                                                    <span aria-label="delete all">
+                                                        <DeleteIcon />
+                                                    </span>
+                                                ),
+                                                tooltip: 'Delete selected rows',
+                                                onClick: (): void => {
+                                                    this.setState({
+                                                        deleteDialogOpen: true,
+                                                    });
+                                                },
+                                            },
+                                        ]
+                                      : []),
                               ]
                             : []
                     }
