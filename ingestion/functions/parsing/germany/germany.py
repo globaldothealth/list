@@ -46,16 +46,16 @@ def convert_demographics(gender: str, age: str):
     if gender:
         demo["gender"] = convert_gender(gender)
     if age:
-        age_range = age.split("-")
+        age_range = age.split('-')
         if len(age_range) > 1:
             demo["ageRange"] = {
-                "start": float("".join([x for x in age_range[0] if x.isdigit()])),
-                "end": float("".join([x for x in age_range[1] if x.isdigit()])),
+                "start": float(age_range[0][1:3]),
+                "end": float(age_range[1][1:3])
             }
         else:
             demo["ageRange"] = {
-                "start": float("".join([x for x in age_range[0] if x.isdigit()])),
-                "end": float("".join([x for x in age_range[0] if x.isdigit()])),
+                "start": float(age_range[0][1:3]),
+                "end": float(age_range[0][1:3])
             }
     return demo
 
