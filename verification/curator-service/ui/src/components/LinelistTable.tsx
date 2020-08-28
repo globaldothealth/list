@@ -407,14 +407,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     setCaseVerification(
-        rowData: TableRow,
+        rowData: TableRow[],
         verificationStatus: VerificationStatus,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + rowData.id;
+            const updateUrl = this.state.url + '/batchUpdate';
             this.setState({ error: '' });
-            const response = axios.put(updateUrl, {
-                'caseReference.verificationStatus': verificationStatus,
+            const response = axios.post(updateUrl, {
+                cases: rowData.map((row) => {
+                    return {
+                        _id: row.id,
+                        'caseReference.verificationStatus': verificationStatus,
+                    };
+                }),
             });
             response.then(resolve).catch((e) => {
                 this.setState({ error: e.toString() });
@@ -814,7 +819,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
@@ -824,18 +832,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               );
                                               return;
                                           }
-                                          const updatePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.setCaseVerification(
-                                                      row,
-                                                      VerificationStatus.Verified,
-                                                  ),
+                                          await this.setCaseVerification(
+                                              rows,
+                                              VerificationStatus.Verified,
                                           );
-                                          Promise.all(updatePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
-                                              },
-                                          );
+                                          this.tableRef.current.onQueryChange();
                                       },
                                   },
                                   {
@@ -844,7 +845,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
@@ -854,18 +858,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               );
                                               return;
                                           }
-                                          const updatePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.setCaseVerification(
-                                                      row,
-                                                      VerificationStatus.Unverified,
-                                                  ),
+                                          await this.setCaseVerification(
+                                              rows,
+                                              VerificationStatus.Unverified,
                                           );
-                                          Promise.all(updatePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
-                                              },
-                                          );
+                                          this.tableRef.current.onQueryChange();
                                       },
                                   },
                                   // Only allow deleting all rows if there is a search query.
