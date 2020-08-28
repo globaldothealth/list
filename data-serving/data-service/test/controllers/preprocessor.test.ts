@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {
+    createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
     setBatchUpdateRevisionMetadata,
@@ -463,15 +464,8 @@ describe('batch upsert', () => {
 });
 describe('batch update', () => {
     it('sets update metadata', async () => {
-        const existingCase = {
-            ...minimalCase,
-            caseReference: {
-                ...minimalCase.caseReference,
-                sourceEntryId: 'case_id_exists',
-            },
-        };
         const c = new Case({
-            ...existingCase,
+            ...minimalCase,
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
@@ -482,19 +476,16 @@ describe('batch update', () => {
         });
         await c.save();
 
-        const existingCase2 = {
-            ...minimalCase,
-            caseReference: {
-                ...minimalCase.caseReference,
-                sourceEntryId: 'case_id_exists2',
-            },
-        };
         const c2 = new Case({
-            ...existingCase2,
+            ...minimalCase,
             revisionMetadata: {
-                revisionNumber: 0,
+                revisionNumber: 1,
+                updateMetadata: {
+                    curator: 'test@gmail.com',
+                    date: Date.now(),
+                },
                 creationMetadata: {
-                    curator: 'creator@gmail.com',
+                    curator: 'creator2@gmail.com',
                     date: Date.parse('2020-01-01'),
                 },
             },
@@ -503,8 +494,8 @@ describe('batch update', () => {
 
         const requestBody = {
             cases: [
-                { ...existingCase, _id: c._id },
-                { ...existingCase2, _id: c2._id },
+                { ...minimalCase, _id: c._id },
+                { ...minimalCase, _id: c2._id },
             ],
             curator: { email: 'updater@gmail.com' },
         };
@@ -519,7 +510,7 @@ describe('batch update', () => {
         expect(requestBody).toEqual({
             cases: [
                 {
-                    ...existingCase,
+                    ...minimalCase,
                     _id: c._id,
                     revisionMetadata: {
                         revisionNumber: 1,
@@ -534,12 +525,12 @@ describe('batch update', () => {
                     },
                 },
                 {
-                    ...existingCase2,
+                    ...minimalCase,
                     _id: c2._id,
                     revisionMetadata: {
-                        revisionNumber: 1,
+                        revisionNumber: 2,
                         creationMetadata: {
-                            curator: 'creator@gmail.com',
+                            curator: 'creator2@gmail.com',
                             date: Date.parse('2020-01-01'),
                         },
                         updateMetadata: {
@@ -552,15 +543,8 @@ describe('batch update', () => {
         });
     });
     it('with existing cases creates case revisions', async () => {
-        const existingCase = {
-            ...minimalCase,
-            caseReference: {
-                ...minimalCase.caseReference,
-                sourceEntryId: 'case_id_exists',
-            },
-        };
         const c = new Case({
-            ...existingCase,
+            ...minimalCase,
             revisionMetadata: {
                 revisionNumber: 0,
                 creationMetadata: {
@@ -571,19 +555,16 @@ describe('batch update', () => {
         });
         await c.save();
 
-        const existingCase2 = {
-            ...minimalCase,
-            caseReference: {
-                ...minimalCase.caseReference,
-                sourceEntryId: 'case_id_exists2',
-            },
-        };
         const c2 = new Case({
-            ...existingCase2,
+            ...minimalCase,
             revisionMetadata: {
-                revisionNumber: 0,
+                revisionNumber: 1,
+                updateMetadata: {
+                    curator: 'test@gmail.com',
+                    date: Date.now(),
+                },
                 creationMetadata: {
-                    curator: 'creator@gmail.com',
+                    curator: 'creator2@gmail.com',
                     date: Date.parse('2020-01-01'),
                 },
             },
@@ -592,13 +573,13 @@ describe('batch update', () => {
 
         const requestBody = {
             cases: [
-                { ...existingCase, _id: c._id },
-                { ...existingCase2, _id: c2._id },
+                { ...minimalCase, _id: c._id },
+                { ...minimalCase, _id: c2._id },
             ],
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await createBatchUpsertCaseRevisions(
+        await createBatchUpdateCaseRevisions(
             { body: requestBody, method: 'POST' } as Request,
             {} as Response,
             nextFn,
