@@ -13,6 +13,19 @@ import datetime
 from mock import MagicMock, patch
 from moto import mock_s3
 
+try:
+    import common_lib
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            os.pardir,
+            'common'))
+    import common_lib
+
 _SOURCE_API_URL = "http://bar.baz"
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
@@ -274,7 +287,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.DATA_UPLOAD_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.DATA_UPLOAD_ERROR.name}}
         return
     # We got the wrong exception or no exception, fail the test.
     assert False
@@ -300,7 +313,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": parsing_lib.UploadError.VALIDATION_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.VALIDATION_ERROR.name}}
         return
     # We got the wrong exception or no exception, fail the test.
     assert False

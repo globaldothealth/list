@@ -3,11 +3,21 @@ import datetime
 import json
 import os
 import pytest
+import sys
 
 from moto import mock_s3
 from unittest.mock import MagicMock, patch
 
 _SOURCE_API_URL = "http://foo.bar"
+
+try:
+    import common_lib
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'common'))
+    import common_lib
 
 
 @pytest.fixture()
@@ -181,7 +191,7 @@ def test_get_source_details_raises_error_if_source_not_found(
         assert requests_mock.request_history[0].url == get_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONFIGURATION_NOT_FOUND.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -206,7 +216,7 @@ def test_get_source_details_raises_error_if_other_errors_getting_source(
         assert requests_mock.request_history[0].url == get_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.INTERNAL_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -270,7 +280,7 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONFIGURATION_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONFIGURATION_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -294,7 +304,7 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONTENT_NOT_FOUND.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -318,7 +328,7 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -356,7 +366,7 @@ def test_upload_to_s3_raises_error_on_s3_error(
     except Exception:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.INTERNAL_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.

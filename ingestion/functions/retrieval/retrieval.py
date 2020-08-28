@@ -22,13 +22,14 @@ s3_client = boto3.client("s3")
 # Layer code, like common_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import common_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir, 'common'))
-import common_lib
-from common_lib import UploadError
+    import common_lib
 
 
 def extract_event_fields(event):
@@ -61,8 +62,8 @@ def get_source_details(env, source_id, upload_id, api_headers):
                 "awsLambdaArn", ""), api_json.get(
                 'dateFilter', {})
         upload_error = (
-            UploadError.SOURCE_CONFIGURATION_NOT_FOUND
-            if r.status_code == 404 else UploadError.INTERNAL_ERROR)
+            common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
+            if r.status_code == 404 else common_lib.UploadError.INTERNAL_ERROR)
         e = RuntimeError(
             f"Error retrieving source details, status={r.status_code}, response={r.text}")
         common_lib.complete_with_error(
@@ -70,7 +71,7 @@ def get_source_details(env, source_id, upload_id, api_headers):
             api_headers)
     except ValueError as e:
         common_lib.complete_with_error(
-            e, env, UploadError.INTERNAL_ERROR, source_id, upload_id,
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
 
@@ -85,8 +86,8 @@ def retrieve_content(
         if source_format != "JSON" and source_format != "CSV":
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
-                e, env, UploadError.SOURCE_CONFIGURATION_ERROR, source_id,
-                upload_id, api_headers)
+                e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
+                source_id, upload_id, api_headers)
         print('Download finished')
 
         key_filename_part = f"content.{source_format.lower()}"
@@ -116,9 +117,9 @@ def retrieve_content(
     except requests.exceptions.RequestException as e:
         # TODO: Handle 301.
         upload_error = (
-            UploadError.SOURCE_CONTENT_NOT_FOUND
+            common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
             if r.status_code == 404 else
-            UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
+            common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
         common_lib.complete_with_error(
             e, env, upload_error, source_id, upload_id,
             api_headers)
@@ -133,7 +134,7 @@ def upload_to_s3(
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
     except Exception as e:
         common_lib.complete_with_error(
-            e, env, UploadError.INTERNAL_ERROR, source_id, upload_id,
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers)
 
 
@@ -158,8 +159,9 @@ def invoke_parser(
     print(f"Parser response: {response}")
     if "StatusCode" not in response or response["StatusCode"] != 202:
         e = Exception(f"Parser invocation unsuccessful. Response: {response}")
-        common_lib.complete_with_error(e, env, UploadError.INTERNAL_ERROR,
-                                       source_id, upload_id, api_headers)
+        common_lib.complete_with_error(
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_headers)
 
 
 def get_today():
