@@ -228,14 +228,13 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
         parsing_lib.extract_event_fields(input_event)
 
 
-def test_prepare_cases_adds_upload_id_and_verification_status(requests_mock):
+def test_prepare_cases_adds_upload_id_and(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         upload_id)
     assert result[0]["caseReference"]["uploadId"] == upload_id
-    assert result[0]["caseReference"]["verificationStatus"] == parsing_lib.UNVERIFIED_STATUS
 
 
 def test_write_to_server_returns_created_and_updated_count(
