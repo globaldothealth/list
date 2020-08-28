@@ -933,7 +933,8 @@ components:
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
