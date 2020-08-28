@@ -92,7 +92,7 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.upsert,
         );
-        apiRouter.put(
+        apiRouter.post(
             '/cases/batchUpdate',
             setBatchUpdateRevisionMetadata,
             createBatchUpdateCaseRevisions,

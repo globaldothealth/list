@@ -510,7 +510,7 @@ describe('batch update', () => {
         };
         const nextFn = jest.fn();
         await setBatchUpdateRevisionMetadata(
-            { body: requestBody, method: 'PUT' } as Request,
+            { body: requestBody, method: 'POST' } as Request,
             {} as Response,
             nextFn,
         );
@@ -599,7 +599,7 @@ describe('batch update', () => {
         };
         const nextFn = jest.fn();
         await createBatchUpsertCaseRevisions(
-            { body: requestBody, method: 'PUT' } as Request,
+            { body: requestBody, method: 'POST' } as Request,
             {} as Response,
             nextFn,
         );

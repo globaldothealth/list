@@ -523,12 +523,12 @@ describe('Cases', () => {
     });
 
     it('proxies valid batch update calls', async () => {
-        mockedAxios.put.mockResolvedValueOnce({
+        mockedAxios.post.mockResolvedValueOnce({
             status: 200,
             data: { numModified: 2 },
         });
         const res = await curatorRequest
-            .put('/api/cases/batchUpdate')
+            .post('/api/cases/batchUpdate')
             .send({
                 cases: [
                     {
@@ -541,19 +541,19 @@ describe('Cases', () => {
             })
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(res.body.numModified).toEqual(2);
     });
 
     it('batch update forwards server errors from proxied update', async () => {
         const code = 500;
         const message = 'Server error';
-        mockedAxios.put.mockRejectedValueOnce({
+        mockedAxios.post.mockRejectedValueOnce({
             response: { status: code, data: message },
         });
 
         const res = await curatorRequest
-            .put('/api/cases/batchUpdate')
+            .post('/api/cases/batchUpdate')
             .send({
                 cases: [
                     {
@@ -565,7 +565,7 @@ describe('Cases', () => {
                 ],
             })
             .expect(code);
-        expect(mockedAxios.put).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(res.text).toEqual(message);
     });
 
