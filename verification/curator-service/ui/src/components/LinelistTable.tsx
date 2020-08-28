@@ -801,7 +801,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         this.props.user.roles.includes('curator')
                             ? [
                                   // Only allow selecting rows across pages if
-                                  // there is a search query
+                                  // there is a search query.
                                   ...(this.state.search.trim() !== ''
                                       ? [
                                             {
