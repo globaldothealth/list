@@ -109,13 +109,7 @@ Resources:
       Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
+        - !Ref CommonLibLayer
   GermanyParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -127,17 +121,10 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-          # Workaround for a bug with the existing SAM CLI 1.0 Docker images.
-          # Re: https://github.com/awslabs/aws-sam-cli/issues/2135
-          AWS_SESSION_TOKEN: ""
-
+        - !Ref CommonLibLayer
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
