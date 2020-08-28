@@ -333,7 +333,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 /**
  * Updates multiple cases.
  *
- * Handles HTTP PUT /api/cases/batchUpdate.
+ * Handles HTTP POST /api/cases/batchUpdate.
  */
 export const batchUpdate = async (
     req: Request,

@@ -230,7 +230,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpdate:
-    put:
+    post:
       summary: Batch updates cases
       tags: [Case]
       operationId: batchUpdateCases
@@ -250,6 +250,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
         "422":
           $ref: "#/components/responses/422"
         "500":

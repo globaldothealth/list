@@ -565,7 +565,7 @@ describe('PUT', () => {
         const newNotes = 'abc';
         const newNotes2 = 'cba';
         const res = await request(app)
-            .put('/api/cases/batchUpdate')
+            .post('/api/cases/batchUpdate')
             .send({
                 ...curatorMetadata,
                 cases: [
@@ -591,7 +591,7 @@ describe('PUT', () => {
         const newNotes = 'abc';
         const newNotes2 = 'cba';
         await request(app)
-            .put('/api/cases/batchUpdate')
+            .post('/api/cases/batchUpdate')
             .send({
                 ...curatorMetadata,
                 cases: [{ _id: c._id, notes: newNotes }, { notes: newNotes2 }],

@@ -254,7 +254,7 @@ export default class CasesController {
 
     batchUpdate = async (req: Request, res: Response): Promise<void> => {
         try {
-            const updateResponse = await axios.put(
+            const updateResponse = await axios.post(
                 this.dataServerURL + '/api/cases/batchUpdate',
                 {
                     ...req.body,
