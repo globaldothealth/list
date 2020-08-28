@@ -568,6 +568,27 @@ paths:
           $ref: "#/components/responses/207BatchCaseUpsert"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseArray"
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/{id}:
     parameters:
       - name: id
@@ -1356,6 +1377,13 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Location"
+    BatchCaseUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchCaseUpsertResponse:
       description: Response to batch upsert case API requests
       properties:
@@ -1405,6 +1433,12 @@ components:
         application/json:
           schema:
             type: object
+    "200BatchCaseUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchCaseUpdateResponse"
     "200BatchCaseUpsert":
       description: OK
       content:

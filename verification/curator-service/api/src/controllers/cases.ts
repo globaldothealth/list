@@ -252,6 +252,30 @@ export default class CasesController {
         }
     };
 
+    batchUpdate = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const updateResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpdate',
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
+                { maxContentLength: Infinity },
+            );
+            res.status(200).send({
+                numModified: updateResponse.data.numModified,
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err.message);
+        }
+    };
+
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {

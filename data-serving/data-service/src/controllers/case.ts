@@ -331,6 +331,40 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Updates multiple cases.
+ *
+ * Handles HTTP POST /api/cases/batchUpdate.
+ */
+export const batchUpdate = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
+    if (!req.body.cases.every((c: any) => c._id)) {
+        res.status(422).json('Every case must specify its _id');
+        return;
+    }
+    try {
+        const bulkWriteResult = await Case.bulkWrite(
+            req.body.cases.map((c: any) => {
+                return {
+                    updateOne: {
+                        filter: {
+                            _id: c._id,
+                        },
+                        update: c,
+                    },
+                };
+            }),
+            { ordered: false },
+        );
+        res.json({ numModified: bulkWriteResult.modifiedCount });
+    } catch (err) {
+        res.status(500).json(err.message);
+        return;
+    }
+};
+
+/**
  * Upserts a case based on a compound index of
  * caseReference.{dataSourceId, dataEntryId}.
  *
