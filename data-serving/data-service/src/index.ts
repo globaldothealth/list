@@ -3,9 +3,11 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
-    createBatchCaseRevisions,
+    createBatchUpdateCaseRevisions,
+    createBatchUpsertCaseRevisions,
     createCaseRevision,
-    setBatchRevisionMetadata,
+    setBatchUpdateRevisionMetadata,
+    setBatchUpsertRevisionMetadata,
     setRevisionMetadata,
 } from './controllers/preprocessor';
 
@@ -90,8 +92,8 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
-            setBatchRevisionMetadata,
-            createBatchCaseRevisions,
+            setBatchUpsertRevisionMetadata,
+            createBatchUpsertCaseRevisions,
             caseController.batchUpsert,
         );
         apiRouter.put(
@@ -99,6 +101,12 @@ new OpenApiValidator({
             setRevisionMetadata,
             createCaseRevision,
             caseController.upsert,
+        );
+        apiRouter.post(
+            '/cases/batchUpdate',
+            setBatchUpdateRevisionMetadata,
+            createBatchUpdateCaseRevisions,
+            caseController.batchUpdate,
         );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
