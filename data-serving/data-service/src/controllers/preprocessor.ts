@@ -1,8 +1,12 @@
 import { Case, CaseDocument } from '../model/case';
 import { CaseRevision, CaseRevisionDocument } from '../model/case-revision';
 import { NextFunction, Request, Response } from 'express';
+import {
+    casesMatchingSearchQuery,
+    findCasesWithCaseReferenceData,
+} from './case';
 
-import { findCasesWithCaseReferenceData } from './case';
+import { DocumentQuery } from 'mongoose';
 
 const createNewMetadata = (curatorEmail: string) => {
     return {
@@ -115,6 +119,30 @@ export const setBatchUpsertRevisionMetadata = async (
     });
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;
+
+    next();
+};
+
+export const findCasesToUpdate = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
+    // Find all cases matching the query
+    const matchedCases = await (casesMatchingSearchQuery({
+        searchQuery: request.body.query,
+        count: false,
+    }) as DocumentQuery<CaseDocument[], CaseDocument, {}>).exec();
+
+    // Set those case ids to be updated with the request case.
+    const casesToUpdate = matchedCases.map((c: any) => {
+        return { _id: c._id, ...request.body.case };
+    });
+    request.body.cases = casesToUpdate;
+
+    // Delete no longer used fields
+    delete request.body.query;
+    delete request.body.case;
 
     next();
 };

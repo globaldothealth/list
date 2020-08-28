@@ -21,7 +21,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 // Returns a mongoose query for all cases matching the given search query.
 // If count is true, it returns a query for the number of cases matching
 // the search query.
-const casesMatchingSearchQuery = (opts: {
+export const casesMatchingSearchQuery = (opts: {
     searchQuery: string;
     count: boolean;
 }) => {
