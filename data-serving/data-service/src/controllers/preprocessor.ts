@@ -133,25 +133,20 @@ export const setBatchUpdateRevisionMetadata = async (
     })
         .select({
             _id: 1,
-            caseReference: 1,
             revisionMetadata: 1,
         })
         .exec();
 
     const metadataMap = new Map(
-        existingCases
-            .filter((c) => c && c.caseReference)
-            .map((c) => [
-                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
-                createUpdateMetadata(c, curatorEmail),
-            ]),
+        existingCases.map((c) => [
+            c._id.toString(),
+            createUpdateMetadata(c, curatorEmail),
+        ]),
     );
 
     // Set the request cases' revision metadata to the update metadata.
     request.body.cases.forEach((c: any) => {
-        c.revisionMetadata = metadataMap.get(
-            c.caseReference?.sourceId + ':' + c.caseReference?.sourceEntryId,
-        );
+        c.revisionMetadata = metadataMap.get(c._id?.toString());
     });
 
     // Clean up the additional metadata that falls outside the `case` entity.
