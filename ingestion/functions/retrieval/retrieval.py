@@ -27,8 +27,8 @@ if ('lambda' not in sys.argv[0]):
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir, 'common'))
-from common_lib import UploadError
 import common_lib
+from common_lib import UploadError
 
 
 def extract_event_fields(event):

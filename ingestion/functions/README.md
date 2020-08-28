@@ -192,6 +192,11 @@ If a source has a time-based URL scheme you can use standard Python [date format
 
 For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/%Y-%m-%d.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
 
+### Encoding of sources
+
+When the retrieval function stores the contents of a source in S3, the data is automatically encoded in utf-8 so that parsers do not have to care about which
+encoding to use when reading the files.
+
 ## Parsers
 
 You can find a list of issues/FR for parsers using the [importer tag](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+label%3AImporter).
