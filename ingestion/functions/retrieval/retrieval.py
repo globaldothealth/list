@@ -1,6 +1,9 @@
+import codecs
 import json
 import os
 import sys
+import io
+from chardet import detect
 
 import boto3
 import google.auth.transport.requests
@@ -75,26 +78,36 @@ def retrieve_content(
         env, source_id, upload_id, url, source_format, api_headers):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        data = None
-        extension = None
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
         r.raise_for_status()
-        data = r.content
-        if source_format == "JSON":
-            extension = "json"
-        elif source_format == "CSV":
-            extension = "csv"
-        else:
+        if source_format != "JSON" and source_format != "CSV":
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, UploadError.SOURCE_CONFIGURATION_ERROR, source_id,
                 upload_id, api_headers)
+        print('Download finished')
 
-        key_filename_part = f"content.{extension}"
-        with open(f"/tmp/{key_filename_part}", "wb") as f:
-            f.write(data)
+        key_filename_part = f"content.{source_format.lower()}"
+        # Lambda limitations: 512MB ephemeral disk space.
+        # Memory range is from 128 to 3008 MB so we could switch to
+        # https://docs.python.org/3/library/io.html#io.StringIO for bigger
+        # sources.
+        # Make the encoding of retrieved content consistent (UTF-8) for all
+        # parsers as per https://github.com/globaldothealth/list/issues/867.
+        bytesio = io.BytesIO(r.content)
+        print('detecting encoding of retrieved content.')
+        detected_enc = detect(bytesio.read(2048))
+        print(f'Source encoding is presumably {detected_enc}')
+        bytesio.seek(0)
+        with codecs.open(f"/tmp/{key_filename_part}", "wb", 'utf-8') as f:
+            # Write the output file as utf-8 in chunks because decoding the
+            # whole data in one shot becomes really slow with big files.
+            content = bytesio.read(2048)
+            while content:
+                f.write(codecs.decode(content, detected_enc['encoding']))
+                content = bytesio.read(2048)
             s3_object_key = (
                 f"{source_id}"
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
