@@ -6,6 +6,7 @@ import {
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
+    findCasesToUpdate,
     setBatchUpdateRevisionMetadata,
     setBatchUpsertRevisionMetadata,
     setRevisionMetadata,
@@ -104,6 +105,13 @@ new OpenApiValidator({
         );
         apiRouter.post(
             '/cases/batchUpdate',
+            setBatchUpdateRevisionMetadata,
+            createBatchUpdateCaseRevisions,
+            caseController.batchUpdate,
+        );
+        apiRouter.post(
+            '/cases/batchUpdateQuery',
+            findCasesToUpdate,
             setBatchUpdateRevisionMetadata,
             createBatchUpdateCaseRevisions,
             caseController.batchUpdate,

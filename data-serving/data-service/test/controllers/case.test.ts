@@ -599,6 +599,60 @@ describe('PUT', () => {
             .expect('Content-Type', /json/)
             .expect(422);
     });
+    it('update many items from query should return 200 OK', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        const c = new Case(minimalCase);
+        c.notes = 'test case';
+        await c.save();
+        const c2 = new Case(minimalCase);
+        c2.notes = 'test case';
+        await c2.save();
+        const c3 = new Case(minimalCase);
+        const unchangedNotes = 'unchanged notes';
+        c3.notes = unchangedNotes;
+        await c3.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                query: 'test case',
+                case: { notes: newNotes },
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(2);
+        const cases = await Case.find();
+        expect(cases[0].notes).toEqual(newNotes);
+        expect(cases[1].notes).toEqual(newNotes);
+        expect(cases[2].notes).toEqual(unchangedNotes);
+    });
+    it('update many items with query without case should return 400', async () => {
+        await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                query: 'test case',
+            })
+            .expect(400);
+    });
+    it('batchUpdateQuery without query should return 400', async () => {
+        await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                case: { notes: 'new notes' },
+            })
+            .expect(400);
+    });
     it('upsert present item should return 200 OK', async () => {
         const c = new Case(minimalCase);
         const sourceId = '5ea86423bae6982635d2e1f8';
