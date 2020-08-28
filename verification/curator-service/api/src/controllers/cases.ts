@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
-class InvalidParamError extends Error { }
+class InvalidParamError extends Error {}
 
 /**
  * CasesController forwards requests to the data service.
@@ -14,7 +14,7 @@ export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
         private readonly geocoders: Geocoder[],
-    ) { }
+    ) {}
 
     list = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -256,6 +256,30 @@ export default class CasesController {
         try {
             const updateResponse = await axios.post(
                 this.dataServerURL + '/api/cases/batchUpdate',
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
+                { maxContentLength: Infinity },
+            );
+            res.status(200).send({
+                numModified: updateResponse.data.numModified,
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err.message);
+        }
+    };
+
+    batchUpdateQuery = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const updateResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpdateQuery',
                 {
                     ...req.body,
                     curator: { email: (req.user as UserDocument).email },
