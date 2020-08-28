@@ -157,9 +157,24 @@ def get_today():
 def format_source_url(url: str) -> str:
     """
     Formats the given url with the date formatting params contained in it if any.
-    Cf. https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+    - $FULLYEAR is replaced with the 4 digits current year.
+    - $FULLMONTH is replaced with the 2 digits current month.
+    - $FULLDAY is replaced with the 2 digits current day of the month.
+    - $MONTH is replaced with the 1 or 2 digits current month.
+    - $DAY is replaced with the 1 or 2 digits current day of the month.
     """
-    return get_today().strftime(url)
+    today = get_today()
+    mappings = {
+        "$FULLYEAR": str(today.year),
+        "$FULLMONTH": str(today.month).zfill(2),
+        "$MONTH": str(today.month),
+        "$FULLDAY": str(today.day).zfill(2),
+        "$DAY": str(today.day),
+    }
+    for key in mappings:
+        if key in url:
+            url = url.replace(key, mappings[key], -1)
+    return url
 
 
 def lambda_handler(event, context):
