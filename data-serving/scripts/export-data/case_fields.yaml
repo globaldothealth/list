@@ -1,5 +1,13 @@
 - name: _id
   description: Unique ID of the case
+- name: caseReference.verificationStatus
+  description: >
+    Whether this case was verified by a curator.
+    This is verification at the ingestion level, that is curators verified that
+    the data that got ingested corresponds to the data that was present in an
+    source outside the system.
+    It does not mean that the curators verified that the case really existed.
+    Values can be VERIFIED or UNVERIFIED.
 - name: caseReference.sourceId
   description: Unique ID of the source for this case
 - name: caseReference.sourceUrl

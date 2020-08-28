@@ -69,8 +69,9 @@ def test_format_url_leaves_unchanged_if_no_format_params():
 def test_format_url(mock_today):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
-    url = "http://foo.bar/%Y-%m-%d.json"
-    assert retrieval.format_source_url(url) == "http://foo.bar/2020-06-08.json"
+    url = "http://foo.bar/$FULLYEAR-$FULLMONTH-$FULLDAY/$MONTH/$DAY.json"
+    assert retrieval.format_source_url(
+        url) == "http://foo.bar/2020-06-08/6/8.json"
 
 
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,

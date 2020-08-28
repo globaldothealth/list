@@ -188,9 +188,20 @@ That parser will now import a day worth of data with a lag of 3 days, this delay
 
 ### Handling sources with unstable URLs
 
-If a source has a time-based URL scheme you can use standard Python [date formatting parameters](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) in the source URL and those will be automatically applied when retrieving the source content.
+If a source has a time-based URL scheme you can use the following date formatting directives in the source URL and those will be automatically applied when retrieving the source content:
 
-For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/%Y-%m-%d.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
+- `$FULLYEAR` is replaced with the 4 digits current year.
+- `$FULLMONTH` is replaced with the 2 digits current month.
+- `$FULLDAY` is replaced with the 2 digits current day of the month.
+- `$MONTH` is replaced with the 1 or 2 digits current month.
+- `$DAY` is replaced with the 1 or 2 digits current day of the month.
+
+For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/$FULLYEAR-$FULLMONTH-$FULLDAY.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
+
+### Encoding of sources
+
+When the retrieval function stores the contents of a source in S3, the data is automatically encoded in utf-8 so that parsers do not have to care about which
+encoding to use when reading the files.
 
 ## Parsers
 
