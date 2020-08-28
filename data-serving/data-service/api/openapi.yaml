@@ -172,7 +172,7 @@ paths:
                     Cases matching this query will be deleted. Must contain
                     non-whitespace characters.
                   type: string
-                  pattern: ^(?!\s*$).+
+                  pattern: \S+
               oneOf:
                 - required: [caseIds]
                 - required: [query]
@@ -247,6 +247,43 @@ paths:
                   $ref: "#/components/schemas/Curator"
               required:
                 - curator
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - curator
+                - query
+                - case
       responses:
         "200":
           $ref: "#/components/responses/200BatchUpdateResponse"
