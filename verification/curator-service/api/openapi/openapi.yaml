@@ -459,7 +459,7 @@ paths:
                     Cases matching this query will be deleted. Must contain
                     non-whitespace characters.
                   type: string
-                  pattern: ^(?!\s*$).+
+                  pattern: \S+
               oneOf:
                 - required: [caseIds]
                 - required: [query]
@@ -606,7 +606,7 @@ paths:
                     Cases matching this query will be updated. Must contain
                     non-whitespace characters.
                   type: string
-                  pattern: ^(?!\s*$).+
+                  pattern: \S+
                 case:
                   description: >
                     The case fields that all matching cases will be updated to.
