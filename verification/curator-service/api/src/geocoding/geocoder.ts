@@ -19,6 +19,7 @@ export interface GeocodeResult {
     geoResolution: Resolution;
 }
 
+/** Resolution defines how granular a location is. */
 export enum Resolution {
     Point = 'Point',
     Admin3 = 'Admin3',

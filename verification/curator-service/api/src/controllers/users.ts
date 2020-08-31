@@ -80,7 +80,7 @@ export const updateRoles = async (
 };
 
 /**
- * List the roles available to users.
+ * List the roles defined in the system.
  */
 export const listRoles = (req: Request, res: Response): void => {
     res.json({ roles: userRoles });
