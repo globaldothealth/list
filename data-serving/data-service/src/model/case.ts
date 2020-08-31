@@ -68,6 +68,18 @@ export const caseSchema = new mongoose.Schema(
     },
 );
 
+/**
+ * Determines if a provided JSON-representation case is equivalent to the
+ * document.
+ *
+ * @remarks
+ * This is a _semantic_ equivalence. We intentionally don't check book-keeping
+ * data (like revisionMetadata) -- we strictly want to know if the content has
+ * changed.
+ *
+ * @param jsonCase - JSON object representing a case document.
+ * @returns Whether or not the provided JSON is equivalent.
+ */
 // TODO: Type request Cases.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
