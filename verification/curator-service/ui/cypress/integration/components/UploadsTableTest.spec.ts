@@ -23,12 +23,12 @@ describe('Uploads table', function () {
         cy.visit('/uploads');
         cy.contains('www.example.com');
         cy.contains('5ef8e943dfe6e00030892d58');
-        cy.contains('2020-1-1');
+        cy.contains('2020-01-01');
         cy.contains('IN_PROGRESS');
         cy.contains('5');
         cy.contains('3');
         cy.contains('5ef8e943dfe6e00030892d59');
-        cy.contains('2020-1-2');
+        cy.contains('2020-01-02');
         cy.contains('SUCCESS');
         cy.contains('2');
         cy.contains('0');
