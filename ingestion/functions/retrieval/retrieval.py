@@ -115,7 +115,6 @@ def retrieve_content(
                 f"{key_filename_part}")
             return (f.name, s3_object_key)
     except requests.exceptions.RequestException as e:
-        # TODO: Handle 301.
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
             if r.status_code == 404 else
