@@ -1,4 +1,4 @@
-import { Chip, withStyles } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import { FastField, useFormikContext } from 'formik';
 import {
     FormikAutocomplete,
@@ -10,37 +10,33 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
-import { createStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
-const styles = () =>
-    createStyles({
-        fieldRow: {
-            marginBottom: '2em',
-        },
-        ageRow: {
-            alignItems: 'baseline',
-            display: 'flex',
-        },
-        ageField: {
-            width: '8em',
-        },
-        ageSeparator: {
-            margin: '0 2em',
-        },
-        select: {
-            width: '8em',
-        },
-        chip: {
-            margin: '0.5em',
-        },
-        section: {
-            marginBottom: '1em',
-        },
-    });
-
-type DemographicsProps = WithStyles<typeof styles>;
+const styles = makeStyles(() => ({
+    fieldRow: {
+        marginBottom: '2em',
+    },
+    ageRow: {
+        alignItems: 'baseline',
+        display: 'flex',
+    },
+    ageField: {
+        width: '8em',
+    },
+    ageSeparator: {
+        margin: '0 2em',
+    },
+    select: {
+        width: '8em',
+    },
+    chip: {
+        margin: '0.5em',
+    },
+    section: {
+        marginBottom: '1em',
+    },
+}));
 
 // If changing this list, also modify https://github.com/globaldothealth/list/blob/main/data-serving/data-service/api/openapi.yaml
 const genderValues = [
@@ -51,8 +47,8 @@ const genderValues = [
     'Other',
 ];
 
-function Demographics(props: DemographicsProps): JSX.Element {
-    const { classes } = props;
+export default function Demographics(): JSX.Element {
+    const classes = styles();
     const { initialValues, setFieldValue } = useFormikContext<CaseFormValues>();
     const [commonOccupations, setCommonOccupations] = React.useState([]);
 
@@ -158,5 +154,3 @@ function Demographics(props: DemographicsProps): JSX.Element {
         </Scroll.Element>
     );
 }
-
-export default withStyles(styles)(Demographics);
