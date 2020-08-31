@@ -1,14 +1,16 @@
 import { Case, CaseDocument } from '../model/case';
-import { CaseRevision, CaseRevisionDocument } from '../model/case-revision';
 import { NextFunction, Request, Response } from 'express';
 import {
     casesMatchingSearchQuery,
     findCasesWithCaseReferenceData,
 } from './case';
 
+import { CaseRevision } from '../model/case-revision';
 import { DocumentQuery } from 'mongoose';
 
-const createNewMetadata = (curatorEmail: string) => {
+// TODO: Type this as RevisionMetadataDocument.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createNewMetadata = (curatorEmail: string): any => {
     return {
         revisionNumber: 0,
         creationMetadata: {
@@ -18,7 +20,9 @@ const createNewMetadata = (curatorEmail: string) => {
     };
 };
 
-const createUpdateMetadata = (c: CaseDocument, curatorEmail: string) => {
+// TODO: Type this as RevisionMetadataDocument.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createUpdateMetadata = (c: CaseDocument, curatorEmail: string): any => {
     return {
         revisionNumber: ++c.revisionMetadata.revisionNumber,
         creationMetadata: {
@@ -62,7 +66,7 @@ export const setRevisionMetadata = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const curatorEmail = request.body.curator.email;
 
     // Single case update or upsert.
@@ -85,7 +89,7 @@ export const setBatchUpsertRevisionMetadata = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const curatorEmail = request.body.curator.email;
 
     // Find the cases if they already exists so we can update existing
@@ -109,6 +113,8 @@ export const setBatchUpsertRevisionMetadata = async (
 
     // Set the request cases' revision metadata to the update metadata, if
     // present, or create metadata otherwise.
+    // TODO: Type request Cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request.body.cases.forEach((c: any) => {
         c.revisionMetadata =
             metadataMap.get(
@@ -127,7 +133,7 @@ export const findCasesToUpdate = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     // Find all cases matching the query
     const matchedCases = await (casesMatchingSearchQuery({
         searchQuery: request.body.query,
@@ -135,6 +141,8 @@ export const findCasesToUpdate = async (
     }) as DocumentQuery<CaseDocument[], CaseDocument, {}>).exec();
 
     // Set those case ids to be updated with the request case.
+    // TODO: Type request Cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const casesToUpdate = matchedCases.map((c: any) => {
         return { _id: c._id, ...request.body.case };
     });
@@ -151,11 +159,13 @@ export const setBatchUpdateRevisionMetadata = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const curatorEmail = request.body.curator.email;
 
     const existingCases = await Case.find({
         _id: {
+            // TODO: Type request Cases.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             $in: request.body.cases.map((c: any) => c._id),
         },
     })
@@ -173,6 +183,8 @@ export const setBatchUpdateRevisionMetadata = async (
     );
 
     // Set the request cases' revision metadata to the update metadata.
+    // TODO: Type request Cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request.body.cases.forEach((c: any) => {
         c.revisionMetadata = metadataMap.get(c._id?.toString());
     });
@@ -187,7 +199,7 @@ export const createCaseRevision = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const c = await getCase(request);
 
     if (c) {
@@ -203,7 +215,7 @@ export const createBatchUpsertCaseRevisions = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const casesToUpsert = (await findCasesWithCaseReferenceData(request)).map(
         (c) => {
             return {
@@ -215,6 +227,7 @@ export const createBatchUpsertCaseRevisions = async (
     await CaseRevision.insertMany(casesToUpsert, {
         ordered: false,
         rawResult: true,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore Mongoose types don't include the `lean` option from its
         // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
         lean: true,
@@ -227,10 +240,12 @@ export const createBatchUpdateCaseRevisions = async (
     request: Request,
     response: Response,
     next: NextFunction,
-) => {
+): Promise<void> => {
     const casesToUpdate = (
         await Case.find({
             _id: {
+                // TODO: Type request Cases.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 $in: request.body.cases.map((c: any) => c._id),
             },
         }).exec()
@@ -243,6 +258,7 @@ export const createBatchUpdateCaseRevisions = async (
     await CaseRevision.insertMany(casesToUpdate, {
         ordered: false,
         rawResult: true,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore Mongoose types don't include the `lean` option from its
         // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
         lean: true,
