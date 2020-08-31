@@ -38,3 +38,15 @@ describe('validate', () => {
         return new Case(fullModel).validate();
     });
 });
+
+describe('custom instance methods', () => {
+    it('equalsJSON returns true for identical case', () => {
+        const c = new Case(fullModel);
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns false for differing case', () => {
+        const c = new Case(fullModel);
+        delete fullModel.demographics.gender;
+        expect(c.equalsJSON(fullModel)).toBe(false);
+    });
+});
