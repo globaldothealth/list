@@ -161,7 +161,7 @@ export default class CasesController {
     };
 
     /**
-     * udpate will try to geocode the location found in the request if needed
+     * upsert will try to geocode the location found in the request if needed
      * and then will forwards the request with the added geolocation to the
      * data service
      */
