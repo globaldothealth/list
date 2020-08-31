@@ -346,7 +346,7 @@ describe('upsert', () => {
         );
     });
 });
-describe.only('batch upsert', () => {
+describe('batch upsert', () => {
     it('sets create and update metadata', async () => {
         const existingCase = {
             ...minimalCase,
@@ -417,7 +417,7 @@ describe.only('batch upsert', () => {
             ],
         });
     });
-    it.only('does not add update metadata if case semantically unchanged', async () => {
+    it('does not add update metadata if case semantically unchanged', async () => {
         const existingCase = {
             ...minimalCase,
             caseReference: {
