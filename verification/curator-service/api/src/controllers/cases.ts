@@ -7,7 +7,7 @@ import axios from 'axios';
 class InvalidParamError extends Error {}
 
 /**
- * CasesController forwards requests to the data service.
+ * CasesController mostly forwards case-related requests to the data service.
  * It handles CRUD operations from curators.
  */
 export default class CasesController {
@@ -16,6 +16,7 @@ export default class CasesController {
         private readonly geocoders: Geocoder[],
     ) {}
 
+    /** List simply forwards the request to the data service */
     list = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -32,6 +33,7 @@ export default class CasesController {
         }
     };
 
+    /** listSymptoms simply forwards the request to the data service */
     listSymptoms = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -48,6 +50,7 @@ export default class CasesController {
         }
     };
 
+    /** listPlacesOfTransmission simply forwards the request to the data service */
     listPlacesOfTransmission = async (
         req: Request,
         res: Response,
@@ -67,6 +70,7 @@ export default class CasesController {
         }
     };
 
+    /** listOccupations simply forwards the request to the data service */
     listOccupations = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -83,6 +87,7 @@ export default class CasesController {
         }
     };
 
+    /** get simply forwards the request to the data service */
     get = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -99,6 +104,7 @@ export default class CasesController {
         }
     };
 
+    /** batchDel simply forwards the request to the data service */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.delete(
@@ -116,6 +122,7 @@ export default class CasesController {
         }
     };
 
+    /** del simply forwards the request to the data service */
     del = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.delete(
@@ -132,6 +139,7 @@ export default class CasesController {
         }
     };
 
+    /** update simply forwards the request to the data service */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.put(
@@ -152,6 +160,11 @@ export default class CasesController {
         }
     };
 
+    /**
+     * udpate will try to geocode the location found in the request if needed
+     * and then will forwards the request with the added geolocation to the
+     * data service
+     */
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
@@ -252,6 +265,11 @@ export default class CasesController {
         }
     };
 
+    /**
+     * batchUpdate simply forwards the request to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
     batchUpdate = async (req: Request, res: Response): Promise<void> => {
         try {
             const updateResponse = await axios.post(
@@ -276,6 +294,11 @@ export default class CasesController {
         }
     };
 
+    /**
+     * batchUpdateQuery simply forwards the request to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
     batchUpdateQuery = async (req: Request, res: Response): Promise<void> => {
         try {
             const updateResponse = await axios.post(
@@ -300,6 +323,12 @@ export default class CasesController {
         }
     };
 
+    /**
+     * create tries to geocode the location of the case if needed and then
+     * forwards the query to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
@@ -382,7 +411,7 @@ export default class CasesController {
      * Perform geocoding for each case (of multiple `cases` specified in the
      * request body), in accordance with the above geocoding logic.
      *
-     * TODO: Use a batch geocode API.
+     * TODO: Use a batch geocode API like https://docs.mapbox.com/api/search/#batch-geocoding.
      *
      * @returns {object} Detailing the nature of any issues encountered.
      */
