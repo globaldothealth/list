@@ -49,7 +49,23 @@ Serverless Application Model
 Python and executed on a version 3.8 runtime. See set up instructions and
 common commands, below.
 
-### One-time setup
+### Setup for folks without AWS access
+
+If you're a first-time contributor to the project and don't have access to the S3 bucket containing the service account keys, you can run the ingestion and parsing functions fully locally, in the `retrieval/valid_scheduled_event.json`, add this auth param to it:
+
+```json
+"auth": {
+   "email": "local@ingestion.function"
+}
+```
+
+This will make the functions log-in as a new user specified by this email and use the cookies generated for this user instead of the service account creds stored on S3.
+
+Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
+
+TODO: #754 Add param to store and retrieve source content locally, not on S3.
+
+### One-time setup for people with AWS access
 
 #### Prerequisites
 

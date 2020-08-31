@@ -34,10 +34,16 @@ paths:
       tags:
         - Auth
         - User
-      summary: Authorize a user for the given roles
+      summary: >
+        Creates a local user for testing.The user can have any specified roles
+        in the request and the returned cookies can be used for subsequent
+        requests acting as this new user.
+        Note that this endpoint is only exposed in a local environment.
+      servers:
+        - url: http://localhost:3001/api
       operationId: registerAuth
       requestBody:
-        description: User to authorize
+        description: User to register
         required: true
         content:
           application/json:

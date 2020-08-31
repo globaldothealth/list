@@ -174,8 +174,10 @@ def run_lambda(event, context, parsing_function):
     env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
         event)
     api_creds = common_lib.obtain_api_credentials(s3_client)
+    # TODO: #754 Handle cookies as well.
     if not upload_id:
-        upload_id = common_lib.create_upload_record(env, source_id, api_creds)
+        upload_id = common_lib.create_upload_record(
+            env, source_id, api_creds, None)
     try:
         raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
         case_data = parsing_function(
@@ -190,8 +192,9 @@ def run_lambda(event, context, parsing_function):
                 api_creds),
             env, source_id, upload_id,
             api_creds)
+        # TODO: #754 Handle cookies as well.
         common_lib.finalize_upload(
-            env, source_id, upload_id, api_creds, count_created, count_updated)
+            env, source_id, upload_id, api_creds, None, count_created, count_updated)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(

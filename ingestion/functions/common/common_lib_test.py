@@ -23,6 +23,18 @@ def mock_source_api_url_fixture():
         yield mock
 
 
+def test_register_local_user(
+        requests_mock, mock_source_api_url_fixture):
+    requests_mock.post(
+        "http://localhost:3001/auth/register",
+        json={"email": "foo@bar.baz"},
+        status_code=200,
+        cookies={"foo": "bar"})
+
+    cookies = common_lib.login("foo@bar.baz")
+
+    assert cookies == {"foo": "bar"}
+
 def test_create_upload_record_returns_upload_id(
         requests_mock, mock_source_api_url_fixture):
     create_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads"
@@ -32,7 +44,7 @@ def test_create_upload_record_returns_upload_id(
         json={"_id": upload_id, "status": "IN_PROGRESS", "summary": {}},
         status_code=201)
 
-    response = common_lib.create_upload_record("env", _SOURCE_ID, {})
+    response = common_lib.create_upload_record("env", _SOURCE_ID, {}, {})
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert response == upload_id
@@ -47,7 +59,7 @@ def test_create_upload_record_raises_error_for_failed_request(
         exc=requests.exceptions.ConnectTimeout)
 
     try:
-        common_lib.create_upload_record("env", _SOURCE_ID, {})
+        common_lib.create_upload_record("env", _SOURCE_ID, {}, {})
     except requests.exceptions.ConnectTimeout:
         return
 
@@ -67,7 +79,7 @@ def test_finalize_upload_invokes_update_api(
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
     common_lib.finalize_upload(
-        "env", _SOURCE_ID, upload_id, {}, num_created, num_updated)
+        "env", _SOURCE_ID, upload_id, {}, {}, num_created, num_updated)
 
     assert requests_mock.request_history[0].url == update_upload_url
 
@@ -82,7 +94,7 @@ def test_finalize_upload_raises_error_for_failed_request(
         [{"json": {}, "status_code": 500}, {"json": {}}])
 
     try:
-        common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, 42, 0)
+        common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
     except RuntimeError:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -115,7 +127,7 @@ def test_complete_with_error_updates_upload_if_provided_data(
     try:
         upload_error = common_lib.UploadError.SOURCE_CONFIGURATION_ERROR
         common_lib.complete_with_error(
-            e, "env", upload_error, _SOURCE_ID, upload_id, {})
+            e, "env", upload_error, _SOURCE_ID, upload_id, {}, {})
     except ValueError:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
