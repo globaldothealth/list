@@ -80,15 +80,15 @@ def retrieve_content(
         env, source_id, upload_id, url, source_format, api_headers, cookies):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        print(f"Downloading {source_format} content from {url}")
-        headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
-        r = requests.get(url, headers=headers)
-        r.raise_for_status()
         if source_format != "JSON" and source_format != "CSV":
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
+        print(f"Downloading {source_format} content from {url}")
+        headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
+        r = requests.get(url, headers=headers)
+        r.raise_for_status()
         print('Download finished')
 
         key_filename_part = f"content.{source_format.lower()}"
@@ -124,7 +124,7 @@ def retrieve_content(
         # TODO: Handle 301.
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
-            if r.status_code == 404 else
+            if e.response.status_code == 404 else
             common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
         common_lib.complete_with_error(
             e, env, upload_error, source_id, upload_id,

@@ -266,7 +266,6 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     content_url = "http://foo.bar/"
-    requests_mock.get(content_url)
     source_id = "source_id"
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
@@ -277,8 +276,7 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         retrieval.retrieve_content(
             "env", source_id, upload_id, content_url, bad_format, {}, {})
     except ValueError:
-        assert requests_mock.request_history[0].url == content_url
-        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
         ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONFIGURATION_ERROR.name}}
         return
