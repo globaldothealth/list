@@ -21,7 +21,9 @@
         },
         "gender": "Female",
         "occupation": "Horse trainer",
-        "nationality": "Swedish",
+        "nationalities": [
+            "Swedish"
+        ],
         "ethnicity": "Other"
     },
     "genomeSequences": [
