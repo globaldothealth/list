@@ -14,7 +14,6 @@ import axios from 'axios';
 import { throttle } from 'lodash';
 
 interface SourceProps {
-    borderless?: boolean;
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
 }
@@ -29,29 +28,21 @@ export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
         return (
             <Scroll.Element name="source">
-                <fieldset
-                    style={{
-                        borderStyle: this.props.borderless ? 'none' : 'solid',
-                    }}
-                >
-                    <FieldTitle
-                        title="Data Source"
-                        tooltip={tooltipText}
-                    ></FieldTitle>
-                    <SourcesAutocomplete
-                        initialValue={this.props.initialValue}
+                <FieldTitle
+                    title="Data Source"
+                    tooltip={tooltipText}
+                ></FieldTitle>
+                <SourcesAutocomplete initialValue={this.props.initialValue} />
+                {this.props.hasSourceEntryId && (
+                    <FastField
+                        label="Source entry ID"
+                        name="caseReference.sourceEntryId"
+                        type="text"
+                        data-testid="sourceEntryId"
+                        component={TextField}
+                        fullWidth
                     />
-                    {this.props.hasSourceEntryId && (
-                        <FastField
-                            label="Source entry ID"
-                            name="caseReference.sourceEntryId"
-                            type="text"
-                            data-testid="sourceEntryId"
-                            component={TextField}
-                            fullWidth
-                        />
-                    )}
-                </fieldset>
+                )}
             </Scroll.Element>
         );
     }
