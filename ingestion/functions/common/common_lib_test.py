@@ -91,15 +91,13 @@ def test_finalize_upload_raises_error_for_failed_request(
     requests_mock.register_uri(
         "PUT",
         update_upload_url,
-        [{"json": {}, "status_code": 500}, {"json": {}}])
+        [{"status_code": 500}])
 
     try:
         common_lib.finalize_upload("env", _SOURCE_ID, upload_id, {}, {}, 42, 0)
     except RuntimeError:
+        assert len(requests_mock.request_history) == 1
         assert requests_mock.request_history[0].url == update_upload_url
-        assert requests_mock.request_history[1].url == update_upload_url
-        assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
