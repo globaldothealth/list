@@ -3,6 +3,8 @@ import AWSMock from 'aws-sdk-mock';
 import AwsEventsClient from '../../src/clients/aws-events-client';
 import AwsLambdaClient from '../../src/clients/aws-lambda-client';
 
+const _ENV = 'test';
+
 let client: AwsEventsClient;
 const addInvokeFromEventPermissionSpy = jest.fn().mockResolvedValue({});
 const deleteRuleSpy = jest.fn().mockResolvedValueOnce({});
@@ -44,6 +46,7 @@ beforeEach(() => {
     client = new AwsEventsClient(
         'us-east-1',
         new AwsLambdaClient('some-arn', 'us-east-1'),
+        _ENV,
     );
 });
 
@@ -65,16 +68,37 @@ describe('putRule', () => {
         expect(putRuleSpy).toHaveBeenCalledTimes(1);
     });
     it('creates a permissioned target for the rule if targetId and sourceId provided', async () => {
+        const ruleName = 'passingRule';
+        const targetArn = 'targetArn';
+        const targetId = 'targetId';
+        const sourceId = 'sourceId';
         await client.putRule(
-            'passingRule',
+            ruleName,
             'description',
             'rate(1 hour)',
-            'targetArn',
-            'targetId',
-            'sourceId',
+            targetArn,
+            targetId,
+            sourceId,
             'statementId',
         );
         expect(putTargetsSpy).toHaveBeenCalledTimes(1);
+        expect(putTargetsSpy).toHaveBeenCalledWith(
+            {
+                Rule: ruleName,
+                Targets: [
+                    {
+                        Arn: targetArn,
+                        Id: targetId,
+                        Input: JSON.stringify({
+                            env: _ENV,
+                            sourceId: sourceId,
+                        }),
+                    },
+                ],
+            },
+            // There's a callback function added under-the-hood by aws-sdk.
+            expect.anything(),
+        );
         expect(addInvokeFromEventPermissionSpy).toHaveBeenCalledTimes(1);
     });
     it('does not mutate rule targets if target details not provided', async () => {
