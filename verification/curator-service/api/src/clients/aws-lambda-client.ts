@@ -12,6 +12,10 @@ export interface RetrievalPayload {
     upload_id: string;
 }
 
+export interface LambdaFunction {
+    name: string;
+}
+
 /**
  * Client to interact with the AWS Lambda API.
  *
@@ -100,6 +104,25 @@ export default class AwsLambdaClient {
             return JSON.parse(
                 res.Payload?.toString() || '',
             ) as RetrievalPayload;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    };
+
+    /** Lists the available parser */
+    listParsers = async (): Promise<LambdaFunction[]> => {
+        try {
+            const res = await this.lambdaClient
+                .listFunctions({ MaxItems: 10000 })
+                .promise();
+            return (
+                res.Functions?.filter((f) =>
+                    f.FunctionName?.includes('ParsingFunction'),
+                )?.map<LambdaFunction>((f) => {
+                    return { name: f.FunctionName || '' };
+                }) || []
+            );
         } catch (e) {
             console.error(e);
             throw e;
