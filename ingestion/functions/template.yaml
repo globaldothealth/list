@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Lambda functions for Global Health ingestion
 
-Parameters:
-  SourceApiUrl:
-    Type: String
-    Description: Address at which to retrieve source details
-    Default: "http://localhost:3001/api"
-
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -28,10 +22,6 @@ Resources:
       Timeout: 300
       Layers:
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
   ParsingLibLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -75,17 +65,21 @@ Resources:
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
   HongKongParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: parsing/hongkong/
       Handler: hongkong.lambda_handler
       Runtime: python3.8
-      Description: Parse case data for India
+      Description: Parse case data for HongKong
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
   JapanParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -101,10 +95,6 @@ Resources:
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -120,29 +110,6 @@ Resources:
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-  BrazilAmapaParsingFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: parsing/brazil_amapa/
-      Handler: amapa.lambda_handler
-      Runtime: python3.8
-      Description: Parse case data for the Amapa State of Brazil
-      # Function's execution role
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
-      Timeout: 300
-      Layers:
-        - !Ref ParsingLibLayer
-        - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
