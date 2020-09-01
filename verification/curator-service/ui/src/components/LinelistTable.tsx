@@ -414,7 +414,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         verificationStatus: VerificationStatus,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + '/batchUpdate';
+            const updateUrl = this.state.url + 'batchUpdate';
             this.setState({ error: '' });
             const response = axios.post(updateUrl, {
                 cases: rowData.map((row) => {
@@ -435,7 +435,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         verificationStatus: VerificationStatus,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + '/batchUpdateQuery';
+            const updateUrl = this.state.url + 'batchUpdateQuery';
             this.setState({ error: '' });
             const response = axios.post(updateUrl, {
                 query: this.state.search,
