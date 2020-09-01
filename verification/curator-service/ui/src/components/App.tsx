@@ -53,8 +53,10 @@ const theme = createMuiTheme({
             paper: '#ffffff',
         },
         primary: {
-            main: '#0E7569',
+            main: '#31A497',
             contrastText: '#ffffff',
+            light: '#6AD6C8',
+            dark: '#0E7569',
         },
         secondary: {
             main: '#00C6AF',
@@ -77,8 +79,20 @@ const theme = createMuiTheme({
                 color: '#5D5D5D',
                 borderRadius: '4px',
                 '&$selected': {
-                    backgroundColor: '#E7EFED',
+                    backgroundColor: '#0E75691A',
                     color: '#0E7569',
+                },
+            },
+        },
+        MuiAppBar: {
+            colorPrimary: {
+                backgroundColor: '#ECF3F0',
+            },
+        },
+        MuiCheckbox: {
+            colorSecondary: {
+                '&$checked': {
+                    color: '#31A497',
                 },
             },
         },
@@ -112,7 +126,7 @@ function TopbarMenu(): JSX.Element {
                 aria-controls="topbar-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
-                color="inherit"
+                color="primary"
             >
                 <MoreVertIcon />
             </IconButton>
@@ -174,6 +188,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
     },
     drawerPaper: {
+        backgroundColor: '#ECF3F0',
         border: 'none',
         width: drawerWidth,
     },
@@ -332,10 +347,14 @@ export default function App(): JSX.Element {
         <div className={classes.root}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <AppBar position="fixed" className={classes.appBar}>
+                <AppBar
+                    position="fixed"
+                    elevation={0}
+                    className={classes.appBar}
+                >
                     <Toolbar>
                         <IconButton
-                            color="inherit"
+                            color="primary"
                             aria-label="toggle drawer"
                             onClick={toggleDrawer}
                             edge="start"
@@ -349,7 +368,7 @@ export default function App(): JSX.Element {
                             <Button
                                 classes={{ label: classes.buttonLabel }}
                                 variant="outlined"
-                                color="inherit"
+                                color="primary"
                                 href="/auth/logout"
                             >
                                 Logout {user?.email}
@@ -357,7 +376,7 @@ export default function App(): JSX.Element {
                         ) : (
                             <Button
                                 variant="outlined"
-                                color="inherit"
+                                color="primary"
                                 href={process.env.REACT_APP_LOGIN_URL}
                             >
                                 Login

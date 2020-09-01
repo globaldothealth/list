@@ -53,155 +53,148 @@ export default function Events(): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name="travelHistory">
-            <fieldset>
-                <FieldTitle title="Travel History"></FieldTitle>
-                <SelectField
-                    name={`traveledPrior30Days`}
-                    label="Travelled in the last 30 days"
-                    values={hasTravelledValues}
-                ></SelectField>
-                {values.traveledPrior30Days === 'Yes' && (
-                    <FieldArray name="travelHistory">
-                        {({ push, remove }): JSX.Element => {
-                            return (
-                                <div>
-                                    {values.travelHistory &&
-                                        values.travelHistory.map(
-                                            (travelHistoryElement, index) => {
-                                                return (
+            <FieldTitle title="Travel History"></FieldTitle>
+            <SelectField
+                name={`traveledPrior30Days`}
+                label="Travelled in the last 30 days"
+                values={hasTravelledValues}
+            ></SelectField>
+            {values.traveledPrior30Days === 'Yes' && (
+                <FieldArray name="travelHistory">
+                    {({ push, remove }): JSX.Element => {
+                        return (
+                            <div>
+                                {values.travelHistory &&
+                                    values.travelHistory.map(
+                                        (travelHistoryElement, index) => {
+                                            return (
+                                                <div
+                                                    key={
+                                                        travelHistoryElement.reactId
+                                                    }
+                                                    data-testid={
+                                                        'travel-history-section'
+                                                    }
+                                                >
                                                     <div
-                                                        key={
-                                                            travelHistoryElement.reactId
-                                                        }
-                                                        data-testid={
-                                                            'travel-history-section'
+                                                        className={
+                                                            classes.travelLocationTitle
                                                         }
                                                     >
-                                                        <div
+                                                        {`Travel location ${
+                                                            index + 1
+                                                        }`}
+                                                        <span
                                                             className={
-                                                                classes.travelLocationTitle
+                                                                classes.spacer
                                                             }
+                                                        ></span>
+                                                        <Button
+                                                            startIcon={
+                                                                <CancelIcon />
+                                                            }
+                                                            data-testid={
+                                                                'remove-travel-history-button'
+                                                            }
+                                                            onClick={(): void => {
+                                                                remove(index);
+                                                            }}
                                                         >
-                                                            {`Travel location ${
-                                                                index + 1
-                                                            }`}
-                                                            <span
-                                                                className={
-                                                                    classes.spacer
-                                                                }
-                                                            ></span>
-                                                            <Button
-                                                                startIcon={
-                                                                    <CancelIcon />
-                                                                }
-                                                                data-testid={
-                                                                    'remove-travel-history-button'
-                                                                }
-                                                                onClick={(): void => {
-                                                                    remove(
-                                                                        index,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Remove
-                                                            </Button>
-                                                        </div>
-                                                        <PlacesAutocomplete
-                                                            initialValue={
-                                                                initialValues
+                                                            Remove
+                                                        </Button>
+                                                    </div>
+                                                    <PlacesAutocomplete
+                                                        initialValue={
+                                                            initialValues
+                                                                .travelHistory[
+                                                                index
+                                                            ]?.location?.name
+                                                        }
+                                                        name={`travelHistory[${index}].location`}
+                                                    ></PlacesAutocomplete>
+                                                    {travelHistoryElement.location && (
+                                                        <Location
+                                                            locationPath={`travelHistory[${index}].location`}
+                                                            geometry={
+                                                                values
                                                                     .travelHistory[
                                                                     index
                                                                 ]?.location
-                                                                    ?.name
+                                                                    ?.geometry
                                                             }
-                                                            name={`travelHistory[${index}].location`}
-                                                        ></PlacesAutocomplete>
-                                                        {travelHistoryElement.location && (
-                                                            <Location
-                                                                locationPath={`travelHistory[${index}].location`}
-                                                                geometry={
-                                                                    values
-                                                                        .travelHistory[
-                                                                        index
-                                                                    ]?.location
-                                                                        ?.geometry
-                                                                }
-                                                            ></Location>
-                                                        )}
-                                                        <div
-                                                            className={
-                                                                classes.fieldRowTop
-                                                            }
-                                                        >
-                                                            <DateField
-                                                                name={`travelHistory[${index}].dateRange.start`}
-                                                                label="Start date"
-                                                                initialFocusedDate={
-                                                                    values.confirmedDate
-                                                                }
-                                                            ></DateField>
-                                                        </div>
+                                                        ></Location>
+                                                    )}
+                                                    <div
+                                                        className={
+                                                            classes.fieldRowTop
+                                                        }
+                                                    >
                                                         <DateField
-                                                            name={`travelHistory[${index}].dateRange.end`}
-                                                            label="End date"
+                                                            name={`travelHistory[${index}].dateRange.start`}
+                                                            label="Start date"
                                                             initialFocusedDate={
                                                                 values.confirmedDate
                                                             }
                                                         ></DateField>
-                                                        <SelectField
-                                                            name={`travelHistory[${index}].purpose`}
-                                                            label="Primary reason for travel"
-                                                            values={
-                                                                travelPurposes
-                                                            }
-                                                        ></SelectField>
-                                                        <div
-                                                            className={
-                                                                classes.fieldRow
-                                                            }
-                                                        >
-                                                            <FormikAutocomplete
-                                                                name={`travelHistory[${index}].methods`}
-                                                                label="Methods of travel"
-                                                                initialValue={
-                                                                    initialValues
-                                                                        .travelHistory[
-                                                                        index
-                                                                    ]?.methods
-                                                                }
-                                                                multiple
-                                                                freeSolo
-                                                                optionsList={
-                                                                    travelMethods
-                                                                }
-                                                            />
-                                                        </div>
                                                     </div>
-                                                );
-                                            },
-                                        )}
+                                                    <DateField
+                                                        name={`travelHistory[${index}].dateRange.end`}
+                                                        label="End date"
+                                                        initialFocusedDate={
+                                                            values.confirmedDate
+                                                        }
+                                                    ></DateField>
+                                                    <SelectField
+                                                        name={`travelHistory[${index}].purpose`}
+                                                        label="Primary reason for travel"
+                                                        values={travelPurposes}
+                                                    ></SelectField>
+                                                    <div
+                                                        className={
+                                                            classes.fieldRow
+                                                        }
+                                                    >
+                                                        <FormikAutocomplete
+                                                            name={`travelHistory[${index}].methods`}
+                                                            label="Methods of travel"
+                                                            initialValue={
+                                                                initialValues
+                                                                    .travelHistory[
+                                                                    index
+                                                                ]?.methods
+                                                            }
+                                                            multiple
+                                                            freeSolo
+                                                            optionsList={
+                                                                travelMethods
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        },
+                                    )}
 
-                                    <Button
-                                        data-testid="addTravelHistory"
-                                        startIcon={<AddCircleIcon />}
-                                        onClick={(): void => {
-                                            push({
-                                                reactId: shortId.generate(),
-                                                dateRange: {
-                                                    start: null,
-                                                    end: null,
-                                                },
-                                            });
-                                        }}
-                                    >
-                                        Add travel location
-                                    </Button>
-                                </div>
-                            );
-                        }}
-                    </FieldArray>
-                )}
-            </fieldset>
+                                <Button
+                                    data-testid="addTravelHistory"
+                                    startIcon={<AddCircleIcon />}
+                                    onClick={(): void => {
+                                        push({
+                                            reactId: shortId.generate(),
+                                            dateRange: {
+                                                start: null,
+                                                end: null,
+                                            },
+                                        });
+                                    }}
+                                >
+                                    Add travel location
+                                </Button>
+                            </div>
+                        );
+                    }}
+                </FieldArray>
+            )}
         </Scroll.Element>
     );
 }
