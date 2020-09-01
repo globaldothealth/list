@@ -147,7 +147,11 @@ paths:
         "500":
           $ref: "#/components/responses/500"
     delete:
-      summary: Deletes multiple cases
+      summary: >
+        Deletes multiple cases. It is required to supply exactly one of either 
+        caseIds or query in the request body. If caseIds are supplied, cases 
+        corresponding to those caseIds will be deleted. If query is supplied, 
+        all cases that match the query will be deleted.
       tags: [Case]
       operationId: deleteCases
       requestBody:
@@ -156,11 +160,22 @@ paths:
         content:
           application/json:
             schema:
+              type: object
               properties:
                 caseIds:
+                  description: Cases corresponding to these ids will be deleted
                   type: array
                   items:
                     type: string
+                query:
+                  description: >
+                    Cases matching this query will be deleted. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
       responses:
         "204":
           description: Cases deleted
@@ -210,6 +225,70 @@ paths:
       responses:
         "207":
           $ref: "#/components/responses/207BatchUpsertCaseResponse"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - curator
+                - query
+                - case
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -362,6 +441,13 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    BatchUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchValidateCaseResponse:
       description: Response to batch validate case API requests
       properties:
@@ -414,7 +500,8 @@ components:
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
@@ -688,6 +775,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200BatchUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchUpdateResponse"
     "200SymptomArray":
       description: OK
       content:

@@ -20,7 +20,13 @@ test('shows location when passed location information', async () => {
         place: '',
     };
     const { getByDisplayValue } = render(
-        <Formik initialValues={{ location: loc }}>
+        <Formik
+            initialValues={{ location: loc }}
+            // onSubmit just here to appease tslint.
+            onSubmit={async (values): Promise<void> => {
+                return;
+            }}
+        >
             <Form>
                 <Location locationPath="location" geometry={loc.geometry} />
             </Form>

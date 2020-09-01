@@ -1,6 +1,9 @@
 import { CaseReferenceForm } from '../common-form-fields/Source';
 import { Location as Loc } from '../Case';
 
+/**
+ * CaseFormValues defines all the values contained in the manual case entry form.
+ */
 export default interface CaseFormValues {
     caseReference?: CaseReferenceForm;
     gender?: string;

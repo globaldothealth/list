@@ -2,7 +2,15 @@ import { Request, Response } from 'express';
 
 import { Source } from '../model/source';
 
+/**
+ * UploadsController handles single uploads, that is a batch of cases sent
+ * together that can be verified by a curator together as well.
+ */
 export default class UploadsController {
+    /**
+     * Creates a new upload for the source present in the req.params.sourceId.
+     * The source with the added upload is sent in the response.
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             const source = await Source.findById(req.params.sourceId);
@@ -27,6 +35,10 @@ export default class UploadsController {
         }
     };
 
+    /**
+     * Update an existing upload.
+     * The updated source is sent in the response.
+     */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
             const source = await Source.findById(req.params.sourceId);
@@ -58,6 +70,10 @@ export default class UploadsController {
         }
     };
 
+    /**
+     * Lists all the uploads.
+     * A default pagination of 10 items per page is used.
+     */
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
