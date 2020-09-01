@@ -47,9 +47,6 @@ def create_upload_record(env, source_id, headers, cookies):
                         headers=headers)
     if res and res.status_code == 201:
         res_json = res.json()
-        # Upload POST API doesn't provide 'errors' json in response body, all
-        # we have is the response body itself which is enough to describe the
-        # error.
         return res_json["_id"]
     e = RuntimeError(
         f'Error creating upload record, status={res.status_code}, response={res.text}')
@@ -70,8 +67,6 @@ def finalize_upload(
                        json=update,
                        headers=headers,
                        cookies=cookies)
-    # Upload PUT API doesn't provide 'errors' json in response body, all we have
-    # is the response body itself which is enough to describe the error.
     if not res or res.status_code != 200:
         raise RuntimeError(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
