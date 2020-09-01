@@ -116,13 +116,16 @@ export const setBatchUpsertRevisionMetadata = async (
                         c.caseReference.sourceEntryId,
                 );
                 if (existingCase !== undefined && existingCase.equalsJSON(c)) {
-                    unchangedIds.add(existingCase._id);
+                    unchangedIds.add(existingCase._id.toString());
                 }
             }
             return unchangedIds;
         },
         new Set(),
     );
+
+    // Store the unchanged IDs for future middleware.
+    response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
 
     // For existing cases, compute the revision metadata that should be saved
     // to the database. If the case is unmodified, per the above set, the
@@ -131,7 +134,7 @@ export const setBatchUpsertRevisionMetadata = async (
     existingCasesByCaseRefCombo.forEach((c, caseRefKey) => {
         metadataMap.set(
             caseRefKey,
-            unchangedCaseIdSet.has(c._id)
+            unchangedCaseIdSet.has(c._id.toString())
                 ? c.revisionMetadata.toJSON()
                 : createUpdateMetadata(c, curatorEmail),
         );
@@ -242,13 +245,20 @@ export const createBatchUpsertCaseRevisions = async (
     response: Response,
     next: NextFunction,
 ): Promise<void> => {
-    const casesToUpsert = (await findCasesWithCaseReferenceData(request)).map(
-        (c) => {
+    const casesToUpsert = (await findCasesWithCaseReferenceData(request))
+        .filter((c) => {
+            if (response.locals?.unchangedCaseIdSet) {
+                return !response.locals.unchangedCaseIdSet.has(
+                    c._id.toString(),
+                );
+            }
+            return true;
+        })
+        .map((c) => {
             return {
                 case: c,
             };
-        },
-    );
+        });
 
     await CaseRevision.insertMany(casesToUpsert, {
         ordered: false,
