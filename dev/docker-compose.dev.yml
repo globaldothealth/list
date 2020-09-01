@@ -7,6 +7,10 @@ services:
       - ../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi
     environment:
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
+      GOOGLE_OAUTH_CLIENT_ID: "401905127729-2q5oc7ud6au0kq3p9lcudkgo7vlndqh6.apps.googleusercontent.com"
+      GOOGLE_OAUTH_CLIENT_SECRET: "daaN6eTGa1K3mUCFAJ-s8UDq"
+      MAPBOX_TOKEN: "sk.eyJ1IjoiaGVhbHRobWFwIiwiYSI6ImNrYmNiZjIwZjAwOW0yem80amQwcXBvd3gifQ.AzjoTm1VArJ2EtJ5VrcLqg"
+
   data:
     command: "npm run dev"
     volumes:
