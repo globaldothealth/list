@@ -86,8 +86,9 @@ def write_to_server(cases, env, source_id, upload_id, headers):
                         headers=headers)
     if res and res.status_code == 200:
         res_json = res.json()
-        # TODO: Look for "errors" in res_json and handle them in some way.
         return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+    # Response can contain an 'error' field which describe each error that
+    # occurred, it will be contained in the res.text here below.
     e = RuntimeError(
         f'Error sending cases to server, status={res.status_code}, response={res.text}')
     # 207 encompasses both geocoding and case schema validation errors.

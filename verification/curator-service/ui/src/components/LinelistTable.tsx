@@ -359,6 +359,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             deleteDialogOpen: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
+        this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
+            this,
+        );
     }
 
     componentDidMount(): void {
@@ -420,6 +423,25 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         'caseReference.verificationStatus': verificationStatus,
                     };
                 }),
+            });
+            response.then(resolve).catch((e) => {
+                this.setState({ error: e.toString() });
+                reject(e);
+            });
+        });
+    }
+
+    setCaseVerificationWithQuery(
+        verificationStatus: VerificationStatus,
+    ): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const updateUrl = this.state.url + '/batchUpdateQuery';
+            this.setState({ error: '' });
+            const response = axios.post(updateUrl, {
+                query: this.state.search,
+                case: {
+                    'caseReference.verificationStatus': verificationStatus,
+                },
             });
             response.then(resolve).catch((e) => {
                 this.setState({ error: e.toString() });
@@ -778,41 +800,57 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     actions={
                         this.props.user.roles.includes('curator')
                             ? [
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <Button variant="outlined">
-                                              {this.state.totalNumRows ===
-                                              this.state.numSelectedRows
-                                                  ? 'Unselect'
-                                                  : 'Select'}{' '}
-                                              all {this.state.totalNumRows} rows
-                                          </Button>
-                                      ),
-                                      tooltip: `
+                                  // Only allow selecting rows across pages if
+                                  // there is a search query.
+                                  ...(this.state.search.trim() !== ''
+                                      ? [
+                                            {
+                                                icon: (): JSX.Element => (
+                                                    <Button variant="outlined">
+                                                        {this.state
+                                                            .totalNumRows ===
+                                                        this.state
+                                                            .numSelectedRows
+                                                            ? 'Unselect'
+                                                            : 'Select'}{' '}
+                                                        all{' '}
+                                                        {
+                                                            this.state
+                                                                .totalNumRows
+                                                        }{' '}
+                                                        rows
+                                                    </Button>
+                                                ),
+                                                tooltip: `
                                       ${
                                           this.state.totalNumRows ===
                                           this.state.numSelectedRows
                                               ? 'Unselect'
                                               : 'Select'
                                       } all rows across pages`,
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: async (
-                                          _: any,
-                                          rows: any,
-                                      ): Promise<void> => {
-                                          const shouldSelectAll =
-                                              this.state.totalNumRows !==
-                                              this.state.numSelectedRows;
-                                          await this.tableRef.current.onAllSelected(
-                                              shouldSelectAll,
-                                          );
-                                          this.setState({
-                                              numSelectedRows: shouldSelectAll
-                                                  ? this.state.totalNumRows
-                                                  : 0,
-                                          });
-                                      },
-                                  },
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                onClick: async (
+                                                    _: any,
+                                                    rows: any,
+                                                ): Promise<void> => {
+                                                    const shouldSelectAll =
+                                                        this.state
+                                                            .totalNumRows !==
+                                                        this.state
+                                                            .numSelectedRows;
+                                                    await this.tableRef.current.onAllSelected(
+                                                        shouldSelectAll,
+                                                    );
+                                                    this.setState({
+                                                        numSelectedRows: shouldSelectAll
+                                                            ? this.state
+                                                                  .totalNumRows
+                                                            : 0,
+                                                    });
+                                                },
+                                            },
+                                        ]
+                                      : []),
                                   {
                                       icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
@@ -826,16 +864,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Verified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Verified,
+                                              );
                                           }
-                                          await this.setCaseVerification(
-                                              rows,
-                                              VerificationStatus.Verified,
-                                          );
                                           this.tableRef.current.onQueryChange();
                                       },
                                   },
@@ -852,42 +889,34 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Unverified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Unverified,
+                                              );
                                           }
-                                          await this.setCaseVerification(
-                                              rows,
-                                              VerificationStatus.Unverified,
-                                          );
                                           this.tableRef.current.onQueryChange();
                                       },
                                   },
-                                  // Only allow deleting all rows if there is a search query.
-                                  ...(this.state.totalNumRows !==
-                                      this.state.numSelectedRows ||
-                                  this.state.search.trim() !== ''
-                                      ? [
-                                            // This action is for deleting selected rows.
-                                            // The action for deleting single rows is in the
-                                            // RowMenu function.
-                                            {
-                                                icon: (): JSX.Element => (
-                                                    <span aria-label="delete all">
-                                                        <DeleteIcon />
-                                                    </span>
-                                                ),
-                                                tooltip: 'Delete selected rows',
-                                                onClick: (): void => {
-                                                    this.setState({
-                                                        deleteDialogOpen: true,
-                                                    });
-                                                },
-                                            },
-                                        ]
-                                      : []),
+                                  // This action is for deleting selected rows.
+                                  // The action for deleting single rows is in the
+                                  // RowMenu function.
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <span aria-label="delete all">
+                                              <DeleteIcon />
+                                          </span>
+                                      ),
+                                      tooltip: 'Delete selected rows',
+                                      onClick: (): void => {
+                                          this.setState({
+                                              deleteDialogOpen: true,
+                                          });
+                                      },
+                                  },
                               ]
                             : []
                     }

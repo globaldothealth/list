@@ -114,6 +114,7 @@ app.use('/auth', authController.router);
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+    env.SERVICE_ENV,
     env.AWS_SERVICE_REGION,
 );
 const awsEventsClient = new AwsEventsClient(
@@ -324,7 +325,7 @@ new OpenApiValidator({
                 customCss: '.swagger-ui .topbar { display: none }',
                 // Make it look nicer.
                 customCssUrl:
-                    'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+                    'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
             }),
         );
 

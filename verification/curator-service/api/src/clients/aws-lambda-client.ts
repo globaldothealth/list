@@ -30,6 +30,7 @@ export default class AwsLambdaClient {
     private readonly lambdaClient: AWS.Lambda;
     constructor(
         private readonly retrievalFunctionArn: string,
+        private readonly serviceEnv: string,
         awsRegion: string,
     ) {
         AWS.config.update({ region: awsRegion });
@@ -88,6 +89,7 @@ export default class AwsLambdaClient {
                 .invoke({
                     FunctionName: this.retrievalFunctionArn,
                     Payload: JSON.stringify({
+                        env: this.serviceEnv,
                         sourceId: sourceId,
                     }),
                 })

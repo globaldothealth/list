@@ -25,7 +25,7 @@ beforeEach(() => {
     AWSMock.mock('Lambda', 'removePermission', removePermissionSpy);
     AWSMock.mock('Lambda', 'invoke', invokeSpy);
     AWSMock.mock('Lambda', 'listFunctions', listFunctionsSpy);
-    client = new AwsLambdaClient('some-arn', 'us-east-1');
+    client = new AwsLambdaClient('some-arn', 'test', 'us-east-1');
 });
 
 afterEach(() => {

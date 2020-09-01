@@ -92,24 +92,53 @@ export const setBatchUpsertRevisionMetadata = async (
 ): Promise<void> => {
     const curatorEmail = request.body.curator.email;
 
-    // Find the cases if they already exists so we can update existing
-    // metadata.
-    const existingCases = await findCasesWithCaseReferenceData(
-        request,
-        /* fieldsToSelect= */ {
-            _id: 1,
-            caseReference: 1,
-            revisionMetadata: 1,
-        },
-    );
-    const metadataMap = new Map(
-        existingCases
+    // Find and map existing cases by sourceId:sourceEntryId.
+    const existingCasesByCaseRefCombo = new Map(
+        (await findCasesWithCaseReferenceData(request))
             .filter((c) => c && c.caseReference)
             .map((c) => [
                 c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
-                createUpdateMetadata(c, curatorEmail),
+                c,
             ]),
     );
+
+    // Get sourceId:sourceEntryId for cases that are included in the batch
+    // request but that won't be modified (because the request case is identical
+    // to the existing one).
+    const unchangedCaseIdSet = request.body.cases.reduce(
+        // TODO: Type request Cases.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (unchangedIds: Set<string>, c: any) => {
+            if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
+                const existingCase = existingCasesByCaseRefCombo.get(
+                    c.caseReference.sourceId +
+                        ':' +
+                        c.caseReference.sourceEntryId,
+                );
+                if (existingCase !== undefined && existingCase.equalsJSON(c)) {
+                    unchangedIds.add(existingCase._id.toString());
+                }
+            }
+            return unchangedIds;
+        },
+        new Set(),
+    );
+
+    // Store the unchanged IDs for future middleware.
+    response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
+
+    // For existing cases, compute the revision metadata that should be saved
+    // to the database. If the case is unmodified, per the above set, the
+    // current metadata is used. Else, an update metadata is created.
+    const metadataMap = new Map();
+    existingCasesByCaseRefCombo.forEach((c, caseRefKey) => {
+        metadataMap.set(
+            caseRefKey,
+            unchangedCaseIdSet.has(c._id.toString())
+                ? c.revisionMetadata.toJSON()
+                : createUpdateMetadata(c, curatorEmail),
+        );
+    });
 
     // Set the request cases' revision metadata to the update metadata, if
     // present, or create metadata otherwise.
@@ -138,7 +167,7 @@ export const findCasesToUpdate = async (
     const matchedCases = await (casesMatchingSearchQuery({
         searchQuery: request.body.query,
         count: false,
-    }) as DocumentQuery<CaseDocument[], CaseDocument, {}>).exec();
+    }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>).exec();
 
     // Set those case ids to be updated with the request case.
     // TODO: Type request Cases.
@@ -216,18 +245,25 @@ export const createBatchUpsertCaseRevisions = async (
     response: Response,
     next: NextFunction,
 ): Promise<void> => {
-    const casesToUpsert = (await findCasesWithCaseReferenceData(request)).map(
-        (c) => {
+    const casesToUpsert = (await findCasesWithCaseReferenceData(request))
+        .filter((c) => {
+            if (response.locals?.unchangedCaseIdSet) {
+                return !response.locals.unchangedCaseIdSet.has(
+                    c._id.toString(),
+                );
+            }
+            return true;
+        })
+        .map((c) => {
             return {
                 case: c,
             };
-        },
-    );
+        });
 
     await CaseRevision.insertMany(casesToUpsert, {
         ordered: false,
         rawResult: true,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore Mongoose types don't include the `lean` option from its
         // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
         lean: true,
@@ -258,7 +294,7 @@ export const createBatchUpdateCaseRevisions = async (
     await CaseRevision.insertMany(casesToUpdate, {
         ordered: false,
         rawResult: true,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore Mongoose types don't include the `lean` option from its
         // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
         lean: true,
