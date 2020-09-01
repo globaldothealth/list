@@ -44,7 +44,22 @@ describe('custom instance methods', () => {
         const c = new Case(fullModel);
         expect(c.equalsJSON(fullModel)).toBe(true);
     });
-    it('equalsJSON returns false for differing case', () => {
+    it('equalsJSON returns true for case differing in caseReference', () => {
+        const c = new Case(fullModel);
+        delete fullModel.caseReference;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns true for case differing in revisionMetadata', () => {
+        const c = new Case(fullModel);
+        delete fullModel.revisionMetadata;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns true for case differing in importedCase', () => {
+        const c = new Case(fullModel);
+        delete fullModel.importedCase;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns false for semantically differing case', () => {
         const c = new Case(fullModel);
         delete fullModel.demographics.gender;
         expect(c.equalsJSON(fullModel)).toBe(false);
