@@ -231,4 +231,15 @@ export default class SourcesController {
         }
         return;
     };
+
+    /** Lists available parsers for automated ingestion */
+    listParsers = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const output = await this.lambdaClient.listParsers();
+            res.json(output);
+        } catch (err) {
+            res.status(500).json(err.message);
+        }
+        return;
+    };
 }

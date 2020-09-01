@@ -324,6 +324,16 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /sources/parsers:
+    get:
+      summary: Lists parsers available for automated ingestion
+      tags: [Suggest]
+      operationId: listParsers
+      responses:
+        "200":
+          $ref: "#/components/responses/200ParsersArray"
+        "500":
+          $ref: "#/components/responses/500"
   /cases:
     get:
       tags: [Case]
@@ -816,6 +826,19 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Parser:
+      description: A parser for automated ingestion
+      type: object
+      properties:
+        name:
+          type: string
+          description: The Lambda name
+          example: epid-ingestion-CHZurichParsingFunction-1L624HBVU0E56
+    ParsersArray:
+      type: array
+      items:
+        description: An array of parsers
+        $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
       type: object
@@ -924,7 +947,7 @@ components:
               properties:
                 awsLambdaArn:
                   type: string
-                  pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+                  #pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
                   example: arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
             regexParsing:
               type: object
@@ -1560,6 +1583,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Retrieval"
+    "200ParsersArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ParsersArray"
     "200Upload":
       description: OK
       content:
