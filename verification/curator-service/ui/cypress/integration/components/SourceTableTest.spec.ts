@@ -21,7 +21,7 @@ describe('Sources table', function () {
 
         cy.get('button[title="Edit"]').click();
         cy.get('input[placeholder="Name"]').clear().type('Edited source');
-        cy.get('input[placeholder="AWS Parser ARN"]')
+        cy.get('input[placeholder="Parsers"]')
             .clear()
             .type('arn:aws:lambda:us-east-1:612888738066:function:test-func');
         cy.get('button[title="Save"]').click();
