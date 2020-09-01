@@ -4,6 +4,7 @@ import { Button, LinearProgress, Typography } from '@material-ui/core';
 import { Case, VerificationStatus } from './Case';
 import { Form, Formik } from 'formik';
 import { GenomeSequence, Travel } from './new-case-form-fields/CaseFormValues';
+import { Paper, makeStyles } from '@material-ui/core';
 import Source, { submitSource } from './common-form-fields/Source';
 import { green, grey, red } from '@material-ui/core/colors';
 
@@ -30,7 +31,6 @@ import User from './User';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 import { hasKey } from './Utils';
-import { makeStyles } from '@material-ui/core';
 import shortId from 'shortid';
 import { toUTCDate } from './util/date';
 import { useHistory } from 'react-router-dom';
@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: '18em',
     },
     formSection: {
+        padding: '0.5em 1em 1em',
         margin: '2em 0',
     },
     statusMessage: {
@@ -817,46 +818,48 @@ export default function CaseForm(props: Props): JSX.Element {
                                 Required fields are marked.
                             </Typography>
                             <Form>
-                                <div className={classes.formSection}>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Source
                                         initialValue={values.caseReference}
                                         hasSourceEntryId={true}
                                     ></Source>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Demographics></Demographics>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <LocationForm></LocationForm>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Events></Events>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Symptoms></Symptoms>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <PreexistingConditions></PreexistingConditions>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Transmission></Transmission>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <TravelHistory></TravelHistory>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <GenomeSequences></GenomeSequences>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Pathogens></Pathogens>
-                                </div>
-                                <div className={classes.formSection}>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
                                     <Notes></Notes>
-                                </div>
+                                </Paper>
                                 {!props.initialCase && (
-                                    <div className={classes.formSection}>
+                                    <Paper
+                                        classes={{ root: classes.formSection }}
+                                    >
                                         <NumCases></NumCases>
-                                    </div>
+                                    </Paper>
                                 )}
                                 {isSubmitting && <LinearProgress />}
                                 <br />

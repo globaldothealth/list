@@ -25,7 +25,6 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -94,8 +93,9 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
+            backgroundColor: 'white',
             borderRadius: theme.spacing(1),
-            marginTop: theme.spacing(2),
+            marginTop: theme.spacing(1),
         },
         centeredContent: {
             display: 'flex',
@@ -453,11 +453,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
-            <Paper>
+            <>
                 {this.state.error && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        variant="filled"
+                        variant="outlined"
                         severity="error"
                     >
                         {this.state.error}
@@ -468,14 +468,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     this.props.location.state?.newCaseIds.length > 0 &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert
-                            classes={{ root: classes.alert }}
-                            variant="filled"
+                            classes={{
+                                root: classes.alert,
+                            }}
+                            variant="standard"
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.newCaseIds}`}
                                 >
                                     <Button
-                                        color="inherit"
+                                        color="primary"
                                         size="small"
                                         data-testid="view-case-btn"
                                     >
@@ -489,7 +491,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     ) : (
                         <MuiAlert
                             classes={{ root: classes.alert }}
-                            variant="filled"
+                            variant="standard"
                         >
                             {`${this.props.location.state.newCaseIds.length} cases added`}
                         </MuiAlert>
@@ -498,13 +500,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
                         <MuiAlert
-                            variant="filled"
+                            variant="standard"
                             classes={{ root: classes.alert }}
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.editedCaseIds}`}
                                 >
-                                    <Button color="inherit" size="small">
+                                    <Button color="primary" size="small">
                                         VIEW
                                     </Button>
                                 </Link>
@@ -516,8 +518,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 {this.props.location.state?.bulkMessage && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        severity="info"
-                        variant="outlined"
+                        variant="standard"
                     >
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
@@ -744,8 +745,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     components={{
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
-                                {...props}
+                                classes={{
+                                    highlight: { backgroundColor: 'purple' },
+                                }}
                                 toolbarButtonAlignment="left"
+                                {...props}
                             />
                         ),
                     }}
@@ -785,7 +789,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E7EFED' }
+                                ? { backgroundColor: '#F0FBF9' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
@@ -921,7 +925,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             : []
                     }
                 />
-            </Paper>
+            </>
         );
     }
 }

@@ -11,10 +11,8 @@ import axios from 'axios';
 export default function Pathogens(): JSX.Element {
     return (
         <Scroll.Element name="pathogens">
-            <fieldset>
-                <FieldTitle title="Pathogens"></FieldTitle>
-                <PathogensAutocomplete />
-            </fieldset>
+            <FieldTitle title="Pathogens"></FieldTitle>
+            <PathogensAutocomplete />
         </Scroll.Element>
     );
 }
