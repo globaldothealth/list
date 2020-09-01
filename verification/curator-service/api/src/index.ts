@@ -114,6 +114,7 @@ app.use('/auth', authController.router);
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
+    env.SERVICE_ENV,
     env.AWS_SERVICE_REGION,
 );
 const awsEventsClient = new AwsEventsClient(
