@@ -70,7 +70,6 @@ export default function ParsersAutocomplete(
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    //label="Parsers"
                     placeholder="Parsers"
                     InputProps={{
                         ...params.InputProps,
