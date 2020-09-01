@@ -201,7 +201,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
-                    : {},
+                    : undefined,
         };
     }
 

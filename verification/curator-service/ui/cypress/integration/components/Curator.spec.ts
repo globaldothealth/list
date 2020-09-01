@@ -169,7 +169,7 @@ describe('Curator', function () {
             cy.contains('Female');
             cy.contains('21');
             cy.contains('Frankreich');
-            cy.contains('2020-1-1');
+            cy.contains('2020-01-01');
             cy.contains('Recovered');
 
             // View the case from the message bar.
@@ -318,12 +318,12 @@ describe('Curator', function () {
             cy.contains('45.7589');
             cy.contains('4.8414');
             // Events.
-            cy.contains('2020-1-1');
-            cy.contains('2020-1-2');
-            cy.contains('2020-1-3');
-            cy.contains('2020-1-4');
-            cy.contains('2020-1-5');
-            cy.contains('2020-1-6');
+            cy.contains('2020-01-01');
+            cy.contains('2020-01-02');
+            cy.contains('2020-01-03');
+            cy.contains('2020-01-04');
+            cy.contains('2020-01-05');
+            cy.contains('2020-01-06');
             cy.contains('PCR test');
             cy.contains('Recovered');
             cy.contains('Yes');

@@ -4,6 +4,10 @@ import { Source, SourceDocument } from '../model/source';
 import AwsEventsClient from '../clients/aws-events-client';
 import AwsLambdaClient from '../clients/aws-lambda-client';
 
+/**
+ * SourcesController handles HTTP requests from curators and automated ingestion
+ * functions related to sources of case data.
+ */
 export default class SourcesController {
     constructor(
         private readonly lambdaClient: AwsLambdaClient,

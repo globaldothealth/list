@@ -1,4 +1,11 @@
-# Common utilities between parsing and retrieval lambdas.
+"""
+Common utilities between parsing and retrieval lambdas.
+
+TODO: Considering structuring this as a class (if that's workable with AWS
+Lambda layers). Many methods accept similar parameters, in order to accomplish
+API calls, and it's information that could be easily encoded as state in an
+object.
+"""
 
 import os
 import tempfile
@@ -9,6 +16,11 @@ import google
 from enum import Enum
 from google.oauth2 import service_account
 
+_ENV_TO_SOURCE_API_URL = {
+    "local": "http://localhost:3001/api",
+    "dev": "https://dev-curator.ghdsi.org/api",
+    "prod": "https://curator.ghdsi.org/api"
+}
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
 
@@ -25,12 +37,13 @@ class UploadError(Enum):
     VALIDATION_ERROR = 8
 
 
-def create_upload_record(source_id, headers):
+def create_upload_record(env, source_id, headers, cookies):
     """Creates an upload resource via the G.h Source API."""
-    post_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads"
+    post_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads"
     print(f"Creating upload via {post_api_url}")
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
+                        cookies=cookies,
                         headers=headers)
     if res and res.status_code == 201:
         res_json = res.json()
@@ -42,10 +55,10 @@ def create_upload_record(source_id, headers):
 
 
 def finalize_upload(
-        source_id, upload_id, headers, count_created=None, count_updated=None,
-        error=None):
+        env, source_id, upload_id, headers, cookies, count_created=None,
+        count_updated=None, error=None):
     """Records the results of an upload via the G.h Source API."""
-    put_api_url = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}/uploads/{upload_id}"
+    put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
     print(f"Updating upload via {put_api_url}")
     update = {
         "status": "ERROR", "summary": {"error": error.name}} if error else {
@@ -53,18 +66,21 @@ def finalize_upload(
         "summary": {"numCreated": count_created, "numUpdated": count_updated}}
     res = requests.put(put_api_url,
                        json=update,
-                       headers=headers)
+                       headers=headers,
+                       cookies=cookies)
     # TODO: Look for "errors" in res_json and handle them in some way.
+    # TODO: This can end up in a error-loop where we try to upload and fail
+    #       endlessly
     if not res or res.status_code != 200:
         e = RuntimeError(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, headers)
+        complete_with_error(e, env, UploadError.INTERNAL_ERROR,
+                            source_id, upload_id, headers, cookies)
 
 
 def complete_with_error(
-        exception, upload_error=None, source_id=None, upload_id=None,
-        headers=None):
+        exception, env=None, upload_error=None, source_id=None, upload_id=None,
+        headers=None, cookies=None):
     """
     Logs and raises the provided exception.
 
@@ -72,10 +88,27 @@ def complete_with_error(
     provided data.
     """
     print(exception)
-    if upload_error and source_id and upload_id:
-        finalize_upload(source_id, upload_id, headers,
+    if env and upload_error and source_id and upload_id:
+        finalize_upload(env, source_id, upload_id, headers, cookies,
                         error=upload_error)
     raise exception
+
+
+def login(email: str):
+    """Logs-in a local curator server instance for testing.
+
+    Returns the cookie of the now logged-in user.
+    """
+    print('Logging-in user', email)
+    endpoint = "http://localhost:3001/auth/register"
+    res = requests.post(endpoint, json={
+        "email": email,
+        "roles": ['curator', 'reader'],
+    })
+    if not res or res.status_code != 200:
+        raise RuntimeError(
+            f'Error registering local user, status={res.status_code}, response={res.text}')
+    return res.cookies
 
 
 def obtain_api_credentials(s3_client):
@@ -100,3 +133,12 @@ def obtain_api_credentials(s3_client):
     except Exception as e:
         print(e)
         raise e
+
+
+def get_source_api_url(env):
+    """
+    Returns the URL at which to reach the Source API for the provided environment.
+    """
+    if env not in _ENV_TO_SOURCE_API_URL:
+        raise ValueError(f"No source API URL found for provided env: {env}")
+    return _ENV_TO_SOURCE_API_URL[env]
