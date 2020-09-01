@@ -1,6 +1,9 @@
+import codecs
 import json
 import os
 import sys
+import io
+from chardet import detect
 
 import boto3
 import google.auth.transport.requests
@@ -8,6 +11,7 @@ import requests
 
 from datetime import datetime, timezone
 
+ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
@@ -18,88 +22,117 @@ s3_client = boto3.client("s3")
 # Layer code, like common_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import common_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             os.pardir, 'common'))
-import common_lib
-from common_lib import UploadError
+    import common_lib
 
 
-def extract_source_id(event):
-    if SOURCE_ID_FIELD not in event:
+def extract_event_fields(event):
+    print('Extracting fields from event', event)
+    if any(
+            field not in event
+            for field
+            in [ENV_FIELD, SOURCE_ID_FIELD]):
         error_message = (
-            f"Required field {SOURCE_ID_FIELD} not found in input event json.")
+            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event json.")
         print(error_message)
         raise ValueError(error_message)
-    return event[SOURCE_ID_FIELD]
+    return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get('auth', {})
 
 
-def get_source_details(source_id, upload_id, api_headers):
+def get_source_details(env, source_id, upload_id, api_headers, cookies):
     """
     Retrieves the content URL and format associated with the provided source ID.
     """
     try:
-        source_api_endpoint = f"{os.environ['SOURCE_API_URL']}/sources/{source_id}"
+        source_api_endpoint = f"{common_lib.get_source_api_url(env)}/sources/{source_id}"
         print(f"Requesting source configuration from {source_api_endpoint}")
-        r = requests.get(source_api_endpoint, headers=api_headers)
-        api_json = r.json()
-        print(f"Received source API response: {api_json}")
-        return api_json["origin"]["url"], api_json["format"], api_json.get(
-            "automation", {}).get(
-            "parser", {}).get(
-            "awsLambdaArn", ""), api_json.get(
-            'dateFilter', {})
-    except Exception as e:
+        r = requests.get(source_api_endpoint,
+                         headers=api_headers, cookies=cookies)
+        if r and r.status_code == 200:
+            api_json = r.json()
+            print(f"Received source API response: {api_json}")
+            return api_json["origin"]["url"], api_json["format"], api_json.get(
+                "automation", {}).get(
+                "parser", {}).get(
+                "awsLambdaArn", ""), api_json.get(
+                'dateFilter', {})
         upload_error = (
-            UploadError.SOURCE_CONFIGURATION_NOT_FOUND
-            if r.status_code == 404 else UploadError.INTERNAL_ERROR)
+            common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND
+            if r.status_code == 404 else common_lib.UploadError.INTERNAL_ERROR)
+        e = RuntimeError(
+            f"Error retrieving source details, status={r.status_code}, response={r.text}")
         common_lib.complete_with_error(
-            e, upload_error, source_id, upload_id,
-            api_headers)
+            e, env, upload_error, source_id, upload_id,
+            api_headers, cookies)
+    except ValueError as e:
+        common_lib.complete_with_error(
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_headers, cookies)
 
 
-def retrieve_content(source_id, upload_id, url, source_format, api_headers):
+def retrieve_content(
+        env, source_id, upload_id, url, source_format, api_headers, cookies):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        data = None
-        extension = None
+        if source_format != "JSON" and source_format != "CSV":
+            e = ValueError(f"Unsupported source format: {source_format}")
+            common_lib.complete_with_error(
+                e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
+                source_id, upload_id, api_headers, cookies)
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
         r.raise_for_status()
-        data = r.content
-        if source_format == "JSON":
-            extension = "json"
-        elif source_format == "CSV":
-            extension = "csv"
+        print('Download finished')
+
+        key_filename_part = f"content.{source_format.lower()}"
+        # Lambda limitations: 512MB ephemeral disk space.
+        # Memory range is from 128 to 3008 MB so we could switch to
+        # https://docs.python.org/3/library/io.html#io.StringIO for bigger
+        # sources.
+        # Make the encoding of retrieved content consistent (UTF-8) for all
+        # parsers as per https://github.com/globaldothealth/list/issues/867.
+        bytesio = io.BytesIO(r.content)
+        print('detecting encoding of retrieved content.')
+        detected_enc = detect(bytesio.read(2048))
+        print(f'Source encoding is presumably {detected_enc}')
+        bytesio.seek(0)
+        source_encoding = detected_enc['encoding']
+        if source_encoding != "utf-8":
+            with codecs.open(f"/tmp/{key_filename_part}", "wb", 'utf-8') as f:
+                # Write the output file as utf-8 in chunks because decoding the
+                # whole data in one shot becomes really slow with big files.
+                content = bytesio.read(2048)
+                while content:
+                    f.write(codecs.decode(content, source_encoding))
+                    content = bytesio.read(2048)
         else:
-            e = ValueError(f"Unsupported source format: {source_format}")
-            common_lib.complete_with_error(
-                e, UploadError.SOURCE_CONFIGURATION_ERROR, source_id, upload_id,
-                api_headers)
-
-        key_filename_part = f"content.{extension}"
-        with open(f"/tmp/{key_filename_part}", "wb") as f:
-            f.write(data)
-            s3_object_key = (
-                f"{source_id}"
-                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-                f"{key_filename_part}")
-            return (f.name, s3_object_key)
+            with open(f"/tmp/{key_filename_part}", "wb") as f:
+                f.write(r.content)
+        s3_object_key = (
+            f"{source_id}"
+            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+            f"{key_filename_part}")
+        return (f.name, s3_object_key)
     except requests.exceptions.RequestException as e:
-        # TODO: Handle 301.
         upload_error = (
-            UploadError.SOURCE_CONTENT_NOT_FOUND
-            if r.status_code == 404 else
-            UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
+            common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
+            if e.response.status_code == 404 else
+            common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
         common_lib.complete_with_error(
-            e, upload_error, source_id, upload_id,
-            api_headers)
+            e, env, upload_error, source_id, upload_id,
+            api_headers, cookies)
 
 
-def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
+def upload_to_s3(
+        file_name, s3_object_key, env, source_id, upload_id, api_headers,
+        cookies):
     try:
         s3_client.upload_file(
             file_name, OUTPUT_BUCKET, s3_object_key)
@@ -107,14 +140,15 @@ def upload_to_s3(file_name, s3_object_key, source_id, upload_id, api_headers):
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
     except Exception as e:
         common_lib.complete_with_error(
-            e, UploadError.INTERNAL_ERROR, source_id, upload_id,
-            api_headers)
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_headers, cookies)
 
 
 def invoke_parser(
-    parser_arn, source_id, upload_id, api_headers, s3_object_key,
+    env, parser_arn, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter):
     payload = {
+        "env": env,
         "s3Bucket": OUTPUT_BUCKET,
         "sourceId": source_id,
         "s3Key": s3_object_key,
@@ -131,20 +165,38 @@ def invoke_parser(
     print(f"Parser response: {response}")
     if "StatusCode" not in response or response["StatusCode"] != 202:
         e = Exception(f"Parser invocation unsuccessful. Response: {response}")
-        common_lib.complete_with_error(e, UploadError.INTERNAL_ERROR,
-                                       source_id, upload_id, api_headers)
+        common_lib.complete_with_error(
+            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+            api_headers, cookies)
 
 
 def get_today():
     """Return today's datetime, just here for easier mocking."""
     return datetime.today()
 
+
 def format_source_url(url: str) -> str:
     """
     Formats the given url with the date formatting params contained in it if any.
-    Cf. https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+    - $FULLYEAR is replaced with the 4 digits current year.
+    - $FULLMONTH is replaced with the 2 digits current month.
+    - $FULLDAY is replaced with the 2 digits current day of the month.
+    - $MONTH is replaced with the 1 or 2 digits current month.
+    - $DAY is replaced with the 1 or 2 digits current day of the month.
     """
-    return get_today().strftime(url)
+    today = get_today()
+    mappings = {
+        "$FULLYEAR": str(today.year),
+        "$FULLMONTH": str(today.month).zfill(2),
+        "$MONTH": str(today.month),
+        "$FULLDAY": str(today.day).zfill(2),
+        "$DAY": str(today.day),
+    }
+    for key in mappings:
+        if key in url:
+            url = url.replace(key, mappings[key], -1)
+    return url
+
 
 def lambda_handler(event, context):
     """Global ingestion retrieval function.
@@ -170,19 +222,25 @@ def lambda_handler(event, context):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    source_id = extract_source_id(event)
-    auth_headers = common_lib.obtain_api_credentials(s3_client)
-    upload_id = common_lib.create_upload_record(source_id, auth_headers)
+    env, source_id, local_auth = extract_event_fields(event)
+    auth_headers = None
+    cookies = None
+    if local_auth and env == 'local':
+        cookies = common_lib.login(local_auth['email'])
+    else:
+        auth_headers = common_lib.obtain_api_credentials(s3_client)
+    upload_id = common_lib.create_upload_record(
+        env, source_id, auth_headers, cookies)
     url, source_format, parser_arn, date_filter = get_source_details(
-        source_id, upload_id, auth_headers)
+        env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
     file_name, s3_object_key = retrieve_content(
-        source_id, upload_id, url, source_format, auth_headers)
-    upload_to_s3(file_name, s3_object_key, source_id, upload_id, auth_headers)
+        env, source_id, upload_id, url, source_format, auth_headers, cookies)
+    upload_to_s3(file_name, s3_object_key, env,
+                 source_id, upload_id, auth_headers, cookies)
     if parser_arn:
-        invoke_parser(
-            parser_arn, source_id, upload_id, auth_headers, s3_object_key, url,
-            date_filter)
+        invoke_parser(env, parser_arn, source_id, upload_id,
+                      auth_headers, cookies, s3_object_key, url, date_filter)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,

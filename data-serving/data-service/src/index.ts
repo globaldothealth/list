@@ -3,9 +3,12 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
-    createBatchCaseRevisions,
+    createBatchUpdateCaseRevisions,
+    createBatchUpsertCaseRevisions,
     createCaseRevision,
-    setBatchRevisionMetadata,
+    findCasesToUpdate,
+    setBatchUpdateRevisionMetadata,
+    setBatchUpsertRevisionMetadata,
     setRevisionMetadata,
 } from './controllers/preprocessor';
 
@@ -44,7 +47,17 @@ app.get('/', homeController.get);
 
 // API documentation.
 const swaggerDocument = YAML.load('./api/openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+        // Hide the useless "SWAGGER" black bar at the top.
+        customCss: '.swagger-ui .topbar { display: none }',
+        // Make it look nicer.
+        customCssUrl:
+            'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+    }),
+);
 
 // Basic health check handler.
 app.get('/health', (req: Request, res: Response) => {
@@ -80,8 +93,8 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
-            setBatchRevisionMetadata,
-            createBatchCaseRevisions,
+            setBatchUpsertRevisionMetadata,
+            createBatchUpsertCaseRevisions,
             caseController.batchUpsert,
         );
         apiRouter.put(
@@ -89,6 +102,19 @@ new OpenApiValidator({
             setRevisionMetadata,
             createCaseRevision,
             caseController.upsert,
+        );
+        apiRouter.post(
+            '/cases/batchUpdate',
+            setBatchUpdateRevisionMetadata,
+            createBatchUpdateCaseRevisions,
+            caseController.batchUpdate,
+        );
+        apiRouter.post(
+            '/cases/batchUpdateQuery',
+            findCasesToUpdate,
+            setBatchUpdateRevisionMetadata,
+            createBatchUpdateCaseRevisions,
+            caseController.batchUpdate,
         );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
