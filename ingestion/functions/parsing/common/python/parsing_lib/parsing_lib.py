@@ -86,7 +86,7 @@ def write_to_server(cases, env, source_id, upload_id, headers):
                         headers=headers)
     if res and res.status_code == 200:
         res_json = res.json()
-        return len(res_json["createdCaseIds"]), len(res_json["updatedCaseIds"])
+        return res_json["numCreated"], res_json["numUpdated"]
     # Response can contain an 'error' field which describe each error that
     # occurred, it will be contained in the res.text here below.
     e = RuntimeError(
@@ -195,7 +195,8 @@ def run_lambda(event, context, parsing_function):
             api_creds)
         # TODO: #754 Handle cookies as well.
         common_lib.finalize_upload(
-            env, source_id, upload_id, api_creds, None, count_created, count_updated)
+            env, source_id, upload_id, api_creds, None, count_created,
+            count_updated)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(

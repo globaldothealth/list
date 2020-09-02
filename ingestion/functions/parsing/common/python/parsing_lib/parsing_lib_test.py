@@ -162,8 +162,8 @@ def test_run_lambda_e2e(
     num_updated = 5
     requests_mock.post(
         full_source_url,
-        json={"createdCaseIds": list(range(num_created)),
-              "updatedCaseIds": list(range(num_updated))})
+        json={"numCreated": num_created,
+              "numUpdated": num_updated})
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
@@ -254,16 +254,18 @@ def test_write_to_server_returns_created_and_updated_count(
         requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    num_created = 10
+    num_updated = 5
     requests_mock.post(
         full_source_url,
-        json={"createdCaseIds": list(range(10)),
-              "updatedCaseIds": list(range(5))})
+        json={"numCreated": num_created,
+              "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
         [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {})
     assert requests_mock.request_history[0].url == full_source_url
-    assert count_created == 10
-    assert count_updated == 5
+    assert count_created == num_created
+    assert count_updated == num_updated
 
 
 def test_write_to_server_raises_error_for_failed_batch_upsert(
