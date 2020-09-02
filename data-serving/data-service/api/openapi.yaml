@@ -468,17 +468,15 @@ components:
     BatchUpsertCaseResponse:
       description: Response to batch upsert case API requests
       properties:
-        createdCaseIds:
-          type: array
-          items:
-            type: string
-        updatedCaseIds:
-          type: array
-          items:
-            type: string
+        numCreated:
+          type: number
+          description: The number of cases created by the request.
+        numUpdated:
+          type: number
+          description: The number of cases modified by the request.
       required:
-        - createdCaseIds
-        - updatedCaseIds
+        - numCreated
+        - numUpdated
     Case:
       description: A single line-list case.
       properties:
