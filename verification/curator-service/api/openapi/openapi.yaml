@@ -4,21 +4,46 @@ info:
   description: Server for CRUD operations on Global Health data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
+    name: Healthmap
+    url: http://www.diseasedaily.org/about
     email: info@healthmap.org
   license:
     name: MIT
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
+tags:
+  - name: Case
+    description: Case related operations
+  - name: Suggest
+    description: Suggestion for input of cases
+  - name: Geocode
+    description: Geolocation of a case
+  - name: User
+    description: User of the system
+  - name: Source
+    description: A source of case data
+  - name: Upload
+    description: >
+      A bundle of case data that were uploaded as part of a batch upload
+      or an automated ingestion pipeline
+  - name: Auth
+    description: Authentication-related operations
 paths:
   /auth/register:
     post:
-      tags: 
+      tags:
         - Auth
         - User
-      summary: Authorize a user for the given roles
+      summary: >
+        Creates a local user for testing.The user can have any specified roles
+        in the request and the returned cookies can be used for subsequent
+        requests acting as this new user.
+        Note that this endpoint is only exposed in a local environment.
+      servers:
+        - url: http://localhost:3001/api
       operationId: registerAuth
       requestBody:
-        description: User to authorize
+        description: User to register
         required: true
         content:
           application/json:
@@ -65,6 +90,7 @@ paths:
           schema:
             type: string
         - name: access_token
+          description: Bearer token used by automated ingestion lambdas.
           in: query
           required: false
           schema:
@@ -167,11 +193,55 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /sources/{id}/retrieve:
+    parameters:
+      - name: id
+        in: path
+        description: The source ID for which to retrieve content
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+    post:
+      tags: [Source]
+      summary: Trigger a retrieval of the content for the specified source
+      operationId: retrieve
+      responses:
+        "200":
+          $ref: "#/components/responses/200Retrieval"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /sources/uploads:
     get:
       tags: [Source, Upload]
       summary: Lists all uploads for all sources
       operationId: listUploads
+      parameters:
+        - name: page
+          in: query
+          description: The pages of uploads to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: The number of uploads to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         "200":
           $ref: "#/components/responses/200UploadsArray"
@@ -252,6 +322,16 @@ paths:
           $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/parsers:
+    get:
+      summary: Lists parsers available for automated ingestion
+      tags: [Suggest]
+      operationId: listParsers
+      responses:
+        "200":
+          $ref: "#/components/responses/200ParsersArray"
         "500":
           $ref: "#/components/responses/500"
   /cases:
@@ -369,9 +449,51 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    delete:
+      summary: >
+        Deletes multiple cases. It is required to supply exactly one of either 
+        caseIds or query in the request body. If caseIds are supplied, cases 
+        corresponding to those caseIds will be deleted. If query is supplied, 
+        all cases that match the query will be deleted.
+      tags: [Case]
+      operationId: deleteCases
+      requestBody:
+        description: Cases to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will be deleted
+                  type: array
+                  items:
+                    type: string
+                query:
+                  description: >
+                    Cases matching this query will be deleted. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
+      responses:
+        "204":
+          description: Cases deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used sypmtoms
+      tags: [Suggest]
       operationId: listSymptoms
       parameters:
         - name: limit
@@ -396,6 +518,7 @@ paths:
   /cases/placesOfTransmission:
     get:
       summary: Lists most frequently used places of transmission
+      tags: [Suggest]
       operationId: listPlacesOfTransmission
       parameters:
         - name: limit
@@ -420,6 +543,7 @@ paths:
   /cases/occupations:
     get:
       summary: Lists most frequently used occupations
+      tags: [Suggest]
       operationId: listOccupations
       parameters:
         - name: limit
@@ -458,6 +582,61 @@ paths:
           $ref: "#/components/responses/200BatchCaseUpsert"
         "207":
           $ref: "#/components/responses/207BatchCaseUpsert"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseArray"
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - query
+                - case
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/{id}:
@@ -550,7 +729,7 @@ paths:
           description: OK
   /geocode/suggest:
     get:
-      tags: [Geocode]
+      tags: [Suggest, Geocode]
       summary: Suggests geocodes for a given query string
       operationId: suggestGeocodes
       parameters:
@@ -647,6 +826,19 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Parser:
+      description: A parser for automated ingestion
+      type: object
+      properties:
+        name:
+          type: string
+          description: The Lambda name
+          example: epid-ingestion-CHZurichParsingFunction-1L624HBVU0E56
+    ParsersArray:
+      type: array
+      items:
+        description: An array of parsers
+        $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
       type: object
@@ -675,7 +867,7 @@ components:
                 - PARSING_ERROR
                 - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
-        created: 
+        created:
           $ref: "#/components/schemas/Date"
     UploadsArray:
       type: object
@@ -688,25 +880,53 @@ components:
             properties:
               sourceName:
                 type: string
+                description: Name of the source of the upload
+                example: India Ministry of Health
               sourceUrl:
                 type: string
+                example: https://api.covid19india.org/raw_data7.json
               upload:
                 $ref: "#/components/schemas/Upload"
+    Retrieval:
+      description: Output of the retrieval lambda function.
+      type: object
+      properties:
+        bucket:
+          type: string
+          description: S3 bucket name where the source content was stored
+          example: sources-raw
+        key:
+          type: string
+          description: S3 key of the source content
+          example: some/s3/key/content.json
+        upload_id:
+          type: string
+          description: Upload ID correpsonding to this retrieval
+          example: 5f06d810d261423384c9aeb4
     Source:
       description: A source of line list case data.
       type: object
       properties:
         name:
           type: string
+          description: Human readable name of a source
+          example: Paraguay Ministry of Health and Labor
         origin:
           type: object
           properties:
             url:
               type: string
+              example: https://opendata.digilugu.ee/opendata_covid19_test_results.csv
             license:
               type: string
+              example: MIT
         format:
           type: string
+          description: Format of the source to be ingested, useful when automated ingestion
+          enum:
+            - null
+            - CSV
+            - JSON
         dateFilter:
           type: object
           properties:
@@ -717,8 +937,8 @@ components:
             op:
               type: string
               enum:
-              - EQ
-              - LT
+                - EQ
+                - LT
         automation:
           type: object
           properties:
@@ -727,7 +947,8 @@ components:
               properties:
                 awsLambdaArn:
                   type: string
-                  pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+                  #pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+                  example: arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
             regexParsing:
               type: object
               properties:
@@ -746,9 +967,11 @@ components:
                 awsRuleArn:
                   type: string
                   pattern: '^arn\:aws\:events\:.+\:.+\:rule\/.+'
+                  example: arn:aws:events:us-east-1:612888738066:rule/5ef22491937717c3331c3729
                 awsScheduleExpression:
                   type: string
                   pattern: '^((rate\(((1 (minute|hour|day))|([1-9]+ (minutes|hours|days)))\))|(cron\((.+\s){5}.+\)))'
+                  example: rate(1 day)
               required:
                 - awsScheduleExpression
         uploads:
@@ -777,25 +1000,33 @@ components:
             sourceId:
               type: string
               pattern: '^[a-f\d]{24}$'
+              description: UUID of the source this case was extracted from
+              example: 5ef22491937717c3331c3729
             sourceUrl:
               type: string
+              description: URL of the source this case was extracted from
+              example: https://api.covid19india.org/raw_data7.json
             uploadId:
               description: >
                 The UUID of the upload in which the batch of cases including
                 this case document was entered into the G.h system. This field
                 is only populated for cases entered via automated ingestion.
+                example: example: 5ef22491937717c3331c3729
               type: string
               pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
                 - VERIFIED
             additionalSources:
               type: array
+              description: List of additional URLs that described a case
+              example: https://www.chinadaily.com.cn/a/202006/11/WS5ee1ea62a3108348172526ac.html
               items:
                 type: object
                 properties:
@@ -806,20 +1037,29 @@ components:
           properties:
             gender:
               type: string
+              enum: [null, Male, Female, Non-binary/Third gender, Other]
             ageRange:
               type: object
+              description: >
+                Age bracket, start is included, end is excluded if different
+                than start.
               properties:
                 start:
                   type: number
                 end:
                   type: number
             ethnicity:
+              description: >
+                Social group that has a common national or cultural tradition.
+              example: Asian
               type: string
             nationalities:
               type: array
+              example: French
               items:
                 type: string
             occupation:
+              example: Epidemiologist
               type: string
         location:
           $ref: "#/components/schemas/Location"
@@ -843,17 +1083,41 @@ components:
                 $ref: "#/components/schemas/DateRange"
               value:
                 type: string
+                description: >
+                  For outcome event, value can be Death or Recovered.
+                  For icuAdmission and hospitalAdmission, value can be Yes or No.
+                example: Recovered
+          example:
+            - name: confirmed
+              dateRange:
+                start: "06/20/2020"
+                end: "06/20/2020"
+            - name: outcome
+              value: Death
+            - name: icuAdmission
+              dateRange:
+                start: "06/20/2020"
+                end: "06/25/2020"
+              value: Yes
         symptoms:
           type: object
+          description: Symptoms that the patient had if any
           properties:
             status:
               type: string
+              enum: [null, Asymptomatic, Symptomatic, Presymptomatic]
             values:
               type: array
               items:
                 type: string
+          example:
+            status: Symptomatic
+            values:
+              - Headache
+              - Vomiting
         preexistingConditions:
           type: object
+          description: Any preexisting condition that the patient had
           properties:
             hasPreexistingConditions:
               type: boolean
@@ -861,23 +1125,40 @@ components:
               type: array
               items:
                 type: string
+                example: Low blood pressure
+          example:
+            hasPreexistingConditions: true
+            values:
+              - acatalasia
+              - pleuropneumonia
         transmission:
           type: object
+          description: How this case got infected and by who if known
           properties:
             routes:
               type: array
               items:
                 type: string
+              example:
+                - Oral
+                - Air-borne
             places:
               type: array
               items:
                 type: string
+              example:
+                - Airplane
+                - Bus
+                - Gym
             linkedCaseIds:
               type: array
               items:
                 type: string
+                description: UUID of a related case in the system
+                example: 5f3a99d615246c7402ac07d3
         travelHistory:
           type: object
+          description: Travel history of the patient if known
           properties:
             traveledPrior30Days:
               type: boolean
@@ -896,8 +1177,22 @@ components:
                     type: array
                     items:
                       type: string
+          example:
+            traveledPrior30Days: true
+            travel:
+              dateRange:
+                start: "02/18/2020"
+                end: "02/20/2020"
+              location:
+                name: "Peru"
+              purpose: Business
+              methods:
+                - Plane
+                - Ferry
+                - Train
         genomeSequences:
           type: array
+          description: Genome sequence of the pathogen
           items:
             type: object
             properties:
@@ -905,29 +1200,42 @@ components:
                 $ref: "#/components/schemas/Date"
               repositoryUrl:
                 type: string
+                example: https://www.ncbi.nlm.nih.gov/nuccore/AY242057.1
               sequenceId:
                 type: string
+                example: AY242057.1
               sequenceName:
                 type: string
+                example: Danio rerio foxi one (foo) gene, complete cds
               sequenceLength:
                 type: integer
                 format: int64
                 minimum: 0
+                example: 2074
         pathogens:
           type: array
+          description: Pathogens associated with the case
           items:
             type: object
             properties:
               name:
                 type: string
+                example: Brucellosis
               id:
                 type: integer
                 format: int32
                 minimum: 0
         notes:
           type: string
+          description: >
+            Anything that does not fit in a schema but worth mentioning about
+            the case
+          example: >
+            Case travelled to meet their family in their hometown, got infected
+            at a party there.
         revisionMetadata:
           type: object
+          description: Various revisions of this case over time
           properties:
             revisionNumber:
               type: integer
@@ -972,6 +1280,7 @@ components:
         - type: string
         - type: object
         - type: number
+      example: "02/20/2020"
     DateRange:
       type: object
       properties:
@@ -984,10 +1293,13 @@ components:
       properties:
         curator:
           type: string
+          description: Email of the curator
+          example: "foo@bar.com"
         date:
           $ref: "#/components/schemas/Date"
         notes:
           type: string
+          description: Notes from the curator about the update
     NewCase:
       description: >
         A "#/components/schemas/Case" with additional required fields for
@@ -1008,6 +1320,9 @@ components:
               type: string
             limitToResolution:
               type: string
+              description: >
+                Comma-separated list of resolutions to restrict geocoding to.
+                Allowed values are: Point, Admin3, Admin2, Admin1, Country.
       required:
         - caseReference
         - location
@@ -1028,18 +1343,22 @@ components:
       required:
         - origin
     User:
-      description: A user
+      description: A user of the system (researcher, policy maker, etc)
       type: object
       properties:
         allOf:
           $ref: "#/components/schemas/RoleArray"
         name:
           type: string
+          description: Full name of the user if provided by the OAuth provider
+          example: John Doe
         email:
           type: string
           format: email
+          example: foo@bar.com
         googleID:
           type: string
+          description: Unique identifier for the google account of the user
       required:
         - email
     UserArray:
@@ -1053,6 +1372,7 @@ components:
           type: integer
     Role:
       type: string
+      description: Role of a user in the system
       enum:
         - admin
         - curator
@@ -1070,18 +1390,38 @@ components:
       properties:
         country:
           type: string
+          description: English full name of a country
+          example: Costa Rica
         administrativeAreaLevel1:
           type: string
+          description: First administrative subdivision of a country
+          example: Any province in Costa Rica
         administrativeAreaLevel2:
           type: string
+          description: Second administrative subdivision of a country
+          example: Any canton in Costa Rica
         administrativeAreaLevel3:
           type: string
+          description: Third administrative subdivision of a country
+          example: Any district in Costa Rica
         place:
           type: string
+          description: Name of the place this location refers to
+          example: Boston Children's Hospital
         name:
           type: string
-        geoResolution: 
+          description: >
+            Full name of the location
+          example: Lyon, Auvergne-Rhône-Alpes, France
+        geoResolution:
           type: string
+          description: How granular the location is
+          enum:
+            - Point
+            - Admin3
+            - Admin2
+            - Admin1
+            - Country
         geometry:
           type: object
           properties:
@@ -1101,6 +1441,13 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Location"
+    BatchCaseUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchCaseUpsertResponse:
       description: Response to batch upsert case API requests
       properties:
@@ -1116,20 +1463,25 @@ components:
           description: UUIDs of cases created by the batch upsert
           items:
             type: string
+            example: 5f204ed6b986091d868a6ae4
         updatedCaseIds:
           type: array
           description: UUIDs of cases updated by the batch upsert
           items:
             type: string
+            example: 5f204ed6b986091d868a6ae4
         errors:
           type: array
           items:
             type: object
             properties:
               index:
+                description: 0-based index of the case which triggered an error
                 type: integer
               message:
                 type: string
+                description: what went wrong
+                example: Cannot parse age
             required:
               - index
               - message
@@ -1145,6 +1497,12 @@ components:
         application/json:
           schema:
             type: object
+    "200BatchCaseUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchCaseUpdateResponse"
     "200BatchCaseUpsert":
       description: OK
       content:
@@ -1219,6 +1577,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Source"
+    "200Retrieval":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Retrieval"
+    "200ParsersArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ParsersArray"
     "200Upload":
       description: OK
       content:
@@ -1274,3 +1644,7 @@ components:
 servers:
   - url: http://localhost:3001/api
     description: Local server
+  - url: http://dev-curator.ghdsi.org/api
+    description: Development server
+  - url: http://curator.ghdsi.org/api
+    description: Production server

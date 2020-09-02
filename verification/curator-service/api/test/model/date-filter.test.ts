@@ -6,4 +6,8 @@ describe('DateFilter schema', () => {
         const errors = new DateFilter(fullModel).validateSync();
         expect(errors).toBeUndefined();
     });
+    it('should not include an _id field', () => {
+        const df = new DateFilter(fullModel);
+        expect(df['_id']).toBeUndefined();
+    });
 });

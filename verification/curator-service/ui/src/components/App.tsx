@@ -6,7 +6,6 @@ import {
     IconButton,
     Menu,
     MenuItem,
-    Popper,
     Toolbar,
     useMediaQuery,
 } from '@material-ui/core';
@@ -15,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
-import Alerts from './Alerts';
+import AutomatedSourceForm from './AutomatedSourceForm';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
 import Charts from './Charts';
@@ -32,12 +31,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
+import PublishIcon from '@material-ui/icons/Publish';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
+import UploadsTable from './UploadsTable';
 import User from './User';
 import Users from './Users';
 import ViewCase from './ViewCase';
@@ -53,8 +53,10 @@ const theme = createMuiTheme({
             paper: '#ffffff',
         },
         primary: {
-            main: '#0E7569',
+            main: '#31A497',
             contrastText: '#ffffff',
+            light: '#6AD6C8',
+            dark: '#0E7569',
         },
         secondary: {
             main: '#00C6AF',
@@ -77,8 +79,20 @@ const theme = createMuiTheme({
                 color: '#5D5D5D',
                 borderRadius: '4px',
                 '&$selected': {
-                    backgroundColor: '#E7EFED',
+                    backgroundColor: '#0E75691A',
                     color: '#0E7569',
+                },
+            },
+        },
+        MuiAppBar: {
+            colorPrimary: {
+                backgroundColor: '#ECF3F0',
+            },
+        },
+        MuiCheckbox: {
+            colorSecondary: {
+                '&$checked': {
+                    color: '#31A497',
                 },
             },
         },
@@ -112,7 +126,7 @@ function TopbarMenu(): JSX.Element {
                 aria-controls="topbar-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
-                color="inherit"
+                color="primary"
             >
                 <MoreVertIcon />
             </IconButton>
@@ -166,9 +180,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     menuButton: {
         marginRight: theme.spacing(2),
     },
-    alertsButton: {
-        marginLeft: '0.5em',
-    },
     hide: {
         display: 'none',
     },
@@ -177,6 +188,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
     },
     drawerPaper: {
+        backgroundColor: '#ECF3F0',
         border: 'none',
         width: drawerWidth,
     },
@@ -224,12 +236,6 @@ export default function App(): JSX.Element {
     });
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
     const [
-        alertsAnchorEl,
-        setAlertsAnchorEl,
-    ] = React.useState<null | HTMLElement>(null);
-    const alertsRef = React.createRef<HTMLDivElement>();
-    const alertsOpen = Boolean(alertsAnchorEl);
-    const [
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
@@ -253,6 +259,12 @@ export default function App(): JSX.Element {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
+            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+        },
+        {
+            text: 'Uploads',
+            icon: <PublishIcon />,
+            to: '/uploads',
             displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
         },
         {
@@ -310,10 +322,6 @@ export default function App(): JSX.Element {
         setDrawerOpen(!drawerOpen);
     };
 
-    const toggleAlertsPanel = (): void => {
-        setAlertsAnchorEl(alertsAnchorEl ? null : alertsRef.current);
-    };
-
     const openCreateNewPopup = (event: any): void => {
         setCreateNewButtonAnchorEl(event.currentTarget);
     };
@@ -339,10 +347,14 @@ export default function App(): JSX.Element {
         <div className={classes.root}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar ref={alertsRef}>
+                <AppBar
+                    position="fixed"
+                    elevation={0}
+                    className={classes.appBar}
+                >
+                    <Toolbar>
                         <IconButton
-                            color="inherit"
+                            color="primary"
                             aria-label="toggle drawer"
                             onClick={toggleDrawer}
                             edge="start"
@@ -356,7 +368,7 @@ export default function App(): JSX.Element {
                             <Button
                                 classes={{ label: classes.buttonLabel }}
                                 variant="outlined"
-                                color="inherit"
+                                color="primary"
                                 href="/auth/logout"
                             >
                                 Logout {user?.email}
@@ -364,21 +376,11 @@ export default function App(): JSX.Element {
                         ) : (
                             <Button
                                 variant="outlined"
-                                color="inherit"
+                                color="primary"
                                 href={process.env.REACT_APP_LOGIN_URL}
                             >
                                 Login
                             </Button>
-                        )}
-                        {hasAnyRole(['curator']) && (
-                            <IconButton
-                                color="inherit"
-                                aria-label="toggle alerts panel"
-                                onClick={toggleAlertsPanel}
-                                className={classes.alertsButton}
-                            >
-                                <NotificationsIcon />
-                            </IconButton>
                         )}
                         <TopbarMenu />
                     </Toolbar>
@@ -431,6 +433,14 @@ export default function App(): JSX.Element {
                                     >
                                         <MenuItem>New bulk upload</MenuItem>
                                     </Link>
+                                    <Link
+                                        to="/sources/automated"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>
+                                            New automated source
+                                        </MenuItem>
+                                    </Link>
                                 </Menu>
                             </>
                         )}
@@ -460,18 +470,6 @@ export default function App(): JSX.Element {
                         </List>
                     </div>
                 </Drawer>
-                {hasAnyRole(['curator']) && (
-                    <Popper
-                        anchorEl={alertsAnchorEl}
-                        open={alertsOpen}
-                        placement="bottom-end"
-                        // zIndex necessary to show above table headers
-                        style={{ zIndex: 10 }}
-                        keepMounted
-                    >
-                        <Alerts />
-                    </Popper>
-                )}
                 <main
                     className={clsx(classes.content, {
                         [classes.contentShift]: drawerOpen,
@@ -485,8 +483,13 @@ export default function App(): JSX.Element {
                             </Route>
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
-                            <Route path="/sources">
-                                <SourceTable />
+                            <Route exact path="/sources">
+                                <SourceTable user={user} />
+                            </Route>
+                        )}
+                        {hasAnyRole(['curator', 'reader']) && (
+                            <Route exact path="/uploads">
+                                <UploadsTable />
                             </Route>
                         )}
                         {user.email && (
@@ -499,6 +502,14 @@ export default function App(): JSX.Element {
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
+                        {hasAnyRole(['curator']) && (
+                            <Route path="/sources/automated">
+                                <AutomatedSourceForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
                         {hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm

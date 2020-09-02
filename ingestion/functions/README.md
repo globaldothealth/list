@@ -46,10 +46,26 @@ available (3c).
 Ingestion functions are managed, developed, and deployed using the AWS
 Serverless Application Model
 ([SAM](https://aws.amazon.com/serverless/sam/)). Functions are written in
-Python and executed on a version 3.6 runtime. See set up instructions and
+Python and executed on a version 3.8 runtime. See set up instructions and
 common commands, below.
 
-### One-time setup
+### Setup for folks without AWS access
+
+If you're a first-time contributor to the project and don't have access to the S3 bucket containing the service account keys, you can run the ingestion and parsing functions fully locally, in the `retrieval/valid_scheduled_event.json`, add this auth param to it:
+
+```json
+"auth": {
+   "email": "local@ingestion.function"
+}
+```
+
+This will make the functions log-in as a new user specified by this email and use the cookies generated for this user instead of the service account creds stored on S3.
+
+Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
+
+TODO: #754 Add param to store and retrieve source content locally, not on S3.
+
+### One-time setup for people with AWS access
 
 #### Prerequisites
 
@@ -94,6 +110,9 @@ more generally about Python Lambda development
 The points at which the Lambda integration is most apparent are in testing and
 execution of code.
 
+You are free to write the parsers however you like.
+It's best to get inspiration from existing functions though and the only prerequisite for it showing up in the UI once your PR is merged in is that its name must include _"ParsingFunction"_.
+
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
@@ -106,6 +125,8 @@ python3.8 -m pytest test/my_test.py
 #### Manual local run
 
 **IMPORTANT**: Local runs still require access to a service account hosted on s3. Follow #754 for updates on how to run functions with your own creds.
+
+You need AWS sam CLi installed on your system, [follow the instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) on their website to install it.
 
 Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
 
@@ -130,10 +151,10 @@ In your parser package's `input_event.json` set the `s3Key` as `5f311a9795e33800
 Next you can invoke your parsing function:
 
 ```shell
-sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
+sam local invoke "MyParsingFunction" -e my/dir/input_event.json --docker-network=host
 ```
 
-Run this from the base `ingestion/functions` dir. The `MyFunction` name should
+Run this from the base `ingestion/functions` dir. The `MyParsingFunction` name should
 correspond to the name of the resource as defined in the SAM `template.yaml`;
 for more information on the template, read
 [this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).
@@ -144,6 +165,16 @@ Test via unit tests and manual testing prior to sending changes. A GitHub
 action
 [verifying the SAM build](../../.github/workflows/ingestion-aws-sam-build.yml)
 is run on pull requests.
+
+### Writing a parser
+
+At minima, a parser must output a list of cases that conform to the openAPI
+specifications.
+
+If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
+
+For geocoding, the parser can either hardcode a location with latitude/longitude included, in which case no geocoding will be attempted on the server.
+If it doesn't have that information it can output a `location.query` which will get geocoded by the server. If geocodes are to be restricted to a certain administrative area level, one can pass the `location.limitToResolution`. Details about those parameters are in the OpenAPI spec for the `NewCase` schema definition.
 
 ### Deployment
 
@@ -174,6 +205,23 @@ To accomodate for that, here is the procedure to write a parser that only import
 
 That parser will now import a day worth of data with a lag of 3 days, this delay is deemed is acceptable given the inability to dedupe cases.
 
+### Handling sources with unstable URLs
+
+If a source has a time-based URL scheme you can use the following date formatting directives in the source URL and those will be automatically applied when retrieving the source content:
+
+- `$FULLYEAR` is replaced with the 4 digits current year.
+- `$FULLMONTH` is replaced with the 2 digits current month.
+- `$FULLDAY` is replaced with the 2 digits current day of the month.
+- `$MONTH` is replaced with the 1 or 2 digits current month.
+- `$DAY` is replaced with the 1 or 2 digits current day of the month.
+
+For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/$FULLYEAR-$FULLMONTH-$FULLDAY.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
+
+### Encoding of sources
+
+When the retrieval function stores the contents of a source in S3, the data is automatically encoded in utf-8 so that parsers do not have to care about which
+encoding to use when reading the files.
+
 ## Parsers
 
 You can find a list of issues/FR for parsers using the [importer tag](https://github.com/globaldothealth/list/issues?q=is%3Aopen+is%3Aissue+label%3AImporter).
@@ -181,7 +229,8 @@ You can find a list of issues/FR for parsers using the [importer tag](https://gi
 Here is an overview of parsers written so far and some details about the data they collect.
 
 | Parser                      | Code                                                                                            | Remarks                                                                                                                                                                                                                                                                                             | FR   |
-| --------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+|-----------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
 | India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
 | Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided)                                                                                                                                                                                | #483 |
 | Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)  |                                                                                                                                                                                                                                                                                                     | #518 |
+| Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)     |                                                                                                                                                                                                                                                                                                     | #481 |

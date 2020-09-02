@@ -15,7 +15,7 @@ import { withStyles } from '@material-ui/core';
 const styles = (theme: Theme) =>
     createStyles({
         modalContents: {
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: '#ECF3F0',
             left: '15%',
             height: '100%',
             position: 'absolute',
@@ -24,9 +24,12 @@ const styles = (theme: Theme) =>
             width: 'calc(100vw - 15%)',
         },
         container: {
-            height: 'calc(100% - 80px)',
+            height: 'calc(100% - 64px)',
             overflow: 'auto',
             padding: '1em',
+        },
+        appBarContents: {
+            color: 'black',
         },
     });
 
@@ -43,17 +46,21 @@ class AppModal extends React.Component<Props, {}> {
             <>
                 <Modal open={true}>
                     <div className={classes.modalContents}>
-                        <AppBar position="relative">
+                        <AppBar elevation={0} position="relative">
                             <Toolbar>
                                 <IconButton
-                                    color="inherit"
+                                    classes={{ root: classes.appBarContents }}
                                     aria-label="close overlay"
                                     onClick={this.props.onModalClose}
                                     edge="start"
                                 >
                                     <CloseIcon />
                                 </IconButton>
-                                <Typography variant="h6" noWrap>
+                                <Typography
+                                    classes={{ root: classes.appBarContents }}
+                                    variant="h6"
+                                    noWrap
+                                >
                                     {this.props.title}
                                 </Typography>
                             </Toolbar>

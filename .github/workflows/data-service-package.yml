@@ -1,0 +1,31 @@
+name: Data Service Github Packages Push
+
+on:
+  # Build whenever a PR is merged into the main branch.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/data-service-package.yml"
+      - "data-serving/data-service/**"
+    # Build whenever a new tag is created.
+    tags:
+      - "*"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          # https://github.com/globaldothealth/list/settings/secrets
+          # https://docs.github.com/en/packages/getting-started-with-github-container-registry/migrating-to-github-container-registry-for-docker-images#authenticating-with-the-container-registry
+          password: ${{ secrets.CR_PAT }}
+          registry: ghcr.io
+          repository: ${{github.repository}}/dataservice
+          dockerfile: data-serving/data-service/Dockerfile
+          add_git_labels: true
+          tag_with_ref: true
+          tag_with_sha: true

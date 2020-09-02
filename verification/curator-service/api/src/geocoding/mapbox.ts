@@ -12,9 +12,15 @@ import LRUCache from 'lru-cache';
 import MapboxAdminsFetcher from './adminsFetcher';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 
-// getFeatureTypeFromContext will return the feature 'text' field if it is of the provided type.
-// The types in the context fields are a prefix of the ID. E.g 'region.foo' will be a feature of type 'region'.
-function getFeatureTypeFromContext(
+/**
+ * getFeatureDescriptionFromContext will return the feature 'text' field if it is of the provided type.
+ * The types in the context fields are a prefix of the ID. E.g 'region.foo' will be a feature of type 'region'.
+ * @param context: A geocode feature to get the desired type from.
+ * @param type: The desired type.
+ *
+ * @returns the description (text) of the feature with the given type.
+ */
+function getFeatureDescriptionFromContext(
     context: GeocodeFeature[],
     type: string,
 ): string {
@@ -125,8 +131,14 @@ export default class MapboxGeocoder {
                             longitude: feature.center[0],
                             latitude: feature.center[1],
                         },
-                        country: getFeatureTypeFromContext(contexts, 'country'),
-                        place: getFeatureTypeFromContext(contexts, 'poi'),
+                        country: getFeatureDescriptionFromContext(
+                            contexts,
+                            'country',
+                        ),
+                        place: getFeatureDescriptionFromContext(
+                            contexts,
+                            'poi',
+                        ),
                         name: feature.place_name,
                         geoResolution: getResolution(contexts),
                     };
