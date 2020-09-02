@@ -1,11 +1,23 @@
+import {
+    Button,
+    Divider,
+    MenuItem,
+    Theme,
+    WithStyles,
+    createStyles,
+    withStyles,
+} from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core';
+import React, { RefObject } from 'react';
 
+import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
-import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import User from './User';
+import SourceRetrievalButton from './SourceRetrievalButton';
+import ParsersAutocomplete from './ParsersAutocomplete';
 
 interface ListResponse {
     sources: Source[];
@@ -38,8 +50,13 @@ interface Schedule {
 
 interface Automation {
     parser?: Parser;
-    schedule: Schedule;
+    schedule?: Schedule;
     regexParsing?: RegexParsing;
+}
+
+interface DateFilter {
+    numDaysBeforeToday?: number;
+    op?: string;
 }
 
 interface Source {
@@ -48,11 +65,13 @@ interface Source {
     format?: string;
     origin: Origin;
     automation?: Automation;
+    dateFilter?: DateFilter;
 }
 
 interface SourceTableState {
     url: string;
     error: string;
+    pageSize: number;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -61,9 +80,15 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+    // automation.parser
+
+    format?: string;
+    awsLambdaArn?: string;
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
+    // dateFilter
+    dateFilter?: DateFilter;
 }
 
 // Return type isn't meaningful.
@@ -74,39 +99,31 @@ const styles = (theme: Theme) =>
             color: 'red',
             marginTop: theme.spacing(2),
         },
+        alert: {
+            borderRadius: theme.spacing(1),
+            marginTop: theme.spacing(2),
+        },
+        divider: {
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
+        },
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-type Props = WithStyles<typeof styles>;
+interface Props extends WithStyles<typeof styles> {
+    user: User;
+}
 
 class SourceTable extends React.Component<Props, SourceTableState> {
+    tableRef: RefObject<any> = React.createRef();
+
     constructor(props: Props) {
         super(props);
         this.state = {
             url: '/api/sources/',
             error: '',
+            pageSize: 10,
         };
-    }
-
-    addSource(rowData: TableRow): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            if (
-                !(
-                    this.validateRequired(rowData.name) &&
-                    this.validateRequired(rowData.url) &&
-                    this.validateAutomationFields(rowData)
-                )
-            ) {
-                return reject();
-            }
-            const newSource = this.createSourceFromRowData(rowData);
-            this.setState({ error: '' });
-            const response = axios.post(this.state.url, newSource);
-            response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
-                reject(e);
-            });
-        });
     }
 
     deleteSource(rowData: TableRow): Promise<unknown> {
@@ -152,35 +169,10 @@ class SourceTable extends React.Component<Props, SourceTableState> {
     }
 
     /**
-     * Creates a source from the provided table row data.
-     *
-     * For new sources, an AWS rule ARN won't be defined (instead, it's created
-     * by the server upon receiving the create request). A schedule expression
-     * may be supplied, and indicates the intent to create a corresponding AWS
-     * scheduled event rule to automate source ingestion.
-     */
-    createSourceFromRowData(rowData: TableRow): Source {
-        return {
-            _id: rowData._id,
-            name: rowData.name,
-            origin: {
-                url: rowData.url,
-            },
-            automation: rowData.awsScheduleExpression
-                ? {
-                    schedule: {
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
-                : undefined,
-        };
-    }
-
-    /**
      * Updates a source from the provided table row data.
      *
      * Unlike for creation, an AWS rule ARN may be supplied alongside a
-     * schedule expression.
+     * schedule expression (and optionally, a parser Lambda ARN).
      */
     updateSourceFromRowData(rowData: TableRow): Source {
         return {
@@ -189,14 +181,28 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             origin: {
                 url: rowData.url,
             },
-            automation: rowData.awsScheduleExpression
-                ? {
-                    schedule: {
-                        awsRuleArn: rowData.awsRuleArn,
-                        awsScheduleExpression: rowData.awsScheduleExpression,
-                    },
-                }
-                : undefined,
+            format: rowData.format,
+            automation:
+                rowData.awsScheduleExpression || rowData.awsLambdaArn
+                    ? {
+                          parser: rowData.awsLambdaArn
+                              ? {
+                                    awsLambdaArn: rowData.awsLambdaArn,
+                                }
+                              : undefined,
+                          schedule: rowData.awsScheduleExpression
+                              ? {
+                                    awsRuleArn: rowData.awsRuleArn,
+                                    awsScheduleExpression:
+                                        rowData.awsScheduleExpression,
+                                }
+                              : undefined,
+                      }
+                    : undefined,
+            dateFilter:
+                rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
+                    ? rowData.dateFilter
+                    : undefined,
         };
     }
 
@@ -223,7 +229,17 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         return (
             <div>
                 <Paper>
+                    {this.state.error && (
+                        <MuiAlert
+                            classes={{ root: classes.alert }}
+                            variant="filled"
+                            severity="error"
+                        >
+                            {this.state.error}
+                        </MuiAlert>
+                    )}
                     <MaterialTable
+                        tableRef={this.tableRef}
                         columns={[
                             { title: 'ID', field: '_id', editable: 'never' },
                             {
@@ -275,6 +291,32 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                             },
                             {
+                                title: 'Format',
+                                field: 'format',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        select
+                                        size="small"
+                                        fullWidth
+                                        data-testid="format-select"
+                                        placeholder="Format"
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value || ''}
+                                    >
+                                        {['', 'JSON', 'CSV'].map((value) => (
+                                            <MenuItem
+                                                key={`format-${value}`}
+                                                value={value || ''}
+                                            >
+                                                {value || 'Unknown'}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                ),
+                            },
+                            {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
                             },
@@ -283,11 +325,125 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 field: 'awsRuleArn',
                                 editable: 'never',
                             },
+                            {
+                                title: 'Parser function',
+                                field: 'awsLambdaArn',
+                                editComponent: (props): JSX.Element => (
+                                    <ParsersAutocomplete
+                                        defaultValue={props.value || ''}
+                                        onChange={props.onChange}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Date filtering',
+                                field: 'dateFilter',
+                                render: (rowData): JSX.Element =>
+                                    rowData.dateFilter?.op === 'EQ' ? (
+                                        <div>
+                                            Only parse data from{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            days ago
+                                        </div>
+                                    ) : rowData.dateFilter?.op === 'LT' ? (
+                                        <div>
+                                            Parse all data up to{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            ago
+                                        </div>
+                                    ) : (
+                                        <div>None</div>
+                                    ),
+                                editComponent: (props): JSX.Element => (
+                                    <>
+                                        Only parse data
+                                        <TextField
+                                            select
+                                            fullWidth
+                                            size="small"
+                                            data-testid="op-select"
+                                            placeholder="Operator"
+                                            onChange={(event): void =>
+                                                props.onChange({
+                                                    numDaysBeforeToday:
+                                                        props.value
+                                                            ?.numDaysBeforeToday,
+                                                    op: event.target.value,
+                                                })
+                                            }
+                                            value={props.value?.op || ''}
+                                        >
+                                            {[
+                                                { text: 'Unknown', value: '' },
+                                                {
+                                                    text: 'from exactly',
+                                                    value: 'EQ',
+                                                },
+                                                { text: 'up to', value: 'LT' },
+                                            ].map((pair) => (
+                                                <MenuItem
+                                                    key={`op-${pair.value}`}
+                                                    value={pair.value || ''}
+                                                >
+                                                    {pair.text}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                        <TextField
+                                            size="small"
+                                            fullWidth
+                                            data-testid="num-days"
+                                            placeholder="days"
+                                            onChange={(event): void =>
+                                                props.onChange({
+                                                    numDaysBeforeToday:
+                                                        event.target.value,
+                                                    op: props.value?.op,
+                                                })
+                                            }
+                                            value={
+                                                props.value
+                                                    ?.numDaysBeforeToday || ''
+                                            }
+                                        ></TextField>
+                                        days ago
+                                        <Divider
+                                            variant="middle"
+                                            className={classes.divider}
+                                        />
+                                        <Button
+                                            variant="contained"
+                                            data-testid="clear-date-filter"
+                                            onClick={() => {
+                                                props.onChange({});
+                                            }}
+                                        >
+                                            Clear
+                                        </Button>
+                                    </>
+                                ),
+                            },
+                            {
+                                title: 'Curation actions',
+                                render: (row): JSX.Element => (
+                                    <SourceRetrievalButton sourceId={row._id} />
+                                ),
+                                editable: 'never',
+                                hidden: !this.props.user.roles.includes(
+                                    'curator',
+                                ),
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
                                 let listUrl = this.state.url;
-                                listUrl += '?limit=' + query.pageSize;
+                                listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
                                 this.setState({ error: '' });
                                 const response = axios.get<ListResponse>(
@@ -301,13 +457,18 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             flattenedSources.push({
                                                 _id: s._id,
                                                 name: s.name,
+                                                format: s.format,
                                                 url: s.origin.url,
+                                                awsLambdaArn:
+                                                    s.automation?.parser
+                                                        ?.awsLambdaArn,
                                                 awsRuleArn:
                                                     s.automation?.schedule
                                                         ?.awsRuleArn,
                                                 awsScheduleExpression:
                                                     s.automation?.schedule
                                                         ?.awsScheduleExpression,
+                                                dateFilter: s.dateFilter,
                                             });
                                         }
                                         resolve({
@@ -328,26 +489,41 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             // https://docs.mongodb.com/manual/text-search/
                             search: false,
                             filtering: false,
-                            pageSize: 10,
+                            sorting: false,
+                            emptyRowsWhenPaging: false,
+                            padding: 'dense',
+                            draggable: false, // No need to be able to drag and drop headers.
+                            pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                            maxBodyHeight: 'calc(100vh - 15em)',
+                            headerStyle: {
+                                zIndex: 1,
+                            },
                         }}
-                        editable={{
-                            onRowAdd: (rowData: TableRow): Promise<unknown> =>
-                                this.addSource(rowData),
-                            onRowUpdate: (
-                                newRowData: TableRow,
-                                oldRowData: TableRow | undefined,
-                            ): Promise<unknown> =>
-                                this.editSource(newRowData, oldRowData),
-                            onRowDelete: (
-                                rowData: TableRow,
-                            ): Promise<unknown> => this.deleteSource(rowData),
+                        onChangeRowsPerPage={(newPageSize: number) => {
+                            this.setState({ pageSize: newPageSize });
+                            this.tableRef.current.onQueryChange();
                         }}
+                        editable={
+                            this.props.user.roles.includes('curator')
+                                ? {
+                                      onRowUpdate: (
+                                          newRowData: TableRow,
+                                          oldRowData: TableRow | undefined,
+                                      ): Promise<unknown> =>
+                                          this.editSource(
+                                              newRowData,
+                                              oldRowData,
+                                          ),
+                                      onRowDelete: (
+                                          rowData: TableRow,
+                                      ): Promise<unknown> =>
+                                          this.deleteSource(rowData),
+                                  }
+                                : undefined
+                        }
                     />
                 </Paper>
-                {this.state.error && (
-                    <div className={classes.error}>{this.state.error}</div>
-                )}
             </div>
         );
     }

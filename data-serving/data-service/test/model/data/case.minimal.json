@@ -1,4 +1,8 @@
 {
+    "caseReference": {
+        "sourceId": "5ea86423bae6982635d2e1f8",
+        "sourceUrl": "cdc.gov"
+    },
     "events": [
         {
             "name": "confirmed",
@@ -8,17 +12,20 @@
             }
         }
     ],
-    "sources": [
-        {
-            "url": "cdc.gov"
-        }
-    ],
-    "revisionMetadata": {
-        "id": 0,
-        "moderator": "abc",
-        "date": "2020-01-03T05:00:00Z"
-    },
     "location": {
-        "country": "China"
+        "country": "Canada",
+        "geoResolution": "Country",
+        "geometry": {
+            "latitude": 2.3522219,
+            "longitude": 48.85661400000001
+        },
+        "name": "Canada"
+    },
+    "revisionMetadata": {
+        "revisionNumber": 0,
+        "creationMetadata": {
+            "curator": "abc123",
+            "date": "2020-01-03T00:00:00.000Z"
+        }
     }
 }

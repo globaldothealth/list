@@ -4,10 +4,18 @@ import { fireEvent, render } from '@testing-library/react';
 
 import React from 'react';
 import SourceTable from './SourceTable';
+import User from './User';
 import axios from 'axios';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const curator: User = {
+    _id: 'testUser',
+    name: 'Alice Smith',
+    email: 'foo@bar.com',
+    roles: ['admin', 'curator'],
+};
 
 afterEach(() => {
     mockedAxios.get.mockClear();
@@ -20,25 +28,31 @@ it('loads and displays sources', async () => {
     const sourceId = 'abc123';
     const sourceName = 'source_name';
     const originUrl = 'origin url';
+    const format = 'JSON';
+    const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
     const awsRuleArn = 'arn:aws:events:a:b:rule/c';
     const awsScheduleExpression = 'rate(2 hours)';
     const sources = [
         {
             _id: sourceId,
             name: sourceName,
-            format: 'format',
+            format: format,
             origin: {
                 url: originUrl,
                 license: 'origin license',
             },
             automation: {
                 parser: {
-                    awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
+                    awsLambdaArn: awsLambdaArn,
                 },
                 schedule: {
                     awsRuleArn: awsRuleArn,
                     awsScheduleExpression: awsScheduleExpression,
                 },
+            },
+            dateFilter: {
+                numDaysBeforeToday: 666,
+                op: 'EQ',
             },
         },
     ];
@@ -54,7 +68,7 @@ it('loads and displays sources', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<SourceTable />);
+    const { findByText } = render(<SourceTable user={curator} />);
 
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -66,7 +80,12 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(sourceId))).toBeInTheDocument();
     expect(await findByText(new RegExp(sourceName))).toBeInTheDocument();
     expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
+    expect(await findByText(new RegExp(format))).toBeInTheDocument();
+    expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
+    expect(
+        await findByText('Only parse data from 666 days ago'),
+    ).toBeInTheDocument();
     expect(
         await findByText(
             new RegExp(awsScheduleExpression.replace(/(?=[()])/g, '\\')),
@@ -80,7 +99,7 @@ it('API errors are displayed', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
+            format: 'JSON',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
@@ -108,16 +127,22 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/sources/?limit=10&page=1',
+    );
+    const row = await findByText(/abc123/);
+    expect(row).toBeInTheDocument();
 
-    // Throw error on add request.
-    mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
+    // Throw error on delete request.
+    mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
+    const deleteButton = getByText(/delete_outline/);
+    fireEvent.click(deleteButton);
     const confirmButton = getByText(/check/);
     fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
     expect(error).toBeInTheDocument();
@@ -128,7 +153,7 @@ it('can delete a row', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
+            format: 'JSON',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
@@ -157,7 +182,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -199,80 +224,8 @@ it('can delete a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = queryByText(/abc123/);
-    expect(newRow).not.toBeInTheDocument();
-});
-
-it('can add a row', async () => {
-    const axiosGetResponse = {
-        data: {
-            sources: [],
-            total: 0,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
-
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
-
-    // Check table is empty on load
-    const row = queryByText(/abc123/);
-    expect(row).not.toBeInTheDocument();
-
-    // Add a row
-    const newSource = {
-        _id: 'abc123',
-        name: 'source_name',
-        format: 'format',
-        origin: {
-            url: 'origin url',
-            license: 'origin license',
-        },
-        automation: {
-            parser: {
-                awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
-            },
-            schedule: {
-                awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                awsScheduleExpression: 'rate(2 hours)',
-            },
-        },
-    };
-    const axiosPostResponse = {
-        data: {
-            source: newSource,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    const axiosGetAfterAddResponse = {
-        data: {
-            sources: [newSource],
-            total: 1,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
-    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
-
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-
-    // Check table is reloaded
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = await findByText(/abc123/);
-    expect(newRow).toBeInTheDocument();
+    const noRec = await findByText(/No records to display/);
+    expect(noRec).toBeInTheDocument();
 });
 
 it('can edit a row', async () => {
@@ -280,7 +233,6 @@ it('can edit a row', async () => {
         {
             _id: 'abc123',
             name: 'source_name',
-            format: 'format',
             origin: {
                 url: 'origin url',
                 license: 'origin license',
@@ -308,7 +260,9 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText, queryByText } = render(
+        <SourceTable user={curator} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -323,7 +277,7 @@ it('can edit a row', async () => {
             name: 'source_name',
             format: 'format',
             origin: {
-                url: 'new origin url',
+                url: 'new source url',
                 license: 'origin license',
             },
             automation: {
@@ -366,8 +320,8 @@ it('can edit a row', async () => {
 
     // Check table data is reloaded
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    const editedRow = await findByText('new source url');
+    expect(editedRow).toBeInTheDocument();
     const oldRow = queryByText('origin url');
     expect(oldRow).not.toBeInTheDocument();
-    const editedRow = await findByText('new origin url');
-    expect(editedRow).toBeInTheDocument();
 });

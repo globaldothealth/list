@@ -1,18 +1,46 @@
 {
+    "caseReference": {
+        "sourceId": "5ea86423bae6982635d2e1f8",
+        "sourceEntryId": "entryId",
+        "sourceUrl": "cdc.gov",
+        "uploadId": "012345678901234567890123",
+        "verificationStatus": "VERIFIED",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
+    },
     "demographics": {
         "ageRange": {
             "start": 50.0,
             "end": 59.0
         },
-        "sex": "Female",
-        "species": "Homo sapien"
+        "gender": "Female",
+        "occupation": "Horse trainer",
+        "nationalities": [
+            "Swedish"
+        ],
+        "ethnicity": "Other"
     },
+    "genomeSequences": [
+        {
+            "sampleCollectionDate": "2019-12-30",
+            "repositoryUrl": "https://www.ncbi.nlm.nih.gov/nuccore/NC_045512",
+            "sequenceId": "NC_045512.2",
+            "sequenceName": "Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome",
+            "sequenceLength": 33000
+        }
+    ],
     "location": {
-        "id": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
         "country": "France",
         "administrativeAreaLevel1": "Île-de-France",
         "administrativeAreaLevel2": "Paris",
-        "locality": "Paris",
+        "name": "Wuhan",
+        "geoResolution": "Admin2",
         "geometry": {
             "latitude": 2.3522219,
             "longitude": 48.85661400000001
@@ -28,6 +56,7 @@
         },
         {
             "name": "confirmed",
+            "value": "PCR test",
             "dateRange": {
                 "start": 1578891600000,
                 "end": 1578891600000
@@ -41,7 +70,8 @@
             }
         },
         {
-            "name": "discharged",
+            "name": "outcome",
+            "value": "Recovered",
             "dateRange": {
                 "start": "1581483600000",
                 "end": "1581483600000"
@@ -49,95 +79,102 @@
         }
     ],
     "symptoms": {
-        "provided": [
-            "severe pneumonia",
-            "dyspnea",
-            "weakness"
+        "values": [
+            "Severe pneumonia",
+            "Dyspnea",
+            "Weakness"
         ],
-        "imputed": [
-            "severe pneumonia",
-            "pneumonia",
-            "dyspnea",
-            "difficulty breathing",
-            "weakness"
-        ]
+        "status": "Symptomatic"
     },
-    "chronicDisease": {
-        "provided": [
-            "hypertension",
-            "type 2 diabetes",
-            "coronary heart disease",
-            "lung cancer"
+    "preexistingConditions": {
+        "values": [
+            "Hypertension",
+            "Type 2 diabetes",
+            "Coronary heart disease",
+            "Lung cancer"
         ],
-        "imputed": [
-            "hypertension",
-            "type 2 diabetes",
-            "diabetes",
-            "coronary heart disease",
-            "heart disease",
-            "lung cancer",
-            "cancer"
-        ]
+        "hasPreexistingConditions": true
     },
-    "travelHistory": [
-        {
-            "location": {
-                "id": "ChIJb_KF3fiuLjQRECJYbKzJwjk",
-                "country": "China",
-                "administrativeAreaLevel1": "Hubei",
-                "locality": "Wuhan",
-                "geometry": {
-                    "latitude": 30.592849,
-                    "longitude": 114.305539
-                }
-            },
-            "dateRange": {
-                "start": "2020-01-03",
-                "end": "2020-01-03"
-            },
-            "purpose": "Family",
-            "additionalInformation": "large family gathering for holidays"
-        }
-    ],
+    "travelHistory": {
+        "travel": [
+            {
+                "dateRange": {
+                    "start": "2020-01-10",
+                    "end": "2020-01-17"
+                },
+                "location": {
+                    "country": "United States",
+                    "administrativeAreaLevel1": "New York",
+                    "administrativeAreaLevel2": "Kings County",
+                    "administrativeAreaLevel3": "Brooklyn",
+                    "place": "Kings County Hospital Center",
+                    "name": "Kings County Hospital Center",
+                    "geoResolution": "Point",
+                    "geometry": {
+                        "latitude": 40.6809611,
+                        "longitude": -73.9740028
+                    }
+                },
+                "methods": [
+                    "Plane"
+                ],
+                "purpose": "Family"
+            }
+        ],
+        "traveledPrior30Days": true
+    },
     "sources": [
         {
             "id": "def456",
             "url": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
         }
     ],
-    "outbreakSpecifics": {
-        "livesInWuhan": false,
-        "reportedMarketExposure": true
-    },
     "pathogens": [
         {
-            "name": "sars-cov-2",
-            "sequenceSources": [
-                {
-                    "id": "ghi789"
-                }
-            ]
+            "name": "COVID-19",
+            "id": 304
         },
         {
-            "name": "e. coli",
-            "additionalInformation": "patient had a urinary catheter"
+            "name": "Pneumonia",
+            "id": 104
         }
     ],
     "notes": "Contact of a confirmed case at work.",
     "revisionMetadata": {
-        "id": 0,
-        "moderator": "abc123",
-        "date": "2020-01-03",
-        "notes": "initial data entry"
+        "revisionNumber": 0,
+        "creationMetadata": {
+            "curator": "abc123",
+            "date": "2020-01-03",
+            "notes": "initial data entry"
+        },
+        "updateMetadata": {
+            "curator": "xyz789",
+            "date": "2020-01-13",
+            "notes": "fix source error"
+        }
+    },
+    "transmission": {
+        "routes": [
+            "Vector borne"
+        ],
+        "places": [
+            "Gym"
+        ],
+        "linkedCaseIds": [
+            "abc",
+            "def"
+        ]
     },
     "importedCase": {
-        "additionalInformation": "Contact of a confirmed case at work.",
-        "notesForDiscussion": "Other stuff from notes",
-        "geoResolution": "admin_2",
+        "ID": "xyz",
+        "additional_information": "Contact of a confirmed case at work.",
+        "notes_for_discussion": "Other stuff from notes",
+        "geo_resolution": "admin_2",
         "symptoms": "severe pneumonia:dyspnea:weakness:some free-form symptoms:that don't match the symptom dictionary\"",
-        "chronicDiseaseBinary": true,
-        "chronicDisease": "hypertension:type 2 diabetes:coronary heart disease:lung cancer:some free-form chronic diseases:that don't match the chronic disease dictionary",
+        "chronic_disease_binary": "true",
         "outcome": "discharge 2/12",
-        "adminId": "291"
+        "admin_id": "291",
+        "lives_in_Wuhan": "false",
+        "reported_market_exposure": "true"
     }
 }

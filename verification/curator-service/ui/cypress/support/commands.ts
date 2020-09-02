@@ -1,28 +1,65 @@
+import 'cypress-file-upload';
+
 declare global {
+    // One-off Cypress setup.
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Cypress {
         interface Chainable {
-            addCase: (
-                country: string,
-                notes: string,
-                sourceUrl: string,
-            ) => void;
-            login: () => void;
-            addSource: (name: string, url: string) => void;
+            addCase: (opts: {
+                country: string;
+                methodOfConfirmation?: string;
+                nationalities?: string[];
+                notes?: string;
+                occupation?: string;
+                symptomStatus?: string;
+                symptoms?: string[];
+                transmissionPlaces?: string[];
+            }) => void;
+            login: (opts: {
+                name: string;
+                email: string;
+                roles: string[];
+            }) => void;
+            addSource: (name: string, url: string, uploads?: []) => void;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            seedLocation: (loc: any) => void;
+            clearSeededLocations: () => void;
         }
     }
 }
 
-export function addCase(
-    country: string,
-    notes: string,
-    sourceUrl: string,
-): void {
+export function addCase(opts: {
+    country: string;
+    methodOfConfirmation?: string;
+    nationalities?: string[];
+    notes?: string;
+    occupation?: string;
+    symptomStatus?: string;
+    symptoms?: string[];
+    transmissionPlaces?: string[];
+    uploadId?: string;
+}): void {
     cy.request({
         method: 'POST',
         url: '/api/cases',
         body: {
+            caseReference: {
+                sourceId: '5ef8e943dfe6e00030892d58',
+                sourceUrl: 'www.example.com',
+                uploadId: opts.uploadId,
+            },
+            demographics: {
+                nationalities: opts.nationalities,
+                occupation: opts.occupation,
+            },
             location: {
-                country: country,
+                country: opts.country,
+                geoResolution: 'Country',
+                geometry: {
+                    latitude: 42,
+                    longitude: 12,
+                },
+                name: opts.country,
             },
             events: [
                 {
@@ -30,19 +67,17 @@ export function addCase(
                     dateRange: {
                         start: new Date().toJSON(),
                     },
+                    value: opts.methodOfConfirmation,
                 },
             ],
-            notes: notes,
-            sources: [
-                {
-                    url: sourceUrl,
-                },
-            ],
-            revisionMetadata: {
-                date: new Date().toJSON(),
-                id: 0,
-                moderator: 'test',
+            symptoms: {
+                status: opts.symptomStatus ?? undefined,
+                values: opts.symptoms ?? [],
             },
+            transmission: {
+                places: opts.transmissionPlaces ?? [],
+            },
+            notes: opts.notes,
         },
     });
 }
@@ -63,7 +98,23 @@ export function login(opts: {
     });
 }
 
-export function addSource(name: string, url: string): void {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function seedLocation(loc: any): void {
+    cy.request({
+        method: 'POST',
+        url: '/api/geocode/seed',
+        body: loc,
+    });
+}
+
+export function clearSeededLocations(): void {
+    cy.request({
+        method: 'POST',
+        url: '/api/geocode/clear',
+    });
+}
+
+export function addSource(name: string, url: string, uploads?: []): void {
     cy.request({
         method: 'POST',
         url: '/api/sources',
@@ -72,6 +123,8 @@ export function addSource(name: string, url: string): void {
             origin: {
                 url: url,
             },
+            uploads: uploads,
+            format: 'JSON',
         },
     });
 }
@@ -79,3 +132,5 @@ export function addSource(name: string, url: string): void {
 Cypress.Commands.add('addCase', addCase);
 Cypress.Commands.add('login', login);
 Cypress.Commands.add('addSource', addSource);
+Cypress.Commands.add('seedLocation', seedLocation);
+Cypress.Commands.add('clearSeededLocations', clearSeededLocations);

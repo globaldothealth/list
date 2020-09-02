@@ -1,18 +1,22 @@
-import { SourceDocument, sourceSchema } from './source';
-
 import mongoose from 'mongoose';
+import { positiveIntFieldInfo } from './positive-int';
 
-export const pathogenSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: 'Enter a pathogen name',
+export const pathogenSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            index: true,
+        },
+        id: {
+            ...positiveIntFieldInfo,
+            required: true,
+        },
     },
-    sequenceSources: [sourceSchema],
-    additionalInformation: String,
-});
+    { _id: false },
+);
 
 export type PathogenDocument = mongoose.Document & {
     name: string;
-    sequenceSources: [SourceDocument];
-    additionalInformation: string;
+    id: string;
 };

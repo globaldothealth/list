@@ -1,0 +1,160 @@
+{
+    "_id": "5ef8e943dfe6e00030892d58",
+    "caseReference": {
+        "sourceId": "5ea86423bae6982635d2e1f8",
+        "sourceEntryId": "entryId",
+        "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19",
+        "additionalSources": [
+            {
+                "sourceUrl": "twitter.com/a-tweet"
+            },
+            {
+                "sourceUrl": "news.org/an-article"
+            }
+        ]
+    },
+    "demographics": {
+        "ageRange": {
+            "start": 50.0,
+            "end": 59.0
+        },
+        "gender": "Non-binary/Third gender",
+        "occupation": "Horse breeder",
+        "nationalities": ["Swedish"],
+        "ethnicity": "Asian"
+    },
+    "genomeSequences": [
+        {
+            "sampleCollectionDate": "2019-12-30",
+            "repositoryUrl": "https://www.ncbi.nlm.nih.gov/nuccore/NC_045512",
+            "sequenceId": "NC_045512.2",
+            "sequenceName": "Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome",
+            "sequenceLength": 33000
+        }
+    ],
+    "location": {
+        "country": "France",
+        "administrativeAreaLevel1": "Île-de-F",
+        "administrativeAreaLevel2": "Paris",
+        "name": "Wuhan",
+        "geoResolution": "Admin2",
+        "geometry": {
+            "latitude": 2.3522219,
+            "longitude": 48.85661400000001
+        }
+    },
+    "events": [
+        {
+            "name": "onsetSymptoms",
+            "dateRange": {
+                "start": "2020-01-01",
+                "end": "2020-01-01"
+            }
+        },
+        {
+            "name": "confirmed",
+            "value": "PCR test",
+            "dateRange": {
+                "start": "2020-01-02",
+                "end": "2020-01-02"
+            }
+        },
+        {
+            "name": "hospitalAdmission",
+            "dateRange": {
+                "start": "2020-01-03",
+                "end": "2020-01-03"
+            },
+            "value": "Yes"
+        },
+        {
+            "name": "icuAdmission",
+            "dateRange": {
+                "start": "2020-01-04",
+                "end": "2020-01-05"
+            },
+            "value": "Yes"
+        },
+        {
+            "name": "outcome",
+            "value": "Recovered",
+            "dateRange": {
+                "start": "2020-01-06",
+                "end": "2020-01-06"
+            }
+        }
+    ],
+    "symptoms": {
+        "values": [
+            "Severe pneumonia",
+            "Dyspnea",
+            "Weakness"
+        ],
+        "status": "Symptomatic"
+    },
+    "preexistingConditions": {
+        "values": [
+            "Hypertension",
+            "Type 2 diabetes",
+            "Coronary heart disease",
+            "Lung cancer"
+        ],
+        "hasPreexistingConditions": true
+    },
+    "travelHistory": {
+        "travel": [
+            {
+                "dateRange": {
+                    "start": "2020-02-10",
+                    "end": "2020-02-17"
+                },
+                "location": {
+                    "country": "United States",
+                    "administrativeAreaLevel1": "New York",
+                    "administrativeAreaLevel2": "Kings County",
+                    "administrativeAreaLevel3": "Brooklyn",
+                    "place": "Kings Hospital Center",
+                    "name": "Kings Hospital Center",
+                    "geoResolution": "Point",
+                    "geometry": {
+                        "latitude": 40.6809611,
+                        "longitude": -73.9740028
+                    }
+                },
+                "methods": [ "Plane" ],
+                "purpose": "Family"
+            }
+        ],
+        "traveledPrior30Days": true
+    },
+    "pathogens": [
+        {
+            "name": "COVID-19",
+            "id": 304
+        },
+        {
+            "name": "Pneumonia",
+            "id": 104
+        }
+    ],
+    "notes": "Contact of a confirmed case at work.",
+    "revisionMetadata": {
+        "revisionNumber": 1,
+        "creationMetadata": {
+            "curator": "abc123",
+            "date": "2020-01-20",
+            "notes": "initial data entry"
+        },
+        "updateMetadata": {
+            "curator": "xyz789",
+            "date": "2020-04-13",
+            "notes": "fix source error"
+        }
+    },
+    "transmission": {
+        "routes": [ "Vector borne" ],
+        "places": [ "Gym" ],
+        "linkedCaseIds": [ "bbf8e943dfe6e00030892dcc", "aaf8e943dfe6e00030892dee" ]
+    },
+    "importedCase": {}
+}

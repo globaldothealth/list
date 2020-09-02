@@ -1,0 +1,26 @@
+{
+    "travel": [
+        {
+            "dateRange": {
+                "start": "2020-01-10",
+                "end": "2020-01-17"
+            },
+            "location": {
+                "country": "United States",
+                "administrativeAreaLevel1": "New York",
+                "administrativeAreaLevel2": "Kings County",
+                "administrativeAreaLevel3": "Brooklyn",
+                "place": "Kings County Hospital Center",
+                "name": "Kings County Hospital Center",
+                "geoResolution": "Point",
+                "geometry": {
+                    "latitude": 40.6809611,
+                    "longitude": -73.9740028
+                }
+            },
+            "methods": [ "Plane" ],
+            "purpose": "Family"
+        }
+    ],
+    "traveledPrior30Days": true
+}

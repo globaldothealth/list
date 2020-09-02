@@ -4,7 +4,7 @@
         "url": "foo.bar",
         "license": "MIT"
     },
-    "format": "PDF",
+    "format": "CSV",
     "automation": {
         "parser": {
             "awsLambdaArn": "arn:aws:lambda:region:id:function:name"
@@ -13,5 +13,20 @@
             "awsRuleArn": "arn:aws:events:region:id:rule/name",
             "awsScheduleExpression": "cron(0 10 * * ? *)"
         }
+    },
+    "uploads": [
+        {
+            "status": "ERROR",
+            "summary": {
+                "numCreated": 0,
+                "numUpdated": 0,
+                "error": "INTERNAL_ERROR"
+            },
+            "created": "2020-01-13"
+        }
+    ],
+    "dateFilter": {
+        "numDaysBeforeToday": 3,
+        "op": "EQ"
     }
 }

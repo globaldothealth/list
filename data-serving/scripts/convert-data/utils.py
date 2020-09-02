@@ -4,6 +4,7 @@ import datetime
 import logging
 from typing import List
 from urllib.parse import urlparse
+from constants import SHEET_ID_NAME_MAP
 
 
 def is_url(value: str) -> bool:
@@ -36,5 +37,20 @@ def format_iso_8601_date(value: datetime) -> str:
     return value.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def warn(id: str, field_name: str, value: str, error: Exception) -> None:
-    logging.warning('[%s] [%s] "%s": %s', id, field_name, value, error)
+def log_error(
+        id: str, old_field_name: str, new_field_name: str, value: str,
+        error: Exception) -> None:
+    # Split on the last dash to get (sheet_id, row_num) pairs. A couple of the
+    # sheet ids have a dash within them.
+    id_parts = id.rsplit('-', 1)
+    sheet_id = id_parts[0]
+    row_num = id_parts[1]
+
+    logging.error('\t'.join([
+                  sheet_id,
+                  SHEET_ID_NAME_MAP.get(sheet_id, ''),
+                  row_num,
+                  old_field_name,
+                  new_field_name,
+                  value,
+                  str(error)]))

@@ -1,4 +1,4 @@
-# Kubernetes deployment file for the epid service on AWS.
+# Kubernetes deployment file for the Global Health service on AWS.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,45 +30,54 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-dev"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: google_oauth_client_id
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-287t4897k8
+                  name: curator-dev-bch28c9gkm
                   key: aws_secret_access_key
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -91,7 +100,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.pkg.github.com/open-covid-data/healthmap-gdo-temp/curatorservice:sha-946b540
+          image: docker.io/healthmapidha/curatorservice:0.0.12
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -101,74 +110,75 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-prod"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: db_connection_string
             - name: SESSION_COOKIE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: session_cookie_key
             - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: google_oauth_client_secret
             - name: GOOGLE_OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: google_oauth_client_id
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: aws_access_key_id
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-ktf295kbg4
+                  name: curator-prod-4mtk8mh9t2
                   key: aws_secret_access_key
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-4mtk8mh9t2
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: curator-dev
-  annotations:
-    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
     environment: dev
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 3001
-  type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: curator-prod
-  annotations:
-    alb.ingress.kubernetes.io/target-type: ip
 spec:
   selector:
     app: curator
     environment: prod
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 3001
-  type: NodePort

@@ -3,6 +3,8 @@
         "start": 20,
         "end": 29
     },
-    "sex": "Female",
-    "species": "Homo sapien"
+    "gender": "Female",
+    "occupation": "Horse trainer",
+    "nationalities": ["American", "Swedish"],
+    "ethnicity": "Other"
 }

@@ -13,14 +13,14 @@
   '''
 
 import re
-import pycountry
-import pandas as pd
 import numbers
 import math
 import datetime
 from typing import Any, Callable, Dict, List, Tuple
-from constants import LOCATIONS, VALID_SEXES
-from utils import trim_string_list
+from constants import (COMMON_LOCATION_ABBREVIATIONS,
+                       VALID_GEO_RESOLUTIONS, VALID_SEXES)
+from utils import is_url, trim_string_list
+from geocode_util import lookup_location
 
 
 def parse_list(value: Any, separator: str) -> List[str]:
@@ -53,7 +53,7 @@ def parse_bool(value: Any) -> bool:
       None: When the input value is empty or a string indicating n/a.
       bool: When the value is present and successfully parsed.
     '''
-    if pd.isna(value) or value == 'na':
+    if value is None or value == 'na':
         return None
 
     # Throw an error if the value can't be converted to a boolean.
@@ -79,7 +79,7 @@ def parse_range(
     Returns:
       Tuple[Any, Any]: Always. The tuple is in the format (start, end).
     '''
-    if pd.isna(value):
+    if not value:
         return (None, None)
 
     # First check if the value is represented as a range.
@@ -120,7 +120,7 @@ def parse_age(value: Any) -> float:
       None: When the value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     if type(value) is str:
@@ -156,7 +156,7 @@ def parse_date(value: str) -> datetime:
       None: When the value is empty.
       datetime: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     try:
@@ -166,7 +166,7 @@ def parse_date(value: str) -> datetime:
         return datetime.datetime.strptime(value, '%m.%d.%Y')
 
 
-def parse_location(value: Any) -> Dict[str, Any]:
+def parse_location(geocoder: Any, value: Any) -> Dict[str, Any]:
     '''
     Parses a location from a string.
 
@@ -191,52 +191,45 @@ def parse_location(value: Any) -> Dict[str, Any]:
           'administrativeAreaLevel2': str,
           'locality': str,
           'geometry': {
-          'latitude': float,
-          'longitude': float
+            'latitude': float,
+            'longitude': float
           }
         }
     '''
-    if pd.isna(value) or value.lower() in ['no', 'none', 'unknown']:
-        return None
     if type(value) is not str:
         raise ValueError('location is not a string')
 
-    # Remove common prefixes 'travelled to' and 'traveled to' and lowercase it.
-    normalized_location = re.sub(
-        r'(travelled|traveled)\sto\s(the\s*)?',
-        '', value.lower())
+    # Parse the location string into tokens (e.g. city, province, country) and
+    # try to find a match with the geocoder.
+    geocode_result = lookup_location(
+        geocoder, COMMON_LOCATION_ABBREVIATIONS, parse_list(
+            value.lower(),
+            ','))
 
-    # First try to look up the location in a hard-coded map that accounts for
-    # most popular locations that the lookup (below) misses.
-    location = LOCATIONS.get(normalized_location)
-    if location is not None:
-        return location
-
-    # Next, attempt to look up the location in a countries database.
-    try:
-        country = pycountry.countries.lookup(normalized_location)
-        return {
-            'country': country.name
+    result = {
+        'country': geocode_result.country_new,
+        'geometry': {
+            'latitude': geocode_result.lat,
+            'longitude': geocode_result.lng
         }
-    except LookupError:
-        pass
-
-    # If the format is ${CITY}, ${COUNTRY}, we want to keep the more specific
-    # piece. If not, look it up as is. We do this split after checking for the
-    # country to avoid false positives in the case where it's actually a
-    # comma-separated list of countries ("China, Brazil")
-    normalized_subdivision = parse_list(normalized_location, ',')[0]
-
-    # Well, if it's not a country, maybe it's a subdivision. And if not, it will
-    # throw!
-    subdivision = pycountry.subdivisions.lookup(normalized_subdivision)
-    return {
-        'administrativeAreaLevel1': subdivision.name,
-        'country': subdivision.country.name
     }
 
+    if geocode_result.admin1:
+        result['administrativeAreaLevel1'] = geocode_result.admin1
+    if geocode_result.admin2:
+        result['administrativeAreaLevel2'] = geocode_result.admin2
+    if geocode_result.admin3:
+        result['administrativeAreaLevel3'] = geocode_result.admin3
+    if geocode_result.location:
+        result['place'] = geocode_result.location
+    if geocode_result.geo_resolution:
+        result['geoResolution'] = parse_geo_resolution(
+            geocode_result.geo_resolution)
 
-def parse_location_list(value: Any) -> [Dict[str, Any]]:
+    return result
+
+
+def parse_location_list(geocoder: Any, value: Any) -> [Dict[str, Any]]:
     '''
     Parses one or more locations from a string.
 
@@ -246,11 +239,11 @@ def parse_location_list(value: Any) -> [Dict[str, Any]]:
 
     Returns:
       None: When the input value is empty or a string indicating n/a.
-      [Dict[str, Any]]: When the value is present and successfully parsed. 
+      [Dict[str, Any]]: When the value is present and successfully parsed.
         A list of dictionaries containing the location data.
     '''
     separator = None
-    if pd.isna(value):
+    if not value:
         return None
     if ';' in value:
         separator = ';'
@@ -258,7 +251,7 @@ def parse_location_list(value: Any) -> [Dict[str, Any]]:
         separator = ':'
 
     locations = parse_list(value, separator) if separator else [value]
-    return [parse_location(l) for l in locations if l]
+    return [parse_location(geocoder, l) for l in locations if l]
 
 
 def parse_sex(value: Any) -> str:
@@ -274,7 +267,7 @@ def parse_sex(value: Any) -> str:
       None: When the input value is empty or a string indicating n/a.
       str: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     if str(value).lower() not in VALID_SEXES:
@@ -296,7 +289,7 @@ def parse_latitude(value: Any) -> float:
       None: When the input value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     latitude = float(value)
@@ -320,7 +313,7 @@ def parse_longitude(value: Any) -> float:
       None: When the input value is empty.
       float: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
 
     longitude = float(value)
@@ -329,6 +322,30 @@ def parse_longitude(value: Any) -> float:
         raise ValueError('longitude outside of valid range')
 
     return longitude
+
+
+def parse_geo_resolution(value: Any) -> str:
+    '''
+    Parses a geo resolution enum value from the input.
+
+    Parameters:
+      value: Value representing a geo resolution, expected to be one of "place",
+        "adminAreaL1", "adminAreaL2", or "country."
+
+    Raises:
+      ValueError: The value is not in the geo resolution enum.
+    Returns:
+      None: When the input value is empty or a string indicating n/a.
+      str: When the value is present and successfully parsed.
+    '''
+    if not value:
+        return None
+
+    geo_resolution = VALID_GEO_RESOLUTIONS.get(str(value).lower())
+    if not geo_resolution:
+        raise ValueError('geo resolution not in enum')
+
+    return geo_resolution.capitalize()
 
 
 def parse_string_list(value: Any) -> List[str]:
@@ -345,7 +362,7 @@ def parse_string_list(value: Any) -> List[str]:
       None: When the input value is empty.
       List[str]: When the value is present and successfully parsed.
     '''
-    if pd.isna(value):
+    if not value:
         return None
     if type(value) is not str:
         raise ValueError('not a string')
@@ -363,3 +380,11 @@ def parse_string_list(value: Any) -> List[str]:
 
     # Assuming this wasn't a list, but a singular value.
     return [value]
+
+
+def parse_url(value: Any) -> str:
+  # TODO: Too noisy right now. Use a more accurate URL parser before throwing.
+  # if not is_url(value):
+  #  raise ValueError('not a valid URL')
+
+  return value

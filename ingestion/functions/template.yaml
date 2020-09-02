@@ -1,6 +1,6 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AWS Lambda functions for epid ingestion
+Description: AWS Lambda functions for Global Health ingestion
 
 Resources:
   RawSourcesBucket:
@@ -12,16 +12,104 @@ Resources:
     Properties:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
-      Runtime: python3.6
-      Description: Retrieve the executing machine IP
+      Runtime: python3.8
+      Description: Retrieve raw source content
+      # Function's execution role
+      Policies:
+        - AWSLambdaFullAccess
+        - S3WritePolicy:
+            BucketName: !Ref RawSourcesBucket
+      Timeout: 300
+      Layers:
+        - !Ref CommonLibLayer
+  ParsingLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: parsing_lib
+      Description: Common functions required for parsing
+      ContentUri: parsing/common/python/parsing_lib
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.8
+  CommonLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common_lib
+      Description: Common functions between parsing and retrieval
+      ContentUri: common
+      CompatibleRuntimes:
+        - python3.6
+        - python3.7
+        - python3.8
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: python3.8
+  IndiaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/india/
+      Handler: india.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for India
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-        - S3WritePolicy:
-            BucketName: !Ref RawSourcesBucket
-      Timeout: 10 # Seconds
-
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
+  HongKongParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/hongkong/
+      Handler: hongkong.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for HongKong
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
+  JapanParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/japan/
+      Handler: japan.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Japan
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
+  CHZurichParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/ch_zurich/
+      Handler: zurich.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for the Zurich Canton of Switzerland
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:

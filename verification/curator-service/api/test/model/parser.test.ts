@@ -16,17 +16,6 @@ describe('validate', () => {
         });
     });
 
-    it('a parser with a misformatted AWS lambda ARN is invalid', async () => {
-        const badArn = {
-            ...fullModel,
-            awsLambdaArn: 'invalid:arn:aws:lambda:region:function:field',
-        };
-
-        return new Parser(badArn).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
     it('a fully specified parser is valid', async () => {
         return new Parser(fullModel).validate();
     });

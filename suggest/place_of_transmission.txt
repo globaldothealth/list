@@ -1,0 +1,30 @@
+Airplane
+Assisted Living
+Bar / Pub
+Building site
+Conference
+Cruise ship
+Elderly Care
+Factory
+Food Processing Plant
+Funeral
+Gym
+Hospital
+Hotel
+Household
+Large shared accomodation
+Long Term Acute Care
+Long Term Care Facility
+Nighclub
+Office
+Prison
+Public Space
+Religous place of worship
+Restaurant
+School
+Ship
+Shopping
+Sport event
+Warehouse
+Wedding
+Work

@@ -1,40 +1,37 @@
 # Ingress defines how load balancers should forward traffic
 # from the internet traffic to the cluster.
 # https://kubernetes.io/docs/concepts/services-networking/ingress/
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: curator-dev
+  name: curator
   annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-  labels:
-    app: curator
-    environment: dev
+    # Makes this ingress discovered by the nginx ingress controller.
+    kubernetes.io/ingress.class: "nginx"
+    # Use this issuer defined in letsencrypt.yaml to get certs automatically.
+    cert-manager.io/issuer: "letsencrypt-prod"
+    # Set the max size of requests to the service.
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    # Set the timeout (in seconds) for the response to nginx.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
 spec:
+  tls:
+    - hosts:
+        - dev-curator.ghdsi.org
+      secretName: dev-curator-ghdsi-org-cert
+    - hosts:
+        - curator.ghdsi.org
+      secretName: curator-ghdsi-org-cert
   rules:
-    - http:
+    - host: dev-curator.ghdsi.org
+      http:
         paths:
-          - path: /*
-            backend:
+          - backend:
               serviceName: curator-dev
               servicePort: 80
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: curator-prod
-  annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-  labels:
-    app: curator
-    environment: prod
-spec:
-  rules:
-    - http:
+    - host: curator.ghdsi.org
+      http:
         paths:
-          - path: /*
-            backend:
+          - backend:
               serviceName: curator-prod
               servicePort: 80

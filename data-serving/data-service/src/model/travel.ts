@@ -3,25 +3,19 @@ import { LocationDocument, locationSchema } from './location';
 
 import mongoose from 'mongoose';
 
-export enum TravelPurpose {
-    Family = 'Family',
-    Conference = 'Conference',
-    Work = 'Work',
-}
-
-export const travelSchema = new mongoose.Schema({
-    location: locationSchema,
-    dateRange: dateRangeSchema,
-    purpose: {
-        type: String,
-        enum: Object.values(TravelPurpose),
+export const travelSchema = new mongoose.Schema(
+    {
+        dateRange: dateRangeSchema,
+        location: locationSchema,
+        methods: [String],
+        purpose: String,
     },
-    additionalInformation: String,
-});
+    { _id: false },
+);
 
 export type TravelDocument = mongoose.Document & {
-    location: LocationDocument;
     dateRange: DateRangeDocument;
-    purpose: TravelPurpose;
-    additionalInformation: string;
+    location: LocationDocument;
+    methods: [string];
+    purpose: string;
 };

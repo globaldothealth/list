@@ -21,3 +21,22 @@ describe('validate', () => {
         expect(errors?.toString()).toMatch('Enter an origin');
     });
 });
+
+describe('custom instance methods', () => {
+    it('toAwsStatementId returns formatted source ID', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsStatementId()).toContain(s._id);
+    });
+    it('toAwsRuleDescription returns formatted source name', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsRuleDescription()).toContain(s.name);
+    });
+    it('toAwsRuleName returns formatted source ID', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsRuleName()).toContain(s._id);
+    });
+    it('toAwsRuleTargetId returns formatted source ID', () => {
+        const s = new Source(minimalSource);
+        expect(s.toAwsRuleTargetId()).toContain(s._id);
+    });
+});

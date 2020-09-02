@@ -2,9 +2,18 @@ import { Request, Response } from 'express';
 import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
+import AwsLambdaClient from '../clients/aws-lambda-client';
 
+/**
+ * SourcesController handles HTTP requests from curators and automated ingestion
+ * functions related to sources of case data.
+ */
 export default class SourcesController {
-    constructor(private readonly awsEventsClient: AwsEventsClient) {}
+    constructor(
+        private readonly lambdaClient: AwsLambdaClient,
+        private readonly awsEventsClient: AwsEventsClient,
+        private readonly retrievalFunctionArn: string,
+    ) {}
 
     /**
      * List the sources.
@@ -23,9 +32,14 @@ export default class SourcesController {
             res.status(422).json('limit must be > 0');
             return;
         }
+        const filter = req.query.url
+            ? {
+                  'origin.url': new RegExp(req.query.url as string, 'i'),
+              }
+            : {};
         try {
             const [docs, total] = await Promise.all([
-                Source.find({})
+                Source.find(filter)
                     .skip(limit * (page - 1))
                     .limit(limit + 1),
                 Source.countDocuments({}),
@@ -76,7 +90,7 @@ export default class SourcesController {
                 return;
             }
             await source.set(req.body).validate();
-            await this.updateSourceAwsProperties(source);
+            await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
             res.json(result);
         } catch (err) {
@@ -100,20 +114,41 @@ export default class SourcesController {
      *
      * TODO: Allow deleting schema-validated fields in update operations.
      */
-    private async updateSourceAwsProperties(
+    private async updateAutomationScheduleAwsResources(
         source: SourceDocument,
     ): Promise<void> {
-        if (source.isModified('automation.schedule.awsScheduleExpression')) {
+        // Careful here, source.isModified('automation.schedule.awsScheduleExpression')
+        // will return true even when just the parser is updated which is
+        // error prone, prefer isModified() without dotted.paths if possible.
+        if (source.automation?.schedule?.isModified('awsScheduleExpression')) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
-                    source._id.toString(),
+                    source.toAwsRuleName(),
+                    source.toAwsRuleDescription(),
                     source.automation.schedule.awsScheduleExpression,
+                    this.retrievalFunctionArn,
+                    source.toAwsRuleTargetId(),
+                    source._id.toString(),
+                    source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
             } else {
-                await this.awsEventsClient.deleteRule(source._id.toString());
+                await this.awsEventsClient.deleteRule(
+                    source.toAwsRuleName(),
+                    source.toAwsRuleTargetId(),
+                    this.retrievalFunctionArn,
+                    source.toAwsStatementId(),
+                );
                 source.set('automation.schedule', undefined);
             }
+        } else if (
+            source.isModified('name') &&
+            source.automation?.schedule?.awsRuleArn
+        ) {
+            await this.awsEventsClient.putRule(
+                source.toAwsRuleName(),
+                source.toAwsRuleDescription(),
+            );
         }
     }
 
@@ -124,13 +159,7 @@ export default class SourcesController {
         try {
             const source = new Source(req.body);
             await source.validate();
-            if (source.automation?.schedule) {
-                const createdRuleArn = await this.awsEventsClient.putRule(
-                    source._id.toString(),
-                    source.automation.schedule.awsScheduleExpression,
-                );
-                source.set('automation.schedule.awsRuleArn', createdRuleArn);
-            }
+            await this.createAutomationScheduleAwsResources(source);
             const result = await source.save();
             res.status(201).json(result);
         } catch (err) {
@@ -143,6 +172,32 @@ export default class SourcesController {
     };
 
     /**
+     * Performs creation of AWS assets corresponding to the provided source,
+     * based on the content of the create operation.
+     *
+     * If an automation schedule is present, a CloudWatch scheduled rule will
+     * be created with a target of the global retrieval function. A resource-
+     * based permission will be added to the global retrieval function such
+     * that it can be invoked by the rule.
+     */
+    private async createAutomationScheduleAwsResources(
+        source: SourceDocument,
+    ): Promise<void> {
+        if (source.automation?.schedule) {
+            const createdRuleArn = await this.awsEventsClient.putRule(
+                source.toAwsRuleName(),
+                source.toAwsRuleDescription(),
+                source.automation.schedule.awsScheduleExpression,
+                this.retrievalFunctionArn,
+                source.toAwsRuleTargetId(),
+                source._id.toString(),
+                source.toAwsStatementId(),
+            );
+            source.set('automation.schedule.awsRuleArn', createdRuleArn);
+        }
+    }
+
+    /**
      * Delete a single source.
      */
     del = async (req: Request, res: Response): Promise<void> => {
@@ -152,10 +207,39 @@ export default class SourcesController {
             return;
         }
         if (source.automation?.schedule?.awsRuleArn) {
-            await this.awsEventsClient.deleteRule(source._id.toString());
+            await this.awsEventsClient.deleteRule(
+                source.toAwsRuleName(),
+                source.toAwsRuleTargetId(),
+                this.retrievalFunctionArn,
+                source.toAwsStatementId(),
+            );
         }
         source.remove();
-        res.json(source);
+        res.status(204).end();
+        return;
+    };
+
+    /** Trigger retrieval of the source's content in S3. */
+    retrieve = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const output = await this.lambdaClient.invokeRetrieval(
+                req.params.id,
+            );
+            res.json(output);
+        } catch (err) {
+            res.status(500).json(err.message);
+        }
+        return;
+    };
+
+    /** Lists available parsers for automated ingestion */
+    listParsers = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const output = await this.lambdaClient.listParsers();
+            res.json(output);
+        } catch (err) {
+            res.status(500).json(err.message);
+        }
         return;
     };
 }

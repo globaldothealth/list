@@ -2,7 +2,7 @@ name: Integration Tests CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"
@@ -10,7 +10,7 @@ on:
       - "data-serving/data-service/**"
       - "data-serving/samples/**"
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"
@@ -22,14 +22,32 @@ jobs:
   integration-tests:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        browser: ["chrome", "firefox"]
+    name: Cypress tests on ${{ matrix.browser }}
+
     steps:
       - uses: actions/checkout@v2
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
-      - name: Cypress integration tests
-        run: |
-          npm ci
-          npm run cypress-run
-        working-directory: verification/curator-service/ui
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: verification/curator-service/ui
+          browser: ${{ matrix.browser }}
+          wait-on: 'http://localhost:3002'
+          wait-on-timeout: 300
         env:
           CI: true
+      # Screenshots are only available on failures.
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: verification/curator-service/ui/cypress/screenshots
+      # Videos are always available.
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: cypress-videos
+          path: verification/curator-service/ui/cypress/videos/components

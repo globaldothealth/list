@@ -5,12 +5,12 @@ name: Curator UI Node.js CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/curator-ui-node.yml"
       - "verification/curator-service/ui/**"
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/curator-ui-node.yml"
       - "verification/curator-service/ui/**"
@@ -29,7 +29,11 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm test
+          npm run test-and-coverage
         working-directory: verification/curator-service/ui
         env:
           CI: true
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: verification/curator-service/ui/coverage/coverage-final.json

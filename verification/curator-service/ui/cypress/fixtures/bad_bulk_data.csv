@@ -1,0 +1,2 @@
+sourceEntryId,gender,ageRangeStart,ageRangeEnd,country,admin1,admin2,admin3,dateConfirmed,hospitalized,dateHospitalized,outcome,dateOutcome,caseCount
+def,Female,142,42,Canada,Alberta,,Banff,06/23/2020,true,,,,

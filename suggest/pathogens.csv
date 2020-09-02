@@ -1,0 +1,295 @@
+165,Acinetobacter baumannii
+211,Adenovirus
+191,African Horse Sickness
+206,African Swine Fever
+1,African Trypanosomiasis
+203,Algae
+3,Amebiasis
+221,Amoeba
+290,Anaplasmosis
+242,Animal Die-off
+231,Anisakis
+4,Anthrax
+248,Antimicrobial resistance
+5,Arenavirus
+6,Ascariasis
+7,Aspergillosis
+192,Avian Cholera
+68,Avian Influenza
+283,Avian Influenza H5N1
+293,Avian Influenza H5N2
+289,Avian Influenza H5N6
+292,Avian Influenza H5N8
+287,Avian Influenza H7N2
+299,Avian Influenza H7N8
+271,Avian Influenza H7N9
+8,Babesiosis
+9,Bacterial Meningitis
+232,Bartonella
+207,Bite
+10,Blastomycosis
+205,Blue Ear
+170,Bluetongue
+11,Botulism
+183,Bovine Pleuropneumonia
+226,Bovine TB
+204,Bronchitis/Bronchiolitis
+13,Brucellosis
+12,BSE
+278,Burkholderia cepacia
+22,C. difficile
+14,Campylobacter
+256,Canine distemper
+259,Canine Influenza
+281,Carbapenem-resistant enterobacteriaceae (CRE)
+16,Cat Scratch Fever
+17,Chagas
+18,Chicken Pox
+19,Chikungunya
+107,Chlamydia
+20,Cholera
+177,Chronic Wasting Disease
+202,Chronic/Non-Infectious Disease
+275,Citrobacter freundii
+295,Citrus Canker
+294,Citrus Greening
+27,CJD
+167,Classical Swine Fever
+280,Clostridium perfringens enterotoxin (CPE)
+23,Coccidioidomycosis
+25,Cold
+235,Colitis
+24,Colorado Tick Fever
+219,Conflict
+26,Conjunctivitis
+201,Coronavirus
+158,Crimean-Congo Hemorrhagic Fever
+28,Cryptococcosis
+29,Cryptosporidium
+31,Cysticercosis
+32,Cytomegalovirus
+33,Dengue
+34,Diarrhea
+35,Diphtheria
+36,Diphyllobothriasis
+37,Dracunculiasis
+38,Dysentery
+39,E. coli
+40,Eastern Equine Encephalitis
+41,Ebola
+42,Echinococcosis
+43,Elephantiasis
+303,Elizabethkingia
+296,Emerald Ash Borer
+44,Encephalitis
+273,Enterobacter cloacae
+45,Enterobiasis
+193,Enterococcus
+213,Enterovirus
+288,Enterovirus 68
+218,Environmental
+263,Eosinophilia
+46,Eosinophilic Pneumonia
+178,Epizootic Hemorrhagic Disease
+173,Equine Herpes Virus
+159,Equine Infectious Anemia
+210,Equine Influenza
+47,Fascioliasis
+48,Fasciolopsiasis
+258,Feline immunodeficiency virus
+260,Feline infectious peritonitis
+257,Feline leukemia virus
+254,Feline panleukopenia virus
+216,Fever
+49,Filariasis
+220,Flea-borne disease
+267,Food-related toxin
+50,Foodborne Illness
+57,Foot and Mouth
+135,Foot Fungus
+51,Free Living Amoeba
+270,Fungal Meningitis
+150,Gastroenteritis
+52,Giardiasis
+53,Glanders
+230,Gnathostoma
+54,Gnathostomiasis
+55,Gonorrhea
+264,Guillain Barre
+56,Guinea Worm
+222,H. influenzae
+59,H. pylori
+169,Hand
+58,Hantavirus
+261,Helminths
+151,Hemorrhagic Fever
+60,Hepatitis
+243,Hepatitis A
+244,Hepatitis B
+245,Hepatitis C
+246,Hepatitis D
+247,Hepatitis E
+61,Herpes
+62,Herpes Zoster
+266,HFM-CoxsackieA
+265,HFM-Enterovirus71
+63,Histoplasmosis
+2,HIV/AIDS
+64,Hookworm
+94,Hospital-Related Infection
+65,HPV
+172,Human Bocavirus
+66,Hymenolepiasis
+67,Influenza
+224,Influenza H1N1
+268,Influenza H3N2
+69,Isosporiasis
+187,Japanese Encephalitis
+269,Kawasaki Disease
+272,Klebsiella pneumoniae
+71,Kuru
+301,Kyasanur Forest Disease
+240,La Crosse Encephalitis
+72,Lassa Fever
+73,Legionnaires'
+74,Leishmaniasis
+75,Leprosy
+76,Leptospirosis
+163,LGV
+98,Lice
+77,Listeriosis
+21,Liver Fluke
+291,Loiasis
+186,Lumpy Skin Disease
+78,Lyme Disease
+79,Machupo Virus
+80,Malaria
+81,Marburg Fever
+82,Measles
+83,Melioidosis
+84,Meningitis
+227,Meningitis - HiB
+229,Meningitis - Neisseria
+228,Meningitis - Strep/Pneumoccocal
+85,Meningococcemia
+285,MERS
+86,Metagonimiasis
+88,Monkeypox
+89,Mononucleosis
+87,MRSA
+90,Mucormycosis
+91,Mumps
+253,Murray Valley encephalitis
+166,Mycobacteria
+92,Myiasis
+157,Newcastle Disease
+214,Nipah/Hendra Virus
+93,Norovirus
+174,Not Yet Classified
+286,Novel Swine Enteric Coronavirus
+95,Onchocerciasis
+199,Other Animal Disease
+249,Other Human Disease
+200,Other Plant Disease
+96,Otitis media
+171,P. aeruginosa
+233,Paracoccidioidomycosis
+188,Paragonimus
+241,Paralytic Shellfish Poisoning
+97,Parotitis
+180,Parvovirus
+181,Pasteurellosis
+99,Pelvic Inflammatory Disease
+190,Peste des petits ruminants
+197,Pests
+101,Pinworm
+102,Plague
+305,PMSIS
+103,Pneumococcal Pneumonia
+104,Pneumonia
+176,Poisoning
+105,Polio
+185,Porcine Circovirus
+284,Powassan virus
+106,Prion
+276,Proteus mirabilis
+262,Protozoa
+217,Psittacosis
+108,Q Fever
+109,Rabies
+196,Rash
+238,Relapsing Fever
+212,Respiratory Illness
+110,Respiratory Syncytial Virus
+111,Rheumatic Fever
+112,Ricin
+225,Rickettsia
+175,Rift Valley Fever
+255,Ringworm
+114,River Blindness
+115,Rocky Mountain Spotted Fever
+116,Roseola
+117,Ross River Virus
+189,Rotavirus
+118,Rubella
+119,Salmonella
+121,SARS
+122,Scabies
+123,Scarlet Fever
+124,Schistosomiasis
+250,Schmallenberg
+194,Scrapie
+251,Scrub Typhus
+168,Sepsis
+274,Serratia marcescens
+125,Sexually Transmitted Infection
+182,Sheep/Goat Pox
+126,Shigellosis
+127,Shingles
+128,Smallpox-Related
+198,Soybean Rust
+234,Sporotrichosis
+236,St. Louis Encephalitis
+129,Staph
+130,Staphylococcal Entertoxin B
+277,Stenotrophomonas maltophilia
+179,Strangles
+131,Strep
+160,Strep Group B
+132,Syphilis
+133,Taeniasis
+134,Tetanus
+15,Thrush
+215,Tick-borne disease
+239,Tick-borne Encephalitis
+136,Toxic Shock Syndrome
+137,Toxocariasis
+138,Toxoplasmosis
+139,Trachoma
+140,Trichinellosis
+141,Trichinosis
+142,Trichuriasis
+143,Trypanosomiasis
+144,Tuberculosis
+145,Tularemia
+120,Typhoid
+113,Typhus
+208,Vaccine Complication
+146,Valley Fever
+279,Vancomycin Resistant Enterococci (VRE)
+147,Venezuelan Equine Encephalitis
+184,Vesicular Stomatitis
+161,Vibrio parahaemolyticus
+195,Vibrio vulnificus
+237,Vibrio
+149,Viral Encephalitis
+152,Viral Meningitis
+153,Viral Pneumonia
+209,Waterborne Illness
+154,West Nile Virus
+155,Western Equine Encephalitis
+223,White nose syndrome
+100,Whooping Cough
+298,Xylella Fastidiosa
+156,Yellow Fever
+282,Zika virus

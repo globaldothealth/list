@@ -1,7 +1,7 @@
 # This dockerfile builds the curator API service and its UI in a single container.
 # The UI is served as a static resource from the curator API service express server.
 # Security best practices are followed and a trimmed down image is used for production serving.
-FROM node:12 as builder
+FROM node:14 as builder
 
 # Build the curator service.
 WORKDIR /usr/src/app/verification/curator-service/api
@@ -30,6 +30,11 @@ RUN npm ci
 COPY verification/curator-service/ui/. .
 # Build the app.
 ENV REACT_APP_LOGIN_URL /auth/google
+# Set the public (but restricted to our domains) mapbox token.
+# A more flexible solution to be able to run that image on other domains would
+# be for the curator service to expose the tokens via an API but this is much
+# simpler for now and again, this is public so fine to be checked-in an image.
+ENV REACT_APP_PUBLIC_MAPBOX_TOKEN "pk.eyJ1IjoiaGVhbHRobWFwIiwiYSI6ImNrYzNjczdmczA3cTQyc3M1bHdndHVjZWsifQ.0qMMMDRA3p1VeBQvXKpfdQ"
 RUN npm run build
 
 
@@ -47,6 +52,7 @@ WORKDIR /usr/src/app/
 
 # Copy compiled app from previous stage.
 COPY --from=builder /usr/src/app/verification/curator-service/api/node_modules ./node_modules
+COPY --from=builder /usr/src/app/verification/curator-service/api/openapi ./openapi
 COPY --from=builder /usr/src/app/verification/curator-service/api/dist ./dist
 COPY --from=builder /usr/src/app/verification/curator-service/ui/build ./fe
 # Set environment variable to serve static files from built UI.

@@ -9,13 +9,12 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-import pandas as pd
-from parsers import (parse_age, parse_bool, parse_date,
+from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
-                     parse_longitude, parse_range, parse_sex, parse_string_list)
-from pandas import Series
-from typing import Any, Callable, Dict, List
-from utils import format_iso_8601_date, is_url, warn
+                     parse_longitude, parse_range, parse_sex, parse_string_list,
+                     parse_url)
+from typing import Any, Callable, Dict, List, Tuple
+from utils import format_iso_8601_date, log_error
 
 
 def convert_range(value: Any, parser: Callable[[Any], Any],
@@ -116,7 +115,7 @@ def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
     })
 
 
-def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
+def convert_event(id: str, dates: Any, value: str, field_name: str, event_name: str) -> Dict[str, Any]:
     '''
     Converts a single event date column to the new event object with a name and
     range of dates.
@@ -145,20 +144,24 @@ def convert_event(id: str, name: str, dates: Any) -> Dict[str, Any]:
         where the date strings are ISO 8601 date representations.
 
     '''
-    if pd.isna(dates):
+    if not dates:
         return None
 
     try:
-        return {
-            'name': str(name),
+        event = {
+            'name': str(event_name),
             'dateRange': convert_date_range(dates)
         }
+
+        if value:
+          event['value'] = value
+
+        return event
     except ValueError as e:
-        warn(id, f'event[name="{name}"]', dates, e)
+        log_error(id, field_name, f'event[name="{event_name}"]', dates, e)
 
 
-def convert_events(id: str, event_dates: Dict[str, Any],
-                   outcome: str) -> List[Dict[str, Any]]:
+def convert_events(id: str, events: List[Tuple[Any, Any, str, str]]) -> List[Dict[str, Any]]:
     '''
     Converts event date columns to the new events array. Also includes the
     outcome field as an event, even though we don't have an associated date.
@@ -183,13 +186,7 @@ def convert_events(id: str, event_dates: Dict[str, Any],
         }]
         where the date strings are ISO 8601 date representations.
     '''
-    events = list(map(lambda i: convert_event(
-        id, i[0], i[1]), event_dates.items()))
-
-    # The old data model had an outcome string, which will become an event in
-    # the new data model, but it won't have a date associated with it.
-    if pd.notna(outcome):
-        events.append({'name': str(outcome)})
+    events = [convert_event(id, i[0], i[1], i[2], i[3]) for i in events]
 
     # Filter out None values.
     events = [e for e in events if e]
@@ -214,8 +211,7 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
             'end': {
               '$date': str
             },
-          'sex': str,
-          'species': str
+          'sex': str
         }
 
     '''
@@ -226,21 +222,21 @@ def convert_demographics(id: str, age: Any, sex: str) -> Dict[str, Any]:
         if converted_age is not None:
             demographics['ageRange'] = converted_age
     except ValueError as e:
-        warn(id, 'demographics.ageRange', age, e)
+        log_error(id, 'age', 'demographics.ageRange', age, e)
 
     try:
         parsed_sex = parse_sex(sex)
         if parsed_sex:
-            demographics['sex'] = parsed_sex
+            demographics['gender'] = parsed_sex
     except ValueError as e:
-        warn(id, 'demographics.sex', age, e)
+        log_error(id, 'sex', 'demographics.gender', age, e)
 
     return demographics or None
 
 
-def convert_location(id: str, country: str, adminL1: str,
-                     adminL2: str, locality: str, latitude: float,
-                     longitude: float) -> Dict[str, Any]:
+def convert_location(id: str, location: str, admin3: str, admin2: str,
+                     admin1: str, country: str, geo_resolution: str,
+                     latitude: float, longitude: float) -> Dict[str, Any]:
     '''
     Converts location fields to a location object.
 
@@ -253,26 +249,32 @@ def convert_location(id: str, country: str, adminL1: str,
           'country': str,
           'administrativeAreaLevel1': str,
           'administrativeAreaLevel2': str,
-          'locality': str,
+          'administrativeAreaLevel3': str,
+          'place': str,
+          'geo_resolution': str,
+          'name': str,
           'geometry': {
-          'latitude': float,
-          'longitude': float
+            'latitude': float,
+            'longitude': float
           }
         }
     '''
     location = {}
 
-    if pd.notna(country):
+    if location:
+        location['place'] = str(location)
+
+    if admin3:
+        location['administrativeAreaLevel3'] = str(admin3)
+
+    if admin2:
+        location['administrativeAreaLevel2'] = str(admin2)
+
+    if admin1:
+        location['administrativeAreaLevel1'] = str(admin1)
+
+    if country:
         location['country'] = str(country)
-
-    if pd.notna(adminL1):
-        location['administrativeAreaLevel1'] = str(adminL1)
-
-    if pd.notna(adminL2):
-        location['administrativeAreaLevel2'] = str(adminL2)
-
-    if pd.notna(locality):
-        location['locality'] = str(locality)
 
     geometry = {}
 
@@ -281,17 +283,30 @@ def convert_location(id: str, country: str, adminL1: str,
         if parsed_latitude is not None:
             geometry['latitude'] = parsed_latitude
     except ValueError as e:
-        warn(id, 'location.latitude', latitude, e)
+        log_error(id, 'latitude', 'location.latitude', latitude, e)
 
     try:
         parsed_longitude = parse_longitude(longitude)
         if parsed_longitude is not None:
             geometry['longitude'] = parsed_longitude
     except ValueError as e:
-        warn(id, 'location.longitude', longitude, e)
+        log_error(id, 'longitude', 'location.longitude', longitude, e)
 
     if geometry:
         location['geometry'] = geometry
+
+    # Produce a reasonable human readable name based on admin hierarchy.
+    location['name'] = ', '.join([part for part in 
+      [admin1, admin2, admin3]
+    if part])
+
+    try:
+        parsed_geo_resolution = parse_geo_resolution(geo_resolution)
+        if parsed_longitude is not None:
+            location['geoResolution'] = parsed_geo_resolution
+    except ValueError as e:
+        log_error(id, 'geo_resolution',
+                  'location.geoResolution', geo_resolution, e)
 
     return location
 
@@ -312,14 +327,14 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
       Dict[str, List[str]]: When the value is present and successfully parsed.
         The dictionary in the format:
         {
-          'provided': List[str]
+          'values': List[str]
         }
     '''
     try:
         string_list = parse_string_list(value)
-        return {'provided': string_list} if string_list else None
+        return {'values': string_list} if string_list else None
     except ValueError as e:
-        warn(id, 'field_name.provided', value, e)
+        log_error(id, field_name, f'{field_name}.values', value, e)
 
 
 def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
@@ -336,11 +351,13 @@ def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
         }
     '''
     revision_metadata = {
-        'id': 0
+        'revisionNumber': 0
     }
 
-    if pd.notna(data_moderator_initials):
-        revision_metadata['moderator'] = str(data_moderator_initials)
+    if data_moderator_initials:
+        revision_metadata['creationMetadata'] = {
+            'curator': str(data_moderator_initials)
+        }
 
     return revision_metadata
 
@@ -352,100 +369,52 @@ def convert_notes_field(notes_fields: [str]) -> str:
     Returns:
       str: Always.
     '''
-    notes = '; '.join([x for x in notes_fields if pd.notna(x)])
+    notes = '; '.join([x for x in notes_fields if x])
     return notes or None
 
 
-def convert_sources_field(source: str) -> Dict[str, str]:
+def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
     '''
-    Converts the source field to a new source representation that's a list of
-    objects with either a URL or an unknown reference type.
+    Converts the case reference field from the source field.
 
     Returns:
       None: When the input is empty.
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
-          'url': str,
-          'other': str
+          'sourceUrl': str,
+          'additionalSources': [
+           {
+             'sourceUrl': str
+           }
+          ]
         }
     '''
-    if pd.isna(source):
+    if not source:
         return None
 
-    sources = parse_list(source, ',')
-
-    return [{
-        'url': source
-    } if is_url(source) else {
-        'other': str(source)
-    } for source in sources]
-
-
-def convert_pathogens_field(sequence: str) -> List[Dict[str, Any]]:
-    '''
-    Converts the sequence field to an array of pathogens that may have sequence
-    source data.
-
-    Returns:
-      List[Dict[str, Any]]: Always. The output is in the format:
-        [{
-          'name': str,
-          'sequenceSource': {
-            'url': str,
-            'other': str
-          }
-        }]
-    '''
-    sources = convert_sources_field(sequence)
-    return [{
-        'name': 'sars-cov-2',
-        'sequenceSources': sources
-    }] if sources else None
-
-
-def convert_outbreak_specifics(id: str, reported_market_exposure: str,
-                               lives_in_wuhan: str) -> Dict[str, bool]:
-    '''
-    Converts the covid-19-specific fields into a new outbreakSpecifics
-    object.
-
-    Parameters:
-      id: The id of the input row for logging a failed conversion.
-
-    Returns:
-      None: When the input is empty.
-      Dict[str, bool]: When the input is nonempty. The dictionary is in the
-        format:
-        {
-          'reportedMarketExposure': bool,
-          'livesInWuhan': bool
-        }
-    '''
-
-    outbreak_specifics = {}
+    sources = parse_list(source, ', ')
 
     try:
-        normalized = parse_bool(reported_market_exposure)
-        if normalized is not None:
-            outbreak_specifics['reportedMarketExposure'] = normalized
+      sourceUrls = [ parse_url(source) for source in sources ]
+
+      if not sourceUrls:
+        return None
+      
+      caseReference = { 'sourceUrl': sourceUrls[0] }
+
+      if len(sourceUrls) > 1:
+        caseReference['additionalSources'] = [{
+            'sourceUrl': sourceUrl
+        } for sourceUrl in sourceUrls[1:]]
+
+      return caseReference
     except ValueError as e:
-        warn(
-            id, 'outbreakSpecifics.reportedMarketExposure',
-            reported_market_exposure, e)
-
-    try:
-        normalized = parse_bool(lives_in_wuhan)
-        if normalized is not None:
-            outbreak_specifics['livesInWuhan'] = normalized
-    except ValueError as e:
-        warn(id, 'outbreakSpecifics.livesInWuhan', lives_in_wuhan, e)
-
-    return outbreak_specifics or None
+       log_error(id, 'source', 'caseReference.sourceUrl', source, e)
 
 
-def convert_travel_history(id: str, dates: str, location: str) -> Dict[
-        str, Any]:
+def convert_travel_history(geocoder: Any, id: str, dates: str,
+                           location: str) -> Dict[str, Any]:
     '''
     Converts the travel history date and location fields to a new travelHistory
     object.
@@ -458,36 +427,42 @@ def convert_travel_history(id: str, dates: str, location: str) -> Dict[
       Dict[str, Any]: When the input is nonempty. The dictionary is in the
         format:
         {
-          'location': {...},
-          'dateRange': {...}
+          'travel': [
+            'location': {...},
+            'dateRange': {...}
+          ]
         }
     '''
     location_list = None
     try:
-        location_list = parse_location_list(location)
+        location_list = parse_location_list(geocoder, location)
     except (LookupError, ValueError) as e:
-        warn(id, 'travelHistory.location', location, e)
+        log_error(id, 'travel_history_location',
+                  'travelHistory.location', location, e)
 
     date_range = None
     try:
         date_range = convert_date_range(dates)
     except (ValueError) as e:
-        warn(id, 'travelHistory.dateRange', location, e)
+        log_error(id, 'travel_history_dates',
+                  'travelHistory.dateRange', dates, e)
 
     if not location_list and not date_range:
         return None
     if not location_list:
-        return [{'dateRange': date_range}]
+        return { 'travel': [{'dateRange': date_range}] }
     if not date_range:
-        return [{'location': l} for l in location_list if l]
+        return { 'travel': [{'location': l} for l in location_list if l] }
 
     # We believe it will be useful to have dates associated with each travel
     # location, but in the existing data, travel history only has one (or no)
     # date associated with the entire field.
-    return [{'dateRange': date_range, 'location': l} for l in location_list if l]
+    return { 'travel':
+      [{'dateRange': date_range, 'location': l} for l in location_list if l]
+    }
 
 
-def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
+def convert_imported_case(values_to_archive: Dict[str, Any]) -> Dict[str, Any]:
     '''
     Converts original field names and values to the importedCase archival
     object.
@@ -496,5 +471,4 @@ def convert_imported_case(values_to_archive: Series) -> Dict[str, Any]:
       Dict[str, Any]: Always. Dictionary keys are the names of the original
         fields, and the values are the values of the original fields.
     '''
-    return {k: str(v) for k, v in values_to_archive.iteritems()
-            if pd.notna(v)}
+    return {k: str(v) for k, v in values_to_archive.items() if v}

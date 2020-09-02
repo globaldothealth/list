@@ -1,15 +1,20 @@
 version: "3.7"
 services:
+  mongo:
+    volumes:
+      - ../verification/scripts:/verification/scripts
   curator:
     command: "npm run dev"
     volumes:
       - ../verification/curator-service/api/src:/usr/src/app/verification/curator-service/api/src
+      - ../verification/curator-service/api/openapi:/usr/src/app/verification/curator-service/api/openapi
     environment:
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
   data:
     command: "npm run dev"
     volumes:
       - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
+      - ../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api
   curatorui:
     command: "npm run start-noenv"
     volumes:
@@ -19,3 +24,4 @@ services:
       # not accessible from the user's browser.
       # In production simply /auth/google would work.
       REACT_APP_LOGIN_URL: "http://localhost:3001/auth/google"
+      REACT_APP_PUBLIC_MAPBOX_TOKEN: "${REACT_APP_PUBLIC_MAPBOX_TOKEN}"

@@ -9,43 +9,100 @@
       "__v": {
         "bsonType": "int"
       },
+      "caseReference": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "bsonType": "string"
+          },
+          "sourceEntryId": {
+            "bsonType": "string"
+          },
+          "sourceUrl": {
+            "bsonType": "string"
+          },
+          "uploadId": {
+            "bsonType": "string"
+          },
+          "verificationStatus": {
+            "bsonType": "string"
+          },
+          "additionalSources": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "object",
+              "additionalProperties": false,
+              "properties": {
+                "sourceUrl": {
+                  "bsonType": "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "demographics": {
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "ageRange": {
             "bsonType": "object",
             "additionalProperties": false,
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "start": {
-                "bsonType": "double",
-                "minimum": -1,
-                "maximum": 300
+                "bsonType": "number",
+                "minimum": 0,
+                "maximum": 120
               },
               "end": {
-                "bsonType": "double",
-                "minimum": -1,
-                "maximum": 300
+                "bsonType": "number",
+                "minimum": 0,
+                "maximum": 120
               }
             }
           },
-          "sex": {
-            "enum": [
-              "Male",
-              "Female",
-              "Other"
-            ]
+          "gender": {
+            "bsonType": "string"
           },
-          "species": {
-            "enum": [
-              "Homo sapien"
-            ]
+          "occupation": {
+            "bsonType": "string"
+          },
+          "nationalities": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "string"
+            }
+          },
+          "ethnicity": {
+            "bsonType": "string"
+          }
+        }
+      },
+      "genomeSequences": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": {
+          "bsonType": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sampleCollectionDate": {
+              "bsonType": "date"
+            },
+            "repositoryUrl": {
+              "bsonType": "string"
+            },
+            "sequenceId": {
+              "bsonType": "string"
+            },
+            "sequenceName": {
+              "bsonType": "string"
+            },
+            "sequenceLength": {
+              "bsonType": "int"
+            }
           }
         }
       },
@@ -53,12 +110,6 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "id": {
-            "bsonType": "string"
-          },
           "country": {
             "bsonType": "string"
           },
@@ -68,7 +119,16 @@
           "administrativeAreaLevel2": {
             "bsonType": "string"
           },
-          "locality": {
+          "administrativeAreaLevel3": {
+            "bsonType": "string"
+          },
+          "place": {
+            "bsonType": "string"
+          },
+          "name": {
+            "bsonType": "string"
+          },
+          "geoResolution": {
             "bsonType": "string"
           },
           "geometry": {
@@ -79,16 +139,13 @@
               "longitude"
             ],
             "properties": {
-              "_id": {
-                "bsonType": "objectId"
-              },
               "latitude": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -90.0,
                 "maximum": 90.0
               },
               "longitude": {
-                "bsonType": "double",
+                "bsonType": "number",
                 "minimum": -180.0,
                 "maximum": 180.0
               }
@@ -103,19 +160,16 @@
           "bsonType": "object",
           "additionalProperties": false,
           "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
             "name": {
+              "bsonType": "string"
+            },
+            "value": {
               "bsonType": "string"
             },
             "dateRange": {
               "bsonType": "object",
               "additionalProperties": false,
               "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
                 "start": {
                   "bsonType": "date"
                 },
@@ -131,165 +185,118 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "provided": {
+          "values": {
             "bsonType": "array",
             "uniqueItems": true,
             "items": {
               "bsonType": "string"
             }
           },
-          "imputed": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "items": {
-              "bsonType": "string"
-            }
+          "status": {
+            "bsonType": "string"
           }
         }
       },
-      "chronicDisease": {
+      "preexistingConditions": {
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "provided": {
+          "values": {
             "bsonType": "array",
             "uniqueItems": true,
             "items": {
               "bsonType": "string"
             }
           },
-          "imputed": {
-            "bsonType": "array",
-            "uniqueItems": true,
-            "items": {
-              "bsonType": "string"
-            }
+          "hasPreexistingConditions": {
+            "bsonType": "bool"
           }
         }
       },
       "travelHistory": {
-        "bsonType": "array",
-        "uniqueItems": true,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "required": [
-            "location"
-          ],
-          "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
-            "location": {
-              "bsonType": "object",
-              "additionalProperties": false,
-              "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
-                "id": {
-                  "bsonType": "string"
-                },
-                "country": {
-                  "bsonType": "string"
-                },
-                "administrativeAreaLevel1": {
-                  "bsonType": "string"
-                },
-                "administrativeAreaLevel2": {
-                  "bsonType": "string"
-                },
-                "locality": {
-                  "bsonType": "string"
-                },
-                "geometry": {
-                  "bsonType": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "latitude",
-                    "longitude"
-                  ],
-                  "properties": {
-                    "_id": {
-                      "bsonType": "objectId"
-                    },
-                    "latitude": {
-                      "bsonType": "double",
-                      "minimum": -90.0,
-                      "maximum": 90.0
-                    },
-                    "longitude": {
-                      "bsonType": "double",
-                      "minimum": -180.0,
-                      "maximum": 180.0
-                    }
-                  }
-                }
-              }
-            },
-            "dateRange": {
-              "bsonType": "object",
-              "additionalProperties": false,
-              "properties": {
-                "_id": {
-                  "bsonType": "objectId"
-                },
-                "start": {
-                  "bsonType": "date"
-                },
-                "end": {
-                  "bsonType": "date"
-                }
-              }
-            },
-            "purpose": {
-              "bsonType": "string"
-            },
-            "additionalInformation": {
-              "bsonType": "string"
-            }
-          }
-        }
-      },
-      "sources": {
-        "bsonType": "array",
-        "uniqueItems": true,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
-            "id": {
-              "bsonType": "string"
-            },
-            "url": {
-              "bsonType": "string"
-            },
-            "other": {
-              "bsonType": "string"
-            }
-          }
-        }
-      },
-      "outbreakSpecifics": {
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
+          "travel": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "object",
+              "additionalProperties": false,
+              "properties": {
+                "location": {
+                  "bsonType": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "country": {
+                      "bsonType": "string"
+                    },
+                    "administrativeAreaLevel1": {
+                      "bsonType": "string"
+                    },
+                    "administrativeAreaLevel2": {
+                      "bsonType": "string"
+                    },
+                    "administrativeAreaLevel3": {
+                      "bsonType": "string"
+                    },
+                    "place": {
+                      "bsonType": "string"
+                    },
+                    "name": {
+                      "bsonType": "string"
+                    },
+                    "geoResolution": {
+                      "bsonType": "string"
+                    },
+                    "geometry": {
+                      "bsonType": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "latitude",
+                        "longitude"
+                      ],
+                      "properties": {
+                        "latitude": {
+                          "bsonType": "number",
+                          "minimum": -90.0,
+                          "maximum": 90.0
+                        },
+                        "longitude": {
+                          "bsonType": "number",
+                          "minimum": -180.0,
+                          "maximum": 180.0
+                        }
+                      }
+                    }
+                  }
+                },
+                "dateRange": {
+                  "bsonType": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start": {
+                      "bsonType": "date"
+                    },
+                    "end": {
+                      "bsonType": "date"
+                    }
+                  }
+                },
+                "purpose": {
+                  "bsonType": "string"
+                },
+                "methods": {
+                  "bsonType": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "bsonType": "string"
+                  }
+                }
+              }
+            }
           },
-          "livesInWuhan": {
-            "bsonType": "bool"
-          },
-          "reportedMarketExposure": {
+          "traveledPrior30Days": {
             "bsonType": "bool"
           }
         }
@@ -304,35 +311,37 @@
             "name"
           ],
           "properties": {
-            "_id": {
-              "bsonType": "objectId"
-            },
             "name": {
               "bsonType": "string"
             },
-            "sequenceSources": {
-              "bsonType": "array",
-              "uniqueItems": true,
-              "items": {
-                "bsonType": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "_id": {
-                    "bsonType": "objectId"
-                  },
-                  "id": {
-                    "bsonType": "string"
-                  },
-                  "url": {
-                    "bsonType": "string"
-                  },
-                  "other": {
-                    "bsonType": "string"
-                  }
-                }
-              }
-            },
-            "additionalInformation": {
+            "id": {
+              "bsonType": "int"
+            }
+          }
+        }
+      },
+      "transmission": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "properties": {
+          "routes": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "string"
+            }
+          },
+          "places": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "string"
+            }
+          },
+          "linkedCaseIds": {
+            "bsonType": "array",
+            "uniqueItems": true,
+            "items": {
               "bsonType": "string"
             }
           }
@@ -345,23 +354,41 @@
         "bsonType": "object",
         "additionalProperties": false,
         "required": [
-          "id"
+          "revisionNumber"
         ],
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
-          "id": {
+          "revisionNumber": {
             "bsonType": "int"
           },
-          "moderator": {
-            "bsonType": "string"
+          "creationMetadata": {
+            "bsonType": "object",
+            "additionalProperties": false,
+            "properties": {
+              "curator": {
+                "bsonType": "string"
+              },
+              "date": {
+                "bsonType": "date"
+              },
+              "notes": {
+                "bsonType": "string"
+              }
+            }
           },
-          "date": {
-            "bsonType": "date"
-          },
-          "notes": {
-            "bsonType": "string"
+          "updateMetadata": {
+            "bsonType": "object",
+            "additionalProperties": false,
+            "properties": {
+              "curator": {
+                "bsonType": "string"
+              },
+              "date": {
+                "bsonType": "date"
+              },
+              "notes": {
+                "bsonType": "string"
+              }
+            }
           }
         }
       },
@@ -369,16 +396,16 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "_id": {
-            "bsonType": "objectId"
-          },
           "ID": {
+            "bsonType": "string"
+          },
+          "city": {
             "bsonType": "string"
           },
           "province": {
             "bsonType": "string"
           },
-          "geo_resolution": {
+          "country": {
             "bsonType": "string"
           },
           "date_onset_symptoms": {
@@ -408,16 +435,13 @@
           "location": {
             "bsonType": "string"
           },
-          "admin3": {
-            "bsonType": "string"
-          },
-          "country_new": {
-            "bsonType": "string"
-          },
           "admin_id": {
             "bsonType": "string"
           },
           "travel_history_binary": {
+            "bsonType": "string"
+          },
+          "lives_in_Wuhan": {
             "bsonType": "string"
           }
         }

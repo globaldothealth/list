@@ -13,8 +13,9 @@ declare function printjson(message: {}): void;
 declare function quit(): void;
 
 interface Collection {
-    drop: () => Promise<CommandResult>;
+    remove: (query: object) => Promise<CommandResult>;
     stats: () => Promise<CollectionStats>;
+    dropIndexes: () => Promise<CommandResult>;
 }
 
 interface CollectionStats {
@@ -45,7 +46,27 @@ interface Database {
     getCollection: (name: string) => Promise<Collection>;
 
     getCollectionNames: () => Promise<[string]>;
+
+    runCommand: (options: CollModOptions|CreateIndexesOptions) => Promise<CommandResult>;
 }
+
+interface CollModOptions {
+    collMod: string;
+    validator: object;
+}
+
+interface CreateIndexesOptions {
+    createIndexes: string;
+    indexes: IndexSpec;
+}
+
+interface IndexSpec {
+    name: string;
+    key: object;
+    keyPattern: object;
+    unique: boolean;
+}
+
 
 /** Options to pass with the command to create a collection. */
 interface CreateCollectionOptions {
@@ -55,4 +76,6 @@ interface CreateCollectionOptions {
 /** The result of a call to `runCommand.` */
 interface CommandResult {
     ok: number;
+
+    nRemoved: number;
 }

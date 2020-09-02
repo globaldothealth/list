@@ -14,25 +14,25 @@ const Demographics = mongoose.model<DemographicsDocument>(
 );
 
 describe('validate', () => {
-    it('a start age under -1 is invalid', async () => {
+    it('a start age under 0 is invalid', async () => {
         return new Demographics({
             ...fullModel,
-            ...{ ageRange: { start: -1.1 } },
+            ...{ ageRange: { start: -0.1 } },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
-    it('a start age over 300 is invalid', async () => {
+    it('a start age over 120 is invalid', async () => {
         return new Demographics({
             ...fullModel,
-            ...{ ageRange: { start: 301 } },
+            ...{ ageRange: { start: 121 } },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });
     });
 
-    it('an end age under -1 is invalid', async () => {
+    it('an end age under 0 is invalid', async () => {
         return new Demographics({
             ...fullModel,
             ...{ ageRange: { end: -2 } },
@@ -41,28 +41,10 @@ describe('validate', () => {
         });
     });
 
-    it('an end age over 300 is invalid', async () => {
+    it('an end age over 120 is invalid', async () => {
         return new Demographics({
             ...fullModel,
-            ...{ ageRange: { end: 300.1 } },
-        }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
-    it('an unknown species name is invalid', async () => {
-        return new Demographics({
-            ...fullModel,
-            ...{ species: 'Felis catus' },
-        }).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
-    });
-
-    it('an unknown sex is invalid', async () => {
-        return new Demographics({
-            ...fullModel,
-            ...{ sex: 'Also felis catus' },
+            ...{ ageRange: { end: 120.1 } },
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });

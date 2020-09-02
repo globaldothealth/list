@@ -1,0 +1,432 @@
+Abattoir worker
+Accountant
+Accounts clerk or bookkeeper
+Actor
+Actor or actress
+Actuary
+Acupuncturist
+Advertising executive
+Agronomist
+Air conditioning installer
+Alarm installer
+Ambulance officer or driver
+Amusement parlour or centre
+Anaesthetist
+Animal breeder
+Animal groomer
+Animal shooter
+Animal trainer
+Announcer
+Antenna erector
+Antique dealer
+Apiarist or beekeeper
+Aquarium shop worker
+Archaeologist
+Architect
+Armed Services
+Armoured van driver
+Art dealer
+Artist
+Asphalt layer
+Assessor – insurance
+Astronomer
+Auctioneer
+Audiologist
+Auditor
+Author
+Auto electrician
+Aviation industry air traffic controller
+Aviation industry aircraft maintenance
+Aviation industry ground staff
+Aviation instructor
+Aviation regular public transport (pilots and crew)
+Avon sales person
+Bailiff
+Baker
+Bank teller
+Bar staff
+Barber
+Barrister
+Battery fitting
+Beach inspector
+Beautician
+Bicycle store worker
+Binman
+Biochemist
+Biologist
+Blacksmith
+Blaster or explosives handler
+Boarding house owner
+Boat builder
+Boilermaker
+Book shop worker
+Bookbinder
+Bookkeeper
+Bootmaker
+Botanist
+Bottle dealer
+Brassware shop worker
+Brewery
+Bricklayer
+Builder
+Builder’s labourer
+Bus driver
+Business executive
+Butcher
+Butler
+Cabinet maker
+Cameraman
+Cane shop worker
+Canvas goods manufacturer
+Caravan park owner
+Card shop worker
+Cardiologist
+Caretaker
+Carpenter
+Carpet layer
+Cartographer
+Cashier
+Casino worker
+Caterer
+Ceiling fixer
+Chauffeur
+Chef
+Chemist
+Childcare
+China and glassware shop
+Chiropodist
+Chiropractor
+Circus worker or performer
+Cleaner
+Clergyman
+Clerk
+Coffee lounge
+Commercial traveller
+Commodity broker
+Compositor
+Computer analyst
+Computer programmer
+Concrete worker
+Confectionery shop
+Conveyancer
+Cook
+Coroner
+Correctional Officer
+Courier
+Crane operator
+Crayfisherman
+Curator
+Customs agent
+Dance instructor
+Debt collector
+Delicatessen
+Demolition worker
+Dental hygienist
+Dental nurse
+Dentist
+Department store worker
+Dermatologist
+Diamond cutter
+Die maker
+Dietician
+Disposal store – sales
+Diver
+Dock worker
+Doctor
+Draftperson
+Drainer
+Driller
+Driver
+Dry cleaning
+Economist
+Editor
+Electrician
+Electroplater
+Elevator mechanic
+Embalmer
+Endocrinologist
+Engineer
+Engraver
+ENT Surgeon
+Entertainer
+Equipment and plant hire
+Estate agent
+Explosives worker
+Factory worker
+Farm manager
+Farm owner 
+Farm worker
+Fashion designer
+Fencing contractor
+Fibre glass moulder
+Financial adviser
+Financial planner
+Firemen
+Fisherman
+Fishmonger
+Fitter
+Floor covering fixer
+Floor sander
+Florist
+French polisher
+Fruit picker
+Funeral director
+Furniture removalist
+Furniture retailer
+Garbage contractor
+Garden shop worker
+Gardener
+Gas fitter
+Gastroenterologist
+General surgeon
+Geologist
+Glazier
+Goldsmith
+Golf instructor
+Grape grower
+Graphic designer
+Greengrocer
+Greenkeeper
+Grocer
+Gunsmith
+Gymnasium instructor
+Gynaecologist
+Haberdasher
+Hairdresser
+Handyman
+Hardware retailer
+Head Teacher
+Healthcare worker
+Health food store worker
+Home maintenance contractor
+Homemaker
+Horse breeder
+Horse riding instructor
+House restumper
+Hypnotherapist
+Importer or exporter
+Inspector
+Instrument maker
+Insulation installer
+Insurance consultant
+Interior decorator
+Interpreter
+Investor
+Jackeroo
+Janitor
+Jeweller
+Jockey
+Joiner
+Journalist
+Judge
+Kennel proprietor
+Lab technician 
+Laboratory technician
+Labourer
+Landbroker
+Landscape architect
+Landscape gardener
+Lawnmowing contractor
+Lawyer
+Lecturer
+Librarian
+Lift mechanic
+Linesman
+Liquor store worker
+Livestock broker
+Locksmith
+Logger
+Loss adjuster
+Machinist
+Mail contractor
+Management consultant
+Manicurist
+Martial arts instructor
+Masseur
+Meat packer
+Mechanic
+Medical practitioner
+Merchant banker
+Merchant marine
+Metal dealer
+Metallurgist
+Meteorologist
+Meter reader
+Miner
+Model
+Motor cycle mechanic
+Moulder
+Museum or gallery proprietor
+Music teacher
+Musician
+Nanny
+Naturopath
+Neurologist
+Neurosurgeon
+Newsagent
+Nurse
+Nurseryman
+Occupational health and safety inspector
+Occupational therapist
+Office worker
+Oil worker
+Oncologist
+Ophthalmologist
+Opthalmic surgeon
+Optician, optometrist
+Orthodontist
+Orthopaedic surgeon
+Osteopath
+Paediatrician
+Painter
+Panel beater
+Park ranger
+Parking station attendant
+Parking warden
+Pastry cook
+Pathologist
+Patternmaker
+Paver
+Pawnbroker
+Payroll guard
+Periodontist
+Personnel consultant
+Pest exterminator
+Pet shop worker
+Pharmacist
+Photoengraver
+Photographer
+Physician
+Physicist
+Physiotherapist
+Piano tuner
+Picture framer
+Pilot
+Plasterer
+Plumber
+Podiatrist
+Police
+Porter
+Post office worker
+Postman
+Potter
+Poultry farmer
+Printer
+Prison warder
+Private investigator
+Produce merchant
+Professional sportsman
+Professor
+Psychiatrist
+Psychologist
+Quantity surveyor
+Quarry worker
+Radio and television announcer
+Radiographer
+Radiologist
+Railway worker 
+Real estate
+Receptionist
+Record shop worker
+Refrigeration mechanic
+Rehabilitation consultant
+Removalist
+Renal physician
+Repairman
+Reporter
+Retail worker
+Rigger
+Roof worker
+Rubbish collector
+Saddlemaker
+Sailmaker
+Sales rep
+Sandblaster
+Scaffold erector
+Seaman
+Seaman – navy
+Second hand dealer
+Secretary
+Security guard
+Shearer
+Sheet metal worker
+Shipwright
+Shoemaker or repairer
+Shopfitter
+Shopkeeper
+Showman
+Signwriter
+Singer
+Skylight fitter
+Social worker
+Software engineer
+Solicitor
+Speech therapist
+Sports person
+Spray painter
+Stationer
+Statistician
+Steel erector or fixer
+Steeplejack
+Stevedore
+Steward (airline)
+Stockbroker
+Stockman
+Stonemason
+Storeman
+Student
+Stuntman
+Surveyor
+Swimming instructor
+TAB agent
+Take away food shop worker
+Tanner
+Tax consultant
+Taxi driver
+Taxidermist
+Teacher
+Telephone technician
+Telephonist
+Tennis coach
+Tiler
+Timber merchant
+Tobacconist
+Toolmaker
+Tour guide
+Tow truck driver
+Town planner
+Toy shop worker
+Travel agent
+Tree feller
+Tree surgeon
+Tugboat crew
+Tupperware salesperson
+TV technician
+Typesetter
+Typist
+Tyre fitter
+Undertaker
+Upholsterer
+Urologist
+Valuer
+Vending machine serviceman
+Veterinary nurse
+Veterinary surgeon
+Video shop proprietor
+Vigneron
+waiter
+Waiter
+Wallpaper hanger
+Watchmaker
+Water proofer
+Welder
+Welfare officer
+Wharf labourer
+Window cleaner
+Window dresser
+Window tinter
+Wine maker
+Wine merchant
+X-ray machine operator
+Zoo worker
+Zoologist

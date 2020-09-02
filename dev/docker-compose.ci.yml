@@ -4,3 +4,4 @@ services:
     environment:
       GOOGLE_OAUTH_CLIENT_ID: "foo"
       GOOGLE_OAUTH_CLIENT_SECRET: "bar"
+      MAPBOX_TOKEN: ""

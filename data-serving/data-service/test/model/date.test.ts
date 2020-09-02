@@ -25,9 +25,9 @@ describe('validate', () => {
         );
     });
 
-    it('a date in the future is invalid', async () => {
+    it('a date too far in the future is invalid', async () => {
         return new FakeModel({
-            date: new Date(Date.now() + 1000 /* seconds */),
+            date: new Date(Date.now() + 10000 /* seconds */),
         }).validate((e) => {
             expect(e.name).toBe(Error.ValidationError.name);
         });

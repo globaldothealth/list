@@ -1,0 +1,2 @@
+sourceEntryId,gender,ageRange,ethnicity,nationalities,occupation,country,admin1,admin2,admin3,dateConfirmed,confirmationMethod,hospitalized,dateHospitalized,icuAdmission,dateIcuAdmission,outcome,dateOutcome,dateSymptomOnset,symptomStatus,symptoms,hasPreexistingConditions,preexistingConditions,caseCount
+sourceEntryId,Male,42-43,Bangladeshi,British;Indian,Accountant,United Kingdom,England,Greater London,London,06/23/2020,PCR test,true,06/21/2020,true,06/22/2020,Recovered,06/24/2020,06/19/2020,Symptomatic,cough;fever,true,Lyme disease;COPD,1

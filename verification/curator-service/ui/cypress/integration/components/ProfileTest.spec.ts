@@ -10,6 +10,7 @@ describe('Profile', function () {
 
         cy.contains('Alice Smith');
         cy.contains('alice@test.com');
-        cy.contains('reader, curator');
+        cy.contains('reader');
+        cy.contains('curator');
     });
 });

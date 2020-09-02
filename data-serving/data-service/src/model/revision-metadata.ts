@@ -1,30 +1,56 @@
 import { dateFieldInfo } from './date';
 import mongoose from 'mongoose';
+import { positiveIntFieldInfo } from './positive-int';
 
-export const revisionMetadataSchema = new mongoose.Schema({
-    id: {
-        type: Number,
-        min: 0,
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer value',
+const editMetadataSchema = new mongoose.Schema(
+    {
+        curator: {
+            type: String,
+            required: true,
+            index: true,
         },
-        required: 'Enter a revision id',
+        date: {
+            ...dateFieldInfo,
+            required: true,
+        },
+        notes: String,
     },
-    moderator: {
-        type: String,
-        required: 'Enter a revision moderator id',
-    },
-    date: {
-        ...dateFieldInfo,
-        required: 'Enter a revision date',
-    },
-    notes: String,
-});
+    { _id: false },
+);
 
-export type RevisionMetadataDocument = mongoose.Document & {
-    id: number;
-    moderator: string;
+export const revisionMetadataSchema = new mongoose.Schema(
+    {
+        revisionNumber: {
+            ...positiveIntFieldInfo,
+            required: true,
+        },
+        creationMetadata: {
+            type: editMetadataSchema,
+            required: true,
+        },
+        updateMetadata: {
+            type: editMetadataSchema,
+            required: function (this: RevisionMetadataDocument): boolean {
+                return this?.revisionNumber > 0;
+            },
+        },
+    },
+    { _id: false },
+);
+
+type EditMetadataDocument = mongoose.Document & {
+    curator: string;
     date: Date;
     notes: string;
 };
+
+export type RevisionMetadataDocument = mongoose.Document & {
+    revisionNumber: number;
+    creationMetadata: EditMetadataDocument;
+    updateMetadata?: EditMetadataDocument;
+};
+
+export const RevisionMetadata = mongoose.model<RevisionMetadataDocument>(
+    'RevisionMetadata',
+    revisionMetadataSchema,
+);

@@ -2,34 +2,34 @@
   "name": "setup-db",
   "version": "1.0.0",
   "description": "Creates or replaces a database and collection and sets it up with a schema and indexes.",
-  "main": "dist/index.js",
+  "main": "dist/scripts/setup-db/src/index.js",
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "setup": "npm install && tsc && mongo --eval \"let args={databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA'}\" dist/index.js",
-    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json'}\" dist/index.js"
+    "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', indexesPath: '$INDEXES', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js",
+    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json', indexesPath: './../../data-service/schemas/cases.indexes.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-covid-data/healthmap-gdo-temp.git",
+    "url": "git+https://github.com/globaldothealth/list.git",
     "directory": "data-serving/scripts/setup-db"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/open-covid-data/healthmap-gdo-temp/issues"
+    "url": "https://github.com/globaldothealth/list/issues"
   },
-  "homepage": "https://github.com/open-covid-data/healthmap-gdo-temp#readme",
+  "homepage": "https://github.com/globaldothealth/list#readme",
   "node_modules": [],
   "dependencies": {
-    "@types/node": "^13.13.5",
-    "@typescript-eslint/eslint-plugin": "^2.31.0",
-    "@typescript-eslint/parser": "^2.31.0",
+    "@types/node": "^13.13.15",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
-    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.0.4",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.7"
   }
 }

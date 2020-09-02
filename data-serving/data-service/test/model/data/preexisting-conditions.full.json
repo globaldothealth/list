@@ -1,0 +1,9 @@
+{
+    "values": [
+        "Hypertension",
+        "Type 2 diabetes",
+        "Coronary heart disease",
+        "Lung cancer"
+    ],
+    "hasPreexistingConditions": true
+}

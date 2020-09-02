@@ -2,35 +2,25 @@ import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
 
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
-import mongoose from 'mongoose';
 import supertest from 'supertest';
 
+let mongoServer: MongoMemoryServer;
 beforeAll(() => {
-    return mongoose.connect(
-        // This is provided by jest-mongodb.
-        // The `else testurl` is to appease Typescript.
-        process.env.MONGO_URL || 'testurl',
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
-        },
-    );
-});
-
-afterAll(() => {
-    return mongoose.disconnect();
+    mongoServer = new MongoMemoryServer();
 });
 
 beforeEach(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {
     await User.deleteMany({});
     await Session.deleteMany({});
+    return mongoServer.stop();
 });
 
 describe('GET', () => {
@@ -42,6 +32,15 @@ describe('GET', () => {
             .send({ ...baseUser, ...{ roles: ['admin'] } })
             .expect(200);
     });
+
+    it('list roles should return roles', async () => {
+        const res = await adminRequest
+            .get('/api/users/roles')
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(res.body.roles).toEqual(['admin', 'curator', 'reader']);
+    });
+
     it('list should return 200', async () => {
         const res = await adminRequest
             .get('/api/users')
@@ -93,11 +92,11 @@ describe('GET', () => {
     });
 
     it('rejects negative page param', async () => {
-        await adminRequest.get('/api/users?page=-7').expect(422);
+        return adminRequest.get('/api/users?page=-7').expect(400);
     });
 
     it('rejects negative limit param', async () => {
-        await adminRequest.get('/api/users?page=1&limit=-2').expect(422);
+        return adminRequest.get('/api/users?page=1&limit=-2').expect(400);
     });
 });
 
@@ -119,14 +118,12 @@ describe('PUT', () => {
         // Check stuff that didn't change.
         expect(res.body.email).toEqual(userRes.body.email);
     });
-    it('cannot update an inexistent user', async () => {
-        const request = supertest.agent(app);
-        await request
-            .post('/auth/register')
+    it('cannot update an nonexistent user', async () => {
+        return supertest
+            .agent(app)
+            .put('/api/users/5ea86423bae6982635d2e1f8')
             .send({ ...baseUser, ...{ roles: ['admin'] } })
-            .expect(200)
-            .expect('Content-Type', /json/);
-        await request.put('/api/users/424242424242424242424242').expect(404);
+            .expect(404);
     });
     it('should not update to an invalid role', async () => {
         const request = supertest.agent(app);
@@ -135,11 +132,9 @@ describe('PUT', () => {
             .send({ ...baseUser, ...{ roles: ['admin'] } })
             .expect(200)
             .expect('Content-Type', /json/);
-        const res = await request
+        return request
             .put(`/api/users/${userRes.body._id}`)
             .send({ roles: ['invalidRole'] })
-            .expect(422);
-        expect(res.body).toContain('Validation failed');
-        expect(res.body).toContain('invalidRole');
+            .expect(400);
     });
 });

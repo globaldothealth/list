@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { User } from '../model/user';
+import { User, userRoles } from '../model/user';
 
 /**
  * List the users.
@@ -77,4 +77,11 @@ export const updateRoles = async (
         res.status(500).json(err.message);
         return;
     }
+};
+
+/**
+ * List the roles defined in the system.
+ */
+export const listRoles = (req: Request, res: Response): void => {
+    res.json({ roles: userRoles });
 };

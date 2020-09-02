@@ -1,22 +1,17 @@
 import mongoose from 'mongoose';
 
+export const userRoles = ['admin', 'curator', 'reader'];
+
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-    },
+    name: String,
     email: {
         type: String,
         required: 'User must have an email',
     },
-    googleID: {
-        type: String,
-        // Note: we can relax that requirement if we start
-        // supporting more identity platforms.
-        required: 'User must be logged-in with Google',
-    },
+    googleID: String,
     roles: {
         type: [String],
-        enum: ['reader', 'curator', 'admin'],
+        enum: userRoles,
     },
 });
 

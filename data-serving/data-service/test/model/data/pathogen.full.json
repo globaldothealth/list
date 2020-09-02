@@ -1,10 +1,4 @@
 {
-    "name": "sars-cov-2",
-    "sequenceSources": [
-        {
-            "id": "ghi789",
-            "url": "http://abc.def",
-            "other": "ghi"
-        }
-    ]
+    "name": "COVID-19",
+    "id": 304
 }

@@ -5,10 +5,21 @@ import {
 } from '../../src/model/automation';
 
 import { Error } from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import fullModel from './data/automation.full.json';
 import minimalModel from './data/automation.minimal.json';
 import mongoose from 'mongoose';
 import regexParsingModel from './data/regex-parsing.full.json';
+
+let mongoServer: MongoMemoryServer;
+
+beforeAll(() => {
+    mongoServer = new MongoMemoryServer();
+});
+
+afterAll(async () => {
+    return mongoServer.stop();
+});
 
 const Automation = mongoose.model<AutomationDocument>(
     'Automation',
@@ -26,13 +37,11 @@ type WrapperDocument = mongoose.Document & { automation: AutomationDocument };
 const Wrapper = mongoose.model<WrapperDocument>('Wrapper', wrapperSchema);
 
 describe('validate', () => {
-    it('an automation without a schedule is invalid', async () => {
+    it('an automation without a schedule is valid', async () => {
         const missingSchedule = { ...fullModel };
         delete missingSchedule.schedule;
 
-        return new Automation(missingSchedule).validate((e) => {
-            expect(e.name).toBe(Error.ValidationError.name);
-        });
+        return new Automation(missingSchedule).validate();
     });
 
     it('an automation with both a parser and regexParsing is invalid', async () => {

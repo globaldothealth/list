@@ -1,41 +1,50 @@
 import { Range } from './range';
 import mongoose from 'mongoose';
 
-export enum Sex {
-    Female = 'Female',
-    Male = 'Male',
-    Other = 'Other',
-}
-
-export enum Species {
-    HomoSapien = 'Homo sapien',
-}
-
-export const demographicsSchema = new mongoose.Schema({
-    ageRange: {
-        start: {
-            type: Number,
-            min: -1,
-            max: 300,
+export const demographicsSchema = new mongoose.Schema(
+    {
+        ageRange: {
+            start: {
+                type: Number,
+                min: 0,
+                max: 120,
+            },
+            end: {
+                type: Number,
+                min: 0,
+                max: 120,
+            },
+            _id: false,
         },
-        end: {
-            type: Number,
-            min: -1,
-            max: 300,
+        gender: {
+            type: String,
+            index: true,
+        },
+        occupation: {
+            type: String,
+            index: true,
+        },
+        nationalities: {
+            type: [String],
+            index: true,
+        },
+        ethnicity: {
+            type: String,
+            index: true,
         },
     },
-    species: {
-        type: String,
-        enum: Object.values(Species),
-    },
-    sex: {
-        type: String,
-        enum: Object.values(Sex),
-    },
-});
+    { _id: false },
+);
 
 export type DemographicsDocument = mongoose.Document & {
     ageRange: Range<number>;
-    sex: Sex;
-    species: Species;
+    gender: string;
+    occupation: string;
+    nationalities: [string];
+    ethnicity: string;
 };
+
+export const Demographics = mongoose.model<DemographicsDocument>(
+    'Demographics',
+    demographicsSchema,
+);

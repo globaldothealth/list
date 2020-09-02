@@ -5,12 +5,12 @@ name: Data service Node.js CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/data-service-node.yml"
       - "data-serving/data-service/**"
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/data-service-node.yml"
       - "data-serving/data-service/**"
@@ -33,3 +33,7 @@ jobs:
         working-directory: data-serving/data-service
         env:
           CI: true
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: data-serving/data-service/coverage/coverage-final.json
