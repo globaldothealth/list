@@ -450,6 +450,24 @@ describe('POST', () => {
 
         expect(await CaseRevision.collection.countDocuments()).toEqual(1);
     });
+    it('batch upsert for unchanged case skips creating metadata and revision', async () => {
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [existingCase],
+                ...curatorMetadata,
+            });
+
+        const caseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        expect(caseInDb?.revisionMetadata.revisionNumber).toEqual(0);
+        expect(caseInDb?.revisionMetadata.creationMetadata.curator).toEqual(
+            minimalCase.revisionMetadata.creationMetadata.curator,
+        );
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+    });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)
             .post('/api/cases/batchUpsert')
