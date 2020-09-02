@@ -216,8 +216,8 @@ export default class CasesController {
             if (geocodeErrors.length > 0) {
                 res.status(207).send({
                     phase: 'GEOCODE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: geocodeErrors,
                 });
                 return;
@@ -232,8 +232,8 @@ export default class CasesController {
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: validationResponse.data.errors,
                 });
                 return;
@@ -250,8 +250,8 @@ export default class CasesController {
             );
             res.status(200).send({
                 phase: 'UPSERT',
-                createdCaseIds: upsertResponse.data.createdCaseIds,
-                updatedCaseIds: upsertResponse.data.updatedCaseIds,
+                numCreated: upsertResponse.data.numCreated,
+                numUpdated: upsertResponse.data.numUpdated,
                 errors: [],
             });
             return;
