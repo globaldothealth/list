@@ -1,11 +1,15 @@
 name: Curator Service Github Packages Push
 
 on:
+  # Build whenever a PR is merged into the main branch.
   push:
     branches: [main]
     paths:
       - ".github/workflows/curator-service-package.yml"
       - "verification/curator-service/**"
+  # Build whenever a new tag is created.
+  release:
+    types: [created]
 
 jobs:
   build-and-push:
