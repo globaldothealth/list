@@ -101,6 +101,12 @@ const styles = (theme: Theme) =>
             display: 'flex',
             justifyContent: 'center',
         },
+        tableToolbar: {
+            backgroundColor: '#31A497',
+        },
+        toolbarItems: {
+            color: 'white',
+        },
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
@@ -745,11 +751,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     components={{
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
-                                classes={{
-                                    highlight: { backgroundColor: 'purple' },
-                                }}
-                                toolbarButtonAlignment="left"
                                 {...props}
+                                classes={
+                                    this.state.numSelectedRows > 0
+                                        ? {
+                                              highlight: classes.tableToolbar,
+                                              title: classes.toolbarItems,
+                                          }
+                                        : {}
+                                }
+                                toolbarButtonAlignment="left"
                             />
                         ),
                     }}
@@ -810,7 +821,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
-                                                    <Button variant="outlined">
+                                                    <Button
+                                                        classes={{
+                                                            root:
+                                                                classes.toolbarItems,
+                                                        }}
+                                                    >
                                                         {this.state
                                                             .totalNumRows ===
                                                         this.state
@@ -911,7 +927,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="delete all">
-                                              <DeleteIcon />
+                                              <DeleteIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
                                           </span>
                                       ),
                                       tooltip: 'Delete selected rows',
