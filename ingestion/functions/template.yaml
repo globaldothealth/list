@@ -125,7 +125,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300 # Seconds
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
