@@ -188,6 +188,12 @@ Just change the image tag referenced in the deployment file to an earlier versio
 ### Deleting a release
 
 If for some reason you need to delete a tag, you can do it with `git tag -d curator-1.2.3` then `git push origin :refs/tags/curator-0.1.2` to delete it remotely.
+ 
+Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
+
+### Deprecated packages
+
+https://github.com/globaldothealth/list/packages/253413 and https://github.com/globaldothealth/list/packages/253391 were package repositories setup before Github Container Registry was released, they are unused and because they are public they cannot be deleted so please ignore them.
 
 ## Metric server
 
