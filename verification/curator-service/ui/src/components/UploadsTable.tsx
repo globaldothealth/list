@@ -156,21 +156,8 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 );
                                 response
                                     .then((result) => {
-                                        const flattenedSources = result.data.uploads
-                                            .filter((u) => {
-                                                const numCreated =
-                                                    u.upload?.summary
-                                                        ?.numCreated;
-                                                const numUpdated =
-                                                    u.upload?.summary
-                                                        ?.numUpdated;
-                                                return numCreated
-                                                    ? numCreated > 0
-                                                    : false || numUpdated
-                                                    ? numUpdated > 0
-                                                    : false;
-                                            })
-                                            .map((u) => {
+                                        const flattenedSources = result.data.uploads.map(
+                                            (u) => {
                                                 return {
                                                     id: u.upload._id,
                                                     created: u.upload.created,
@@ -183,12 +170,12 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                         u.upload.summary
                                                             .numUpdated ?? 0,
                                                 };
-                                            });
+                                            },
+                                        );
                                         resolve({
                                             data: flattenedSources,
                                             page: query.page,
-                                            totalCount:
-                                                flattenedSources.length ?? 0,
+                                            totalCount: result.data.total ?? 0,
                                         });
                                     })
                                     .catch((e) => {
