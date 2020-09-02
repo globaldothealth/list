@@ -1,7 +1,0 @@
-{
-    "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f3d3c6f4a02ac002e843937/2020/08/25/1823/content.csv",
-    "sourceUrl": "https://foo.bar",
-    "sourceId": "5f3d3c6f4a02ac002e843937"
-}
-

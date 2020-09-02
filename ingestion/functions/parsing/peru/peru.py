@@ -56,8 +56,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     """
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-#         reader = csv.reader(f)
-#         next(reader) # Skip the header.
         cases = []
         for entry in reader:
             cases.append(
