@@ -20,7 +20,9 @@ jobs:
       - uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ github.token }}
+          # https://github.com/globaldothealth/list/settings/secrets
+          # https://docs.github.com/en/packages/getting-started-with-github-container-registry/migrating-to-github-container-registry-for-docker-images#authenticating-with-the-container-registry
+          password: ${{ secrets.CR_PAT }}
           registry: ghcr.io
           repository: ${{github.repository}}/curatorservice
           dockerfile: verification/curator-service/Dockerfile
