@@ -51,74 +51,72 @@ export default function Transmission(): JSX.Element {
 
     return (
         <Scroll.Element name="transmission">
-            <fieldset>
-                <FieldTitle title="Transmission"></FieldTitle>
-                <div className={classes.fieldRow}>
-                    <FormikAutocomplete
-                        name="transmissionRoutes"
-                        freeSolo
-                        label="Route of transmission"
-                        initialValue={initialValues.transmissionRoutes}
-                        multiple
-                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/route_of_transmission.txt"
-                    />
-                </div>
-                <div className={classes.fieldRow}>
-                    {commonPlacesOfTransmission.length > 0 && (
-                        <>
-                            <div className={classes.section}>
-                                Frequently added places of transmission
-                            </div>{' '}
-                            <div className={classes.section}>
-                                {commonPlacesOfTransmission.map((place) => (
-                                    <Chip
-                                        key={place}
-                                        className={classes.chip}
-                                        label={place}
-                                        onClick={(): void => {
-                                            if (
-                                                !values.transmissionPlaces.includes(
-                                                    place,
-                                                )
-                                            ) {
-                                                setFieldValue(
-                                                    'transmissionPlaces',
-                                                    values.transmissionPlaces.concat(
-                                                        [place],
-                                                    ),
-                                                );
-                                            }
-                                        }}
-                                    ></Chip>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                    <FormikAutocomplete
-                        name="transmissionPlaces"
-                        freeSolo
-                        label="Places of transmission"
-                        initialValue={initialValues.transmissionPlaces}
-                        multiple
-                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/place_of_transmission.txt"
-                    />
-                </div>
-                <ChipInput
-                    fullWidth
-                    alwaysShowPlaceholder
-                    placeholder="Contacted case IDs"
-                    defaultValue={initialValues.transmissionLinkedCaseIds}
-                    onBlur={(): void =>
-                        setTouched({ transmissionLinkedCaseIds: true })
-                    }
-                    onChange={(values): void => {
-                        setFieldValue(
-                            'transmissionLinkedCaseIds',
-                            values ?? undefined,
-                        );
-                    }}
-                ></ChipInput>
-            </fieldset>
+            <FieldTitle title="Transmission"></FieldTitle>
+            <div className={classes.fieldRow}>
+                <FormikAutocomplete
+                    name="transmissionRoutes"
+                    freeSolo
+                    label="Route of transmission"
+                    initialValue={initialValues.transmissionRoutes}
+                    multiple
+                    optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/route_of_transmission.txt"
+                />
+            </div>
+            <div className={classes.fieldRow}>
+                {commonPlacesOfTransmission.length > 0 && (
+                    <>
+                        <div className={classes.section}>
+                            Frequently added places of transmission
+                        </div>{' '}
+                        <div className={classes.section}>
+                            {commonPlacesOfTransmission.map((place) => (
+                                <Chip
+                                    key={place}
+                                    className={classes.chip}
+                                    label={place}
+                                    onClick={(): void => {
+                                        if (
+                                            !values.transmissionPlaces.includes(
+                                                place,
+                                            )
+                                        ) {
+                                            setFieldValue(
+                                                'transmissionPlaces',
+                                                values.transmissionPlaces.concat(
+                                                    [place],
+                                                ),
+                                            );
+                                        }
+                                    }}
+                                ></Chip>
+                            ))}
+                        </div>
+                    </>
+                )}
+                <FormikAutocomplete
+                    name="transmissionPlaces"
+                    freeSolo
+                    label="Places of transmission"
+                    initialValue={initialValues.transmissionPlaces}
+                    multiple
+                    optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/place_of_transmission.txt"
+                />
+            </div>
+            <ChipInput
+                fullWidth
+                alwaysShowPlaceholder
+                placeholder="Contacted case IDs"
+                defaultValue={initialValues.transmissionLinkedCaseIds}
+                onBlur={(): void =>
+                    setTouched({ transmissionLinkedCaseIds: true })
+                }
+                onChange={(values): void => {
+                    setFieldValue(
+                        'transmissionLinkedCaseIds',
+                        values ?? undefined,
+                    );
+                }}
+            ></ChipInput>
         </Scroll.Element>
     );
 }

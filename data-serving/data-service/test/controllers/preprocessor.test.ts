@@ -366,6 +366,7 @@ describe('batch upsert', () => {
             },
         });
         await c.save();
+        const existingCaseWithUpdate = { ...existingCase, notes: 'new notes' };
 
         const newCase = {
             ...minimalCase,
@@ -376,13 +377,13 @@ describe('batch upsert', () => {
         };
 
         const requestBody = {
-            cases: [existingCase, newCase],
+            cases: [existingCaseWithUpdate, newCase],
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
         await setBatchUpsertRevisionMetadata(
             { body: requestBody, method: 'PUT' } as Request,
-            {} as Response,
+            { locals: {} } as Response,
             nextFn,
         );
 
@@ -390,7 +391,7 @@ describe('batch upsert', () => {
         expect(requestBody).toEqual({
             cases: [
                 {
-                    ...existingCase,
+                    ...existingCaseWithUpdate,
                     revisionMetadata: {
                         revisionNumber: 1,
                         creationMetadata: {
@@ -414,6 +415,32 @@ describe('batch upsert', () => {
                     },
                 },
             ],
+        });
+    });
+    it('does not add update metadata if case semantically unchanged', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        await new Case(existingCase).save();
+
+        const requestBody = {
+            cases: [existingCase],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await setBatchUpsertRevisionMetadata(
+            { body: requestBody, method: 'PUT' } as Request,
+            { locals: {} } as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(requestBody).toEqual({
+            cases: [existingCase],
         });
     });
     it('with existing cases creates case revisions', async () => {
@@ -460,6 +487,41 @@ describe('batch upsert', () => {
         expect((await CaseRevision.find())[0].case.toObject()).toEqual(
             c.toObject(),
         );
+    });
+    it('with unchanged cases does not create revision', async () => {
+        const existingCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists',
+            },
+        };
+        const c = new Case({
+            ...existingCase,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c.save();
+
+        const unchangedIdSet = new Set([c._id.toString()]);
+        const requestBody = {
+            cases: [existingCase],
+            curator: { email: 'updater@gmail.com' },
+        };
+        const nextFn = jest.fn();
+        await createBatchUpsertCaseRevisions(
+            { body: requestBody, method: 'PUT' } as Request,
+            { locals: { unchangedCaseIdSet: unchangedIdSet } } as Response,
+            nextFn,
+        );
+
+        expect(nextFn).toHaveBeenCalledTimes(1);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });
 describe('batch update', () => {

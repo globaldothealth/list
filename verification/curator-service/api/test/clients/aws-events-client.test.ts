@@ -45,7 +45,7 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
     client = new AwsEventsClient(
         'us-east-1',
-        new AwsLambdaClient('some-arn', 'us-east-1'),
+        new AwsLambdaClient('some-arn', 'test', 'us-east-1'),
         _ENV,
     );
 });
