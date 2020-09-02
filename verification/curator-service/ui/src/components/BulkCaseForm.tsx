@@ -172,8 +172,8 @@ interface BatchUpsertError {
 
 interface BatchUpsertResponse {
     phase: string;
-    createdCaseIds: string[];
-    updatedCaseIds: string[];
+    numCreated: number;
+    numUpdated: number;
     errors: BatchUpsertError[];
 }
 
@@ -523,30 +523,27 @@ class BulkCaseForm extends React.Component<
             );
             return;
         }
-        const createdIds = upsertResponse.createdCaseIds;
-        const updatedIds = upsertResponse.updatedCaseIds;
         await this.finalizeUpload(caseReference.sourceId, uploadId, 'SUCCESS', {
-            numCreated: createdIds.length,
-            numUpdated: updatedIds.length,
+            numCreated: upsertResponse.numCreated,
+            numUpdated: upsertResponse.numUpdated,
         });
         const createdMessage =
-            createdIds.length === 0
+            upsertResponse.numCreated === 0
                 ? ''
-                : createdIds.length === 1
+                : upsertResponse.numCreated === 1
                 ? '1 new case added. '
-                : `${createdIds.length} new cases added. `;
+                : `${upsertResponse.numCreated} new cases added. `;
         const updatedMessage =
-            updatedIds.length === 0
+            upsertResponse.numUpdated === 0
                 ? ''
-                : updatedIds.length === 1
+                : upsertResponse.numUpdated === 1
                 ? '1 case updated. '
-                : `${updatedIds.length} cases updated. `;
+                : `${upsertResponse.numUpdated} cases updated. `;
         this.props.history.push({
             pathname: '/cases',
             state: {
                 bulkMessage: `${filename} uploaded. ${createdMessage} ${updatedMessage}`,
-                newCaseIds: createdIds,
-                editedCaseIds: updatedIds,
+                searchQuery: `uploadid:${uploadId}`,
             },
         });
     }
