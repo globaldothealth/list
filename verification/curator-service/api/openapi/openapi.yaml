@@ -1440,7 +1440,11 @@ components:
           description: The number of cases created by the request.
         numUpdated:
           type: number
-          description: The number of cases modified by the request.
+          description: >
+            The number of cases modified by the request. Note that this only
+            includes cases that are actually modified by the batch upsert. If a
+            case is included in the batch upsert request, but contains no
+            changes compared to the currently stored case, it won't be counted.
         errors:
           type: array
           items:
