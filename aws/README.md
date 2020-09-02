@@ -172,8 +172,8 @@ You can list the existing tags/versions with `git tag` or on the [github repo](h
 
 ### `main` image tag for dev
 
-Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically (pending [Flux-based deployment
-(https://github.com/globaldothealth/list/issues/673) but is considered okay for the development environment. The latest image with the `main` tag is fetched when a deployment is updated in kubernetes.
+Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically - better approach is pending [Flux-based deployment]
+(https://github.com/globaldothealth/list/issues/673). The latest image with the `main` tag is fetched when a deployment is updated in kubernetes.
 To update dev to the `main` image, do:
 
 ```shell
