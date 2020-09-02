@@ -41,27 +41,31 @@ This repository contains the servers and scripts that support its data curation 
 ### READMEs
 
 - Getting set up
-    - [Local development](dev/README.md)
-    - [Production infrastructure set-up and management](aws/README.md)
+  - [Local development](dev/README.md)
+  - [Production infrastructure set-up and management](aws/README.md)
 - Component documentation
-    - [Authentication & authorization](verification/curator-service/auth.md)
-    - [Data ingestion functions](ingestion/functions/README.md)
-    - [Curator service](verification/curator-service/api/README.md)
-    - [Curator UI](verification/curator-service/ui/README.md)
-    - [Data service](data-serving/data-service/README.md)
+  - [Authentication & authorization](verification/curator-service/auth.md)
+  - [Data ingestion functions](ingestion/functions/README.md)
+  - [Curator service](verification/curator-service/api/README.md)
+  - [Curator UI](verification/curator-service/ui/README.md)
+  - [Data service](data-serving/data-service/README.md)
+  - [Geocoding](verification/curator-service/api/src/geocoding/README.md)
+  - [API](verification/curator-service/api/openapi/openapi.yaml)
 - Scripts
-    - Data service
-        - [Converting legacy CSV data to schema-conformant JSON](data-serving/scripts/convert-data/README.md)
-        - [Converting & importing legacy data into MongoDb](data-serving/scripts/data-pipeline/README.md)
-        - [Exporting MongoDb data to CSV/JSON](data-serving/scripts/export-data/README.md)
-        - [Setting up your MongoDB instance](data-serving/scripts/setup-db/README.md)
-    - [Curator portal](verification/scripts/README.md)
+  - Data service
+    - [Converting legacy CSV data to schema-conformant JSON](data-serving/scripts/convert-data/README.md)
+    - [Converting & importing legacy data into MongoDb](data-serving/scripts/data-pipeline/README.md)
+    - [Exporting MongoDb data to CSV/JSON](data-serving/scripts/export-data/README.md)
+    - [Setting up your MongoDB instance](data-serving/scripts/setup-db/README.md)
+  - [Curator portal](verification/scripts/README.md)
 - How do I...
   - [Update the case schema](data-serving/README.md)
 
 ### API docs
 
 - [Curator service](curator.ghdsi.org/api-docs)
+- [Local curator service](http://localhost:3001/api-docs)
+- [Local data service](http://localhost:3000/api-docs)
 
 ## Stats
 

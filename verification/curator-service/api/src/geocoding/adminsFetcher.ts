@@ -42,7 +42,7 @@ export default class MapboxAdminsFetcher {
         });
     }
 
-    // Fill in missing admin levels for the given GeocodeResult.
+    /** Fill in missing admin levels for the given GeocodeResult. */
     async fillAdmins(geocode: GeocodeResult): Promise<void> {
         // Return early if no need to fill in admins.
         if (

@@ -30,105 +30,97 @@ export default function GenomeSequences(): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name="genomeSequences">
-            <fieldset>
-                <FieldTitle title="Genome Sequences"></FieldTitle>
-                <FieldArray name="genomeSequences">
-                    {({ push, remove }): JSX.Element => {
-                        return (
-                            <div>
-                                {values.genomeSequences &&
-                                    values.genomeSequences.map(
-                                        (genomeSequence, index) => (
+            <FieldTitle title="Genome Sequences"></FieldTitle>
+            <FieldArray name="genomeSequences">
+                {({ push, remove }): JSX.Element => {
+                    return (
+                        <div>
+                            {values.genomeSequences &&
+                                values.genomeSequences.map(
+                                    (genomeSequence, index) => (
+                                        <div
+                                            key={genomeSequence.reactId}
+                                            data-testid={
+                                                'genome-sequence-section'
+                                            }
+                                        >
                                             <div
-                                                key={genomeSequence.reactId}
-                                                data-testid={
-                                                    'genome-sequence-section'
+                                                className={
+                                                    classes.genomeSequenceTitle
                                                 }
                                             >
-                                                <div
-                                                    className={
-                                                        classes.genomeSequenceTitle
+                                                {`Genome sequence ${index + 1}`}
+                                                <span
+                                                    className={classes.spacer}
+                                                ></span>
+                                                <Button
+                                                    startIcon={<CancelIcon />}
+                                                    data-testid={
+                                                        'remove-genome-sequence-button'
                                                     }
+                                                    onClick={(): void => {
+                                                        remove(index);
+                                                    }}
                                                 >
-                                                    {`Genome sequence ${
-                                                        index + 1
-                                                    }`}
-                                                    <span
-                                                        className={
-                                                            classes.spacer
-                                                        }
-                                                    ></span>
-                                                    <Button
-                                                        startIcon={
-                                                            <CancelIcon />
-                                                        }
-                                                        data-testid={
-                                                            'remove-genome-sequence-button'
-                                                        }
-                                                        onClick={(): void => {
-                                                            remove(index);
-                                                        }}
-                                                    >
-                                                        Remove
-                                                    </Button>
-                                                </div>
-                                                <DateField
-                                                    name={`genomeSequences[${index}].sampleCollectionDate`}
-                                                    label="Sample collection date"
-                                                ></DateField>
-                                                <FastField
-                                                    className={classes.field}
-                                                    name={`genomeSequences[${index}].repositoryUrl`}
-                                                    type="text"
-                                                    label="Repository URL"
-                                                    fullWidth
-                                                    component={TextField}
-                                                ></FastField>
-                                                <FastField
-                                                    className={classes.field}
-                                                    name={`genomeSequences[${index}].sequenceId`}
-                                                    type="text"
-                                                    label="Sequence accession"
-                                                    fullWidth
-                                                    component={TextField}
-                                                ></FastField>
-                                                <FastField
-                                                    className={classes.field}
-                                                    name={`genomeSequences[${index}].sequenceName`}
-                                                    type="text"
-                                                    label="Sequence name"
-                                                    fullWidth
-                                                    component={TextField}
-                                                ></FastField>
-                                                <FastField
-                                                    className={classes.field}
-                                                    name={`genomeSequences[${index}].sequenceLength`}
-                                                    type="number"
-                                                    label="Sequence length"
-                                                    fullWidth
-                                                    component={TextField}
-                                                ></FastField>
+                                                    Remove
+                                                </Button>
                                             </div>
-                                        ),
-                                    )}
+                                            <DateField
+                                                name={`genomeSequences[${index}].sampleCollectionDate`}
+                                                label="Sample collection date"
+                                            ></DateField>
+                                            <FastField
+                                                className={classes.field}
+                                                name={`genomeSequences[${index}].repositoryUrl`}
+                                                type="text"
+                                                label="Repository URL"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                            <FastField
+                                                className={classes.field}
+                                                name={`genomeSequences[${index}].sequenceId`}
+                                                type="text"
+                                                label="Sequence accession"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                            <FastField
+                                                className={classes.field}
+                                                name={`genomeSequences[${index}].sequenceName`}
+                                                type="text"
+                                                label="Sequence name"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                            <FastField
+                                                className={classes.field}
+                                                name={`genomeSequences[${index}].sequenceLength`}
+                                                type="number"
+                                                label="Sequence length"
+                                                fullWidth
+                                                component={TextField}
+                                            ></FastField>
+                                        </div>
+                                    ),
+                                )}
 
-                                <Button
-                                    data-testid="addGenomeSequence"
-                                    startIcon={<AddCircleIcon />}
-                                    onClick={(): void => {
-                                        push({
-                                            reactId: shortId.generate(),
-                                            sampleCollectionDate: null,
-                                        });
-                                    }}
-                                >
-                                    Add genome sequence
-                                </Button>
-                            </div>
-                        );
-                    }}
-                </FieldArray>
-            </fieldset>
+                            <Button
+                                data-testid="addGenomeSequence"
+                                startIcon={<AddCircleIcon />}
+                                onClick={(): void => {
+                                    push({
+                                        reactId: shortId.generate(),
+                                        sampleCollectionDate: null,
+                                    });
+                                }}
+                            >
+                                Add genome sequence
+                            </Button>
+                        </div>
+                    );
+                }}
+            </FieldArray>
         </Scroll.Element>
     );
 }

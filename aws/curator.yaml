@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:latest
+          image: ghcr.io/globaldothealth/list/curatorservice:main
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -30,6 +30,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-dev"
             - name: DB_CONNECTION_STRING
@@ -96,7 +100,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: docker.io/healthmapidha/curatorservice:0.0.9
+          image: ghcr.io/globaldothealth/list/curatorservice:0.0.15
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -106,6 +110,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
             - name: DATASERVER_URL
               value: "http://data-prod"
             - name: DB_CONNECTION_STRING

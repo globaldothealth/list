@@ -8,22 +8,21 @@ on:
     - 'ingestion/functions/**'
 
 jobs:
-  deploy:
+  sam-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion/functions
     steps:
     - uses: actions/checkout@v2
-    - name: sam build
-      uses: youyo/aws-sam-action/python3.8@master
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
       with:
-        sam_command: build -t ingestion/functions/template.yaml
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: us-east-1
-    - name: sam deploy
-      uses: youyo/aws-sam-action/python3.8@master
-      with:
-        sam_command: 'deploy -t ingestion/functions/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset'
+        python-version: 3.8
+    - name: sam build and deploy
+      run: |
+        sam build
+        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

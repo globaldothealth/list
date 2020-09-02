@@ -55,9 +55,9 @@ it('loads and displays case', async () => {
     );
     expect(getByText('entryId')).toBeInTheDocument();
     expect(getByText('abc123')).toBeInTheDocument();
-    expect(getByText('2020-1-20')).toBeInTheDocument();
+    expect(getByText('2020-01-20')).toBeInTheDocument();
     expect(getByText('xyz789')).toBeInTheDocument();
-    expect(getByText('2020-4-13')).toBeInTheDocument();
+    expect(getByText('2020-04-13')).toBeInTheDocument();
     expect(
         getByText('Contact of a confirmed case at work.'),
     ).toBeInTheDocument();
@@ -76,11 +76,11 @@ it('loads and displays case', async () => {
     expect(getByText(/2.3522/)).toBeInTheDocument();
     expect(getByText(/48.85/)).toBeInTheDocument();
     // Events.
-    expect(getByText('2020-1-1')).toBeInTheDocument();
-    expect(getByText('2020-1-2')).toBeInTheDocument();
-    expect(getByText('2020-1-3')).toBeInTheDocument();
-    expect(getByText('2020-1-4 - 2020-1-5')).toBeInTheDocument();
-    expect(getByText('2020-1-6')).toBeInTheDocument();
+    expect(getByText('2020-01-01')).toBeInTheDocument();
+    expect(getByText('2020-01-02')).toBeInTheDocument();
+    expect(getByText('2020-01-03')).toBeInTheDocument();
+    expect(getByText('2020-01-04 - 2020-01-05')).toBeInTheDocument();
+    expect(getByText('2020-01-06')).toBeInTheDocument();
     expect(getByText('Recovered')).toBeInTheDocument();
     expect(getByText('PCR test')).toBeInTheDocument();
     // Symptoms.
@@ -106,7 +106,7 @@ it('loads and displays case', async () => {
     );
 
     // Travel history.
-    expect(getByText('2020-2-10 - 2020-2-17')).toBeInTheDocument();
+    expect(getByText('2020-02-10 - 2020-02-17')).toBeInTheDocument();
     expect(getByText('United States')).toBeInTheDocument();
     expect(getByText('New York')).toBeInTheDocument();
     expect(getByText('Kings County')).toBeInTheDocument();
