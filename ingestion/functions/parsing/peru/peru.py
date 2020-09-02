@@ -2,8 +2,7 @@ import json
 import os
 import sys
 from datetime import date, datetime
-import pandas as pd
-
+import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -14,6 +13,7 @@ if ('lambda' not in sys.argv[0]):
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
 import parsing_lib
+
 
 def convert_date(raw_date):
     """ 
@@ -37,73 +37,57 @@ def convert_gender(raw_gender):
     return None
 
 
+
 def convert_location(raw_entry):
-    department = raw_entry["DEPARTAMENTO"]
-    province = raw_entry["PROVINCIA"]
-    district = raw_entry["DISTRITO"]
-
-    query_terms = ("Peru",)
-    location = {"country": "Peru"}
-    if department:
-        location["administrativeAreaLevel1"] = department
-        query_terms = (department,) + query_terms
-    if province:
-        location["administrativeAreaLevel2"] = province
-        query_terms = (province,) + query_terms
-    if district:
-        location["administrativeAreaLevel3"] = district
-        query_terms = (district,) + query_terms
-
-    location["query"] = ", ".join(query_terms)
-    return location
-
+    # print(raw_entry['DISTRITO'])
+    query_terms = [
+        term for term in [
+            raw_entry.get("DISTRITO", ""),
+            raw_entry.get("PROVINCIA", ""),
+            raw_entry.get("DEPARTAMENTO", ""),
+            "Peru"]
+        if "EN INVESTIGACIÓN" not in term]
+    
+    return {"query":  ", ".join(query_terms)}
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
-
-    Two primary caveats at present:
-        1. We aren't converting all fields yet.
-        2. We're restricting ourselves to data with an `agebracket` present.
-           This data has an interesting format in which some rows represent
-           aggregate data. We need to add handling logic; until we've done so,
-           this filter is used to process strictly line list data.
     """
     with open(raw_data_file, "r") as f:
-        cases = pd.read_csv(raw_data_file,sep=',',encoding='ISO-8859-1')
-        return [
-            {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceEntryId": entry["UUID"],
-                    "sourceUrl": source_url
-                },
-                "revisionMetadata": {
-                    "revisionNumber": 0,
-                    "creationMetadata": {
-                        "curator": "auto",
-                        "date": date.today().strftime("%m/%d/%Y")
-                    }
-                },
-                "location": convert_location(entry),
-                "events": [
+        reader = csv.DictReader(f)
+#         reader = csv.reader(f)
+#         next(reader) # Skip the header.
+        cases = []
+        for entry in reader:
+            cases.append(
+        {
+            "caseReference": {
+                "sourceId": source_id,
+                "sourceEntryId": entry["UUID"],
+                "sourceUrl": source_url
+            },
+            "location": convert_location(entry),
+            "events": [
+                {
+                    "name": "confirmed",
+                    "dateRange":
                     {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(entry["FECHA_RESULTADO"]),
-                            "end": convert_date(entry["FECHA_RESULTADO"])
-                        }
+                        "start": convert_date(entry["FECHA_RESULTADO"]),
+                        "end": convert_date(entry["FECHA_RESULTADO"])
                     }
-                ],
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["EDAD"]),
-                        "end": float(entry["EDAD"])
-                    },
-                    "gender": convert_gender(entry["SEXO"])
                 }
-            } for i,entry in cases.iterrows()]
+            ],
+            "demographics": {
+                "ageRange": {
+                    "start": float(entry["EDAD"]),
+                    "end": float(entry["EDAD"])
+                },
+                "gender": convert_gender(entry["SEXO"])
+            }
+        }) 
+    return cases
+
 
 
 
