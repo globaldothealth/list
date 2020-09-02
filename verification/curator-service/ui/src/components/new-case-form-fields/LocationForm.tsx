@@ -23,31 +23,29 @@ function LocationForm(): JSX.Element {
     >();
     return (
         <Scroll.Element name="location">
-            <fieldset>
-                <FieldTitle title="Location"></FieldTitle>
-                <PlacesAutocomplete
-                    initialValue={initialValues.location?.name}
-                    name="location"
-                    required
+            <FieldTitle title="Location"></FieldTitle>
+            <PlacesAutocomplete
+                initialValue={initialValues.location?.name}
+                name="location"
+                required
+            />
+            {!values.location && (
+                <Button
+                    variant="outlined"
+                    color="default"
+                    id="add-location"
+                    startIcon={<AddIcon />}
+                    onClick={() => setFieldValue('location', {})}
+                >
+                    Specify geocode manually
+                </Button>
+            )}
+            {values.location && (
+                <Location
+                    locationPath="location"
+                    geometry={values.location?.geometry}
                 />
-                {!values.location && (
-                    <Button
-                        variant="outlined"
-                        color="default"
-                        id="add-location"
-                        startIcon={<AddIcon />}
-                        onClick={() => setFieldValue('location', {})}
-                    >
-                        Specify geocode manually
-                    </Button>
-                )}
-                {values.location && (
-                    <Location
-                        locationPath="location"
-                        geometry={values.location?.geometry}
-                    />
-                )}
-            </fieldset>
+            )}
         </Scroll.Element>
     );
 }

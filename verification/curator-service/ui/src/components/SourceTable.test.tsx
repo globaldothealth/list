@@ -4,10 +4,18 @@ import { fireEvent, render } from '@testing-library/react';
 
 import React from 'react';
 import SourceTable from './SourceTable';
+import User from './User';
 import axios from 'axios';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+const curator: User = {
+    _id: 'testUser',
+    name: 'Alice Smith',
+    email: 'foo@bar.com',
+    roles: ['admin', 'curator'],
+};
 
 afterEach(() => {
     mockedAxios.get.mockClear();
@@ -60,7 +68,7 @@ it('loads and displays sources', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<SourceTable />);
+    const { findByText } = render(<SourceTable user={curator} />);
 
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -119,16 +127,22 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/sources/?limit=10&page=1',
+    );
+    const row = await findByText(/abc123/);
+    expect(row).toBeInTheDocument();
 
-    // Throw error on add request.
-    mockedAxios.post.mockRejectedValueOnce(new Error('Request failed'));
+    // Throw error on delete request.
+    mockedAxios.delete.mockRejectedValueOnce(new Error('Request failed'));
 
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
+    const deleteButton = getByText(/delete_outline/);
+    fireEvent.click(deleteButton);
     const confirmButton = getByText(/check/);
     fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
 
     const error = await findByText('Error: Request failed');
     expect(error).toBeInTheDocument();
@@ -168,7 +182,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText } = render(<SourceTable />);
+    const { getByText, findByText } = render(<SourceTable user={curator} />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -214,78 +228,6 @@ it('can delete a row', async () => {
     expect(noRec).toBeInTheDocument();
 });
 
-it('can add a row', async () => {
-    const axiosGetResponse = {
-        data: {
-            sources: [],
-            total: 0,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosGetResponse);
-
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
-
-    // Check table is empty on load
-    const row = queryByText(/abc123/);
-    expect(row).not.toBeInTheDocument();
-
-    // Add a row
-    const newSource = {
-        _id: 'abc123',
-        name: 'source_name',
-        format: 'JSON',
-        origin: {
-            url: 'origin url',
-            license: 'origin license',
-        },
-        automation: {
-            parser: {
-                awsLambdaArn: 'arn:aws:lambda:a:b:functions:c',
-            },
-            schedule: {
-                awsRuleArn: 'arn:aws:events:a:b:rule/c',
-                awsScheduleExpression: 'rate(2 hours)',
-            },
-        },
-    };
-    const axiosPostResponse = {
-        data: {
-            source: newSource,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    const axiosGetAfterAddResponse = {
-        data: {
-            sources: [newSource],
-            total: 1,
-        },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.post.mockResolvedValueOnce(axiosPostResponse);
-    mockedAxios.get.mockResolvedValueOnce(axiosGetAfterAddResponse);
-
-    const addButton = getByText(/add_box/);
-    fireEvent.click(addButton);
-    const confirmButton = getByText(/check/);
-    fireEvent.click(confirmButton);
-    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
-
-    // Check table is reloaded
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    const newRow = await findByText(/abc123/);
-    expect(newRow).toBeInTheDocument();
-});
-
 it('can edit a row', async () => {
     const sources = [
         {
@@ -318,7 +260,9 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(<SourceTable />);
+    const { getByText, findByText, queryByText } = render(
+        <SourceTable user={curator} />,
+    );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',

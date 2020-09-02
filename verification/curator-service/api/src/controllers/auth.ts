@@ -6,14 +6,18 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
 
-import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import {
+    Strategy as BearerStrategy,
+    IVerifyOptions,
+} from 'passport-http-bearer';
 import { Router } from 'express';
 import axios from 'axios';
 import passport from 'passport';
 
-// mustBeAuthenticated is a middleware that checks that the user making the call is
-// authenticated.
-// Subsequent request handlers can be assured req.user will be defined.
+/**
+ * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
+ * Subsequent request handlers can be assured req.user will be defined.
+ */
 export const mustBeAuthenticated = (
     req: Request,
     res: Response,
@@ -25,6 +29,11 @@ export const mustBeAuthenticated = (
     res.sendStatus(403);
 };
 
+/**
+ * Checks roles of a user against a set of required roles.
+ * @param user the user to check roles for.
+ * @param requiredRoles The set of roles that the user should have, if any role matches the function returns true.
+ */
 const userHasRequiredRole = (
     user: UserDocument,
     requiredRoles: Set<string>,
@@ -68,6 +77,9 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
     };
 };
 
+/**
+ * AuthController handles authentication of users with the system.
+ */
 export class AuthController {
     public router: Router;
     constructor(private readonly afterLoginRedirURL: string) {
@@ -108,7 +120,9 @@ export class AuthController {
         );
     }
 
-    // configureLocalAuth will get or create the user present in the request.
+    /**
+     * configureLocalAuth will get or create the user present in the request.
+     */
     configureLocalAuth(): void {
         console.log('Configuring local auth for tests');
         // /register creates a user if necessary and log them in.
@@ -133,6 +147,12 @@ export class AuthController {
             },
         );
     }
+
+    /**
+     * Configures OAuth passport strategy.
+     * @param clientID the OAuth client ID as gotten from the Google developer console.
+     * @param clientSecret the OAuth client secret as gotten from the Google developer console.
+     */
     configurePassport(clientID: string, clientSecret: string): void {
         passport.serializeUser<UserDocument, string>((user, done) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
@@ -197,7 +217,14 @@ export class AuthController {
         // Configure passport to accept HTTP bearer tokens.
         passport.use(
             new BearerStrategy(
-                async (token: string, done: Function): Promise<void> => {
+                async (
+                    token: string,
+                    done: (
+                        error: unknown,
+                        user?: unknown,
+                        options?: IVerifyOptions | string,
+                    ) => void,
+                ): Promise<void> => {
                     try {
                         const response = await axios.get(
                             `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,

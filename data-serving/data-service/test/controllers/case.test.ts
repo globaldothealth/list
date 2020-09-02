@@ -1,5 +1,6 @@
 import { Case } from '../../src/model/case';
 import { CaseRevision } from '../../src/model/case-revision';
+import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
@@ -449,6 +450,24 @@ describe('POST', () => {
 
         expect(await CaseRevision.collection.countDocuments()).toEqual(1);
     });
+    it('batch upsert for unchanged case skips creating metadata and revision', async () => {
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [existingCase],
+                ...curatorMetadata,
+            });
+
+        const caseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        expect(caseInDb?.revisionMetadata.revisionNumber).toEqual(0);
+        expect(caseInDb?.revisionMetadata.creationMetadata.curator).toEqual(
+            minimalCase.revisionMetadata.creationMetadata.curator,
+        );
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+    });
     it('batch upsert with any invalid case should return 422', async () => {
         await request(app)
             .post('/api/cases/batchUpsert')
@@ -553,6 +572,104 @@ describe('PUT', () => {
             .put('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .send(curatorMetadata)
             .expect(404);
+    });
+    it('update many items should return 200 OK', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+        const c2 = new Case(minimalCase);
+        await c2.save();
+        await new Case(minimalCase).save();
+
+        const newNotes = 'abc';
+        const newNotes2 = 'cba';
+        const res = await request(app)
+            .post('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [
+                    { _id: c._id, notes: newNotes },
+                    { _id: c2._id, notes: newNotes2 },
+                ],
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(2);
+        const cases = await Case.find();
+        expect(cases[0].notes).toEqual(newNotes);
+        expect(cases[1].notes).toEqual(newNotes2);
+    });
+    it('update many items without _id should return 422', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+        const c2 = new Case(minimalCase);
+        await c2.save();
+        await new Case(minimalCase).save();
+
+        const newNotes = 'abc';
+        const newNotes2 = 'cba';
+        await request(app)
+            .post('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [{ _id: c._id, notes: newNotes }, { notes: newNotes2 }],
+            })
+            .expect('Content-Type', /json/)
+            .expect(422);
+    });
+    it('update many items from query should return 200 OK', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        const c = new Case(minimalCase);
+        c.notes = 'test case';
+        await c.save();
+        const c2 = new Case(minimalCase);
+        c2.notes = 'test case';
+        await c2.save();
+        const c3 = new Case(minimalCase);
+        const unchangedNotes = 'unchanged notes';
+        c3.notes = unchangedNotes;
+        await c3.save();
+
+        const newNotes = 'abc';
+        const res = await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                query: 'test case',
+                case: { notes: newNotes },
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(2);
+        const cases = await Case.find();
+        expect(cases[0].notes).toEqual(newNotes);
+        expect(cases[1].notes).toEqual(newNotes);
+        expect(cases[2].notes).toEqual(unchangedNotes);
+    });
+    it('update many items with query without case should return 400', async () => {
+        await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                query: 'test case',
+            })
+            .expect(400);
+    });
+    it('batchUpdateQuery without query should return 400', async () => {
+        await request(app)
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                ...curatorMetadata,
+                case: { notes: 'new notes' },
+            })
+            .expect(400);
     });
     it('upsert present item should return 200 OK', async () => {
         const c = new Case(minimalCase);
@@ -736,7 +853,7 @@ describe('PUT', () => {
 });
 
 describe('DELETE', () => {
-    it('delete present item should return 200 OK', async () => {
+    it('delete present item should return 204 OK', async () => {
         const c = new Case(minimalCase);
         await c.save();
 
@@ -746,5 +863,88 @@ describe('DELETE', () => {
         return request(app)
             .delete('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
+    });
+    it('delete multiple cases cannot specify caseIds and query', async () => {
+        const c = await new Case(minimalCase).save();
+        const c2 = await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        await request(app)
+            .delete('/api/cases')
+            .send({ caseIds: [c._id, c2._id], query: 'test' })
+            .expect(400);
+    });
+    it('delete multiple cases cannot send without request body', async () => {
+        await request(app).delete('/api/cases').expect(415);
+    });
+    it('delete multiple cases cannot send empty request body', async () => {
+        await request(app).delete('/api/cases').send({}).expect(400);
+    });
+    it('delete multiple cases cannot send empty query', async () => {
+        await request(app).delete('/api/cases').send({ query: '' }).expect(400);
+    });
+    it('delete multiple cases cannot send whitespace only query', async () => {
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: ' ' })
+            .expect(400);
+    });
+    it('delete multiple cases with caseIds should return 204 OK', async () => {
+        const c = await new Case(minimalCase).save();
+        const c2 = await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(2);
+
+        await request(app)
+            .delete('/api/cases')
+            .send({ caseIds: [c._id, c2._id] })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(0);
+    });
+    it('delete multiple cases with query should return 204 OK', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        const c = new Case(minimalCase);
+        c.notes = 'got it at work';
+        c.demographics = new Demographics({ gender: 'Female' });
+        await c.save();
+        const c2 = new Case(minimalCase);
+        c2.demographics = new Demographics({ gender: 'Female' });
+        await c2.save();
+        await new Case(minimalCase).save();
+        expect(await Case.collection.countDocuments()).toEqual(3);
+
+        // Unmatched query deletes no cases
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at home' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at work gender:Male' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'gender:Male' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+
+        // Deletes matched queries
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'at work gender:Female' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(2);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'gender:Female' })
+            .expect(204);
+        expect(await Case.collection.countDocuments()).toEqual(1);
     });
 });

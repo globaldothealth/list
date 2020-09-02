@@ -45,7 +45,7 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "react-router-last-location": "^2.0.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^3.4.3",
     "react-scroll": "^1.8.0",
     "shortid": "^2.2.15",
     "typeface-roboto": "0.0.75",
@@ -84,7 +84,7 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^4.12.1",
+    "cypress": "^5.0.0",
     "cypress-file-upload": "^4.0.7",
     "jest-canvas-mock": "^2.2.0"
   },
