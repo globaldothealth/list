@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, Typography, makeStyles } from '@material-ui/core';
+import { Button, Paper, Typography, makeStyles } from '@material-ui/core';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
@@ -135,7 +135,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                             </Typography>
                         </div>
                         <Form>
-                            <fieldset className={classes.allFormSections}>
+                            <Paper className={classes.allFormSections}>
                                 <div className={classes.fieldTitle}>
                                     <FieldTitle title="Data Source" />
                                 </div>
@@ -169,7 +169,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         required
                                     />
                                 </div>
-                            </fieldset>
+                            </Paper>
                         </Form>
                         {errorMessage && (
                             <MuiAlert

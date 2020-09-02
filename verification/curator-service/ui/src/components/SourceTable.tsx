@@ -17,6 +17,7 @@ import axios from 'axios';
 import { isUndefined } from 'util';
 import User from './User';
 import SourceRetrievalButton from './SourceRetrievalButton';
+import ParsersAutocomplete from './ParsersAutocomplete';
 
 interface ListResponse {
     sources: Source[];
@@ -325,8 +326,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 editable: 'never',
                             },
                             {
-                                title: 'AWS Parser ARN',
+                                title: 'Parser function',
                                 field: 'awsLambdaArn',
+                                editComponent: (props): JSX.Element => (
+                                    <ParsersAutocomplete
+                                        defaultValue={props.value || ''}
+                                        onChange={props.onChange}
+                                    />
+                                ),
                             },
                             {
                                 title: 'Date filtering',

@@ -39,7 +39,7 @@ def extract_event_fields(event):
             for field
             in [ENV_FIELD, SOURCE_ID_FIELD]):
         error_message = (
-            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event json.")
+            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event: {event}")
         print(error_message)
         raise ValueError(error_message)
     return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get('auth', {})
