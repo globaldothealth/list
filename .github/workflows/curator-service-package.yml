@@ -4,11 +4,11 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - ".github/workflows/curator-package.yml"
+      - ".github/workflows/curator-service-package.yml"
   push:
     branches: [main]
     paths:
-      - ".github/workflows/curator-package.yml"
+      - ".github/workflows/curator-service-package.yml"
       - "verification/curator-service/**"
 
 jobs:
