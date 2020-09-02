@@ -1,10 +1,6 @@
 name: Curator Service Github Packages Push
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/curator-service-package.yml"
   push:
     branches: [main]
     paths:
