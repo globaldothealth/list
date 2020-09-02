@@ -1,12 +1,17 @@
 import AWS from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
-import AwsLambdaClient from '../../src/clients/aws-lambda-client';
+import AwsLambdaClient, {
+    RetrievalPayload,
+    LambdaFunction,
+} from '../../src/clients/aws-lambda-client';
 
 let client: AwsLambdaClient;
 const addPermissionSpy = jest
     .fn()
     .mockResolvedValue({ Statement: 'statement' });
 const removePermissionSpy = jest.fn().mockResolvedValue({});
+const invokeSpy = jest.fn();
+const listFunctionsSpy = jest.fn();
 
 beforeAll(() => {
     AWSMock.setSDKInstance(AWS);
@@ -15,9 +20,12 @@ beforeAll(() => {
 beforeEach(() => {
     addPermissionSpy.mockClear();
     removePermissionSpy.mockClear();
+    invokeSpy.mockClear();
     AWSMock.mock('Lambda', 'addPermission', addPermissionSpy);
     AWSMock.mock('Lambda', 'removePermission', removePermissionSpy);
-    client = new AwsLambdaClient('us-east-1');
+    AWSMock.mock('Lambda', 'invoke', invokeSpy);
+    AWSMock.mock('Lambda', 'listFunctions', listFunctionsSpy);
+    client = new AwsLambdaClient('some-arn', 'test', 'us-east-1');
 });
 
 afterEach(() => {
@@ -79,5 +87,64 @@ describe('removePermission', () => {
         return expect(
             client.removePermission('functionName', 'statementId'),
         ).rejects.toThrow(expectedError);
+    });
+});
+
+describe('invokeRetrieval', () => {
+    it('invoke retrieval for the given source', async () => {
+        const payload: RetrievalPayload = {
+            key: 'some key',
+            bucket: 'some bucket',
+            upload_id: 'foo',
+        };
+        invokeSpy.mockResolvedValueOnce({
+            Payload: JSON.stringify(payload),
+        });
+        const res = await client.invokeRetrieval('some-source-id');
+        expect(invokeSpy).toHaveBeenCalledTimes(1);
+        expect(res).toEqual(payload);
+    });
+    it('throws when error is returned by aws api', async () => {
+        const expectedError = new Error('AWS error');
+        invokeSpy.mockRejectedValueOnce(expectedError);
+        return expect(client.invokeRetrieval('some-source-id')).rejects.toThrow(
+            expectedError,
+        );
+    });
+    it('throws when function is not run properly', async () => {
+        invokeSpy.mockResolvedValueOnce({
+            FunctionError: 'Func error',
+        });
+        return expect(client.invokeRetrieval('some-source-id')).rejects.toThrow(
+            /Func error/,
+        );
+    });
+});
+
+describe('parsers', () => {
+    it('can be listed', async () => {
+        const payload: LambdaFunction[] = [
+            {
+                name: 'JapanParsingFunction',
+            },
+        ];
+        listFunctionsSpy.mockResolvedValueOnce({
+            Functions: [
+                {
+                    FunctionName: 'JapanParsingFunction',
+                },
+                {
+                    FunctionName: 'RetrievalFunction',
+                },
+            ],
+        });
+        const res = await client.listParsers();
+        expect(listFunctionsSpy).toHaveBeenCalledTimes(1);
+        expect(res).toEqual(payload);
+    });
+    it('throws when error is returned by aws api', async () => {
+        const expectedError = new Error('AWS error');
+        listFunctionsSpy.mockRejectedValueOnce(expectedError);
+        return expect(client.listParsers()).rejects.toThrow(expectedError);
     });
 });

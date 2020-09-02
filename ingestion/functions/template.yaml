@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Lambda functions for Global Health ingestion
 
-Parameters:
-  SourceApiUrl:
-    Type: String
-    Description: Address at which to retrieve source details
-    Default: "http://localhost:3001/api"
-
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -25,13 +19,9 @@ Resources:
         - AWSLambdaFullAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
   ParsingLibLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -71,33 +61,40 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
   HongKongParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: parsing/hongkong/
       Handler: hongkong.lambda_handler
       Runtime: python3.8
-      Description: Parse case data for India
+      Description: Parse case data for HongKong
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
+  JapanParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/japan/
+      Handler: japan.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Japan
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Timeout: 300
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -109,15 +106,10 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      Timeout: 60 # Seconds
+      Timeout: 300
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
-      Environment:
-        Variables:
-          SOURCE_API_URL:
-            Ref: SourceApiUrl
-
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:

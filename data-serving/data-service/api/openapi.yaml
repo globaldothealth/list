@@ -4,15 +4,23 @@ info:
   description: Server for CRUD operations on Global Health line-list data
   termsOfService: "https://www.healthmap.org/about/termsofuse/"
   contact:
+    name: Healthmap
+    url: http://www.diseasedaily.org/about
     email: info@healthmap.org
   license:
     name: MIT
     url: "https://opensource.org/licenses/MIT"
   version: 1.0.0
+tags:
+  - name: Case
+    description: Case related operations
+  - name: Suggest
+    description: Suggestion for input of cases
 paths:
   /cases:
     get:
       summary: Lists cases
+      tags: [Case]
       operationId: listCases
       parameters:
         - name: page
@@ -65,6 +73,7 @@ paths:
           $ref: "#/components/responses/500"
     post:
       summary: Creates one (or multiple identical) new cases
+      tags: [Case]
       operationId: createCase
       requestBody:
         description: Case to add
@@ -104,6 +113,7 @@ paths:
           $ref: "#/components/responses/500"
     put:
       summary: Upserts a case
+      tags: [Case]
       description: >
         Creates or updates a case, depending on whether the provided values for
         the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
@@ -136,9 +146,51 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+    delete:
+      summary: >
+        Deletes multiple cases. It is required to supply exactly one of either 
+        caseIds or query in the request body. If caseIds are supplied, cases 
+        corresponding to those caseIds will be deleted. If query is supplied, 
+        all cases that match the query will be deleted.
+      tags: [Case]
+      operationId: deleteCases
+      requestBody:
+        description: Cases to delete
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will be deleted
+                  type: array
+                  items:
+                    type: string
+                query:
+                  description: >
+                    Cases matching this query will be deleted. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
+      responses:
+        "204":
+          description: Cases deleted
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/batchValidate:
     post:
       summary: Batch validates cases
+      tags: [Case]
       operationId: batchValidateCases
       requestBody:
         description: Cases to validate
@@ -155,6 +207,7 @@ paths:
   /cases/batchUpsert:
     post:
       summary: Batch upserts cases
+      tags: [Case]
       operationId: batchUpsertCases
       requestBody:
         description: Cases to upsert
@@ -176,10 +229,75 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - curator
+                - query
+                - case
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/symptoms:
     get:
       summary: Lists most frequently used symptoms
       operationId: listSymptoms
+      tags: [Suggest]
       parameters:
         - name: limit
           in: query
@@ -204,6 +322,7 @@ paths:
     get:
       summary: Lists most frequently used places of transmission
       operationId: listPlacesOfTransmission
+      tags: [Suggest]
       parameters:
         - name: limit
           in: query
@@ -227,6 +346,7 @@ paths:
   /cases/occupations:
     get:
       summary: Lists most frequently used occupations
+      tags: [Suggest]
       operationId: listOccupations
       parameters:
         - name: limit
@@ -260,6 +380,7 @@ paths:
     get:
       summary: Gets a specific case
       operationId: getCase
+      tags: [Case]
       responses:
         "200":
           $ref: "#/components/responses/200Case"
@@ -276,6 +397,7 @@ paths:
     put:
       summary: Updates a specific case
       operationId: updateCase
+      tags: [Case]
       requestBody:
         description: Case to update
         required: true
@@ -305,6 +427,7 @@ paths:
     delete:
       summary: Deletes a specific case
       operationId: deleteCase
+      tags: [Case]
       responses:
         "204":
           description: Case deleted
@@ -318,6 +441,13 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    BatchUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchValidateCaseResponse:
       description: Response to batch validate case API requests
       properties:
@@ -370,7 +500,8 @@ components:
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
@@ -644,6 +775,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200BatchUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchUpdateResponse"
     "200SymptomArray":
       description: OK
       content:

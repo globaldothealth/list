@@ -7,13 +7,13 @@ declare global {
         interface Chainable {
             addCase: (opts: {
                 country: string;
-                notes: string;
-                sourceUrl: string;
                 methodOfConfirmation?: string;
                 nationalities?: string[];
-                curator?: string;
+                notes?: string;
+                occupation?: string;
                 symptomStatus?: string;
                 symptoms?: string[];
+                transmissionPlaces?: string[];
             }) => void;
             login: (opts: {
                 name: string;
@@ -30,15 +30,14 @@ declare global {
 
 export function addCase(opts: {
     country: string;
-    notes: string;
-    sourceUrl: string;
     methodOfConfirmation?: string;
     nationalities?: string[];
-    curator?: string;
+    notes?: string;
     occupation?: string;
     symptomStatus?: string;
     symptoms?: string[];
     transmissionPlaces?: string[];
+    uploadId?: string;
 }): void {
     cy.request({
         method: 'POST',
@@ -47,6 +46,7 @@ export function addCase(opts: {
             caseReference: {
                 sourceId: '5ef8e943dfe6e00030892d58',
                 sourceUrl: 'www.example.com',
+                uploadId: opts.uploadId,
             },
             demographics: {
                 nationalities: opts.nationalities,

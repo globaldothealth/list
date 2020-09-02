@@ -25,6 +25,7 @@ import AppModal from './AppModal';
 import BulkCaseFormValues from './bulk-case-form-fields/BulkCaseFormValues';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
+import { Paper } from '@material-ui/core';
 import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -639,14 +640,14 @@ class BulkCaseForm extends React.Component<
                                 </Typography>
                             </div>
                             <Form>
-                                <fieldset className={classes.allFormSections}>
+                                <Paper className={classes.allFormSections}>
                                     <div className={classes.formSection}>
-                                        <Source borderless={true} />
+                                        <Source />
                                     </div>
                                     <div className={classes.formSection}>
                                         <FileUpload></FileUpload>
                                     </div>
-                                </fieldset>
+                                </Paper>
                                 {/* TODO: Host the final instructions doc. */}
                                 <a
                                     href="https://github.com/globaldothealth/list/tree/main/verification/curator-service/ui#bulk-upload-process"
