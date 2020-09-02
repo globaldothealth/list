@@ -42,9 +42,12 @@ def convert_age(age: float):
 def convert_confirmation_method(raw_test: str):
     if raw_test == "RT-PCR":
         return "PCR test"
-    elif "TESTE" in raw_test:
+    elif "TESTE" or "ensaio" in raw_test:
         return "Serological test"
-    return "Unknown"
+    else:
+        print(f'unknown confirmation method: {raw_test}')
+        return "Unknown"
+    
 
 def convert_profession(raw_profession: str):
     if raw_profession == "Sim":
@@ -70,45 +73,34 @@ def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
     if raw_commorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-
+        commorbidities = {
+                        "Diabetes": "diabetes mellitus", 
+                        "Gestante": "pregnancy",
+                        "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
+                        "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
+                        "Doenças cardíacas crônicas": "heart disease" 
+                        }
+        
         commorbidities_list = []
-        if "Diabetes" in raw_commorbidities:
-            commorbidities_list.append("diabetes mellitus")
-        if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_commorbidities:
-            commorbidities_list.append("primary immunodeficiency disease or chromosomal disease")
-            #Is combined DO OK?
-        if "Gestante" in raw_commorbidities:
-            commorbidities_list.append("pregnancy") #Not in DO
-            #I have grouped 'gestante' and 'gestante de alto risco' (high-risk pregnancy) into the same 
-            #entry ("pregnancy") in the commorbidities list.
-        if "Doenças respiratórias crônicas descompensadas" in raw_commorbidities:
-            commorbidities_list.append("respiratory system disease")
-        if "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)" in raw_commorbidities:
-            commorbidities_list.append("chronic kidney disease") 
-        if "Doenças cardíacas crônicas" in raw_commorbidities:
-            commorbidities_list.append("heart disease")
+
+        for key in commorbidities:
+            if key in raw_commorbidities:
+                commorbidities_list.append(commorbidities[key])
 
         preexistingConditions["values"] = commorbidities_list
         return preexistingConditions
     return None
 
 def convert_location(raw_entry: str):
-    if raw_entry:
-        municipality = raw_entry
-    else:
-        municipality = ""
-    query_terms = (municipality,) + ("Amapá", "Brazil")
-    return {"query":  ", ".join(query_terms)}
+    query = ", ".join(word for word in [raw_entry, "Amapá", "Brazil"] if word)
+    return {"query": query}
 
-def convert_notes(raw_commorbidities:str, raw_notes_neighbourhood: str, raw_notes_indigenousEthnicity: str):
+def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_notes_indigenousEthnicity: str):
     raw_notes = []
     if "Imunossupressão" in raw_commorbidities:
         raw_notes.append("Patient with immunosupression")
-        """ 
-        Immunosupression is not necessarily a disease as defined in the Disease Ontology 
-        (i.e. could be drug-induced, or the result of many diseases) so I have put this in notes instead
-        of pre-existing conditions.
-        """
+    if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_commorbidities:
+        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
     if raw_notes_indigenousEthnicity:
@@ -130,8 +122,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         next(reader) # Skip the header.
         cases = []
         for row in reader:
-            if float(row[_AGE_INDEX]) > 120: #We have entries as high as 351 - unclear if this is days.
-                print('Age too high')
+            if float(row[_AGE_INDEX]) > 110: #We have entries as high as 351 - unclear if this is days.
+                print(f'age too high: {row[_AGE_INDEX]}')
                 continue
             case = {
                 "caseReference": {
