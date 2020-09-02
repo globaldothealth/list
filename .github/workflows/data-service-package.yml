@@ -1,0 +1,25 @@
+name: Data Service Github Packages Push
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/data-service-package.yml"
+      - "data-serving/data-service/**"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+          registry: ghcr.io
+          repository: ${{github.repository}}/dataservice
+          dockerfile: data-serving/data-service/Dockerfile
+          add_git_labels: true
+          tag_with_ref: true
+          tag_with_sha: true
