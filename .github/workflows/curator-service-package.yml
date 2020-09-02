@@ -2,7 +2,7 @@ name: Curator Service Github Packages Push
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - ".github/workflows/curator-package.yml"
       - "verification/curator-service/**"
