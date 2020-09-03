@@ -1086,6 +1086,7 @@ components:
                 description: >
                   For outcome event, value can be Death or Recovered.
                   For icuAdmission and hospitalAdmission, value can be Yes or No.
+                  For confirmed event, the value can be the method of confirmation (i.e. "PCR test").
                 example: Recovered
           example:
             - name: confirmed
