@@ -7,24 +7,23 @@ import csv
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import parsing_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-import parsing_lib
+    import parsing_lib
 
 
-def convert_date(raw_date):
+def convert_date(raw_date: str):
     """ 
     Convert raw date field into a value interpretable by the dataserver.
 
     The date is listed in YYYYmmdd format, but the data server API will
     assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
-    
-    Adding line to ensure date has type str
     """
-    raw_date = str(raw_date)
     date = datetime.strptime(raw_date, "%Y%m%d")
     return date.strftime("%m/%d/%Y")
 
@@ -37,57 +36,62 @@ def convert_gender(raw_gender):
     return None
 
 
-
 def convert_location(raw_entry):
-    # print(raw_entry['DISTRITO'])
     query_terms = [
         term for term in [
             raw_entry.get("DISTRITO", ""),
             raw_entry.get("PROVINCIA", ""),
             raw_entry.get("DEPARTAMENTO", ""),
             "Peru"]
-        if "EN INVESTIGACIÓN" not in term]
-    
+        if term != "EN INVESTIGACIÓN"]
+
     return {"query":  ", ".join(query_terms)}
+
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
+    Creates a dict to map type of confirming diagnostic test from Spanish abbreviation to English.
+    Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test
     """
+
+    conf_methods = {
+        'PR': 'Serological test',
+        'PCR': 'PCR test'
+    }
+
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         cases = []
         for entry in reader:
             cases.append(
-        {
-            "caseReference": {
-                "sourceId": source_id,
-                "sourceEntryId": entry["UUID"],
-                "sourceUrl": source_url
-            },
-            "location": convert_location(entry),
-            "events": [
                 {
-                    "name": "confirmed",
-                    "dateRange":
-                    {
-                        "start": convert_date(entry["FECHA_RESULTADO"]),
-                        "end": convert_date(entry["FECHA_RESULTADO"])
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceEntryId": entry["UUID"],
+                        "sourceUrl": source_url
+                    },
+                    "location": convert_location(entry),
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "value": conf_methods.get(entry['METODODX']),
+                            "dateRange":
+                            {
+                                "start": convert_date(entry["FECHA_RESULTADO"]),
+                                "end": convert_date(entry["FECHA_RESULTADO"])
+                            }
+                        }
+                    ],
+                    "demographics": {
+                        "ageRange": {
+                            "start": float(entry["EDAD"]),
+                            "end": float(entry["EDAD"])
+                        },
+                        "gender": convert_gender(entry["SEXO"])
                     }
-                }
-            ],
-            "demographics": {
-                "ageRange": {
-                    "start": float(entry["EDAD"]),
-                    "end": float(entry["EDAD"])
-                },
-                "gender": convert_gender(entry["SEXO"])
-            }
-        }) 
+                })
     return cases
-
-
-
 
 
 def lambda_handler(event, context):
