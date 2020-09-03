@@ -105,9 +105,7 @@ export const batchUpsertDropUnchangedCases = async (
     request.body.cases = request.body.cases.filter((c: any) => {
         if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
             const existingCase = existingCasesByCaseRefCombo.get(
-                c.caseReference.sourceId +
-                ':' +
-                c.caseReference.sourceEntryId,
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
             );
             if (existingCase !== undefined && existingCase.equalsJSON(c)) {
                 unchangedCaseIdSet.add(existingCase._id.toString());
@@ -121,7 +119,7 @@ export const batchUpsertDropUnchangedCases = async (
     response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
 
     next();
-}
+};
 
 // Set appropriate values for the revision metadata and uploadids fields.
 export const setBatchUpsertFields = async (
@@ -142,17 +140,13 @@ export const setBatchUpsertFields = async (
     );
 
     // Store modification details for response handler.
-    response.locals.numModified =
-        existingCasesByCaseRefCombo.size;
+    response.locals.numModified = existingCasesByCaseRefCombo.size;
 
     // For existing cases, compute the revision metadata that should be saved
     // to the database.
     const metadataMap = new Map();
     existingCasesByCaseRefCombo.forEach((c, caseRefKey) => {
-        metadataMap.set(
-            caseRefKey,
-            createUpdateMetadata(c, curatorEmail),
-        );
+        metadataMap.set(caseRefKey, createUpdateMetadata(c, curatorEmail));
     });
 
     // TODO: Type request Cases.
@@ -163,12 +157,13 @@ export const setBatchUpsertFields = async (
         c.revisionMetadata =
             metadataMap.get(
                 c.caseReference?.sourceId +
-                ':' +
-                c.caseReference?.sourceEntryId,
+                    ':' +
+                    c.caseReference?.sourceEntryId,
             ) || createNewMetadata(curatorEmail);
 
         // If case is present, add uploadIds to existing list of uploadIds
-        if (c.caseReference?.uploadIds &&
+        if (
+            c.caseReference?.uploadIds &&
             c.caseReference?.sourceId &&
             c.caseReference?.sourceEntryId
         ) {
