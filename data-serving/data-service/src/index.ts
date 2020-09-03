@@ -3,14 +3,14 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    batchUpsertDropUnchangedCases,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
     findCasesToUpdate,
     setBatchUpdateRevisionMetadata,
-    setBatchUpsertRevisionMetadata,
+    setBatchUpsertFields,
     setRevisionMetadata,
-    setUploadIds,
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
@@ -94,8 +94,8 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
-            setUploadIds,
-            setBatchUpsertRevisionMetadata,
+            batchUpsertDropUnchangedCases,
+            setBatchUpsertFields,
             createBatchUpsertCaseRevisions,
             caseController.batchUpsert,
         );

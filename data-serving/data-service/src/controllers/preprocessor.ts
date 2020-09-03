@@ -7,6 +7,7 @@ import {
 
 import { CaseRevision } from '../model/case-revision';
 import { DocumentQuery } from 'mongoose';
+import _ from 'lodash';
 
 // TODO: Type this as RevisionMetadataDocument.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,41 +86,45 @@ export const setRevisionMetadata = async (
     next();
 };
 
-export const setUploadIds = async (
+// Remove cases from the request that don't need to be updated.
+export const batchUpsertDropUnchangedCases = async (
     request: Request,
     response: Response,
     next: NextFunction,
 ): Promise<void> => {
-    const existingCasesWithUploadIds = new Map(
+    const existingCasesByCaseRefCombo = new Map(
         (await findCasesWithCaseReferenceData(request))
-            .filter((c) => c?.caseReference?.uploadIds)
+            .filter((c) => c && c.caseReference)
             .map((c) => [
                 c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
-                c.caseReference.uploadIds,
+                c,
             ]),
     );
 
-    request.body.cases.forEach(async (c: any) => {
-        if (
-            c.caseReference?.uploadIds &&
-            c.caseReference?.sourceId &&
-            c.caseReference?.sourceEntryId
-        ) {
-            const existingCaseUploadIds = existingCasesWithUploadIds.get(
-                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+    const unchangedCaseIdSet = new Set();
+    request.body.cases = request.body.cases.filter((c: any) => {
+        if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
+            const existingCase = existingCasesByCaseRefCombo.get(
+                c.caseReference.sourceId +
+                ':' +
+                c.caseReference.sourceEntryId,
             );
-            if (existingCaseUploadIds) {
-                c.caseReference.uploadIds = c.caseReference.uploadIds.concat(
-                    existingCaseUploadIds,
-                );
+            if (existingCase !== undefined && existingCase.equalsJSON(c)) {
+                unchangedCaseIdSet.add(existingCase._id.toString());
+                return false;
             }
         }
+        return true;
     });
 
-    next();
-};
+    // Store the unchanged IDs for future middleware.
+    response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
 
-export const setBatchUpsertRevisionMetadata = async (
+    next();
+}
+
+// Set appropriate values for the revision metadata and uploadids fields.
+export const setBatchUpsertFields = async (
     request: Request,
     response: Response,
     next: NextFunction,
@@ -136,58 +141,47 @@ export const setBatchUpsertRevisionMetadata = async (
             ]),
     );
 
-    // Get sourceId:sourceEntryId for cases that are included in the batch
-    // request but that won't be modified (because the request case is identical
-    // to the existing one).
-    const unchangedCaseIdSet = request.body.cases.reduce(
-        // TODO: Type request Cases.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (unchangedIds: Set<string>, c: any) => {
-            if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
-                const existingCase = existingCasesByCaseRefCombo.get(
-                    c.caseReference.sourceId +
-                        ':' +
-                        c.caseReference.sourceEntryId,
-                );
-                if (existingCase !== undefined && existingCase.equalsJSON(c)) {
-                    unchangedIds.add(existingCase._id.toString());
-                }
-            }
-            return unchangedIds;
-        },
-        new Set(),
-    );
-
-    // Store the unchanged IDs for future middleware.
-    response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
     // Store modification details for response handler.
     response.locals.numModified =
-        existingCasesByCaseRefCombo.size - unchangedCaseIdSet.size;
+        existingCasesByCaseRefCombo.size;
 
     // For existing cases, compute the revision metadata that should be saved
-    // to the database. If the case is unmodified, per the above set, the
-    // current metadata is used. Else, an update metadata is created.
+    // to the database.
     const metadataMap = new Map();
     existingCasesByCaseRefCombo.forEach((c, caseRefKey) => {
         metadataMap.set(
             caseRefKey,
-            unchangedCaseIdSet.has(c._id.toString())
-                ? c.revisionMetadata.toJSON()
-                : createUpdateMetadata(c, curatorEmail),
+            createUpdateMetadata(c, curatorEmail),
         );
     });
 
-    // Set the request cases' revision metadata to the update metadata, if
-    // present, or create metadata otherwise.
     // TODO: Type request Cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request.body.cases.forEach((c: any) => {
+        // Set the request cases' revision metadata to the update metadata, if
+        // present, or create metadata otherwise.
         c.revisionMetadata =
             metadataMap.get(
                 c.caseReference?.sourceId +
-                    ':' +
-                    c.caseReference?.sourceEntryId,
+                ':' +
+                c.caseReference?.sourceEntryId,
             ) || createNewMetadata(curatorEmail);
+
+        // If case is present, add uploadIds to existing list of uploadIds
+        if (c.caseReference?.uploadIds &&
+            c.caseReference?.sourceId &&
+            c.caseReference?.sourceEntryId
+        ) {
+            const existingCaseUploadIds = existingCasesByCaseRefCombo.get(
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+            )?.caseReference?.uploadIds;
+            if (existingCaseUploadIds) {
+                c.caseReference.uploadIds = _.union(
+                    c.caseReference.uploadIds,
+                    existingCaseUploadIds,
+                );
+            }
+        }
     });
     // Clean up the additional metadata that falls outside the `case` entity.
     delete request.body.curator;

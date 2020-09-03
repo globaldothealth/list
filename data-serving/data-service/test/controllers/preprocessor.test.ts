@@ -4,7 +4,7 @@ import {
     createBatchUpsertCaseRevisions,
     createCaseRevision,
     setBatchUpdateRevisionMetadata,
-    setBatchUpsertRevisionMetadata,
+    setBatchUpsertFields,
     setRevisionMetadata,
 } from '../../src/controllers/preprocessor';
 
@@ -381,7 +381,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setBatchUpsertRevisionMetadata(
+        await setBatchUpsertFields(
             { body: requestBody, method: 'PUT' } as Request,
             { locals: {} } as Response,
             nextFn,
@@ -432,7 +432,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setBatchUpsertRevisionMetadata(
+        await setBatchUpsertFields(
             { body: requestBody, method: 'PUT' } as Request,
             { locals: {} } as Response,
             nextFn,
