@@ -252,7 +252,6 @@ export const batchUpsert = async (
     res: Response,
 ): Promise<void> => {
     try {
-        const toBeUpsertedCaseIds = await findCaseIdsWithCaseReferenceData(req);
         const bulkWriteResult = await Case.bulkWrite(
             // Case data should be validated prior to this point.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -284,13 +283,10 @@ export const batchUpsert = async (
             { ordered: false },
         );
         res.status(207).json({
-            // Types are a little goofy here. We're grabbing the string ID from
-            // what MongoDB returns, which is data in the form of:
-            //   { index0 (string): _id0 (ObjectId), ..., indexN: _idN}
-            createdCaseIds: Object.entries(bulkWriteResult.insertedIds)
-                .concat(Object.entries(bulkWriteResult.upsertedIds))
-                .map((kv) => String(kv[1])),
-            updatedCaseIds: toBeUpsertedCaseIds,
+            numCreated:
+                (bulkWriteResult.insertedCount || 0) +
+                (bulkWriteResult.upsertedCount || 0),
+            numUpdated: res.locals.numModified,
         });
         return;
     } catch (err) {
