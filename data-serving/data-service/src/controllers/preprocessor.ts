@@ -85,6 +85,40 @@ export const setRevisionMetadata = async (
     next();
 };
 
+export const setUploadIds = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    const existingCasesWithUploadIds = new Map(
+        (await findCasesWithCaseReferenceData(request))
+            .filter((c) => c?.caseReference?.uploadIds)
+            .map((c) => [
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+                c.caseReference.uploadIds,
+            ]),
+    );
+
+    request.body.cases.forEach(async (c: any) => {
+        if (
+            c.caseReference?.uploadIds &&
+            c.caseReference?.sourceId &&
+            c.caseReference?.sourceEntryId
+        ) {
+            const existingCaseUploadIds = existingCasesWithUploadIds.get(
+                c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
+            );
+            if (existingCaseUploadIds) {
+                c.caseReference.uploadIds = c.caseReference.uploadIds.concat(
+                    existingCaseUploadIds,
+                );
+            }
+        }
+    });
+
+    next();
+};
+
 export const setBatchUpsertRevisionMetadata = async (
     request: Request,
     response: Response,

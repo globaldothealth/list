@@ -407,6 +407,42 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
         expect(updatedCaseInDb?.notes).toEqual(existingCaseWithEntryId.notes);
     });
+    it.only('batch upsert should add uploadId to field array', async () => {
+        const newCaseWithoutEntryId = new Case(minimalCase);
+        const newCaseWithEntryId = new Case(fullCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+
+        const existingCase = new Case(fullCase);
+        await existingCase.save();
+        const newUploadIds = ['012301234567890123456789'];
+        const existingUploadIds = existingCase.caseReference.uploadIds;
+        existingCase.caseReference.uploadIds = newUploadIds;
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithoutEntryId,
+                    newCaseWithEntryId,
+                    existingCase,
+                ],
+                ...curatorMetadata,
+            })
+            .expect(207);
+        expect(res.body.createdCaseIds).toHaveLength(2);
+        expect(res.body.updatedCaseIds).toHaveLength(1);
+        const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        expect(updatedCaseInDb?.caseReference.uploadIds).toHaveLength(3);
+        expect(updatedCaseInDb?.caseReference.uploadIds).toContain(
+            existingUploadIds[0],
+        );
+        expect(updatedCaseInDb?.caseReference.uploadIds).toContain(
+            existingUploadIds[1],
+        );
+        expect(updatedCaseInDb?.caseReference.uploadIds).toContain(
+            newUploadIds[0],
+        );
+    });
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
