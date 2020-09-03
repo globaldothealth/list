@@ -73,11 +73,30 @@ export default class AwsEventsClient {
                 await this.cloudWatchEventsClient
                     .putTargets(putTargetsParams)
                     .promise();
-                await this.lambdaClient.addInvokeFromEventPermission(
-                    response.RuleArn,
-                    targetArn,
-                    statementId,
-                );
+
+                try {
+                    await this.lambdaClient.addInvokeFromEventPermission(
+                        response.RuleArn,
+                        targetArn,
+                        statementId,
+                    );
+                } catch (err) {
+                    // Adding an invocation permission can fail if such a
+                    // permission already exists. Under these circumstances
+                    // (indicated by a 409), we don't want to throw.
+                    //
+                    // We could retrieve the Lambda policy, and grep it for the
+                    // RuleArn prior to calling addPermission, but it's another
+                    // method to worry about, and it isn't any more robust than
+                    // this mechanism.
+                    if (err.statusCode === 409) {
+                        console.log(
+                            `Permission with statement ID ${statementId} already exists; continuing.`,
+                        );
+                        return response.RuleArn;
+                    }
+                    throw err;
+                }
             }
             return response.RuleArn;
         } catch (err) {
