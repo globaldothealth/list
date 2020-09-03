@@ -78,8 +78,8 @@ describe('GET', () => {
             for (let i = 0; i < res.body.cases.length - 1; i++) {
                 expect(
                     res.body.cases[i].revisionMetadata.creationMetadata.date >
-                    res.body.cases[i + 1].revisionMetadata.creationMetadata
-                        .date,
+                        res.body.cases[i + 1].revisionMetadata.creationMetadata
+                            .date,
                 ).toBeTruthy();
             }
             // Second page is expected.
@@ -438,7 +438,8 @@ describe('POST', () => {
         const unchangedCaseWithEntryId = new Case(fullCase);
         unchangedCaseWithEntryId.caseReference.sourceEntryId =
             'unchangedEntryId';
-        const unchangedCaseUploadIds = unchangedCaseWithEntryId.caseReference.uploadIds;
+        const unchangedCaseUploadIds =
+            unchangedCaseWithEntryId.caseReference.uploadIds;
         await unchangedCaseWithEntryId.save();
         unchangedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
 
@@ -461,27 +462,25 @@ describe('POST', () => {
         // Upload ids were not changed for unchanged case.
         expect(unchangedDbCase?.caseReference?.uploadIds).toHaveLength(2);
         expect(unchangedDbCase?.caseReference?.uploadIds[0]).toEqual(
-            unchangedCaseUploadIds[0]
+            unchangedCaseUploadIds[0],
         );
         expect(unchangedDbCase?.caseReference?.uploadIds[1]).toEqual(
-            unchangedCaseUploadIds[1]
+            unchangedCaseUploadIds[1],
         );
         expect(res.body.numCreated).toBe(2); // Both new cases were created.
         expect(res.body.numUpdated).toBe(1); // Only changed case was updated.
 
         // Upload ids were added for changed case.
-        const changedDbCase = await Case.findById(
-            changedCaseWithEntryId._id,
-        );
+        const changedDbCase = await Case.findById(changedCaseWithEntryId._id);
         expect(changedDbCase?.caseReference?.uploadIds).toHaveLength(3);
         expect(changedDbCase?.caseReference?.uploadIds[0]).toEqual(
-            newUploadIds[0]
+            newUploadIds[0],
         );
         expect(changedDbCase?.caseReference?.uploadIds[1]).toEqual(
-            unchangedCaseUploadIds[0]
+            unchangedCaseUploadIds[0],
         );
         expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
-            unchangedCaseUploadIds[1]
+            unchangedCaseUploadIds[1],
         );
     });
     it('batch upsert should result in create and update metadata', async () => {
