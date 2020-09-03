@@ -1,11 +1,7 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f3d3c6f4a02ac002e843937/2020/08/19/1455/content.csv",
+    "s3Key": "5f46eda6a6a7a5002834c2a3/2020/08/26/2318/content.csv",
     "sourceUrl": "http://www.chp.gov.hk/files/misc/enhanced_sur_covid_19_eng.csv",
-    "sourceId": "5f3d3c6f4a02ac002e843937",
-    "dateFilter": {
-        "numDaysBeforeToday": 3,
-        "op": "EQ"
-    }
+    "sourceId": "5f46eda6a6a7a5002834c2a3"
 }
