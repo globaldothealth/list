@@ -259,13 +259,13 @@ export default function App(): JSX.Element {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Uploads',
             icon: <PublishIcon />,
             to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Profile',
