@@ -10,9 +10,6 @@ import requests
 from enum import Enum
 from google.oauth2 import service_account
 
-# TODO: Use tempfile here instead.
-LOCAL_DATA_FILE = "/tmp/rawdata"
-
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
@@ -57,12 +54,10 @@ def extract_event_fields(event):
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
 
 
-def retrieve_raw_data_file(s3_bucket, s3_key):
+def retrieve_raw_data_file(s3_bucket, s3_key, out_file):
     try:
-        local_data_file = LOCAL_DATA_FILE
         print(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
-        s3_client.download_file(s3_bucket, s3_key, local_data_file)
-        return local_data_file
+        s3_client.download_fileobj(s3_bucket, s3_key, out_file)
     except Exception as e:
         common_lib.complete_with_error(e)
 
@@ -115,6 +110,7 @@ def filter_cases_by_date(
     """
     if not date_filter:
         return case_data
+    print(f'Filtering cases using date filter {date_filter}')
     now = get_today()
     delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
     cutoff_date = now - delta
@@ -180,10 +176,13 @@ def run_lambda(event, context, parsing_function):
         upload_id = common_lib.create_upload_record(
             env, source_id, api_creds, None)
     try:
-        raw_data_file = retrieve_raw_data_file(s3_bucket, s3_key)
+        local_data_file = tempfile.NamedTemporaryFile("wb")
+        retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
+        print(f'Raw file retrieved at {local_data_file.name}')
         case_data = parsing_function(
-            raw_data_file, source_id,
+            local_data_file.name, source_id,
             source_url)
+        print(f'Parsed {len(case_data)} cases')
         final_cases = prepare_cases(case_data, upload_id)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(

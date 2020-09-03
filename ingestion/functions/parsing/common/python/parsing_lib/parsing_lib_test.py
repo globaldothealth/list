@@ -8,6 +8,7 @@ import os
 import pytest
 import requests
 import sys
+import tempfile
 import datetime
 
 from mock import MagicMock, patch
@@ -200,12 +201,14 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
 
-    local_file = parsing_lib.retrieve_raw_data_file(
-        input_event[parsing_lib.S3_BUCKET_FIELD],
-        input_event[parsing_lib.S3_KEY_FIELD])
-    assert local_file == parsing_lib.LOCAL_DATA_FILE
-    with open(local_file, "r") as f:
-        assert json.load(f) == sample_data
+    with tempfile.NamedTemporaryFile("wb") as f:
+        parsing_lib.retrieve_raw_data_file(
+            input_event[parsing_lib.S3_BUCKET_FIELD],
+            input_event[parsing_lib.S3_KEY_FIELD],
+            f)
+        f.flush()
+        with open(f.name, "r") as f:
+            assert json.load(f) == sample_data
 
 
 def test_extract_event_fields_returns_all_present_fields(input_event):
