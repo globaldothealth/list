@@ -146,8 +146,7 @@ def test_run_lambda_e2e(
         mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
-    common_lib.obtain_api_credentials = MagicMock(
-        name="obtain_api_credentials")
+    common_lib.login = MagicMock(name="login")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
@@ -217,7 +216,8 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        input_event[parsing_lib.DATE_FILTER_FIELD])
+        input_event[parsing_lib.DATE_FILTER_FIELD],
+        input_event[parsing_lib.AUTH_FIELD])
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
@@ -262,7 +262,7 @@ def test_write_to_server_returns_created_and_updated_count(
               "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {})
+        [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {}, {})
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
@@ -283,7 +283,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     try:
         parsing_lib.write_to_server(
             [_PARSED_CASE],
-            "env", _SOURCE_ID, upload_id, {})
+            "env", _SOURCE_ID, upload_id, {}, {})
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -309,7 +309,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     try:
         parsing_lib.write_to_server(
             [_PARSED_CASE],
-            "env", _SOURCE_ID, upload_id, {})
+            "env", _SOURCE_ID, upload_id, {}, {})
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -327,7 +327,7 @@ def test_filter_cases_by_date_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -338,7 +338,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert cases == []
 
 
@@ -349,7 +349,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert cases == []
 
 
@@ -360,7 +360,7 @@ def test_filter_cases_by_date_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -378,7 +378,7 @@ def test_filter_cases_by_date_unsupported_op(
         parsing_lib.filter_cases_by_date(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
-            "env", _SOURCE_ID, upload_id, {})  # api_creds
+            "env", _SOURCE_ID, upload_id, {}, {})  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
         assert requests_mock.request_history[0].url == update_upload_url
