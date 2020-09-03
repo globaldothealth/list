@@ -78,8 +78,8 @@ describe('GET', () => {
             for (let i = 0; i < res.body.cases.length - 1; i++) {
                 expect(
                     res.body.cases[i].revisionMetadata.creationMetadata.date >
-                        res.body.cases[i + 1].revisionMetadata.creationMetadata
-                            .date,
+                    res.body.cases[i + 1].revisionMetadata.creationMetadata
+                        .date,
                 ).toBeTruthy();
             }
             // Second page is expected.
@@ -407,7 +407,7 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
         expect(updatedCaseInDb?.notes).toEqual(existingCaseWithEntryId.notes);
     });
-    it.only('batch upsert should add uploadId to field array', async () => {
+    it('batch upsert should add uploadId to field array', async () => {
         const newCaseWithoutEntryId = new Case(minimalCase);
         const newCaseWithEntryId = new Case(fullCase);
         newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
