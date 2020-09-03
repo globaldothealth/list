@@ -34,7 +34,7 @@ describe('Uploads table', function () {
         cy.contains('0');
     });
 
-    it.only('can navigate to filtered linelist', function () {
+    it('can navigate to filtered linelist', function () {
         cy.addCase({
             uploadIds: ['5ef8e943dfe6e00030892d58'],
             country: 'France',
