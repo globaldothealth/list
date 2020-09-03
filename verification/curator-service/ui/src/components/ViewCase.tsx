@@ -262,9 +262,13 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
-                            <RowHeader title="Data upload ID" />
+                            <RowHeader title="Data upload IDs" />
                             <RowContent
-                                content={props.c.caseReference?.uploadId || ''}
+                                content={
+                                    props.c.caseReference?.uploadIds?.join(
+                                        ', ',
+                                    ) || ''
+                                }
                             />
 
                             {props.c.caseReference?.additionalSources && (

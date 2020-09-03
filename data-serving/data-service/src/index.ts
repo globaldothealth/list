@@ -10,6 +10,7 @@ import {
     setBatchUpdateRevisionMetadata,
     setBatchUpsertRevisionMetadata,
     setRevisionMetadata,
+    setUploadIds,
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
@@ -93,6 +94,7 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
+            setUploadIds,
             setBatchUpsertRevisionMetadata,
             createBatchUpsertCaseRevisions,
             caseController.batchUpsert,

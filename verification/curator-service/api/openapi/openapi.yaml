@@ -1006,14 +1006,14 @@ components:
               type: string
               description: URL of the source this case was extracted from
               example: https://api.covid19india.org/raw_data7.json
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-                example: example: 5ef22491937717c3331c3729
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for

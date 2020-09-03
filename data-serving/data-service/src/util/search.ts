@@ -1,4 +1,5 @@
-import { parse, SearchParserResult } from 'search-query-parser';
+import { SearchParserResult, parse } from 'search-query-parser';
+
 import { resolveConfigFile } from 'prettier';
 
 export interface ParsedSearch {
@@ -19,7 +20,7 @@ const keywords = new Map<string, string>([
     ['country', 'location.country'],
     ['outcome', 'outcome'],
     ['caseid', '_id'],
-    ['uploadid', 'caseReference.uploadId'],
+    ['uploadid', 'caseReference.uploadIds'],
     ['source', 'caseReference.sourceUrl'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
