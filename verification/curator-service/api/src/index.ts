@@ -141,12 +141,12 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/sources',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             sourcesController.list,
         );
         apiRouter.get(
             '/sources/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             sourcesController.get,
         );
         apiRouter.post(
