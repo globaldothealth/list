@@ -17,6 +17,7 @@ S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
 UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
+AUTH_FIELD = "auth"
 
 s3_client = boto3.client("s3")
 
@@ -51,7 +52,7 @@ def extract_event_fields(event):
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
     return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {})
+        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket, s3_key, out_file):
@@ -73,12 +74,12 @@ def prepare_cases(cases, upload_id):
     return cases
 
 
-def write_to_server(cases, env, source_id, upload_id, headers):
+def write_to_server(cases, env, source_id, upload_id, headers, cookies):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     print(f"Sending {len(cases)} cases to {put_api_url}")
     res = requests.post(put_api_url, json={"cases": cases},
-                        headers=headers)
+                        headers=headers, cookies=cookies)
     if res and res.status_code == 200:
         res_json = res.json()
         return res_json["numCreated"], res_json["numUpdated"]
@@ -93,7 +94,7 @@ def write_to_server(cases, env, source_id, upload_id, headers):
                     if res.status_code == 207 else
                     common_lib.UploadError.DATA_UPLOAD_ERROR)
     common_lib.complete_with_error(e, env, upload_error,
-                                   source_id, upload_id, headers)
+                                   source_id, upload_id, headers, cookies)
 
 
 def get_today():
@@ -102,7 +103,7 @@ def get_today():
 
 
 def filter_cases_by_date(
-        case_data, date_filter, env, source_id, upload_id, api_creds):
+        case_data, date_filter, env, source_id, upload_id, api_creds, cookies):
     """Filter cases according ot the date_filter provided.
 
     Returns the cases that matched the date filter or all cases if
@@ -130,7 +131,7 @@ def filter_cases_by_date(
             e = ValueError(f'Unsupported date filter operand: {op}')
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
-                source_id, upload_id, api_creds)
+                source_id, upload_id, api_creds, cookies)
 
     return [case for case in case_data if case_is_within_range(case, cutoff_date, op)]
 
@@ -168,13 +169,17 @@ def run_lambda(event, context, parsing_function):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter = extract_event_fields(
+    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, local_auth = extract_event_fields(
         event)
-    api_creds = common_lib.obtain_api_credentials(s3_client)
-    # TODO: #754 Handle cookies as well.
+    api_creds = None
+    cookies = None
+    if local_auth and env == 'local':
+        cookies = common_lib.login(local_auth['email'])
+    else:
+        api_creds = common_lib.obtain_api_credentials(s3_client)
     if not upload_id:
         upload_id = common_lib.create_upload_record(
-            env, source_id, api_creds, None)
+            env, source_id, api_creds, cookies)
     try:
         local_data_file = tempfile.NamedTemporaryFile("wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
@@ -189,15 +194,14 @@ def run_lambda(event, context, parsing_function):
                 final_cases,
                 date_filter,
                 env, source_id, upload_id,
-                api_creds),
+                api_creds, cookies),
             env, source_id, upload_id,
-            api_creds)
-        # TODO: #754 Handle cookies as well.
+            api_creds, cookies)
         common_lib.finalize_upload(
-            env, source_id, upload_id, api_creds, None, count_created,
+            env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)
         return {"count_created": count_created, "count_updated": count_updated}
     except Exception as e:
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
-            api_creds)
+            api_creds, cookies)
