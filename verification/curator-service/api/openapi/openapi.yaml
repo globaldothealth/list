@@ -1086,6 +1086,7 @@ components:
                 description: >
                   For outcome event, value can be Death or Recovered.
                   For icuAdmission and hospitalAdmission, value can be Yes or No.
+                  For confirmed event, the value can be the method of confirmation (i.e. "PCR test").
                 example: Recovered
           example:
             - name: confirmed
@@ -1458,18 +1459,16 @@ components:
             - GEOCODE
             - VALIDATE
             - UPSERT
-        createdCaseIds:
-          type: array
-          description: UUIDs of cases created by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
-        updatedCaseIds:
-          type: array
-          description: UUIDs of cases updated by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
+        numCreated:
+          type: number
+          description: The number of cases created by the request.
+        numUpdated:
+          type: number
+          description: >
+            The number of cases modified by the request. Note that this only
+            includes cases that are actually modified by the batch upsert. If a
+            case is included in the batch upsert request, but contains no
+            changes compared to the currently stored case, it won't be counted.
         errors:
           type: array
           items:
@@ -1487,8 +1486,8 @@ components:
               - message
       required:
         - phase
-        - createdCaseIds
-        - updatedCaseIds
+        - numCreated
+        - numUpdated
         - errors
   responses:
     "200Auth":

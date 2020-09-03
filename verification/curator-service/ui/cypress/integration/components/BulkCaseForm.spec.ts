@@ -196,8 +196,9 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
-        // The updated case now has a gender of Female.
-        cy.contains('bulk_data.csv uploaded. 2 cases updated.');
+        // One case was updated to have a gender of Female.
+        // The other case, while present, wasn't modified.
+        cy.contains('bulk_data.csv uploaded. 1 case updated.');
         cy.contains('Female');
 
         // Check both upload ids are present

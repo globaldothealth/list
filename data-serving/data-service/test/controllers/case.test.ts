@@ -382,14 +382,19 @@ describe('POST', () => {
     it('batch upsert with no cases should return 400', () => {
         return request(app).post('/api/cases/batchUpsert').send({}).expect(400);
     });
-    it('batch upsert with only valid cases should return 207 with IDs', async () => {
+    it('batch upsert with only valid cases should return 207 with counts', async () => {
         const newCaseWithoutEntryId = new Case(minimalCase);
         const newCaseWithEntryId = new Case(fullCase);
         newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
 
-        const existingCaseWithEntryId = new Case(fullCase);
-        await existingCaseWithEntryId.save();
-        existingCaseWithEntryId.notes = 'new notes';
+        const changedCaseWithEntryId = new Case(fullCase);
+        await changedCaseWithEntryId.save();
+        changedCaseWithEntryId.notes = 'new notes';
+
+        const unchangedCaseWithEntryId = new Case(fullCase);
+        unchangedCaseWithEntryId.caseReference.sourceEntryId =
+            'unchangedEntryId';
+        await unchangedCaseWithEntryId.save();
 
         const res = await request(app)
             .post('/api/cases/batchUpsert')
@@ -397,15 +402,24 @@ describe('POST', () => {
                 cases: [
                     newCaseWithoutEntryId,
                     newCaseWithEntryId,
-                    existingCaseWithEntryId,
+                    changedCaseWithEntryId,
+                    unchangedCaseWithEntryId,
                 ],
                 ...curatorMetadata,
             })
             .expect(207);
-        expect(res.body.createdCaseIds).toHaveLength(2);
-        expect(res.body.updatedCaseIds).toHaveLength(1);
-        const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
-        expect(updatedCaseInDb?.notes).toEqual(existingCaseWithEntryId.notes);
+
+        const unchangedDbCase = await Case.findById(
+            unchangedCaseWithEntryId._id,
+        );
+        expect(unchangedDbCase?.toJSON()).toEqual(
+            unchangedCaseWithEntryId.toJSON(),
+        );
+        expect(res.body.numCreated).toBe(2); // Both new cases were created.
+        expect(res.body.numUpdated).toBe(1); // Only changed case was updated.
+
+        const updatedCaseInDb = await Case.findById(changedCaseWithEntryId._id);
+        expect(updatedCaseInDb?.notes).toEqual(changedCaseWithEntryId.notes);
     });
     it('batch upsert should add uploadId to field array', async () => {
         const newCaseWithoutEntryId = new Case(minimalCase);
@@ -455,14 +469,16 @@ describe('POST', () => {
                 ...curatorMetadata,
             });
 
-        const newCaseInDb = await Case.findById(res.body.createdCaseIds[0]);
-        expect(newCaseInDb?.revisionMetadata.revisionNumber).toEqual(0);
+        const newCaseInDb = await Case.findOne({
+            'revisionMetadata.revisionNumber': 0,
+        });
         expect(newCaseInDb?.revisionMetadata.creationMetadata.curator).toEqual(
             curatorMetadata.curator.email,
         );
 
-        const updatedCaseInDb = await Case.findById(res.body.updatedCaseIds[0]);
-        expect(updatedCaseInDb?.revisionMetadata.revisionNumber).toEqual(1);
+        const updatedCaseInDb = await Case.findOne({
+            'revisionMetadata.revisionNumber': 1,
+        });
         expect(
             updatedCaseInDb?.revisionMetadata.updateMetadata?.curator,
         ).toEqual(curatorMetadata.curator.email);
@@ -490,14 +506,14 @@ describe('POST', () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
 
-        const res = await request(app)
+        await request(app)
             .post('/api/cases/batchUpsert')
             .send({
                 cases: [existingCase],
                 ...curatorMetadata,
             });
 
-        const caseInDb = await Case.findById(res.body.updatedCaseIds[0]);
+        const caseInDb = await Case.findById(existingCase._id);
         expect(caseInDb?.revisionMetadata.revisionNumber).toEqual(0);
         expect(caseInDb?.revisionMetadata.creationMetadata.curator).toEqual(
             minimalCase.revisionMetadata.creationMetadata.curator,

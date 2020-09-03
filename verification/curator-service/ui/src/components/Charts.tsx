@@ -26,7 +26,7 @@ function TabPanel(props: TabPanelProps) {
             aria-labelledby={`simple-tab-${index}`}
             {...other}
         >
-            {value === index && <Box p={3}>{children}</Box>}
+            {value === index && <Box>{children}</Box>}
         </div>
     );
 }
@@ -39,9 +39,8 @@ function a11yProps(index: any) {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-    root: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
+    appBar: {
+        backgroundColor: '#31A497',
     },
 }));
 
@@ -54,8 +53,12 @@ export default function Charts() {
     };
 
     return (
-        <div className={classes.root}>
-            <AppBar position="static">
+        <>
+            <AppBar
+                position="static"
+                elevation={0}
+                classes={{ colorPrimary: classes.appBar }}
+            >
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -75,6 +78,6 @@ export default function Charts() {
             <TabPanel value={value} index={2}>
                 <FreshnessCharts />
             </TabPanel>
-        </div>
+        </>
     );
 }

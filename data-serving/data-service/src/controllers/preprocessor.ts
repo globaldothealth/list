@@ -160,6 +160,9 @@ export const setBatchUpsertRevisionMetadata = async (
 
     // Store the unchanged IDs for future middleware.
     response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
+    // Store modification details for response handler.
+    response.locals.numModified =
+        existingCasesByCaseRefCombo.size - unchangedCaseIdSet.size;
 
     // For existing cases, compute the revision metadata that should be saved
     // to the database. If the case is unmodified, per the above set, the
