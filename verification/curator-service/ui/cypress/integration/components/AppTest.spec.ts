@@ -89,8 +89,8 @@ describe('App', function () {
         cy.contains('Create new').should('not.exist');
         cy.contains('Home');
         cy.contains('Linelist');
-        cy.contains('Sources');
         cy.contains('Profile');
+        cy.contains('Sources').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
 
