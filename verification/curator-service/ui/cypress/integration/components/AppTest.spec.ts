@@ -43,6 +43,7 @@ describe('App', function () {
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Profile').should('not.exist');
+        cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
 
@@ -54,6 +55,7 @@ describe('App', function () {
         cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
+        cy.contains('Uploads').should('not.exist');
         cy.contains('Profile');
         cy.contains('Manage users').should('not.exist');
     });
@@ -66,6 +68,7 @@ describe('App', function () {
         cy.contains('Home');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
+        cy.contains('Uploads').should('not.exist');
         cy.contains('Profile');
         cy.contains('Manage users');
     });
@@ -79,6 +82,7 @@ describe('App', function () {
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Profile');
+        cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
     });
 
@@ -90,6 +94,7 @@ describe('App', function () {
         cy.contains('Home');
         cy.contains('Linelist');
         cy.contains('Profile');
+        cy.contains('Uploads').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
