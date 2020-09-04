@@ -244,13 +244,22 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
         parsing_lib.extract_event_fields(input_event)
 
 
-def test_prepare_cases_adds_upload_id_and(requests_mock):
+def test_prepare_cases_adds_upload_id(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         upload_id)
     assert result[0]["caseReference"]["uploadId"] == upload_id
+
+
+def test_prepare_cases_removes_nones(requests_mock):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    _PARSED_CASE["demographics"] = None
+    result = parsing_lib.prepare_cases(
+        [_PARSED_CASE],
+        "123456789012345678901234")
+    assert "demographics" not in result[0].keys()
 
 
 def test_write_to_server_returns_created_and_updated_count(
@@ -389,3 +398,14 @@ def test_filter_cases_by_date_unsupported_op(
             "error": "SOURCE_CONFIGURATION_ERROR"}}
         return
     assert "Should have raised a ValueError exception" == False
+
+
+def test_remove_nested_nones_removes_only_nones():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    data = {"keep1": 0, "keep2": False, "keep3": [], "drop1": None,
+            "multi": {"multikeep": "ok", "multidrop": None},
+            "empty": {"dropped": None}}
+    expected = {"keep1": 0, "keep2": False, "keep3": [],
+                "multi": {"multikeep": "ok"},
+                "empty": {}}
+    assert parsing_lib.remove_nested_nones(data) == expected
