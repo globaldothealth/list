@@ -120,7 +120,7 @@ def convert_preexisting_conditions(raw_commorbidities: str):
             'Pneumatopatia Crônica': 'pneumopathy',
             'Doenças respiratórias crônicas descompensadas': 'respiratory system disease',
             'Diabetes': 'diabetes mellitus',
-            'Síndrome de Down': "Down's syndrome",
+            'Síndrome de Down': "Down syndrome",
             'Obesidad': 'obesity',
             'Outro': 'other',
             'Puérpera': 'recently gave birth',
@@ -203,7 +203,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
+        reader = csv.reader(f, delimiter=';')
         next(reader)  # Skip the header.
         cases = []
         for row in reader:
