@@ -6,14 +6,12 @@ import csv
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-try:
-    import parsing_lib
-except ImportError:
+if ('lambda' not in sys.argv[0]):
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-    import parsing_lib
+import parsing_lib
 
 _AGE_INDEX = 5
 _GENDER_INDEX = 4
@@ -204,12 +202,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     Parses G.h-format case data from raw API data.
     """
-    with io.open(raw_data_file, mode='r', encoding='unicode_escape') as f:
-        reader = csv.reader(f, delimiter=';')
+    with open(raw_data_file, "r") as f:
+        reader = csv.reader(f)
         next(reader)  # Skip the header.
-        head = [next(reader) for x in range(10)]
         cases = []
-        for row in head:
+        for row in reader:
             try:
                 case = {
                     "caseReference": {
