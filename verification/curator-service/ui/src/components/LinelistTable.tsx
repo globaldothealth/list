@@ -579,7 +579,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
-                        ...(this.props.user.roles.includes('curator')
+                        ...(this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
                                   // TODO: move to the left of selection checkboxes when possible
                                   // https://github.com/mbrn/material-table/issues/2317
@@ -785,7 +786,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: this.props.user.roles.includes('curator'),
+                        selection:
+                            this.props.user.roles.includes('curator') ||
+                            this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         maxBodyHeight: 'calc(100vh - 20em)',
@@ -813,7 +816,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }
                     }}
                     actions={
-                        this.props.user.roles.includes('curator')
+                        this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
