@@ -795,7 +795,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: this.props.user.roles.includes('curator'),
+                        selection:
+                            this.props.user.roles.includes('curator') ||
+                            this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         maxBodyHeight: 'calc(100vh - 20em)',
@@ -823,7 +825,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }
                     }}
                     actions={
-                        this.props.user.roles.includes('curator')
+                        this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
@@ -885,6 +888,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
                                       ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
@@ -909,6 +915,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
                                       ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any

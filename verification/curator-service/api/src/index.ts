@@ -222,7 +222,7 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.list,
         );
         apiRouter.get(
@@ -242,7 +242,7 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.get,
         );
         apiRouter.post(
@@ -277,7 +277,7 @@ new OpenApiValidator({
         );
         apiRouter.delete(
             '/cases',
-            mustHaveAnyRole(['curator']),
+            mustHaveAnyRole(['curator', 'admin']),
             casesController.batchDel,
         );
         apiRouter.delete(
