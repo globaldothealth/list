@@ -1,7 +1,7 @@
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
-import { UserDocument, User } from '../model/user';
+import { UserDocument } from '../model/user';
 import axios from 'axios';
 
 class InvalidParamError extends Error {}
