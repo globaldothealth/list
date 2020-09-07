@@ -36,7 +36,7 @@
             "caseReference.uploadIds": -1
         },
         "partialFilterExpression": {
-            "caseReference.uploadIds": {
+            "caseReference.uploadIds.0": {
                 "$exists": true
             }
         }
