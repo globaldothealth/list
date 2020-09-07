@@ -177,6 +177,9 @@ describe('GET', () => {
                     .expect('Content-Type', /json/);
             });
         });
+        it('rejects invalid searches', (done) => {
+            request(app).get('/api/cases?q=country%3A').expect(422, done);
+        });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(400, done);
         });

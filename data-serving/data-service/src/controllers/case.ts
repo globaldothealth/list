@@ -2,7 +2,7 @@ import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
 
-import parseSearchQuery from '../util/search';
+import parseSearchQuery, { ParsingError } from '../util/search';
 
 /**
  * Get a specific case.
@@ -102,6 +102,10 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         // If we fetched all available data, just return it.
         res.json({ cases: docs, total: total });
     } catch (e) {
+        if (e instanceof ParsingError) {
+            res.status(422).json(e.message);
+            return;
+        }
         console.error(e);
         res.status(500).json(e.message);
         return;
