@@ -78,6 +78,7 @@ This repository contains the servers and scripts that support its data curation 
   - [Curator portal](verification/scripts/README.md)
 - How do I...
   - [Update the case schema](data-serving/README.md)
+  - [Rotate secrets](aws/README.md#secrets)
 
 ### API docs
 
