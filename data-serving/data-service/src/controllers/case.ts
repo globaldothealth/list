@@ -436,6 +436,7 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
             res.status(422).json(
                 `query ${req.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
             );
+            return;
         }
     }
 
