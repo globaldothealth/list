@@ -144,9 +144,15 @@ describe('GET', () => {
                 expect(res.body.cases).toHaveLength(0);
                 expect(res.body.total).toEqual(0);
             });
-            it('returns the case if keyword matches', async () => {
+            it('returns the case if matches', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=country%3AGermany')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns the case if non case sensitive matches', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=country%3Agermany')
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
             });

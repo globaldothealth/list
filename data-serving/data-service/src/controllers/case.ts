@@ -32,8 +32,15 @@ export const casesMatchingSearchQuery = (opts: {
           }
         : {};
 
-    const casesQuery = Case.find(queryOpts);
-    const countQuery = Case.countDocuments(queryOpts);
+    // Always search with case-insensitivity.
+    const casesQuery = Case.find(queryOpts).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
+    const countQuery = Case.countDocuments(queryOpts).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
