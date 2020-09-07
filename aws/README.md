@@ -152,13 +152,16 @@ PATCH version when you make backwards compatible bug fixes.
 
 Github workflows will automatically extract the tags from the repository and apply them to the images built (thanks to the `add_git_labels: true` param in the workflow).
 
-To push a new release:
+To push a new release follow the [github UI flow](https://github.com/globaldothealth/list/releases/new) or do it using the command line:
 
 Tag main with the `0.1.2` tag:
 
-`git tag 0.1.2`
+```
+git checkout main
+git tag 0.1.2
+```
 
-the push it to the repo:
+then push it to the repo:
 
 `git push origin 0.1.2`
 
