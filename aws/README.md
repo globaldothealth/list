@@ -152,7 +152,7 @@ If for some reason a secret has been compromised or if you want to perform a rot
 
 5. Change reference to new secret in deployment configs.
 
-6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml)
+6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml`)
 
 7. Verify new deployment works as intended.
 
