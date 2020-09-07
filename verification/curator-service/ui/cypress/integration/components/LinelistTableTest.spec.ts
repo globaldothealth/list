@@ -220,9 +220,14 @@ describe('Linelist table', function () {
                 sourceUrl: 'foo.bar',
             });
         }
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.contains('rows').click();
+        cy.route('GET', '/api/cases/?limit=5&page=1').as('get5Cases');
         cy.get('li').contains('5').click();
+        cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
         cy.contains('1 row selected').should('not.exist');
         cy.get('input[type="checkbox"]').eq(1).click();
@@ -258,7 +263,10 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.get('input[id="search-field"]').click();
