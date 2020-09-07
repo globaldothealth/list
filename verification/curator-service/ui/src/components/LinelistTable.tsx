@@ -742,7 +742,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: e.toString() });
+                                    // If response has some json in it, it is included
+                                    // as e.response.data by axios, otherwise if it's a
+                                    // network error or something else we just take the
+                                    // stringified error.
+                                    if (e.response?.data) {
+                                        this.setState({
+                                            error: e.response.data,
+                                        });
+                                    } else {
+                                        this.setState({ error: e.toString() });
+                                    }
                                     reject(e);
                                 });
                         })
