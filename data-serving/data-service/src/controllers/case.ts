@@ -286,7 +286,7 @@ export const batchUpsert = async (
             numCreated:
                 (bulkWriteResult.insertedCount || 0) +
                 (bulkWriteResult.upsertedCount || 0),
-            numUpdated: res.locals.numModified,
+            numUpdated: bulkWriteResult.modifiedCount,
         });
         return;
     } catch (err) {
