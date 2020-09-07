@@ -497,6 +497,20 @@ describe('batch upsert', () => {
                 sourceEntryId: 'case_id_exists',
             },
         };
+        const existingCase2 = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists2',
+            },
+        };
+        const newCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists3',
+            },
+        };
         const c = new Case({
             ...existingCase,
             revisionMetadata: {
@@ -508,9 +522,20 @@ describe('batch upsert', () => {
             },
         });
         await c.save();
+        const c2 = new Case({
+            ...existingCase2,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c2.save();
 
         const requestBody = {
-            cases: [existingCase],
+            cases: [existingCase, existingCase2, newCase],
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
@@ -522,7 +547,7 @@ describe('batch upsert', () => {
 
         expect(nextFn).toHaveBeenCalledTimes(1);
         expect(requestBody).toEqual({
-            cases: [],
+            cases: [newCase],
             curator: {
                 email: 'updater@gmail.com',
             },

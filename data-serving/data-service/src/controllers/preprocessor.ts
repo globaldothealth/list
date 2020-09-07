@@ -101,17 +101,18 @@ export const batchUpsertDropUnchangedCases = async (
             ]),
     );
 
-    request.body.cases = request.body.cases.filter((c: any) => {
+    for (let i = 0; i < request.body.cases.length; i++) {
+        const c = request.body.cases[i];
         if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
             const existingCase = existingCasesByCaseRefCombo.get(
                 c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
             );
             if (existingCase !== undefined && existingCase.equalsJSON(c)) {
-                return false;
+                request.body.cases.splice(i, 1);
+                i--;
             }
         }
-        return true;
-    });
+    }
 
     next();
 };
