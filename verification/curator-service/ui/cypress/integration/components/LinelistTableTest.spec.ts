@@ -188,7 +188,7 @@ describe('Linelist table', function () {
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
     });
 
-    it.only('displays search errors', function () {
+    it('displays search errors', function () {
         cy.visit('/cases');
         cy.get('input[id="search-field"]').click();
         cy.get('li').contains('country:').click();
