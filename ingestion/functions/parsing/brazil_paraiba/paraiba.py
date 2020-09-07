@@ -6,12 +6,14 @@ import csv
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import parsing_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-import parsing_lib
+    import parsing_lib
 
 _DATE_DEATH_INDEX = 6
 _GENDER_INDEX = 3
@@ -40,6 +42,8 @@ def convert_gender(raw_gender: str):
 
 def convert_age(age: str):
     if age.isdecimal():
+    	#Ages are mostly reported in decimal years, but there are entries like '1 ano' ['1 year'] 
+    	#and '1 m' ['1 month'] which need to be dealt with separately.
         return {
             "start": float(age),
             "end": float(age)
@@ -64,7 +68,7 @@ def convert_age(age: str):
             }
 
 def convert_confirmation_method(raw_test: str):
-    if "Clínico" or "Clinico" in raw_test: #written both ways in dataset
+    if "Clínico" in raw_test or "Clinico" in raw_test: #written both ways in dataset
         return "Clinical diagnosis"
     elif "C. Epid" in raw_test:
         return "Other"
@@ -82,17 +86,12 @@ def convert_confirmation_method(raw_test: str):
 
 def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
-    if raw_commorbidities != "Sem comorbidades" or "Outros" or "Tabagismo" or "Imunossupressão":
-    	#How do we want to deal with 'Others' - do we want to have hasPreexistingConditions = True
-    	#and not populate the values?
+    if raw_commorbidities not in ["Sem comorbidades","Doença Hematológica","Tabagismo","Imunossupressão"]:
         preexistingConditions["hasPreexistingConditions"] = True
         commorbidities = {
                         "Diabetes Mellitus": "diabetes mellitus", 
                         "Cardiopatia": "heart disease",
                         "Doença de Aparelho Digestivo": "gastrointestinal system disease",
-                        #This was the closest I could find in the DO - 
-                        #somewhat broader than just hematologic disease which is direct translation
-                        "Doença Hematológica": "hematopoietic system disease",
                         "Doença Hepática": "liver disease",
                         "Doença Neurológica": "nervous system disease",
                         "Doença Renal": "kidney disease",
@@ -125,12 +124,12 @@ def convert_notes(raw_commorbidities: str):
         raw_notes.append("Patient with immunosupression")
     if "Tabagismo" in raw_commorbidities:
         raw_notes.append("Smoker")
+    if "Doença Hematológica" in raw_commorbidities: 
+    	raw_notes.append("Hematologic disease")
+    if "Outros" in raw_commorbidities: 
+    	raw_notes.append("Unspecified pre-existing condition")
     notes = (', ').join(raw_notes)
-    
-    if notes != '':
-        return notes
-    else:
-        return None
+    return notes
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -187,7 +186,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             }
             cases.append(case)
         # TODO(AB, Anya): Handle ensuring None fields aren't sent in requests.
-        return [c for c in cases if c["preexistingConditions"] is not None]
+        return [c for c in cases if c["preexistingConditions"]]
         
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

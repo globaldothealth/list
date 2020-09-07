@@ -66,6 +66,6 @@ class ParaibaTest(unittest.TestCase):
                                             "values":
                                             ["diabetes mellitus", "heart disease", "respiratory system disease"]
                                         },
-                "notes": None
+                "notes": ''
             }
         ])
