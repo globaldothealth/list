@@ -8,5 +8,8 @@
     "dateFilter": {
         "numDaysBeforeToday": 3,
         "op": "EQ"
+    },
+    "auth": {
+        "email": "test@fixture.com"
     }
 }
