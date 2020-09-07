@@ -134,9 +134,6 @@ export const setBatchUpsertFields = async (
             ]),
     );
 
-    // Store modification details for response handler.
-    response.locals.numModified = existingCasesByCaseRefCombo.size;
-
     // For existing cases, compute the revision metadata that should be saved
     // to the database.
     const metadataMap = new Map();
