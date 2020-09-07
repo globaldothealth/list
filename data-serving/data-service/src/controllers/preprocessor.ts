@@ -101,22 +101,17 @@ export const batchUpsertDropUnchangedCases = async (
             ]),
     );
 
-    const unchangedCaseIdSet = new Set();
     request.body.cases = request.body.cases.filter((c: any) => {
         if (c.caseReference?.sourceId && c.caseReference?.sourceEntryId) {
             const existingCase = existingCasesByCaseRefCombo.get(
                 c.caseReference.sourceId + ':' + c.caseReference.sourceEntryId,
             );
             if (existingCase !== undefined && existingCase.equalsJSON(c)) {
-                unchangedCaseIdSet.add(existingCase._id.toString());
                 return false;
             }
         }
         return true;
     });
-
-    // Store the unchanged IDs for future middleware.
-    response.locals.unchangedCaseIdSet = unchangedCaseIdSet;
 
     next();
 };
@@ -271,20 +266,13 @@ export const createBatchUpsertCaseRevisions = async (
     response: Response,
     next: NextFunction,
 ): Promise<void> => {
-    const casesToUpsert = (await findCasesWithCaseReferenceData(request))
-        .filter((c) => {
-            if (response.locals?.unchangedCaseIdSet) {
-                return !response.locals.unchangedCaseIdSet.has(
-                    c._id.toString(),
-                );
-            }
-            return true;
-        })
-        .map((c) => {
+    const casesToUpsert = (await findCasesWithCaseReferenceData(request)).map(
+        (c) => {
             return {
                 case: c,
             };
-        });
+        },
+    );
 
     await CaseRevision.insertMany(casesToUpsert, {
         ordered: false,

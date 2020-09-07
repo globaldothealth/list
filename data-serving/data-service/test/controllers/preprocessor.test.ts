@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {
+    batchUpsertDropUnchangedCases,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
@@ -488,7 +489,7 @@ describe('batch upsert', () => {
             c.toObject(),
         );
     });
-    it('with unchanged cases does not create revision', async () => {
+    it('removes cases from request that would not be updated', async () => {
         const existingCase = {
             ...minimalCase,
             caseReference: {
@@ -508,20 +509,24 @@ describe('batch upsert', () => {
         });
         await c.save();
 
-        const unchangedIdSet = new Set([c._id.toString()]);
         const requestBody = {
             cases: [existingCase],
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await createBatchUpsertCaseRevisions(
+        await batchUpsertDropUnchangedCases(
             { body: requestBody, method: 'PUT' } as Request,
-            { locals: { unchangedCaseIdSet: unchangedIdSet } } as Response,
+            {} as Response,
             nextFn,
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+        expect(requestBody).toEqual({
+            cases: [],
+            curator: {
+                email: 'updater@gmail.com',
+            },
+        });
     });
 });
 describe('batch update', () => {
