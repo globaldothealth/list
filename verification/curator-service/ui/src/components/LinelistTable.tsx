@@ -579,8 +579,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 <MaterialTable
                     tableRef={this.tableRef}
                     columns={[
-                        ...(this.props.user.roles.includes('curator') ||
-                        this.props.user.roles.includes('admin')
+                        ...(this.props.user.roles.includes('curator')
                             ? [
                                   // TODO: move to the left of selection checkboxes when possible
                                   // https://github.com/mbrn/material-table/issues/2317
@@ -879,6 +878,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
                                       ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
@@ -903,6 +905,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
                                       ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
