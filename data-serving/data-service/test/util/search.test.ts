@@ -16,6 +16,10 @@ describe('search query', () => {
         expect(res).toEqual({ fullTextSearch: 'want -nogood', filters: [] });
     });
 
+    it('errors if no value given for keyword', () => {
+        expect(() => parseSearchQuery('country:')).toThrow(/country/);
+    });
+
     it('is parses tokens', () => {
         const res = parseSearchQuery(
             'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss occupation:"clock maker" country:switzerland outcome:recovered caseid:abc123 uploadid:def456 source:wsj.com admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
