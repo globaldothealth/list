@@ -8,8 +8,11 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Paper,
+    TablePagination,
     Theme,
     Tooltip,
+    Typography,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
@@ -100,6 +103,14 @@ const styles = (theme: Theme) =>
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
         },
         tableToolbar: {
             backgroundColor: '#31A497',
@@ -734,6 +745,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     }
                                     this.setState({
                                         totalNumRows: result.data.total,
+                                        selectedRowsCurrentPage: [],
+                                        numSelectedRows: 0,
                                     });
                                     resolve({
                                         data: flattenedCases,
@@ -757,19 +770,34 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 });
                         })
                     }
-                    title="COVID-19 cases"
                     components={{
+                        Container: (props): JSX.Element => (
+                            <Paper elevation={0} {...props}></Paper>
+                        ),
+                        Pagination: (props): JSX.Element => {
+                            return this.state.numSelectedRows === 0 ? (
+                                <div className={classes.tablePaginationBar}>
+                                    <Typography>Linelist</Typography>
+                                    <span className={classes.spacer}></span>
+                                    <TablePagination
+                                        {...props}
+                                        classes={{
+                                            ...props.classes,
+                                            root: classes.paginationRoot,
+                                        }}
+                                    ></TablePagination>
+                                </div>
+                            ) : (
+                                <></>
+                            );
+                        },
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
                                 {...props}
-                                classes={
-                                    this.state.numSelectedRows > 0
-                                        ? {
-                                              highlight: classes.tableToolbar,
-                                              title: classes.toolbarItems,
-                                          }
-                                        : {}
-                                }
+                                classes={{
+                                    highlight: classes.tableToolbar,
+                                    title: classes.toolbarItems,
+                                }}
                                 toolbarButtonAlignment="left"
                             />
                         ),
@@ -800,6 +828,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        paginationPosition: 'top',
+                        toolbar: this.state.numSelectedRows > 0,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
