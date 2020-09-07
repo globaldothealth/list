@@ -1,4 +1,5 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import { Paper, TablePagination, Typography } from '@material-ui/core';
 import React, { RefObject } from 'react';
 import {
     Theme,
@@ -9,7 +10,6 @@ import {
 
 import { Link } from 'react-router-dom';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Paper } from '@material-ui/core';
 import axios from 'axios';
 import renderDate from './util/date';
 
@@ -20,6 +20,14 @@ const styles = (theme: Theme) =>
         alert: {
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(2),
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
         },
     });
 
@@ -184,7 +192,26 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     });
                             })
                         }
-                        title="Uploads"
+                        components={{
+                            Container: (props): JSX.Element => (
+                                <Paper elevation={0} {...props}></Paper>
+                            ),
+                            Pagination: (props): JSX.Element => {
+                                return (
+                                    <div className={classes.tablePaginationBar}>
+                                        <Typography>Uploads</Typography>
+                                        <span className={classes.spacer}></span>
+                                        <TablePagination
+                                            {...props}
+                                            classes={{
+                                                ...props.classes,
+                                                root: classes.paginationRoot,
+                                            }}
+                                        ></TablePagination>
+                                    </div>
+                                );
+                            },
+                        }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/
@@ -196,6 +223,8 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                            paginationPosition: 'top',
+                            toolbar: false,
                             maxBodyHeight: 'calc(100vh - 15em)',
                             headerStyle: {
                                 zIndex: 1,
