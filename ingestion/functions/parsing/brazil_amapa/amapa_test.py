@@ -54,8 +54,8 @@ class AmapaTest(unittest.TestCase):
                 ],
                 "preexistingConditions": {
                     "hasPreexistingConditions": True,
-                    "values": ["diabetes mellitus", "pregnancy", "heart disease"]
+                    "values": ["diabetes mellitus", "heart disease"]
                     },
-                "notes": "Patient with immunosupression, Neighbourhood: AGRESTE"
+                "notes": "Neighbourhood: AGRESTE"
             }
         ])
