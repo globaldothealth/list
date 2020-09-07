@@ -1,7 +1,7 @@
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { Request, Response } from 'express';
 
-import { UserDocument } from '../model/user';
+import { UserDocument, User } from '../model/user';
 import axios from 'axios';
 
 class InvalidParamError extends Error {}
@@ -107,6 +107,11 @@ export default class CasesController {
     /** batchDel simply forwards the request to the data service */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         try {
+            // Limit number of deletes a non-admin can do.
+            // Cf. https://github.com/globaldothealth/list/issues/937.
+            if (!(req.user as UserDocument)?.roles?.includes('admin')) {
+                req.body['maxCasesThreshold'] = 10000;
+            }
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
                 { data: req.body },
