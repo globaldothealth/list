@@ -966,4 +966,23 @@ describe('DELETE', () => {
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(1);
     });
+    it('delete multiple cases cannot go over threshold', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        await Promise.all([
+            new Case(minimalCase).set('notes', 'foo').save(),
+            new Case(minimalCase).set('notes', 'foo').save(),
+            new Case(minimalCase).set('notes', 'foo').save(),
+        ]);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'foo', maxCasesThreshold: 2 })
+            .expect(422, /more than the maximum allowed/);
+    });
 });
