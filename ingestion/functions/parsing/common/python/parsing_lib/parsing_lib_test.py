@@ -244,7 +244,7 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
         parsing_lib.extract_event_fields(input_event)
 
 
-def test_prepare_cases_adds_upload_id(requests_mock):
+def test_prepare_cases_adds_upload_id():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
@@ -253,13 +253,22 @@ def test_prepare_cases_adds_upload_id(requests_mock):
     assert result[0]["caseReference"]["uploadId"] == upload_id
 
 
-def test_prepare_cases_removes_nones(requests_mock):
+def test_prepare_cases_removes_nones():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     _PARSED_CASE["demographics"] = None
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         "123456789012345678901234")
     assert "demographics" not in result[0].keys()
+
+
+def test_prepare_cases_removes_empty_strings():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    _PARSED_CASE["notes"] = ""
+    result = parsing_lib.prepare_cases(
+        [_PARSED_CASE],
+        "123456789012345678901234")
+    assert "notes" not in result[0].keys()
 
 
 def test_write_to_server_returns_created_and_updated_count(
@@ -400,12 +409,13 @@ def test_filter_cases_by_date_unsupported_op(
     assert "Should have raised a ValueError exception" == False
 
 
-def test_remove_nested_nones_removes_only_nones():
+def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     data = {"keep1": 0, "keep2": False, "keep3": [], "drop1": None,
             "multi": {"multikeep": "ok", "multidrop": None},
-            "empty": {"dropped": None}}
+            "emptyobject": {"dropped": None},
+            "emptystr": ""}
     expected = {"keep1": 0, "keep2": False, "keep3": [],
                 "multi": {"multikeep": "ok"},
-                "empty": {}}
-    assert parsing_lib.remove_nested_nones(data) == expected
+                "emptyobject": {}}
+    assert parsing_lib.remove_nested_none_and_empty(data) == expected

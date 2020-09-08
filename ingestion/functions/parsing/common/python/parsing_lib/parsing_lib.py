@@ -71,16 +71,16 @@ def prepare_cases(cases, upload_id):
     """
     for i in range(len(cases)):
         cases[i]["caseReference"]["uploadId"] = upload_id
-        cases[i] = remove_nested_nones(cases[i])
+        cases[i] = remove_nested_none_and_empty(cases[i])
     return cases
 
 
-def remove_nested_nones(d):
+def remove_nested_none_and_empty(d):
     if not isinstance(d, (dict, list)):
         return d
     if isinstance(d, list):
-        return [v for v in (remove_nested_nones(v) for v in d) if v is not None]
-    return {k: v for k, v in ((k, remove_nested_nones(v)) for k, v in d.items()) if v is not None}
+        return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
+    return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
 
 
 def write_to_server(cases, env, source_id, upload_id, headers, cookies):
