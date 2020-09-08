@@ -30,8 +30,7 @@ def convert_gender(raw_gender: str):
         return "Male"
     elif raw_gender == "Feminino":
         return "Female"
-    # TODO(AB, Anya): Handle ensuring None fields aren't sent in requests.
-    return "Other"
+    return None
 
 def convert_age(age: float):
     return {
@@ -152,8 +151,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX], row[_NOTES_BAIRRO_INDEX], row[_NOTES_INDIGENOUS_GROUP_INDEX])
             }
             cases.append(case)
-        # TODO(AB, Anya): Handle ensuring None fields aren't sent in requests.
-        return [c for c in cases if c["preexistingConditions"] is not None]
+        return cases
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
