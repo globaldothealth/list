@@ -49,11 +49,13 @@ describe('Automated source form', function () {
             method: 'POST',
             url: '/api/sources',
             status: 422,
-            response: {},
+            response: {
+                data: 'nope',
+            },
         }).as('createSource');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@createSource');
-        cy.contains('Request failed');
+        cy.contains('nope');
 
         cy.visit('/sources');
         cy.contains('No records to display');

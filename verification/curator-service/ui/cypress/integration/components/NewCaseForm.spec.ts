@@ -305,11 +305,13 @@ describe('New case form', function () {
             method: 'POST',
             url: '/api/cases?num_cases=1',
             status: 422,
-            response: {},
+            response: {
+                data: 'nope',
+            },
         }).as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');
-        cy.contains('Request failed');
+        cy.contains('nope');
 
         cy.get('button[aria-label="close overlay"').click();
         cy.contains('No records to display');
