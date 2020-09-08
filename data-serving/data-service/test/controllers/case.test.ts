@@ -52,6 +52,27 @@ describe('GET', () => {
             .get('/api/cases/53cb6b9b4f4ddef1ad47f943')
             .expect(404);
     });
+    describe('download', () => {
+        it('should return 200 OK', async () => {
+            const c = new Case(minimalCase);
+            await c.save();
+            const c2 = new Case(fullCase);
+            await c2.save();
+            const res = await request(app)
+                .get('/api/cases/download')
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(c._id);
+            expect(res.text).toContain(c.caseReference.verificationStatus);
+            expect(res.text).toContain(c.caseReference.sourceId);
+            expect(res.text).toContain(c2._id);
+            expect(res.text).toContain(c2.caseReference.verificationStatus);
+            expect(res.text).toContain(c2.caseReference.sourceId);
+        });
+    });
     describe('list', () => {
         it('should return 200 OK', () => {
             return request(app)

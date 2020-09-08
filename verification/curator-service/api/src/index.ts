@@ -226,6 +226,11 @@ new OpenApiValidator({
             casesController.list,
         );
         apiRouter.get(
+            '/cases/download',
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            casesController.download,
+        );
+        apiRouter.get(
             '/cases/symptoms',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.listSymptoms,

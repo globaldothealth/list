@@ -33,6 +33,34 @@ export default class CasesController {
         }
     };
 
+    /** Download forwards the request to the data service and streams the
+     * streamed response as a csv attachment. */
+    download = async (req: Request, res: Response): Promise<void> => {
+        try {
+            axios({
+                method: 'get',
+                url: this.dataServerURL + '/api' + req.url,
+                responseType: 'stream',
+            }).then((response) => {
+                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader(
+                    'Content-Disposition',
+                    'attachment; filename="cases.csv"',
+                );
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Pragma', 'no-cache');
+                response.data.pipe(res);
+            });
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
     /** listSymptoms simply forwards the request to the data service */
     listSymptoms = async (req: Request, res: Response): Promise<void> => {
         try {

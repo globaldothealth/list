@@ -251,6 +251,29 @@ describe('Linelist table', function () {
         cy.contains('7 rows selected').should('not.exist');
     });
 
+    it('Can download all cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.server();
+        cy.route('GET', '/api/cases/download').as('downloadCases');
+        cy.contains('Download').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.include(csv, 'France');
+            assert.include(csv, 'Germany');
+            assert.include(csv, 'United Kingdom');
+        });
+    });
+
     it('Can delete all cases across rows for a search result', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
