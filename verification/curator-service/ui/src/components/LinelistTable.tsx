@@ -8,8 +8,11 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Paper,
+    TablePagination,
     Theme,
     Tooltip,
+    Typography,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
@@ -25,7 +28,6 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -94,12 +96,27 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
+            backgroundColor: 'white',
             borderRadius: theme.spacing(1),
-            marginTop: theme.spacing(2),
+            marginTop: theme.spacing(1),
         },
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
+        },
+        tableToolbar: {
+            backgroundColor: '#31A497',
+        },
+        toolbarItems: {
+            color: 'white',
         },
     });
 
@@ -359,6 +376,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             deleteDialogOpen: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
+        this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
+            this,
+        );
     }
 
     componentDidMount(): void {
@@ -411,7 +431,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         verificationStatus: VerificationStatus,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + '/batchUpdate';
+            const updateUrl = this.state.url + 'batchUpdate';
             this.setState({ error: '' });
             const response = axios.post(updateUrl, {
                 cases: rowData.map((row) => {
@@ -422,7 +442,30 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 }),
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+                reject(e);
+            });
+        });
+    }
+
+    setCaseVerificationWithQuery(
+        verificationStatus: VerificationStatus,
+    ): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const updateUrl = this.state.url + 'batchUpdateQuery';
+            this.setState({ error: '' });
+            const response = axios.post(updateUrl, {
+                query: this.state.search,
+                case: {
+                    'caseReference.verificationStatus': verificationStatus,
+                },
+            });
+            response.then(resolve).catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
@@ -431,11 +474,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
-            <Paper>
+            <>
                 {this.state.error && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        variant="filled"
+                        variant="outlined"
                         severity="error"
                     >
                         {this.state.error}
@@ -446,14 +489,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     this.props.location.state?.newCaseIds.length > 0 &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert
-                            classes={{ root: classes.alert }}
-                            variant="filled"
+                            classes={{
+                                root: classes.alert,
+                            }}
+                            variant="standard"
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.newCaseIds}`}
                                 >
                                     <Button
-                                        color="inherit"
+                                        color="primary"
                                         size="small"
                                         data-testid="view-case-btn"
                                     >
@@ -467,7 +512,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     ) : (
                         <MuiAlert
                             classes={{ root: classes.alert }}
-                            variant="filled"
+                            variant="standard"
                         >
                             {`${this.props.location.state.newCaseIds.length} cases added`}
                         </MuiAlert>
@@ -476,13 +521,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
                         <MuiAlert
-                            variant="filled"
+                            variant="standard"
                             classes={{ root: classes.alert }}
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.editedCaseIds}`}
                                 >
-                                    <Button color="inherit" size="small">
+                                    <Button color="primary" size="small">
                                         VIEW
                                     </Button>
                                 </Link>
@@ -494,8 +539,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 {this.props.location.state?.bulkMessage && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        severity="info"
-                        variant="outlined"
+                        variant="standard"
                     >
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
@@ -705,6 +749,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     }
                                     this.setState({
                                         totalNumRows: result.data.total,
+                                        selectedRowsCurrentPage: [],
+                                        numSelectedRows: 0,
                                     });
                                     resolve({
                                         data: flattenedCases,
@@ -713,16 +759,43 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: e.toString() });
+                                    this.setState({
+                                        error:
+                                            e.response?.data?.message ||
+                                            e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })
                     }
-                    title="COVID-19 cases"
                     components={{
+                        Container: (props): JSX.Element => (
+                            <Paper elevation={0} {...props}></Paper>
+                        ),
+                        Pagination: (props): JSX.Element => {
+                            return this.state.numSelectedRows === 0 ? (
+                                <div className={classes.tablePaginationBar}>
+                                    <Typography>Linelist</Typography>
+                                    <span className={classes.spacer}></span>
+                                    <TablePagination
+                                        {...props}
+                                        classes={{
+                                            ...props.classes,
+                                            root: classes.paginationRoot,
+                                        }}
+                                    ></TablePagination>
+                                </div>
+                            ) : (
+                                <></>
+                            );
+                        },
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
                                 {...props}
+                                classes={{
+                                    highlight: classes.tableToolbar,
+                                    title: classes.toolbarItems,
+                                }}
                                 toolbarButtonAlignment="left"
                             />
                         ),
@@ -748,9 +821,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: this.props.user.roles.includes('curator'),
+                        selection:
+                            this.props.user.roles.includes('curator') ||
+                            this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        paginationPosition: 'top',
+                        toolbar: this.state.numSelectedRows > 0,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
@@ -763,7 +840,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E7EFED' }
+                                ? { backgroundColor: '#F0FBF9' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
@@ -776,46 +853,71 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }
                     }}
                     actions={
-                        this.props.user.roles.includes('curator')
+                        this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <Button variant="outlined">
-                                              {this.state.totalNumRows ===
-                                              this.state.numSelectedRows
-                                                  ? 'Unselect'
-                                                  : 'Select'}{' '}
-                                              all {this.state.totalNumRows} rows
-                                          </Button>
-                                      ),
-                                      tooltip: `
+                                  // Only allow selecting rows across pages if
+                                  // there is a search query.
+                                  ...(this.state.search.trim() !== ''
+                                      ? [
+                                            {
+                                                icon: (): JSX.Element => (
+                                                    <Button
+                                                        classes={{
+                                                            root:
+                                                                classes.toolbarItems,
+                                                        }}
+                                                    >
+                                                        {this.state
+                                                            .totalNumRows ===
+                                                        this.state
+                                                            .numSelectedRows
+                                                            ? 'Unselect'
+                                                            : 'Select'}{' '}
+                                                        all{' '}
+                                                        {
+                                                            this.state
+                                                                .totalNumRows
+                                                        }{' '}
+                                                        rows
+                                                    </Button>
+                                                ),
+                                                tooltip: `
                                       ${
                                           this.state.totalNumRows ===
                                           this.state.numSelectedRows
                                               ? 'Unselect'
                                               : 'Select'
                                       } all rows across pages`,
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: async (
-                                          _: any,
-                                          rows: any,
-                                      ): Promise<void> => {
-                                          const shouldSelectAll =
-                                              this.state.totalNumRows !==
-                                              this.state.numSelectedRows;
-                                          await this.tableRef.current.onAllSelected(
-                                              shouldSelectAll,
-                                          );
-                                          this.setState({
-                                              numSelectedRows: shouldSelectAll
-                                                  ? this.state.totalNumRows
-                                                  : 0,
-                                          });
-                                      },
-                                  },
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                onClick: async (
+                                                    _: any,
+                                                    rows: any,
+                                                ): Promise<void> => {
+                                                    const shouldSelectAll =
+                                                        this.state
+                                                            .totalNumRows !==
+                                                        this.state
+                                                            .numSelectedRows;
+                                                    await this.tableRef.current.onAllSelected(
+                                                        shouldSelectAll,
+                                                    );
+                                                    this.setState({
+                                                        numSelectedRows: shouldSelectAll
+                                                            ? this.state
+                                                                  .totalNumRows
+                                                            : 0,
+                                                    });
+                                                },
+                                            },
+                                        ]
+                                      : []),
                                   {
                                       icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
                                       ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -826,22 +928,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Verified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Verified,
+                                              );
                                           }
-                                          await this.setCaseVerification(
-                                              rows,
-                                              VerificationStatus.Verified,
-                                          );
                                           this.tableRef.current.onQueryChange();
                                       },
                                   },
                                   {
                                       icon: (): JSX.Element => (
                                           <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
                                       ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -852,47 +956,44 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Unverified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Unverified,
+                                              );
                                           }
-                                          await this.setCaseVerification(
-                                              rows,
-                                              VerificationStatus.Unverified,
-                                          );
                                           this.tableRef.current.onQueryChange();
                                       },
                                   },
-                                  // Only allow deleting all rows if there is a search query.
-                                  ...(this.state.totalNumRows !==
-                                      this.state.numSelectedRows ||
-                                  this.state.search.trim() !== ''
-                                      ? [
-                                            // This action is for deleting selected rows.
-                                            // The action for deleting single rows is in the
-                                            // RowMenu function.
-                                            {
-                                                icon: (): JSX.Element => (
-                                                    <span aria-label="delete all">
-                                                        <DeleteIcon />
-                                                    </span>
-                                                ),
-                                                tooltip: 'Delete selected rows',
-                                                onClick: (): void => {
-                                                    this.setState({
-                                                        deleteDialogOpen: true,
-                                                    });
-                                                },
-                                            },
-                                        ]
-                                      : []),
+                                  // This action is for deleting selected rows.
+                                  // The action for deleting single rows is in the
+                                  // RowMenu function.
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <span aria-label="delete all">
+                                              <DeleteIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
+                                          </span>
+                                      ),
+                                      tooltip: 'Delete selected rows',
+                                      onClick: (): void => {
+                                          this.setState({
+                                              deleteDialogOpen: true,
+                                          });
+                                      },
+                                  },
                               ]
                             : []
                     }
                 />
-            </Paper>
+            </>
         );
     }
 }

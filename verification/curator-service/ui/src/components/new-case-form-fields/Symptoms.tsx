@@ -50,55 +50,53 @@ export default function Symptoms(): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name="symptoms">
-            <fieldset>
-                <FieldTitle title="Symptoms"></FieldTitle>
-                <SelectField
-                    name="symptomsStatus"
-                    label="Symptom status"
-                    values={symptomStatusValues}
-                ></SelectField>
-                {values.symptomsStatus === 'Symptomatic' && (
-                    <>
-                        {commonSymptoms.length > 0 && (
-                            <>
-                                <div className={classes.section}>
-                                    Frequently added symptoms
-                                </div>
-                                <div className={classes.section}>
-                                    {commonSymptoms.map((symptom) => (
-                                        <Chip
-                                            key={symptom}
-                                            className={classes.chip}
-                                            label={symptom}
-                                            onClick={(): void => {
-                                                if (
-                                                    !values.symptoms.includes(
+            <FieldTitle title="Symptoms"></FieldTitle>
+            <SelectField
+                name="symptomsStatus"
+                label="Symptom status"
+                values={symptomStatusValues}
+            ></SelectField>
+            {values.symptomsStatus === 'Symptomatic' && (
+                <>
+                    {commonSymptoms.length > 0 && (
+                        <>
+                            <div className={classes.section}>
+                                Frequently added symptoms
+                            </div>
+                            <div className={classes.section}>
+                                {commonSymptoms.map((symptom) => (
+                                    <Chip
+                                        key={symptom}
+                                        className={classes.chip}
+                                        label={symptom}
+                                        onClick={(): void => {
+                                            if (
+                                                !values.symptoms.includes(
+                                                    symptom,
+                                                )
+                                            ) {
+                                                setFieldValue(
+                                                    'symptoms',
+                                                    values.symptoms.concat([
                                                         symptom,
-                                                    )
-                                                ) {
-                                                    setFieldValue(
-                                                        'symptoms',
-                                                        values.symptoms.concat([
-                                                            symptom,
-                                                        ]),
-                                                    );
-                                                }
-                                            }}
-                                        ></Chip>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                        <FormikAutocomplete
-                            name="symptoms"
-                            label="Symptoms"
-                            initialValue={initialValues.symptoms}
-                            multiple
-                            optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/symptoms.txt"
-                        />
-                    </>
-                )}
-            </fieldset>
+                                                    ]),
+                                                );
+                                            }
+                                        }}
+                                    ></Chip>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    <FormikAutocomplete
+                        name="symptoms"
+                        label="Symptoms"
+                        initialValue={initialValues.symptoms}
+                        multiple
+                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/symptoms.txt"
+                    />
+                </>
+            )}
         </Scroll.Element>
     );
 }

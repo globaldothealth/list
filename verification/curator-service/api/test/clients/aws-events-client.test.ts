@@ -1,4 +1,5 @@
-import AWS from 'aws-sdk';
+import AWS, { AWSError } from 'aws-sdk';
+
 import AWSMock from 'aws-sdk-mock';
 import AwsEventsClient from '../../src/clients/aws-events-client';
 import AwsLambdaClient from '../../src/clients/aws-lambda-client';
@@ -45,7 +46,7 @@ beforeEach(() => {
     AWSMock.mock('CloudWatchEvents', 'removeTargets', removeTargetsSpy);
     client = new AwsEventsClient(
         'us-east-1',
-        new AwsLambdaClient('some-arn', 'us-east-1'),
+        new AwsLambdaClient('some-arn', 'test', 'us-east-1'),
         _ENV,
     );
 });
@@ -144,6 +145,26 @@ describe('putRule', () => {
                 'statementId',
             ),
         ).rejects.toThrow(expectedError);
+    });
+    it('does not throw 409 errors from lambda client', async () => {
+        // AWSError isn't backed by an actual prototype.
+        // https://github.com/aws/aws-sdk-js/issues/2611
+        const expectedError = new Error() as AWSError;
+        expectedError.statusCode = 409;
+
+        addInvokeFromEventPermissionSpy.mockRejectedValueOnce(expectedError);
+
+        await client.putRule(
+            'ruleName',
+            'description',
+            'rate(1 hour)',
+            'targetArn',
+            'awsErrorTargetId',
+            'sourceId',
+            'statementId',
+        );
+
+        expect(addInvokeFromEventPermissionSpy).toHaveBeenCalledTimes(1);
     });
     it('throws error if PutRuleResponse somehow lacks RuleArn', async () => {
         putRuleSpy.mockResolvedValueOnce({});

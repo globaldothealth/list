@@ -132,37 +132,40 @@ Data service has the labels `app=data` and `environment=prod|dev`.
 
 Services exposed contain the environment in their names to avoid mistakenly taking to a different service, for example use `http://data-dev` to talk to dev data service and `http://data-prod` to talk to the prod data service.
 
-## Docker-hub
+## Github Container Registry
 
-Images used in deployments are pulled from docker hub where automated builds have been set-up.
+Images used in deployments are pulled from the Github Container Registry where images are automatically pushed by the [curator](/.github/workflows/curator-service-package.yml) and data [workflows](/.github/workflows/curator-service-package.yml).
 
-Check out the repos for the [curator service](https://hub.docker.com/repository/docker/healthmapidha/curatorservice) and [data service](https://hub.docker.com/repository/docker/healthmapidha/dataservice).
-
-Automated builds create a new image with the _latest_ tag upon every push to the main branch on this github repo. More specialized tags are described below.
+Check out the registries for the [curator service](https://github.com/orgs/globaldothealth/packages/container/list%2Fcuratorservice/) and [data service](https://github.com/orgs/globaldothealth/packages/container/list%2Fdataservice/).
 
 ## Releases
 
 We follow [semantic versioning](https://semver.org/) which is basically:
 
-    Given a version number MAJOR.MINOR.PATCH, increment the:
+```text
+Given a version number MAJOR.MINOR.PATCH, increment the:
 
-    MAJOR version when you make incompatible API changes,
-    MINOR version when you add functionality in a backwards compatible manner, and
-    PATCH version when you make backwards compatible bug fixes.
+MAJOR version when you make incompatible API changes,
+MINOR version when you add functionality in a backwards compatible manner, and
+PATCH version when you make backwards compatible bug fixes.
+```
 
-Docker-hub has automated builds setup that extract the semantic version from tags in the main branch.
+Github workflows will automatically extract the tags from the repository and apply them to the images built (thanks to the `add_git_labels: true` param in the workflow).
 
-To push a new release of the curator service:
+To push a new release follow the [github UI flow](https://github.com/globaldothealth/list/releases/new) or do it using the command line:
 
-Tag main with the `curator-0.1.2` tag:
+Tag main with the `0.1.2` tag:
 
-`git tag curator-0.1.2`
+```
+git checkout main
+git tag 0.1.2
+```
 
-the push it to the repo:
+then push it to the repo:
 
-`git push origin curator-0.1.2`
+`git push origin 0.1.2`
 
-Docker hub will automatically build the image: `docker.io/healthmapidha/curatorservice:0.1.2`.
+Github actions will automatically build the image: `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
 This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
 
@@ -170,9 +173,11 @@ To push a new release of the data service, follow the same procedure but change 
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
-### `Latest` image tag for dev
+### `main` image tag for dev
 
-Dev instances of curator and data services are using the `latest` image tag, that's not best practice but is okay while we work on other features. The latest image is fetched when a deployment is updated, to update dev to the `latest` image built by docker-hub, do:
+Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically - better approach is pending [Flux-based deployment]
+(https://github.com/globaldothealth/list/issues/673). The latest image with the `main` tag is fetched when a deployment is updated in kubernetes.
+To update dev to the `main` image, do:
 
 ```shell
 kubectl rollout restart deployment/curator-dev
@@ -181,11 +186,17 @@ kubectl rollout restart deployment/data-dev
 
 ### Rollback
 
-Just change the image tag referenced in the deployment file to an earlier version and apply the change.
+Just change the image tag referenced in the deployment file to an earlier version and apply the change with `kubectl apply`.
 
 ### Deleting a release
 
-If for some reason you need to delete a tag, you can do it with `git tag -d curator-1.2.3` then `git push origin :refs/tags/curator-0.1.2` to delete it remotely.
+If for some reason you need to delete a tag, you can do it with `git tag -d 1.2.3` then `git push origin :refs/tags/0.1.2` to delete it remotely.
+ 
+Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
+
+### Deprecated packages
+
+https://github.com/globaldothealth/list/packages/253413 and https://github.com/globaldothealth/list/packages/253391 were package repositories setup before Github Container Registry was released, they are unused and because they are public they cannot be deleted so please ignore them.
 
 ## Metric server
 

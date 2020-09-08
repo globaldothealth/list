@@ -47,7 +47,6 @@ def create_upload_record(env, source_id, headers, cookies):
                         headers=headers)
     if res and res.status_code == 201:
         res_json = res.json()
-        # TODO: Look for "errors" in res_json and handle them in some way.
         return res_json["_id"]
     e = RuntimeError(
         f'Error creating upload record, status={res.status_code}, response={res.text}')
@@ -68,14 +67,9 @@ def finalize_upload(
                        json=update,
                        headers=headers,
                        cookies=cookies)
-    # TODO: Look for "errors" in res_json and handle them in some way.
-    # TODO: This can end up in a error-loop where we try to upload and fail
-    #       endlessly
     if not res or res.status_code != 200:
-        e = RuntimeError(
+        raise RuntimeError(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, env, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, headers, cookies)
 
 
 def complete_with_error(
