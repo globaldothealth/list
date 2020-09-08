@@ -4,6 +4,9 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
+// Don't set client-side timeouts for requests to the data service.
+axios.defaults.timeout = 0;
+
 class InvalidParamError extends Error {}
 
 /**
