@@ -305,9 +305,7 @@ describe('New case form', function () {
             method: 'POST',
             url: '/api/cases?num_cases=1',
             status: 422,
-            response: {
-                data: 'nope',
-            },
+            response: { data: { message: 'nope' } },
         }).as('addCase');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@addCase');

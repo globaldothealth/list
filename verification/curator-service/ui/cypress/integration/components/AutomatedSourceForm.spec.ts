@@ -49,9 +49,7 @@ describe('Automated source form', function () {
             method: 'POST',
             url: '/api/sources',
             status: 422,
-            response: {
-                data: 'nope',
-            },
+            response: { data: { message: 'nope' } },
         }).as('createSource');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@createSource');
