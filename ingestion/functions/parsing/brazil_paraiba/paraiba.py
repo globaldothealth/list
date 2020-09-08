@@ -185,7 +185,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX])
             }
             cases.append(case)
-        # TODO(AB, Anya): Handle ensuring None fields aren't sent in requests.
         return cases
         
 def lambda_handler(event, context):
