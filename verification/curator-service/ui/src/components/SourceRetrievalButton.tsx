@@ -48,7 +48,7 @@ export default function SourceRetrievalButton(props: {
                         })
                         .catch((e) => {
                             setResult(undefined);
-                            setError(e.message);
+                            setError(e.response?.data || e.toString());
                         })
                         .finally(() => {
                             setRetrieving(false);

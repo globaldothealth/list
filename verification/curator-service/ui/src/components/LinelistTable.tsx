@@ -442,7 +442,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 }),
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({ error: e.response?.data || e.toString() });
                 reject(e);
             });
         });
@@ -461,7 +461,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({ error: e.response?.data || e.toString() });
                 reject(e);
             });
         });
@@ -759,13 +759,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     // as e.response.data by axios, otherwise if it's a
                                     // network error or something else we just take the
                                     // stringified error.
-                                    if (e.response?.data) {
-                                        this.setState({
-                                            error: e.response.data,
-                                        });
-                                    } else {
-                                        this.setState({ error: e.toString() });
-                                    }
+                                    this.setState({
+                                        error: e.response?.data || e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })

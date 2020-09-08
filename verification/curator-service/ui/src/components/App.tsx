@@ -308,7 +308,6 @@ export default function App(): JSX.Element {
             })
             .catch((e) => {
                 setUser({ _id: '', name: '', email: '', roles: [] });
-                console.error(e);
             });
     };
 

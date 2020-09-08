@@ -34,7 +34,7 @@ export default function EditCase(props: Props): JSX.Element {
             })
             .catch((e) => {
                 setCase(undefined);
-                setErrorMessage(e.message);
+                setErrorMessage(e.response?.data || e.toString());
             })
             .finally(() => setLoading(false));
     }, [props.id]);

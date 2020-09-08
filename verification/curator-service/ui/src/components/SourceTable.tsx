@@ -142,7 +142,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             this.setState({ error: '' });
             const response = axios.delete(deleteUrl);
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({ error: e.response?.data || e.toString() });
                 reject(e);
             });
         });
@@ -172,7 +172,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 newSource,
             );
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({ error: e.response?.data || e.toString() });
                 reject(e);
             });
         });
@@ -485,7 +485,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         });
                                     })
                                     .catch((e) => {
-                                        this.setState({ error: e.toString() });
+                                        this.setState({
+                                            error:
+                                                e.response?.data ||
+                                                e.toString(),
+                                        });
                                         reject(e);
                                     });
                             })

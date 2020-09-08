@@ -153,7 +153,9 @@ class Users extends React.Component<Props, UsersState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: JSON.stringify(e) });
+                                    this.setState({
+                                        error: e.response?.data || e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })
@@ -218,7 +220,7 @@ class Users extends React.Component<Props, UsersState> {
                 }
             })
             .catch((e) => {
-                this.setState({ error: JSON.stringify(e) });
+                this.setState({ error: e.response?.data || e.toString() });
                 console.error(e);
             });
     }
