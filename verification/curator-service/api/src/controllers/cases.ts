@@ -5,6 +5,8 @@ import { UserDocument } from '../model/user';
 import axios from 'axios';
 
 // Don't set client-side timeouts for requests to the data service.
+// TODO: Make this more fine-grained once we fix
+//   https://github.com/globaldothealth/list/issues/961.
 axios.defaults.timeout = 0;
 
 class InvalidParamError extends Error {}
