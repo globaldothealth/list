@@ -2,7 +2,7 @@
     "sourceId": "5ef8e943dfe6e00030892d58",
     "sourceEntryId": "entryId",
     "sourceUrl": "cdc.gov",
-    "uploadId": "012345678901234567890123",
+    "uploadIds": ["012345678901234567890123", "012345678901234567890124"],
     "verificationStatus": "VERIFIED",
     "additionalSources": [
         {

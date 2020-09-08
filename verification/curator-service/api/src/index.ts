@@ -1,7 +1,7 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
@@ -26,6 +26,7 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import { ValidationError } from 'express-openapi-validator/dist/framework/types';
 
 const app = express();
 
@@ -222,7 +223,7 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.list,
         );
         apiRouter.get(
@@ -242,7 +243,7 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.get,
         );
         apiRouter.post(
@@ -277,7 +278,7 @@ new OpenApiValidator({
         );
         apiRouter.delete(
             '/cases',
-            mustHaveAnyRole(['curator']),
+            mustHaveAnyRole(['curator', 'admin']),
             casesController.batchDel,
         );
         apiRouter.delete(
@@ -327,6 +328,22 @@ new OpenApiValidator({
                 customCssUrl:
                     'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
             }),
+        );
+
+        // Register error handler to format express validator errors otherwise
+        // a complete HTML document is sent as the error output.
+        app.use(
+            (
+                err: ValidationError,
+                req: Request,
+                res: Response,
+                next: NextFunction,
+            ) => {
+                res.status(err.status || 500).json({
+                    message: err.message,
+                    errors: err.errors,
+                });
+            },
         );
 
         // Serve static UI content if static directory was specified.

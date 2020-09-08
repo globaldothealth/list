@@ -15,7 +15,7 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
-UPLOAD_ID_FIELD = "uploadId"
+UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
 
@@ -51,7 +51,7 @@ def extract_event_fields(event):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
 
 
@@ -70,7 +70,7 @@ def prepare_cases(cases, upload_id):
     TODO: Migrate source_id/source_url to this method.
     """
     for i in range(len(cases)):
-        cases[i]["caseReference"]["uploadId"] = upload_id
+        cases[i]["caseReference"]["uploadIds"] = [upload_id]
         cases[i] = remove_nested_none_and_empty(cases[i])
     return cases
 

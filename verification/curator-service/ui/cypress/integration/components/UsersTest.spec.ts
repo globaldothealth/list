@@ -52,6 +52,7 @@ describe('Manage users page', function () {
         cy.get('li[data-value="admin"]').click();
         cy.wait('@updateUser');
         cy.wait('@getUsers');
+        cy.get('div[data-testid="Bob-select-roles"]').click();
         cy.get('li[data-value="reader"]').click();
         cy.wait('@updateUser');
         cy.wait('@getUsers');
