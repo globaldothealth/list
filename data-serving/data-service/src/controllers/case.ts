@@ -112,7 +112,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.json({ cases: docs, total: total });
     } catch (e) {
         if (e instanceof ParsingError) {
-            res.status(422).json(e);
+            res.status(422).json({ message: e.message });
             return;
         }
         console.error(e);
