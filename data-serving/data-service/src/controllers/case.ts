@@ -12,7 +12,9 @@ import parseSearchQuery, { ParsingError } from '../util/search';
 export const get = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findById(req.params.id).lean();
     if (!c) {
-        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        res.status(404).send({
+            message: `Case with ID ${req.params.id} not found.`,
+        });
         return;
     }
     res.json(c);
@@ -63,16 +65,16 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     if (page < 1) {
-        res.status(422).json('page must be > 0');
+        res.status(422).json({ message: 'page must be > 0' });
         return;
     }
     if (limit < 1) {
-        res.status(422).json('limit must be > 0');
+        res.status(422).json({ message: 'limit must be > 0' });
         return;
     }
     // Filter query param looks like &q=some%20search%20query
     if (typeof req.query.q !== 'string' && typeof req.query.q !== 'undefined') {
-        res.status(422).json('q must be a unique string');
+        res.status(422).json({ message: 'q must be a unique string' });
         return;
     }
     try {
@@ -110,11 +112,11 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         res.json({ cases: docs, total: total });
     } catch (e) {
         if (e instanceof ParsingError) {
-            res.status(422).json(e.message);
+            res.status(422).json({ message: e.message });
             return;
         }
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -147,10 +149,10 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -178,7 +180,7 @@ export const batchValidate = async (
         res.status(207).json({ errors: errors });
         return;
     } catch (err) {
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -302,11 +304,11 @@ export const batchUpsert = async (
         return;
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
         console.warn(err);
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -323,16 +325,18 @@ export const update = async (req: Request, res: Response): Promise<void> => {
             runValidators: true,
         });
         if (!c) {
-            res.status(404).send(`Case with ID ${req.params.id} not found.`);
+            res.status(404).send({
+                message: `Case with ID ${req.params.id} not found.`,
+            });
             return;
         }
         res.json(c);
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -347,7 +351,7 @@ export const batchUpdate = async (
     res: Response,
 ): Promise<void> => {
     if (!req.body.cases.every((c: any) => c._id)) {
-        res.status(422).json('Every case must specify its _id');
+        res.status(422).json({ message: 'Every case must specify its _id' });
         return;
     }
     try {
@@ -366,7 +370,7 @@ export const batchUpdate = async (
         );
         res.json({ numModified: bulkWriteResult.modifiedCount });
     } catch (err) {
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -427,7 +431,7 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
             },
             (err) => {
                 if (err) {
-                    res.status(500).json(err.message);
+                    res.status(500).json(err);
                     return;
                 }
                 res.status(204).end();
@@ -444,9 +448,9 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
             count: true,
         });
         if (total > Number(maxCasesThreshold)) {
-            res.status(422).json(
-                `query ${req.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
-            );
+            res.status(422).json({
+                message: `query ${req.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
+            });
             return;
         }
     }
@@ -457,7 +461,7 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
     });
     Case.deleteMany(casesQuery, (err) => {
         if (err) {
-            res.status(500).json(err.message);
+            res.status(500).json(err);
             return;
         }
         res.status(204).end();
@@ -472,7 +476,9 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
 export const del = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findByIdAndDelete(req.params.id, req.body);
     if (!c) {
-        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        res.status(404).send({
+            message: `Case with ID ${req.params.id} not found.`,
+        });
         return;
     }
     res.status(204).end();
@@ -500,7 +506,7 @@ export const listSymptoms = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -529,7 +535,7 @@ export const listPlacesOfTransmission = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -557,7 +563,7 @@ export const listOccupations = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
