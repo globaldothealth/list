@@ -39,7 +39,7 @@ def extract_event_fields(event):
             for field
             in [ENV_FIELD, SOURCE_ID_FIELD]):
         error_message = (
-            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event json.")
+            f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event: {event}")
         print(error_message)
         raise ValueError(error_message)
     return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get('auth', {})
@@ -100,9 +100,10 @@ def retrieve_content(
         # parsers as per https://github.com/globaldothealth/list/issues/867.
         bytesio = io.BytesIO(r.content)
         print('detecting encoding of retrieved content.')
-        detected_enc = detect(bytesio.read(2048))
-        print(f'Source encoding is presumably {detected_enc}')
+        # Read 2MB to be quite sure about the encoding.
+        detected_enc = detect(bytesio.read(2<<20))
         bytesio.seek(0)
+        print(f'Source encoding is presumably {detected_enc}')
         source_encoding = detected_enc['encoding']
         if source_encoding != "utf-8":
             with codecs.open(f"/tmp/{key_filename_part}", "wb", 'utf-8') as f:

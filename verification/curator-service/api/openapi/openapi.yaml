@@ -324,6 +324,16 @@ paths:
           $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
+  /sources/parsers:
+    get:
+      summary: Lists parsers available for automated ingestion
+      tags: [Suggest]
+      operationId: listParsers
+      responses:
+        "200":
+          $ref: "#/components/responses/200ParsersArray"
+        "500":
+          $ref: "#/components/responses/500"
   /cases:
     get:
       tags: [Case]
@@ -478,6 +488,8 @@ paths:
           $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/symptoms:
@@ -816,6 +828,19 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Parser:
+      description: A parser for automated ingestion
+      type: object
+      properties:
+        name:
+          type: string
+          description: The Lambda name
+          example: epid-ingestion-CHZurichParsingFunction-1L624HBVU0E56
+    ParsersArray:
+      type: array
+      items:
+        description: An array of parsers
+        $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
       type: object
@@ -924,7 +949,7 @@ components:
               properties:
                 awsLambdaArn:
                   type: string
-                  pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+                  #pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
                   example: arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
             regexParsing:
               type: object
@@ -983,14 +1008,14 @@ components:
               type: string
               description: URL of the source this case was extracted from
               example: https://api.covid19india.org/raw_data7.json
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-                example: example: 5ef22491937717c3331c3729
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
@@ -1063,6 +1088,7 @@ components:
                 description: >
                   For outcome event, value can be Death or Recovered.
                   For icuAdmission and hospitalAdmission, value can be Yes or No.
+                  For confirmed event, the value can be the method of confirmation (i.e. "PCR test").
                 example: Recovered
           example:
             - name: confirmed
@@ -1435,18 +1461,16 @@ components:
             - GEOCODE
             - VALIDATE
             - UPSERT
-        createdCaseIds:
-          type: array
-          description: UUIDs of cases created by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
-        updatedCaseIds:
-          type: array
-          description: UUIDs of cases updated by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
+        numCreated:
+          type: number
+          description: The number of cases created by the request.
+        numUpdated:
+          type: number
+          description: >
+            The number of cases modified by the request. Note that this only
+            includes cases that are actually modified by the batch upsert. If a
+            case is included in the batch upsert request, but contains no
+            changes compared to the currently stored case, it won't be counted.
         errors:
           type: array
           items:
@@ -1464,8 +1488,8 @@ components:
               - message
       required:
         - phase
-        - createdCaseIds
-        - updatedCaseIds
+        - numCreated
+        - numUpdated
         - errors
   responses:
     "200Auth":
@@ -1560,6 +1584,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Retrieval"
+    "200ParsersArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ParsersArray"
     "200Upload":
       description: OK
       content:

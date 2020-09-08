@@ -107,6 +107,11 @@ export default class CasesController {
     /** batchDel simply forwards the request to the data service */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         try {
+            // Limit number of deletes a non-admin can do.
+            // Cf. https://github.com/globaldothealth/list/issues/937.
+            if (!(req.user as UserDocument)?.roles?.includes('admin')) {
+                req.body['maxCasesThreshold'] = 10000;
+            }
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
                 { data: req.body },
@@ -168,9 +173,9 @@ export default class CasesController {
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.put(
@@ -183,7 +188,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -191,7 +196,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -216,8 +221,8 @@ export default class CasesController {
             if (geocodeErrors.length > 0) {
                 res.status(207).send({
                     phase: 'GEOCODE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: geocodeErrors,
                 });
                 return;
@@ -232,8 +237,8 @@ export default class CasesController {
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: validationResponse.data.errors,
                 });
                 return;
@@ -250,8 +255,8 @@ export default class CasesController {
             );
             res.status(200).send({
                 phase: 'UPSERT',
-                createdCaseIds: upsertResponse.data.createdCaseIds,
-                updatedCaseIds: upsertResponse.data.updatedCaseIds,
+                numCreated: upsertResponse.data.numCreated,
+                numUpdated: upsertResponse.data.numUpdated,
                 errors: [],
             });
             return;
@@ -290,7 +295,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -319,7 +324,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -332,9 +337,9 @@ export default class CasesController {
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.post(
@@ -347,7 +352,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -355,7 +360,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 

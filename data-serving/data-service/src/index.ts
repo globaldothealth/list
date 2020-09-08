@@ -3,12 +3,13 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    batchUpsertDropUnchangedCases,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
     findCasesToUpdate,
     setBatchUpdateRevisionMetadata,
-    setBatchUpsertRevisionMetadata,
+    setBatchUpsertFields,
     setRevisionMetadata,
 } from './controllers/preprocessor';
 
@@ -55,7 +56,7 @@ app.use(
         customCss: '.swagger-ui .topbar { display: none }',
         // Make it look nicer.
         customCssUrl:
-            'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-monokai.css',
+            'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
     }),
 );
 
@@ -93,7 +94,8 @@ new OpenApiValidator({
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
-            setBatchUpsertRevisionMetadata,
+            batchUpsertDropUnchangedCases,
+            setBatchUpsertFields,
             createBatchUpsertCaseRevisions,
             caseController.batchUpsert,
         );

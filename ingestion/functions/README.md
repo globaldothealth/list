@@ -63,7 +63,9 @@ This will make the functions log-in as a new user specified by this email and us
 
 Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
 
-TODO: #754 Add param to store and retrieve source content locally, not on S3.
+Unfortunately there is no way to mount local volumes to store/retrieve source
+contents instead of relying on S3 which means testing e2e locally isn't possible.
+If you want to use another storage system for testing feel free to send a PR.
 
 ### One-time setup for people with AWS access
 
@@ -110,6 +112,9 @@ more generally about Python Lambda development
 The points at which the Lambda integration is most apparent are in testing and
 execution of code.
 
+You are free to write the parsers however you like.
+It's best to get inspiration from existing functions though and the only prerequisite for it showing up in the UI once your PR is merged in is that its name must include _"ParsingFunction"_.
+
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
@@ -148,10 +153,10 @@ In your parser package's `input_event.json` set the `s3Key` as `5f311a9795e33800
 Next you can invoke your parsing function:
 
 ```shell
-sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
+sam local invoke "MyParsingFunction" -e my/dir/input_event.json --docker-network=host
 ```
 
-Run this from the base `ingestion/functions` dir. The `MyFunction` name should
+Run this from the base `ingestion/functions` dir. The `MyParsingFunction` name should
 correspond to the name of the resource as defined in the SAM `template.yaml`;
 for more information on the template, read
 [this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).

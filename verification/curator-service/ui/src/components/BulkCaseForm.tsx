@@ -25,6 +25,7 @@ import AppModal from './AppModal';
 import BulkCaseFormValues from './bulk-case-form-fields/BulkCaseFormValues';
 import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
+import { Paper } from '@material-ui/core';
 import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -172,8 +173,8 @@ interface BatchUpsertError {
 
 interface BatchUpsertResponse {
     phase: string;
-    createdCaseIds: string[];
-    updatedCaseIds: string[];
+    numCreated: number;
+    numUpdated: number;
     errors: BatchUpsertError[];
 }
 
@@ -382,7 +383,7 @@ class BulkCaseForm extends React.Component<
                 sourceId: caseReference.sourceId,
                 sourceEntryId: c.sourceEntryId,
                 sourceUrl: caseReference.sourceUrl,
-                uploadId: uploadId,
+                uploadIds: [uploadId],
                 verificationStatus: VerificationStatus.Verified,
             },
             demographics: {
@@ -523,30 +524,27 @@ class BulkCaseForm extends React.Component<
             );
             return;
         }
-        const createdIds = upsertResponse.createdCaseIds;
-        const updatedIds = upsertResponse.updatedCaseIds;
         await this.finalizeUpload(caseReference.sourceId, uploadId, 'SUCCESS', {
-            numCreated: createdIds.length,
-            numUpdated: updatedIds.length,
+            numCreated: upsertResponse.numCreated,
+            numUpdated: upsertResponse.numUpdated,
         });
         const createdMessage =
-            createdIds.length === 0
+            upsertResponse.numCreated === 0
                 ? ''
-                : createdIds.length === 1
+                : upsertResponse.numCreated === 1
                 ? '1 new case added. '
-                : `${createdIds.length} new cases added. `;
+                : `${upsertResponse.numCreated} new cases added. `;
         const updatedMessage =
-            updatedIds.length === 0
+            upsertResponse.numUpdated === 0
                 ? ''
-                : updatedIds.length === 1
+                : upsertResponse.numUpdated === 1
                 ? '1 case updated. '
-                : `${updatedIds.length} cases updated. `;
+                : `${upsertResponse.numUpdated} cases updated. `;
         this.props.history.push({
             pathname: '/cases',
             state: {
                 bulkMessage: `${filename} uploaded. ${createdMessage} ${updatedMessage}`,
-                newCaseIds: createdIds,
-                editedCaseIds: updatedIds,
+                searchQuery: `uploadid:${uploadId}`,
             },
         });
     }
@@ -639,14 +637,14 @@ class BulkCaseForm extends React.Component<
                                 </Typography>
                             </div>
                             <Form>
-                                <fieldset className={classes.allFormSections}>
+                                <Paper className={classes.allFormSections}>
                                     <div className={classes.formSection}>
-                                        <Source borderless={true} />
+                                        <Source />
                                     </div>
                                     <div className={classes.formSection}>
                                         <FileUpload></FileUpload>
                                     </div>
-                                </fieldset>
+                                </Paper>
                                 {/* TODO: Host the final instructions doc. */}
                                 <a
                                     href="https://github.com/globaldothealth/list/tree/main/verification/curator-service/ui#bulk-upload-process"

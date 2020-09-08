@@ -186,7 +186,7 @@ test('calls callback when user is changed', async () => {
     fireEvent.click(listbox.getByText(/curator/i));
     fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
     // Awaiting this text gives time for the async functions to complete.
-    expect(await findByText('Alice Smith')).toBeInTheDocument();
+    expect(await findByText('Alice Smith')).toBeInTheDOM();
 
     // Check callback has been called
     expect(mockCallback).toHaveBeenCalledTimes(1);
@@ -246,7 +246,7 @@ test('callback not called when other users are changed', async () => {
     fireEvent.click(listbox.getByText(/curator/i));
     fireEvent.keyDown(getByRole('listbox'), { key: 'Escape' });
     // Awaiting this text gives time for the async functions to complete.
-    expect(await findByText('Alice Smith')).toBeInTheDocument();
+    expect(await findByText('Alice Smith')).toBeInTheDOM();
 
     // Check callback has not been called
     expect(functionCalledCounter).toBe(0);

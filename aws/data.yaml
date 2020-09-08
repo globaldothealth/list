@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:latest
+          image: ghcr.io/globaldothealth/list/dataservice:main
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: docker.io/healthmapidha/dataservice:0.0.12
+          image: ghcr.io/globaldothealth/list/dataservice:0.0.17
           ports:
             - containerPort: 3000
           livenessProbe:
