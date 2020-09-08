@@ -8,6 +8,7 @@ import os
 import pytest
 import requests
 import sys
+import tempfile
 import datetime
 
 from mock import MagicMock, patch
@@ -146,8 +147,7 @@ def test_run_lambda_e2e(
         mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
-    common_lib.obtain_api_credentials = MagicMock(
-        name="obtain_api_credentials")
+    common_lib.login = MagicMock(name="login")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
@@ -162,12 +162,12 @@ def test_run_lambda_e2e(
     num_updated = 5
     requests_mock.post(
         full_source_url,
-        json={"createdCaseIds": list(range(num_created)),
-              "updatedCaseIds": list(range(num_updated))})
+        json={"numCreated": num_created,
+              "numUpdated": num_updated})
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
-    del input_event[parsing_lib.UPLOAD_ID_FIELD]
+    del input_event[parsing_lib.UPLOAD_IDS_FIELD]
     base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
@@ -200,12 +200,14 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
 
-    local_file = parsing_lib.retrieve_raw_data_file(
-        input_event[parsing_lib.S3_BUCKET_FIELD],
-        input_event[parsing_lib.S3_KEY_FIELD])
-    assert local_file == parsing_lib.LOCAL_DATA_FILE
-    with open(local_file, "r") as f:
-        assert json.load(f) == sample_data
+    with tempfile.NamedTemporaryFile("wb") as f:
+        parsing_lib.retrieve_raw_data_file(
+            input_event[parsing_lib.S3_BUCKET_FIELD],
+            input_event[parsing_lib.S3_KEY_FIELD],
+            f)
+        f.flush()
+        with open(f.name, "r") as f:
+            assert json.load(f) == sample_data
 
 
 def test_extract_event_fields_returns_all_present_fields(input_event):
@@ -214,10 +216,11 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
-        input_event[parsing_lib.UPLOAD_ID_FIELD],
+        input_event[parsing_lib.UPLOAD_IDS_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        input_event[parsing_lib.DATE_FILTER_FIELD])
+        input_event[parsing_lib.DATE_FILTER_FIELD],
+        input_event[parsing_lib.AUTH_FIELD])
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
@@ -241,29 +244,49 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
         parsing_lib.extract_event_fields(input_event)
 
 
-def test_prepare_cases_adds_upload_id_and(requests_mock):
+def test_prepare_cases_adds_upload_id():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         upload_id)
-    assert result[0]["caseReference"]["uploadId"] == upload_id
+    assert result[0]["caseReference"]["uploadIds"] == [upload_id]
+
+
+def test_prepare_cases_removes_nones():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    _PARSED_CASE["demographics"] = None
+    result = parsing_lib.prepare_cases(
+        [_PARSED_CASE],
+        "123456789012345678901234")
+    assert "demographics" not in result[0].keys()
+
+
+def test_prepare_cases_removes_empty_strings():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    _PARSED_CASE["notes"] = ""
+    result = parsing_lib.prepare_cases(
+        [_PARSED_CASE],
+        "123456789012345678901234")
+    assert "notes" not in result[0].keys()
 
 
 def test_write_to_server_returns_created_and_updated_count(
         requests_mock, mock_source_api_url_fixture):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
+    num_created = 10
+    num_updated = 5
     requests_mock.post(
         full_source_url,
-        json={"createdCaseIds": list(range(10)),
-              "updatedCaseIds": list(range(5))})
+        json={"numCreated": num_created,
+              "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {})
+        [_PARSED_CASE], "env", _SOURCE_ID, "upload_id", {}, {})
     assert requests_mock.request_history[0].url == full_source_url
-    assert count_created == 10
-    assert count_updated == 5
+    assert count_created == num_created
+    assert count_updated == num_updated
 
 
 def test_write_to_server_raises_error_for_failed_batch_upsert(
@@ -281,7 +304,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     try:
         parsing_lib.write_to_server(
             [_PARSED_CASE],
-            "env", _SOURCE_ID, upload_id, {})
+            "env", _SOURCE_ID, upload_id, {}, {})
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -307,7 +330,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     try:
         parsing_lib.write_to_server(
             [_PARSED_CASE],
-            "env", _SOURCE_ID, upload_id, {})
+            "env", _SOURCE_ID, upload_id, {}, {})
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -325,7 +348,7 @@ def test_filter_cases_by_date_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -336,7 +359,7 @@ def test_filter_cases_by_date_not_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert cases == []
 
 
@@ -347,7 +370,7 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert cases == []
 
 
@@ -358,7 +381,7 @@ def test_filter_cases_by_date_before_today(mock_today):
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
-        "env", "source_id", "upload_id", {})  # api_creds
+        "env", "source_id", "upload_id", {}, {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
@@ -376,7 +399,7 @@ def test_filter_cases_by_date_unsupported_op(
         parsing_lib.filter_cases_by_date(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
-            "env", _SOURCE_ID, upload_id, {})  # api_creds
+            "env", _SOURCE_ID, upload_id, {}, {})  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
         assert requests_mock.request_history[0].url == update_upload_url
@@ -384,3 +407,15 @@ def test_filter_cases_by_date_unsupported_op(
             "error": "SOURCE_CONFIGURATION_ERROR"}}
         return
     assert "Should have raised a ValueError exception" == False
+
+
+def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    data = {"keep1": 0, "keep2": False, "keep3": [], "drop1": None,
+            "multi": {"multikeep": "ok", "multidrop": None},
+            "emptyobject": {"dropped": None},
+            "emptystr": ""}
+    expected = {"keep1": 0, "keep2": False, "keep3": [],
+                "multi": {"multikeep": "ok"},
+                "emptyobject": {}}
+    assert parsing_lib.remove_nested_none_and_empty(data) == expected

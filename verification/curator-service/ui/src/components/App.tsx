@@ -253,19 +253,20 @@ export default function App(): JSX.Element {
             text: 'Linelist',
             icon: <ListIcon />,
             to: '/cases',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean =>
+                hasAnyRole(['reader', 'curator', 'admin']),
         },
         {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Uploads',
             icon: <PublishIcon />,
             to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Profile',
@@ -307,7 +308,6 @@ export default function App(): JSX.Element {
             })
             .catch((e) => {
                 setUser({ _id: '', name: '', email: '', roles: [] });
-                console.error(e);
             });
     };
 
@@ -477,7 +477,7 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator', 'reader', 'admin']) && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
                             </Route>

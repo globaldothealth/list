@@ -1,5 +1,4 @@
 import { parse, SearchParserResult } from 'search-query-parser';
-import { resolveConfigFile } from 'prettier';
 
 export interface ParsedSearch {
     fullTextSearch?: string;
@@ -8,6 +7,9 @@ export interface ParsedSearch {
         values: string[];
     }[];
 }
+
+/** Parsing error is thrown upon invalid search query. */
+export class ParsingError extends Error {}
 
 // Map of keywords to their case data path.
 // IMPORTANT: If you change this mapping, reflect the new keys in the openapi.yaml file as well.
@@ -19,7 +21,7 @@ const keywords = new Map<string, string>([
     ['country', 'location.country'],
     ['outcome', 'outcome'],
     ['caseid', '_id'],
-    ['uploadid', 'caseReference.uploadId'],
+    ['uploadid', 'caseReference.uploadIds'],
     ['source', 'caseReference.sourceUrl'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
@@ -56,6 +58,9 @@ export default function parseSearchQuery(q: string): ParsedSearch {
                 values: searchParsedResult[keyword],
             });
         });
+        if (res.filters.length === 0 && !res.fullTextSearch) {
+            throw new ParsingError(`Invalid search query ${q}`);
+        }
     }
     return res;
 }
