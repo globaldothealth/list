@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import {
+    batchUpsertDropUnchangedCases,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
     setBatchUpdateRevisionMetadata,
-    setBatchUpsertRevisionMetadata,
+    setBatchUpsertFields,
     setRevisionMetadata,
 } from '../../src/controllers/preprocessor';
 
@@ -381,7 +382,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setBatchUpsertRevisionMetadata(
+        await setBatchUpsertFields(
             { body: requestBody, method: 'PUT' } as Request,
             { locals: {} } as Response,
             nextFn,
@@ -432,7 +433,7 @@ describe('batch upsert', () => {
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await setBatchUpsertRevisionMetadata(
+        await setBatchUpsertFields(
             { body: requestBody, method: 'PUT' } as Request,
             { locals: {} } as Response,
             nextFn,
@@ -488,12 +489,26 @@ describe('batch upsert', () => {
             c.toObject(),
         );
     });
-    it('with unchanged cases does not create revision', async () => {
+    it('removes cases from request that would not be updated', async () => {
         const existingCase = {
             ...minimalCase,
             caseReference: {
                 ...minimalCase.caseReference,
                 sourceEntryId: 'case_id_exists',
+            },
+        };
+        const existingCase2 = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists2',
+            },
+        };
+        const newCase = {
+            ...minimalCase,
+            caseReference: {
+                ...minimalCase.caseReference,
+                sourceEntryId: 'case_id_exists3',
             },
         };
         const c = new Case({
@@ -507,21 +522,36 @@ describe('batch upsert', () => {
             },
         });
         await c.save();
+        const c2 = new Case({
+            ...existingCase2,
+            revisionMetadata: {
+                revisionNumber: 0,
+                creationMetadata: {
+                    curator: 'creator@gmail.com',
+                    date: Date.parse('2020-01-01'),
+                },
+            },
+        });
+        await c2.save();
 
-        const unchangedIdSet = new Set([c._id.toString()]);
         const requestBody = {
-            cases: [existingCase],
+            cases: [existingCase, existingCase2, newCase],
             curator: { email: 'updater@gmail.com' },
         };
         const nextFn = jest.fn();
-        await createBatchUpsertCaseRevisions(
+        await batchUpsertDropUnchangedCases(
             { body: requestBody, method: 'PUT' } as Request,
-            { locals: { unchangedCaseIdSet: unchangedIdSet } } as Response,
+            {} as Response,
             nextFn,
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+        expect(requestBody).toEqual({
+            cases: [newCase],
+            curator: {
+                email: 'updater@gmail.com',
+            },
+        });
     });
 });
 describe('batch update', () => {

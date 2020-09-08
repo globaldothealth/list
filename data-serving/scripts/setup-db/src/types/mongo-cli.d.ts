@@ -71,6 +71,12 @@ interface IndexSpec {
 /** Options to pass with the command to create a collection. */
 interface CreateCollectionOptions {
     validator: JSON;
+    collation?: Collation;
+}
+
+interface Collation {
+    locale: string;
+    strength: number;
 }
 
 /** The result of a call to `runCommand.` */

@@ -63,7 +63,9 @@ This will make the functions log-in as a new user specified by this email and us
 
 Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
 
-TODO: #754 Add param to store and retrieve source content locally, not on S3.
+Unfortunately there is no way to mount local volumes to store/retrieve source
+contents instead of relying on S3 which means testing e2e locally isn't possible.
+If you want to use another storage system for testing feel free to send a PR.
 
 ### One-time setup for people with AWS access
 
