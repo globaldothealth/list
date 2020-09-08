@@ -62,8 +62,6 @@ const setupDatabase = async ({
         } else {
             await database.createCollection(collectionName, {
                 validator: schema,
-                // Create default indexes with case-insensitivity.
-                collation: { locale: 'en_US', strength: 2 },
             });
             print(`Created collection "${collectionName}" with schema 📑`);
             collection = await database.getCollection(collectionName);
