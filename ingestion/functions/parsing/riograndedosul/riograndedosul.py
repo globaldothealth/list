@@ -32,6 +32,25 @@ _COMORBIDITIES = 17
 _INDIGENOUS = 21
 _NEIGHBORHOOD = 23
 
+_COMORBIDITIES_MAP = {
+    'Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)': 'chronic kidney disease',
+    'Asm': 'asthma',
+    'Doença Cardiovascular Crônica': 'cardiovascular disease',
+    'Doenças cardíacas crônicas': 'heart disease',
+    'Doença Hematológica Crônic': "hematopoietic system disease",
+    'Doença Renal Crônic': 'kidney disease',
+    'Doença Hepática Crônic': 'liver disease',
+    'Doença Neurológica Crônic': "nervous system disease",
+    'Pneumatopatia Crônica': 'pneumopathy',
+    'Doenças respiratórias crônicas descompensadas': 'respiratory system disease',
+    'Diabetes': 'diabetes mellitus',
+    'Síndrome de Down': "Down syndrome",
+    'Obesidad': 'obesity',
+    'Outro': 'other',
+    'Puérpera': 'recently gave birth',
+    'Gestante': 'pregnancy'
+}
+
 
 def convert_date(raw_date):
     """
@@ -108,36 +127,17 @@ def convert_symptoms(fever: str, cough: str, sorethroat: str, shortbreath: str, 
 
 def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
-    if raw_commorbidities:
-        preexistingConditions["hasPreexistingConditions"] = True
-        commorbidities = {
-            'Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)': 'chronic kidney disease',
-            'Asm': 'asthma',
-            'Doença Cardiovascular Crônica': 'cardiovascular disease',
-            'Doenças cardíacas crônicas': 'heart disease',
-            'Doença Hematológica Crônic': "hematopoietic system disease",
-            'Doença Renal Crônic': 'kidney disease',
-            'Doença Hepática Crônic': 'liver disease',
-            'Doença Neurológica Crônic': "nervous system disease",
-            'Pneumatopatia Crônica': 'pneumopathy',
-            'Doenças respiratórias crônicas descompensadas': 'respiratory system disease',
-            'Diabetes': 'diabetes mellitus',
-            'Síndrome de Down': "Down syndrome",
-            'Obesidad': 'obesity',
-            'Outro': 'other',
-            'Puérpera': 'recently gave birth',
-            'Gestante': 'pregnancy'
-        }
+    if not raw_commorbidities:
+        return None
+    preexistingConditions["hasPreexistingConditions"] = True
+    commorbidities_list = []
 
-        commorbidities_list = []
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_commorbidities:
+            commorbidities_list.append(_COMORBIDITIES_MAP[key])
 
-        for key in commorbidities:
-            if key in raw_commorbidities:
-                commorbidities_list.append(commorbidities[key])
-
-        preexistingConditions["values"] = commorbidities_list
-        return preexistingConditions
-    return None
+    preexistingConditions["values"] = commorbidities_list
+    return preexistingConditions
 
 
 def convert_ethnicity(raw_ethnicity: str):
@@ -161,7 +161,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str):
         if age == "80 e mais":
             demo["ageRange"] = {
                 "start": 80,
-                "end": 80
+                "end": 120
             }
         elif age == "<1":
             demo["ageRange"] = {
@@ -194,10 +194,7 @@ def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_not
         raw_notes.append("Indigenous ethnicity: " +
                          raw_notes_indigenousEthnicity)
     notes = (', ').join(raw_notes)
-    if notes != '':
-        return notes
-    else:
-        return None
+    return notes
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -239,6 +236,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 cases.append(case)
             except ValueError as ve:
                 print(ve)
+                print(row)
         return cases
 
 
