@@ -56,7 +56,7 @@ export default function ViewCase(props: Props): JSX.Element {
             })
             .catch((e) => {
                 setCase(undefined);
-                setErrorMessage(e.response?.data || e.toString());
+                setErrorMessage(e.response?.data?.message || e.toString());
             })
             .finally(() => setLoading(false));
     }, [props.id]);

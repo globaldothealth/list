@@ -476,7 +476,7 @@ export default function CaseForm(props: Props): JSX.Element {
             }
             setErrorMessage('');
         } catch (e) {
-            setErrorMessage(e.response?.data || e.toString());
+            setErrorMessage(e.response?.data?.message || e.toString());
             return;
         }
         // Navigate to cases after successful submit

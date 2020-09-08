@@ -189,7 +189,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     .catch((e) => {
                                         this.setState({
                                             error:
-                                                e.response?.data ||
+                                                e.response?.data?.message ||
                                                 e.toString(),
                                         });
                                         reject(e);

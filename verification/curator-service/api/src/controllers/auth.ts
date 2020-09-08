@@ -68,9 +68,9 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     req.user = user;
                     return next();
                 } else {
-                    res.status(403).json(
-                        `access is restricted to users with ${requiredRoles} roles`,
-                    );
+                    res.status(403).json({
+                        message: `access is restricted to users with ${requiredRoles} roles`,
+                    });
                 }
             })(req, res, next);
         }

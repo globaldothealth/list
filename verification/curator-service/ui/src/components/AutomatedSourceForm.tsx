@@ -96,7 +96,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             await axios.post('/api/sources', newSource);
             setErrorMessage('');
         } catch (e) {
-            setErrorMessage(e.response?.data || e.toString());
+            setErrorMessage(e.response?.data?.message || e.toString());
             return;
         }
         // Navigate to sources after successful submit
