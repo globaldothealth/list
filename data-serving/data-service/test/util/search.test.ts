@@ -55,7 +55,7 @@ describe('search query', () => {
                     values: ['abc123'],
                 },
                 {
-                    path: 'caseReference.uploadId',
+                    path: 'caseReference.uploadIds',
                     values: ['def456'],
                 },
                 {

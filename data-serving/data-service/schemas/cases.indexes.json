@@ -31,12 +31,12 @@
         }
     },
     {
-        "name": "uploadIdIdx",
+        "name": "uploadIdsIdx",
         "key": {
-            "caseReference.uploadId": -1
+            "caseReference.uploadIds": -1
         },
         "partialFilterExpression": {
-            "caseReference.uploadId": {
+            "caseReference.uploadIds.0": {
                 "$exists": true
             }
         }
