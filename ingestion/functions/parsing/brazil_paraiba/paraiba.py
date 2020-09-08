@@ -186,7 +186,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             }
             cases.append(case)
         # TODO(AB, Anya): Handle ensuring None fields aren't sent in requests.
-        return [c for c in cases if c["preexistingConditions"]]
+        return cases
         
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
