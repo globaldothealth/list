@@ -2,7 +2,7 @@ import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
 
-import parseSearchQuery from '../util/search';
+import parseSearchQuery, { ParsingError } from '../util/search';
 
 /**
  * Get a specific case.
@@ -12,7 +12,9 @@ import parseSearchQuery from '../util/search';
 export const get = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findById(req.params.id).lean();
     if (!c) {
-        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        res.status(404).send({
+            message: `Case with ID ${req.params.id} not found.`,
+        });
         return;
     }
     res.json(c);
@@ -32,8 +34,15 @@ export const casesMatchingSearchQuery = (opts: {
           }
         : {};
 
-    const casesQuery = Case.find(queryOpts);
-    const countQuery = Case.countDocuments(queryOpts);
+    // Always search with case-insensitivity.
+    const casesQuery = Case.find(queryOpts).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
+    const countQuery = Case.countDocuments(queryOpts).collation({
+        locale: 'en_US',
+        strength: 2,
+    });
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
@@ -56,16 +65,16 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     if (page < 1) {
-        res.status(422).json('page must be > 0');
+        res.status(422).json({ message: 'page must be > 0' });
         return;
     }
     if (limit < 1) {
-        res.status(422).json('limit must be > 0');
+        res.status(422).json({ message: 'limit must be > 0' });
         return;
     }
     // Filter query param looks like &q=some%20search%20query
     if (typeof req.query.q !== 'string' && typeof req.query.q !== 'undefined') {
-        res.status(422).json('q must be a unique string');
+        res.status(422).json({ message: 'q must be a unique string' });
         return;
     }
     try {
@@ -102,8 +111,12 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         // If we fetched all available data, just return it.
         res.json({ cases: docs, total: total });
     } catch (e) {
+        if (e instanceof ParsingError) {
+            res.status(422).json({ message: e.message });
+            return;
+        }
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -136,10 +149,10 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         res.status(201).json(result);
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -167,7 +180,7 @@ export const batchValidate = async (
         res.status(207).json({ errors: errors });
         return;
     } catch (err) {
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -252,7 +265,6 @@ export const batchUpsert = async (
     res: Response,
 ): Promise<void> => {
     try {
-        const toBeUpsertedCaseIds = await findCaseIdsWithCaseReferenceData(req);
         const bulkWriteResult = await Case.bulkWrite(
             // Case data should be validated prior to this point.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -284,22 +296,19 @@ export const batchUpsert = async (
             { ordered: false },
         );
         res.status(207).json({
-            // Types are a little goofy here. We're grabbing the string ID from
-            // what MongoDB returns, which is data in the form of:
-            //   { index0 (string): _id0 (ObjectId), ..., indexN: _idN}
-            createdCaseIds: Object.entries(bulkWriteResult.insertedIds)
-                .concat(Object.entries(bulkWriteResult.upsertedIds))
-                .map((kv) => String(kv[1])),
-            updatedCaseIds: toBeUpsertedCaseIds,
+            numCreated:
+                (bulkWriteResult.insertedCount || 0) +
+                (bulkWriteResult.upsertedCount || 0),
+            numUpdated: bulkWriteResult.modifiedCount,
         });
         return;
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
         console.warn(err);
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -316,16 +325,18 @@ export const update = async (req: Request, res: Response): Promise<void> => {
             runValidators: true,
         });
         if (!c) {
-            res.status(404).send(`Case with ID ${req.params.id} not found.`);
+            res.status(404).send({
+                message: `Case with ID ${req.params.id} not found.`,
+            });
             return;
         }
         res.json(c);
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -340,7 +351,7 @@ export const batchUpdate = async (
     res: Response,
 ): Promise<void> => {
     if (!req.body.cases.every((c: any) => c._id)) {
-        res.status(422).json('Every case must specify its _id');
+        res.status(422).json({ message: 'Every case must specify its _id' });
         return;
     }
     try {
@@ -359,7 +370,7 @@ export const batchUpdate = async (
         );
         res.json({ numModified: bulkWriteResult.modifiedCount });
     } catch (err) {
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
@@ -420,7 +431,7 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
             },
             (err) => {
                 if (err) {
-                    res.status(500).json(err.message);
+                    res.status(500).json(err);
                     return;
                 }
                 res.status(204).end();
@@ -429,13 +440,28 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
+    // If we have a limit set, check that we do not go over it first.
+    const maxCasesThreshold = req.body['maxCasesThreshold'];
+    if (maxCasesThreshold) {
+        const total = await casesMatchingSearchQuery({
+            searchQuery: req.body.query,
+            count: true,
+        });
+        if (total > Number(maxCasesThreshold)) {
+            res.status(422).json({
+                message: `query ${req.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
+            });
+            return;
+        }
+    }
+
     const casesQuery = casesMatchingSearchQuery({
         searchQuery: req.body.query,
         count: false,
     });
     Case.deleteMany(casesQuery, (err) => {
         if (err) {
-            res.status(500).json(err.message);
+            res.status(500).json(err);
             return;
         }
         res.status(204).end();
@@ -450,7 +476,9 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
 export const del = async (req: Request, res: Response): Promise<void> => {
     const c = await Case.findByIdAndDelete(req.params.id, req.body);
     if (!c) {
-        res.status(404).send(`Case with ID ${req.params.id} not found.`);
+        res.status(404).send({
+            message: `Case with ID ${req.params.id} not found.`,
+        });
         return;
     }
     res.status(204).end();
@@ -478,7 +506,7 @@ export const listSymptoms = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -507,7 +535,7 @@ export const listPlacesOfTransmission = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };
@@ -535,7 +563,7 @@ export const listOccupations = async (
         return;
     } catch (e) {
         console.error(e);
-        res.status(500).json(e.message);
+        res.status(500).json(e);
         return;
     }
 };

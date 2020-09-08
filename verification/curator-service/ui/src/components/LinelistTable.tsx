@@ -8,8 +8,11 @@ import {
     IconButton,
     Menu,
     MenuItem,
+    Paper,
+    TablePagination,
     Theme,
     Tooltip,
+    Typography,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
@@ -100,6 +103,14 @@ const styles = (theme: Theme) =>
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
         },
         tableToolbar: {
             backgroundColor: '#31A497',
@@ -431,7 +442,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 }),
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
@@ -450,7 +463,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 },
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
@@ -734,6 +749,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     }
                                     this.setState({
                                         totalNumRows: result.data.total,
+                                        selectedRowsCurrentPage: [],
+                                        numSelectedRows: 0,
                                     });
                                     resolve({
                                         data: flattenedCases,
@@ -742,24 +759,43 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: e.toString() });
+                                    this.setState({
+                                        error:
+                                            e.response?.data?.message ||
+                                            e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })
                     }
-                    title="COVID-19 cases"
                     components={{
+                        Container: (props): JSX.Element => (
+                            <Paper elevation={0} {...props}></Paper>
+                        ),
+                        Pagination: (props): JSX.Element => {
+                            return this.state.numSelectedRows === 0 ? (
+                                <div className={classes.tablePaginationBar}>
+                                    <Typography>Linelist</Typography>
+                                    <span className={classes.spacer}></span>
+                                    <TablePagination
+                                        {...props}
+                                        classes={{
+                                            ...props.classes,
+                                            root: classes.paginationRoot,
+                                        }}
+                                    ></TablePagination>
+                                </div>
+                            ) : (
+                                <></>
+                            );
+                        },
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
                                 {...props}
-                                classes={
-                                    this.state.numSelectedRows > 0
-                                        ? {
-                                              highlight: classes.tableToolbar,
-                                              title: classes.toolbarItems,
-                                          }
-                                        : {}
-                                }
+                                classes={{
+                                    highlight: classes.tableToolbar,
+                                    title: classes.toolbarItems,
+                                }}
                                 toolbarButtonAlignment="left"
                             />
                         ),
@@ -785,9 +821,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: this.props.user.roles.includes('curator'),
+                        selection:
+                            this.props.user.roles.includes('curator') ||
+                            this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        paginationPosition: 'top',
+                        toolbar: this.state.numSelectedRows > 0,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
@@ -813,7 +853,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }
                     }}
                     actions={
-                        this.props.user.roles.includes('curator')
+                        this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
@@ -875,6 +916,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       icon: (): JSX.Element => (
                                           <VerifiedIcon data-testid="verify-action" />
                                       ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
                                       tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
@@ -899,6 +943,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <UnverifiedIcon data-testid="unverify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
                                       ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any

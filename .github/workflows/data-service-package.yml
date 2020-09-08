@@ -7,9 +7,9 @@ on:
     paths:
       - ".github/workflows/data-service-package.yml"
       - "data-serving/data-service/**"
-  # Build whenever a new tag is created.
-  release:
-    types: [created]
+    # Build whenever a new tag is created.
+    tags:
+      - "*"
 
 jobs:
   build-and-push:
