@@ -39,22 +39,33 @@ def convert_gender(raw_gender):
         return "Female"
 
 
+def convert_age(age: str):
+    """
+    Convert age string.
+    All age ranges in format AXX-AXX with X = numeric.
+    Exception: A80+
+    """
+    age_range = age.split("-")
+    if len(age_range) > 1:
+        return {
+            "start": float(age_range[0][1:3]),
+            "end": float(age_range[1][1:3]),
+        }
+    else:
+        return {
+            "start": 80.0,
+            "end": 120.0,
+        }
+
+
 def convert_demographics(gender: str, age: str):
+    if not gender and not age:
+        return None
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
     if age:
-        age_range = age.split("-")
-        if len(age_range) > 1:
-            demo["ageRange"] = {
-                "start": float(age_range[0][1:3]),
-                "end": float(age_range[1][1:3]),
-            }
-        else:
-            demo["ageRange"] = {
-                "start": float(age_range[0][1:3]),
-                "end": float(age_range[0][1:3]),
-            }
+        demo["ageRange"] = convert_age(age)
     return demo
 
 
@@ -98,6 +109,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 cases.extend([case] * num_confirmed_cases)
             except ValueError as ve:
                 print(ve)
+                print(row)
         return cases
 
 
