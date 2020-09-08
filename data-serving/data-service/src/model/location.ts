@@ -23,20 +23,10 @@ export const locationSchema = new mongoose.Schema(
         country: {
             type: String,
             required: true,
-            index: true,
         },
-        administrativeAreaLevel1: {
-            type: String,
-            index: true,
-        },
-        administrativeAreaLevel2: {
-            type: String,
-            index: true,
-        },
-        administrativeAreaLevel3: {
-            type: String,
-            index: true,
-        },
+        administrativeAreaLevel1: String,
+        administrativeAreaLevel2: String,
+        administrativeAreaLevel3: String,
         // Place represents a precise location, such as an establishment or POI.
         place: String,
         // A human-readable name of the location.

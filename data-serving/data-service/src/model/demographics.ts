@@ -16,22 +16,10 @@ export const demographicsSchema = new mongoose.Schema(
             },
             _id: false,
         },
-        gender: {
-            type: String,
-            index: true,
-        },
-        occupation: {
-            type: String,
-            index: true,
-        },
-        nationalities: {
-            type: [String],
-            index: true,
-        },
-        ethnicity: {
-            type: String,
-            index: true,
-        },
+        gender: String,
+        occupation: String,
+        nationalities: [String],
+        ethnicity: String,
     },
     { _id: false },
 );
