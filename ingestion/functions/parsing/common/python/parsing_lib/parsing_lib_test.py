@@ -167,7 +167,7 @@ def test_run_lambda_e2e(
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
-    del input_event[parsing_lib.UPLOAD_ID_FIELD]
+    del input_event[parsing_lib.UPLOAD_IDS_FIELD]
     base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
@@ -216,7 +216,7 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
-        input_event[parsing_lib.UPLOAD_ID_FIELD],
+        input_event[parsing_lib.UPLOAD_IDS_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
         input_event[parsing_lib.DATE_FILTER_FIELD],
@@ -250,7 +250,7 @@ def test_prepare_cases_adds_upload_id_and(requests_mock):
     result = parsing_lib.prepare_cases(
         [_PARSED_CASE],
         upload_id)
-    assert result[0]["caseReference"]["uploadId"] == upload_id
+    assert result[0]["caseReference"]["uploadIds"] == [upload_id]
 
 
 def test_write_to_server_returns_created_and_updated_count(
