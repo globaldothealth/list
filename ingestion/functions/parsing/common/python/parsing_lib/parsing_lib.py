@@ -203,7 +203,7 @@ def run_lambda(
         This function must accept (in order): a file containing raw source
         data, a string representing the source UUID, and a string representing
         the source URL. It must yield each case conforming to the G.h
-        case format as per .
+        case format as per https://curator.ghdsi.org/api-docs/.
         For an example, see:
           https://github.com/globaldothealth/list/blob/main/ingestion/functions/parsing/india/india.py#L57
 
