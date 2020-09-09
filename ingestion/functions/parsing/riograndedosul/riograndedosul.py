@@ -204,7 +204,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f, delimiter=';')
         next(reader)  # Skip the header.
-        cases = []
         for row in reader:
             try:
                 case = {
@@ -233,11 +232,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     row[_COMORBIDITIES], row[_NEIGHBORHOOD], row[_INDIGENOUS])
                 if notes:
                     case["notes"] = notes
-                cases.append(case)
+                yield case
             except ValueError as ve:
                 print(ve)
                 print(row)
-        return cases
 
 
 def lambda_handler(event, context):
