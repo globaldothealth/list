@@ -55,4 +55,4 @@ class CHZurichTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = zurich.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(result, [_PARSED_CASE, _PARSED_CASE])
+        self.assertCountEqual(list(result), [_PARSED_CASE, _PARSED_CASE])

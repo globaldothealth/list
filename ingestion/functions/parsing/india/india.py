@@ -69,7 +69,7 @@ def parse_cases(raw_data_file, source_id, source_url):
     """
     with open(raw_data_file, "r") as f:
         cases = json.load(f)
-        return [
+        return (
             {
                 "caseReference": {
                     "sourceId": source_id,
@@ -95,7 +95,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "gender": convert_gender(entry["gender"])
                 },
                 "notes": entry["notes"] or None
-            } for entry in cases["raw_data"] if entry["agebracket"]]
+            } for entry in cases["raw_data"] if entry["agebracket"])
 
 
 def lambda_handler(event, context):
