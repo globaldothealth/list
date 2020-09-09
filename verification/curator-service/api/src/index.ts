@@ -1,7 +1,7 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
@@ -14,6 +14,7 @@ import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
+import { ValidationError } from 'express-openapi-validator/dist/framework/types';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -26,7 +27,6 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import { ValidationError } from 'express-openapi-validator/dist/framework/types';
 
 const app = express();
 
@@ -227,11 +227,6 @@ new OpenApiValidator({
             casesController.list,
         );
         apiRouter.get(
-            '/cases/download',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
-            casesController.download,
-        );
-        apiRouter.get(
             '/cases/symptoms',
             mustHaveAnyRole(['reader', 'curator']),
             casesController.listSymptoms,
@@ -255,6 +250,11 @@ new OpenApiValidator({
             '/cases',
             mustHaveAnyRole(['curator']),
             casesController.create,
+        );
+        apiRouter.post(
+            '/cases/download',
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            casesController.download,
         );
         apiRouter.post(
             '/cases/batchUpsert',
