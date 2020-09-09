@@ -15,7 +15,7 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
-UPLOAD_ID_FIELD = "uploadId"
+UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
 
@@ -51,7 +51,7 @@ def extract_event_fields(event):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
 
 
@@ -69,9 +69,18 @@ def prepare_cases(cases, upload_id):
 
     TODO: Migrate source_id/source_url to this method.
     """
-    for case in cases:
-        case["caseReference"]["uploadId"] = upload_id
+    for i in range(len(cases)):
+        cases[i]["caseReference"]["uploadIds"] = [upload_id]
+        cases[i] = remove_nested_none_and_empty(cases[i])
     return cases
+
+
+def remove_nested_none_and_empty(d):
+    if not isinstance(d, (dict, list)):
+        return d
+    if isinstance(d, list):
+        return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
+    return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
 
 
 def write_to_server(cases, env, source_id, upload_id, headers, cookies):

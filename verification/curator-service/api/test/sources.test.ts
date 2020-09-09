@@ -242,11 +242,10 @@ describe('PUT', () => {
             origin: { url: 'http://foo.bar' },
             format: 'JSON',
         }).save();
-        const res = await curatorRequest
+        return curatorRequest
             .put(`/api/sources/${source.id}`)
             .send({ name: '' })
-            .expect(422);
-        expect(res.body).toMatch('Enter a name');
+            .expect(422, /Enter a name/);
     });
     it('should be able to set a parser without schedule', async () => {
         const source = await new Source({

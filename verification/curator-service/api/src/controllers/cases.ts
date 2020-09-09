@@ -4,6 +4,11 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
+// Don't set client-side timeouts for requests to the data service.
+// TODO: Make this more fine-grained once we fix
+//   https://github.com/globaldothealth/list/issues/961.
+axios.defaults.timeout = 0;
+
 class InvalidParamError extends Error {}
 
 /**
@@ -201,9 +206,9 @@ export default class CasesController {
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.put(
@@ -216,7 +221,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -224,7 +229,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -323,7 +328,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -352,7 +357,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -365,9 +370,9 @@ export default class CasesController {
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.post(
@@ -380,7 +385,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -388,7 +393,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
