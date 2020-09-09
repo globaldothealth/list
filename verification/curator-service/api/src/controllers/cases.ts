@@ -43,8 +43,9 @@ export default class CasesController {
     download = async (req: Request, res: Response): Promise<void> => {
         try {
             axios({
-                method: 'get',
+                method: 'post',
                 url: this.dataServerURL + '/api' + req.url,
+                data: req.body,
                 responseType: 'stream',
             }).then((response) => {
                 res.setHeader('Content-Type', 'text/csv');
