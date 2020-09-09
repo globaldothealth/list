@@ -97,7 +97,6 @@ def batch_of(cases, max_items):
         return batch
     except StopIteration:
         return batch
-    
 
 def write_to_server(cases, env, source_id, upload_id, headers, cookies):
     """Upserts the provided cases via the G.h Case API."""

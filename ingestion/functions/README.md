@@ -170,8 +170,10 @@ is run on pull requests.
 
 ### Writing a parser
 
-At minima, a parser must output a list of cases that conform to the openAPI
+At minima, a parser must generate a list of cases that conform to the openAPI
 specifications.
+
+Its main function must yield cases one by one using [python generators](https://wiki.python.org/moin/Generators). A common library will take care of sending those cases to the server for you.
 
 If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
 
