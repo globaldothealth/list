@@ -49,7 +49,8 @@ export const download = async (req: Request, res: Response): Promise<void> => {
                 header: true,
                 columns: columns,
             }).pipe(res);
-        });
+        })
+        .catch((e) => res.status(500).json(e));
 };
 
 // Returns a mongoose query for all cases matching the given search query.
