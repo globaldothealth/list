@@ -2,6 +2,7 @@ import datetime
 import os
 import sys
 import tempfile
+import collections
 
 import boto3
 import google.auth.transport.requests
@@ -18,6 +19,11 @@ SOURCE_ID_FIELD = "sourceId"
 UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
+
+# Number of cases to upload in batch.
+# Increasing that number will speed-up the ingestion but will increase memory
+# usage on the server-side and is known to cause OOMs so increase with caution.
+CASES_BATCH_SIZE = 1000
 
 s3_client = boto3.client("s3")
 
@@ -69,10 +75,9 @@ def prepare_cases(cases, upload_id):
 
     TODO: Migrate source_id/source_url to this method.
     """
-    for i in range(len(cases)):
-        cases[i]["caseReference"]["uploadIds"] = [upload_id]
-        cases[i] = remove_nested_none_and_empty(cases[i])
-    return cases
+    for case in cases:
+        case["caseReference"]["uploadIds"] = [upload_id]
+        yield remove_nested_none_and_empty(case)
 
 
 def remove_nested_none_and_empty(d):
@@ -82,28 +87,50 @@ def remove_nested_none_and_empty(d):
         return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
     return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
 
+def batch_of(cases, max_items):
+    n = 0
+    batch = []
+    try:
+        while n < max_items:
+            batch.append(next(cases))
+            n+=1
+        return batch
+    except StopIteration:
+        return batch
+    
 
 def write_to_server(cases, env, source_id, upload_id, headers, cookies):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
-    print(f"Sending {len(cases)} cases to {put_api_url}")
-    res = requests.post(put_api_url, json={"cases": cases},
-                        headers=headers, cookies=cookies)
-    if res and res.status_code == 200:
-        res_json = res.json()
-        return res_json["numCreated"], res_json["numUpdated"]
-    # Response can contain an 'error' field which describe each error that
-    # occurred, it will be contained in the res.text here below.
-    e = RuntimeError(
-        f'Error sending cases to server, status={res.status_code}, response={res.text}')
-    # 207 encompasses both geocoding and case schema validation errors.
-    # We can consider separating geocoding issues, but for now classifying it
-    # as a validation problem is pretty reasonable.
-    upload_error = (common_lib.UploadError.VALIDATION_ERROR
-                    if res.status_code == 207 else
-                    common_lib.UploadError.DATA_UPLOAD_ERROR)
-    common_lib.complete_with_error(e, env, upload_error,
-                                   source_id, upload_id, headers, cookies)
+    counter = collections.Counter()
+    for batch in batch_of(cases, CASES_BATCH_SIZE):
+        # End of batch.
+        if not batch:
+            break
+        print(f"Sending {len(batch)} cases to {put_api_url}")
+        counter['total'] += len(batch)
+        res = requests.post(put_api_url, json={"cases": batch},
+                            headers=headers, cookies=cookies)
+        if res and res.status_code == 200:
+            res_json = res.json()
+            counter['numCreated'] += res_json["numCreated"]
+            counter['numUpdated'] += res_json["numUpdated"]
+            continue
+        # Response can contain an 'error' field which describe each error that
+        # occurred, it will be contained in the res.text here below.
+        e = RuntimeError(
+            f'Error sending cases to server, status={res.status_code}, response={res.text}')
+        # 207 encompasses both geocoding and case schema validation errors.
+        # We can consider separating geocoding issues, but for now classifying it
+        # as a validation problem is pretty reasonable.
+        upload_error = (common_lib.UploadError.VALIDATION_ERROR
+                        if res.status_code == 207 else
+                        common_lib.UploadError.DATA_UPLOAD_ERROR)
+        common_lib.complete_with_error(e, env, upload_error,
+                                    source_id, upload_id, headers, cookies)
+        return
+    print(f'sent {counter["total"]} cases')
+    return counter['numCreated'], counter['numUpdated']
 
 
 def get_today():
@@ -142,7 +169,7 @@ def filter_cases_by_date(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_creds, cookies)
 
-    return [case for case in case_data if case_is_within_range(case, cutoff_date, op)]
+    return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
 
 
 def run_lambda(event, context, parsing_function):
@@ -196,7 +223,6 @@ def run_lambda(event, context, parsing_function):
         case_data = parsing_function(
             local_data_file.name, source_id,
             source_url)
-        print(f'Parsed {len(case_data)} cases')
         final_cases = prepare_cases(case_data, upload_id)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
