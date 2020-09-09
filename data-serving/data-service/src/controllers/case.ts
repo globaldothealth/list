@@ -26,16 +26,18 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 /**
  * Streams a CSV attachment of all cases.
  *
- * Handles HTTP GET /api/cases/download.
+ * Handles HTTP POST /api/cases/download.
  */
 export const download = async (req: Request, res: Response): Promise<void> => {
     let cases: any;
     try {
-        if (req.query.q) {
+        if (req.body.query) {
             cases = await casesMatchingSearchQuery({
-                searchQuery: req.query.q as string,
+                searchQuery: req.body.query as string,
                 count: false,
             });
+        } else if (req.body.caseIds) {
+            cases = await Case.find({ _id: { $in: req.body.caseIds } }).lean();
         } else {
             cases = await Case.find({}).lean();
         }
