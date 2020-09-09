@@ -22,14 +22,14 @@ it('renders without crashing when logged in', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-    const { findByAltText } = render(
+    const { findByTestId } = render(
         <MemoryRouter>
             <App />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
-    expect(await findByAltText(/foo@bar.com/i)).toBeInTheDocument();
+    expect(await findByTestId('profile-menu')).toBeInTheDocument();
 });
 
 it('renders without crashing when logged out', async () => {
@@ -41,7 +41,7 @@ it('renders without crashing when logged out', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValue(axiosResponse);
-    const { findByAltText } = render(
+    render(
         <MemoryRouter>
             <App />
         </MemoryRouter>,
