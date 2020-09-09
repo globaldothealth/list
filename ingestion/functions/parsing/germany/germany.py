@@ -9,7 +9,8 @@ import csv
 if "lambda" not in sys.argv[0]:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "common/python"
+            os.path.dirname(os.path.dirname(
+                os.path.abspath(__file__))), "common/python"
         )
     )
 import parsing_lib
@@ -103,14 +104,16 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 }
                 # Death and recovery counts are always equal to case counts for the row.
                 if int(row[_DEATHCOUNT]) > 0:
-                    case["events"].append({"name": "outcome", "value": "Death"})
+                    case["events"].append(
+                        {"name": "outcome", "value": "Death"})
                 elif int(row[_RECOVERYCOUNT]) > 0:
-                    case["events"].append({"name": "outcome", "value": "Recovered"})
-                cases.extend([case] * num_confirmed_cases)
+                    case["events"].append(
+                        {"name": "outcome", "value": "Recovered"})
+                for _ in range(num_confirmed_cases):
+                    yield case
             except ValueError as ve:
                 print(ve)
                 print(row)
-        return cases
 
 
 def lambda_handler(event, context):

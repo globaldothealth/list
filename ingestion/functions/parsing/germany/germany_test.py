@@ -49,4 +49,4 @@ class GermanyTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = germany.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(result, _PARSED_CASE)
+        self.assertCountEqual(list(result), _PARSED_CASE)
