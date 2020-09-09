@@ -499,7 +499,7 @@ paths:
       operationId: downloadCases
       responses:
         "200":
-          $ref: "#/components/responses/200"
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/symptoms:
@@ -1538,6 +1538,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200SymptomArray":
       description: OK
       content:
@@ -1642,8 +1648,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/LocationArray"
-    "200":
-      description: OK
     "400":
       description: Malformed request
     "403":

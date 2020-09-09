@@ -204,7 +204,7 @@ paths:
       operationId: downloadCases
       responses:
         "200":
-          $ref: "#/components/responses/200"
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchValidate:
@@ -797,6 +797,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200BatchUpdateResponse":
       description: OK
       content:
@@ -847,8 +853,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BatchUpsertCaseResponse'
-    "200":
-      description: OK
     "400":
       description: Malformed request
     "403":
