@@ -16,7 +16,7 @@
             "pathogen.name": "text",
             "caseReference.sourceUrl": "text"
         }
-    }, 
+    },
     {
         "name": "casesCaseRefIdx",
         "key": {
