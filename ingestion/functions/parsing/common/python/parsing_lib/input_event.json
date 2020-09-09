@@ -7,7 +7,7 @@
     "uploadIds": ["123456789012345678901234"],
     "dateFilter": {
         "numDaysBeforeToday": 3,
-        "op": "EQ"
+        "op": "LT"
     },
     "auth": {
         "email": "test@fixture.com"
