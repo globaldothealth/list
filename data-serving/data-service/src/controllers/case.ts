@@ -1,8 +1,11 @@
 import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
-
 import parseSearchQuery, { ParsingError } from '../util/search';
+
+import axios from 'axios';
+import stringify from 'csv-stringify';
+import yaml from 'js-yaml';
 
 /**
  * Get a specific case.
@@ -18,6 +21,36 @@ export const get = async (req: Request, res: Response): Promise<void> => {
         return;
     }
     res.json(c);
+};
+
+/**
+ * Streams a CSV attachment of all cases.
+ *
+ * Handles HTTP GET /api/cases/download.
+ */
+export const download = async (req: Request, res: Response): Promise<void> => {
+    const cases = await Case.find({}).lean();
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="cases.csv"');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Pragma', 'no-cache');
+    axios
+        .get<string>(
+            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+        )
+        .then((yamlRes) => {
+            const dataDictionary = yaml.safeLoad(yamlRes.data);
+            const columns = (dataDictionary as Array<{
+                name: string;
+                description: string;
+            }>).map((datum) => datum.name);
+            stringify(cases, {
+                header: true,
+                columns: columns,
+            }).pipe(res);
+        })
+        .catch((e) => res.status(500).json(e));
 };
 
 // Returns a mongoose query for all cases matching the given search query.
