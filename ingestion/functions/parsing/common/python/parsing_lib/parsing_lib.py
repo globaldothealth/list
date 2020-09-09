@@ -3,7 +3,7 @@ import os
 import sys
 import tempfile
 import collections
-from typing import Generator, Dict, List
+from typing import Callable, Dict, Generator, Any, List
 
 import boto3
 import google.auth.transport.requests
@@ -45,7 +45,7 @@ except ImportError:
     import common_lib
 
 
-def extract_event_fields(event):
+def extract_event_fields(event: Dict):
     print('Extracting fields from event', event)
     if any(
         field not in event
@@ -62,7 +62,7 @@ def extract_event_fields(event):
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
 
 
-def retrieve_raw_data_file(s3_bucket, s3_key, out_file):
+def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     try:
         print(f"Retrieving raw data from s3://{s3_bucket}/{s3_key}")
         s3_client.download_fileobj(s3_bucket, s3_key, out_file)
@@ -70,7 +70,7 @@ def retrieve_raw_data_file(s3_bucket, s3_key, out_file):
         common_lib.complete_with_error(e)
 
 
-def prepare_cases(cases: Generator[Dict, None, None], upload_id):
+def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
     """
     Populates standard required fields for the G.h Case API.
 
@@ -88,18 +88,22 @@ def remove_nested_none_and_empty(d):
         return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
     return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
 
+
 def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
     n = 0
     batch = []
     try:
         while n < max_items:
             batch.append(next(cases))
-            n+=1
+            n += 1
         return batch
     except StopIteration:
         return batch
 
-def write_to_server(cases, env, source_id, upload_id, headers, cookies):
+
+def write_to_server(
+        cases: Generator[Dict, None, None],
+        env: str, source_id: str, upload_id: str, headers, cookies):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
@@ -128,19 +132,21 @@ def write_to_server(cases, env, source_id, upload_id, headers, cookies):
                         if res.status_code == 207 else
                         common_lib.UploadError.DATA_UPLOAD_ERROR)
         common_lib.complete_with_error(e, env, upload_error,
-                                    source_id, upload_id, headers, cookies)
+                                       source_id, upload_id, headers, cookies)
         return
     print(f'sent {counter["total"]} cases')
     return counter['numCreated'], counter['numUpdated']
 
 
-def get_today():
+def get_today() -> datetime.datetime:
     """Return today's datetime, just here for easier mocking."""
     return datetime.datetime.today()
 
 
 def filter_cases_by_date(
-        case_data, date_filter, env, source_id, upload_id, api_creds, cookies):
+        case_data: Generator[Dict, None, None],
+        date_filter: Dict, env: str, source_id: str, upload_id: str, api_creds,
+        cookies):
     """Filter cases according ot the date_filter provided.
 
     Returns the cases that matched the date filter or all cases if
@@ -173,7 +179,10 @@ def filter_cases_by_date(
     return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
 
 
-def run_lambda(event, context, parsing_function):
+def run_lambda(
+        event: Dict,
+        context: Any,
+        parsing_function: Callable[[str, str, str], Generator[Dict, None, None]]):
     """
     Encapsulates all of the work performed by a parsing Lambda.
 
@@ -194,16 +203,17 @@ def run_lambda(event, context, parsing_function):
         This function must accept (in order): a file containing raw source
         data, a string representing the source UUID, and a string representing
         the source URL. It must yield each case conforming to the G.h
-        case format (TODO: add a link to this definition).
+        case format as per .
         For an example, see:
           https://github.com/globaldothealth/list/blob/main/ingestion/functions/parsing/india/india.py#L57
 
     Returns
     ------
     JSON object containing the count of line list cases successfully written to
-    G.h servers.
+    G.h servers in the format:
+        {"count_created": count_created, "count_updated": count_updated}
     For more information on return types, see:
-      https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
+        https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
     env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, local_auth = extract_event_fields(
