@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 import collections
+from typing import Generator, Dict, List
 
 import boto3
 import google.auth.transport.requests
@@ -69,7 +70,7 @@ def retrieve_raw_data_file(s3_bucket, s3_key, out_file):
         common_lib.complete_with_error(e)
 
 
-def prepare_cases(cases, upload_id):
+def prepare_cases(cases: Generator[Dict, None, None], upload_id):
     """
     Populates standard required fields for the G.h Case API.
 
@@ -87,7 +88,7 @@ def remove_nested_none_and_empty(d):
         return [v for v in (remove_nested_none_and_empty(v) for v in d) if v is not None and v != ""]
     return {k: v for k, v in ((k, remove_nested_none_and_empty(v)) for k, v in d.items()) if v is not None and v != ""}
 
-def batch_of(cases, max_items):
+def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
     n = 0
     batch = []
     try:
@@ -102,7 +103,8 @@ def write_to_server(cases, env, source_id, upload_id, headers, cookies):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
-    for batch in batch_of(cases, CASES_BATCH_SIZE):
+    while True:
+        batch = batch_of(cases, CASES_BATCH_SIZE)
         # End of batch.
         if not batch:
             break
@@ -191,7 +193,7 @@ def run_lambda(event, context, parsing_function):
         Python function that parses raw source data into G.h case data.
         This function must accept (in order): a file containing raw source
         data, a string representing the source UUID, and a string representing
-        the source URL. It must return a list of data conforming to the G.h
+        the source URL. It must yield each case conforming to the G.h
         case format (TODO: add a link to this definition).
         For an example, see:
           https://github.com/globaldothealth/list/blob/main/ingestion/functions/parsing/india/india.py#L57
