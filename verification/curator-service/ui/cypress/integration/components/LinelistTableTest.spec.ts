@@ -274,6 +274,34 @@ describe('Linelist table', function () {
         });
     });
 
+    it('Can download searched cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+
+        cy.get('input[id="search-field"]').click();
+        cy.get('li').contains('country:').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+
+        cy.server();
+        cy.route('GET', '/api/cases/download*').as('downloadCases');
+        cy.contains('Download').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.include(csv, 'France');
+            assert.notInclude(csv, 'Germany');
+            assert.notInclude(csv, 'United Kingdom');
+        });
+    });
+
     it('Can delete all cases across rows for a search result', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({

@@ -29,28 +29,48 @@ export const get = async (req: Request, res: Response): Promise<void> => {
  * Handles HTTP GET /api/cases/download.
  */
 export const download = async (req: Request, res: Response): Promise<void> => {
-    const cases = await Case.find({}).lean();
+    let cases: any;
+    try {
+        if (req.query.q) {
+            cases = await casesMatchingSearchQuery({
+                searchQuery: req.query.q as string,
+                count: false,
+            });
+        } else {
+            cases = await Case.find({}).lean();
+        }
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="cases.csv"');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Pragma', 'no-cache');
-    axios
-        .get<string>(
-            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
-        )
-        .then((yamlRes) => {
-            const dataDictionary = yaml.safeLoad(yamlRes.data);
-            const columns = (dataDictionary as Array<{
-                name: string;
-                description: string;
-            }>).map((datum) => datum.name);
-            stringify(cases, {
-                header: true,
-                columns: columns,
-            }).pipe(res);
-        })
-        .catch((e) => res.status(500).json(e));
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename="cases.csv"',
+        );
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Pragma', 'no-cache');
+        axios
+            .get<string>(
+                'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+            )
+            .then((yamlRes) => {
+                const dataDictionary = yaml.safeLoad(yamlRes.data);
+                const columns = (dataDictionary as Array<{
+                    name: string;
+                    description: string;
+                }>).map((datum) => datum.name);
+                stringify(cases, {
+                    header: true,
+                    columns: columns,
+                }).pipe(res);
+            });
+    } catch (e) {
+        if (e instanceof ParsingError) {
+            res.status(422).json({ message: e.message });
+            return;
+        }
+        console.error(e);
+        res.status(500).json(e);
+        return;
+    }
 };
 
 // Returns a mongoose query for all cases matching the given search query.
@@ -86,7 +106,7 @@ export const casesMatchingSearchQuery = (opts: {
             countQuery.where(f.path).in(f.values);
         }
     });
-    return opts.count ? countQuery : casesQuery;
+    return opts.count ? countQuery : casesQuery.lean();
 };
 
 /**
@@ -125,9 +145,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
             casesQuery
                 .sort({ 'revisionMetadata.creationMetadata.date': -1 })
                 .skip(limit * (page - 1))
-                .limit(limit + 1)
-                // We don't need mongoose docs here, just plain json.
-                .lean(),
+                .limit(limit + 1),
             countQuery,
         ]);
         // If we have more items than limit, add a response param
