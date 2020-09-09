@@ -199,9 +199,18 @@ paths:
           $ref: "#/components/responses/500"
   /cases/download:
     get:
-      summary: Streams a CSV attachment of all cases
+      summary: >
+        Streams a CSV attachment of all cases. If parameter q is supplied the
+        CSV only contains cases matching the search query.
       tags: [Case]
       operationId: downloadCases
+      parameters:
+        - name: q
+          in: query
+          description: The search query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"

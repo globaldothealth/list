@@ -389,6 +389,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
             this,
         );
+        this.downloadCases = this.downloadCases.bind(this);
     }
 
     componentDidMount(): void {
@@ -482,9 +483,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     downloadCases(): void {
+        let downloadUrl = '/api/cases/download';
+        const trimmedQ = this.state.search.trim();
+        if (trimmedQ) {
+            downloadUrl += '?q=' + encodeURIComponent(trimmedQ);
+        }
+        this.setState({ error: '' });
         axios
-            .get('/api/cases/download')
-            .then((response) => fileDownload(response.data, 'cases.csv'));
+            .get(downloadUrl)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+            });
     }
 
     render(): JSX.Element {
