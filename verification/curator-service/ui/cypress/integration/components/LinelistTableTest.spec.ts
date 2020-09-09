@@ -263,7 +263,7 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.server();
-        cy.route('GET', '/api/cases/download').as('downloadCases');
+        cy.route('POST', '/api/cases/download').as('downloadCases');
         cy.contains('Download').click();
         cy.wait('@downloadCases').then((xhr) => {
             const csv = xhr.response.body;
@@ -291,7 +291,7 @@ describe('Linelist table', function () {
         cy.get('input[id="search-field"]').type('France{enter}');
 
         cy.server();
-        cy.route('GET', '/api/cases/download*').as('downloadCases');
+        cy.route('POST', '/api/cases/download').as('downloadCases');
         cy.contains('Download').click();
         cy.wait('@downloadCases').then((xhr) => {
             const csv = xhr.response.body;
@@ -299,6 +299,35 @@ describe('Linelist table', function () {
             assert.include(csv, 'France');
             assert.notInclude(csv, 'Germany');
             assert.notInclude(csv, 'United Kingdom');
+        });
+    });
+
+    it('Can download selected cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+
+        cy.route('POST', '/api/cases/download').as('downloadCases');
+        cy.get('button[title="Download selected rows"]').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.notInclude(csv, 'France');
+            assert.include(csv, 'Germany');
+            assert.include(csv, 'United Kingdom');
         });
     });
 

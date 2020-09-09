@@ -390,6 +390,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.downloadCases = this.downloadCases.bind(this);
+        this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
     }
 
     componentDidMount(): void {
@@ -483,14 +484,34 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     downloadCases(): void {
-        let downloadUrl = '/api/cases/download';
-        const trimmedQ = this.state.search.trim();
-        if (trimmedQ) {
-            downloadUrl += '?q=' + encodeURIComponent(trimmedQ);
+        const requestBody = this.state.search.trim()
+            ? { query: this.state.search }
+            : {};
+        this.setState({ error: '' });
+        axios
+            .post('/api/cases/download', requestBody)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+            });
+    }
+
+    downloadSelectedCases(): void {
+        let requestBody = {};
+        if (this.hasSelectedRowsAcrossPages()) {
+            requestBody = { query: this.state.search };
+        } else {
+            requestBody = {
+                caseIds: this.state.selectedRowsCurrentPage.map(
+                    (row: TableRow) => row.id,
+                ),
+            };
         }
         this.setState({ error: '' });
         axios
-            .get(downloadUrl)
+            .post('/api/cases/download', requestBody)
             .then((response) => fileDownload(response.data, 'cases.csv'))
             .catch((e) => {
                 this.setState({
@@ -1005,6 +1026,22 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               );
                                           }
                                           this.tableRef.current.onQueryChange();
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <span aria-label="download selected rows">
+                                              <SaveAltIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
+                                          </span>
+                                      ),
+                                      tooltip: 'Download selected rows',
+                                      onClick: (): void => {
+                                          this.downloadSelectedCases();
                                       },
                                   },
                                   // This action is for deleting selected rows.
