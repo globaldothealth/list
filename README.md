@@ -81,7 +81,7 @@ This repository contains the servers and scripts that support its data curation 
 
 ### API docs
 
-- [Curator service](curator.ghdsi.org/api-docs)
+- [Curator service](HTTPS://curator.ghdsi.org/api-docs)
 - [Local curator service](http://localhost:3001/api-docs)
 - [Local data service](http://localhost:3000/api-docs)
 

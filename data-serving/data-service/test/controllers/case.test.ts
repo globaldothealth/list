@@ -451,6 +451,68 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(changedCaseWithEntryId._id);
         expect(updatedCaseInDb?.notes).toEqual(changedCaseWithEntryId.notes);
     });
+    it('batch upsert should add uploadId to field array', async () => {
+        const newUploadIds = ['012301234567890123456789'];
+
+        const newCaseWithoutEntryId = new Case(minimalCase);
+        newCaseWithoutEntryId.caseReference.uploadIds = newUploadIds;
+        const newCaseWithEntryId = new Case(fullCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+        newCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+
+        const changedCaseWithEntryId = new Case(fullCase);
+        await changedCaseWithEntryId.save();
+        changedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+        changedCaseWithEntryId.notes = 'new notes';
+
+        const unchangedCaseWithEntryId = new Case(fullCase);
+        unchangedCaseWithEntryId.caseReference.sourceEntryId =
+            'unchangedEntryId';
+        const unchangedCaseUploadIds =
+            unchangedCaseWithEntryId.caseReference.uploadIds;
+        await unchangedCaseWithEntryId.save();
+        unchangedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithoutEntryId,
+                    newCaseWithEntryId,
+                    changedCaseWithEntryId,
+                    unchangedCaseWithEntryId,
+                ],
+                ...curatorMetadata,
+            })
+            .expect(207);
+
+        const unchangedDbCase = await Case.findById(
+            unchangedCaseWithEntryId._id,
+        );
+        // Upload ids were not changed for unchanged case.
+        expect(unchangedDbCase?.caseReference?.uploadIds).toHaveLength(2);
+        expect(unchangedDbCase?.caseReference?.uploadIds[0]).toEqual(
+            unchangedCaseUploadIds[0],
+        );
+        expect(unchangedDbCase?.caseReference?.uploadIds[1]).toEqual(
+            unchangedCaseUploadIds[1],
+        );
+        expect(res.body.numCreated).toBe(2); // Both new cases were created.
+        expect(res.body.numUpdated).toBe(1); // Only changed case was updated.
+
+        // Upload ids were added for changed case.
+        const changedDbCase = await Case.findById(changedCaseWithEntryId._id);
+        expect(changedDbCase?.caseReference?.uploadIds).toHaveLength(3);
+        expect(changedDbCase?.caseReference?.uploadIds[0]).toEqual(
+            newUploadIds[0],
+        );
+        expect(changedDbCase?.caseReference?.uploadIds[1]).toEqual(
+            unchangedCaseUploadIds[0],
+        );
+        expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
+            unchangedCaseUploadIds[1],
+        );
+    });
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
