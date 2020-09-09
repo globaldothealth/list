@@ -3,7 +3,7 @@ import { DocumentQuery, Query } from 'mongoose';
 import { Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
-import fetch from 'node-fetch';
+import axios from 'axios';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 
@@ -33,12 +33,12 @@ export const download = async (req: Request, res: Response): Promise<void> => {
     res.setHeader('Content-Disposition', 'attachment; filename="cases.csv"');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Pragma', 'no-cache');
-    fetch(
-        'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
-    )
-        .then((yamlRes) => yamlRes.text())
-        .then((body) => {
-            const dataDictionary = yaml.safeLoad(body);
+    axios
+        .get<string>(
+            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+        )
+        .then((yamlRes) => {
+            const dataDictionary = yaml.safeLoad(yamlRes.data);
             const columns = (dataDictionary as Array<{
                 name: string;
                 description: string;
