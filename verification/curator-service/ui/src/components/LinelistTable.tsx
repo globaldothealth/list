@@ -28,6 +28,7 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -37,6 +38,7 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import fileDownload from 'js-file-download';
 import renderDate from './util/date';
 
 interface ListResponse {
@@ -104,6 +106,9 @@ const styles = (theme: Theme) =>
             display: 'flex',
             justifyContent: 'center',
         },
+        downloadButton: {
+            marginRight: theme.spacing(1),
+        },
         spacer: { flex: 1 },
         paginationRoot: { border: 'unset' },
         tablePaginationBar: {
@@ -118,6 +123,10 @@ const styles = (theme: Theme) =>
         toolbarItems: {
             color: 'white',
         },
+        topBar: {
+            display: 'flex',
+            alignItems: 'center',
+        },
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
@@ -129,6 +138,7 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         paddingBottom: theme.spacing(1),
         display: 'flex',
         alignItems: 'center',
+        flex: 1,
     },
     tooltip: {
         marginLeft: theme.spacing(1),
@@ -471,6 +481,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
+    downloadCases(): void {
+        axios
+            .get('/api/cases/download')
+            .then((response) => fileDownload(response.data, 'cases.csv'));
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -544,13 +560,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <SearchBar
-                    searchQuery={this.state.search}
-                    onSearchChange={(search: string): void => {
-                        this.setState({ search: search });
-                        this.tableRef.current.onQueryChange();
-                    }}
-                ></SearchBar>
+                <div className={classes.topBar}>
+                    <SearchBar
+                        searchQuery={this.state.search}
+                        onSearchChange={(search: string): void => {
+                            this.setState({ search: search });
+                            this.tableRef.current.onQueryChange();
+                        }}
+                    ></SearchBar>
+                    <Button
+                        className={classes.downloadButton}
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.downloadCases}
+                        startIcon={<SaveAltIcon />}
+                    >
+                        Download
+                    </Button>
+                </div>
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
