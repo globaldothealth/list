@@ -92,6 +92,7 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
       Timeout: 300
+      MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
         - !Ref CommonLibLayer
