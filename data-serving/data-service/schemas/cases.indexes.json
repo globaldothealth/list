@@ -16,7 +16,7 @@
             "pathogen.name": "text",
             "caseReference.sourceUrl": "text"
         }
-    },
+    }, 
     {
         "name": "casesCaseRefIdx",
         "key": {
@@ -165,6 +165,16 @@
         "name": "caseReferenceUpdateMetadataCuratorIdx",
         "key": {
             "caseReference.updateMetadata.curator": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "revisionMetadataCreationMetadataDate",
+        "key": {
+            "revisionMetadata.creationMetadata.date": -1
         },
         "collation": {
             "locale": "en_US",
