@@ -32,10 +32,10 @@ export const download = async (req: Request, res: Response): Promise<void> => {
     let cases: any;
     try {
         if (req.query.q) {
-            cases = await (casesMatchingSearchQuery({
+            cases = await casesMatchingSearchQuery({
                 searchQuery: req.query.q as string,
                 count: false,
-            }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>).lean();
+            });
         } else {
             cases = await Case.find({}).lean();
         }
@@ -106,7 +106,7 @@ export const casesMatchingSearchQuery = (opts: {
             countQuery.where(f.path).in(f.values);
         }
     });
-    return opts.count ? countQuery : casesQuery;
+    return opts.count ? countQuery : casesQuery.lean();
 };
 
 /**
@@ -145,9 +145,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
             casesQuery
                 .sort({ 'revisionMetadata.creationMetadata.date': -1 })
                 .skip(limit * (page - 1))
-                .limit(limit + 1)
-                // We don't need mongoose docs here, just plain json.
-                .lean(),
+                .limit(limit + 1),
             countQuery,
         ]);
         // If we have more items than limit, add a response param
