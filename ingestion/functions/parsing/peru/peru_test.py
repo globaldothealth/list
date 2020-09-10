@@ -12,7 +12,6 @@ _SOURCE_URL = "place_holder"
 
 class PeruTest(unittest.TestCase):
     def setUp(self):
-        # Default of 1500 is not enough to show diffs when there is one.
         self.maxDiff = 5000
 
     def test_parse(self):
@@ -24,7 +23,7 @@ class PeruTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = peru.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(result, [{'caseReference': {'sourceId': 'place_holder',
+        self.assertCountEqual(list(result), [{'caseReference': {'sourceId': 'place_holder',
                                                           'sourceEntryId': '7320cabdc1aaca6c59014cae76a134e6',
                                                           'sourceUrl': 'place_holder'},
                                         'location': {'query': 'AYACUCHO, HUAMANGA, AYACUCHO, Peru'},
