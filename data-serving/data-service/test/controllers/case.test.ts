@@ -593,6 +593,129 @@ describe('POST', () => {
         expect(res.body.errors[0].index).toBe(1);
         expect(res.body.errors[0].message).toMatch('Case validation failed');
     });
+    describe('download', () => {
+        it('should return 200 OK', async () => {
+            const c = new Case(minimalCase);
+            await c.save();
+            const c2 = new Case(fullCase);
+            await c2.save();
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({})
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(c._id);
+            expect(res.text).toContain(c.caseReference.verificationStatus);
+            expect(res.text).toContain(c.caseReference.sourceId);
+            expect(res.text).toContain(c2._id);
+            expect(res.text).toContain(c2.caseReference.verificationStatus);
+            expect(res.text).toContain(c2.caseReference.sourceId);
+        });
+        it('rejects invalid searches', (done) => {
+            request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:',
+                })
+                .expect(422, done);
+        });
+        it('rejects request bodies with query and caseIds', async (done) => {
+            const c = new Case(minimalCase);
+            await c.save();
+
+            request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:India',
+                    caseIds: [c._id],
+                })
+                .expect(400, done);
+        });
+        it('should filter results with caseIds', async () => {
+            const matchingCase = new Case(minimalCase);
+            await matchingCase.save();
+
+            const matchingCase2 = new Case(minimalCase);
+            await matchingCase2.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    caseIds: [matchingCase._id, matchingCase2._id],
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(matchingCase._id);
+            expect(res.text).toContain(matchingCase2._id);
+            expect(res.text).not.toContain(unmatchedCase._id);
+        });
+        it('should filter results with text query', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
+            const matchingCase = new Case(minimalCase);
+            const matchingNotes = 'matching';
+            matchingCase.notes = matchingNotes;
+            await matchingCase.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            const unmatchedNotes = 'unmatched';
+            unmatchedCase.notes = unmatchedNotes;
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: matchingNotes,
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(matchingNotes);
+            expect(res.text).toContain(matchingCase._id);
+            expect(res.text).toContain(matchingNotes);
+            expect(res.text).not.toContain(unmatchedCase._id);
+            expect(res.text).not.toContain(unmatchedNotes);
+        });
+        it('should filter results with keyword query', async () => {
+            const matchedCase = new Case(minimalCase);
+            matchedCase.location.country = 'Germany';
+            matchedCase.set('demographics.occupation', 'engineer');
+            await matchedCase.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:Germany',
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain('Germany');
+            expect(res.text).toContain(matchedCase._id);
+            expect(res.text).not.toContain(unmatchedCase._id);
+        });
+    });
 });
 
 describe('PUT', () => {
