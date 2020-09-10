@@ -102,6 +102,7 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+<<<<<<< HEAD
         - !Ref CommonLibLayer
   BrazilAmapaParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -109,13 +110,24 @@ Resources:
       CodeUri: parsing/brazil_amapa/
       Handler: amapa.lambda_handler
       Description: Parse case data for the Amapa State of Brazil
+=======
+  BrazilParaibaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_paraiba/
+      Handler: paraiba.lambda_handler
+      Description: Parse case data for the Paraiba State of Brazil
+>>>>>>> main
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+<<<<<<< HEAD
         - !Ref CommonLibLayer
+=======
+>>>>>>> main
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
