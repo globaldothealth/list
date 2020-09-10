@@ -7,17 +7,15 @@ import { TextField } from 'formik-material-ui';
 export default function Notes(): JSX.Element {
     return (
         <Scroll.Element name="notes">
-            <fieldset>
-                <FieldTitle title="Notes"></FieldTitle>
-                <FastField
-                    label="Notes"
-                    name="notes"
-                    type="text"
-                    multiline={true}
-                    component={TextField}
-                    fullWidth
-                />
-            </fieldset>
+            <FieldTitle title="Notes"></FieldTitle>
+            <FastField
+                label="Notes"
+                name="notes"
+                type="text"
+                multiline={true}
+                component={TextField}
+                fullWidth
+            />
         </Scroll.Element>
     );
 }

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { uniqueStringsArrayFieldInfo } from './unique-strings-array';
 
 export const caseReferenceSchema = new mongoose.Schema(
     {
@@ -11,8 +12,11 @@ export const caseReferenceSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        uploadId: String,
-        verificationStatus: String,
+        uploadIds: uniqueStringsArrayFieldInfo,
+        verificationStatus: {
+            type: String,
+            default: 'UNVERIFIED',
+        },
         additionalSources: [
             {
                 sourceUrl: String,
@@ -34,13 +38,12 @@ export type CaseReferenceDocument = mongoose.Document & {
     sourceUrl: string;
 
     /**
-     * The UUID of the upload in which the batch of cases including this
-     * case document was entered into the DB.
+     * Array of UUIDs of uploads from which this case was created or updated.
      *
-     * At present, this is only populated for cases created via automated
-     * ingestion.
+     * At present, this is only populated for cases created via bulk upload or
+     * automated ingestion.
      */
-    uploadId: string;
+    uploadIds: string[];
 
     /** Whether the case document has been manually verified for correctness. */
     verificationStatus: string;

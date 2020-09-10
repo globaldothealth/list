@@ -59,7 +59,7 @@ paths:
                 Keyword values can be quoted for multi-words matches and concatenated
                 with a comma to union them. Only equality operator is supported.
                 Supported keywords are: curator, gender, nationality, occupation,
-                country, outcome, caseid, uploadid, source, admin1, admin2, admin3
+                country, outcome, caseid, uploadid, sourceurl, admin1, admin2, admin3
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -167,12 +167,21 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
                     Cases matching this query will be deleted. Must contain
                     non-whitespace characters.
                   type: string
-                  pattern: ^(?!\s*$).+
+                  pattern: \S+
+                maxCasesThreshold:
+                  type: number
+                  description: >
+                    An optional safeguard against deletion of too many cases.
+                    If you want to delete based on a query for example but fail
+                    if the number of cases that's going to be deleted is more
+                    than a given number, set this field to that desired number.
+                    Failure will be indicated by a 422 error status code.
               oneOf:
                 - required: [caseIds]
                 - required: [query]
@@ -185,6 +194,41 @@ paths:
           $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/download:
+    post:
+      summary: >
+        Streams a CSV attachment of all cases. If a query is supplied the
+        CSV only contains cases matching the search query. If caseIds are
+        supplied the CSV only contains cases with those ids. You cannot supply
+        both query and caseIds.
+      tags: [Case]
+      operationId: downloadCases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              maxProperties: 1
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will returned
+                  type: array
+                  items:
+                    type: string
+                    pattern: '^[a-f\d]{24}$'
+                query:
+                  description: >
+                    Cases matching this query will be returned. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+      responses:
+        "200":
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchValidate:
@@ -225,6 +269,70 @@ paths:
       responses:
         "207":
           $ref: "#/components/responses/207BatchUpsertCaseResponse"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CaseArray"
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              required:
+                - curator
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                curator:
+                  $ref: "#/components/schemas/Curator"
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - curator
+                - query
+                - case
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
         "422":
           $ref: "#/components/responses/422"
         "500":
@@ -377,6 +485,13 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    BatchUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchValidateCaseResponse:
       description: Response to batch validate case API requests
       properties:
@@ -397,17 +512,19 @@ components:
     BatchUpsertCaseResponse:
       description: Response to batch upsert case API requests
       properties:
-        createdCaseIds:
-          type: array
-          items:
-            type: string
-        updatedCaseIds:
-          type: array
-          items:
-            type: string
+        numCreated:
+          type: number
+          description: The number of cases created by the request.
+        numUpdated:
+          type: number
+          description: >
+            The number of cases modified by the request. Note that this only
+            includes cases that are actually modified by the batch upsert. If a
+            case is included in the batch upsert request, but contains no
+            changes compared to the currently stored case, it won't be counted.
       required:
-        - createdCaseIds
-        - updatedCaseIds
+        - numCreated
+        - numUpdated
     Case:
       description: A single line-list case.
       properties:
@@ -419,17 +536,19 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
@@ -703,6 +822,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
+    "200BatchUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchUpdateResponse"
     "200SymptomArray":
       description: OK
       content:

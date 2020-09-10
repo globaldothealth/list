@@ -12,18 +12,19 @@ export const list = async (req: Request, res: Response): Promise<void> => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     if (page < 1) {
-        res.status(422).json('page must be > 0');
+        res.status(422).json({ message: 'page must be > 0' });
         return;
     }
     if (limit < 1) {
-        res.status(422).json('limit must be > 0');
+        res.status(422).json({ message: 'limit must be > 0' });
         return;
     }
     try {
         const [docs, total] = await Promise.all([
             User.find({})
                 .skip(limit * (page - 1))
-                .limit(limit + 1),
+                .limit(limit + 1)
+                .lean(),
             User.countDocuments({}),
         ]);
         // If we have more items than limit, add a response param
@@ -40,7 +41,7 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         // If we fetched all available data, just return it.
         res.json({ users: docs, total: total });
     } catch (e) {
-        res.status(422).json(e.message);
+        res.status(422).json(e);
         return;
     }
 };
@@ -63,24 +64,24 @@ export const updateRoles = async (
             },
         );
         if (!user) {
-            res.status(404).json(
-                `user with id ${req.params.id} could not be found`,
-            );
+            res.status(404).json({
+                message: `user with id ${req.params.id} could not be found`,
+            });
             return;
         }
         res.json(user);
     } catch (err) {
         if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
+            res.status(422).json(err);
             return;
         }
-        res.status(500).json(err.message);
+        res.status(500).json(err);
         return;
     }
 };
 
 /**
- * List the roles available to users.
+ * List the roles defined in the system.
  */
 export const listRoles = (req: Request, res: Response): void => {
     res.json({ roles: userRoles });

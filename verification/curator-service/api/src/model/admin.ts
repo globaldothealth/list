@@ -17,4 +17,8 @@ export type AdminDocument = mongoose.Document & {
     name: string;
 };
 
+/**
+ * An admin is an administrative area as per mapbox boundaries API.
+ * Cf. https://docs.mapbox.com/help/tutorials/get-started-mapbox-boundaries/
+ */
 export const Admin = mongoose.model<AdminDocument>('Admin', adminSchema);

@@ -3,11 +3,21 @@ import datetime
 import json
 import os
 import pytest
+import sys
 
 from moto import mock_s3
 from unittest.mock import MagicMock, patch
 
 _SOURCE_API_URL = "http://foo.bar"
+
+try:
+    import common_lib
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'common'))
+    import common_lib
 
 
 @pytest.fixture()
@@ -59,8 +69,9 @@ def test_format_url_leaves_unchanged_if_no_format_params():
 def test_format_url(mock_today):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
-    url = "http://foo.bar/%Y-%m-%d.json"
-    assert retrieval.format_source_url(url) == "http://foo.bar/2020-06-08.json"
+    url = "http://foo.bar/$FULLYEAR-$FULLMONTH-$FULLDAY/$MONTH/$DAY.json"
+    assert retrieval.format_source_url(
+        url) == "http://foo.bar/2020-06-08/6/8.json"
 
 
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
@@ -93,7 +104,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     lambda_arn = "arn"
     requests_mock.get(
         full_source_url,
-        json={"origin": {"url": origin_url}, "format": "JSON",
+        json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}},
               "dateFilter": date_filter})
 
@@ -105,7 +116,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         valid_event["env"],
-        lambda_arn, source_id, upload_id, {},
+        lambda_arn, source_id, upload_id, {}, None,
         response["key"],
         origin_url, date_filter)
     assert requests_mock.request_history[0].url == create_upload_url
@@ -118,7 +129,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
 
 def test_extract_event_fields_returns_env_and_source_id(valid_event):
     from retrieval import retrieval
-    env, source_id = retrieval.extract_event_fields(valid_event)
+    env, source_id, auth = retrieval.extract_event_fields(valid_event)
     assert env == valid_event["env"]
     assert source_id == valid_event["sourceId"]
 
@@ -141,8 +152,9 @@ def test_get_source_details_returns_url_and_format(
     source_id = "id"
     content_url = "http://bar.baz"
     requests_mock.get(f"{_SOURCE_API_URL}/sources/{source_id}",
-                      json={"format": "CSV", "origin": {"url": content_url}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {})
+                      json={"format": "CSV",
+                            "origin": {"url": content_url, "license": "MIT"}})
+    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
     assert result[0] == content_url
     assert result[1] == "CSV"
     assert result[2] == ""
@@ -156,9 +168,10 @@ def test_get_source_details_returns_parser_arn_if_present(
     lambda_arn = "lambdaArn"
     requests_mock.get(
         f"{_SOURCE_API_URL}/sources/{source_id}",
-        json={"origin": {"url": content_url}, "format": "JSON",
+        json={"origin": {"url": content_url, "license": "MIT"},
+              "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {})
+    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
     assert result[2] == lambda_arn
 
 
@@ -175,12 +188,12 @@ def test_get_source_details_raises_error_if_source_not_found(
     requests_mock.put(update_upload_url, json={})
 
     try:
-        retrieval.get_source_details("env", source_id, upload_id, {})
+        retrieval.get_source_details("env", source_id, upload_id, {}, {})
     except Exception:
         assert requests_mock.request_history[0].url == get_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONFIGURATION_NOT_FOUND.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONFIGURATION_NOT_FOUND.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -200,12 +213,12 @@ def test_get_source_details_raises_error_if_other_errors_getting_source(
     requests_mock.put(update_upload_url, json={})
 
     try:
-        retrieval.get_source_details("env", source_id, upload_id, {})
+        retrieval.get_source_details("env", source_id, upload_id, {}, {})
     except Exception:
         assert requests_mock.request_history[0].url == get_source_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.INTERNAL_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -219,7 +232,7 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     format = "JSON"
     requests_mock.get(content_url, json={"data": "yes"})
     retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, format, {})
+        "env", source_id, "upload_id", content_url, format, {}, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.json", "r") as f:
@@ -233,7 +246,7 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     format = "CSV"
     requests_mock.get(content_url, content=b"foo,bar")
     retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, format, {})
+        "env", source_id, "upload_id", content_url, format, {}, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.csv", "r") as f:
@@ -246,7 +259,7 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     content_url = "http://foo.bar/"
     requests_mock.get(content_url, json={"data": "yes"})
     result = retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, "JSON", {})
+        "env", source_id, "upload_id", content_url, "JSON", {}, {})
     assert "/tmp/" in result[0]
     assert source_id in result[1]
 
@@ -255,7 +268,6 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     content_url = "http://foo.bar/"
-    requests_mock.get(content_url)
     source_id = "source_id"
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{source_id}/uploads/{upload_id}"
@@ -264,12 +276,11 @@ def test_retrieve_content_raises_error_for_non_supported_format(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, bad_format, {})
+            "env", source_id, upload_id, content_url, bad_format, {}, {})
     except ValueError:
-        assert requests_mock.request_history[0].url == content_url
-        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONFIGURATION_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONFIGURATION_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -288,12 +299,12 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, "JSON", {})
+            "env", source_id, upload_id, content_url, "JSON", {}, {})
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONTENT_NOT_FOUND.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -312,12 +323,12 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, "JSON", {})
+            "env", source_id, upload_id, content_url, "JSON", {}, {})
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.
@@ -334,7 +345,7 @@ def test_upload_to_s3_writes_indicated_file_to_key(s3):
     s3.create_bucket(Bucket=expected_s3_bucket)
     expected_s3_key = "objectkey"
     retrieval.upload_to_s3(local_file, expected_s3_key,
-                           "", "", "", {})  # api creds
+                           "", "", "", {}, {})  # api creds
     actual_object = s3.get_object(
         Bucket=expected_s3_bucket, Key=expected_s3_key)
     s3_data = actual_object['Body'].read().decode("utf-8")
@@ -351,11 +362,11 @@ def test_upload_to_s3_raises_error_on_s3_error(
 
     try:
         retrieval.upload_to_s3("not a file name", "not an s3 key",
-                               "env", source_id, upload_id, {})  # api creds
+                               "env", source_id, upload_id, {}, {})  # api creds
     except Exception:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": retrieval.UploadError.INTERNAL_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.INTERNAL_ERROR.name}}
         return
 
     # We got the wrong exception or no exception, fail the test.

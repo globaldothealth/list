@@ -2,6 +2,7 @@ import AWS from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
 import AwsLambdaClient, {
     RetrievalPayload,
+    LambdaFunction,
 } from '../../src/clients/aws-lambda-client';
 
 let client: AwsLambdaClient;
@@ -10,6 +11,7 @@ const addPermissionSpy = jest
     .mockResolvedValue({ Statement: 'statement' });
 const removePermissionSpy = jest.fn().mockResolvedValue({});
 const invokeSpy = jest.fn();
+const listFunctionsSpy = jest.fn();
 
 beforeAll(() => {
     AWSMock.setSDKInstance(AWS);
@@ -22,7 +24,8 @@ beforeEach(() => {
     AWSMock.mock('Lambda', 'addPermission', addPermissionSpy);
     AWSMock.mock('Lambda', 'removePermission', removePermissionSpy);
     AWSMock.mock('Lambda', 'invoke', invokeSpy);
-    client = new AwsLambdaClient('some-arn', 'us-east-1');
+    AWSMock.mock('Lambda', 'listFunctions', listFunctionsSpy);
+    client = new AwsLambdaClient('some-arn', 'test', 'us-east-1');
 });
 
 afterEach(() => {
@@ -115,5 +118,33 @@ describe('invokeRetrieval', () => {
         return expect(client.invokeRetrieval('some-source-id')).rejects.toThrow(
             /Func error/,
         );
+    });
+});
+
+describe('parsers', () => {
+    it('can be listed', async () => {
+        const payload: LambdaFunction[] = [
+            {
+                name: 'JapanParsingFunction',
+            },
+        ];
+        listFunctionsSpy.mockResolvedValueOnce({
+            Functions: [
+                {
+                    FunctionName: 'JapanParsingFunction',
+                },
+                {
+                    FunctionName: 'RetrievalFunction',
+                },
+            ],
+        });
+        const res = await client.listParsers();
+        expect(listFunctionsSpy).toHaveBeenCalledTimes(1);
+        expect(res).toEqual(payload);
+    });
+    it('throws when error is returned by aws api', async () => {
+        const expectedError = new Error('AWS error');
+        listFunctionsSpy.mockRejectedValueOnce(expectedError);
+        return expect(client.listParsers()).rejects.toThrow(expectedError);
     });
 });

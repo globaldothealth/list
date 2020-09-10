@@ -6,12 +6,14 @@ import csv
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import parsing_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-import parsing_lib
+    import parsing_lib
 
 # Fixed location, all cases are for the canton of Zurich in Switzerland.
 _LOCATION = {
@@ -31,6 +33,7 @@ _GENDER_INDEX = 3
 _CONFIRMED_INDEX = 4
 _SOURCE_INDEX = 6
 
+
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -41,12 +44,14 @@ def convert_date(raw_date):
     date = datetime.strptime(raw_date, "%Y-%m-%d")
     return date.strftime("%m/%d/%YZ")
 
+
 def convert_gender(raw_gender: str):
     if raw_gender.upper() == "M":
         return "Male"
     elif raw_gender.upper() == "F":
         return "Female"
     return None
+
 
 def convert_demographics(gender: str, age: str):
     demo = {}
@@ -58,6 +63,7 @@ def convert_demographics(gender: str, age: str):
             "end": float(age),
         }
     return demo
+
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
@@ -71,8 +77,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
-        next(reader) # Skip the header.
-        cases = []
+        next(reader)  # Skip the header.
         for row in reader:
             num_confirmed_cases = int(row[_CONFIRMED_INDEX])
             if not num_confirmed_cases:
@@ -97,10 +102,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "demographics": convert_demographics(
                         row[_GENDER_INDEX], row[_AGE_INDEX]),
                 }
-                cases.extend([case] * num_confirmed_cases)
+                for _ in range(num_confirmed_cases):
+                    yield case
             except ValueError as ve:
                 print(ve)
-        return cases
+
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

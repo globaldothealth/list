@@ -55,7 +55,7 @@ describe('Bulk upload form', function () {
         cy.contains('www.bulksource.com');
         cy.contains('sourceEntryId');
         cy.contains('superuser@test.com');
-        cy.contains('Data upload ID')
+        cy.contains('Data upload IDs')
             .parent()
             .parent()
             .contains(/[a-f\d]{24}/);
@@ -74,18 +74,18 @@ describe('Bulk upload form', function () {
 
         // Events
         // Confirmation
-        cy.contains('2020-6-23');
+        cy.contains('2020-06-23');
         cy.contains('PCR test');
         // Symptom onset
-        cy.contains('2020-6-19');
+        cy.contains('2020-06-19');
         // Hospital admission
         cy.contains('Yes');
-        cy.contains('2020-6-21');
+        cy.contains('2020-06-21');
         // ICU admission
-        cy.contains('2020-6-22');
+        cy.contains('2020-06-22');
         // Outcome
         cy.contains('Recovered');
-        cy.contains('2020-6-24');
+        cy.contains('2020-06-24');
 
         // Symptoms
         cy.contains('Symptomatic');
@@ -118,7 +118,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display').should('not.exist');
         cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('www.bulksource.com');
-        cy.contains('2020-6-23');
+        cy.contains('2020-06-23');
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
@@ -149,7 +149,7 @@ describe('Bulk upload form', function () {
         cy.contains('No records to display').should('not.exist');
         cy.contains('bulk_data.csv uploaded. 2 new cases added.');
         cy.contains('www.new-source.com');
-        cy.contains('2020-6-23');
+        cy.contains('2020-06-23');
         cy.contains('Canada');
         cy.contains('Alberta');
         cy.contains('Banff');
@@ -196,9 +196,20 @@ describe('Bulk upload form', function () {
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@batchUpsert');
 
-        // The updated case now has a gender of Female.
-        cy.contains('bulk_data.csv uploaded. 2 cases updated.');
+        // One case was updated to have a gender of Female.
+        // The other case, while present, wasn't modified.
+        cy.contains('bulk_data.csv uploaded. 1 case updated.');
         cy.contains('Female');
+
+        // Check both upload ids are present
+        cy.server();
+        cy.route('get', '/api/cases/*').as('viewCase');
+        cy.contains('td', 'Female').click({ force: true });
+        cy.wait('@viewCase');
+        cy.contains('Data upload IDs')
+            .parent()
+            .parent()
+            .contains(/[a-f\d]{24}, [a-f\d]{24}/);
     });
 
     it('Upserts multiple cases if dictated by caseCount CSV field', function () {

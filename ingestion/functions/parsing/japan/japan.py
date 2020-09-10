@@ -6,12 +6,14 @@ from datetime import date, datetime
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import parsing_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-import parsing_lib
+    import parsing_lib
 
 def convert_gender(raw_gender):
     if "gender" in raw_gender:
@@ -50,7 +52,7 @@ def parse_cases(raw_data_file, source_id, source_url):
     """
     with open(raw_data_file, "r") as f:
         cases = json.load(f)
-        return [
+        return (
             {
                 "caseReference": {
                     "sourceId": source_id,
@@ -73,7 +75,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "gender": convert_gender(entry)
                 },
                 "notes": detect_notes(entry)
-            } for entry in cases if entry["patientId"] != "-1"]
+            } for entry in cases if entry["patientId"] != "-1")
 
 
 def lambda_handler(event, context):

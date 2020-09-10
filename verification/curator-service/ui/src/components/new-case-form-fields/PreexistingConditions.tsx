@@ -11,23 +11,21 @@ export default function PreexistingConditions(): JSX.Element {
     const { values, initialValues } = useFormikContext<CaseFormValues>();
     return (
         <Scroll.Element name="preexistingConditions">
-            <fieldset>
-                <FieldTitle title="Pre-existing conditions"></FieldTitle>
-                <SelectField
-                    name="hasPreexistingConditions"
-                    label="Has preexisting conditions"
-                    values={hasPreexistingConditionsValues}
-                ></SelectField>
-                {values.hasPreexistingConditions === 'Yes' && (
-                    <FormikAutocomplete
-                        name="preexistingConditions"
-                        label="Preexisting conditions"
-                        initialValue={initialValues.preexistingConditions}
-                        multiple
-                        optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/preexisting_conditions.txt"
-                    />
-                )}
-            </fieldset>
+            <FieldTitle title="Pre-existing conditions"></FieldTitle>
+            <SelectField
+                name="hasPreexistingConditions"
+                label="Has preexisting conditions"
+                values={hasPreexistingConditionsValues}
+            ></SelectField>
+            {values.hasPreexistingConditions === 'Yes' && (
+                <FormikAutocomplete
+                    name="preexistingConditions"
+                    label="Preexisting conditions"
+                    initialValue={initialValues.preexistingConditions}
+                    multiple
+                    optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/preexisting_conditions.txt"
+                />
+            )}
         </Scroll.Element>
     );
 }

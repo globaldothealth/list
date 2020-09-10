@@ -3,9 +3,10 @@ export default function renderDate(date: string | Date | null): string {
     if (typeof date === 'string') {
         date = new Date(date);
     }
-    return `${date.getUTCFullYear()}-${
-        date.getUTCMonth() + 1
-    }-${date.getUTCDate()}`;
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
+        2,
+        '0',
+    )}-${String(date.getUTCDate()).padStart(2, '0')}`;
 }
 
 // Changes the date to be in UTC while maintaining the current date values
