@@ -123,6 +123,7 @@ export function addSource(name: string, url: string, uploads?: []): void {
             name: name,
             origin: {
                 url: url,
+                license: 'MIT',
             },
             uploads: uploads,
             format: 'JSON',

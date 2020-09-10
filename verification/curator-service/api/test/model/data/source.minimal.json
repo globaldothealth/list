@@ -1,6 +1,7 @@
 {
     "name": "source name",
     "origin": {
-        "url": "foo.bar"
+        "url": "foo.bar",
+        "license": "MIT"
     }
 }

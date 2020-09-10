@@ -29,6 +29,7 @@ it('loads and displays sources', async () => {
     const sourceName = 'source_name';
     const originUrl = 'origin url';
     const format = 'JSON';
+    const license = 'MIT';
     const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
     const awsRuleArn = 'arn:aws:events:a:b:rule/c';
     const awsScheduleExpression = 'rate(2 hours)';
@@ -39,7 +40,7 @@ it('loads and displays sources', async () => {
             format: format,
             origin: {
                 url: originUrl,
-                license: 'origin license',
+                license: license,
             },
             automation: {
                 parser: {
@@ -81,6 +82,7 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(sourceName))).toBeInTheDocument();
     expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
     expect(await findByText(new RegExp(format))).toBeInTheDocument();
+    expect(await findByText(new RegExp(license))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
     expect(

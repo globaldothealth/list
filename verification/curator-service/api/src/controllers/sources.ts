@@ -41,7 +41,8 @@ export default class SourcesController {
             const [docs, total] = await Promise.all([
                 Source.find(filter)
                     .skip(limit * (page - 1))
-                    .limit(limit + 1),
+                    .limit(limit + 1)
+                    .lean(),
                 Source.countDocuments({}),
             ]);
             // If we have more items than limit, add a response param

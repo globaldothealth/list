@@ -69,6 +69,7 @@ interface Props {
 
 export interface AutomatedSourceFormValues {
     url: string;
+    license: string;
     name: string;
     format: string;
 }
@@ -77,6 +78,7 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     url: Yup.string().required('Required'),
     name: Yup.string().required('Required'),
     format: Yup.string().required('Required'),
+    license: Yup.string().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -89,7 +91,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
     ): Promise<void> => {
         const newSource = {
             name: values.name,
-            origin: { url: values.url },
+            origin: { url: values.url, license: values.license },
             format: values.format,
         };
         try {
@@ -113,7 +115,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedSourceFormSchema}
                 validateOnChange={false}
-                initialValues={{ url: '', name: '', format: '' }}
+                initialValues={{ url: '', name: '', format: '', license: '' }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
                 }}
@@ -130,8 +132,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                 variant="body2"
                             >
                                 Add new cases through automated ingestion from a
-                                data source. G.h List will check for updates
-                                every 15 minutes from this new source.
+                                data source.
                             </Typography>
                         </div>
                         <Form>
@@ -157,6 +158,17 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         name="name"
                                         type="text"
                                         data-testid="name"
+                                        component={TextField}
+                                        fullWidth
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <FastField
+                                        helperText="Required (MIT, Apache V2, ...)"
+                                        label="License"
+                                        name="license"
+                                        type="text"
+                                        data-testid="license"
                                         component={TextField}
                                         fullWidth
                                     />

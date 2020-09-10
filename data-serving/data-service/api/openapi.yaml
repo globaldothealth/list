@@ -167,6 +167,7 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
                     Cases matching this query will be deleted. Must contain
@@ -195,6 +196,39 @@ paths:
           $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/download:
+    post:
+      summary: >
+        Streams a CSV attachment of all cases. If a query is supplied the
+        CSV only contains cases matching the search query. If caseIds are
+        supplied the CSV only contains cases with those ids. You cannot supply
+        both query and caseIds.
+      tags: [Case]
+      operationId: downloadCases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              maxProperties: 1
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will returned
+                  type: array
+                  items:
+                    type: string
+                    pattern: '^[a-f\d]{24}$'
+                query:
+                  description: >
+                    Cases matching this query will be returned. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+      responses:
+        "200":
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchValidate:
@@ -788,6 +822,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200BatchUpdateResponse":
       description: OK
       content:

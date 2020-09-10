@@ -82,6 +82,8 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+
+    license?: string;
     // automation.parser
 
     format?: string;
@@ -162,6 +164,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 !(
                     this.validateRequired(newRowData.name) &&
                     this.validateRequired(newRowData.url) &&
+                    this.validateRequired(newRowData.license) &&
                     this.validateAutomationFields(newRowData)
                 )
             ) {
@@ -194,6 +197,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             name: rowData.name,
             origin: {
                 url: rowData.url,
+                license: rowData.license,
             },
             format: rowData.format,
             automation:
@@ -328,6 +332,31 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             </MenuItem>
                                         ))}
                                     </TextField>
+                                ),
+                            },
+                            {
+                                title: 'License',
+                                field: 'license',
+                                tooltip: 'MIT, Apache V2, ...',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="License"
+                                        error={
+                                            !this.validateRequired(props.value)
+                                        }
+                                        helperText={
+                                            this.validateRequired(props.value)
+                                                ? ''
+                                                : 'Required field'
+                                        }
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    />
                                 ),
                             },
                             {
@@ -470,6 +499,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 name: s.name,
                                                 format: s.format,
                                                 url: s.origin.url,
+                                                license: s.origin.license,
                                                 awsLambdaArn:
                                                     s.automation?.parser
                                                         ?.awsLambdaArn,
