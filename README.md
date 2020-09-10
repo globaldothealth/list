@@ -1,6 +1,6 @@
 # Global.Health List
 
-[Global.Health](http://www.global.health)'s mission is to enable rapid sharing of trusted and open public health data to
+[Global.Health](https://global.health)'s mission is to enable rapid sharing of trusted and open public health data to
 advance the response to infectious diseases.
 
 This repository contains the servers and scripts that support its data curation efforts.
@@ -10,21 +10,39 @@ This repository contains the servers and scripts that support its data curation 
 - [dev](https://dev-curator.ghdsi.org)
 - [prod](https://curator.ghdsi.org)
 
+## Daily exports of case data
+
+- [output](data/README.md)
+- [data dictionary](data-serving/scripts/export-data/case_fields.yaml)
+- [script](data-serving/scripts/export-data/README.md)
+
 ## CI/CD status
 
-![Curator API Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20API%20Node.js%20CI/badge.svg)
+[All actions](https://github.com/globaldothealth/list/actions)
 
-![Curator UI Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20UI%20Node.js%20CI/badge.svg)
+![Curator Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Curator%20Service%20Github%20Packages%20Push/badge.svg)
 
-![Data Service Node.js CI](https://github.com/globaldothealth/list/workflows/Data%20service%20Node.js%20CI/badge.svg)
+![Export prod case data](https://github.com/globaldothealth/list/workflows/Export%20prod%20case%20data/badge.svg)
+
+![Suggest python scripts](https://github.com/globaldothealth/list/workflows/Suggest%20python%20scripts/badge.svg)
+
+![Update case data in dev](https://github.com/globaldothealth/list/workflows/Update%20case%20data%20in%20dev/badge.svg)
+
+![Data Service Github Packages Push](https://github.com/globaldothealth/list/workflows/Data%20Service%20Github%20Packages%20Push/badge.svg)
 
 ![Integration Tests CI](https://github.com/globaldothealth/list/workflows/Integration%20Tests%20CI/badge.svg)
 
-![Ingestion functions Python CI](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20Python%20CI/badge.svg)
+![Ingestion functions AWS SAM deploy](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)
 
 ![Ingestion functions AWS SAM build](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20build/badge.svg)
 
-![Ingestion functions AWS SAM deploy](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20AWS%20SAM%20deploy/badge.svg)
+![Ingestion functions Python CI](https://github.com/globaldothealth/list/workflows/Ingestion%20functions%20Python%20CI/badge.svg)
+
+![Data service Node.js CI](https://github.com/globaldothealth/list/workflows/Data%20service%20Node.js%20CI/badge.svg)
+
+![Curator UI Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20UI%20Node.js%20CI/badge.svg)
+
+![Curator API Node.js CI](https://github.com/globaldothealth/list/workflows/Curator%20API%20Node.js%20CI/badge.svg)
 
 ## Components
 
@@ -63,9 +81,17 @@ This repository contains the servers and scripts that support its data curation 
 
 ### API docs
 
-- [Curator service](curator.ghdsi.org/api-docs)
+- [Curator service](HTTPS://curator.ghdsi.org/api-docs)
 - [Local curator service](http://localhost:3001/api-docs)
 - [Local data service](http://localhost:3000/api-docs)
+
+## Sources licenses and terms of use
+
+This repository and daily data exports are published under the MIT license.
+
+Each automatically ingested data source used has a required license and terms of use attachment, forcing curators to look-up the sources they are setting-up for ingestion.
+
+If you are the owner of a data source included here and would like us to remove data, add or alter an attribution, or add or alter license information, please open an issue on this repository and we will happily consider your request.
 
 ## Stats
 

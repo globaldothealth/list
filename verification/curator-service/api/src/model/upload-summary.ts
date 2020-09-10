@@ -16,3 +16,8 @@ export type UploadSummaryDocument = mongoose.Document & {
     numUpdated: number;
     error: string;
 };
+
+export const UploadSummary = mongoose.model<UploadSummaryDocument>(
+    'UploadSummary',
+    uploadSummarySchema,
+);

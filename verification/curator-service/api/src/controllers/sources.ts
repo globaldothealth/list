@@ -25,11 +25,11 @@ export default class SourcesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         if (page < 1) {
-            res.status(422).json('page must be > 0');
+            res.status(422).json({ message: 'page must be > 0' });
             return;
         }
         if (limit < 1) {
-            res.status(422).json('limit must be > 0');
+            res.status(422).json({ message: 'limit must be > 0' });
             return;
         }
         const filter = req.query.url
@@ -41,7 +41,8 @@ export default class SourcesController {
             const [docs, total] = await Promise.all([
                 Source.find(filter)
                     .skip(limit * (page - 1))
-                    .limit(limit + 1),
+                    .limit(limit + 1)
+                    .lean(),
                 Source.countDocuments({}),
             ]);
             // If we have more items than limit, add a response param
@@ -58,7 +59,7 @@ export default class SourcesController {
             // If we fetched all available data, just return it.
             res.json({ sources: docs, total: total });
         } catch (e) {
-            res.status(422).json(e.message);
+            res.status(422).json(e);
             return;
         }
     };
@@ -69,9 +70,9 @@ export default class SourcesController {
     get = async (req: Request, res: Response): Promise<void> => {
         const doc = await Source.findById(req.params.id);
         if (!doc) {
-            res.status(404).json(
-                `source with id ${req.params.id} could not be found`,
-            );
+            res.status(404).json({
+                message: `source with id ${req.params.id} could not be found`,
+            });
             return;
         }
         res.json(doc);
@@ -84,9 +85,9 @@ export default class SourcesController {
         try {
             const source = await Source.findById(req.params.id);
             if (!source) {
-                res.status(404).json(
-                    `source with id ${req.params.id} could not be found`,
-                );
+                res.status(404).json({
+                    message: `source with id ${req.params.id} could not be found`,
+                });
                 return;
             }
             await source.set(req.body).validate();
@@ -95,10 +96,10 @@ export default class SourcesController {
             res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
-                res.status(422).json(err.message);
+                res.status(422).json(err);
                 return;
             }
-            res.status(500).json(err.message);
+            res.status(500).json(err);
             return;
         }
     };
@@ -164,10 +165,10 @@ export default class SourcesController {
             res.status(201).json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
-                res.status(422).json(err.message);
+                res.status(422).json(err);
                 return;
             }
-            res.status(500).json(err.message);
+            res.status(500).json(err);
         }
     };
 
@@ -227,7 +228,7 @@ export default class SourcesController {
             );
             res.json(output);
         } catch (err) {
-            res.status(500).json(err.message);
+            res.status(500).json(err);
         }
         return;
     };
@@ -238,7 +239,7 @@ export default class SourcesController {
             const output = await this.lambdaClient.listParsers();
             res.json(output);
         } catch (err) {
-            res.status(500).json(err.message);
+            res.status(500).json(err);
         }
         return;
     };

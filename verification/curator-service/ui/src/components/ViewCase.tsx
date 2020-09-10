@@ -56,7 +56,7 @@ export default function ViewCase(props: Props): JSX.Element {
             })
             .catch((e) => {
                 setCase(undefined);
-                setErrorMessage(e.message);
+                setErrorMessage(e.response?.data?.message || e.toString());
             })
             .finally(() => setLoading(false));
     }, [props.id]);
@@ -262,9 +262,13 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 }
                             />
 
-                            <RowHeader title="Data upload ID" />
+                            <RowHeader title="Data upload IDs" />
                             <RowContent
-                                content={props.c.caseReference?.uploadId || ''}
+                                content={
+                                    props.c.caseReference?.uploadIds?.join(
+                                        ', ',
+                                    ) || ''
+                                }
                             />
 
                             {props.c.caseReference?.additionalSources && (
