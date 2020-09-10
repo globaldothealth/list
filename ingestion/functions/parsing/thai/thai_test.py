@@ -18,7 +18,7 @@ _PARSED_CASES = [
             'sourceEntryId': '3445',
             "sourceUrl": _SOURCE_URL
         },
-        "location": {'query': 'Thailand, Bangkok, ราชเทวี'},
+        "location": {'query': 'ราชเทวี, Bangkok, Thailand'},
         "events": [
             {
                 "name": "confirmed",
@@ -44,7 +44,7 @@ _PARSED_CASES = [
             'sourceEntryId': '2999',
             "sourceUrl": _SOURCE_URL
         },
-        "location": {'query': 'Thailand, Songkhla, สะเดา'},
+        "location": {'query': 'สะเดา, Songkhla, Thailand'},
         "events": [
             {
                 "name": "confirmed",

@@ -37,9 +37,9 @@ def convert_gender(raw_gender):
 
 def convert_location(entry):
     query_terms = [
-        'Thailand',
-        entry['ProvinceEn'] or entry['Province'],
         entry['District'],
+        entry['ProvinceEn'] or entry['Province'],
+        'Thailand',
     ]
     return {"query":  ", ".join([term for term in query_terms if term])}
 
