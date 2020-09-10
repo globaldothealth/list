@@ -158,6 +158,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 let listUrl = this.state.url;
                                 listUrl += '?limit=' + this.state.pageSize;
                                 listUrl += '&page=' + (query.page + 1);
+                                listUrl += '&changes_only=true';
                                 this.setState({ error: '' });
                                 const response = axios.get<ListUploadsResponse>(
                                     listUrl,
