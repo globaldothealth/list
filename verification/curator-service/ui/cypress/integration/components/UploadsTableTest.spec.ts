@@ -19,6 +19,18 @@ describe('Uploads table', function () {
                 summary: { numCreated: 2 },
                 created: '2020-01-02',
             },
+            {
+                _id: '5ef8e943dfe6e00030892d60',
+                status: 'SUCCESS',
+                summary: { numUpdated: 4 },
+                created: '2020-01-03',
+            },
+            {
+                _id: '5ef8e943dfe6e00030892d61',
+                status: 'SUCCESS',
+                summary: { numCreated: 0, numUpdated: 0 },
+                created: '2020-01-04',
+            },
         ]);
         cy.visit('/uploads');
         cy.contains('www.example.com');
@@ -29,9 +41,14 @@ describe('Uploads table', function () {
         cy.contains('3');
         cy.contains('5ef8e943dfe6e00030892d59');
         cy.contains('2020-01-02');
-        cy.contains('SUCCESS');
+        cy.get('td[value="SUCCESS"]').should('have.length', 2);
         cy.contains('2');
-        cy.contains('0');
+        cy.get('td[value=0]').should('have.length', 2);
+        cy.contains('5ef8e943dfe6e00030892d60');
+        cy.contains('2020-01-03');
+        cy.contains('4');
+        cy.contains('5ef8e943dfe6e00030892d61').should('not.exist');
+        cy.contains('2020-01-04').should('not.exist');
     });
 
     it('can navigate to filtered linelist', function () {
