@@ -1,14 +1,14 @@
 import {
     AppBar,
+    Avatar,
     CssBaseline,
+    Divider,
     Fab,
     IconButton,
     Menu,
     MenuItem,
     Toolbar,
     useMediaQuery,
-    Avatar,
-    Divider,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
@@ -52,10 +52,8 @@ const theme = createMuiTheme({
             paper: '#ffffff',
         },
         primary: {
-            main: '#31A497',
+            main: '#0E7569',
             contrastText: '#ffffff',
-            light: '#6AD6C8',
-            dark: '#0E7569',
         },
         secondary: {
             main: '#00C6AF',
