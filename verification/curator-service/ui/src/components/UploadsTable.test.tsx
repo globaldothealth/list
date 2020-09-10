@@ -52,7 +52,7 @@ it('loads and displays uploads', async () => {
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/sources/uploads?limit=10&page=1',
+        '/api/sources/uploads?limit=10&page=1&changes_only=true',
     );
 
     // Verify display content.
@@ -73,7 +73,7 @@ it('API errors are displayed', async () => {
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
-        '/api/sources/uploads?limit=10&page=1',
+        '/api/sources/uploads?limit=10&page=1&changes_only=true',
     );
 
     expect(await findByText('Error: Request failed')).toBeInTheDocument();
