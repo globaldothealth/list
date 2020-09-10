@@ -23,6 +23,21 @@ _DATE_SYMPTOMS_INDEX = 2
 _MUNICIPALITY_INDEX = 1
 _PREEXISTING_CONDITIONS_INDEX = 4
 
+commorbidities = {
+                  "Diabetes Mellitus": "diabetes mellitus", 
+                  "Cardiopatia": "heart disease",
+                  "Doença de Aparelho Digestivo": "gastrointestinal system disease",
+                  "Doença Hepática": "liver disease",
+                  "Doença Neurológica": "nervous system disease",
+                  "Doença Renal": "kidney disease",
+                  "Doença Respiratória": "respiratory system disease",
+                  "Neoplasia": "neoplasm",
+                  "Etilismo": "alcohol use disorder",
+                  "Obesidade": "obesity",
+                  "Transtorno mental": "mental or behavioural disorder",
+                  "Hipertensão": "hypertension"
+                 }
+
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -42,8 +57,8 @@ def convert_gender(raw_gender: str):
 
 def convert_age(age: str):
     if age.isdecimal():
-    	#Ages are mostly reported in decimal years, but there are entries like '1 ano' ['1 year'] 
-    	#and '1 m' ['1 month'] which need to be dealt with separately.
+        #Ages are mostly reported in decimal years, but there are entries like '1 ano' ['1 year'] 
+        #and '1 m' ['1 month'] which need to be dealt with separately.
         return {
             "start": float(age),
             "end": float(age)
@@ -88,20 +103,6 @@ def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
     if raw_commorbidities not in ["Sem comorbidades","Doença Hematológica","Tabagismo","Imunossupressão"]:
         preexistingConditions["hasPreexistingConditions"] = True
-        commorbidities = {
-                        "Diabetes Mellitus": "diabetes mellitus", 
-                        "Cardiopatia": "heart disease",
-                        "Doença de Aparelho Digestivo": "gastrointestinal system disease",
-                        "Doença Hepática": "liver disease",
-                        "Doença Neurológica": "nervous system disease",
-                        "Doença Renal": "kidney disease",
-                        "Doença Respiratória": "respiratory system disease",
-                        "Neoplasia": "neoplasm",
-                        "Etilismo": "alcohol use disorder",
-                        "Obesidade": "obesity",
-                        "Transtorno mental": "mental or behavioural disorder",
-                        "Hipertensão": "hypertension"
-                        }
         
         commorbidities_list = []
 
@@ -125,9 +126,9 @@ def convert_notes(raw_commorbidities: str):
     if "Tabagismo" in raw_commorbidities:
         raw_notes.append("Smoker")
     if "Doença Hematológica" in raw_commorbidities: 
-    	raw_notes.append("Hematologic disease")
+        raw_notes.append("Hematologic disease")
     if "Outros" in raw_commorbidities: 
-    	raw_notes.append("Unspecified pre-existing condition")
+        raw_notes.append("Unspecified pre-existing condition")
     notes = (', ').join(raw_notes)
     return notes
 
@@ -143,9 +144,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
         next(reader) # Skip the header.
-        cases = []
         for row in reader:
-            if row[_DATE_SYMPTOMS_INDEX] < "2019-11-01": #One date is recorded as year 2000
+            if datetime.strptime(row[_DATE_SYMPTOMS_INDEX], "%Y-%m-%d") < datetime.strptime("2019-11-01", "%Y-%m-%d"): #One date is recorded as year 2000
                 print("date out of range:" + row[_DATE_SYMPTOMS_INDEX])
                 continue
             case = {
@@ -184,8 +184,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
                 "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX])
             }
-            cases.append(case)
-        return cases
+            yield case
         
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
