@@ -167,12 +167,21 @@ paths:
                   type: array
                   items:
                     type: string
+                    pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
                     Cases matching this query will be deleted. Must contain
                     non-whitespace characters.
                   type: string
                   pattern: \S+
+                maxCasesThreshold:
+                  type: number
+                  description: >
+                    An optional safeguard against deletion of too many cases.
+                    If you want to delete based on a query for example but fail
+                    if the number of cases that's going to be deleted is more
+                    than a given number, set this field to that desired number.
+                    Failure will be indicated by a 422 error status code.
               oneOf:
                 - required: [caseIds]
                 - required: [query]
@@ -185,6 +194,41 @@ paths:
           $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/download:
+    post:
+      summary: >
+        Streams a CSV attachment of all cases. If a query is supplied the
+        CSV only contains cases matching the search query. If caseIds are
+        supplied the CSV only contains cases with those ids. You cannot supply
+        both query and caseIds.
+      tags: [Case]
+      operationId: downloadCases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              maxProperties: 1
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will returned
+                  type: array
+                  items:
+                    type: string
+                    pattern: '^[a-f\d]{24}$'
+                query:
+                  description: >
+                    Cases matching this query will be returned. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+      responses:
+        "200":
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchValidate:
@@ -492,13 +536,14 @@ components:
               pattern: '^[a-f\d]{24}$'
             sourceUrl:
               type: string
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
@@ -777,6 +822,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200BatchUpdateResponse":
       description: OK
       content:

@@ -15,9 +15,9 @@ export default class UploadsController {
         try {
             const source = await Source.findById(req.params.sourceId);
             if (!source) {
-                res.status(404).json(
-                    `Parent resource (source ID ${req.params.sourceId}) not found.`,
-                );
+                res.status(404).json({
+                    message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
+                });
                 return;
             }
             source.uploads.push(req.body);
@@ -28,10 +28,10 @@ export default class UploadsController {
             return;
         } catch (err) {
             if (err.name === 'ValidationError') {
-                res.status(422).json(err.message);
+                res.status(422).json(err);
                 return;
             }
-            res.status(500).json(err.message);
+            res.status(500).json(err);
         }
     };
 
@@ -43,18 +43,18 @@ export default class UploadsController {
         try {
             const source = await Source.findById(req.params.sourceId);
             if (!source) {
-                res.status(404).json(
-                    `Parent resource (source ID ${req.params.sourceId}) not found.`,
-                );
+                res.status(404).json({
+                    message: `Parent resource (source ID ${req.params.sourceId}) not found.`,
+                });
                 return;
             }
             const upload = source.uploads.find(
                 (u) => u._id.toString() === req.params.id,
             );
             if (!upload) {
-                res.status(404).json(
-                    `Upload with ID ${req.params.id}) not found in source ${req.params.sourceId}.`,
-                );
+                res.status(404).json({
+                    message: `Upload with ID ${req.params.id}) not found in source ${req.params.sourceId}.`,
+                });
                 return;
             }
             await upload.set(req.body).validate();
@@ -62,10 +62,10 @@ export default class UploadsController {
             res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
-                res.status(422).json(err.message);
+                res.status(422).json(err);
                 return;
             }
-            res.status(500).json(err.message);
+            res.status(500).json(err);
             return;
         }
     };
@@ -77,10 +77,23 @@ export default class UploadsController {
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const changesOnlyMatcher = req.query.changes_only
+            ? [
+                  {
+                      $match: {
+                          $or: [
+                              { 'uploads.summary.numCreated': { $gt: 0 } },
+                              { 'uploads.summary.numUpdated': { $gt: 0 } },
+                          ],
+                      },
+                  },
+              ]
+            : [];
         try {
             const [uploads, total] = await Promise.all([
                 Source.aggregate([
                     { $unwind: '$uploads' },
+                    ...changesOnlyMatcher,
                     { $skip: limit * (page - 1) },
                     { $limit: limit + 1 },
                     {
@@ -94,6 +107,7 @@ export default class UploadsController {
                 ]),
                 Source.aggregate([
                     { $unwind: '$uploads' },
+                    ...changesOnlyMatcher,
                     { $count: 'total' },
                 ]),
             ]);
@@ -112,7 +126,7 @@ export default class UploadsController {
             res.json({ uploads: uploads, ...total[0] });
             return;
         } catch (err) {
-            res.status(500).json(err.message);
+            res.status(500).json(err);
             return;
         }
     };

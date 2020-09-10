@@ -152,13 +152,16 @@ PATCH version when you make backwards compatible bug fixes.
 
 Github workflows will automatically extract the tags from the repository and apply them to the images built (thanks to the `add_git_labels: true` param in the workflow).
 
-To push a new release:
+To push a new release follow the [github UI flow](https://github.com/globaldothealth/list/releases/new) or do it using the command line:
 
 Tag main with the `0.1.2` tag:
 
-`git tag 0.1.2`
+```
+git checkout main
+git tag 0.1.2
+```
 
-the push it to the repo:
+then push it to the repo:
 
 `git push origin 0.1.2`
 
@@ -172,9 +175,9 @@ You can list the existing tags/versions with `git tag` or on the [github repo](h
 
 ### `main` image tag for dev
 
-Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically - better approach is pending [Flux-based deployment]
-(https://github.com/globaldothealth/list/issues/673). The latest image with the `main` tag is fetched when a deployment is updated in kubernetes.
-To update dev to the `main` image, do:
+Dev instances of curator and data services are using the `main` image tag, that's not best practice as the images are not reloaded automatically - better approach is pending
+[Flux-based deployment](https://github.com/globaldothealth/list/issues/673). The latest image with the `main`
+tag is fetched when a deployment is updated in kubernetes. To update dev to the `main` image, do:
 
 ```shell
 kubectl rollout restart deployment/curator-dev
