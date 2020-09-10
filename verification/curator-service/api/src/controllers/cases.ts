@@ -4,6 +4,11 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
+// Don't set client-side timeouts for requests to the data service.
+// TODO: Make this more fine-grained once we fix
+//   https://github.com/globaldothealth/list/issues/961.
+axios.defaults.timeout = 0;
+
 class InvalidParamError extends Error {}
 
 /**
@@ -23,6 +28,35 @@ export default class CasesController {
                 this.dataServerURL + '/api' + req.url,
             );
             res.status(response.status).json(response.data);
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    /** Download forwards the request to the data service and streams the
+     * streamed response as a csv attachment. */
+    download = async (req: Request, res: Response): Promise<void> => {
+        try {
+            axios({
+                method: 'post',
+                url: this.dataServerURL + '/api' + req.url,
+                data: req.body,
+                responseType: 'stream',
+            }).then((response) => {
+                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader(
+                    'Content-Disposition',
+                    'attachment; filename="cases.csv"',
+                );
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Pragma', 'no-cache');
+                response.data.pipe(res);
+            });
         } catch (err) {
             console.log(err);
             if (err.response?.status && err.response?.data) {

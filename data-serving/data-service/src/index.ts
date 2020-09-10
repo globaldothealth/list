@@ -91,6 +91,7 @@ new OpenApiValidator({
         );
         apiRouter.get('/cases/occupations', caseController.listOccupations);
         apiRouter.post('/cases', setRevisionMetadata, caseController.create);
+        apiRouter.post('/cases/download', caseController.download);
         apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',

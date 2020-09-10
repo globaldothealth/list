@@ -58,5 +58,5 @@ def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
         json.dump(sample_data, f)
         f.flush()
 
-        result, = india.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL)
+        result = next(india.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL))
         assert result == _PARSED_CASE
