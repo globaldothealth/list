@@ -23,7 +23,8 @@ export const list = async (req: Request, res: Response): Promise<void> => {
         const [docs, total] = await Promise.all([
             User.find({})
                 .skip(limit * (page - 1))
-                .limit(limit + 1),
+                .limit(limit + 1)
+                .lean(),
             User.countDocuments({}),
         ]);
         // If we have more items than limit, add a response param
