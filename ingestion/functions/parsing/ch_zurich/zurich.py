@@ -78,7 +78,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header.
-        cases = []
         for row in reader:
             num_confirmed_cases = int(row[_CONFIRMED_INDEX])
             if not num_confirmed_cases:
@@ -103,10 +102,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "demographics": convert_demographics(
                         row[_GENDER_INDEX], row[_AGE_INDEX]),
                 }
-                cases.extend([case] * num_confirmed_cases)
+                for _ in range(num_confirmed_cases):
+                    yield case
             except ValueError as ve:
                 print(ve)
-        return cases
 
 
 def lambda_handler(event, context):

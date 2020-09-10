@@ -2,7 +2,9 @@ import {
     Button,
     Divider,
     MenuItem,
+    TablePagination,
     Theme,
+    Typography,
     WithStyles,
     createStyles,
     withStyles,
@@ -12,12 +14,12 @@ import React, { RefObject } from 'react';
 
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
+import ParsersAutocomplete from './ParsersAutocomplete';
+import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
+import User from './User';
 import axios from 'axios';
 import { isUndefined } from 'util';
-import User from './User';
-import SourceRetrievalButton from './SourceRetrievalButton';
-import ParsersAutocomplete from './ParsersAutocomplete';
 
 interface ListResponse {
     sources: Source[];
@@ -80,6 +82,8 @@ interface TableRow {
     name: string;
     // origin
     url: string;
+
+    license?: string;
     // automation.parser
 
     format?: string;
@@ -107,6 +111,14 @@ const styles = (theme: Theme) =>
             marginTop: theme.spacing(1),
             marginBottom: theme.spacing(1),
         },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
+        },
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
@@ -132,7 +144,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             this.setState({ error: '' });
             const response = axios.delete(deleteUrl);
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
@@ -150,6 +164,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 !(
                     this.validateRequired(newRowData.name) &&
                     this.validateRequired(newRowData.url) &&
+                    this.validateRequired(newRowData.license) &&
                     this.validateAutomationFields(newRowData)
                 )
             ) {
@@ -162,7 +177,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 newSource,
             );
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
@@ -180,6 +197,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             name: rowData.name,
             origin: {
                 url: rowData.url,
+                license: rowData.license,
             },
             format: rowData.format,
             automation:
@@ -317,6 +335,31 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                             },
                             {
+                                title: 'License',
+                                field: 'license',
+                                tooltip: 'MIT, Apache V2, ...',
+                                editComponent: (props): JSX.Element => (
+                                    <TextField
+                                        type="text"
+                                        size="small"
+                                        fullWidth
+                                        placeholder="License"
+                                        error={
+                                            !this.validateRequired(props.value)
+                                        }
+                                        helperText={
+                                            this.validateRequired(props.value)
+                                                ? ''
+                                                : 'Required field'
+                                        }
+                                        onChange={(event): void =>
+                                            props.onChange(event.target.value)
+                                        }
+                                        defaultValue={props.value}
+                                    />
+                                ),
+                            },
+                            {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
                             },
@@ -435,9 +478,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     <SourceRetrievalButton sourceId={row._id} />
                                 ),
                                 editable: 'never',
-                                hidden: !this.props.user.roles.includes(
-                                    'curator',
-                                ),
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
@@ -459,6 +499,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 name: s.name,
                                                 format: s.format,
                                                 url: s.origin.url,
+                                                license: s.origin.license,
                                                 awsLambdaArn:
                                                     s.automation?.parser
                                                         ?.awsLambdaArn,
@@ -478,12 +519,37 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         });
                                     })
                                     .catch((e) => {
-                                        this.setState({ error: e.toString() });
+                                        this.setState({
+                                            error:
+                                                e.response?.data?.message ||
+                                                e.toString(),
+                                        });
                                         reject(e);
                                     });
                             })
                         }
-                        title="Ingestion sources"
+                        components={{
+                            Container: (props): JSX.Element => (
+                                <Paper elevation={0} {...props}></Paper>
+                            ),
+                            Pagination: (props): JSX.Element => {
+                                return (
+                                    <div className={classes.tablePaginationBar}>
+                                        <Typography>
+                                            Ingestion sources
+                                        </Typography>
+                                        <span className={classes.spacer}></span>
+                                        <TablePagination
+                                            {...props}
+                                            classes={{
+                                                ...props.classes,
+                                                root: classes.paginationRoot,
+                                            }}
+                                        ></TablePagination>
+                                    </div>
+                                );
+                            },
+                        }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/
@@ -495,6 +561,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             draggable: false, // No need to be able to drag and drop headers.
                             pageSize: this.state.pageSize,
                             pageSizeOptions: [5, 10, 20, 50, 100],
+                            paginationPosition: 'top',
+                            toolbar: false,
                             maxBodyHeight: 'calc(100vh - 15em)',
                             headerStyle: {
                                 zIndex: 1,
@@ -504,24 +572,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             this.setState({ pageSize: newPageSize });
                             this.tableRef.current.onQueryChange();
                         }}
-                        editable={
-                            this.props.user.roles.includes('curator')
-                                ? {
-                                      onRowUpdate: (
-                                          newRowData: TableRow,
-                                          oldRowData: TableRow | undefined,
-                                      ): Promise<unknown> =>
-                                          this.editSource(
-                                              newRowData,
-                                              oldRowData,
-                                          ),
-                                      onRowDelete: (
-                                          rowData: TableRow,
-                                      ): Promise<unknown> =>
-                                          this.deleteSource(rowData),
-                                  }
-                                : undefined
-                        }
+                        editable={{
+                            onRowUpdate: (
+                                newRowData: TableRow,
+                                oldRowData: TableRow | undefined,
+                            ): Promise<unknown> =>
+                                this.editSource(newRowData, oldRowData),
+                            onRowDelete: (
+                                rowData: TableRow,
+                            ): Promise<unknown> => this.deleteSource(rowData),
+                        }}
                     />
                 </Paper>
             </div>

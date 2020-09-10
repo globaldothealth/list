@@ -30,7 +30,7 @@ export default class GeocodeSuggester {
                 }
             }
         } catch (e) {
-            res.status(500).send(e.message);
+            res.status(500).send(e);
         }
         res.json([]);
     };

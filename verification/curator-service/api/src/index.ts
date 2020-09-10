@@ -1,7 +1,7 @@
 import * as usersController from './controllers/users';
 
 import { AuthController, mustHaveAnyRole } from './controllers/auth';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
@@ -14,6 +14,7 @@ import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
+import { ValidationError } from 'express-openapi-validator/dist/framework/types';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -141,12 +142,12 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/sources',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             sourcesController.list,
         );
         apiRouter.get(
             '/sources/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             sourcesController.get,
         );
         apiRouter.post(
@@ -222,7 +223,7 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.list,
         );
         apiRouter.get(
@@ -242,13 +243,18 @@ new OpenApiValidator({
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
             casesController.get,
         );
         apiRouter.post(
             '/cases',
             mustHaveAnyRole(['curator']),
             casesController.create,
+        );
+        apiRouter.post(
+            '/cases/download',
+            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            casesController.download,
         );
         apiRouter.post(
             '/cases/batchUpsert',
@@ -277,7 +283,7 @@ new OpenApiValidator({
         );
         apiRouter.delete(
             '/cases',
-            mustHaveAnyRole(['curator']),
+            mustHaveAnyRole(['curator', 'admin']),
             casesController.batchDel,
         );
         apiRouter.delete(
@@ -327,6 +333,22 @@ new OpenApiValidator({
                 customCssUrl:
                     'https://cdn.jsdelivr.net/npm/swagger-ui-themes@3.0.1/themes/3.x/theme-material.css',
             }),
+        );
+
+        // Register error handler to format express validator errors otherwise
+        // a complete HTML document is sent as the error output.
+        app.use(
+            (
+                err: ValidationError,
+                req: Request,
+                res: Response,
+                next: NextFunction,
+            ) => {
+                res.status(err.status || 500).json({
+                    message: err.message,
+                    errors: err.errors,
+                });
+            },
         );
 
         // Serve static UI content if static directory was specified.
