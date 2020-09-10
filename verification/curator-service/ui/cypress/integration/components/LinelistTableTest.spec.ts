@@ -188,6 +188,14 @@ describe('Linelist table', function () {
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
     });
 
+    it('displays search errors', function () {
+        cy.visit('/cases');
+        cy.get('input[id="search-field"]').click();
+        cy.get('li').contains('country:').click();
+        cy.get('input[id="search-field"]').type('{enter}');
+        cy.contains(/Invalid search query/);
+    });
+
     it('Can search', function () {
         cy.addCase({
             country: 'France',
@@ -198,7 +206,7 @@ describe('Linelist table', function () {
         cy.contains('France');
         cy.get('input[id="search-field"]').click();
         cy.get('li').contains('country:').click();
-        cy.get('input[id="search-field"]').type('Uruguay{enter}');
+        cy.get('input[id="search-field"]').type('uruguay{enter}');
         cy.contains('France').should('not.exist');
         cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
@@ -212,9 +220,14 @@ describe('Linelist table', function () {
                 sourceUrl: 'foo.bar',
             });
         }
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.contains('rows').click();
+        cy.route('GET', '/api/cases/?limit=5&page=1').as('get5Cases');
         cy.get('li').contains('5').click();
+        cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
         cy.contains('1 row selected').should('not.exist');
         cy.get('input[type="checkbox"]').eq(1).click();
@@ -238,6 +251,86 @@ describe('Linelist table', function () {
         cy.contains('7 rows selected').should('not.exist');
     });
 
+    it('Can download all cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.server();
+        cy.route('POST', '/api/cases/download').as('downloadCases');
+        cy.contains('Download').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.include(csv, 'France');
+            assert.include(csv, 'Germany');
+            assert.include(csv, 'United Kingdom');
+        });
+    });
+
+    it('Can download searched cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+
+        cy.get('input[id="search-field"]').click();
+        cy.get('li').contains('country:').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+
+        cy.server();
+        cy.route('POST', '/api/cases/download').as('downloadCases');
+        cy.contains('Download').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.include(csv, 'France');
+            assert.notInclude(csv, 'Germany');
+            assert.notInclude(csv, 'United Kingdom');
+        });
+    });
+
+    it('Can download selected cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+
+        cy.route('POST', '/api/cases/download').as('downloadCases');
+        cy.get('button[title="Download selected rows"]').click();
+        cy.wait('@downloadCases').then((xhr) => {
+            const csv = xhr.response.body;
+            assert.include(csv, 'location.country');
+            assert.notInclude(csv, 'France');
+            assert.include(csv, 'Germany');
+            assert.include(csv, 'United Kingdom');
+        });
+    });
+
     it('Can delete all cases across rows for a search result', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({
@@ -250,7 +343,10 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.get('input[id="search-field"]').click();

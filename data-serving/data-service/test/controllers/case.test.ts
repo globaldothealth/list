@@ -144,9 +144,15 @@ describe('GET', () => {
                 expect(res.body.cases).toHaveLength(0);
                 expect(res.body.total).toEqual(0);
             });
-            it('returns the case if keyword matches', async () => {
+            it('returns the case if matches', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=country%3AGermany')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns the case if non case sensitive matches', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=country%3Agermany')
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
             });
@@ -176,6 +182,9 @@ describe('GET', () => {
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
             });
+        });
+        it('rejects invalid searches', (done) => {
+            request(app).get('/api/cases?q=country%3A').expect(422, done);
         });
         it('rejects negative page param', (done) => {
             request(app).get('/api/cases?page=-7').expect(400, done);
@@ -421,6 +430,68 @@ describe('POST', () => {
         const updatedCaseInDb = await Case.findById(changedCaseWithEntryId._id);
         expect(updatedCaseInDb?.notes).toEqual(changedCaseWithEntryId.notes);
     });
+    it('batch upsert should add uploadId to field array', async () => {
+        const newUploadIds = ['012301234567890123456789'];
+
+        const newCaseWithoutEntryId = new Case(minimalCase);
+        newCaseWithoutEntryId.caseReference.uploadIds = newUploadIds;
+        const newCaseWithEntryId = new Case(fullCase);
+        newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
+        newCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+
+        const changedCaseWithEntryId = new Case(fullCase);
+        await changedCaseWithEntryId.save();
+        changedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+        changedCaseWithEntryId.notes = 'new notes';
+
+        const unchangedCaseWithEntryId = new Case(fullCase);
+        unchangedCaseWithEntryId.caseReference.sourceEntryId =
+            'unchangedEntryId';
+        const unchangedCaseUploadIds =
+            unchangedCaseWithEntryId.caseReference.uploadIds;
+        await unchangedCaseWithEntryId.save();
+        unchangedCaseWithEntryId.caseReference.uploadIds = newUploadIds;
+
+        const res = await request(app)
+            .post('/api/cases/batchUpsert')
+            .send({
+                cases: [
+                    newCaseWithoutEntryId,
+                    newCaseWithEntryId,
+                    changedCaseWithEntryId,
+                    unchangedCaseWithEntryId,
+                ],
+                ...curatorMetadata,
+            })
+            .expect(207);
+
+        const unchangedDbCase = await Case.findById(
+            unchangedCaseWithEntryId._id,
+        );
+        // Upload ids were not changed for unchanged case.
+        expect(unchangedDbCase?.caseReference?.uploadIds).toHaveLength(2);
+        expect(unchangedDbCase?.caseReference?.uploadIds[0]).toEqual(
+            unchangedCaseUploadIds[0],
+        );
+        expect(unchangedDbCase?.caseReference?.uploadIds[1]).toEqual(
+            unchangedCaseUploadIds[1],
+        );
+        expect(res.body.numCreated).toBe(2); // Both new cases were created.
+        expect(res.body.numUpdated).toBe(1); // Only changed case was updated.
+
+        // Upload ids were added for changed case.
+        const changedDbCase = await Case.findById(changedCaseWithEntryId._id);
+        expect(changedDbCase?.caseReference?.uploadIds).toHaveLength(3);
+        expect(changedDbCase?.caseReference?.uploadIds[0]).toEqual(
+            newUploadIds[0],
+        );
+        expect(changedDbCase?.caseReference?.uploadIds[1]).toEqual(
+            unchangedCaseUploadIds[0],
+        );
+        expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
+            unchangedCaseUploadIds[1],
+        );
+    });
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
         await existingCase.save();
@@ -521,6 +592,129 @@ describe('POST', () => {
         expect(res.body.errors).toHaveLength(1);
         expect(res.body.errors[0].index).toBe(1);
         expect(res.body.errors[0].message).toMatch('Case validation failed');
+    });
+    describe('download', () => {
+        it('should return 200 OK', async () => {
+            const c = new Case(minimalCase);
+            await c.save();
+            const c2 = new Case(fullCase);
+            await c2.save();
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({})
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(c._id);
+            expect(res.text).toContain(c.caseReference.verificationStatus);
+            expect(res.text).toContain(c.caseReference.sourceId);
+            expect(res.text).toContain(c2._id);
+            expect(res.text).toContain(c2.caseReference.verificationStatus);
+            expect(res.text).toContain(c2.caseReference.sourceId);
+        });
+        it('rejects invalid searches', (done) => {
+            request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:',
+                })
+                .expect(422, done);
+        });
+        it('rejects request bodies with query and caseIds', async (done) => {
+            const c = new Case(minimalCase);
+            await c.save();
+
+            request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:India',
+                    caseIds: [c._id],
+                })
+                .expect(400, done);
+        });
+        it('should filter results with caseIds', async () => {
+            const matchingCase = new Case(minimalCase);
+            await matchingCase.save();
+
+            const matchingCase2 = new Case(minimalCase);
+            await matchingCase2.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    caseIds: [matchingCase._id, matchingCase2._id],
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(matchingCase._id);
+            expect(res.text).toContain(matchingCase2._id);
+            expect(res.text).not.toContain(unmatchedCase._id);
+        });
+        it('should filter results with text query', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
+            const matchingCase = new Case(minimalCase);
+            const matchingNotes = 'matching';
+            matchingCase.notes = matchingNotes;
+            await matchingCase.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            const unmatchedNotes = 'unmatched';
+            unmatchedCase.notes = unmatchedNotes;
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: matchingNotes,
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain(matchingNotes);
+            expect(res.text).toContain(matchingCase._id);
+            expect(res.text).toContain(matchingNotes);
+            expect(res.text).not.toContain(unmatchedCase._id);
+            expect(res.text).not.toContain(unmatchedNotes);
+        });
+        it('should filter results with keyword query', async () => {
+            const matchedCase = new Case(minimalCase);
+            matchedCase.location.country = 'Germany';
+            matchedCase.set('demographics.occupation', 'engineer');
+            await matchedCase.save();
+
+            const unmatchedCase = new Case(minimalCase);
+            await unmatchedCase.save();
+
+            const res = await request(app)
+                .post('/api/cases/download')
+                .send({
+                    query: 'country:Germany',
+                })
+                .expect('Content-Type', 'text/csv')
+                .expect(200);
+            expect(res.text).toContain(
+                '_id,caseReference.verificationStatus,caseReference.sourceId',
+            );
+            expect(res.text).toContain('Germany');
+            expect(res.text).toContain(matchedCase._id);
+            expect(res.text).not.toContain(unmatchedCase._id);
+        });
     });
 });
 
@@ -962,5 +1156,24 @@ describe('DELETE', () => {
             .send({ query: 'gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(1);
+    });
+    it('delete multiple cases cannot go over threshold', async () => {
+        // Simulate index creation used in unit tests, in production they are
+        // setup by the setup-db script and such indexes are not present by
+        // default in the in memory mongo spawned by unit tests.
+        await mongoose.connection.collection('cases').createIndex({
+            notes: 'text',
+        });
+
+        await Promise.all([
+            new Case(minimalCase).set('notes', 'foo').save(),
+            new Case(minimalCase).set('notes', 'foo').save(),
+            new Case(minimalCase).set('notes', 'foo').save(),
+        ]);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        await request(app)
+            .delete('/api/cases')
+            .send({ query: 'foo', maxCasesThreshold: 2 })
+            .expect(422, /more than the maximum allowed/);
     });
 });
