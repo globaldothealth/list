@@ -49,7 +49,25 @@ Serverless Application Model
 Python and executed on a version 3.8 runtime. See set up instructions and
 common commands, below.
 
-### One-time setup
+### Setup for folks without AWS access
+
+If you're a first-time contributor to the project and don't have access to the S3 bucket containing the service account keys, you can run the ingestion and parsing functions fully locally, in the `retrieval/valid_scheduled_event.json`, add this auth param to it:
+
+```json
+"auth": {
+   "email": "local@ingestion.function"
+}
+```
+
+This will make the functions log-in as a new user specified by this email and use the cookies generated for this user instead of the service account creds stored on S3.
+
+Note that this only works in a local environment as the handler to register a user isn't exposed in production for obvious reasons.
+
+Unfortunately there is no way to mount local volumes to store/retrieve source
+contents instead of relying on S3 which means testing e2e locally isn't possible.
+If you want to use another storage system for testing feel free to send a PR.
+
+### One-time setup for people with AWS access
 
 #### Prerequisites
 
@@ -94,6 +112,9 @@ more generally about Python Lambda development
 The points at which the Lambda integration is most apparent are in testing and
 execution of code.
 
+You are free to write the parsers however you like.
+It's best to get inspiration from existing functions though and the only prerequisite for it showing up in the UI once your PR is merged in is that its name must include _"ParsingFunction"_.
+
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
@@ -132,10 +153,10 @@ In your parser package's `input_event.json` set the `s3Key` as `5f311a9795e33800
 Next you can invoke your parsing function:
 
 ```shell
-sam local invoke "MyFunction" -e my/dir/input_event.json --docker-network=host
+sam local invoke "MyParsingFunction" -e my/dir/input_event.json --docker-network=host
 ```
 
-Run this from the base `ingestion/functions` dir. The `MyFunction` name should
+Run this from the base `ingestion/functions` dir. The `MyParsingFunction` name should
 correspond to the name of the resource as defined in the SAM `template.yaml`;
 for more information on the template, read
 [this article](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html).
@@ -149,13 +170,21 @@ is run on pull requests.
 
 ### Writing a parser
 
-At minima, a parser must output a list of cases that conform to the openAPI
+At minima, a parser must generate a list of cases that conform to the openAPI
 specifications.
+
+Its main function must yield cases one by one using [python generators](https://wiki.python.org/moin/Generators). A common library will take care of sending those cases to the server for you.
 
 If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
 
 For geocoding, the parser can either hardcode a location with latitude/longitude included, in which case no geocoding will be attempted on the server.
 If it doesn't have that information it can output a `location.query` which will get geocoded by the server. If geocodes are to be restricted to a certain administrative area level, one can pass the `location.limitToResolution`. Details about those parameters are in the OpenAPI spec for the `NewCase` schema definition.
+
+#### Debugging of parsers
+
+When a parser is running locally via `sam local invoke`, you can access its container by listing the current docker containers with `docker container ps` and then you can inspect the container you want using its ID. This allows you to see which environment variables are set and is useful to debug potential memory exceeded errors or dangling parsers that are waiting to timeout for some obscure reason. Some useful debugging commands include `docker logs <container id>`, `docker container inspect <container id>` and `docker container stats <container id>`.
+
+For live parsers, you can look in the [AWS console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) directly, all `print()` calls are logged to Cloudwatch which is useful for debugging.
 
 ### Deployment
 
@@ -188,9 +217,20 @@ That parser will now import a day worth of data with a lag of 3 days, this delay
 
 ### Handling sources with unstable URLs
 
-If a source has a time-based URL scheme you can use standard Python [date formatting parameters](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes) in the source URL and those will be automatically applied when retrieving the source content.
+If a source has a time-based URL scheme you can use the following date formatting directives in the source URL and those will be automatically applied when retrieving the source content:
 
-For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/%Y-%m-%d.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
+- `$FULLYEAR` is replaced with the 4 digits current year.
+- `$FULLMONTH` is replaced with the 2 digits current month.
+- `$FULLDAY` is replaced with the 2 digits current day of the month.
+- `$MONTH` is replaced with the 1 or 2 digits current month.
+- `$DAY` is replaced with the 1 or 2 digits current day of the month.
+
+For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/$FULLYEAR-$FULLMONTH-$FULLDAY.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
+
+### Encoding of sources
+
+When the retrieval function stores the contents of a source in S3, the data is automatically encoded in utf-8 so that parsers do not have to care about which
+encoding to use when reading the files.
 
 ## Parsers
 
@@ -202,5 +242,7 @@ Here is an overview of parsers written so far and some details about the data th
 |-----------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
 | India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
 | Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided)                                                                                                                                                                                | #483 |
+| Thailand                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/thai)      |                                                                                                                                                                                                                                                                                                     | #516 |
 | Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)  |                                                                                                                                                                                                                                                                                                     | #518 |
 | Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)     |                                                                                                                                                                                                                                                                                                     | #481 |
+| Estonia                     | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/estonia)   |                                                                                                                                                                                                                                                                                                     | #502 |

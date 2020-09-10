@@ -6,10 +6,14 @@ import {
     DialogContentText,
     DialogTitle,
     IconButton,
+    InputAdornment,
     Menu,
     MenuItem,
+    Paper,
+    TablePagination,
     Theme,
     Tooltip,
+    Typography,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
@@ -18,14 +22,15 @@ import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { Autocomplete } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -35,6 +40,7 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
+import fileDownload from 'js-file-download';
 import renderDate from './util/date';
 
 interface ListResponse {
@@ -94,138 +100,214 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
+            backgroundColor: 'white',
             borderRadius: theme.spacing(1),
-            marginTop: theme.spacing(2),
+            marginTop: theme.spacing(1),
         },
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
         },
+        downloadButton: {
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
+        },
+        tableToolbar: {
+            backgroundColor: '#31A497',
+        },
+        toolbarItems: {
+            color: 'white',
+        },
+        topBar: {
+            display: 'flex',
+            alignItems: 'center',
+        },
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
-    searchBarInput: {
-        borderRadius: '8px',
-    },
     searchRoot: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
         display: 'flex',
         alignItems: 'center',
+        flex: 1,
     },
-    tooltip: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
+    divider: {
+        backgroundColor: '#0E7569',
+        height: '40px',
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        width: '1px',
     },
 }));
+
+const StyledSearchTextField = withStyles({
+    root: {
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '& fieldset': {
+                border: '1px solid #0E7569',
+            },
+            '&.Mui-focused fieldset': {
+                border: '1px solid #0E7569',
+            },
+        },
+    },
+})(TextField);
 
 function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
-    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
 
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (): void => {
+        setAnchorEl(null);
+    };
+
+    const clickItem = (text: string): void => {
+        setSearch(search + (search ? ` ${text}:` : `${text}:`));
+        handleClose();
+    };
+
     const classes = searchBarStyles();
     return (
         <div className={classes.searchRoot}>
-            <Autocomplete
-                options={[
-                    'curator:',
-                    'gender:',
-                    'nationality:',
-                    'occupation:',
-                    'country:',
-                    'outcome:',
-                    'caseid:',
-                    'source:',
-                    'uploadid:',
-                    'admin1:',
-                    'admin2:',
-                    'admin3:',
-                ]}
+            <StyledSearchTextField
                 id="search-field"
-                freeSolo
-                value={search}
-                onKeyPress={(ev) => {
+                onKeyPress={(ev): void => {
                     if (ev.key === 'Enter') {
                         ev.preventDefault();
                         props.onSearchChange(search);
-                        setOpen(false);
                     }
                 }}
-                onChange={(ev, val) => {
-                    setSearch(val || '');
+                onChange={(event): void => {
+                    setSearch(event.target.value);
                 }}
-                open={open}
-                onClose={() => setOpen(false)}
-                onOpen={() => setOpen(true)}
+                placeholder="Search"
+                value={search}
+                variant="outlined"
                 fullWidth
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Search"
-                        variant="filled"
-                        InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                            classes: { root: classes.searchBarInput },
-                        }}
-                    />
-                )}
+                InputProps={{
+                    margin: 'dense',
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <Button
+                                color="primary"
+                                startIcon={<FilterListIcon />}
+                                onClick={handleClick}
+                            >
+                                Filter
+                            </Button>
+                            <div className={classes.divider}></div>
+                            <SearchIcon color="primary" />
+                        </InputAdornment>
+                    ),
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <HtmlTooltip
+                                color="primary"
+                                title={
+                                    <React.Fragment>
+                                        <h4>Search syntax</h4>
+                                        <h5>Full text search</h5>
+                                        Example:{' '}
+                                        <i>"got infected at work" -India</i>
+                                        <br />
+                                        You can use arbitrary strings to search
+                                        over those text fields:
+                                        {[
+                                            'notes',
+                                            'curator',
+                                            'occupation',
+                                            'nationalities',
+                                            'ethnicity',
+                                            'country',
+                                            'admin1',
+                                            'admin2',
+                                            'admin3',
+                                            'place',
+                                            'location name',
+                                            'pathogen name',
+                                            'source url',
+                                            'upload ID',
+                                        ].join(', ')}
+                                        <h5>Keywords search</h5>
+                                        Example:{' '}
+                                        <i>
+                                            curator:foo@bar.com,fez@meh.org
+                                            country:Japan gender:female
+                                            occupation:"healthcare worker"
+                                        </i>
+                                        <br />
+                                        Values are OR'ed for the same keyword
+                                        and all keywords are AND'ed.
+                                        <br />
+                                        Keyword values can be quoted for
+                                        multi-words matches and concatenated
+                                        with a comma to union them.
+                                        <br />
+                                        Only equality operator is supported.
+                                        <br />
+                                        Supported keywords are shown when the
+                                        search bar is clicked.
+                                    </React.Fragment>
+                                }
+                                placement="left"
+                            >
+                                <HelpIcon />
+                            </HtmlTooltip>
+                        </InputAdornment>
+                    ),
+                }}
             />
-            <HtmlTooltip
-                className={classes.tooltip}
-                title={
-                    <React.Fragment>
-                        <h4>Search syntax</h4>
-                        <h5>Full text search</h5>
-                        Example: <i>"got infected at work" -India</i>
-                        <br />
-                        You can use arbitrary strings to search over those text
-                        fields:
-                        {[
-                            'notes',
-                            'curator',
-                            'occupation',
-                            'nationalities',
-                            'ethnicity',
-                            'country',
-                            'admin1',
-                            'admin2',
-                            'admin3',
-                            'place',
-                            'location name',
-                            'pathogen name',
-                            'source url',
-                            'upload ID',
-                        ].join(', ')}
-                        <h5>Keywords search</h5>
-                        Example:{' '}
-                        <i>
-                            curator:foo@bar.com,fez@meh.org country:Japan
-                            gender:female occupation:"healthcare worker"
-                        </i>
-                        <br />
-                        Values are OR'ed for the same keyword and all keywords
-                        are AND'ed.
-                        <br />
-                        Keyword values can be quoted for multi-words matches and
-                        concatenated with a comma to union them.
-                        <br />
-                        Only equality operator is supported.
-                        <br />
-                        Supported keywords are shown when the search bar is
-                        clicked.
-                    </React.Fragment>
-                }
-                placement="left"
+            <Menu
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
             >
-                <HelpIcon />
-            </HtmlTooltip>
+                {[
+                    'curator',
+                    'gender',
+                    'nationality',
+                    'occupation',
+                    'country',
+                    'outcome',
+                    'caseid',
+                    'sourceurl',
+                    'uploadid',
+                    'admin1',
+                    'admin2',
+                    'admin3',
+                ].map((text) => (
+                    <MenuItem key={text} onClick={(): void => clickItem(text)}>
+                        {text}
+                    </MenuItem>
+                ))}
+            </Menu>
         </div>
     );
 }
@@ -359,6 +441,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             deleteDialogOpen: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
+        this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
+            this,
+        );
+        this.downloadCases = this.downloadCases.bind(this);
+        this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
     }
 
     componentDidMount(): void {
@@ -407,30 +494,95 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     setCaseVerification(
-        rowData: TableRow,
+        rowData: TableRow[],
         verificationStatus: VerificationStatus,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + rowData.id;
+            const updateUrl = this.state.url + 'batchUpdate';
             this.setState({ error: '' });
-            const response = axios.put(updateUrl, {
-                'caseReference.verificationStatus': verificationStatus,
+            const response = axios.post(updateUrl, {
+                cases: rowData.map((row) => {
+                    return {
+                        _id: row.id,
+                        'caseReference.verificationStatus': verificationStatus,
+                    };
+                }),
             });
             response.then(resolve).catch((e) => {
-                this.setState({ error: e.toString() });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 reject(e);
             });
         });
     }
 
+    setCaseVerificationWithQuery(
+        verificationStatus: VerificationStatus,
+    ): Promise<unknown> {
+        return new Promise((resolve, reject) => {
+            const updateUrl = this.state.url + 'batchUpdateQuery';
+            this.setState({ error: '' });
+            const response = axios.post(updateUrl, {
+                query: this.state.search,
+                case: {
+                    'caseReference.verificationStatus': verificationStatus,
+                },
+            });
+            response.then(resolve).catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+                reject(e);
+            });
+        });
+    }
+
+    downloadCases(): void {
+        const requestBody = this.state.search.trim()
+            ? { query: this.state.search }
+            : {};
+        this.setState({ error: '' });
+        axios
+            .post('/api/cases/download', requestBody)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+            });
+    }
+
+    downloadSelectedCases(): void {
+        let requestBody = {};
+        if (this.hasSelectedRowsAcrossPages()) {
+            requestBody = { query: this.state.search };
+        } else {
+            requestBody = {
+                caseIds: this.state.selectedRowsCurrentPage.map(
+                    (row: TableRow) => row.id,
+                ),
+            };
+        }
+        this.setState({ error: '' });
+        axios
+            .post('/api/cases/download', requestBody)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => {
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
+            });
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
-            <Paper>
+            <>
                 {this.state.error && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        variant="filled"
+                        variant="outlined"
                         severity="error"
                     >
                         {this.state.error}
@@ -441,14 +593,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     this.props.location.state?.newCaseIds.length > 0 &&
                     (this.props.location.state.newCaseIds.length === 1 ? (
                         <MuiAlert
-                            classes={{ root: classes.alert }}
-                            variant="filled"
+                            classes={{
+                                root: classes.alert,
+                            }}
+                            variant="standard"
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.newCaseIds}`}
                                 >
                                     <Button
-                                        color="inherit"
+                                        color="primary"
                                         size="small"
                                         data-testid="view-case-btn"
                                     >
@@ -462,7 +616,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     ) : (
                         <MuiAlert
                             classes={{ root: classes.alert }}
-                            variant="filled"
+                            variant="standard"
                         >
                             {`${this.props.location.state.newCaseIds.length} cases added`}
                         </MuiAlert>
@@ -471,13 +625,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     (this.props.location.state?.editedCaseIds?.length ?? 0) >
                         0 && (
                         <MuiAlert
-                            variant="filled"
+                            variant="standard"
                             classes={{ root: classes.alert }}
                             action={
                                 <Link
                                     to={`/cases/view/${this.props.location.state.editedCaseIds}`}
                                 >
-                                    <Button color="inherit" size="small">
+                                    <Button color="primary" size="small">
                                         VIEW
                                     </Button>
                                 </Link>
@@ -489,19 +643,29 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 {this.props.location.state?.bulkMessage && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
-                        severity="info"
-                        variant="outlined"
+                        variant="standard"
                     >
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <SearchBar
-                    searchQuery={this.state.search}
-                    onSearchChange={(search: string): void => {
-                        this.setState({ search: search });
-                        this.tableRef.current.onQueryChange();
-                    }}
-                ></SearchBar>
+                <div className={classes.topBar}>
+                    <SearchBar
+                        searchQuery={this.state.search}
+                        onSearchChange={(search: string): void => {
+                            this.setState({ search: search });
+                            this.tableRef.current.onQueryChange();
+                        }}
+                    ></SearchBar>
+                    <Button
+                        className={classes.downloadButton}
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.downloadCases}
+                        startIcon={<SaveAltIcon />}
+                    >
+                        Download
+                    </Button>
+                </div>
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
@@ -700,6 +864,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     }
                                     this.setState({
                                         totalNumRows: result.data.total,
+                                        selectedRowsCurrentPage: [],
+                                        numSelectedRows: 0,
                                     });
                                     resolve({
                                         data: flattenedCases,
@@ -708,16 +874,43 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: e.toString() });
+                                    this.setState({
+                                        error:
+                                            e.response?.data?.message ||
+                                            e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })
                     }
-                    title="COVID-19 cases"
                     components={{
+                        Container: (props): JSX.Element => (
+                            <Paper elevation={0} {...props}></Paper>
+                        ),
+                        Pagination: (props): JSX.Element => {
+                            return this.state.numSelectedRows === 0 ? (
+                                <div className={classes.tablePaginationBar}>
+                                    <Typography>Linelist</Typography>
+                                    <span className={classes.spacer}></span>
+                                    <TablePagination
+                                        {...props}
+                                        classes={{
+                                            ...props.classes,
+                                            root: classes.paginationRoot,
+                                        }}
+                                    ></TablePagination>
+                                </div>
+                            ) : (
+                                <></>
+                            );
+                        },
                         Toolbar: (props): JSX.Element => (
                             <MTableToolbar
                                 {...props}
+                                classes={{
+                                    highlight: classes.tableToolbar,
+                                    title: classes.toolbarItems,
+                                }}
                                 toolbarButtonAlignment="left"
                             />
                         ),
@@ -743,9 +936,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
-                        selection: this.props.user.roles.includes('curator'),
+                        selection:
+                            this.props.user.roles.includes('curator') ||
+                            this.props.user.roles.includes('admin'),
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        paginationPosition: 'top',
+                        toolbar: this.state.numSelectedRows > 0,
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
@@ -758,7 +955,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             (
                                 this.props.location.state?.editedCaseIds ?? []
                             ).includes(rowData.id)
-                                ? { backgroundColor: '#E7EFED' }
+                                ? { backgroundColor: '#F0FBF9' }
                                 : {},
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
@@ -771,131 +968,163 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         }
                     }}
                     actions={
-                        this.props.user.roles.includes('curator')
+                        this.props.user.roles.includes('curator') ||
+                        this.props.user.roles.includes('admin')
                             ? [
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <Button variant="outlined">
-                                              {this.state.totalNumRows ===
-                                              this.state.numSelectedRows
-                                                  ? 'Unselect'
-                                                  : 'Select'}{' '}
-                                              all {this.state.totalNumRows} rows
-                                          </Button>
-                                      ),
-                                      tooltip: `
+                                  // Only allow selecting rows across pages if
+                                  // there is a search query.
+                                  ...(this.state.search.trim() !== ''
+                                      ? [
+                                            {
+                                                icon: (): JSX.Element => (
+                                                    <Button
+                                                        classes={{
+                                                            root:
+                                                                classes.toolbarItems,
+                                                        }}
+                                                    >
+                                                        {this.state
+                                                            .totalNumRows ===
+                                                        this.state
+                                                            .numSelectedRows
+                                                            ? 'Unselect'
+                                                            : 'Select'}{' '}
+                                                        all{' '}
+                                                        {
+                                                            this.state
+                                                                .totalNumRows
+                                                        }{' '}
+                                                        rows
+                                                    </Button>
+                                                ),
+                                                tooltip: `
                                       ${
                                           this.state.totalNumRows ===
                                           this.state.numSelectedRows
                                               ? 'Unselect'
                                               : 'Select'
                                       } all rows across pages`,
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                onClick: async (
+                                                    _: any,
+                                                    rows: any,
+                                                ): Promise<void> => {
+                                                    const shouldSelectAll =
+                                                        this.state
+                                                            .totalNumRows !==
+                                                        this.state
+                                                            .numSelectedRows;
+                                                    await this.tableRef.current.onAllSelected(
+                                                        shouldSelectAll,
+                                                    );
+                                                    this.setState({
+                                                        numSelectedRows: shouldSelectAll
+                                                            ? this.state
+                                                                  .totalNumRows
+                                                            : 0,
+                                                    });
+                                                },
+                                            },
+                                        ]
+                                      : []),
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <VerifiedIcon data-testid="verify-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
+                                      tooltip: 'Verify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                       onClick: async (
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
-                                          const shouldSelectAll =
-                                              this.state.totalNumRows !==
-                                              this.state.numSelectedRows;
-                                          await this.tableRef.current.onAllSelected(
-                                              shouldSelectAll,
-                                          );
-                                          this.setState({
-                                              numSelectedRows: shouldSelectAll
-                                                  ? this.state.totalNumRows
-                                                  : 0,
-                                          });
-                                      },
-                                  },
-                                  {
-                                      icon: (): JSX.Element => (
-                                          <VerifiedIcon data-testid="verify-action" />
-                                      ),
-                                      tooltip: 'Verify selected rows',
-                                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Verified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Verified,
+                                              );
                                           }
-                                          const updatePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.setCaseVerification(
-                                                      row,
-                                                      VerificationStatus.Verified,
-                                                  ),
-                                          );
-                                          Promise.all(updatePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
-                                              },
-                                          );
+                                          this.tableRef.current.onQueryChange();
                                       },
                                   },
                                   {
                                       icon: (): JSX.Element => (
                                           <UnverifiedIcon data-testid="unverify-action" />
                                       ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
                                       tooltip: 'Unverify selected rows',
                                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                      onClick: (_: any, rows: any): void => {
+                                      onClick: async (
+                                          _: any,
+                                          rows: any,
+                                      ): Promise<void> => {
                                           if (
                                               this.hasSelectedRowsAcrossPages()
                                           ) {
-                                              // TODO: Implement action for all rows
-                                              alert(
-                                                  'Action not yet implemented when all rows selected',
+                                              await this.setCaseVerificationWithQuery(
+                                                  VerificationStatus.Unverified,
                                               );
-                                              return;
+                                          } else {
+                                              await this.setCaseVerification(
+                                                  rows,
+                                                  VerificationStatus.Unverified,
+                                              );
                                           }
-                                          const updatePromises = rows.map(
-                                              (row: TableRow) =>
-                                                  this.setCaseVerification(
-                                                      row,
-                                                      VerificationStatus.Unverified,
-                                                  ),
-                                          );
-                                          Promise.all(updatePromises).then(
-                                              () => {
-                                                  this.tableRef.current.onQueryChange();
-                                              },
-                                          );
+                                          this.tableRef.current.onQueryChange();
                                       },
                                   },
-                                  // Only allow deleting all rows if there is a search query.
-                                  ...(this.state.totalNumRows !==
-                                      this.state.numSelectedRows ||
-                                  this.state.search.trim() !== ''
-                                      ? [
-                                            // This action is for deleting selected rows.
-                                            // The action for deleting single rows is in the
-                                            // RowMenu function.
-                                            {
-                                                icon: (): JSX.Element => (
-                                                    <span aria-label="delete all">
-                                                        <DeleteIcon />
-                                                    </span>
-                                                ),
-                                                tooltip: 'Delete selected rows',
-                                                onClick: (): void => {
-                                                    this.setState({
-                                                        deleteDialogOpen: true,
-                                                    });
-                                                },
-                                            },
-                                        ]
-                                      : []),
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <span aria-label="download selected rows">
+                                              <SaveAltIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
+                                          </span>
+                                      ),
+                                      tooltip: 'Download selected rows',
+                                      onClick: (): void => {
+                                          this.downloadSelectedCases();
+                                      },
+                                  },
+                                  // This action is for deleting selected rows.
+                                  // The action for deleting single rows is in the
+                                  // RowMenu function.
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <span aria-label="delete all">
+                                              <DeleteIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
+                                          </span>
+                                      ),
+                                      tooltip: 'Delete selected rows',
+                                      onClick: (): void => {
+                                          this.setState({
+                                              deleteDialogOpen: true,
+                                          });
+                                      },
+                                  },
                               ]
                             : []
                     }
                 />
-            </Paper>
+            </>
         );
     }
 }

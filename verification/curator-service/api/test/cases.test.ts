@@ -260,7 +260,35 @@ describe('Cases', () => {
         expect(mockedAxios.delete).toHaveBeenCalledWith(
             'http://localhost:3000/api/cases',
             {
-                data: { caseIds: ['5e99f21a1c9d440000ceb088'] },
+                data: {
+                    caseIds: ['5e99f21a1c9d440000ceb088'],
+                    maxCasesThreshold: 10000,
+                },
+            },
+        );
+    });
+
+    it('does not set maxCasesThreshold for admins', async () => {
+        mockedAxios.delete.mockResolvedValueOnce({
+            status: 204,
+            statusText: 'Cases deleted',
+        });
+        const adminRequest = supertest.agent(app);
+        await adminRequest
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['reader', 'curator', 'admin'] } })
+            .expect(200);
+        await adminRequest
+            .delete('/api/cases')
+            .send({ caseIds: ['5e99f21a1c9d440000ceb088'] })
+            .expect(204);
+        expect(mockedAxios.delete).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.delete).toHaveBeenCalledWith(
+            'http://localhost:3000/api/cases',
+            {
+                data: {
+                    caseIds: ['5e99f21a1c9d440000ceb088'],
+                },
             },
         );
     });
@@ -358,8 +386,8 @@ describe('Cases', () => {
             .mockResolvedValueOnce({
                 status: 207,
                 data: {
-                    createdCaseIds: ['abc', 'def'],
-                    updatedCaseIds: [],
+                    numCreated: 2,
+                    numUpdated: 0,
                 },
             });
         const res = await curatorRequest
@@ -380,8 +408,8 @@ describe('Cases', () => {
             .expect('Content-Type', /json/);
         expect(mockedAxios.post).toHaveBeenCalledTimes(2);
         expect(res.body.phase).toBe('UPSERT');
-        expect(res.body.createdCaseIds).toHaveLength(2);
-        expect(res.body.updatedCaseIds).toHaveLength(0);
+        expect(res.body.numCreated).toBe(2);
+        expect(res.body.numUpdated).toBe(0);
         expect(res.body.errors).toHaveLength(0);
     });
 
@@ -420,8 +448,8 @@ describe('Cases', () => {
         expect(mockedAxios.post).not.toHaveBeenCalled();
         expect(mockedAxios.put).not.toHaveBeenCalled();
         expect(res.body.phase).toBe('GEOCODE');
-        expect(res.body.createdCaseIds).toHaveLength(0);
-        expect(res.body.updatedCaseIds).toHaveLength(0);
+        expect(res.body.numCreated).toBe(0);
+        expect(res.body.numUpdated).toBe(0);
         expect(res.body.errors).toEqual([
             {
                 index: 1,
@@ -475,8 +503,8 @@ describe('Cases', () => {
         expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(mockedAxios.put).not.toHaveBeenCalled();
         expect(res.body.phase).toBe('VALIDATE');
-        expect(res.body.createdCaseIds).toHaveLength(0);
-        expect(res.body.updatedCaseIds).toHaveLength(0);
+        expect(res.body.numCreated).toBe(0);
+        expect(res.body.numUpdated).toBe(0);
         expect(res.body.errors).toEqual(validationErrors);
     });
 
@@ -519,6 +547,92 @@ describe('Cases', () => {
             })
             .expect(code);
         expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+        expect(res.text).toEqual(message);
+    });
+
+    it('proxies valid batch update calls', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 200,
+            data: { numModified: 2 },
+        });
+        const res = await curatorRequest
+            .post('/api/cases/batchUpdate')
+            .send({
+                cases: [
+                    {
+                        age: '42',
+                    },
+                    {
+                        age: '42',
+                    },
+                ],
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(res.body.numModified).toEqual(2);
+    });
+
+    it('batch update forwards server errors from proxied update', async () => {
+        const code = 500;
+        const message = 'Server error';
+        mockedAxios.post.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+
+        const res = await curatorRequest
+            .post('/api/cases/batchUpdate')
+            .send({
+                cases: [
+                    {
+                        age: '42',
+                    },
+                    {
+                        age: '42',
+                    },
+                ],
+            })
+            .expect(code);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(res.text).toEqual(message);
+    });
+
+    it('proxies valid batch update query calls', async () => {
+        mockedAxios.post.mockResolvedValueOnce({
+            status: 200,
+            data: { numModified: 2 },
+        });
+        const res = await curatorRequest
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                case: {
+                    age: '42',
+                },
+                query: 'test case',
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+        expect(res.body.numModified).toEqual(2);
+    });
+
+    it('batch update query forwards server errors from proxied update', async () => {
+        const code = 500;
+        const message = 'Server error';
+        mockedAxios.post.mockRejectedValueOnce({
+            response: { status: code, data: message },
+        });
+
+        const res = await curatorRequest
+            .post('/api/cases/batchUpdateQuery')
+            .send({
+                case: {
+                    age: '42',
+                },
+                query: 'test case',
+            })
+            .expect(code);
+        expect(mockedAxios.post).toHaveBeenCalledTimes(1);
         expect(res.text).toEqual(message);
     });
 

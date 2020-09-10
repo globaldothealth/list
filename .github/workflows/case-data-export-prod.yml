@@ -37,8 +37,8 @@ jobs:
           pip install -r data-serving/scripts/export-data/requirements.txt
       - name: Create gzip of CSV and JSON prod case data
         run: |
-          python3 data-serving/scripts/export-data/export.py -mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format csv
-          python3 data-serving/scripts/export-data/export.py -mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format json
+          python3 data-serving/scripts/export-data/export.py --mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format csv --fields data-serving/scripts/export-data/case_fields.yaml
+          python3 data-serving/scripts/export-data/export.py --mongodb_connection_string "${{ secrets.DB_CONNECTION_URL_PROD }}" --format json --fields data-serving/scripts/export-data/case_fields.yaml
           tar -cvzf data/cases.tar.gz cases.csv cases.json
 
       - name: Commit files

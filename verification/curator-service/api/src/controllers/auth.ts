@@ -6,14 +6,18 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
 
-import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import {
+    Strategy as BearerStrategy,
+    IVerifyOptions,
+} from 'passport-http-bearer';
 import { Router } from 'express';
 import axios from 'axios';
 import passport from 'passport';
 
-// mustBeAuthenticated is a middleware that checks that the user making the call is
-// authenticated.
-// Subsequent request handlers can be assured req.user will be defined.
+/**
+ * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
+ * Subsequent request handlers can be assured req.user will be defined.
+ */
 export const mustBeAuthenticated = (
     req: Request,
     res: Response,
@@ -25,6 +29,11 @@ export const mustBeAuthenticated = (
     res.sendStatus(403);
 };
 
+/**
+ * Checks roles of a user against a set of required roles.
+ * @param user the user to check roles for.
+ * @param requiredRoles The set of roles that the user should have, if any role matches the function returns true.
+ */
 const userHasRequiredRole = (
     user: UserDocument,
     requiredRoles: Set<string>,
@@ -59,15 +68,31 @@ export const mustHaveAnyRole = (requiredRoles: string[]) => {
                     req.user = user;
                     return next();
                 } else {
-                    res.status(403).json(
-                        `access is restricted to users with ${requiredRoles} roles`,
-                    );
+                    res.status(403).json({
+                        message: `access is restricted to users with ${requiredRoles} roles`,
+                    });
                 }
             })(req, res, next);
         }
     };
 };
 
+/** GoogleProfile extends passport's default Profile with Google specific fields */
+interface GoogleProfile extends Profile {
+    // Unique profile ID
+    id: string;
+    // List of profile pictures.
+    photos: [{ value: string }];
+    // Full name of the user.
+    displayName: string;
+    // List of emails belonging to the profile.
+    // Unclear as to when multiple ones are possible.
+    emails: [{ value: string }];
+}
+
+/**
+ * AuthController handles authentication of users with the system.
+ */
 export class AuthController {
     public router: Router;
     constructor(private readonly afterLoginRedirURL: string) {
@@ -108,7 +133,9 @@ export class AuthController {
         );
     }
 
-    // configureLocalAuth will get or create the user present in the request.
+    /**
+     * configureLocalAuth will get or create the user present in the request.
+     */
     configureLocalAuth(): void {
         console.log('Configuring local auth for tests');
         // /register creates a user if necessary and log them in.
@@ -133,6 +160,12 @@ export class AuthController {
             },
         );
     }
+
+    /**
+     * Configures OAuth passport strategy.
+     * @param clientID the OAuth client ID as gotten from the Google developer console.
+     * @param clientSecret the OAuth client secret as gotten from the Google developer console.
+     */
     configurePassport(clientID: string, clientSecret: string): void {
         passport.serializeUser<UserDocument, string>((user, done) => {
             // Serializes the user id in the cookie, no user info should be in there, just the id.
@@ -171,19 +204,33 @@ export class AuthController {
                     profile: Profile,
                     cb: VerifyCallback,
                 ): Promise<void> => {
+                    const googleProfile = profile as GoogleProfile;
                     try {
                         // Passport got our user profile from google.
                         // Find or create a correpsonding user in our DB.
-                        let user = await User.findOne({ googleID: profile.id });
+                        let user = await User.findOne({
+                            googleID: googleProfile.id,
+                        });
+                        const picture = profile.photos?.[0].value;
                         if (!user) {
                             user = await User.create({
-                                googleID: profile['id'],
+                                googleID: googleProfile.id,
                                 name: profile.displayName,
                                 email: (profile.emails || []).map(
                                     (v) => v.value,
                                 )[0],
                                 roles: [],
+                                picture: picture,
                             });
+                        }
+                        if (picture !== user.picture) {
+                            console.log(
+                                'User has a different picture, updating it',
+                            );
+                            user = await User.findOneAndUpdate(
+                                { googleID: googleProfile.id },
+                                { picture: picture },
+                            );
                         }
                         cb(undefined, user);
                     } catch (e) {
@@ -197,7 +244,14 @@ export class AuthController {
         // Configure passport to accept HTTP bearer tokens.
         passport.use(
             new BearerStrategy(
-                async (token: string, done: Function): Promise<void> => {
+                async (
+                    token: string,
+                    done: (
+                        error: unknown,
+                        user?: unknown,
+                        options?: IVerifyOptions | string,
+                    ) => void,
+                ): Promise<void> => {
                     try {
                         const response = await axios.get(
                             `https://openidconnect.googleapis.com/v1/userinfo?access_token=${token}`,

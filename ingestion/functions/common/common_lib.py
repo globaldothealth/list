@@ -37,16 +37,16 @@ class UploadError(Enum):
     VALIDATION_ERROR = 8
 
 
-def create_upload_record(env, source_id, headers):
+def create_upload_record(env, source_id, headers, cookies):
     """Creates an upload resource via the G.h Source API."""
     post_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads"
     print(f"Creating upload via {post_api_url}")
     res = requests.post(post_api_url,
                         json={"status": "IN_PROGRESS", "summary": {}},
+                        cookies=cookies,
                         headers=headers)
     if res and res.status_code == 201:
         res_json = res.json()
-        # TODO: Look for "errors" in res_json and handle them in some way.
         return res_json["_id"]
     e = RuntimeError(
         f'Error creating upload record, status={res.status_code}, response={res.text}')
@@ -54,7 +54,7 @@ def create_upload_record(env, source_id, headers):
 
 
 def finalize_upload(
-        env, source_id, upload_id, headers, count_created=None,
+        env, source_id, upload_id, headers, cookies, count_created=None,
         count_updated=None, error=None):
     """Records the results of an upload via the G.h Source API."""
     put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
@@ -65,18 +65,16 @@ def finalize_upload(
         "summary": {"numCreated": count_created, "numUpdated": count_updated}}
     res = requests.put(put_api_url,
                        json=update,
-                       headers=headers)
-    # TODO: Look for "errors" in res_json and handle them in some way.
+                       headers=headers,
+                       cookies=cookies)
     if not res or res.status_code != 200:
-        e = RuntimeError(
+        raise RuntimeError(
             f'Error updating upload record, status={res.status_code}, response={res.text}')
-        complete_with_error(e, env, UploadError.INTERNAL_ERROR,
-                            source_id, upload_id, headers)
 
 
 def complete_with_error(
         exception, env=None, upload_error=None, source_id=None, upload_id=None,
-        headers=None):
+        headers=None, cookies=None):
     """
     Logs and raises the provided exception.
 
@@ -85,9 +83,26 @@ def complete_with_error(
     """
     print(exception)
     if env and upload_error and source_id and upload_id:
-        finalize_upload(env, source_id, upload_id, headers,
+        finalize_upload(env, source_id, upload_id, headers, cookies,
                         error=upload_error)
     raise exception
+
+
+def login(email: str):
+    """Logs-in a local curator server instance for testing.
+
+    Returns the cookie of the now logged-in user.
+    """
+    print('Logging-in user', email)
+    endpoint = "http://localhost:3001/auth/register"
+    res = requests.post(endpoint, json={
+        "email": email,
+        "roles": ['curator', 'reader'],
+    })
+    if not res or res.status_code != 200:
+        raise RuntimeError(
+            f'Error registering local user, status={res.status_code}, response={res.text}')
+    return res.cookies
 
 
 def obtain_api_credentials(s3_client):

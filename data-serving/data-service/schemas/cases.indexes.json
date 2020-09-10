@@ -5,7 +5,6 @@
             "notes": "text",
             "revisionMetadata.creationMetadata.curator": "text",
             "demographics.occupation": "text",
-            "demographics.nationalities": "text",
             "demographics.ethnicity": "text",
             "location.country": "text",
             "location.administrativeAreaLevel1": "text",
@@ -31,12 +30,12 @@
         }
     },
     {
-        "name": "uploadIdIdx",
+        "name": "uploadIdsIdx",
         "key": {
-            "caseReference.uploadId": -1
+            "caseReference.uploadIds": -1
         },
         "partialFilterExpression": {
-            "caseReference.uploadId": {
+            "caseReference.uploadIds.0": {
                 "$exists": true
             }
         }
@@ -45,18 +44,145 @@
         "name": "eventNamesIdx",
         "key": {
             "events.name": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
         }
     },
     {
         "name": "countriesIdx",
         "key": {
             "location.country": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
         }
     },
     {
         "name": "travelHistoryCountriesIdx",
         "key": {
             "travelHistory.travel.location.country": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "demographicsGenderIdx",
+        "key": {
+            "demographics.gender": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "demographicsOccupationIdx",
+        "key": {
+            "demographics.occupation": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "demographicsNationalitiesIdx",
+        "key": {
+            "demographics.nationalities": -1
+        },
+        "partialFilterExpression": {
+            "demographics.nationalities.0": {
+                "$exists": true
+            }
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "demographicsEthnicityIdx",
+        "key": {
+            "demographics.ethnicity": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "locationAdmin1Idx",
+        "key": {
+            "location.administrativeAreaLevel1": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "locationAdmin2Idx",
+        "key": {
+            "location.administrativeAreaLevel2": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "locationAdmin3Idx",
+        "key": {
+            "location.administrativeAreaLevel3": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "pathogenIdx",
+        "key": {
+            "pathogen.name": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceCreationMetadataCuratorIdx",
+        "key": {
+            "caseReference.creationMetadata.curator": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceUpdateMetadataCuratorIdx",
+        "key": {
+            "caseReference.updateMetadata.curator": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "revisionMetadataCreationMetadataDate",
+        "key": {
+            "revisionMetadata.creationMetadata.date": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
         }
     }
 ]

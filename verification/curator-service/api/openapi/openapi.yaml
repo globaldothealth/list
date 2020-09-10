@@ -34,10 +34,16 @@ paths:
       tags:
         - Auth
         - User
-      summary: Authorize a user for the given roles
+      summary: >
+        Creates a local user for testing.The user can have any specified roles
+        in the request and the returned cookies can be used for subsequent
+        requests acting as this new user.
+        Note that this endpoint is only exposed in a local environment.
+      servers:
+        - url: http://localhost:3001/api
       operationId: registerAuth
       requestBody:
-        description: User to authorize
+        description: User to register
         required: true
         content:
           application/json:
@@ -236,6 +242,15 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: changes_only
+          in: query
+          description: > 
+            Filters the list of uploads to only return uploads that created or
+            modified cases
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           $ref: "#/components/responses/200UploadsArray"
@@ -316,6 +331,16 @@ paths:
           $ref: "#/components/responses/404"
         "422":
           $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /sources/parsers:
+    get:
+      summary: Lists parsers available for automated ingestion
+      tags: [Suggest]
+      operationId: listParsers
+      responses:
+        "200":
+          $ref: "#/components/responses/200ParsersArray"
         "500":
           $ref: "#/components/responses/500"
   /cases:
@@ -459,7 +484,7 @@ paths:
                     Cases matching this query will be deleted. Must contain
                     non-whitespace characters.
                   type: string
-                  pattern: ^(?!\s*$).+
+                  pattern: \S+
               oneOf:
                 - required: [caseIds]
                 - required: [query]
@@ -472,6 +497,41 @@ paths:
           $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/download:
+    post:
+      summary: >
+        Streams a CSV attachment of all cases. If a query is supplied the
+        CSV only contains cases matching the search query. If caseIds are
+        supplied the CSV only contains cases with those ids. You cannot supply
+        both query and caseIds.
+      tags: [Case]
+      operationId: downloadCases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              maxProperties: 1
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will returned
+                  type: array
+                  items:
+                    type: string
+                    pattern: '^[a-f\d]{24}$'
+                query:
+                  description: >
+                    Cases matching this query will be returned. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+      responses:
+        "200":
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/symptoms:
@@ -566,6 +626,61 @@ paths:
           $ref: "#/components/responses/200BatchCaseUpsert"
         "207":
           $ref: "#/components/responses/207BatchCaseUpsert"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdate:
+    post:
+      summary: Batch updates cases
+      tags: [Case]
+      operationId: batchUpdateCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseArray"
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/batchUpdateQuery:
+    post:
+      summary: Batch updates cases that match the query property
+      tags: [Case]
+      operationId: batchUpdateQueryCases
+      requestBody:
+        description: Cases to update
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                query:
+                  description: >
+                    Cases matching this query will be updated. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                case:
+                  description: >
+                    The case fields that all matching cases will be updated to.
+                  $ref: "#/components/schemas/Case"
+              required:
+                - query
+                - case
+      responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpdateResponse"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
         "500":
           $ref: "#/components/responses/500"
   /cases/{id}:
@@ -755,6 +870,19 @@ paths:
           $ref: "#/components/responses/500"
 components:
   schemas:
+    Parser:
+      description: A parser for automated ingestion
+      type: object
+      properties:
+        name:
+          type: string
+          description: The Lambda name
+          example: epid-ingestion-CHZurichParsingFunction-1L624HBVU0E56
+    ParsersArray:
+      type: array
+      items:
+        description: An array of parsers
+        $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
       type: object
@@ -863,7 +991,7 @@ components:
               properties:
                 awsLambdaArn:
                   type: string
-                  pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
+                  #pattern: '^arn\:aws\:lambda\:.+\:.+\:function\:.+'
                   example: arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-IndiaParsingFunction-J20HSC838QT6
             regexParsing:
               type: object
@@ -922,18 +1050,19 @@ components:
               type: string
               description: URL of the source this case was extracted from
               example: https://api.covid19india.org/raw_data7.json
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-                example: example: 5ef22491937717c3331c3729
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
-                correctness.
+                correctness. For new cases, if this field isn't provided, a
+                default value of UNVERIFIED will be used.
               type: string
               enum:
                 - UNVERIFIED
@@ -958,6 +1087,8 @@ components:
               description: >
                 Age bracket, start is included, end is excluded if different
                 than start.
+                If no end is specified it means that the age bracket is from
+                start and above.
               properties:
                 start:
                   type: number
@@ -1001,6 +1132,7 @@ components:
                 description: >
                   For outcome event, value can be Death or Recovered.
                   For icuAdmission and hospitalAdmission, value can be Yes or No.
+                  For confirmed event, the value can be the method of confirmation (i.e. "PCR test").
                 example: Recovered
           example:
             - name: confirmed
@@ -1356,6 +1488,13 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Location"
+    BatchCaseUpdateResponse:
+      description: Response to batch update cases API requests
+      properties:
+        numModified:
+          type: number
+      required:
+        - numModified
     BatchCaseUpsertResponse:
       description: Response to batch upsert case API requests
       properties:
@@ -1366,18 +1505,16 @@ components:
             - GEOCODE
             - VALIDATE
             - UPSERT
-        createdCaseIds:
-          type: array
-          description: UUIDs of cases created by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
-        updatedCaseIds:
-          type: array
-          description: UUIDs of cases updated by the batch upsert
-          items:
-            type: string
-            example: 5f204ed6b986091d868a6ae4
+        numCreated:
+          type: number
+          description: The number of cases created by the request.
+        numUpdated:
+          type: number
+          description: >
+            The number of cases modified by the request. Note that this only
+            includes cases that are actually modified by the batch upsert. If a
+            case is included in the batch upsert request, but contains no
+            changes compared to the currently stored case, it won't be counted.
         errors:
           type: array
           items:
@@ -1395,8 +1532,8 @@ components:
               - message
       required:
         - phase
-        - createdCaseIds
-        - updatedCaseIds
+        - numCreated
+        - numUpdated
         - errors
   responses:
     "200Auth":
@@ -1405,6 +1542,12 @@ components:
         application/json:
           schema:
             type: object
+    "200BatchCaseUpdateResponse":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchCaseUpdateResponse"
     "200BatchCaseUpsert":
       description: OK
       content:
@@ -1429,6 +1572,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200SymptomArray":
       description: OK
       content:
@@ -1485,6 +1634,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Retrieval"
+    "200ParsersArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ParsersArray"
     "200Upload":
       description: OK
       content:

@@ -4,18 +4,24 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 
-class InvalidParamError extends Error { }
+// Don't set client-side timeouts for requests to the data service.
+// TODO: Make this more fine-grained once we fix
+//   https://github.com/globaldothealth/list/issues/961.
+axios.defaults.timeout = 0;
+
+class InvalidParamError extends Error {}
 
 /**
- * CasesController forwards requests to the data service.
+ * CasesController mostly forwards case-related requests to the data service.
  * It handles CRUD operations from curators.
  */
 export default class CasesController {
     constructor(
         private readonly dataServerURL: string,
         private readonly geocoders: Geocoder[],
-    ) { }
+    ) {}
 
+    /** List simply forwards the request to the data service */
     list = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -32,6 +38,36 @@ export default class CasesController {
         }
     };
 
+    /** Download forwards the request to the data service and streams the
+     * streamed response as a csv attachment. */
+    download = async (req: Request, res: Response): Promise<void> => {
+        try {
+            axios({
+                method: 'post',
+                url: this.dataServerURL + '/api' + req.url,
+                data: req.body,
+                responseType: 'stream',
+            }).then((response) => {
+                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader(
+                    'Content-Disposition',
+                    'attachment; filename="cases.csv"',
+                );
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Pragma', 'no-cache');
+                response.data.pipe(res);
+            });
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    /** listSymptoms simply forwards the request to the data service */
     listSymptoms = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -48,6 +84,7 @@ export default class CasesController {
         }
     };
 
+    /** listPlacesOfTransmission simply forwards the request to the data service */
     listPlacesOfTransmission = async (
         req: Request,
         res: Response,
@@ -67,6 +104,7 @@ export default class CasesController {
         }
     };
 
+    /** listOccupations simply forwards the request to the data service */
     listOccupations = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -83,6 +121,7 @@ export default class CasesController {
         }
     };
 
+    /** get simply forwards the request to the data service */
     get = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.get(
@@ -99,8 +138,14 @@ export default class CasesController {
         }
     };
 
+    /** batchDel simply forwards the request to the data service */
     batchDel = async (req: Request, res: Response): Promise<void> => {
         try {
+            // Limit number of deletes a non-admin can do.
+            // Cf. https://github.com/globaldothealth/list/issues/937.
+            if (!(req.user as UserDocument)?.roles?.includes('admin')) {
+                req.body['maxCasesThreshold'] = 10000;
+            }
             const response = await axios.delete(
                 this.dataServerURL + '/api' + req.url,
                 { data: req.body },
@@ -116,6 +161,7 @@ export default class CasesController {
         }
     };
 
+    /** del simply forwards the request to the data service */
     del = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.delete(
@@ -132,6 +178,7 @@ export default class CasesController {
         }
     };
 
+    /** update simply forwards the request to the data service */
     update = async (req: Request, res: Response): Promise<void> => {
         try {
             const response = await axios.put(
@@ -152,12 +199,17 @@ export default class CasesController {
         }
     };
 
+    /**
+     * upsert will try to geocode the location found in the request if needed
+     * and then will forwards the request with the added geolocation to the
+     * data service
+     */
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.put(
@@ -170,7 +222,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -178,7 +230,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -203,8 +255,8 @@ export default class CasesController {
             if (geocodeErrors.length > 0) {
                 res.status(207).send({
                     phase: 'GEOCODE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: geocodeErrors,
                 });
                 return;
@@ -219,8 +271,8 @@ export default class CasesController {
             if (validationResponse.data.errors.length > 0) {
                 res.status(207).send({
                     phase: 'VALIDATE',
-                    createdCaseIds: [],
-                    updatedCaseIds: [],
+                    numCreated: 0,
+                    numUpdated: 0,
                     errors: validationResponse.data.errors,
                 });
                 return;
@@ -237,8 +289,8 @@ export default class CasesController {
             );
             res.status(200).send({
                 phase: 'UPSERT',
-                createdCaseIds: upsertResponse.data.createdCaseIds,
-                updatedCaseIds: upsertResponse.data.updatedCaseIds,
+                numCreated: upsertResponse.data.numCreated,
+                numUpdated: upsertResponse.data.numUpdated,
                 errors: [],
             });
             return;
@@ -252,12 +304,76 @@ export default class CasesController {
         }
     };
 
+    /**
+     * batchUpdate simply forwards the request to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
+    batchUpdate = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const updateResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpdate',
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
+                { maxContentLength: Infinity },
+            );
+            res.status(200).send({
+                numModified: updateResponse.data.numModified,
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    /**
+     * batchUpdateQuery simply forwards the request to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
+    batchUpdateQuery = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const updateResponse = await axios.post(
+                this.dataServerURL + '/api/cases/batchUpdateQuery',
+                {
+                    ...req.body,
+                    curator: { email: (req.user as UserDocument).email },
+                },
+                { maxContentLength: Infinity },
+            );
+            res.status(200).send({
+                numModified: updateResponse.data.numModified,
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            if (err.response?.status && err.response?.data) {
+                res.status(err.response.status).send(err.response.data);
+                return;
+            }
+            res.status(500).send(err);
+        }
+    };
+
+    /**
+     * create tries to geocode the location of the case if needed and then
+     * forwards the query to the data service.
+     * It does set the curator in the request to the data service based on the
+     * currently logged-in user.
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!(await this.geocode(req))) {
-                res.status(404).send(
-                    `no geolocation found for ${req.body['location']?.query}`,
-                );
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
                 return;
             }
             const response = await axios.post(
@@ -270,7 +386,7 @@ export default class CasesController {
             res.status(response.status).json(response.data);
         } catch (err) {
             if (err instanceof InvalidParamError) {
-                res.status(422).send(err.message);
+                res.status(422).send(err);
                 return;
             }
             console.log(err);
@@ -278,7 +394,7 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
-            res.status(500).send(err.message);
+            res.status(500).send(err);
         }
     };
 
@@ -334,7 +450,7 @@ export default class CasesController {
      * Perform geocoding for each case (of multiple `cases` specified in the
      * request body), in accordance with the above geocoding logic.
      *
-     * TODO: Use a batch geocode API.
+     * TODO: Use a batch geocode API like https://docs.mapbox.com/api/search/#batch-geocoding.
      *
      * @returns {object} Detailing the nature of any issues encountered.
      */

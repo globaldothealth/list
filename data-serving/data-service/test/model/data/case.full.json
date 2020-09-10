@@ -3,7 +3,7 @@
         "sourceId": "5ea86423bae6982635d2e1f8",
         "sourceEntryId": "entryId",
         "sourceUrl": "cdc.gov",
-        "uploadId": "012345678901234567890123",
+        "uploadIds": ["012345678901234567890123", "012345678901234567890124"],
         "verificationStatus": "VERIFIED",
         "additionalSources": [
             {
@@ -21,7 +21,9 @@
         },
         "gender": "Female",
         "occupation": "Horse trainer",
-        "nationality": "Swedish",
+        "nationalities": [
+            "Swedish"
+        ],
         "ethnicity": "Other"
     },
     "genomeSequences": [

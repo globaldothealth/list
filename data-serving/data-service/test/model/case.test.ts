@@ -38,3 +38,30 @@ describe('validate', () => {
         return new Case(fullModel).validate();
     });
 });
+
+describe('custom instance methods', () => {
+    it('equalsJSON returns true for identical case', () => {
+        const c = new Case(fullModel);
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns true for case differing in caseReference', () => {
+        const c = new Case(fullModel);
+        delete fullModel.caseReference;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns true for case differing in revisionMetadata', () => {
+        const c = new Case(fullModel);
+        delete fullModel.revisionMetadata;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns true for case differing in importedCase', () => {
+        const c = new Case(fullModel);
+        delete fullModel.importedCase;
+        expect(c.equalsJSON(fullModel)).toBe(true);
+    });
+    it('equalsJSON returns false for semantically differing case', () => {
+        const c = new Case(fullModel);
+        delete fullModel.demographics.gender;
+        expect(c.equalsJSON(fullModel)).toBe(false);
+    });
+});

@@ -1,7 +1,8 @@
 import {
     AppBar,
-    Button,
+    Avatar,
     CssBaseline,
+    Divider,
     Fab,
     IconButton,
     Menu,
@@ -30,9 +31,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PeopleIcon from '@material-ui/icons/People';
-import PersonIcon from '@material-ui/icons/Person';
 import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
 import SourceTable from './SourceTable';
@@ -77,8 +76,20 @@ const theme = createMuiTheme({
                 color: '#5D5D5D',
                 borderRadius: '4px',
                 '&$selected': {
-                    backgroundColor: '#E7EFED',
+                    backgroundColor: '#0E75691A',
                     color: '#0E7569',
+                },
+            },
+        },
+        MuiAppBar: {
+            colorPrimary: {
+                backgroundColor: '#ECF3F0',
+            },
+        },
+        MuiCheckbox: {
+            colorSecondary: {
+                '&$checked': {
+                    color: '#31A497',
                 },
             },
         },
@@ -90,62 +101,13 @@ const drawerWidth = 240;
 const menuStyles = makeStyles((theme) => ({
     link: {
         color: theme.palette.text.primary,
+        fontWeight: 300,
+    },
+    divider: {
+        marginTop: '1em',
+        marginBottom: '1em',
     },
 }));
-
-function TopbarMenu(): JSX.Element {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const classes = menuStyles();
-
-    return (
-        <>
-            <IconButton
-                aria-controls="topbar-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-                color="inherit"
-            >
-                <MoreVertIcon />
-            </IconButton>
-            <Menu
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                <MenuItem onClick={handleClose}>
-                    <a
-                        className={classes.link}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        href="https://global.health"
-                    >
-                        About Global.Health
-                    </a>
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                    <a
-                        className={classes.link}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        href="https://github.com/globaldothealth/list/issues/new/choose"
-                    >
-                        Report an issue
-                    </a>
-                </MenuItem>
-            </Menu>
-        </>
-    );
-}
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -174,6 +136,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexShrink: 0,
     },
     drawerPaper: {
+        backgroundColor: '#ECF3F0',
         border: 'none',
         width: drawerWidth,
     },
@@ -209,7 +172,80 @@ const useStyles = makeStyles((theme: Theme) => ({
     createNewIcon: {
         marginRight: '12px',
     },
+    avatar: {
+        width: theme.spacing(3),
+        height: theme.spacing(3),
+    },
 }));
+
+function ProfileMenu(props: { user: User }) {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const classes = menuStyles();
+
+    return (
+        <div>
+            <IconButton
+                aria-controls="profile-menu"
+                data-testid="profile-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+            >
+                <Avatar alt={props.user.email} src={props.user.picture} />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                {props.user.email ? (
+                    <>
+                        <Link to="/profile" onClick={handleClose}>
+                            <MenuItem>Profile</MenuItem>
+                        </Link>
+
+                        <a className={classes.link} href="/auth/logout">
+                            <MenuItem>Logout</MenuItem>
+                        </a>
+                    </>
+                ) : (
+                    <a
+                        className={classes.link}
+                        href={process.env.REACT_APP_LOGIN_URL}
+                    >
+                        <MenuItem>Login</MenuItem>
+                    </a>
+                )}
+                <Divider className={classes.divider} />
+                <a
+                    className={classes.link}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href="https://global.health"
+                >
+                    <MenuItem>About Global.Health</MenuItem>
+                </a>
+                <a
+                    className={classes.link}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href="https://github.com/globaldothealth/list/issues/new/choose"
+                >
+                    <MenuItem>Report an issue</MenuItem>
+                </a>
+            </Menu>
+        </div>
+    );
+}
 
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
@@ -238,25 +274,20 @@ export default function App(): JSX.Element {
             text: 'Linelist',
             icon: <ListIcon />,
             to: '/cases',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean =>
+                hasAnyRole(['reader', 'curator', 'admin']),
         },
         {
             text: 'Sources',
             icon: <LinkIcon />,
             to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Uploads',
             icon: <PublishIcon />,
             to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['reader', 'curator']),
-        },
-        {
-            text: 'Profile',
-            icon: <PersonIcon />,
-            to: '/profile',
-            displayCheck: (): boolean => user?.email !== '',
+            displayCheck: (): boolean => hasAnyRole(['curator']),
         },
         {
             text: 'Manage users',
@@ -288,11 +319,11 @@ export default function App(): JSX.Element {
                     name: resp.data.name,
                     email: resp.data.email,
                     roles: resp.data.roles,
+                    picture: resp.data.picture,
                 });
             })
             .catch((e) => {
                 setUser({ _id: '', name: '', email: '', roles: [] });
-                console.error(e);
             });
     };
 
@@ -332,10 +363,14 @@ export default function App(): JSX.Element {
         <div className={classes.root}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <AppBar position="fixed" className={classes.appBar}>
+                <AppBar
+                    position="fixed"
+                    elevation={0}
+                    className={classes.appBar}
+                >
                     <Toolbar>
                         <IconButton
-                            color="inherit"
+                            color="primary"
                             aria-label="toggle drawer"
                             onClick={toggleDrawer}
                             edge="start"
@@ -345,25 +380,7 @@ export default function App(): JSX.Element {
                         </IconButton>
                         <GHListLogo />
                         <span className={classes.spacer}></span>
-                        {user?.email ? (
-                            <Button
-                                classes={{ label: classes.buttonLabel }}
-                                variant="outlined"
-                                color="inherit"
-                                href="/auth/logout"
-                            >
-                                Logout {user?.email}
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outlined"
-                                color="inherit"
-                                href={process.env.REACT_APP_LOGIN_URL}
-                            >
-                                Login
-                            </Button>
-                        )}
-                        <TopbarMenu />
+                        <ProfileMenu user={user} />
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -458,7 +475,7 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator', 'reader', 'admin']) && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
                             </Route>

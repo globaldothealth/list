@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, Typography, makeStyles } from '@material-ui/core';
+import { Button, Paper, Typography, makeStyles } from '@material-ui/core';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
@@ -69,6 +69,7 @@ interface Props {
 
 export interface AutomatedSourceFormValues {
     url: string;
+    license: string;
     name: string;
     format: string;
 }
@@ -77,6 +78,7 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     url: Yup.string().required('Required'),
     name: Yup.string().required('Required'),
     format: Yup.string().required('Required'),
+    license: Yup.string().required('Required'),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -89,14 +91,14 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
     ): Promise<void> => {
         const newSource = {
             name: values.name,
-            origin: { url: values.url },
+            origin: { url: values.url, license: values.license },
             format: values.format,
         };
         try {
             await axios.post('/api/sources', newSource);
             setErrorMessage('');
         } catch (e) {
-            setErrorMessage(JSON.stringify(e));
+            setErrorMessage(e.response?.data?.message || e.toString());
             return;
         }
         // Navigate to sources after successful submit
@@ -113,7 +115,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedSourceFormSchema}
                 validateOnChange={false}
-                initialValues={{ url: '', name: '', format: '' }}
+                initialValues={{ url: '', name: '', format: '', license: '' }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
                 }}
@@ -130,12 +132,11 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                 variant="body2"
                             >
                                 Add new cases through automated ingestion from a
-                                data source. G.h List will check for updates
-                                every 15 minutes from this new source.
+                                data source.
                             </Typography>
                         </div>
                         <Form>
-                            <fieldset className={classes.allFormSections}>
+                            <Paper className={classes.allFormSections}>
                                 <div className={classes.fieldTitle}>
                                     <FieldTitle title="Data Source" />
                                 </div>
@@ -162,6 +163,17 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                     />
                                 </div>
                                 <div className={classes.formSection}>
+                                    <FastField
+                                        helperText="Required (MIT, Apache V2, ...)"
+                                        label="License"
+                                        name="license"
+                                        type="text"
+                                        data-testid="license"
+                                        component={TextField}
+                                        fullWidth
+                                    />
+                                </div>
+                                <div className={classes.formSection}>
                                     <SelectField
                                         name="format"
                                         label="Data Source Format"
@@ -169,7 +181,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         required
                                     />
                                 </div>
-                            </fieldset>
+                            </Paper>
                         </Form>
                         {errorMessage && (
                             <MuiAlert
