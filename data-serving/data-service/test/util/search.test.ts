@@ -35,7 +35,7 @@ describe('search query', () => {
                     values: ['male'],
                 },
                 {
-                    path: 'demographics.nationality',
+                    path: 'demographics.nationalities',
                     values: ['swiss'],
                 },
                 {
