@@ -8,6 +8,7 @@ import {
     Menu,
     MenuItem,
     Toolbar,
+    Typography,
     useMediaQuery,
 } from '@material-ui/core';
 import { Link, Route, Switch, useHistory } from 'react-router-dom';
@@ -171,6 +172,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     createNewIcon: {
         marginRight: '12px',
+    },
+    covidTitle: {
+        fontSize: '28px',
+        marginLeft: '14px',
+        marginTop: '8px',
     },
     avatar: {
         width: theme.spacing(3),
@@ -394,6 +400,9 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerContents}>
                         <div className={classes.drawerHeader}></div>
+                        <Typography className={classes.covidTitle}>
+                            COVID-19
+                        </Typography>
                         {hasAnyRole(['curator']) && (
                             <>
                                 <Fab
