@@ -6,6 +6,7 @@ import {
     DialogContentText,
     DialogTitle,
     IconButton,
+    InputAdornment,
     Menu,
     MenuItem,
     Paper,
@@ -21,14 +22,15 @@ import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { Autocomplete } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import SearchIcon from '@material-ui/icons/Search';
 import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
@@ -107,7 +109,8 @@ const styles = (theme: Theme) =>
             justifyContent: 'center',
         },
         downloadButton: {
-            marginRight: theme.spacing(1),
+            marginLeft: theme.spacing(2),
+            marginRight: theme.spacing(2),
         },
         spacer: { flex: 1 },
         paginationRoot: { border: 'unset' },
@@ -130,9 +133,6 @@ const styles = (theme: Theme) =>
     });
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
-    searchBarInput: {
-        borderRadius: '8px',
-    },
     searchRoot: {
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
@@ -140,119 +140,174 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         alignItems: 'center',
         flex: 1,
     },
-    tooltip: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
+    divider: {
+        backgroundColor: '#0E7569',
+        height: '40px',
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        width: '1px',
     },
 }));
+
+const StyledSearchTextField = withStyles({
+    root: {
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '8px',
+            '& fieldset': {
+                border: '1px solid #0E7569',
+            },
+            '&.Mui-focused fieldset': {
+                border: '1px solid #0E7569',
+            },
+        },
+    },
+})(TextField);
 
 function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
-    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
 
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = (): void => {
+        setAnchorEl(null);
+    };
+
+    const clickItem = (text: string): void => {
+        setSearch(search + (search ? ` ${text}:` : `${text}:`));
+        handleClose();
+    };
+
     const classes = searchBarStyles();
     return (
         <div className={classes.searchRoot}>
-            <Autocomplete
-                options={[
-                    'curator:',
-                    'gender:',
-                    'nationality:',
-                    'occupation:',
-                    'country:',
-                    'outcome:',
-                    'caseid:',
-                    'source:',
-                    'uploadid:',
-                    'admin1:',
-                    'admin2:',
-                    'admin3:',
-                ]}
+            <StyledSearchTextField
                 id="search-field"
-                freeSolo
-                value={search}
-                onKeyPress={(ev) => {
+                onKeyPress={(ev): void => {
                     if (ev.key === 'Enter') {
                         ev.preventDefault();
                         props.onSearchChange(search);
-                        setOpen(false);
                     }
                 }}
-                onChange={(ev, val) => {
-                    setSearch(val || '');
+                onChange={(event): void => {
+                    setSearch(event.target.value);
                 }}
-                open={open}
-                onClose={() => setOpen(false)}
-                onOpen={() => setOpen(true)}
+                placeholder="Search"
+                value={search}
+                variant="outlined"
                 fullWidth
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label="Search"
-                        variant="filled"
-                        InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                            classes: { root: classes.searchBarInput },
-                        }}
-                    />
-                )}
+                InputProps={{
+                    margin: 'dense',
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <Button
+                                color="primary"
+                                startIcon={<FilterListIcon />}
+                                onClick={handleClick}
+                            >
+                                Filter
+                            </Button>
+                            <div className={classes.divider}></div>
+                            <SearchIcon color="primary" />
+                        </InputAdornment>
+                    ),
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <HtmlTooltip
+                                color="primary"
+                                title={
+                                    <React.Fragment>
+                                        <h4>Search syntax</h4>
+                                        <h5>Full text search</h5>
+                                        Example:{' '}
+                                        <i>"got infected at work" -India</i>
+                                        <br />
+                                        You can use arbitrary strings to search
+                                        over those text fields:
+                                        {[
+                                            'notes',
+                                            'curator',
+                                            'occupation',
+                                            'nationalities',
+                                            'ethnicity',
+                                            'country',
+                                            'admin1',
+                                            'admin2',
+                                            'admin3',
+                                            'place',
+                                            'location name',
+                                            'pathogen name',
+                                            'source url',
+                                            'upload ID',
+                                        ].join(', ')}
+                                        <h5>Keywords search</h5>
+                                        Example:{' '}
+                                        <i>
+                                            curator:foo@bar.com,fez@meh.org
+                                            country:Japan gender:female
+                                            occupation:"healthcare worker"
+                                        </i>
+                                        <br />
+                                        Values are OR'ed for the same keyword
+                                        and all keywords are AND'ed.
+                                        <br />
+                                        Keyword values can be quoted for
+                                        multi-words matches and concatenated
+                                        with a comma to union them.
+                                        <br />
+                                        Only equality operator is supported.
+                                        <br />
+                                        Supported keywords are shown when the
+                                        search bar is clicked.
+                                    </React.Fragment>
+                                }
+                                placement="left"
+                            >
+                                <HelpIcon />
+                            </HtmlTooltip>
+                        </InputAdornment>
+                    ),
+                }}
             />
-            <HtmlTooltip
-                className={classes.tooltip}
-                title={
-                    <React.Fragment>
-                        <h4>Search syntax</h4>
-                        <h5>Full text search</h5>
-                        Example: <i>"got infected at work" -India</i>
-                        <br />
-                        You can use arbitrary strings to search over those text
-                        fields:
-                        {[
-                            'notes',
-                            'curator',
-                            'occupation',
-                            'nationalities',
-                            'ethnicity',
-                            'country',
-                            'admin1',
-                            'admin2',
-                            'admin3',
-                            'place',
-                            'location name',
-                            'pathogen name',
-                            'source url',
-                            'upload ID',
-                        ].join(', ')}
-                        <h5>Keywords search</h5>
-                        Example:{' '}
-                        <i>
-                            curator:foo@bar.com,fez@meh.org country:Japan
-                            gender:female occupation:"healthcare worker"
-                        </i>
-                        <br />
-                        Values are OR'ed for the same keyword and all keywords
-                        are AND'ed.
-                        <br />
-                        Keyword values can be quoted for multi-words matches and
-                        concatenated with a comma to union them.
-                        <br />
-                        Only equality operator is supported.
-                        <br />
-                        Supported keywords are shown when the search bar is
-                        clicked.
-                    </React.Fragment>
-                }
-                placement="left"
+            <Menu
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
             >
-                <HelpIcon />
-            </HtmlTooltip>
+                {[
+                    'curator',
+                    'gender',
+                    'nationality',
+                    'occupation',
+                    'country',
+                    'outcome',
+                    'caseid',
+                    'source',
+                    'uploadid',
+                    'admin1',
+                    'admin2',
+                    'admin3',
+                ].map((text) => (
+                    <MenuItem key={text} onClick={(): void => clickItem(text)}>
+                        {text}
+                    </MenuItem>
+                ))}
+            </Menu>
         </div>
     );
 }
