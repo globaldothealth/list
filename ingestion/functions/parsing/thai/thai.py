@@ -62,7 +62,7 @@ def demographics(entry):
     gender = entry['GenderEn'] or entry['Gender']
     if gender:
         demo['gender'] = convert_gender(gender)
-    return demo
+    return demo or None
 
 
 def parse_cases(raw_data_file, source_id, source_url):
