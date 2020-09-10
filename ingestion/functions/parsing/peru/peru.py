@@ -64,8 +64,7 @@ def parse_cases(raw_data_file, source_id, source_url):
         reader = csv.DictReader(f)
         cases = []
         for entry in reader:
-            cases.append(
-                {
+            case =  {
                     "caseReference": {
                         "sourceId": source_id,
                         "sourceEntryId": entry["UUID"],
@@ -90,8 +89,9 @@ def parse_cases(raw_data_file, source_id, source_url):
                         },
                         "gender": convert_gender(entry["SEXO"])
                     }
-                })
-    return cases
+                }
+            yield case
+    
 
 
 def lambda_handler(event, context):
