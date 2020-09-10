@@ -6,12 +6,14 @@ import csv
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
-if ('lambda' not in sys.argv[0]):
+try:
+    import parsing_lib
+except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
-import parsing_lib
+    import parsing_lib
 
 _DATE_CONFIRMED_INDEX = 0
 _HEALTHCARE_WORKER_INDEX = 1
@@ -24,6 +26,14 @@ _MUNICIPALITY_INDEX = 7
 _AGE_INDEX = 8
 _ETHNICITY_INDEX = 9
 _NOTES_INDIGENOUS_GROUP_INDEX = 10
+
+commorbidities = {
+                  "Diabetes": "diabetes mellitus", 
+                  "Gestante": "pregnancy",
+                  "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
+                  "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
+                  "Doenças cardíacas crônicas": "heart disease" 
+                  }
 
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
@@ -72,13 +82,6 @@ def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
     if raw_commorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-        commorbidities = {
-                        "Diabetes": "diabetes mellitus", 
-                        "Gestante": "pregnancy",
-                        "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
-                        "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
-                        "Doenças cardíacas crônicas": "heart disease" 
-                        }
         
         commorbidities_list = []
 
@@ -119,7 +122,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
         next(reader) # Skip the header.
-        cases = []
         for row in reader:
             if float(row[_AGE_INDEX]) > 110: #We have entries as high as 351 - unclear if this is days.
                 print(f'age too high: {row[_AGE_INDEX]}')
@@ -150,8 +152,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
                 "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX], row[_NOTES_BAIRRO_INDEX], row[_NOTES_INDIGENOUS_GROUP_INDEX])
             }
-            cases.append(case)
-        return cases
+            yield case
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

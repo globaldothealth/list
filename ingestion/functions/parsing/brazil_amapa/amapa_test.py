@@ -22,7 +22,7 @@ class AmapaTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = amapa.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(result, [
+        self.assertCountEqual(list(result), [
             {
                 "caseReference": {
                     "sourceId": _SOURCE_ID,
