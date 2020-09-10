@@ -297,7 +297,7 @@ function SearchBar(props: {
                     'country',
                     'outcome',
                     'caseid',
-                    'source',
+                    'sourceurl',
                     'uploadid',
                     'admin1',
                     'admin2',

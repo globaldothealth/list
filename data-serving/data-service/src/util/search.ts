@@ -22,7 +22,7 @@ const keywords = new Map<string, string>([
     ['outcome', 'outcome'],
     ['caseid', '_id'],
     ['uploadid', 'caseReference.uploadIds'],
-    ['source', 'caseReference.sourceUrl'],
+    ['sourceurl', 'caseReference.sourceUrl'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
