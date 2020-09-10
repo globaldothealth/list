@@ -68,7 +68,7 @@ def convert_demographics(gender: str, age: str):
             }
         else:
             raise ValueError(f'Unhandled age: {age}')
-    return demo
+    return demo or None
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
