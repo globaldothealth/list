@@ -184,7 +184,7 @@ function SearchBar(props: {
     };
 
     const clickItem = (text: string): void => {
-        setSearch(search + (search ? ` ${text}` : text));
+        setSearch(search + (search ? ` ${text}:` : `${text}:`));
         handleClose();
     };
 
@@ -290,18 +290,18 @@ function SearchBar(props: {
                 onClose={handleClose}
             >
                 {[
-                    'curator:',
-                    'gender:',
-                    'nationality:',
-                    'occupation:',
-                    'country:',
-                    'outcome:',
-                    'caseid:',
-                    'source:',
-                    'uploadid:',
-                    'admin1:',
-                    'admin2:',
-                    'admin3:',
+                    'curator',
+                    'gender',
+                    'nationality',
+                    'occupation',
+                    'country',
+                    'outcome',
+                    'caseid',
+                    'source',
+                    'uploadid',
+                    'admin1',
+                    'admin2',
+                    'admin3',
                 ].map((text) => (
                     <MenuItem key={text} onClick={(): void => clickItem(text)}>
                         {text}
