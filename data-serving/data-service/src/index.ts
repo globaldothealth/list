@@ -4,6 +4,7 @@ import * as homeController from './controllers/home';
 import { Request, Response } from 'express';
 import {
     batchUpsertDropUnchangedCases,
+    createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
@@ -125,8 +126,16 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.update,
         );
-        apiRouter.delete('/cases', caseController.batchDel);
-        apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
+        apiRouter.delete(
+            '/cases',
+            createBatchDeleteCaseRevisions,
+            caseController.batchDel,
+        );
+        apiRouter.delete(
+            '/cases/:id([a-z0-9]{24})',
+            createCaseRevision,
+            caseController.del,
+        );
         app.use('/api', apiRouter);
     });
 
