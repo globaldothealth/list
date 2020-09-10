@@ -67,7 +67,7 @@ describe('GET', () => {
     it('list should return 200', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         const res = await curatorRequest
@@ -82,12 +82,12 @@ describe('GET', () => {
     it('list should filter by url if supplied', async () => {
         const relevantSource = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         await new Source({
             name: 'test-source',
-            origin: { url: 'http://bar.baz' },
+            origin: { url: 'http://bar.baz', license: 'MIT' },
             format: 'JSON',
         }).save();
 
@@ -104,7 +104,7 @@ describe('GET', () => {
         for (const i of Array.from(Array(15).keys())) {
             await new Source({
                 name: `test-source-${i}`,
-                origin: { url: 'http://foo.bar' },
+                origin: { url: 'http://foo.bar', license: 'MIT' },
                 format: 'JSON',
             }).save();
         }
@@ -146,7 +146,7 @@ describe('GET', () => {
     it('one existing item should return 200', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         const res = await curatorRequest
@@ -161,7 +161,7 @@ describe('PUT', () => {
     it('should update a source', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         const res = await curatorRequest
@@ -178,7 +178,7 @@ describe('PUT', () => {
     it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         const scheduleExpression = 'rate(1 hour)';
@@ -205,7 +205,7 @@ describe('PUT', () => {
     it('should update AWS rule description on source rename', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
             automation: {
                 schedule: {
@@ -232,26 +232,25 @@ describe('PUT', () => {
             .put('/api/sources/5ea86423bae6982635d2e1f8')
             .send({
                 name: 'test-source',
-                origin: { url: 'http://foo.bar' },
+                origin: { url: 'http://foo.bar', license: 'MIT' },
             })
             .expect(404, done);
     });
     it('should not update to an invalid source', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
-        const res = await curatorRequest
+        return curatorRequest
             .put(`/api/sources/${source.id}`)
             .send({ name: '' })
-            .expect(422);
-        expect(res.body).toMatch('Enter a name');
+            .expect(422, /Enter a name/);
     });
     it('should be able to set a parser without schedule', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         await curatorRequest
@@ -272,7 +271,7 @@ describe('POST', () => {
     it('should return the created source', async () => {
         const source = {
             name: 'some_name',
-            origin: { url: 'http://what.ever' },
+            origin: { url: 'http://what.ever', license: 'MIT' },
             format: 'JSON',
         };
         const res = await curatorRequest
@@ -287,7 +286,7 @@ describe('POST', () => {
         const scheduleExpression = 'rate(1 hour)';
         const source = {
             name: 'some_name',
-            origin: { url: 'http://what.ever' },
+            origin: { url: 'http://what.ever', license: 'MIT' },
             format: 'JSON',
             automation: {
                 schedule: { awsScheduleExpression: scheduleExpression },
@@ -325,7 +324,7 @@ describe('DELETE', () => {
     it('should delete a source', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
         await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
@@ -334,7 +333,7 @@ describe('DELETE', () => {
     it('should delete corresponding AWS rule (et al.) if source contains ruleArn', async () => {
         const source = await new Source({
             name: 'test-source',
-            origin: { url: 'http://foo.bar' },
+            origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
             automation: {
                 schedule: {
