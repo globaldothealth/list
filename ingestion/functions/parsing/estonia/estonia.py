@@ -15,7 +15,7 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-# Fixed location, all cases are for Estonia and no coarser location is available in the source.
+# Fixed location, all cases are for Estonia and no finer location is available in the source.
 _LOCATION = {
     "country": "Estonia",
     "geoResolution": "Country",
