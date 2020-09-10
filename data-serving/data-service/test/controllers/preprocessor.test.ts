@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
     batchUpsertDropUnchangedCases,
+    createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
@@ -11,9 +12,11 @@ import {
 
 import { Case } from '../../src/model/case';
 import { CaseRevision } from '../../src/model/case-revision';
+import { Demographics } from '../../src/model/demographics';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../../src/index';
 import minimalCase from './../model/data/case.minimal.json';
+import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 let mongoServer: MongoMemoryServer;
@@ -685,5 +688,108 @@ describe('batch update', () => {
         expect((await CaseRevision.find())[1].case.toObject()).toEqual(
             c2.toObject(),
         );
+    });
+    describe('batch delete', () => {
+        it('creates case revisions from caseIds', async () => {
+            const c = await new Case(minimalCase).save();
+            const c2 = await new Case(minimalCase).save();
+
+            const requestBody = { caseIds: [c._id, c2._id] };
+            const nextFn = jest.fn();
+            await createBatchDeleteCaseRevisions(
+                { body: requestBody, method: 'DELETE' } as Request,
+                {} as Response,
+                nextFn,
+            );
+
+            expect(nextFn).toHaveBeenCalledTimes(1);
+            expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+            expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+                c.toObject(),
+            );
+            expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+                c2.toObject(),
+            );
+        });
+        it('creates case revisions from query', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
+            const c = new Case(minimalCase);
+            c.notes = 'got it at work';
+            c.demographics = new Demographics({ gender: 'Female' });
+            await c.save();
+            const c2 = new Case(minimalCase);
+            c2.demographics = new Demographics({ gender: 'Female' });
+            await c2.save();
+            await new Case(minimalCase).save();
+
+            const requestBody = { query: 'gender:Female' };
+            const nextFn = jest.fn();
+            await createBatchDeleteCaseRevisions(
+                { body: requestBody, method: 'DELETE' } as Request,
+                {} as Response,
+                nextFn,
+            );
+
+            expect(nextFn).toHaveBeenCalledTimes(1);
+            expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+            expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+                c.toObject(),
+            );
+            expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+                c2.toObject(),
+            );
+        });
+        it('does not create case revisions if over threshold', async () => {
+            // Simulate index creation used in unit tests, in production they are
+            // setup by the setup-db script and such indexes are not present by
+            // default in the in memory mongo spawned by unit tests.
+            await mongoose.connection.collection('cases').createIndex({
+                notes: 'text',
+            });
+
+            await Promise.all([
+                new Case(minimalCase).set('notes', 'foo').save(),
+                new Case(minimalCase).set('notes', 'foo').save(),
+                new Case(minimalCase).set('notes', 'foo').save(),
+            ]);
+
+            const requestBody = { query: 'foo', maxCasesThreshold: 2 };
+            const nextFn = jest.fn();
+            await createBatchDeleteCaseRevisions(
+                { body: requestBody, method: 'DELETE' } as Request,
+                {} as Response,
+                nextFn,
+            );
+
+            expect(nextFn).toHaveBeenCalledTimes(1);
+            expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+        });
+    });
+    describe('delete', () => {
+        it('creates case revision', async () => {
+            const c = await new Case(minimalCase).save();
+
+            const nextFn = jest.fn();
+            await createCaseRevision(
+                {
+                    method: 'DELETE',
+                    params: { id: c._id },
+                } as Request<any>,
+                {} as Response,
+                nextFn,
+            );
+
+            expect(nextFn).toHaveBeenCalledTimes(1);
+            expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+            expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+                c.toObject(),
+            );
+        });
     });
 });
