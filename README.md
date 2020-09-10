@@ -85,6 +85,14 @@ This repository contains the servers and scripts that support its data curation 
 - [Local curator service](http://localhost:3001/api-docs)
 - [Local data service](http://localhost:3000/api-docs)
 
+## Sources licenses and terms of use
+
+This repository and daily data exports are published under the MIT license.
+
+Each automatically ingested data source used has a required license and terms of use attachment, forcing curators to look-up the sources they are setting-up for ingestion.
+
+If you are the owner of a data source included here and would like us to remove data, add or alter an attribution, or add or alter license information, please open an issue on this repository and we will happily consider your request.
+
 ## Stats
 
 ![code size](https://img.shields.io/github/languages/code-size/globaldothealth/list) ![repo size](https://img.shields.io/github/repo-size/globaldothealth/list)

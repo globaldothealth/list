@@ -13,13 +13,15 @@ const userSchema = new mongoose.Schema({
         type: [String],
         enum: userRoles,
     },
+    picture: String,
 });
 
 export type UserDocument = mongoose.Document & {
     googleID: string;
-    name: string;
+    name?: string;
     email: string;
     roles: [string];
+    picture?: string;
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);

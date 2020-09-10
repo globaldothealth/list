@@ -170,5 +170,15 @@
             "locale": "en_US",
             "strength": 2
         }
+    },
+    {
+        "name": "revisionMetadataCreationMetadataDate",
+        "key": {
+            "revisionMetadata.creationMetadata.date": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
     }
 ]
