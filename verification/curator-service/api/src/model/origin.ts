@@ -5,9 +5,7 @@ export const originSchema = new mongoose.Schema({
         type: String,
         required: 'Enter an origin URL',
     },
-    license: {
-        type: String,
-    },
+    license: String,
 });
 
 export type OriginDocument = mongoose.Document & {

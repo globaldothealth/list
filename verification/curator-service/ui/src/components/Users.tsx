@@ -1,10 +1,16 @@
 import MaterialTable, { QueryResult } from 'material-table';
+import { Paper, TablePagination, Typography } from '@material-ui/core';
 import React, { RefObject } from 'react';
+import {
+    Theme,
+    WithStyles,
+    createStyles,
+    withStyles,
+} from '@material-ui/core/styles';
 
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiAlert from '@material-ui/lab/Alert';
-import { Paper } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import User from './User';
 import axios from 'axios';
@@ -29,7 +35,7 @@ interface TableRow {
     roles: string[];
 }
 
-interface Props {
+interface Props extends WithStyles<typeof styles> {
     user: User;
     onUserChange: () => void;
 }
@@ -38,7 +44,25 @@ interface UsersSelectDisplayProps extends React.HTMLAttributes<HTMLDivElement> {
     'data-testid'?: string;
 }
 
-export default class Users extends React.Component<Props, UsersState> {
+// Return type isn't meaningful.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const styles = (theme: Theme) =>
+    createStyles({
+        alert: {
+            borderRadius: theme.spacing(1),
+            marginTop: theme.spacing(2),
+        },
+        spacer: { flex: 1 },
+        paginationRoot: { border: 'unset' },
+        tablePaginationBar: {
+            alignItems: 'center',
+            backgroundColor: '#ECF3F0',
+            display: 'flex',
+            height: '64px',
+        },
+    });
+
+class Users extends React.Component<Props, UsersState> {
     // We could use a proper type here but then we wouldn't be able to call
     // onQueryChange() to refresh the table as we want.
     // https://github.com/mbrn/material-table/issues/1752
@@ -66,10 +90,15 @@ export default class Users extends React.Component<Props, UsersState> {
     }
 
     render(): JSX.Element {
+        const { classes } = this.props;
         return (
             <Paper>
                 {this.state.error && (
-                    <MuiAlert elevation={6} variant="filled" severity="error">
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        variant="filled"
+                        severity="error"
+                    >
                         {this.state.error}
                     </MuiAlert>
                 )}
@@ -124,12 +153,35 @@ export default class Users extends React.Component<Props, UsersState> {
                                     });
                                 })
                                 .catch((e) => {
-                                    this.setState({ error: JSON.stringify(e) });
+                                    this.setState({
+                                        error:
+                                            e.response?.data?.message ||
+                                            e.toString(),
+                                    });
                                     reject(e);
                                 });
                         })
                     }
-                    title="Users"
+                    components={{
+                        Container: (props): JSX.Element => (
+                            <Paper elevation={0} {...props}></Paper>
+                        ),
+                        Pagination: (props): JSX.Element => {
+                            return (
+                                <div className={classes.tablePaginationBar}>
+                                    <Typography>Users</Typography>
+                                    <span className={classes.spacer}></span>
+                                    <TablePagination
+                                        {...props}
+                                        classes={{
+                                            ...props.classes,
+                                            root: classes.paginationRoot,
+                                        }}
+                                    ></TablePagination>
+                                </div>
+                            );
+                        },
+                    }}
                     options={{
                         search: false,
                         filtering: false,
@@ -138,6 +190,8 @@ export default class Users extends React.Component<Props, UsersState> {
                         draggable: false, // No need to be able to drag and drop headers.
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
+                        paginationPosition: 'top',
+                        toolbar: false,
                         headerStyle: {
                             zIndex: 1,
                         },
@@ -168,7 +222,9 @@ export default class Users extends React.Component<Props, UsersState> {
                 }
             })
             .catch((e) => {
-                this.setState({ error: JSON.stringify(e) });
+                this.setState({
+                    error: e.response?.data?.message || e.toString(),
+                });
                 console.error(e);
             });
     }
@@ -207,3 +263,5 @@ export default class Users extends React.Component<Props, UsersState> {
         );
     }
 }
+
+export default withStyles(styles, { withTheme: true })(Users);

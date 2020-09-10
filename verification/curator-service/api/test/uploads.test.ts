@@ -5,6 +5,7 @@ import { Session, User } from '../src/model/user';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import { Upload } from '../src/model/upload';
+import { UploadSummary } from '../src/model/upload-summary';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
 import minimalSource from './model/data/source.minimal.json';
@@ -108,6 +109,40 @@ describe('GET', () => {
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
+    });
+    it('should filter for changes only', async () => {
+        const noChangesSource = await new Source(fullSource).save();
+
+        const sourceWithCreatedUploads = new Source(fullSource);
+        sourceWithCreatedUploads.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numCreated: 3 }),
+            }),
+        ];
+        await sourceWithCreatedUploads.save();
+
+        const sourceWithUpdatedUploads = new Source(fullSource);
+        sourceWithUpdatedUploads.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numUpdated: 3 }),
+            }),
+        ];
+        await sourceWithUpdatedUploads.save();
+
+        const res = await curatorRequest
+            .get('/api/sources/uploads?changes_only=true')
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.uploads).toHaveLength(2);
+        expect(res.body.uploads[0].upload._id).toEqual(
+            sourceWithCreatedUploads.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[1].upload._id).toEqual(
+            sourceWithUpdatedUploads.uploads[0]._id.toString(),
+        );
     });
     it('rejects negative page param', (done) => {
         curatorRequest.get('/api/sources/uploads?page=-7').expect(400, done);

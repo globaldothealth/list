@@ -12,12 +12,14 @@ describe('Automated source form', function () {
         const url = 'www.newsource.com';
         const name = 'New source name';
         const format = 'JSON';
+        const license = 'WTFPL';
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
         cy.contains('li', 'New automated source').click();
         cy.get('div[data-testid="url"]').type(url);
         cy.get('div[data-testid="name"]').type(name);
+        cy.get('div[data-testid="license"]').type(license);
         cy.get('div[data-testid="format"]').click();
         cy.get(`li[data-value=${format}`).click();
         cy.server();
@@ -31,6 +33,7 @@ describe('Automated source form', function () {
         cy.contains(url);
         cy.contains(name);
         cy.contains(format);
+        cy.contains(license);
     });
 
     it('Does not add source on submission error', function () {
@@ -40,6 +43,7 @@ describe('Automated source form', function () {
         cy.visit('/sources/automated');
         cy.get('div[data-testid="url"]').type('www.newsource.com');
         cy.get('div[data-testid="name"]').type('New source name');
+        cy.get('div[data-testid="license"]').type('WTFPL');
         cy.get('div[data-testid="format"]').click();
         cy.get('li[data-value="JSON"').click();
 
@@ -49,11 +53,11 @@ describe('Automated source form', function () {
             method: 'POST',
             url: '/api/sources',
             status: 422,
-            response: {},
+            response: { message: 'nope' },
         }).as('createSource');
         cy.get('button[data-testid="submit"]').click();
         cy.wait('@createSource');
-        cy.contains('Request failed');
+        cy.contains('nope');
 
         cy.visit('/sources');
         cy.contains('No records to display');

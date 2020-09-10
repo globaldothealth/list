@@ -41,6 +41,13 @@ describe('validate', () => {
         });
     });
 
+    it('a start age without end is valid', async () => {
+        return new Demographics({
+            ...fullModel,
+            ...{ ageRange: { start: 85 } },
+        }).validate();
+    });
+
     it('an end age over 120 is invalid', async () => {
         return new Demographics({
             ...fullModel,

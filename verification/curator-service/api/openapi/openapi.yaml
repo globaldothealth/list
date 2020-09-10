@@ -242,6 +242,15 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: changes_only
+          in: query
+          description: > 
+            Filters the list of uploads to only return uploads that created or
+            modified cases
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           $ref: "#/components/responses/200UploadsArray"
@@ -488,6 +497,41 @@ paths:
           $ref: "#/components/responses/403"
         "404":
           $ref: "#/components/responses/404"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
+  /cases/download:
+    post:
+      summary: >
+        Streams a CSV attachment of all cases. If a query is supplied the
+        CSV only contains cases matching the search query. If caseIds are
+        supplied the CSV only contains cases with those ids. You cannot supply
+        both query and caseIds.
+      tags: [Case]
+      operationId: downloadCases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              maxProperties: 1
+              properties:
+                caseIds:
+                  description: Cases corresponding to these ids will returned
+                  type: array
+                  items:
+                    type: string
+                    pattern: '^[a-f\d]{24}$'
+                query:
+                  description: >
+                    Cases matching this query will be returned. Must contain
+                    non-whitespace characters.
+                  type: string
+                  pattern: \S+
+      responses:
+        "200":
+          $ref: "#/components/responses/200CasesDownload"
         "500":
           $ref: "#/components/responses/500"
   /cases/symptoms:
@@ -1006,14 +1050,14 @@ components:
               type: string
               description: URL of the source this case was extracted from
               example: https://api.covid19india.org/raw_data7.json
-            uploadId:
+            uploadIds:
               description: >
-                The UUID of the upload in which the batch of cases including
-                this case document was entered into the G.h system. This field
-                is only populated for cases entered via automated ingestion.
-                example: example: 5ef22491937717c3331c3729
-              type: string
-              pattern: '^[a-f\d]{24}$'
+                An array of UUIDs of uploads where this case was created or updated
+                through bulk upload or automated ingestion.
+              type: array
+              items:
+                type: string
+                pattern: '^[a-f\d]{24}$'
             verificationStatus:
               description: >
                 Whether the case document has been manually verified for
@@ -1043,6 +1087,8 @@ components:
               description: >
                 Age bracket, start is included, end is excluded if different
                 than start.
+                If no end is specified it means that the age bracket is from
+                start and above.
               properties:
                 start:
                   type: number
@@ -1526,6 +1572,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CasesDownload":
+      description: OK
+      content:
+        text/csv:
+          schema:
+            description: A CSV with headers detailing case data. 
     "200SymptomArray":
       description: OK
       content:
