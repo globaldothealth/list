@@ -104,7 +104,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     lambda_arn = "arn"
     requests_mock.get(
         full_source_url,
-        json={"origin": {"url": origin_url}, "format": "JSON",
+        json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}},
               "dateFilter": date_filter})
 
@@ -152,7 +152,8 @@ def test_get_source_details_returns_url_and_format(
     source_id = "id"
     content_url = "http://bar.baz"
     requests_mock.get(f"{_SOURCE_API_URL}/sources/{source_id}",
-                      json={"format": "CSV", "origin": {"url": content_url}})
+                      json={"format": "CSV",
+                            "origin": {"url": content_url, "license": "MIT"}})
     result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
     assert result[0] == content_url
     assert result[1] == "CSV"
@@ -167,7 +168,8 @@ def test_get_source_details_returns_parser_arn_if_present(
     lambda_arn = "lambdaArn"
     requests_mock.get(
         f"{_SOURCE_API_URL}/sources/{source_id}",
-        json={"origin": {"url": content_url}, "format": "JSON",
+        json={"origin": {"url": content_url, "license": "MIT"},
+              "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
     result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
     assert result[2] == lambda_arn
