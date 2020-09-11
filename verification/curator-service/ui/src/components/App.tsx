@@ -95,6 +95,19 @@ const theme = createMuiTheme({
                 },
             },
         },
+        MuiTablePagination: {
+            root: {
+                border: 'unset',
+                fontFamily: 'Inter',
+                '& .MuiTablePagination-input': {
+                    fontFamily: 'Inter',
+                },
+                '&&& .MuiTypography-root': {
+                    fontFamily: 'Inter',
+                    fontSize: '14px',
+                },
+            },
+        },
     },
 });
 
