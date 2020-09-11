@@ -210,6 +210,68 @@ describe('PUT', () => {
             source.toAwsStatementId(),
         );
     });
+    it('should send a notification email if automation added and recipients defined', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: recipients,
+        }).save();
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                automation: {
+                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should send a notification email if automation removed', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: ['foo@bar.com'],
+        }).save();
+        const recipients = ['foo@bar.com'];
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({ automation: { schedule: undefined } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if automation unchanged', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: ['foo@bar.com'],
+        }).save();
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({ format: 'CSV' })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
     it('should update AWS rule description on source rename', async () => {
         const source = await new Source({
             name: 'test-source',
