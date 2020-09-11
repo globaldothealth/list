@@ -16,6 +16,7 @@ export enum EmailService {
 export default class EmailClient {
     private service?: EmailService;
     private transport?: Mail;
+    private initialized = false;
     constructor(private user?: string, private password?: string) {}
 
     /**
@@ -25,6 +26,10 @@ export default class EmailClient {
      * connection. If either is absent, a testing service (Ethereal) is used.
      */
     async initialize(): Promise<EmailClient> {
+        if (this.initialized) {
+            return this;
+        }
+
         if (!this.user || !this.password) {
             this.service = EmailService.Ethereal;
             const testAccount = await nodemailer.createTestAccount();
@@ -63,8 +68,10 @@ export default class EmailClient {
         subject: string,
         text: string,
     ): Promise<SentMessageInfo> {
-        if (this.transport === undefined) {
-            throw new Error('Client must be initialized prior to use.');
+        // These are synonymous, but Typescript-strictness requires the second
+        // condition to operate on this.transport, below.
+        if (!this.initialized || this.transport === undefined) {
+            throw new Error('Must call initialize() prior to use.');
         }
         const mailOptions = {
             to: addressees,
