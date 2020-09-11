@@ -12,6 +12,13 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
+const mockInitialize = jest.fn().mockResolvedValue({});
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {

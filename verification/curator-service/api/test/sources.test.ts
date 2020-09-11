@@ -5,6 +5,8 @@ const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
+const mockSend = jest.fn().mockResolvedValue({});
+const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
@@ -25,6 +27,12 @@ jest.mock('../src/clients/aws-lambda-client', () => {
         return { invokeRetrieval: mockInvoke };
     });
 });
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { send: mockSend, initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {

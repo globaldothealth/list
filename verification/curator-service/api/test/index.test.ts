@@ -2,6 +2,13 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
 import request from 'supertest';
 
+const mockInitialize = jest.fn().mockResolvedValue({});
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 beforeAll(() => {
     mongoServer = new MongoMemoryServer();
