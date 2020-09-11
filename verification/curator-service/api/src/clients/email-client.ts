@@ -53,6 +53,7 @@ export default class EmailClient {
             });
         }
 
+        this.initialized = true;
         return this;
     }
 
