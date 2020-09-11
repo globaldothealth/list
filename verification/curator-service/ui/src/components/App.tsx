@@ -276,9 +276,7 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [linelistSearchQuery, setLinelistSearchQuery] = React.useState<
-        string
-    >('');
+    const [linelistSearchQuery, setLinelistSearchQuery] = React.useState('');
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
