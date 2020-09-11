@@ -7,11 +7,11 @@ API calls, and it's information that could be easily encoded as state in an
 object.
 """
 
-import os
 import tempfile
 import requests
 
 import google
+import google.auth.transport.requests
 
 from enum import Enum
 from google.oauth2 import service_account
