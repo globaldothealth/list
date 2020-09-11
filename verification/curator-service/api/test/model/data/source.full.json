@@ -28,5 +28,9 @@
     "dateFilter": {
         "numDaysBeforeToday": 3,
         "op": "EQ"
-    }
+    },
+    "notificationRecipients": [
+        "foo@bar.com",
+        "bar@baz.com"
+    ]
 }

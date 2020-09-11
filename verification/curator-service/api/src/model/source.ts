@@ -25,6 +25,7 @@ const sourceSchema = new mongoose.Schema({
     },
     uploads: [uploadSchema],
     dateFilter: dateFilterSchema,
+    notificationRecipients: [String],
 });
 
 sourceSchema.methods.toAwsStatementId = function (): string {
@@ -50,6 +51,7 @@ export type SourceDocument = mongoose.Document & {
     automation: AutomationDocument;
     uploads: [UploadDocument];
     dateFilter: DateFilterDocument;
+    notificationRecipients: [string];
 
     toAwsStatementId(): string;
     toAwsRuleDescription(): string;
