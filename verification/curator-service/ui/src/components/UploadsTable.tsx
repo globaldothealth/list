@@ -22,7 +22,6 @@ const styles = (theme: Theme) =>
             marginTop: theme.spacing(2),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -208,15 +207,12 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         <span className={classes.spacer}></span>
                                         <TablePagination
                                             {...props}
-                                            classes={{
-                                                ...props.classes,
-                                                root: classes.paginationRoot,
-                                            }}
                                         ></TablePagination>
                                     </div>
                                 );
                             },
                         }}
+                        style={{ fontFamily: 'Inter' }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/

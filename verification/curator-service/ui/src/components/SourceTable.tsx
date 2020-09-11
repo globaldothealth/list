@@ -112,7 +112,6 @@ const styles = (theme: Theme) =>
             marginBottom: theme.spacing(1),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -535,21 +534,18 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             Pagination: (props): JSX.Element => {
                                 return (
                                     <div className={classes.tablePaginationBar}>
-                                        <Typography>
+                                        <Typography style={{ width: '100%' }}>
                                             Ingestion sources
                                         </Typography>
                                         <span className={classes.spacer}></span>
                                         <TablePagination
                                             {...props}
-                                            classes={{
-                                                ...props.classes,
-                                                root: classes.paginationRoot,
-                                            }}
                                         ></TablePagination>
                                     </div>
                                 );
                             },
                         }}
+                        style={{ fontFamily: 'Inter' }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/
