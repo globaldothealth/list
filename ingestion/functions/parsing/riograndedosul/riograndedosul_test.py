@@ -42,5 +42,5 @@ class RGDSTest(unittest.TestCase):
         current_dir = os.path.dirname(__file__)
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
-        result = riograndedosul.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(result, [_PARSED_CASE])
+        result = next(riograndedosul.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL))
+        self.assertCountEqual([result], [_PARSED_CASE])
