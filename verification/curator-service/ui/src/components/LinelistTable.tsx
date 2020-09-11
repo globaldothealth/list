@@ -53,7 +53,6 @@ interface LinelistTableState {
     url: string;
     error: string;
     pageSize: number;
-    search: string;
     // The rows which are selected on the current page.
     selectedRowsCurrentPage: TableRow[];
     // The total number of rows selected. This can be larger than
@@ -82,13 +81,13 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
-    searchQuery: string;
 }
 
 interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
+    search: string;
 }
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
@@ -108,10 +107,6 @@ const styles = (theme: Theme) =>
             display: 'flex',
             justifyContent: 'center',
         },
-        downloadButton: {
-            marginLeft: theme.spacing(2),
-            marginRight: theme.spacing(2),
-        },
         spacer: { flex: 1 },
         paginationRoot: { border: 'unset' },
         tablePaginationBar: {
@@ -125,10 +120,6 @@ const styles = (theme: Theme) =>
         },
         toolbarItems: {
             color: 'white',
-        },
-        topBar: {
-            display: 'flex',
-            alignItems: 'center',
         },
     });
 
@@ -165,7 +156,7 @@ const StyledSearchTextField = withStyles({
     },
 })(TextField);
 
-function SearchBar(props: {
+export function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
 }): JSX.Element {
@@ -422,11 +413,32 @@ function RowMenu(props: {
     );
 }
 
+export function DownloadButton(props: { search: string }): JSX.Element {
+    const downloadCases = (): void => {
+        const requestBody = props.search.trim() ? { query: props.search } : {};
+        axios
+            .post('/api/cases/download', requestBody)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => {
+                console.error(e);
+            });
+    };
+
+    return (
+        <Button
+            variant="outlined"
+            color="primary"
+            onClick={downloadCases}
+            startIcon={<SaveAltIcon />}
+        >
+            Download
+        </Button>
+    );
+}
+
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    unlisten: () => void = () => {};
 
     constructor(props: Props) {
         super(props);
@@ -434,7 +446,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             url: '/api/cases/',
             error: '',
             pageSize: 50,
-            search: this.props.location.state?.searchQuery ?? '',
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
@@ -444,31 +455,21 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
             this,
         );
-        this.downloadCases = this.downloadCases.bind(this);
         this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
     }
 
-    componentDidMount(): void {
-        // history.location.state can be updated with new values on which we
-        // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) => {
-            this.setState({
-                search: this.props.history.location.state?.searchQuery ?? '',
-            });
+    componentDidUpdate(prevProps: Props): void {
+        if (prevProps.search !== this.props.search) {
             this.tableRef.current?.onQueryChange();
-        });
-    }
-
-    componentWillUnmount(): void {
-        this.unlisten();
+        }
     }
 
     async deleteCases(): Promise<void> {
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.state.search } };
+            requestBody = { data: { query: this.props.search } };
         } else {
             requestBody = {
                 data: {
@@ -526,7 +527,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             const updateUrl = this.state.url + 'batchUpdateQuery';
             this.setState({ error: '' });
             const response = axios.post(updateUrl, {
-                query: this.state.search,
+                query: this.props.search,
                 case: {
                     'caseReference.verificationStatus': verificationStatus,
                 },
@@ -540,25 +541,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    downloadCases(): void {
-        const requestBody = this.state.search.trim()
-            ? { query: this.state.search }
-            : {};
-        this.setState({ error: '' });
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
-            .catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
-                });
-            });
-    }
-
     downloadSelectedCases(): void {
         let requestBody = {};
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.state.search };
+            requestBody = { query: this.props.search };
         } else {
             requestBody = {
                 caseIds: this.state.selectedRowsCurrentPage.map(
@@ -678,24 +664,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <div className={classes.topBar}>
-                    <SearchBar
-                        searchQuery={this.state.search}
-                        onSearchChange={(search: string): void => {
-                            this.setState({ search: search });
-                            this.tableRef.current.onQueryChange();
-                        }}
-                    ></SearchBar>
-                    <Button
-                        className={classes.downloadButton}
-                        variant="outlined"
-                        color="primary"
-                        onClick={this.downloadCases}
-                        startIcon={<SaveAltIcon />}
-                    >
-                        Download
-                    </Button>
-                </div>
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
@@ -836,7 +804,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            const trimmedQ = this.state.search.trim();
+                            const trimmedQ = this.props.search.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
@@ -996,7 +964,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...(this.state.search.trim() !== ''
+                                  ...(this.props.search.trim() !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
