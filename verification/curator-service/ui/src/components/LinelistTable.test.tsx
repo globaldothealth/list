@@ -90,7 +90,7 @@ it('loads and displays cases', async () => {
 
     const { findByText, findByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable search="" user={curator} />
         </MemoryRouter>,
     );
 
@@ -147,7 +147,7 @@ it('API errors are displayed', async () => {
 
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable search="" user={curator} />
         </MemoryRouter>,
     );
 
@@ -207,7 +207,7 @@ it('can delete a row', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable search="" user={curator} />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -293,7 +293,7 @@ it('can cancel delete action', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable search="" user={curator} />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -355,6 +355,7 @@ it('cannot edit data as a reader only', async () => {
     const { findByText, queryByTestId } = render(
         <MemoryRouter>
             <LinelistTable
+                search=""
                 user={{
                     _id: 'testUser',
                     name: 'Alice Smith',
