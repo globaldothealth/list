@@ -21,6 +21,9 @@ UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
 
+# Expected date fields format.
+DATE_FORMAT = "%m/%d/%YZ"
+
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
 # usage on the server-side and is known to cause OOMs so increase with caution.
@@ -164,7 +167,7 @@ def filter_cases_by_date(
         confirmed_event = [e for e in case["events"]
                            if e["name"] == "confirmed"][0]
         case_date = datetime.datetime.strptime(
-            confirmed_event["dateRange"]["start"], "%m/%d/%YZ")
+            confirmed_event["dateRange"]["start"], DATE_FORMAT)
         delta_days = (case_date - cutoff_date).days
         if op == "EQ":
             return delta_days == 0

@@ -25,7 +25,7 @@ def convert_date(raw_date: str):
     assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
     """
     date = datetime.strptime(raw_date, "%Y%m%d")
-    return date.strftime("%m/%d/%Y")
+    return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender):

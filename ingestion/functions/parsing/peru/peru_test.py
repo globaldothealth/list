@@ -30,7 +30,7 @@ class PeruTest(unittest.TestCase):
                                         'demographics': {'ageRange': {'start': 58.0, 'end': 58.0}, 'gender': 'Male'},
                                         'events': [{'name': 'confirmed',
                                                     'value': 'PCR test',
-                                                    'dateRange': {'start': '07/24/2020', 'end': '07/24/2020'}}]},
+                                                    'dateRange': {'start': '07/24/2020Z', 'end': '07/24/2020Z'}}]},
                                        {'caseReference': {'sourceId': 'place_holder',
                                                           'sourceEntryId': 'e81602051997ace8340bb8c18fe24c65',
                                                           'sourceUrl': 'place_holder'},
@@ -39,7 +39,7 @@ class PeruTest(unittest.TestCase):
                                                          'gender': 'Female'},
                                         'events': [{'name': 'confirmed',
                                                     'value': 'PCR test',
-                                                    'dateRange': {'start': '07/24/2020', 'end': '07/24/2020'}}]},
+                                                    'dateRange': {'start': '07/24/2020Z', 'end': '07/24/2020Z'}}]},
                                        {'caseReference': {'sourceId': 'place_holder',
                                                           'sourceEntryId': 'cecdbf10074dbc011ae05b3cbd320a6f',
                                                           'sourceUrl': 'place_holder'},
@@ -47,7 +47,7 @@ class PeruTest(unittest.TestCase):
                                         'demographics': {'ageRange': {'start': 58.0, 'end': 58.0}, 'gender': 'Male'},
                                         'events': [{'name': 'confirmed',
                                                     'value': 'PCR test',
-                                                    'dateRange': {'start': '07/23/2020', 'end': '07/23/2020'}}]},
+                                                    'dateRange': {'start': '07/23/2020Z', 'end': '07/23/2020Z'}}]},
                                        {'caseReference': {'sourceId': 'place_holder',
                                                           'sourceEntryId': '566af4276cbe9359abe93f9aa86396c3',
                                                           'sourceUrl': 'place_holder'},
@@ -55,7 +55,7 @@ class PeruTest(unittest.TestCase):
                                         'demographics': {'ageRange': {'start': 58.0, 'end': 58.0}, 'gender': 'Male'},
                                         'events': [{'name': 'confirmed',
                                                     'value': 'PCR test',
-                                                    'dateRange': {'start': '07/23/2020', 'end': '07/23/2020'}}]},
+                                                    'dateRange': {'start': '07/23/2020Z', 'end': '07/23/2020Z'}}]},
                                        {'caseReference': {'sourceId': 'place_holder',
                                                           'sourceEntryId': '027561e9d126e7c283d79c02cede562d',
                                                           'sourceUrl': 'place_holder'},
@@ -63,7 +63,7 @@ class PeruTest(unittest.TestCase):
                                         'demographics': {'ageRange': {'start': 28.0, 'end': 28.0}, 'gender': 'Male'},
                                         'events': [{'name': 'confirmed',
                                                     'value': 'PCR test',
-                                                    'dateRange': {'start': '07/24/2020', 'end': '07/24/2020'}
+                                                    'dateRange': {'start': '07/24/2020Z', 'end': '07/24/2020Z'}
                                                     }]}
                                        ]
                               )
