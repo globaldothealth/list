@@ -113,7 +113,17 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
+        paginationRoot: {
+            border: 'unset',
+            fontFamily: 'Inter',
+            '& .MuiTablePagination-input': {
+                fontFamily: 'Inter',
+            },
+            '&&& .MuiTypography-root': {
+                fontFamily: 'Inter',
+                fontSize: '14px',
+            },
+        },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -952,6 +962,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${this.state.numSelectedRows} rows selected`,
                         },
                     }}
+                    style={{ fontFamily: 'Inter' }}
                     options={{
                         search: false,
                         emptyRowsWhenPaging: false,
