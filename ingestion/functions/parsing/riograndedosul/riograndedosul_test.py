@@ -17,7 +17,9 @@ _PARSED_CASE = (
             'sourceId': "abc123",
             'sourceUrl': "https://ti.saude.rs.gov.br/covid19/download"
         },
-        'location': 'Água Santa, Rio Grande do Sul, Brazil',
+        'location': {
+            'query': 'Água Santa, Rio Grande do Sul, Brazil'
+            },
         'events': [
             {
                 'name': 'confirmed',
