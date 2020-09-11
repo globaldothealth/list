@@ -6,7 +6,6 @@ import io
 from chardet import detect
 
 import boto3
-import google.auth.transport.requests
 import requests
 
 from datetime import datetime, timezone
@@ -101,7 +100,7 @@ def retrieve_content(
         bytesio = io.BytesIO(r.content)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
-        detected_enc = detect(bytesio.read(2<<20))
+        detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         print(f'Source encoding is presumably {detected_enc}')
         source_encoding = detected_enc['encoding']

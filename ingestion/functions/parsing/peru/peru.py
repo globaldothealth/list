@@ -1,7 +1,6 @@
-import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -18,7 +17,7 @@ except ImportError:
 
 
 def convert_date(raw_date: str):
-    """ 
+    """
     Convert raw date field into a value interpretable by the dataserver.
 
     The date is listed in YYYYmmdd format, but the data server API will
@@ -62,36 +61,34 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        cases = []
         for entry in reader:
-            case =  {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceEntryId": entry["UUID"],
-                        "sourceUrl": source_url
-                    },
-                    "location": convert_location(entry),
-                    "events": [
-                        {
-                            "name": "confirmed",
-                            "value": conf_methods.get(entry['METODODX']),
-                            "dateRange":
+            case = {
+                "caseReference": {
+                    "sourceId": source_id,
+                    "sourceEntryId": entry["UUID"],
+                    "sourceUrl": source_url
+                },
+                "location": convert_location(entry),
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "value": conf_methods.get(entry['METODODX']),
+                        "dateRange":
                             {
                                 "start": convert_date(entry["FECHA_RESULTADO"]),
                                 "end": convert_date(entry["FECHA_RESULTADO"])
-                            }
                         }
-                    ],
-                    "demographics": {
-                        "ageRange": {
-                            "start": float(entry["EDAD"]),
-                            "end": float(entry["EDAD"])
-                        },
-                        "gender": convert_gender(entry["SEXO"])
                     }
+                ],
+                "demographics": {
+                    "ageRange": {
+                        "start": float(entry["EDAD"]),
+                        "end": float(entry["EDAD"])
+                    },
+                    "gender": convert_gender(entry["SEXO"])
                 }
+            }
             yield case
-    
 
 
 def lambda_handler(event, context):
