@@ -11,7 +11,7 @@ import {
     Typography,
     useMediaQuery,
 } from '@material-ui/core';
-import LinelistTable, { DownloadButton, SearchBar } from './LinelistTable';
+import LinelistTable, { DownloadButton } from './LinelistTable';
 import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
@@ -35,6 +35,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
+import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
@@ -329,7 +330,7 @@ export default function App(): JSX.Element {
 
     useEffect(() => {
         if (location.state) {
-            setLinelistSearchQuery(location.state.searchQuery);
+            setLinelistSearchQuery(location.state.searchQuery ?? '');
         }
     }, [location.state]);
 
