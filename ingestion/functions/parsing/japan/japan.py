@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -15,12 +15,14 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
+
 def convert_gender(raw_gender):
     if "gender" in raw_gender:
         if raw_gender["gender"] == "M":
             return "Male"
         if raw_gender["gender"] == "F":
             return "Female"
+
 
 def convert_age(raw_age):
     age_range = {}
@@ -31,6 +33,7 @@ def convert_age(raw_age):
     else:
         return None
 
+
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
@@ -40,11 +43,23 @@ def convert_location(raw_entry):
         if term and term != "Unspecified"]
     return {"query":  ", ".join(query_terms)}
 
+
 def detect_notes(raw_notes):
     if "notes" in raw_notes:
         return raw_notes["notes"]
     else:
         return None
+
+
+def convert_date(raw_date: str):
+    """
+    Convert raw date field into a value interpretable by the dataserver.
+
+    The date filtering API expects mm/dd/YYYYZ format.
+    """
+    date = datetime.strptime(raw_date, "%Y-%m-%d")
+    return date.strftime("%m/%d/%YZ")
+
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
@@ -65,8 +80,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": entry["dateAnnounced"],
-                            "end": entry["dateAnnounced"]
+                            "start": convert_date(entry["dateAnnounced"]),
+                            "end": convert_date(entry["dateAnnounced"]),
                         }
                     }
                 ],

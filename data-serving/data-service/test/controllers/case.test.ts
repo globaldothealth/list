@@ -1067,7 +1067,12 @@ describe('DELETE', () => {
         const c = new Case(minimalCase);
         await c.save();
 
-        return await request(app).delete(`/api/cases/${c._id}`).expect(204);
+        await request(app).delete(`/api/cases/${c._id}`).expect(204);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
     });
     it('delete absent item should return 404 NOT FOUND', () => {
         return request(app)
@@ -1109,6 +1114,14 @@ describe('DELETE', () => {
             .send({ caseIds: [c._id, c2._id] })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(0);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+        expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+            c2.toObject(),
+        );
     });
     it('delete multiple cases with query should return 204 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
@@ -1144,6 +1157,7 @@ describe('DELETE', () => {
             .send({ query: 'gender:Male' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(3);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
 
         // Deletes matched queries
         await request(app)
@@ -1151,11 +1165,25 @@ describe('DELETE', () => {
             .send({ query: 'at work gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(2);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+
         await request(app)
             .delete('/api/cases')
             .send({ query: 'gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(1);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+        expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+            c2.toObject(),
+        );
     });
     it('delete multiple cases cannot go over threshold', async () => {
         // Simulate index creation used in unit tests, in production they are
@@ -1175,5 +1203,7 @@ describe('DELETE', () => {
             .delete('/api/cases')
             .send({ query: 'foo', maxCasesThreshold: 2 })
             .expect(422, /more than the maximum allowed/);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });
