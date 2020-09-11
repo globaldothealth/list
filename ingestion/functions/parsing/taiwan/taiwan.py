@@ -58,6 +58,11 @@ def convert_demographics(gender: str, age: str):
                 "start": float(start),
                 "end": float(end),
             }
+        elif age.isdigit():
+            demo["ageRange"] = {
+                "start": float(age),
+                "end": float(age),
+            }
         elif age == "70+":
             demo["ageRange"] = {
                 "start": 70.0,
@@ -109,7 +114,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "notes": convert_notes(row["是否為境外移入"]),
             }
             # Number of cases that this row represents.
-            print(case)
             for _ in range(int(row["確定病例數"])):
                 yield case
 
