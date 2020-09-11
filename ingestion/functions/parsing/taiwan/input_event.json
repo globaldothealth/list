@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f5b3aa5afd04100287d126d/2020/09/11/0852/content.csv",
+    "sourceUrl": "https://data.cdc.gov.tw/en/download?resourceid=3c1e263d-16ec-4d70-b56c-21c9e2171fc7&dataurl=https://od.cdc.gov.tw/eic/Day_Confirmation_Age_County_Gender_19CoV.csv",
+    "sourceId": "5f5b3aa5afd04100287d126d"
+}

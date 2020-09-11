@@ -16,3 +16,8 @@ a {
   font-weight: 600;
   text-decoration: none;
 }
+
+@font-face {
+  font-family: 'Mabry Pro';
+  src: local('Mabry Pro'), url(./fonts/mabry-regular-pro.ttf) format('truetype');
+}

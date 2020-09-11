@@ -1,0 +1,8 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/peru/head200_content.csv",
+    "sourceUrl": "https://foo.bar",
+    "sourceId": "5f4fa7dc9767ff004b750977"
+}
+

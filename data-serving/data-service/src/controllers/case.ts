@@ -493,21 +493,6 @@ export const batchDel = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
-    // If we have a limit set, check that we do not go over it first.
-    const maxCasesThreshold = req.body['maxCasesThreshold'];
-    if (maxCasesThreshold) {
-        const total = await casesMatchingSearchQuery({
-            searchQuery: req.body.query,
-            count: true,
-        });
-        if (total > Number(maxCasesThreshold)) {
-            res.status(422).json({
-                message: `query ${req.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
-            });
-            return;
-        }
-    }
-
     const casesQuery = casesMatchingSearchQuery({
         searchQuery: req.body.query,
         count: false,

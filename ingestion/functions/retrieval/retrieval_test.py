@@ -129,7 +129,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
 
 def test_extract_event_fields_returns_env_and_source_id(valid_event):
     from retrieval import retrieval
-    env, source_id, auth = retrieval.extract_event_fields(valid_event)
+    env, source_id, _ = retrieval.extract_event_fields(valid_event)
     assert env == valid_event["env"]
     assert source_id == valid_event["sourceId"]
 
@@ -154,7 +154,8 @@ def test_get_source_details_returns_url_and_format(
     requests_mock.get(f"{_SOURCE_API_URL}/sources/{source_id}",
                       json={"format": "CSV",
                             "origin": {"url": content_url, "license": "MIT"}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
+    result = retrieval.get_source_details(
+        "env", source_id, "upload_id", {}, {})
     assert result[0] == content_url
     assert result[1] == "CSV"
     assert result[2] == ""
@@ -171,7 +172,8 @@ def test_get_source_details_returns_parser_arn_if_present(
         json={"origin": {"url": content_url, "license": "MIT"},
               "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
+    result = retrieval.get_source_details(
+        "env", source_id, "upload_id", {}, {})
     assert result[2] == lambda_arn
 
 
@@ -197,7 +199,7 @@ def test_get_source_details_raises_error_if_source_not_found(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_get_source_details_raises_error_if_other_errors_getting_source(
@@ -222,7 +224,7 @@ def test_get_source_details_raises_error_if_other_errors_getting_source(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
@@ -284,7 +286,7 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_raises_error_for_source_content_not_found(
@@ -308,7 +310,7 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
@@ -332,7 +334,7 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_upload_to_s3_writes_indicated_file_to_key(s3):
@@ -370,4 +372,4 @@ def test_upload_to_s3_raises_error_on_s3_error(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
