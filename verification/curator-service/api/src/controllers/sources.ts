@@ -3,6 +3,7 @@ import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
 import AwsLambdaClient from '../clients/aws-lambda-client';
+import EmailClient from '../clients/email-client';
 
 /**
  * SourcesController handles HTTP requests from curators and automated ingestion
@@ -10,6 +11,7 @@ import AwsLambdaClient from '../clients/aws-lambda-client';
  */
 export default class SourcesController {
     constructor(
+        private readonly emailClient: EmailClient,
         private readonly lambdaClient: AwsLambdaClient,
         private readonly awsEventsClient: AwsEventsClient,
         private readonly retrievalFunctionArn: string,

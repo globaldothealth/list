@@ -7,6 +7,7 @@ import session, { SessionOptions } from 'express-session';
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
+import EmailClient from './clients/email-client';
 import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
@@ -112,6 +113,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
 
+// Configure email client.
+// let emailClient: EmailClient;
+// EmailClient.create(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
+//     .then((client) => {
+//         emailClient = client;
+//     })
+//     .catch((e) => {
+//         console.error('Failed to instantiate email client:', e);
+//         process.exit(1);
+//     });
+
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
@@ -131,11 +143,22 @@ new OpenApiValidator({
 })
     .install(app)
     .then(() => {
+        return new EmailClient(
+            env.EMAIL_USER_ADDRESS,
+            env.EMAIL_USER_PASSWORD,
+        ).initialize();
+    })
+    .catch((e) => {
+        console.error('Failed to instantiate email client:', e);
+        process.exit(1);
+    })
+    .then((emailClient) => {
         // Configure curator API routes.
         const apiRouter = express.Router();
 
         // Configure sources controller.
         const sourcesController = new SourcesController(
+            emailClient,
             awsLambdaClient,
             awsEventsClient,
             env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
