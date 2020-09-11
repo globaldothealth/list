@@ -65,6 +65,7 @@ def convert_demographics(gender: str, age: str):
         elif age == "over 85":
             demo["ageRange"] = {
                 "start": 85.0,
+                "end": 120.0,
             }
         else:
             raise ValueError(f'Unhandled age: {age}')

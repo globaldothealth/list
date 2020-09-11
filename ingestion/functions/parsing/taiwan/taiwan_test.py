@@ -54,7 +54,24 @@ _PARSED_CASES = [
         ],
         'demographics': {
             'gender': 'Male',
-            'ageRange': {'start': 55.0, 'end': 59.0},
+            'ageRange': {'start': 55.0, 'end': 55.0},
+        },
+        'notes': 'Case is from Taiwan'
+    }, {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceUrl": _SOURCE_URL,
+        },
+        'location': {'query': '彰化縣, Taiwan'},
+        'events': [
+            {
+                'name': 'confirmed',
+                'dateRange': {'start': '01/24/2020Z', 'end': '01/24/2020Z'},
+            },
+        ],
+        'demographics': {
+            'gender': 'Male',
+            'ageRange': {'start': 70.0, 'end': 120.0},
         },
         'notes': 'Case is from Taiwan'
     },
