@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "data-serving/data-service/schemas/**"
+      - ".github/workflows/update-prod-db-schema.yaml"
 
 jobs:
   update-case-data:
