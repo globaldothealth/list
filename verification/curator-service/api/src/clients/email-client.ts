@@ -14,30 +14,21 @@ export enum EmailService {
  * SMTP client that sends email via nodemailer.
  */
 export default class EmailClient {
-    private constructor(
-        private readonly service: EmailService,
-        private readonly transport: Mail,
-    ) {}
+    private service?: EmailService;
+    private transport?: Mail;
+    constructor(private user?: string, private password?: string) {}
 
     /**
-     * Creates a client instance based on the provided user/pass,
+     * Initializes a client based on the stored user and password fields.
      *
-     * Both params must be provided to establish a real (Gmail-based)
+     * Both fields must be present to establish a real (Gmail-based)
      * connection. If either is absent, a testing service (Ethereal) is used.
-     *
-     * @param user - The email address to send mail from (e.g. foo@gmail.com).
-     * @param password - The password for the above account.
      */
-    static async create(
-        user?: string,
-        password?: string,
-    ): Promise<EmailClient> {
-        let service: EmailService;
-        let transport: Mail;
-        if (!user || !password) {
-            service = EmailService.Ethereal;
+    async initialize(): Promise<EmailClient> {
+        if (!this.user || !this.password) {
+            this.service = EmailService.Ethereal;
             const testAccount = await nodemailer.createTestAccount();
-            transport = nodemailer.createTransport({
+            this.transport = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
                 port: 587,
                 secure: false, // true for 465, false for other ports
@@ -47,17 +38,17 @@ export default class EmailClient {
                 },
             });
         } else {
-            service = EmailService.Gmail;
-            transport = nodemailer.createTransport({
+            this.service = EmailService.Gmail;
+            this.transport = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
-                    user: user,
-                    pass: password,
+                    user: this.user,
+                    pass: this.password,
                 },
             });
         }
 
-        return new EmailClient(service, transport);
+        return this;
     }
 
     /**
@@ -67,23 +58,26 @@ export default class EmailClient {
      * @param subject - Subject of the email.
      * @param text - Body/content of the email.
      */
-    send = (
+    send(
         addressees: string[],
         subject: string,
         text: string,
-    ): Promise<SentMessageInfo> => {
+    ): Promise<SentMessageInfo> {
+        if (this.transport === undefined) {
+            throw new Error('Client must be initialized prior to use.');
+        }
         const mailOptions = {
             to: addressees,
             subject: subject,
             text: text,
         };
         return this.transport.sendMail(mailOptions);
-    };
+    }
 
     /**
      * Getter returning the configured SMTP service.
      */
-    getService = (): EmailService => {
+    getService = (): EmailService | undefined => {
         return this.service;
     };
 }
