@@ -118,6 +118,9 @@ const styles = (theme: Theme) =>
             display: 'flex',
             height: '64px',
         },
+        tableTitle: {
+            width: '100%',
+        },
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
@@ -534,7 +537,11 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             Pagination: (props): JSX.Element => {
                                 return (
                                     <div className={classes.tablePaginationBar}>
-                                        <Typography style={{ width: '100%' }}>
+                                        <Typography
+                                            classes={{
+                                                root: classes.tableTitle,
+                                            }}
+                                        >
                                             Ingestion sources
                                         </Typography>
                                         <span className={classes.spacer}></span>
