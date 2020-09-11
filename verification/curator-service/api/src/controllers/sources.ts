@@ -6,7 +6,8 @@ import AwsLambdaClient from '../clients/aws-lambda-client';
 import EmailClient from '../clients/email-client';
 
 enum NotificationType {
-    Create = 'Create',
+    Add = 'Add',
+    Remove = 'Remove',
 }
 
 /**
@@ -127,7 +128,7 @@ export default class SourcesController {
         // Careful here, source.isModified('automation.schedule.awsScheduleExpression')
         // will return true even when just the parser is updated which is
         // error prone, prefer isModified() without dotted.paths if possible.
-        if (source.automation?.schedule?.isModified('awsScheduleExpression')) {
+        if (source.automation?.isModified('schedule')) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
                     source.toAwsRuleName(),
@@ -139,6 +140,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
+                this.sendNotifications(source, NotificationType.Add);
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
@@ -147,6 +149,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
+                this.sendNotifications(source, NotificationType.Remove);
             }
         } else if (
             source.isModified('name') &&
@@ -201,7 +204,7 @@ export default class SourcesController {
                 source.toAwsStatementId(),
             );
             source.set('automation.schedule.awsRuleArn', createdRuleArn);
-            await this.sendNotifications(source, NotificationType.Create);
+            await this.sendNotifications(source, NotificationType.Add);
         }
     }
 
@@ -259,12 +262,12 @@ export default class SourcesController {
             let subject: string;
             let text: string;
             switch (type) {
-                case NotificationType.Create:
-                    subject = 'New source configured for automation';
+                case NotificationType.Add:
+                    subject = 'Automation added for source';
                     if (source.name) {
                         subject.concat(`: ${source.name}`);
                     }
-                    text = `A new source was configured for automation in G.h List.
+                    text = `Automation was configured for the following source in G.h List;
                     \n
                     \tID: ${source._id}
                     \tName: ${source.name}
@@ -272,6 +275,18 @@ export default class SourcesController {
                     \tFormat: ${source.format}
                     \tSchedule: ${source.automation.schedule.awsScheduleExpression}
                     \tParser: ${source.automation.parser?.awsLambdaArn}`;
+                    break;
+                case NotificationType.Remove:
+                    subject = 'Automation removed for source';
+                    if (source.name) {
+                        subject.concat(`: ${source.name}`);
+                    }
+                    text = `Automation was removed for the following source in G.h List.
+                    \n
+                    \tID: ${source._id}
+                    \tName: ${source.name}
+                    \tURL: ${source.origin.url}
+                    \tFormat: ${source.format}`;
                     break;
                 default:
                     throw new Error(
