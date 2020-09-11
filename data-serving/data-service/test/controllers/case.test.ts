@@ -1203,6 +1203,7 @@ describe('DELETE', () => {
             .delete('/api/cases')
             .send({ query: 'foo', maxCasesThreshold: 2 })
             .expect(422, /more than the maximum allowed/);
+        expect(await Case.collection.countDocuments()).toEqual(3);
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });

@@ -3,6 +3,7 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    batchDeleteCheckThreshold,
     batchUpsertDropUnchangedCases,
     createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
@@ -128,6 +129,7 @@ new OpenApiValidator({
         );
         apiRouter.delete(
             '/cases',
+            batchDeleteCheckThreshold,
             createBatchDeleteCaseRevisions,
             caseController.batchDel,
         );
