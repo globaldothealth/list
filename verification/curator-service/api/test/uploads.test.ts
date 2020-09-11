@@ -12,10 +12,11 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
-const mockInitialize = jest.fn().mockResolvedValue({});
+const mockSend = jest.fn().mockResolvedValue({});
+const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
-        return { initialize: mockInitialize };
+        return { send: mockSend, initialize: mockInitialize };
     });
 });
 
@@ -34,6 +35,8 @@ beforeEach(async () => {
     await Upload.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
+
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {
@@ -193,6 +196,31 @@ describe('POST', () => {
 
         expect(res.body._id).toEqual(upload._id.toString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
+    });
+    it('should send a notification email if status is error and recipients defined', async () => {
+        const source = await new Source(fullSource).save();
+        const upload = new Upload(minimalUpload);
+        upload.status = 'ERROR';
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(source.notificationRecipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if status not error', async () => {
+        const source = await new Source(fullSource).save();
+        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).not.toHaveBeenCalled();
     });
 });
 
