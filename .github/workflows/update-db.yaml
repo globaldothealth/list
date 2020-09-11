@@ -20,18 +20,19 @@ jobs:
         with:
           node-version: "12.x"
 
-      - name: Update prod schema
+      - name: Update dev schema
         env:
-          CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
+          CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
           DB: "covid19"
           COLL: "cases"
           # Those are relative to the setup-db directory, not the working dir.
           SCHEMA: "../../data-service/schemas/cases.schema.json"
           INDEXES: "../../data-service/schemas/cases.indexes.json"
         run: npm --prefix data-serving/scripts/setup-db run setup
-      - name: Update dev schema
+      
+      - name: Update prod schema
         env:
-          CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
+          CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
           DB: "covid19"
           COLL: "cases"
           # Those are relative to the setup-db directory, not the working dir.
