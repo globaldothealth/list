@@ -113,17 +113,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authController.router);
 
-// Configure email client.
-// let emailClient: EmailClient;
-// EmailClient.create(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
-//     .then((client) => {
-//         emailClient = client;
-//     })
-//     .catch((e) => {
-//         console.error('Failed to instantiate email client:', e);
-//         process.exit(1);
-//     });
-
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
     env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
