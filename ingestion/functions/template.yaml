@@ -127,6 +127,18 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+  PeruParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/peru/
+      Handler: peru.lambda_handler
+      Description: Parse case data across Peru
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
   BrazilAmapaParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
