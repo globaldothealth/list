@@ -82,6 +82,7 @@ export default class UploadsController {
                   {
                       $match: {
                           $or: [
+                              { 'uploads.status': { $ne: 'SUCCESS' } },
                               { 'uploads.summary.numCreated': { $gt: 0 } },
                               { 'uploads.summary.numUpdated': { $gt: 0 } },
                           ],
