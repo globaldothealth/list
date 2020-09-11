@@ -1,16 +1,11 @@
-import csv
-import json
 import os
-import tempfile
 import unittest
-from datetime import date
-
-import pytest
 
 from brazil_amapa import amapa
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
+
 
 class AmapaTest(unittest.TestCase):
     def setUp(self):
@@ -30,10 +25,10 @@ class AmapaTest(unittest.TestCase):
                 },
                 "location": {
                     "query": "Laranjal do Jari, Amapá, Brazil"
-                    },
+                },
                 "demographics": {
                     "gender": "Female",
-                    "ageRange": 
+                    "ageRange":
                     {
                         "start": float(54),
                         "end": float(54)
@@ -46,8 +41,8 @@ class AmapaTest(unittest.TestCase):
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": "2020-04-22T03:00:00.000Z",
-                            "end": "2020-04-22T03:00:00.000Z"
+                            "start": "04/22/2020Z",
+                            "end": "04/22/2020Z"
                         },
                         "value": "Serological test"
                     },
@@ -55,7 +50,7 @@ class AmapaTest(unittest.TestCase):
                 "preexistingConditions": {
                     "hasPreexistingConditions": True,
                     "values": ["diabetes mellitus", "heart disease"]
-                    },
+                },
                 "notes": "Neighbourhood: AGRESTE"
             }
         ])

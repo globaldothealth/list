@@ -3,8 +3,6 @@ import os
 import pytest
 import tempfile
 
-from datetime import date
-
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
@@ -23,8 +21,8 @@ _PARSED_CASE = (
                 "name": "confirmed",
                 "dateRange":
                         {
-                            "start": "2020-03-13",
-                            "end": "2020-03-13"
+                            "start": "03/13/2020Z",
+                            "end": "03/13/2020Z"
                         }
             }
         ],
@@ -56,4 +54,3 @@ def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
 
         result = next(japan.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL))
         assert result == _PARSED_CASE
-

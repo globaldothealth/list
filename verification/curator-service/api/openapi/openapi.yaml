@@ -245,8 +245,8 @@ paths:
         - name: changes_only
           in: query
           description: > 
-            Filters the list of uploads to only return uploads that created or
-            modified cases
+            Filters successful uploads to only include those that created or modified 
+            cases. The response will still include non-successful uploads.
           required: false
           schema:
             type: boolean
