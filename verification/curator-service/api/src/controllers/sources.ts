@@ -140,7 +140,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
-                this.sendNotifications(source, NotificationType.Add);
+                await this.sendNotifications(source, NotificationType.Add);
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
@@ -149,7 +149,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
-                this.sendNotifications(source, NotificationType.Remove);
+                await this.sendNotifications(source, NotificationType.Remove);
             }
         } else if (
             source.isModified('name') &&
@@ -224,6 +224,7 @@ export default class SourcesController {
                 this.retrievalFunctionArn,
                 source.toAwsStatementId(),
             );
+            await this.sendNotifications(source, NotificationType.Remove);
         }
         source.remove();
         res.status(204).end();
