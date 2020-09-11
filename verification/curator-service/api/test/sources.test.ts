@@ -317,6 +317,30 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
+    it('should send a notification email if automation and recipients defined', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: recipients,
+        };
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        const createdSource = new Source(res.body);
+        expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
     it('should not create an incomplete source', async () => {
         await curatorRequest.post('/api/sources').send({}).expect(400);
     });
