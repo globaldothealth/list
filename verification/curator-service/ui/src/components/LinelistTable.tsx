@@ -400,8 +400,7 @@ function RowMenu(props: {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Case {props.rowId} will be permanently deleted and can
-                        not be recovered.
+                        Case {props.rowId} will be permanently deleted.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -424,6 +423,7 @@ function RowMenu(props: {
 }
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
+    maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
@@ -446,6 +446,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
         this.downloadCases = this.downloadCases.bind(this);
         this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
+        this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
+        this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
     }
 
     componentDidMount(): void {
@@ -575,6 +577,34 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             });
     }
 
+    confirmationDialogTitle(): string {
+        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+            return 'Error';
+        }
+        return (
+            'Are you sure you want to delete ' +
+            (this.state.numSelectedRows === 1
+                ? '1 case'
+                : `${this.state.numSelectedRows} cases`) +
+            '?'
+        );
+    }
+
+    confirmationDialogBody(): string {
+        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+            return (
+                `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
+                ' An admin can preform the deletion if it is valid.'
+            );
+        }
+        return (
+            (this.state.numSelectedRows === 1
+                ? '1 case'
+                : `${this.state.numSelectedRows} cases`) +
+            ' will be permanently deleted.'
+        );
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -675,20 +705,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     // would trigger the onRowClick action.
                     onClick={(e): void => e.stopPropagation()}
                 >
-                    <DialogTitle>
-                        Are you sure you want to delete{' '}
-                        {this.state.numSelectedRows === 1
-                            ? '1 case'
-                            : `${this.state.numSelectedRows} cases`}
-                        ?
-                    </DialogTitle>
+                    <DialogTitle>{this.confirmationDialogTitle()}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {this.state.numSelectedRows === 1
-                                ? '1 case'
-                                : `${this.state.numSelectedRows} cases`}{' '}
-                            will be permanently deleted and can not be
-                            recovered.
+                            {this.confirmationDialogBody()}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -701,9 +721,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         >
                             Cancel
                         </Button>
-                        <Button onClick={this.deleteCases} color="primary">
-                            Yes
-                        </Button>
+                        {this.state.numSelectedRows <=
+                            this.maxDeletionThreshold && (
+                            <Button onClick={this.deleteCases} color="primary">
+                                Yes
+                            </Button>
+                        )}
                     </DialogActions>
                 </Dialog>
                 <MaterialTable
