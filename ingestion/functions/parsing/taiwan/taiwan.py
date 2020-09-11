@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -15,14 +15,14 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-# Fixed location, all cases are for Estonia and no finer location is available in the source.
-_LOCATION = {
-    "country": "Estonia",
+TAIWAN_LOCATION = {
+    "country": "Taiwan",
+    # Go to wikipedia to debate please, thank you.
     "geoResolution": "Country",
-    "name": "Estonia",
+    "name": "Taiwan",
     "geometry": {
-        "longitude": "25.7615268448868",
-        "latitude": "58.7783968568071"
+        "longitude": "120.930229378541",
+        "latitude": "23.7779779950014"
     }
 }
 
@@ -31,21 +31,17 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    The date is listed in YYYY-mm-dd HH:MM:SS format (i.e.: 2020-03-06 18:44:00), but the date filtering API
-    expects mm/dd/YYYYZ format.
+    Date filtering API expects mm/dd/YYYYZ format.
     """
-    date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
+    date = datetime.strptime(raw_date, "%Y/%m/%d")
     return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender: str):
-    if raw_gender.upper() == "M":
+    if raw_gender == "男":
         return "Male"
-    elif raw_gender.upper() == "N":
+    elif raw_gender == "女":
         return "Female"
-    elif raw_gender.upper() == "U":
-        # Unknown
-        return None
     else:
         raise ValueError(f'Unhandled gender: {raw_gender}')
 
@@ -62,9 +58,14 @@ def convert_demographics(gender: str, age: str):
                 "start": float(start),
                 "end": float(end),
             }
-        elif age == "over 85":
+        elif age.isdigit():
             demo["ageRange"] = {
-                "start": 85.0,
+                "start": float(age),
+                "end": float(age),
+            }
+        elif age == "70+":
+            demo["ageRange"] = {
+                "start": 70.0,
                 "end": 120.0,
             }
         else:
@@ -72,37 +73,50 @@ def convert_demographics(gender: str, age: str):
     return demo or None
 
 
+def convert_notes(immigration_status: str):
+    return (
+        f"Case is an immigrant" if immigration_status == "是"
+        else "Case is from Taiwan")
+
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
-    """Parses G.h-format case data from raw API data."""
+    """Parses G.h-format case data from raw API data.
+    
+    Remarks: No per-case ID is available so we can't dedupe cases.
+    """
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        next(reader)  # Skip the header.
         for row in reader:
-            # Skip negative cases.
-            if row['ResultValue'] != "P":
-                continue
             case = {
                 "caseReference": {
                     "sourceId": source_id,
                     "sourceUrl": source_url,
-                    "sourceEntryId": row["id"],
                 },
-                "location": _LOCATION,
+                "location": (
+                    # 空值 means "empty value", it's not a city.
+                    {"query": f"{row['縣市']}, Taiwan"} if row['縣市'] != '空值'
+                    else TAIWAN_LOCATION),
                 "events": [
                     {
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": convert_date(row['ResultTime']),
-                            "end": convert_date(row['ResultTime']),
+                            "start": convert_date(row['個案研判日']),
+                            "end": convert_date(row['個案研判日']),
                         },
                     },
                 ],
                 "demographics": convert_demographics(
-                    row['Gender'], row['AgeGroup']),
-                "notes": f"Case residence: {row['Country']} {row['County']}".strip(),
+                    # Sex.
+                    row['性別'],
+                    # Age range.
+                    row['年齡層']),
+                # Immigration status.
+                "notes": convert_notes(row["是否為境外移入"]),
             }
-            yield case
+            # Number of cases that this row represents.
+            for _ in range(int(row["確定病例數"])):
+                yield case
 
 
 def lambda_handler(event, context):
