@@ -46,8 +46,8 @@ class AmapaTest(unittest.TestCase):
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": "2020-04-22T03:00:00.000Z",
-                            "end": "2020-04-22T03:00:00.000Z"
+                            "start": "04/22/2020Z",
+                            "end": "04/22/2020Z"
                         },
                         "value": "Serological test"
                     },

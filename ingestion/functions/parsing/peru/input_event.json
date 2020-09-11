@@ -1,6 +1,16 @@
 {
+<<<<<<< HEAD
     "s3Bucket": "epid-sources-raw",
     "s3Key": "5f0b9a7ead3a2b003edc0e7f/2020/07/12/2320/content.json",
     "sourceUrl": "https://foo.bar",
     "sourceId": "5f0b9a7ead3a2b003edc0e7f"
 }
+=======
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/peru/head200_content.csv",
+    "sourceUrl": "https://foo.bar",
+    "sourceId": "5f4fa7dc9767ff004b750977"
+}
+
+>>>>>>> 4651c0a29d78338723e4843dfa2f313f8f2376ba

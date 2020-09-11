@@ -22,7 +22,7 @@ describe('search query', () => {
 
     it('is parses tokens', () => {
         const res = parseSearchQuery(
-            'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss occupation:"clock maker" country:switzerland outcome:recovered caseid:abc123 uploadid:def456 source:wsj.com admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
+            'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss occupation:"clock maker" country:switzerland outcome:recovered caseid:abc123 uploadid:def456 sourceurl:wsj.com admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
         );
         expect(res).toEqual({
             filters: [
@@ -35,7 +35,7 @@ describe('search query', () => {
                     values: ['male'],
                 },
                 {
-                    path: 'demographics.nationality',
+                    path: 'demographics.nationalities',
                     values: ['swiss'],
                 },
                 {
