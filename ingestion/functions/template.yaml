@@ -53,6 +53,18 @@ Resources:
       RetentionPolicy: Retain
     Metadata:
       BuildMethod: python3.8
+  ThaiParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/thai/
+      Handler: thai.lambda_handler
+      Description: Parse case data for Thailand
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
   IndiaParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -90,12 +102,37 @@ Resources:
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
+  EstoniaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/estonia/
+      Handler: estonia.lambda_handler
+      Description: Parse case data for Estonia
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      MemorySize: 512
+      Layers:
+        - !Ref ParsingLibLayer
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: parsing/ch_zurich/
       Handler: zurich.lambda_handler
       Description: Parse case data for the Zurich Canton of Switzerland
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  PeruParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/peru/
+      Handler: peru.lambda_handler
+      Description: Parse case data across Peru
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
