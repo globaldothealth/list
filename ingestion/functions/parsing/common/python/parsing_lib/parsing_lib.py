@@ -6,11 +6,7 @@ import collections
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
-import google.auth.transport.requests
 import requests
-
-from enum import Enum
-from google.oauth2 import service_account
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
