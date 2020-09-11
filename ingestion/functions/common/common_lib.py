@@ -11,6 +11,7 @@ import tempfile
 import requests
 
 import google
+import google.auth.transport.requests
 
 from enum import Enum
 from google.oauth2 import service_account
