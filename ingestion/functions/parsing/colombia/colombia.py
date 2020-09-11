@@ -39,26 +39,7 @@ def convert_gender(raw_gender):
     return None
 
 
-# def convert_location(raw_entry):
-#     department = raw_entry["Departamento o Distrito "]
-#     city = raw_entry["Ciudad de ubicación"]
-# #     district = raw_entry["DISTRITO"]
-
-#     query_terms = ("Colombia",)
-#     location = {"country": "Colombia"}
-#     if department:
-#         location["administrativeAreaLevel1"] = department
-#         query_terms = (department,) + query_terms
-#     if city:
-#         location["administrativeAreaLevel2"] = city
-#         query_terms = (city,) + query_terms
-
-
-#     location["query"] = ", ".join(query_terms)
-#     return location
-
 def convert_location(raw_entry):
-    #     print(raw_entry['DISTRITO'])
     query_terms = [
         term for term in [
             raw_entry.get("Ciudad de ubicación", ""),
