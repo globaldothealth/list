@@ -113,10 +113,9 @@ def parse_cases(raw_data_file, source_id, source_url):
     symptom_map = {'Leve': 'Mild',
                    'Moderado': 'Moderate',
                    'Grave': 'Serious'}
-    count = 0
+
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        cases = []
         for entry in reader:
             case = {
                 "caseReference": {
@@ -159,7 +158,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     },
                 ]
-                case["notes"] += "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later. \n"
+                case["notes"] += "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later. \n "
 
             # If patient was symptomatic, mark date of onsetSymptoms, otherwise
             # asymptomatic
@@ -181,7 +180,7 @@ def parse_cases(raw_data_file, source_id, source_url):
 
             # Include severity of symptoms
             if entry["Estado"] in ['Leve', 'Moderado', 'Grave']:
-                case["symptoms"]["values"] = symptom_map.get(entry['Estado'])
+                case["symptoms"]["values"] = [symptom_map.get(entry['Estado'])]
 
             # Patient Outcome
             # If patient died, mark date
@@ -220,26 +219,21 @@ def parse_cases(raw_data_file, source_id, source_url):
             # Travel History - we currently do not have any travel dates, so
             # unknown whether in last 30 days (awaiting response)
             if entry["Tipo"].lower() == "importado":
-                case["travelHistory"] = {
-                    "traveledPrior30Days": 'Unknown',
-                    "Country": {
-                        "name": entry['País de procedencia']
-                    }
-                }
-                case["notes"] += "Case caught disease abroad and brought it into Colombia \n"
+                case[
+                    "notes"] += f"Case is reported as importing the disease into Colombia, and country of origin is {entry['País de procedencia']} \n "
             elif entry['Tipo'].lower() == 'relacionado':
-                case["notes"] += "Case was transmitted within Colombia \n"
+                case["notes"] += "Case was transmitted within Colombia \n "
             elif entry['Tipo'].lower() == 'en estudio':
-                case["notes"] += "Case transmission under investigation (unknown) \n"
+                case["notes"] += "Case transmission under investigation (unknown) \n "
 
             # Add notes for each case, including date reported online and how
             # recovery was confirmed
-            case["notes"] += f"Date reported online was {convert_date(entry['fecha reporte web'])}. \n"
+            case["notes"] += f"Date reported online was {convert_date(entry['fecha reporte web'])}. \n "
 
             if entry['Tipo recuperación'] == 'PCR':
-                case["notes"] += f"Patient recovery was confirmed by a negative PCR test. \n"
+                case["notes"] += f"Patient recovery was confirmed by a negative PCR test. \n "
             elif entry['Tipo recuperación'] == 'Tiempo':
-                case["notes"] += f"Patient recovery was confirmed by 21 days elapsing with no symptoms. \n"
+                case["notes"] += f"Patient recovery was confirmed by 21 days elapsing with no symptoms. \n "
 
             yield case
 
