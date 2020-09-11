@@ -1,4 +1,4 @@
-name: Update database schemas
+name: Update databases schema
 
 on:
   push:
