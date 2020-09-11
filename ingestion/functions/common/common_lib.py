@@ -7,7 +7,6 @@ API calls, and it's information that could be easily encoded as state in an
 object.
 """
 
-import os
 import tempfile
 import requests
 
