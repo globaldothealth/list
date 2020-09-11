@@ -154,6 +154,8 @@ def convert_ethnicity(raw_ethnicity: str):
 
 
 def convert_demographics(gender: str, age: str, ethnicity: str):
+    if not any((gender, age, ethnicity)):
+        return None
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
@@ -174,8 +176,8 @@ def convert_demographics(gender: str, age: str, ethnicity: str):
                 "start": float(age_range[0]),
                 "end": float(age_range[1])
             }
-        if ethnicity != "NAO INFORMADO":
-            demo["ethnicity"] = convert_ethnicity(ethnicity.title())
+    if ethnicity != "NAO INFORMADO":
+        demo["ethnicity"] = convert_ethnicity(ethnicity.title())
     return demo
 
 
@@ -194,7 +196,41 @@ def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_not
         raw_notes.append("Indigenous ethnicity: " +
                          raw_notes_indigenousEthnicity)
     notes = (', ').join(raw_notes)
+    if notes == '':
+        return None
     return notes
+
+
+def convert_case(row: list):
+    case = {
+        "caseReference": {
+            "sourceId": source_id,
+            "sourceUrl": source_url
+        },
+        "location": {
+            "query": ", ".join([row[_COUNTY].title(), "Rio Grande do Sul", "Brazil"])
+            },
+        "events": convert_events(
+            row[_DATE_CONFIRMED],
+            row[_DATE_SYMPTOMS],
+            row[_DATE_HOSPITALIZED],
+            row[_DATE_DEATH]),
+        "demographics": convert_demographics(
+            row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]),
+    }
+    if "SIM" in (row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER]):
+        case["symptoms"] = {
+            "status": "Symptomatic",
+            "values": convert_symptoms(row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER])
+        }
+    if row[_COMORBIDITIES]:
+        case["preexistingConditions"] = convert_preexisting_conditions(
+            row[_COMORBIDITIES])
+    notes = convert_notes(
+        row[_COMORBIDITIES], row[_NEIGHBORHOOD], row[_INDIGENOUS])
+    if notes:
+        case["notes"] = notes
+    return case
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -204,38 +240,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f, delimiter=';')
         next(reader)  # Skip the header.
-        for row in reader:
-            try:
-                case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceUrl": source_url
-                    },
-                    "location": ", ".join([row[_COUNTY].title(), "Rio Grande do Sul", "Brazil"]),
-                    "events": convert_events(
-                        row[_DATE_CONFIRMED],
-                        row[_DATE_SYMPTOMS],
-                        row[_DATE_HOSPITALIZED],
-                        row[_DATE_DEATH]),
-                    "demographics": convert_demographics(
-                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]),
-                }
-                if "SIM" in (row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER]):
-                    case["symptoms"] = {
-                        "status": "Symptomatic",
-                        "values": convert_symptoms(row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER])
-                    }
-                if row[_COMORBIDITIES]:
-                    case["preexistingConditions"] = convert_preexisting_conditions(
-                        row[_COMORBIDITIES])
-                notes = convert_notes(
-                    row[_COMORBIDITIES], row[_NEIGHBORHOOD], row[_INDIGENOUS])
-                if notes:
-                    case["notes"] = notes
-                yield case
-            except ValueError as ve:
-                print(ve)
-                print(row)
+        return (convert_case(row) for row in reader)
 
 
 def lambda_handler(event, context):
