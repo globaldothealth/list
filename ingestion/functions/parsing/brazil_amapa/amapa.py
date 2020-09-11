@@ -111,6 +111,15 @@ def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_not
     notes = (', ').join(raw_notes)
     return notes
 
+def convert_date(raw_date: str):
+    """
+    Convert raw date field into a value interpretable by the dataserver.
+
+    The date filtering API expects mm/dd/YYYYZ format.
+    """
+    date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+    return date.strftime("%m/%d/%YZ")
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
         Caveats:
@@ -143,8 +152,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": row[_DATE_CONFIRMED_INDEX],
-                            "end": row[_DATE_CONFIRMED_INDEX]
+                            "start": convert_date(row[_DATE_CONFIRMED_INDEX]),
+                            "end": convert_date(row[_DATE_CONFIRMED_INDEX]),
                         },
                         "value": convert_confirmation_method(row[_METHOD_CONFIRMATION_INDEX])
                     },
