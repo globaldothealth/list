@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {
+    batchDeleteCheckThreshold,
     batchUpsertDropUnchangedCases,
     createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
@@ -737,7 +738,7 @@ describe('batch update', () => {
                 c2.toObject(),
             );
         });
-        it('does not create case revisions if over threshold', async () => {
+        it('does not call next function if over threshold', async () => {
             // Simulate index creation used in unit tests, in production they are
             // setup by the setup-db script and such indexes are not present by
             // default in the in memory mongo spawned by unit tests.
@@ -753,14 +754,20 @@ describe('batch update', () => {
 
             const requestBody = { query: 'foo', maxCasesThreshold: 2 };
             const nextFn = jest.fn();
-            await createBatchDeleteCaseRevisions(
+            await batchDeleteCheckThreshold(
                 { body: requestBody, method: 'DELETE' } as Request,
-                {} as Response,
+                {
+                    status: function (_) {
+                        return this;
+                    },
+                    json: function (_) {
+                        return this;
+                    },
+                } as Response<any>,
                 nextFn,
             );
 
-            expect(nextFn).toHaveBeenCalledTimes(1);
-            expect(await CaseRevision.collection.countDocuments()).toEqual(0);
+            expect(nextFn).toHaveBeenCalledTimes(0);
         });
     });
     describe('delete', () => {
