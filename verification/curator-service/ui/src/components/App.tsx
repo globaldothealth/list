@@ -291,7 +291,7 @@ export default function App(): JSX.Element {
         {
             text: 'Linelist',
             icon: <ListIcon />,
-            to: '/cases',
+            to: { pathname: '/cases', state: { searchQuery: '' } },
             displayCheck: (): boolean =>
                 hasAnyRole(['reader', 'curator', 'admin']),
         },
