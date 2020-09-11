@@ -11,7 +11,8 @@ import {
     Typography,
     useMediaQuery,
 } from '@material-ui/core';
-import { Link, Route, Switch, useHistory } from 'react-router-dom';
+import LinelistTable, { DownloadButton } from './LinelistTable';
+import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
@@ -24,7 +25,6 @@ import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
-import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -35,6 +35,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
+import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
@@ -178,6 +179,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginLeft: '14px',
         marginTop: '8px',
     },
+    searchBar: {
+        flex: 1,
+        marginLeft: theme.spacing(4),
+        marginRight: theme.spacing(2),
+    },
     avatar: {
         width: theme.spacing(3),
         height: theme.spacing(3),
@@ -253,6 +259,10 @@ function ProfileMenu(props: { user: User }) {
     );
 }
 
+interface LocationState {
+    searchQuery: string;
+}
+
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User>({
@@ -267,8 +277,10 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [linelistSearchQuery, setLinelistSearchQuery] = React.useState('');
     const lastLocation = useLastLocation();
     const history = useHistory();
+    const location = useLocation<LocationState>();
     const menuList = [
         {
             text: 'Home',
@@ -279,7 +291,7 @@ export default function App(): JSX.Element {
         {
             text: 'Linelist',
             icon: <ListIcon />,
-            to: '/cases',
+            to: { pathname: '/cases', state: { searchQuery: '' } },
             displayCheck: (): boolean =>
                 hasAnyRole(['reader', 'curator', 'admin']),
         },
@@ -309,12 +321,18 @@ export default function App(): JSX.Element {
 
     useEffect(() => {
         const menuIndex = menuList.findIndex(
-            (menuItem) => menuItem.to === history.location.pathname,
+            (menuItem) => menuItem.to === location.pathname,
         );
         if (menuIndex !== -1) {
             setSelectedMenuIndex(menuIndex);
         }
-    }, [history.location.pathname, menuList]);
+    }, [location.pathname, menuList]);
+
+    useEffect(() => {
+        if (location.state) {
+            setLinelistSearchQuery(location.state.searchQuery ?? '');
+        }
+    }, [location.state]);
 
     const getUser = (): void => {
         axios
@@ -385,7 +403,23 @@ export default function App(): JSX.Element {
                             <MenuIcon />
                         </IconButton>
                         <GHListLogo />
-                        <span className={classes.spacer}></span>
+                        {location.pathname === '/cases' ? (
+                            <>
+                                <div className={classes.searchBar}>
+                                    <SearchBar
+                                        searchQuery={linelistSearchQuery}
+                                        onSearchChange={(searchQuery): void => {
+                                            setLinelistSearchQuery(searchQuery);
+                                        }}
+                                    ></SearchBar>
+                                </div>
+                                <DownloadButton
+                                    search={linelistSearchQuery}
+                                ></DownloadButton>
+                            </>
+                        ) : (
+                            <span className={classes.spacer}></span>
+                        )}
                         <ProfileMenu user={user} />
                     </Toolbar>
                 </AppBar>
@@ -486,7 +520,10 @@ export default function App(): JSX.Element {
                     <Switch>
                         {hasAnyRole(['curator', 'reader', 'admin']) && (
                             <Route exact path="/cases">
-                                <LinelistTable user={user} />
+                                <LinelistTable
+                                    user={user}
+                                    search={linelistSearchQuery}
+                                />
                             </Route>
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
