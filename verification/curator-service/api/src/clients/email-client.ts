@@ -77,7 +77,7 @@ export default class EmailClient {
     /**
      * Getter returning the configured SMTP service.
      */
-    getService = (): EmailService | undefined => {
+    getService(): EmailService | undefined {
         return this.service;
-    };
+    }
 }
