@@ -111,7 +111,16 @@ describe('GET', () => {
         expect(res.body.total).toEqual(15);
     });
     it('should filter for changes only', async () => {
-        const noChangesSource = await new Source(fullSource).save();
+        const sourceWithError = await new Source(fullSource).save();
+
+        const sourceWithNoChanges = new Source(fullSource);
+        sourceWithNoChanges.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({}),
+            }),
+        ];
+        await sourceWithNoChanges.save();
 
         const sourceWithCreatedUploads = new Source(fullSource);
         sourceWithCreatedUploads.uploads = [
@@ -136,11 +145,14 @@ describe('GET', () => {
             .expect('Content-Type', /json/)
             .expect(200);
 
-        expect(res.body.uploads).toHaveLength(2);
+        expect(res.body.uploads).toHaveLength(3);
         expect(res.body.uploads[0].upload._id).toEqual(
-            sourceWithCreatedUploads.uploads[0]._id.toString(),
+            sourceWithError.uploads[0]._id.toString(),
         );
         expect(res.body.uploads[1].upload._id).toEqual(
+            sourceWithCreatedUploads.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[2].upload._id).toEqual(
             sourceWithUpdatedUploads.uploads[0]._id.toString(),
         );
     });
