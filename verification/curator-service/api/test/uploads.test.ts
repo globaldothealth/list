@@ -279,4 +279,35 @@ describe('PUT', () => {
         expect(res.body.uploads[0].summary).toEqual(newSummary);
         expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
+    it('should send a notification email if updated status is error and recipients defined', async () => {
+        fullSource.uploads[0].status = 'SUCCESS';
+        const source = await new Source(fullSource).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'ERROR',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(source.notificationRecipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if updated status is not error', async () => {
+        const source = await new Source(fullSource).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'IN_PROGRESS',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).not.toHaveBeenCalled();
+    });
 });

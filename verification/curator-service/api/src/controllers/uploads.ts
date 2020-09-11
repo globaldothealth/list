@@ -66,6 +66,9 @@ export default class UploadsController {
             }
             await upload.set(req.body).validate();
             const result = await source.save();
+            if (upload.status === 'ERROR') {
+                this.sendErrorNotification(result, upload);
+            }
             res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
