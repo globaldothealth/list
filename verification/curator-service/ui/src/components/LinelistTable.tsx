@@ -96,17 +96,6 @@ const styles = (theme: Theme) =>
             justifyContent: 'center',
         },
         spacer: { flex: 1 },
-        paginationRoot: {
-            border: 'unset',
-            fontFamily: 'Inter',
-            '& .MuiTablePagination-input': {
-                fontFamily: 'Inter',
-            },
-            '&&& .MuiTypography-root': {
-                fontFamily: 'Inter',
-                fontSize: '14px',
-            },
-        },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -703,10 +692,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
-                                        classes={{
-                                            ...props.classes,
-                                            root: classes.paginationRoot,
-                                        }}
                                     ></TablePagination>
                                 </div>
                             ) : (
