@@ -212,6 +212,36 @@ describe('Linelist table', function () {
         cy.get('td[value="France"]');
     });
 
+    it('Search query is saved in browser history', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('United Kingdom');
+        cy.contains('Filter').click();
+        cy.get('li').contains('country').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.contains('United Kingdom').should('not.exist');
+
+        // Navigate to case details and back
+        cy.get('td[value="France"]').click();
+        cy.contains('View case');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.contains('View case').should('not.exist');
+
+        // Search is maintained
+        cy.get('input[id="search-field"]').should(
+            'have.value',
+            'country:France',
+        );
+        cy.get('td[value="France"]');
+        cy.contains('United Kingdom').should('not.exist');
+    });
+
     it('Can select all rows across pages only after searching', function () {
         for (let i = 0; i < 7; i++) {
             cy.addCase({

@@ -273,7 +273,7 @@ function ProfileMenu(props: { user: User }) {
 }
 
 interface LocationState {
-    searchQuery: string;
+    search: string;
 }
 
 export default function App(): JSX.Element {
@@ -290,7 +290,6 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [linelistSearchQuery, setLinelistSearchQuery] = React.useState('');
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
@@ -304,7 +303,7 @@ export default function App(): JSX.Element {
         {
             text: 'Linelist',
             icon: <ListIcon />,
-            to: { pathname: '/cases', state: { searchQuery: '' } },
+            to: { pathname: '/cases', state: { search: '' } },
             displayCheck: (): boolean =>
                 hasAnyRole(['reader', 'curator', 'admin']),
         },
@@ -334,18 +333,13 @@ export default function App(): JSX.Element {
 
     useEffect(() => {
         const menuIndex = menuList.findIndex(
-            (menuItem) => menuItem.to === location.pathname,
+            (menuItem) =>
+                (menuItem.to.pathname ?? menuItem.to) === location.pathname,
         );
         if (menuIndex !== -1) {
             setSelectedMenuIndex(menuIndex);
         }
     }, [location.pathname, menuList]);
-
-    useEffect(() => {
-        if (location.state) {
-            setLinelistSearchQuery(location.state.searchQuery ?? '');
-        }
-    }, [location.state]);
 
     const getUser = (): void => {
         axios
@@ -420,14 +414,18 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={linelistSearchQuery}
+                                        searchQuery={
+                                            location.state?.search ?? ''
+                                        }
                                         onSearchChange={(searchQuery): void => {
-                                            setLinelistSearchQuery(searchQuery);
+                                            history.push('/cases', {
+                                                search: searchQuery,
+                                            });
                                         }}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
-                                    search={linelistSearchQuery}
+                                    search={location.state?.search ?? ''}
                                 ></DownloadButton>
                             </>
                         ) : (
@@ -533,10 +531,7 @@ export default function App(): JSX.Element {
                     <Switch>
                         {hasAnyRole(['curator', 'reader', 'admin']) && (
                             <Route exact path="/cases">
-                                <LinelistTable
-                                    user={user}
-                                    search={linelistSearchQuery}
-                                />
+                                <LinelistTable user={user} />
                             </Route>
                         )}
                         {hasAnyRole(['curator', 'reader']) && (
