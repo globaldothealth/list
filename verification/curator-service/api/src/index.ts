@@ -305,9 +305,21 @@ new OpenApiValidator({
         );
 
         // Configure users controller.
-        apiRouter.get('/users', usersController.list);
-        apiRouter.put('/users/:id', usersController.updateRoles);
-        apiRouter.get('/users/roles', usersController.listRoles);
+        apiRouter.get(
+            '/users',
+            mustHaveAnyRole(['admin']),
+            usersController.list,
+        );
+        apiRouter.put(
+            '/users/:id',
+            mustHaveAnyRole(['admin']),
+            usersController.updateRoles,
+        );
+        apiRouter.get(
+            '/users/roles',
+            mustHaveAnyRole(['admin']),
+            usersController.listRoles,
+        );
 
         // Suggest locations based on the request's "q" query param.
         const geocodeSuggester = new GeocodeSuggester(geocoders);

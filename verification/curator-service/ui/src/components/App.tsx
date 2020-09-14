@@ -416,7 +416,7 @@ export default function App(): JSX.Element {
                             <MenuIcon />
                         </IconButton>
                         <GHListLogo />
-                        {location.pathname === '/cases' ? (
+                        {location.pathname === '/cases' && user.email ? (
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
@@ -539,12 +539,12 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
                                 <SourceTable user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/uploads">
                                 <UploadsTable />
                             </Route>
