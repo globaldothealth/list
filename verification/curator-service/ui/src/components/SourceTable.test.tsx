@@ -30,6 +30,7 @@ it('loads and displays sources', async () => {
     const originUrl = 'origin url';
     const format = 'JSON';
     const license = 'MIT';
+    const recipients = ['foo@bar.com', 'bar@baz.com'];
     const awsLambdaArn = 'arn:aws:lambda:a:b:functions:c';
     const awsRuleArn = 'arn:aws:events:a:b:rule/c';
     const awsScheduleExpression = 'rate(2 hours)';
@@ -55,6 +56,7 @@ it('loads and displays sources', async () => {
                 numDaysBeforeToday: 666,
                 op: 'EQ',
             },
+            notificationRecipients: recipients,
         },
     ];
     const axiosResponse = {
@@ -83,6 +85,9 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(originUrl))).toBeInTheDocument();
     expect(await findByText(new RegExp(format))).toBeInTheDocument();
     expect(await findByText(new RegExp(license))).toBeInTheDocument();
+    expect(
+        await findByText(new RegExp(recipients.join('.*'))),
+    ).toBeInTheDocument();
     expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
     expect(
