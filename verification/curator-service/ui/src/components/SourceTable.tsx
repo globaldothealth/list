@@ -112,12 +112,14 @@ const styles = (theme: Theme) =>
             marginBottom: theme.spacing(1),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
             display: 'flex',
             height: '64px',
+        },
+        tableTitle: {
+            width: '100%',
         },
     });
 
@@ -535,21 +537,22 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             Pagination: (props): JSX.Element => {
                                 return (
                                     <div className={classes.tablePaginationBar}>
-                                        <Typography>
+                                        <Typography
+                                            classes={{
+                                                root: classes.tableTitle,
+                                            }}
+                                        >
                                             Ingestion sources
                                         </Typography>
                                         <span className={classes.spacer}></span>
                                         <TablePagination
                                             {...props}
-                                            classes={{
-                                                ...props.classes,
-                                                root: classes.paginationRoot,
-                                            }}
                                         ></TablePagination>
                                     </div>
                                 );
                             },
                         }}
+                        style={{ fontFamily: 'Inter' }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/

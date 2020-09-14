@@ -259,16 +259,18 @@ export default class SourcesController {
         source: SourceDocument,
         type: NotificationType,
     ): Promise<void> {
-        if (source.notificationRecipients?.length > 0) {
-            let subject: string;
-            let text: string;
-            switch (type) {
-                case NotificationType.Add:
-                    subject = 'Automation added for source';
-                    if (source.name) {
-                        subject.concat(`: ${source.name}`);
-                    }
-                    text = `Automation was configured for the following source in G.h List;
+        if (
+            !source.notificationRecipients ||
+            source.notificationRecipients.length === 0
+        ) {
+            return;
+        }
+        let subject: string;
+        let text: string;
+        switch (type) {
+            case NotificationType.Add:
+                subject = `Automation added for source: ${source.name}`;
+                text = `Automation was configured for the following source in G.h List;
                     \n
                     \tID: ${source._id}
                     \tName: ${source.name}
@@ -276,26 +278,25 @@ export default class SourcesController {
                     \tFormat: ${source.format}
                     \tSchedule: ${source.automation.schedule.awsScheduleExpression}
                     \tParser: ${source.automation.parser?.awsLambdaArn}`;
-                    break;
-                case NotificationType.Remove:
-                    subject = `Automation removed for source: ${source.name}`;
-                    text = `Automation was removed for the following source in G.h List.
+                break;
+            case NotificationType.Remove:
+                subject = `Automation removed for source: ${source.name}`;
+                text = `Automation was removed for the following source in G.h List.
                     \n
                     \tID: ${source._id}
                     \tName: ${source.name}
                     \tURL: ${source.origin.url}
                     \tFormat: ${source.format}`;
-                    break;
-                default:
-                    throw new Error(
-                        `Invalid notification type trigger for source event: ${type}`,
-                    );
-            }
-            await this.emailClient.send(
-                source.notificationRecipients,
-                subject,
-                text,
-            );
+                break;
+            default:
+                throw new Error(
+                    `Invalid notification type trigger for source event: ${type}`,
+                );
         }
+        await this.emailClient.send(
+            source.notificationRecipients,
+            subject,
+            text,
+        );
     }
 }

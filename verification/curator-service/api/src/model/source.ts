@@ -51,7 +51,7 @@ export type SourceDocument = mongoose.Document & {
     automation: AutomationDocument;
     uploads: [UploadDocument];
     dateFilter: DateFilterDocument;
-    notificationRecipients: [string];
+    notificationRecipients: string[];
 
     toAwsStatementId(): string;
     toAwsRuleDescription(): string;
