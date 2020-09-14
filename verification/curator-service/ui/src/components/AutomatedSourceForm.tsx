@@ -4,6 +4,7 @@ import { Button, Paper, Typography, makeStyles } from '@material-ui/core';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
+import ChipInput from 'material-ui-chip-input';
 import FieldTitle from './common-form-fields/FieldTitle';
 import MuiAlert from '@material-ui/lab/Alert';
 import React from 'react';
@@ -60,6 +61,9 @@ const useStyles = makeStyles(() => ({
     cancelButton: {
         marginLeft: '1em',
     },
+    errorHelper: {
+        color: 'red',
+    },
 }));
 
 interface Props {
@@ -72,6 +76,7 @@ export interface AutomatedSourceFormValues {
     license: string;
     name: string;
     format: string;
+    notificationRecipients: string[];
 }
 
 const AutomatedSourceFormSchema = Yup.object().shape({
@@ -79,6 +84,7 @@ const AutomatedSourceFormSchema = Yup.object().shape({
     name: Yup.string().required('Required'),
     format: Yup.string().required('Required'),
     license: Yup.string().required('Required'),
+    notificationRecipients: Yup.array().of(Yup.string().email()),
 });
 
 export default function AutomatedSourceForm(props: Props): JSX.Element {
@@ -93,6 +99,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             name: values.name,
             origin: { url: values.url, license: values.license },
             format: values.format,
+            notificationRecipients: values.notificationRecipients,
         };
         try {
             await axios.post('/api/sources', newSource);
@@ -115,12 +122,24 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             <Formik
                 validationSchema={AutomatedSourceFormSchema}
                 validateOnChange={false}
-                initialValues={{ url: '', name: '', format: '', license: '' }}
+                initialValues={{
+                    url: '',
+                    name: '',
+                    format: '',
+                    license: '',
+                    notificationRecipients: [props.user.email],
+                }}
                 onSubmit={async (values): Promise<void> => {
                     await createSource(values);
                 }}
             >
-                {({ isSubmitting, submitForm }): JSX.Element => (
+                {({
+                    errors,
+                    isSubmitting,
+                    setFieldValue,
+                    submitForm,
+                    values,
+                }): JSX.Element => (
                     <div className={classes.form}>
                         <div className={classes.headerText}>
                             <Typography data-testid="header-title" variant="h5">
@@ -180,6 +199,29 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         values={Object.values(Format)}
                                         required
                                     />
+                                </div>
+                                <div className={classes.formSection}>
+                                    <ChipInput
+                                        classes={{
+                                            helperText: classes.errorHelper,
+                                        }}
+                                        data-testid="recipients"
+                                        helperText={
+                                            errors.notificationRecipients
+                                                ? 'Values must be valid email addresses'
+                                                : undefined
+                                        }
+                                        fullWidth
+                                        alwaysShowPlaceholder
+                                        placeholder="Notification recipient emails"
+                                        defaultValue={[props.user.email]}
+                                        onChange={(values): void =>
+                                            setFieldValue(
+                                                'notificationRecipients',
+                                                values ?? undefined,
+                                            )
+                                        }
+                                    ></ChipInput>
                                 </div>
                             </Paper>
                         </Form>
