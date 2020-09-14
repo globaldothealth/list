@@ -53,7 +53,6 @@ const styles = (theme: Theme) =>
             marginTop: theme.spacing(2),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -173,15 +172,12 @@ class Users extends React.Component<Props, UsersState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
-                                        classes={{
-                                            ...props.classes,
-                                            root: classes.paginationRoot,
-                                        }}
                                     ></TablePagination>
                                 </div>
                             );
                         },
                     }}
+                    style={{ fontFamily: 'Inter' }}
                     options={{
                         search: false,
                         filtering: false,
