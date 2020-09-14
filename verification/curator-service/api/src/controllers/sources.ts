@@ -125,10 +125,7 @@ export default class SourcesController {
     private async updateAutomationScheduleAwsResources(
         source: SourceDocument,
     ): Promise<void> {
-        // Careful here, source.isModified('automation.schedule.awsScheduleExpression')
-        // will return true even when just the parser is updated which is
-        // error prone, prefer isModified() without dotted.paths if possible.
-        if (source.automation?.isModified('schedule')) {
+        if (this.automationScheduleModified(source)) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
                     source.toAwsRuleName(),
@@ -160,6 +157,24 @@ export default class SourcesController {
                 source.toAwsRuleDescription(),
             );
         }
+    }
+
+    /**
+     * Determines whether the automation schedule for a given source was modified.
+     *
+     * This helper is necessary to encapsulate oddities with modified paths in
+     * Mongoose. If one field of a subdocument is modified, all fields of the
+     * subdocument will return true for calls to subDoc.isModified('field').
+     *
+     * We use isModified() in combination with modifiedPaths() to produce an
+     * accurate decision.
+     */
+    private automationScheduleModified(source: SourceDocument): boolean {
+        return (
+            source.automation?.modifiedPaths().includes('schedule') ||
+            (source.automation?.isModified() &&
+                !source.automation.modifiedPaths().includes('parser'))
+        );
     }
 
     /**
