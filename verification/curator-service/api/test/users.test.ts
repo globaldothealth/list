@@ -126,8 +126,13 @@ describe('PUT', () => {
         expect(res.body.email).toEqual(userRes.body.email);
     });
     it('cannot update an nonexistent user', async () => {
-        return supertest
-            .agent(app)
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        return request
             .put('/api/users/5ea86423bae6982635d2e1f8')
             .send({ ...baseUser, ...{ roles: ['admin'] } })
             .expect(404);
