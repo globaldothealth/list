@@ -5,6 +5,8 @@ const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
+const mockSend = jest.fn().mockResolvedValue({});
+const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
@@ -25,6 +27,12 @@ jest.mock('../src/clients/aws-lambda-client', () => {
         return { invokeRetrieval: mockInvoke };
     });
 });
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { send: mockSend, initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {
@@ -307,6 +315,30 @@ describe('POST', () => {
             createdSource.toAwsRuleTargetId(),
             createdSource._id.toString(),
             createdSource.toAwsStatementId(),
+        );
+    });
+    it('should send a notification email if automation and recipients defined', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: recipients,
+        };
+        const res = await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        const createdSource = new Source(res.body);
+        expect(createdSource.automation.schedule.awsRuleArn).toBeDefined();
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
         );
     });
     it('should not create an incomplete source', async () => {
