@@ -75,13 +75,13 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
+    search: string;
 }
 
 interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    search: string;
 }
 
 const styles = (theme: Theme) =>
@@ -246,6 +246,8 @@ export function DownloadButton(props: { search: string }): JSX.Element {
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unlisten: () => void = () => {};
 
     constructor(props: Props) {
         super(props);
@@ -267,16 +269,22 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
     }
 
-    componentDidUpdate(prevProps: Props): void {
-        if (prevProps.search !== this.props.search) {
+    componentDidMount(): void {
+        // history.location.state can be updated with new values on which we
+        // must refresh the table
+        this.unlisten = this.props.history.listen((_, __) => {
             this.tableRef.current?.onQueryChange();
-        }
+        });
+    }
+
+    componentWillUnmount(): void {
+        this.unlisten();
     }
 
     async deleteCases(): Promise<void> {
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.props.search } };
+            requestBody = { data: { query: this.props.location.state.search } };
         } else {
             requestBody = {
                 data: {
@@ -334,7 +342,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             const updateUrl = this.state.url + 'batchUpdateQuery';
             this.setState({ error: '' });
             const response = axios.post(updateUrl, {
-                query: this.props.search,
+                query: this.props.location.state.search,
                 case: {
                     'caseReference.verificationStatus': verificationStatus,
                 },
@@ -351,7 +359,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     downloadSelectedCases(): void {
         let requestBody = {};
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.props.search };
+            requestBody = { query: this.props.location.state.search };
         } else {
             requestBody = {
                 caseIds: this.state.selectedRowsCurrentPage.map(
@@ -611,7 +619,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            const trimmedQ = this.props.search.trim();
+                            const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
@@ -768,7 +776,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...(this.props.search.trim() !== ''
+                                  ...((this.props.location.state?.search?.trim() ??
+                                      '') !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
