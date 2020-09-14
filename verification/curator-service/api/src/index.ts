@@ -189,7 +189,7 @@ new OpenApiValidator({
         );
 
         // Configure uploads controller.
-        const uploadsController = new UploadsController();
+        const uploadsController = new UploadsController(emailClient);
         apiRouter.get(
             '/sources/uploads',
             mustHaveAnyRole(['curator']),
