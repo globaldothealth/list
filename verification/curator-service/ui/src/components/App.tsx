@@ -332,10 +332,13 @@ export default function App(): JSX.Element {
     }, [showMenu]);
 
     useEffect(() => {
-        const menuIndex = menuList.findIndex(
-            (menuItem) =>
-                (menuItem.to.pathname ?? menuItem.to) === location.pathname,
-        );
+        const menuIndex = menuList.findIndex((menuItem) => {
+            const pathname =
+                typeof menuItem.to === 'string'
+                    ? menuItem.to
+                    : menuItem.to.pathname;
+            return pathname === location.pathname;
+        });
         if (menuIndex !== -1) {
             setSelectedMenuIndex(menuIndex);
         }
