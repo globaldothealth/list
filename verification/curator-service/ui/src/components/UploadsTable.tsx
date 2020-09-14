@@ -127,7 +127,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
@@ -143,7 +143,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
