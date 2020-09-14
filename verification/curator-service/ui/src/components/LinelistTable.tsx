@@ -20,6 +20,7 @@ import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -221,14 +222,16 @@ function RowMenu(props: {
 }
 
 export function DownloadButton(props: { search: string }): JSX.Element {
+    const [downloading, setDownloading] = React.useState(false);
+
     const downloadCases = (): void => {
         const requestBody = props.search.trim() ? { query: props.search } : {};
+        setDownloading(true);
         axios
             .post('/api/cases/download', requestBody)
             .then((response) => fileDownload(response.data, 'cases.csv'))
-            .catch((e) => {
-                console.error(e);
-            });
+            .catch((e) => console.error(e))
+            .finally(() => setDownloading(false));
     };
 
     return (
@@ -236,7 +239,10 @@ export function DownloadButton(props: { search: string }): JSX.Element {
             variant="outlined"
             color="primary"
             onClick={downloadCases}
-            startIcon={<SaveAltIcon />}
+            disabled={downloading}
+            startIcon={
+                downloading ? <CircularProgress size={20} /> : <SaveAltIcon />
+            }
         >
             Download
         </Button>
@@ -728,7 +734,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         search: false,
                         emptyRowsWhenPaging: false,
                         filtering: false,
-                        sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
+                        sorting: true, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
                         selection:
