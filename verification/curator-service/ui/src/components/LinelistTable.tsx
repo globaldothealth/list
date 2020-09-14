@@ -734,7 +734,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         search: false,
                         emptyRowsWhenPaging: false,
                         filtering: false,
-                        sorting: true, // Would be nice but has to wait on indexes to properly query the DB.
+                        sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
                         selection:
