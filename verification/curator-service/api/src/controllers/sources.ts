@@ -278,10 +278,7 @@ export default class SourcesController {
                     \tParser: ${source.automation.parser?.awsLambdaArn}`;
                     break;
                 case NotificationType.Remove:
-                    subject = 'Automation removed for source';
-                    if (source.name) {
-                        subject.concat(`: ${source.name}`);
-                    }
+                    subject = `Automation removed for source: ${source.name}`;
                     text = `Automation was removed for the following source in G.h List.
                     \n
                     \tID: ${source._id}
