@@ -206,65 +206,61 @@ describe('POST', () => {
         expect(res.body._id).toEqual(upload._id.toString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
+});
 
-    describe('PUT', () => {
-        it('should return 415 if input missing body', () => {
-            return curatorRequest
-                .put(
-                    '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
-                )
-                .send()
-                .expect(415);
-        });
-        it('should return 400 if parent source ID malformed', () => {
-            return curatorRequest
-                .put('/api/sources/abc123/uploads/012345678901234567890123')
-                .send(minimalUpload)
-                .expect(400);
-        });
-        it('should return 404 if parent source ID not found', () => {
-            return curatorRequest
-                .put(
-                    '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
-                )
-                .send(minimalUpload)
-                .expect(404);
-        });
-        it('should return 400 if upload ID malformed', () => {
-            return curatorRequest
-                .put('/api/sources/012345678901234567890123/uploads/abc123')
-                .send(minimalUpload)
-                .expect(400);
-        });
-        it('should return 404 if upload ID not found', async () => {
-            const source = await new Source(minimalSource).save();
-            return curatorRequest
-                .put(
-                    `/api/sources/${source._id}/uploads/123456789012345678901234`,
-                )
-                .send(minimalUpload)
-                .expect(404);
-        });
-        it('should return 200 with updated upload for valid input', async () => {
-            const source = await new Source(fullSource).save();
-            const newSummary = {
-                numCreated: 123456,
-                numUpdated: 789,
-            };
+describe('PUT', () => {
+    it('should return 415 if input missing body', () => {
+        return curatorRequest
+            .put(
+                '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
+            )
+            .send()
+            .expect(415);
+    });
+    it('should return 400 if parent source ID malformed', () => {
+        return curatorRequest
+            .put('/api/sources/abc123/uploads/012345678901234567890123')
+            .send(minimalUpload)
+            .expect(400);
+    });
+    it('should return 404 if parent source ID not found', () => {
+        return curatorRequest
+            .put(
+                '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
+            )
+            .send(minimalUpload)
+            .expect(404);
+    });
+    it('should return 400 if upload ID malformed', () => {
+        return curatorRequest
+            .put('/api/sources/012345678901234567890123/uploads/abc123')
+            .send(minimalUpload)
+            .expect(400);
+    });
+    it('should return 404 if upload ID not found', async () => {
+        const source = await new Source(minimalSource).save();
+        return curatorRequest
+            .put(`/api/sources/${source._id}/uploads/123456789012345678901234`)
+            .send(minimalUpload)
+            .expect(404);
+    });
+    it('should return 200 with updated upload for valid input', async () => {
+        const source = await new Source(fullSource).save();
+        const newSummary = {
+            numCreated: 123456,
+            numUpdated: 789,
+        };
 
-            const res = await curatorRequest
-                .put(
-                    `/api/sources/${source._id}/uploads/${source.uploads[0]._id}`,
-                )
-                .send({
-                    summary: newSummary,
-                })
-                .expect('Content-Type', /json/)
-                .expect(200);
-            const dbSource = await Source.findById(source._id);
+        const res = await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                summary: newSummary,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+        const dbSource = await Source.findById(source._id);
 
-            expect(res.body.uploads[0].summary).toEqual(newSummary);
-            expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
-        });
+        expect(res.body.uploads[0].summary).toEqual(newSummary);
+        expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
 });
