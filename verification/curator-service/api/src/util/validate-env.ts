@@ -7,6 +7,8 @@ export default function validateEnv(): Readonly<{
     AWS_SERVICE_REGION: string;
     DATASERVER_URL: string;
     DB_CONNECTION_STRING: string;
+    EMAIL_USER_ADDRESS: string;
+    EMAIL_USER_PASSWORD: string;
     ENABLE_FAKE_GEOCODER: boolean;
     ENABLE_LOCAL_AUTH: boolean;
     GLOBAL_RETRIEVAL_FUNCTION_ARN: string;
@@ -51,6 +53,14 @@ export default function validateEnv(): Readonly<{
         DB_CONNECTION_STRING: str({
             desc: 'MongoDB URI provided to MongoClient.',
             devDefault: 'mongodb://localhost:27017/covid19',
+        }),
+        EMAIL_USER_ADDRESS: str({
+            desc: 'Address from which to send notification emails.',
+            devDefault: '',
+        }),
+        EMAIL_USER_PASSWORD: str({
+            desc: 'MongoDB URI provided to MongoClient.',
+            devDefault: '',
         }),
         ENABLE_FAKE_GEOCODER: bool({
             desc: 'Whether to enable the fake seedable geocoder',

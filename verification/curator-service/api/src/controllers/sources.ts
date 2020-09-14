@@ -3,6 +3,11 @@ import { Source, SourceDocument } from '../model/source';
 
 import AwsEventsClient from '../clients/aws-events-client';
 import AwsLambdaClient from '../clients/aws-lambda-client';
+import EmailClient from '../clients/email-client';
+
+enum NotificationType {
+    Create = 'Create',
+}
 
 /**
  * SourcesController handles HTTP requests from curators and automated ingestion
@@ -10,6 +15,7 @@ import AwsLambdaClient from '../clients/aws-lambda-client';
  */
 export default class SourcesController {
     constructor(
+        private readonly emailClient: EmailClient,
         private readonly lambdaClient: AwsLambdaClient,
         private readonly awsEventsClient: AwsEventsClient,
         private readonly retrievalFunctionArn: string,
@@ -195,6 +201,7 @@ export default class SourcesController {
                 source.toAwsStatementId(),
             );
             source.set('automation.schedule.awsRuleArn', createdRuleArn);
+            await this.sendNotifications(source, NotificationType.Create);
         }
     }
 
@@ -243,4 +250,43 @@ export default class SourcesController {
         }
         return;
     };
+
+    private async sendNotifications(
+        source: SourceDocument,
+        type: NotificationType,
+    ): Promise<void> {
+        if (
+            !source.notificationRecipients ||
+            source.notificationRecipients.length === 0
+        ) {
+            return;
+        }
+        let subject: string;
+        let text: string;
+        switch (type) {
+            case NotificationType.Create:
+                subject = 'New source configured for automation';
+                if (source.name) {
+                    subject.concat(`: ${source.name}`);
+                }
+                text = `A new source was configured for automation in G.h List.
+                    \n
+                    \tID: ${source._id}
+                    \tName: ${source.name}
+                    \tURL: ${source.origin.url}
+                    \tFormat: ${source.format}
+                    \tSchedule: ${source.automation.schedule.awsScheduleExpression}
+                    \tParser: ${source.automation.parser?.awsLambdaArn}`;
+                break;
+            default:
+                throw new Error(
+                    `Invalid notification type trigger for source event: ${type}`,
+                );
+        }
+        await this.emailClient.send(
+            source.notificationRecipients,
+            subject,
+            text,
+        );
+    }
 }

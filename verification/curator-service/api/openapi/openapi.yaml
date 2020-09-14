@@ -983,6 +983,13 @@ components:
               enum:
                 - EQ
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
