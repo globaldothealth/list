@@ -166,13 +166,13 @@ export default class SourcesController {
      * Mongoose. If one field of a subdocument is modified, all fields of the
      * subdocument will return true for calls to subDoc.isModified('field').
      *
-     * We use isModified() in combination with modifiedPaths() to produce an
-     * accurate decision.
+     * We use isDirectModified() in combination with modifiedPaths() to produce
+     * an accurate decision.
      */
     private automationScheduleModified(source: SourceDocument): boolean {
         return (
             source.automation?.modifiedPaths().includes('schedule') ||
-            (source.automation?.isModified() &&
+            (source.isDirectModified('automation') &&
                 !source.automation.modifiedPaths().includes('parser'))
         );
     }
