@@ -68,6 +68,7 @@ interface TableRow {
     status: string;
     created: Date;
     sourceUrl: string;
+    sourceName: string;
     numCreated: number;
     numUpdated: number;
 }
@@ -118,6 +119,10 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                             {
                                 title: 'Source URL',
                                 field: 'sourceUrl',
+                            },
+                            {
+                                title: 'Source name',
+                                field: 'sourceName',
                             },
                             {
                                 title: '# created cases',
@@ -171,6 +176,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                     created: u.upload.created,
                                                     status: u.upload.status,
                                                     sourceUrl: u.sourceUrl,
+                                                    sourceName: u.sourceName,
                                                     numCreated:
                                                         u.upload.summary
                                                             .numCreated ?? 0,
