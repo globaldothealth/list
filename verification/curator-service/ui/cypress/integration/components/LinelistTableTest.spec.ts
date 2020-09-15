@@ -5,7 +5,7 @@ describe('Linelist table', function () {
         cy.login({
             email: 'test@bar.com',
             name: 'test',
-            roles: ['admin', 'curator', 'reader'],
+            roles: ['admin', 'curator'],
         });
     });
 
