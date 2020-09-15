@@ -62,7 +62,7 @@ def convert_demographics(gender: str, age: str):
                 "start": float(start),
                 "end": float(end),
             }
-        elif age == "over 85":
+        elif age == "over 85" or age == "üle 85":
             demo["ageRange"] = {
                 "start": 85.0,
                 "end": 120.0,
