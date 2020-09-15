@@ -304,7 +304,7 @@ export default function App(): JSX.Element {
             text: 'Linelist',
             icon: <ListIcon />,
             to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean => true,
+            displayCheck: (): boolean => user.email !== '',
         },
         {
             text: 'Sources',
