@@ -57,7 +57,7 @@ class HongKongTest(unittest.TestCase):
                 "symptoms": {
                     "status": "Symptomatic",
                 },
-                "notes": "Imported case",
+                "travelHistory": {"traveledPrior30Days": True},
                 "demographics": {
                     "ageRange": {
                         "start": 39,
@@ -97,7 +97,7 @@ class HongKongTest(unittest.TestCase):
                 "symptoms": {
                     "status": "Asymptomatic",
                 },
-                "notes": "Imported case",
+                "travelHistory": {"traveledPrior30Days": True},
                 "demographics": {
                     "ageRange": {
                         "start": 40,
@@ -137,7 +137,7 @@ class HongKongTest(unittest.TestCase):
                 "symptoms": {
                     "status": "Asymptomatic",
                 },
-                "notes": "Imported case",
+                "notes": "Bad luck",
                 "demographics": {
                     "ageRange": {
                         "start": 40,
