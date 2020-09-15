@@ -1,5 +1,5 @@
 import MaterialTable, { QueryResult } from 'material-table';
-import { Paper, TablePagination, Typography } from '@material-ui/core';
+import { Avatar, Paper, TablePagination, Typography } from '@material-ui/core';
 import React, { RefObject } from 'react';
 import {
     Theme,
@@ -30,6 +30,7 @@ interface UsersState {
 
 interface TableRow {
     id: string;
+    picture: string;
     name: string;
     email: string;
     roles: string[];
@@ -110,6 +111,15 @@ class Users extends React.Component<Props, UsersState> {
                             hidden: true,
                         },
                         {
+                            title: 'Picture',
+                            field: 'picture',
+                            editable: 'never',
+                            render: (rowData): JSX.Element => (
+                                <Avatar src={rowData.picture} alt="avatar" />
+                            ),
+                            width: '3em',
+                        },
+                        {
                             title: 'Name',
                             field: 'name',
                             type: 'string',
@@ -143,6 +153,7 @@ class Users extends React.Component<Props, UsersState> {
                                             name: c.name || 'Name not provided',
                                             email: c.email,
                                             roles: c.roles,
+                                            picture: c.picture || '',
                                         });
                                     }
                                     resolve({

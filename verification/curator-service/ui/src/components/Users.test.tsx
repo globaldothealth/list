@@ -68,6 +68,7 @@ test('lists users', async () => {
     expect(await findByText('foo@bar.com')).toBeInTheDocument();
     expect(await findByText('Name not provided')).toBeInTheDocument();
     expect(await findByText('foo2@bar.com')).toBeInTheDocument();
+    expect(await findByText('Picture')).toBeInTheDocument();
     expect(queryByText('Carol Smith')).not.toBeInTheDocument();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/?limit=10&page=1');
 });
