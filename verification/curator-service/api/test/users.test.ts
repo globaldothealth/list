@@ -45,7 +45,7 @@ describe('GET', () => {
             .get('/api/users/roles')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body.roles).toEqual(['admin', 'curator', 'reader']);
+        expect(res.body.roles).toEqual(['admin', 'curator']);
     });
 
     it('list should return 200', async () => {
@@ -65,7 +65,7 @@ describe('GET', () => {
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
-                roles: ['reader'],
+                roles: ['curator'],
             }).save();
         }
         // Fetch first page as an admin.

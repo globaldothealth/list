@@ -1430,7 +1430,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:

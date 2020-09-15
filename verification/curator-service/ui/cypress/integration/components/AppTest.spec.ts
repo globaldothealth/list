@@ -96,8 +96,8 @@ describe('App', function () {
         cy.contains('Manage users').should('not.exist');
     });
 
-    it('Homepage with logged in reader', function () {
-        cy.login({ roles: ['reader'] });
+    it('Homepage with logged in user with no roles', function () {
+        cy.login({ roles: [] });
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
