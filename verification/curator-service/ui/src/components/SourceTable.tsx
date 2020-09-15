@@ -93,9 +93,7 @@ interface TableRow {
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
-    // dateFilter
     dateFilter?: DateFilter;
-    // notificationRecipients
     notificationRecipients?: string[];
 }
 
