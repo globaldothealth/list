@@ -610,7 +610,7 @@ export default function App(): JSX.Element {
                             />
                         )}
                         <Route exact path="/">
-                            <Charts />
+                            {hasAnyRole(['curator', 'admin']) && <Charts />}
                         </Route>
                     </Switch>
                 </main>
