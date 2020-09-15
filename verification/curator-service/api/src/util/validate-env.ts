@@ -59,7 +59,8 @@ export default function validateEnv(): Readonly<{
             devDefault: '',
         }),
         EMAIL_USER_PASSWORD: str({
-            desc: 'MongoDB URI provided to MongoClient.',
+            desc:
+                'Password of the email address account used to send notification emails.',
             devDefault: '',
         }),
         ENABLE_FAKE_GEOCODER: bool({
