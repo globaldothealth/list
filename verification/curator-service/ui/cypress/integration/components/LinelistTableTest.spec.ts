@@ -146,44 +146,56 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
+        cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
 
-        cy.server();
-        cy.route('POST', `/api/cases/batchUpdateQuery`).as('updateCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
         // Mark them verified.
+        cy.route('POST', `/api/cases/batchUpdateQuery`).as('updateCases');
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
+        cy.wait('@getCases');
         cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
         cy.contains('rows').click();
 
         // Check only France rows are changed
         cy.get('li').contains('10').click();
+        cy.wait('@getCases');
         cy.get('[data-testid="verified-svg"]').should('have.length', 7);
         cy.get('[data-testid="unverified-svg"]').should('have.length', 2);
 
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
+        cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
         // Mark them unverified.
         cy.get('button[title="Unverify selected rows"]').click();
         cy.wait('@updateCases');
+        cy.wait('@getCases');
         cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('10').click();
+        cy.wait('@getCases');
         cy.get('[data-testid="verified-svg"]').should('not.exist');
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
     });
