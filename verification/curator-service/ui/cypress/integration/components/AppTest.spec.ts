@@ -66,7 +66,7 @@ describe('App', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Home');
-        cy.contains('Linelist').should('not.exist');
+        cy.contains('Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
@@ -93,18 +93,6 @@ describe('App', function () {
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Uploads');
-        cy.contains('Manage users').should('not.exist');
-    });
-
-    it('Homepage with logged in user with no roles', function () {
-        cy.login({ roles: [] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Sources').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
 
