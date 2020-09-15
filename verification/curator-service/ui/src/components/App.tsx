@@ -203,7 +203,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-function ProfileMenu(props: { user?: User }) {
+function ProfileMenu(props: { user?: User }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -351,7 +351,7 @@ export default function App(): JSX.Element {
                 });
             })
             .catch((e) => {
-                setUser({ _id: '', name: '', email: '', roles: [] });
+                setUser(undefined);
             });
     };
 
