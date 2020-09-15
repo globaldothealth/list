@@ -55,6 +55,9 @@ interface LinelistTableState {
     numSelectedRows: number;
     totalNumRows: number;
     deleteDialogOpen: boolean;
+    isLoading: boolean;
+    isDownloading: boolean;
+    isDeleting: boolean;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -96,6 +99,10 @@ const styles = (theme: Theme) =>
             display: 'flex',
             justifyContent: 'center',
         },
+        dialogLoadingSpinner: {
+            marginRight: theme.spacing(2),
+            padding: '6px',
+        },
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
@@ -115,6 +122,10 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     menuItemTitle: {
         marginLeft: theme.spacing(1),
     },
+    dialogLoadingSpinner: {
+        marginRight: theme.spacing(2),
+        padding: '6px',
+    },
 }));
 
 function RowMenu(props: {
@@ -126,6 +137,7 @@ function RowMenu(props: {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
         false,
     );
+    const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -146,6 +158,7 @@ function RowMenu(props: {
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
+            setIsDeleting(true);
             props.setError('');
             const deleteUrl = '/api/cases/' + props.rowId;
             await axios.delete(deleteUrl);
@@ -154,6 +167,7 @@ function RowMenu(props: {
             props.setError(e.toString());
         } finally {
             setDeleteDialogOpen(false);
+            setIsDeleting(false);
             handleClose();
         }
     };
@@ -203,18 +217,26 @@ function RowMenu(props: {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={(): void => {
-                            setDeleteDialogOpen(false);
-                        }}
-                        color="primary"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDelete} color="primary">
-                        Yes
-                    </Button>
+                    {isDeleting ? (
+                        <CircularProgress
+                            classes={{ root: classes.dialogLoadingSpinner }}
+                        />
+                    ) : (
+                        <>
+                            <Button
+                                onClick={(): void => {
+                                    setDeleteDialogOpen(false);
+                                }}
+                                color="primary"
+                                autoFocus
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDelete} color="primary">
+                                Yes
+                            </Button>
+                        </>
+                    )}
                 </DialogActions>
             </Dialog>
         </>
@@ -265,6 +287,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             numSelectedRows: 0,
             totalNumRows: 0,
             deleteDialogOpen: false,
+            isLoading: false,
+            isDownloading: false,
+            isDeleting: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
@@ -288,6 +313,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     async deleteCases(): Promise<void> {
+        this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
             requestBody = { data: { query: this.props.location.state.search } };
@@ -306,7 +332,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         } catch (e) {
             this.setState({ error: e.toString() });
         } finally {
-            this.setState({ deleteDialogOpen: false });
+            this.setState({ deleteDialogOpen: false, isDeleting: false });
         }
     }
 
@@ -323,7 +349,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdate';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
                 cases: rowData.map((row) => {
                     return {
@@ -332,12 +358,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     };
                 }),
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
@@ -346,23 +378,30 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdateQuery';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
                 query: this.props.location.state.search,
                 case: {
                     'caseReference.verificationStatus': verificationStatus,
                 },
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
     downloadSelectedCases(): void {
+        this.setState({ error: '', isDownloading: true });
         let requestBody = {};
         if (this.hasSelectedRowsAcrossPages()) {
             requestBody = { query: this.props.location.state.search };
@@ -373,13 +412,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ),
             };
         }
-        this.setState({ error: '' });
         axios
             .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .then((response) => {
+                fileDownload(response.data, 'cases.csv');
+                this.setState({ isDownloading: false });
+            })
             .catch((e) => {
                 this.setState({
                     error: e.response?.data?.message || e.toString(),
+                    isDownloading: false,
                 });
             });
     }
@@ -501,20 +543,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button
-                            onClick={(): void => {
-                                this.setState({ deleteDialogOpen: false });
-                            }}
-                            color="primary"
-                            autoFocus
-                        >
-                            Cancel
-                        </Button>
-                        {this.state.numSelectedRows <=
-                            this.maxDeletionThreshold && (
-                            <Button onClick={this.deleteCases} color="primary">
-                                Yes
-                            </Button>
+                        {this.state.isDeleting ? (
+                            <CircularProgress
+                                classes={{ root: classes.dialogLoadingSpinner }}
+                            />
+                        ) : (
+                            <>
+                                <Button
+                                    onClick={(): void => {
+                                        this.setState({
+                                            deleteDialogOpen: false,
+                                        });
+                                    }}
+                                    color="primary"
+                                    autoFocus
+                                >
+                                    Cancel
+                                </Button>
+                                {this.state.numSelectedRows <=
+                                    this.maxDeletionThreshold && (
+                                    <Button
+                                        onClick={this.deleteCases}
+                                        color="primary"
+                                    >
+                                        Yes
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </DialogActions>
                 </Dialog>
@@ -620,6 +675,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'sourceUrl',
                         },
                     ]}
+                    isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
@@ -896,18 +952,31 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="download selected rows">
-                                              <SaveAltIcon
-                                                  classes={{
-                                                      root:
-                                                          classes.toolbarItems,
-                                                  }}
-                                              />
+                                              {this.state.isDownloading ? (
+                                                  <CircularProgress
+                                                      size={24}
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              ) : (
+                                                  <SaveAltIcon
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              )}
                                           </span>
                                       ),
-                                      tooltip: 'Download selected rows',
+                                      tooltip: this.state.isDownloading
+                                          ? 'Downloading...'
+                                          : 'Download selected rows',
                                       onClick: (): void => {
                                           this.downloadSelectedCases();
                                       },
+                                      disabled: this.state.isDownloading,
                                   },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
