@@ -135,6 +135,7 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
             >
                 {({
                     errors,
+                    initialValues,
                     isSubmitting,
                     setFieldValue,
                     submitForm,
@@ -214,7 +215,9 @@ export default function AutomatedSourceForm(props: Props): JSX.Element {
                                         fullWidth
                                         alwaysShowPlaceholder
                                         placeholder="Notification recipient emails"
-                                        defaultValue={[props.user.email]}
+                                        defaultValue={
+                                            initialValues.notificationRecipients
+                                        }
                                         onChange={(values): void =>
                                             setFieldValue(
                                                 'notificationRecipients',
