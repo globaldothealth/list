@@ -47,6 +47,10 @@ USER node
 # Run with node env set to production.
 ENV NODE_ENV production
 
+# TODO: Remove this pending https://github.com/globaldothealth/list/issues/961.
+# Run with node debug mode set to http, net, and tls.
+ENV NODE_DEBUG http,net,tls
+
 # Set up a working directory to run our app from.
 WORKDIR /usr/src/app/
 
