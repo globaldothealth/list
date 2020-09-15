@@ -76,9 +76,15 @@ spec:
                   name: curator-dev-bch28c9gkm
                   key: mapbox_token
             - name: EMAIL_USER_ADDRESS
-              value: ''
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-969ttc49f5
+                  key: email_user_address
             - name: EMAIL_USER_PASSWORD
-              value: ''
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-969ttc49f5
+                  key: email_user_password
           resources:
             requests:
               memory: "256Mi"
@@ -159,6 +165,16 @@ spec:
                 secretKeyRef:
                   name: curator-prod-4mtk8mh9t2
                   key: mapbox_token
+            - name: EMAIL_USER_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-9gkgc49f9h
+                  key: email_user_address
+            - name: EMAIL_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-9gkgc49f9h
+                  key: email_user_password
           resources:
             requests:
               memory: "512Mi"
