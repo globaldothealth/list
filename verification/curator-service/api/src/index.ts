@@ -46,6 +46,10 @@ app.use(
 dotenv.config();
 const env = validateEnv();
 
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
+
 // Express configuration.
 app.set('port', env.PORT);
 
