@@ -157,10 +157,10 @@ spec:
                   key: mapbox_token
           resources:
             requests:
-              memory: "768Mi"
+              memory: "512Mi"
               cpu: "150m"
             limits:
-              memory: "1Gi"
+              memory: "768Mi"
               cpu: "250m"
 ---
 apiVersion: v1
