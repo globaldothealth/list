@@ -357,7 +357,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             content={props.c.demographics?.occupation}
                         />
 
-                        <RowHeader title="Nationality" />
+                        <RowHeader title="Nationalities" />
                         <RowContent
                             content={props.c.demographics?.nationalities?.join(
                                 ', ',
