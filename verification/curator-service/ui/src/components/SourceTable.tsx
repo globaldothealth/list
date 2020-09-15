@@ -378,8 +378,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 editComponent: (props): JSX.Element => (
                                     <ChipInput
                                         defaultValue={props.value || []}
-                                        // material-ui-chip-input doesn't define this type.
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         onChange={(value: string[]): void =>
                                             props.onChange(value)
                                         }
