@@ -192,7 +192,7 @@ To push a new release follow the [github UI flow](https://github.com/globaldothe
 
 Tag main with the `0.1.2` tag:
 
-```
+```shell
 git checkout main
 git tag 0.1.2
 ```
@@ -227,7 +227,7 @@ Just change the image tag referenced in the deployment file to an earlier versio
 ### Deleting a release
 
 If for some reason you need to delete a tag, you can do it with `git tag -d 1.2.3` then `git push origin :refs/tags/0.1.2` to delete it remotely.
- 
+
 Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
 
 ### Deprecated packages
