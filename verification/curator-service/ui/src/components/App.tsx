@@ -533,7 +533,7 @@ export default function App(): JSX.Element {
                         )}
                         {user && hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
-                                <SourceTable user={user} />
+                                <SourceTable />
                             </Route>
                         )}
                         {hasAnyRole(['curator']) && (
