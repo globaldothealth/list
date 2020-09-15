@@ -304,8 +304,7 @@ export default function App(): JSX.Element {
             text: 'Linelist',
             icon: <ListIcon />,
             to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean =>
-                hasAnyRole(['reader', 'curator', 'admin']),
+            displayCheck: (): boolean => user.email !== '',
         },
         {
             text: 'Sources',
@@ -532,7 +531,7 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {hasAnyRole(['curator', 'reader', 'admin']) && (
+                        {user.email && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
                             </Route>
@@ -595,7 +594,7 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {user.email && (
                             <Route
                                 path="/cases/view/:id"
                                 render={({ match }): JSX.Element => {

@@ -1,6 +1,10 @@
 import * as usersController from './controllers/users';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
+import {
+    AuthController,
+    mustBeAuthenticated,
+    mustHaveAnyRole,
+} from './controllers/auth';
 import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
@@ -233,29 +237,25 @@ new OpenApiValidator({
             env.DATASERVER_URL,
             geocoders,
         );
-        apiRouter.get(
-            '/cases',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
-            casesController.list,
-        );
+        apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listSymptoms,
         );
         apiRouter.get(
             '/cases/placesOfTransmission',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listPlacesOfTransmission,
         );
         apiRouter.get(
             '/cases/occupations',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.get,
         );
         apiRouter.post(
@@ -265,7 +265,7 @@ new OpenApiValidator({
         );
         apiRouter.post(
             '/cases/download',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.download,
         );
         apiRouter.post(
