@@ -15,11 +15,20 @@ describe('App', function () {
     });
 
     it('Shows charts on home page', function () {
+        cy.login();
         cy.visit('/');
 
         cy.contains('Completeness');
         cy.contains('Cumulative');
         cy.contains('Freshness');
+    });
+
+    it('Does not show charts on home page when logged-out', function () {
+        cy.visit('/');
+
+        cy.contains('Completeness').should('not.exist');
+        cy.contains('Cumulative').should('not.exist');
+        cy.contains('Freshness').should('not.exist');
     });
 
     it('shows login button when logged out', function () {
