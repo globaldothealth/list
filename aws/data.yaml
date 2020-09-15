@@ -30,11 +30,19 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            # TODO: Remove this pending https://github.com/globaldothealth/list/issues/961.
+            # Run with node debug mode set to http, net, and tls.
+            - name: NODE_DEBUG
+              value: "http,net,tls"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: data-dev-ddhhd4mmhf
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
           resources:
             requests:
               memory: "256Mi"
@@ -79,6 +87,10 @@ spec:
                 secretKeyRef:
                   name: data-prod-bdh6659ckt
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
           resources:
             requests:
               memory: "512Mi"

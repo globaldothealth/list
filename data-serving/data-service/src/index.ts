@@ -35,6 +35,10 @@ if (process.env.NODE_ENV !== 'test') {
 dotenv.config();
 const env = validateEnv();
 
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
+
 // Express configuration.
 app.set('port', env.PORT);
 app.use(bodyParser.json({ limit: '50mb' }));
