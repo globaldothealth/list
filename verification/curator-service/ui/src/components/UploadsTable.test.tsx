@@ -57,6 +57,7 @@ it('loads and displays uploads', async () => {
 
     // Verify display content.
     expect(await findByText(new RegExp(sourceUrl))).toBeInTheDocument();
+    expect(await findByText(new RegExp(sourceName))).toBeInTheDocument();
     expect(await findByText(new RegExp(uploadId))).toBeInTheDocument();
     expect(await findByText(new RegExp(status))).toBeInTheDocument();
     expect(await findByText(`${numCreated}`)).toBeInTheDocument();
