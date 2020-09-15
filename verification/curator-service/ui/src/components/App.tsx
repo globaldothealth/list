@@ -203,7 +203,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-function ProfileMenu(props: { user: User }) {
+function ProfileMenu(props: { user?: User }) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -224,7 +224,7 @@ function ProfileMenu(props: { user: User }) {
                 aria-haspopup="true"
                 onClick={handleClick}
             >
-                <Avatar alt={props.user.email} src={props.user.picture} />
+                <Avatar alt={props.user?.email} src={props.user?.picture} />
             </IconButton>
             <Menu
                 anchorEl={anchorEl}
@@ -232,7 +232,7 @@ function ProfileMenu(props: { user: User }) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                {props.user.email ? (
+                {props.user ? (
                     <>
                         <Link to="/profile" onClick={handleClose}>
                             <MenuItem>Profile</MenuItem>
@@ -278,12 +278,7 @@ interface LocationState {
 
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
-    const [user, setUser] = useState<User>({
-        _id: '',
-        name: '',
-        email: '',
-        roles: [],
-    });
+    const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
@@ -304,7 +299,7 @@ export default function App(): JSX.Element {
             text: 'Linelist',
             icon: <ListIcon />,
             to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean => user.email !== '',
+            displayCheck: (): boolean => user !== undefined,
         },
         {
             text: 'Sources',
@@ -412,7 +407,7 @@ export default function App(): JSX.Element {
                             <MenuIcon />
                         </IconButton>
                         <GHListLogo />
-                        {location.pathname === '/cases' && user.email ? (
+                        {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
@@ -531,12 +526,12 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {user.email && (
+                        {user && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
                                 <SourceTable user={user} />
                             </Route>
@@ -546,17 +541,17 @@ export default function App(): JSX.Element {
                                 <UploadsTable />
                             </Route>
                         )}
-                        {user.email && (
+                        {user && (
                             <Route path="/profile">
                                 <Profile user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['admin']) && (
+                        {user && hasAnyRole(['admin']) && (
                             <Route path="/users">
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/sources/automated">
                                 <AutomatedSourceForm
                                     user={user}
@@ -564,7 +559,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
                                     user={user}
@@ -572,7 +567,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/new">
                                 <CaseForm
                                     user={user}
@@ -580,7 +575,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route
                                 path="/cases/edit/:id"
                                 render={({ match }) => {
@@ -594,7 +589,7 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
-                        {user.email && (
+                        {user && (
                             <Route
                                 path="/cases/view/:id"
                                 render={({ match }): JSX.Element => {

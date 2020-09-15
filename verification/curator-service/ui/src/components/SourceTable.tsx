@@ -480,6 +480,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                     <SourceRetrievalButton sourceId={row._id} />
                                 ),
                                 editable: 'never',
+                                hidden: !this.props.user?.roles.includes(
+                                    'curator',
+                                ),
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
