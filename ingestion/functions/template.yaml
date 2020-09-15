@@ -20,6 +20,7 @@ Resources:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
+      MemorySize: 512
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
