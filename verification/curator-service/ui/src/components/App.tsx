@@ -531,7 +531,7 @@ export default function App(): JSX.Element {
                                 <LinelistTable user={user} />
                             </Route>
                         )}
-                        {user && hasAnyRole(['curator']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
                                 <SourceTable />
                             </Route>
