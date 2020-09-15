@@ -35,6 +35,10 @@ spec:
                 secretKeyRef:
                   name: data-dev-ddhhd4mmhf
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
           resources:
             requests:
               memory: "256Mi"
@@ -79,6 +83,10 @@ spec:
                 secretKeyRef:
                   name: data-prod-bdh6659ckt
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
           resources:
             requests:
               memory: "256Mi"
