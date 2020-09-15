@@ -30,6 +30,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            # TODO: Remove this pending https://github.com/globaldothealth/list/issues/961.
+            # Run with node debug mode set to http, net, and tls.
+            - name: NODE_DEBUG
+              value: "http,net,tls"
             - name: SERVICE_ENV
               valueFrom:
                 fieldRef:
