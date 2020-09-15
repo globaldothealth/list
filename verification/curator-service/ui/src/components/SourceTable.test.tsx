@@ -4,18 +4,10 @@ import { fireEvent, render } from '@testing-library/react';
 
 import React from 'react';
 import SourceTable from './SourceTable';
-import User from './User';
 import axios from 'axios';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-const curator: User = {
-    _id: 'testUser',
-    name: 'Alice Smith',
-    email: 'foo@bar.com',
-    roles: ['admin', 'curator'],
-};
 
 afterEach(() => {
     mockedAxios.get.mockClear();
@@ -69,7 +61,7 @@ it('loads and displays sources', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { findByText } = render(<SourceTable user={curator} />);
+    const { findByText } = render(<SourceTable />);
 
     // Verify backend calls.
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -129,7 +121,7 @@ it('API errors are displayed', async () => {
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const { getByText, findByText } = render(<SourceTable user={curator} />);
+    const { getByText, findByText } = render(<SourceTable />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -184,7 +176,7 @@ it('can delete a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText } = render(<SourceTable user={curator} />);
+    const { getByText, findByText } = render(<SourceTable />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',
@@ -262,9 +254,7 @@ it('can edit a row', async () => {
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     // Load table
-    const { getByText, findByText, queryByText } = render(
-        <SourceTable user={curator} />,
-    );
+    const { getByText, findByText, queryByText } = render(<SourceTable />);
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith(
         '/api/sources/?limit=10&page=1',

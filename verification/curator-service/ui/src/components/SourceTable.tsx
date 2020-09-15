@@ -17,7 +17,6 @@ import Paper from '@material-ui/core/Paper';
 import ParsersAutocomplete from './ParsersAutocomplete';
 import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
-import User from './User';
 import axios from 'axios';
 import { isUndefined } from 'util';
 
@@ -124,9 +123,7 @@ const styles = (theme: Theme) =>
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends WithStyles<typeof styles> {
-    user: User;
-}
+type Props = WithStyles<typeof styles>;
 
 class SourceTable extends React.Component<Props, SourceTableState> {
     tableRef: RefObject<any> = React.createRef();
