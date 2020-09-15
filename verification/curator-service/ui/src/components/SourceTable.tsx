@@ -19,6 +19,7 @@ import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 import { isUndefined } from 'util';
+import ChipInput from 'material-ui-chip-input';
 
 interface ListResponse {
     sources: Source[];
@@ -67,6 +68,7 @@ interface Source {
     origin: Origin;
     automation?: Automation;
     dateFilter?: DateFilter;
+    notificationRecipients?: string[];
 }
 
 interface SourceTableState {
@@ -90,8 +92,8 @@ interface TableRow {
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
-    // dateFilter
     dateFilter?: DateFilter;
+    notificationRecipients?: string[];
 }
 
 // Return type isn't meaningful.
@@ -220,6 +222,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
                     : undefined,
+            notificationRecipients: rowData.notificationRecipients,
         };
     }
 
@@ -355,6 +358,27 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             props.onChange(event.target.value)
                                         }
                                         defaultValue={props.value}
+                                    />
+                                ),
+                            },
+                            {
+                                title: 'Notification recipients',
+                                field: 'notificationRecipients',
+                                tooltip:
+                                    'Email addresses of parties to be notified of critical changes',
+                                render: (rowData): string =>
+                                    rowData.notificationRecipients
+                                        ? rowData.notificationRecipients?.join(
+                                              '\n',
+                                          )
+                                        : '',
+                                editComponent: (props): JSX.Element => (
+                                    <ChipInput
+                                        defaultValue={props.value || []}
+                                        onChange={(value: string[]): void =>
+                                            props.onChange(value)
+                                        }
+                                        placeholder="Email address(es)"
                                     />
                                 ),
                             },
@@ -509,6 +533,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                     s.automation?.schedule
                                                         ?.awsScheduleExpression,
                                                 dateFilter: s.dateFilter,
+                                                notificationRecipients:
+                                                    s.notificationRecipients,
                                             });
                                         }
                                         resolve({
