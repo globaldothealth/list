@@ -43,6 +43,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
@@ -91,6 +96,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-4mtk8mh9t2
+                  key: mapbox_token
           resources:
             requests:
               memory: "512Mi"

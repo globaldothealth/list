@@ -1,4 +1,4 @@
-import * as caseController from './controllers/case';
+import * as cases from './controllers/case';
 import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
@@ -19,6 +19,10 @@ import { Case } from './model/case';
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
+import FakeGeocoder from './geocoding/fake';
+import GeocodeSuggester from './geocoding/suggest';
+import { Geocoder } from './geocoding/geocoder';
+import MapboxGeocoder from './geocoding/mapbox';
 import dotenv from 'dotenv';
 import express from 'express';
 import expressStatusMonitor from 'express-status-monitor';
@@ -88,17 +92,39 @@ new OpenApiValidator({
     .install(app)
     .then(() => {
         const apiRouter = express.Router();
+        // Chain geocoders so that during dev/integration tests we can use the fake one.
+        // It might also just be useful to have various geocoders plugged-in at some point.
+        const geocoders = new Array<Geocoder>();
+        if (env.ENABLE_FAKE_GEOCODER) {
+            console.log('Using fake geocoder');
+            const fakeGeocoder = new FakeGeocoder();
+            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+            geocoders.push(fakeGeocoder);
+        }
+        if (env.MAPBOX_TOKEN !== '') {
+            console.log('Using mapbox geocoder');
+            geocoders.push(
+                new MapboxGeocoder(
+                    env.MAPBOX_TOKEN,
+                    env.MAPBOX_PERMANENT_GEOCODE
+                        ? 'mapbox.places-permanent'
+                        : 'mapbox.places',
+                ),
+            );
+        }
+        const caseController = new cases.CasesController(geocoders);
+
         apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
         apiRouter.get('/cases', caseController.list);
-        apiRouter.get('/cases/symptoms', caseController.listSymptoms);
+        apiRouter.get('/cases/symptoms', cases.listSymptoms);
         apiRouter.get(
             '/cases/placesOfTransmission',
-            caseController.listPlacesOfTransmission,
+            cases.listPlacesOfTransmission,
         );
-        apiRouter.get('/cases/occupations', caseController.listOccupations);
+        apiRouter.get('/cases/occupations', cases.listOccupations);
         apiRouter.post('/cases', setRevisionMetadata, caseController.create);
         apiRouter.post('/cases/download', caseController.download);
-        apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
             batchUpsertDropUnchangedCases,
@@ -142,6 +168,11 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.del,
         );
+
+        // Suggest locations based on the request's "q" query param.
+        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        apiRouter.get('/geocode/suggest', geocodeSuggester.suggest);
+
         app.use('/api', apiRouter);
     });
 

@@ -12,10 +12,6 @@ import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
-import FakeGeocoder from './geocoding/fake';
-import GeocodeSuggester from './geocoding/suggest';
-import { Geocoder } from './geocoding/geocoder';
-import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
@@ -32,6 +28,7 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import axios from 'axios';
 
 const app = express();
 
@@ -214,33 +211,8 @@ new OpenApiValidator({
             uploadsController.update,
         );
 
-        // Chain geocoders so that during dev/integration tests we can use the fake one.
-        // It might also just be useful to have various geocoders plugged-in at some point.
-        const geocoders = new Array<Geocoder>();
-        if (env.ENABLE_FAKE_GEOCODER) {
-            console.log('Using fake geocoder');
-            const fakeGeocoder = new FakeGeocoder();
-            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-            geocoders.push(fakeGeocoder);
-        }
-        if (env.MAPBOX_TOKEN !== '') {
-            console.log('Using mapbox geocoder');
-            geocoders.push(
-                new MapboxGeocoder(
-                    env.MAPBOX_TOKEN,
-                    env.MAPBOX_PERMANENT_GEOCODE
-                        ? 'mapbox.places-permanent'
-                        : 'mapbox.places',
-                ),
-            );
-        }
-
         // Configure cases controller proxying to data service.
-        const casesController = new CasesController(
-            env.DATASERVER_URL,
-            geocoders,
-        );
+        const casesController = new CasesController(env.DATASERVER_URL);
         apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
@@ -325,12 +297,39 @@ new OpenApiValidator({
             usersController.listRoles,
         );
 
-        // Suggest locations based on the request's "q" query param.
-        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        // Forward geocode requests to data service.
         apiRouter.get(
             '/geocode/suggest',
             mustHaveAnyRole(['curator']),
-            geocodeSuggester.suggest,
+            async (req: Request, res: Response) => {
+                const response = await axios.get(
+                    env.DATASERVER_URL + '/api' + req.url,
+                    req.body,
+                );
+                res.status(response.status).json(response.data);
+            },
+        );
+        apiRouter.get(
+            '/geocode/seed',
+            mustHaveAnyRole(['curator']),
+            async (req: Request, res: Response) => {
+                const response = await axios.post(
+                    env.DATASERVER_URL + '/api' + req.url,
+                    req.body,
+                );
+                res.status(response.status).json(response.data);
+            },
+        );
+        apiRouter.get(
+            '/geocode/clear',
+            mustHaveAnyRole(['curator']),
+            async (req: Request, res: Response) => {
+                const response = await axios.post(
+                    env.DATASERVER_URL + '/api' + req.url,
+                    req.body,
+                );
+                res.status(response.status).json(response.data);
+            },
         );
 
         app.use('/api', apiRouter);

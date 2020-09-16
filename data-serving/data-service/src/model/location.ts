@@ -42,6 +42,7 @@ export const locationSchema = new mongoose.Schema(
             type: geometrySchema,
             required: true,
         },
+        query: String,
     },
     { _id: false },
 );
@@ -60,4 +61,5 @@ export type LocationDocument = mongoose.Document & {
     name: string;
     geoResolution: string;
     geometry?: Geometry;
+    query: string;
 };

@@ -16,6 +16,8 @@ tags:
     description: Case related operations
   - name: Suggest
     description: Suggestion for input of cases
+  - name: Geocode
+    description: Geolocation of a case
 paths:
   /cases:
     get:
@@ -229,23 +231,6 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchValidate:
-    post:
-      summary: Batch validates cases
-      tags: [Case]
-      operationId: batchValidateCases
-      requestBody:
-        description: Cases to validate
-        required: true
-        content:
-          application/json:
-            schema:
-                $ref: "#/components/schemas/CaseArray"
-      responses:
-        "207":
-          $ref: "#/components/responses/207BatchValidateCaseResponse"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpsert:
@@ -483,6 +468,45 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /geocode/seed:
+    post:
+      tags: [Geocode]
+      summary: Adds geocodes to the geocoding database
+      operationId: seedGeocodes
+      requestBody:
+        description: A single geocode record
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+  /geocode/clear:
+    post:
+      tags: [Geocode]
+      summary: Clears geocodes from the geocoding database
+      operationId: clearGeocodes
+      responses:
+        "200":
+          description: OK
+  /geocode/suggest:
+    get:
+      tags: [Suggest, Geocode]
+      summary: Suggests geocodes for a given query string
+      operationId: suggestGeocodes
+      parameters:
+        - name: q
+          in: query
+          description: The location string for which to find geocodes
+          required: true
+          allowReserved: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/200LocationArray"
 components:
   schemas:
     BatchUpdateResponse:
@@ -492,23 +516,6 @@ components:
           type: number
       required:
         - numModified
-    BatchValidateCaseResponse:
-      description: Response to batch validate case API requests
-      properties:
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              index:
-                type: integer
-              message:
-                type: string
-            required:
-              - index
-              - message
-      required:
-        - errors
     BatchUpsertCaseResponse:
       description: Response to batch upsert case API requests
       properties:
@@ -750,6 +757,8 @@ components:
     Location:
       type: object
       properties:
+        query:
+          type: string
         country:
           type: string
         administrativeAreaLevel1:
@@ -809,6 +818,11 @@ components:
         - location
         - events
         - curator
+    LocationArray:
+      description: A list of geo locations
+      type: array
+      items:
+        $ref: "#/components/schemas/Location"
   responses:
     "200Case":
       description: OK
@@ -852,6 +866,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OccupationArray"
+    "200LocationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationArray"
     "201Case":
       description: Created
       content:
@@ -866,12 +886,6 @@ components:
             anyOf:
               - $ref: "#/components/schemas/Case"
               - $ref: "#/components/schemas/CaseArray"
-    "207BatchValidateCaseResponse":
-      description: Multi-status
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/BatchValidateCaseResponse'
     "207BatchUpsertCaseResponse":
       description: Multi-status
       content:
