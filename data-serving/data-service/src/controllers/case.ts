@@ -410,12 +410,6 @@ export class CasesController {
      */
     upsert = async (req: Request, res: Response): Promise<void> => {
         try {
-            if (!(await this.geocode(req))) {
-                res.status(404).send({
-                    message: `no geolocation found for ${req.body['location']?.query}`,
-                });
-                return;
-            }
             const c = await Case.findOne({
                 'caseReference.sourceId': req.body.caseReference?.sourceId,
                 'caseReference.sourceEntryId':
@@ -431,12 +425,20 @@ export class CasesController {
                 res.status(200).json(result);
                 return;
             } else {
+                // Try to geocode new cases.
+                if (!(await this.geocode(req))) {
+                    res.status(404).send({
+                        message: `no geolocation found for ${req.body['location']?.query}`,
+                    });
+                    return;
+                }
                 const c = new Case(req.body);
                 const result = await c.save();
                 res.status(201).json(result);
                 return;
             }
         } catch (err) {
+            console.error(err);
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
