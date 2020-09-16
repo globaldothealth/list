@@ -21,8 +21,8 @@ _ETHNICITY = 20
 _COUNTY = 1
 _DATE_CONFIRMED = 7
 _DATE_SYMPTOMS = 8
-_DATE_HOSPITALIZED = 11
-_DATE_DEATH = 18
+_HOSPITALIZED = 11
+_DATE_DEATH = 19
 _FEVER = 12
 _COUGH = 13
 _SORETHROAT = 14
@@ -30,7 +30,7 @@ _SHORTBREATH = 15
 _OTHER = 16
 _COMORBIDITIES = 17
 _INDIGENOUS = 21
-_NEIGHBORHOOD = 23
+_NEIGHBORHOOD = 24
 
 _COMORBIDITIES_MAP = {
     'Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)': 'chronic kidney disease',
@@ -67,24 +67,25 @@ def convert_gender(raw_gender: str):
         return "Female"
 
 
-def convert_events(confirmed, symptoms, hospitalized, death):
+def convert_events(date_confirmed, date_symptoms, hospitalized, date_death):
+    """Hospitalization date not listed, so confirmation date is used"""
     events = [
         {
             "name": "confirmed",
             "dateRange":
             {
-                "start": convert_date(confirmed),
-                "end": convert_date(confirmed),
+                "start": convert_date(date_confirmed),
+                "end": convert_date(date_confirmed),
             },
         }
     ]
-    if symptoms:
+    if date_symptoms:
         events.append({
             "name": "onsetSymptoms",
             "dateRange":
             {
-                "start": convert_date(symptoms),
-                "end": convert_date(symptoms),
+                "start": convert_date(date_symptoms),
+                "end": convert_date(date_symptoms),
             },
         })
     if hospitalized != "NAO":
@@ -92,18 +93,18 @@ def convert_events(confirmed, symptoms, hospitalized, death):
             "name": "hospitalAdmission",
             "dateRange":
             {
-                "start": convert_date(hospitalized),
-                "end": convert_date(hospitalized),
+                "start": convert_date(date_confirmed),
+                "end": convert_date(date_confirmed),
             },
             "value": "Yes"
         })
-    if death:
+    if date_death:
         events.append({
             "name": "outcome",
             "dateRange":
             {
-                "start": convert_date(death),
-                "end": convert_date(death),
+                "start": convert_date(date_death),
+                "end": convert_date(date_death),
             },
             "value": "Death"
         })
@@ -194,7 +195,7 @@ def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_not
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood.title())
     if raw_notes_indigenousEthnicity != "NAO ENCONTRADO":
         raw_notes.append("Indigenous ethnicity: " +
-                         raw_notes_indigenousEthnicity)
+                         raw_notes_indigenousEthnicity.title())
     notes = (', ').join(raw_notes)
     if notes == '':
         return None
@@ -215,11 +216,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         "sourceId": source_id,
                         "sourceUrl": source_url
                     },
-                    "location": {"query": ", ".join([row[_COUNTY].title(), "Rio Grande do Sul", "Brazil"])},
+                    "location": {"query": ", ".join([row[_COUNTY], "Rio Grande do Sul", "Brazil"])},
                     "events": convert_events(
                         row[_DATE_CONFIRMED],
                         row[_DATE_SYMPTOMS],
-                        row[_DATE_HOSPITALIZED],
+                        row[_HOSPITALIZED],
                         row[_DATE_DEATH]),
                     "demographics": convert_demographics(
                         row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]),
