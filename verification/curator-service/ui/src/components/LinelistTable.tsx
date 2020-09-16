@@ -80,6 +80,7 @@ interface LocationState {
     editedCaseIds: string[];
     bulkMessage: string;
     search: string;
+    page: number;
 }
 
 interface Props
@@ -680,7 +681,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
-                            listUrl += '&page=' + (query.page + 1);
+                            listUrl +=
+                                '&page=' +
+                                ((this.props.location.state?.page ??
+                                    query.page) +
+                                    1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
@@ -804,6 +809,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         selection:
                             this.props.user.roles.includes('curator') ||
                             this.props.user.roles.includes('admin'),
+                        initialPage: this.props.location.state?.page ?? 0,
                         pageSize: this.state.pageSize,
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         paginationPosition: 'top',
@@ -822,6 +828,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ).includes(rowData.id)
                                 ? { backgroundColor: '#F0FBF9' }
                                 : {},
+                    }}
+                    onChangePage={(pageNumber: number): void => {
+                        this.props.history.push('/cases', {
+                            ...this.props.location.state,
+                            page: pageNumber,
+                        });
                     }}
                     onChangeRowsPerPage={(newPageSize: number) => {
                         this.setState({ pageSize: newPageSize });
