@@ -62,6 +62,15 @@ class PeruTest(unittest.TestCase):
                  'events': [{'name': 'confirmed',
                              'value': 'PCR test',
                              'dateRange': {'start': '07/24/2020Z', 'end': '07/24/2020Z'}
+                             }]},
+                {'caseReference': {'sourceId': 'place_holder',
+                                   'sourceEntryId': '027561e9d126e7c283d79c02cede562f',
+                                   'sourceUrl': 'place_holder'},
+                 'location': {'query': 'LIMA, Peru'},
+                 'demographics': None,
+                 'events': [{'name': 'confirmed',
+                             'value': 'PCR test',
+                             'dateRange': {'start': '07/24/2020Z', 'end': '07/24/2020Z'}
                              }]}
             ]
         )

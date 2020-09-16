@@ -47,6 +47,18 @@ def convert_location(raw_entry):
     return {"query":  ", ".join(query_terms)}
 
 
+def convert_demographics(age: str, sex: str):
+    demo = {}
+    if age:
+        demo["ageRange"] = {
+            "start": float(age),
+            "end": float(age)
+        }
+    if sex:
+        demo["gender"] = convert_gender(sex)
+    return demo or None
+
+
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
@@ -80,13 +92,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     }
                 ],
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["EDAD"]),
-                        "end": float(entry["EDAD"])
-                    },
-                    "gender": convert_gender(entry["SEXO"])
-                }
+                "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
             }
             yield case
 
