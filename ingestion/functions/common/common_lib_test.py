@@ -1,10 +1,8 @@
-import os
 import pytest
 import requests
-import sys
 
 from common import common_lib
-from mock import MagicMock, patch
+from mock import patch
 
 _SOURCE_API_URL = "https://foo.bar"
 _SOURCE_ID = "abc123"
@@ -34,6 +32,7 @@ def test_register_local_user(
     cookies = common_lib.login("foo@bar.baz")
 
     assert cookies == {"foo": "bar"}
+
 
 def test_create_upload_record_returns_upload_id(
         requests_mock, mock_source_api_url_fixture):
@@ -132,7 +131,7 @@ def test_complete_with_error_updates_upload_if_provided_data(
         ) == {"status": "ERROR", "summary": {"error": upload_error.name}}
         return
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised a ValueError exception" == False
+    assert not "Should have raised a ValueError exception"
 
 
 def test_get_source_api_url_returns_mapped_value():
@@ -145,4 +144,4 @@ def test_get_source_api_url_raises_error_for_unmapped_env():
         common_lib.get_source_api_url('not-an-env')
     except ValueError:
         return
-    assert "Should have raised a ValueError exception" == False
+    assert not "Should have raised a ValueError exception"

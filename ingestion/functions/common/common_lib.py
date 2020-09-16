@@ -7,11 +7,11 @@ API calls, and it's information that could be easily encoded as state in an
 object.
 """
 
-import os
 import tempfile
 import requests
 
 import google
+import google.auth.transport.requests
 
 from enum import Enum
 from google.oauth2 import service_account
@@ -97,7 +97,7 @@ def login(email: str):
     endpoint = "http://localhost:3001/auth/register"
     res = requests.post(endpoint, json={
         "email": email,
-        "roles": ['curator', 'reader'],
+        "roles": ['curator'],
     })
     if not res or res.status_code != 200:
         raise RuntimeError(

@@ -245,8 +245,8 @@ paths:
         - name: changes_only
           in: query
           description: > 
-            Filters the list of uploads to only return uploads that created or
-            modified cases
+            Filters successful uploads to only include those that created or modified 
+            cases. The response will still include non-successful uploads.
           required: false
           schema:
             type: boolean
@@ -983,6 +983,13 @@ components:
               enum:
                 - EQ
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
@@ -1423,7 +1430,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:
