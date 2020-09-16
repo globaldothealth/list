@@ -12,6 +12,10 @@
   description: Unique ID of the source for this case
 - name: caseReference.sourceUrl
   description: URL of the raw source for this case
+- name: caseReference.sourceEntryId
+  description: The id of this case that was assigned by the source
+- name: caseReference.additionalSources
+  description: Additional sources that provided data for this case
 - name: demographics.ageRange.start
   description: Minimum age bracket, included
 - name: demographics.ageRange.end
@@ -60,6 +64,12 @@
   description: Whether the case had known preexisting conditions
 - name: preexistingConditions.values
   description: Preexisting conditions if any
+- name: transmission.routes
+  description: List of routes of transmission
+- name: transmission.places
+  description: List of places of transmission
+- name: transmission.linkedCaseIds
+  description: List of case ids for which transmission occurred with this case
 - name: travelHistory.traveledPrior30Days
   description: >
     Whether the case travelled in the 30 days prior to becoming infected

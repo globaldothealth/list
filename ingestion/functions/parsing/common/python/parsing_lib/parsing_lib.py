@@ -6,11 +6,7 @@ import collections
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
-import google.auth.transport.requests
 import requests
-
-from enum import Enum
-from google.oauth2 import service_account
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
@@ -27,7 +23,7 @@ DATE_FORMAT = "%m/%d/%YZ"
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
 # usage on the server-side and is known to cause OOMs so increase with caution.
-CASES_BATCH_SIZE = 1000
+CASES_BATCH_SIZE = 250
 
 s3_client = boto3.client("s3")
 
