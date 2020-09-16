@@ -228,12 +228,7 @@ export default class CasesController {
                 },
                 { maxContentLength: Infinity },
             );
-            res.status(200).send({
-                phase: 'UPSERT',
-                numCreated: upsertResponse.data.numCreated,
-                numUpdated: upsertResponse.data.numUpdated,
-                errors: [],
-            });
+            res.status(upsertResponse.status).send(upsertResponse.data);
             return;
         } catch (err) {
             console.log(err);

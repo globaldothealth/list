@@ -319,10 +319,12 @@ export class CasesController {
                 { ordered: false },
             );
             res.status(207).json({
+                phase: 'UPSERT',
                 numCreated:
                     (bulkWriteResult.insertedCount || 0) +
                     (bulkWriteResult.upsertedCount || 0),
                 numUpdated: bulkWriteResult.modifiedCount,
+                errors: [],
             });
             return;
         } catch (err) {

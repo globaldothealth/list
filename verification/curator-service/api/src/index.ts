@@ -309,26 +309,21 @@ new OpenApiValidator({
                 res.status(response.status).json(response.data);
             },
         );
-        apiRouter.get(
-            '/geocode/seed',
-            mustHaveAnyRole(['curator']),
-            async (req: Request, res: Response) => {
-                const response = await axios.post(
-                    env.DATASERVER_URL + '/api' + req.url,
-                    req.body,
-                );
-                res.status(response.status).json(response.data);
-            },
-        );
-        apiRouter.get(
+        apiRouter.post('/geocode/seed', async (req: Request, res: Response) => {
+            const response = await axios.post(
+                env.DATASERVER_URL + '/api' + req.url,
+                req.body,
+            );
+            res.status(response.status).send();
+        });
+        apiRouter.post(
             '/geocode/clear',
-            mustHaveAnyRole(['curator']),
             async (req: Request, res: Response) => {
                 const response = await axios.post(
                     env.DATASERVER_URL + '/api' + req.url,
                     req.body,
                 );
-                res.status(response.status).json(response.data);
+                res.status(response.status).send();
             },
         );
 

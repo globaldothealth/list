@@ -482,7 +482,7 @@ paths:
               type: object
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/clear:
     post:
       tags: [Geocode]
@@ -490,7 +490,7 @@ paths:
       operationId: clearGeocodes
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/suggest:
     get:
       tags: [Suggest, Geocode]
@@ -519,6 +519,13 @@ components:
     BatchUpsertCaseResponse:
       description: Response to batch upsert case API requests
       properties:
+        phase:
+          type: string
+          description: The last operation completed by the server
+          enum:
+            - GEOCODE
+            - VALIDATE
+            - UPSERT
         numCreated:
           type: number
           description: The number of cases created by the request.
@@ -529,6 +536,21 @@ components:
             includes cases that are actually modified by the batch upsert. If a
             case is included in the batch upsert request, but contains no
             changes compared to the currently stored case, it won't be counted.
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                description: 0-based index of the case which triggered an error
+                type: integer
+              message:
+                type: string
+                description: what went wrong
+                example: Cannot parse age
+            required:
+              - index
+              - message
       required:
         - numCreated
         - numUpdated
@@ -892,6 +914,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BatchUpsertCaseResponse'
+    "200":
+      description: OK
     "400":
       description: Malformed request
     "403":
