@@ -138,6 +138,7 @@ export default function SearchBar(props: {
                                             'pathogen name',
                                             'source url',
                                             'upload ID',
+                                            'verification status',
                                         ].join(', ')}
                                         <h5>Keywords search</h5>
                                         Example:{' '}
@@ -187,6 +188,7 @@ export default function SearchBar(props: {
                     'outcome',
                     'caseid',
                     'sourceurl',
+                    'verificationstatus',
                     'uploadid',
                     'admin1',
                     'admin2',

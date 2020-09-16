@@ -23,6 +23,7 @@ const keywords = new Map<string, string>([
     ['caseid', '_id'],
     ['uploadid', 'caseReference.uploadIds'],
     ['sourceurl', 'caseReference.sourceUrl'],
+    ['verificationstatus', 'caseReference.verificationStatus'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
