@@ -157,7 +157,7 @@ export default function SearchBar(props: {
                                         Only equality operator is supported.
                                         <br />
                                         Supported keywords are shown when the
-                                        search bar is clicked.
+                                        filter button is clicked.
                                     </React.Fragment>
                                 }
                                 placement="left"
