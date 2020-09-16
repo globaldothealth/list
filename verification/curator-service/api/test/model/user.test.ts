@@ -6,7 +6,7 @@ describe('User schema', () => {
             name: 'test source',
             email: 'foo@bar.com',
             googleID: 'baz',
-            roles: ['admin', 'reader'],
+            roles: ['admin', 'curator'],
         }).validateSync();
         expect(errors).toBeUndefined();
     });

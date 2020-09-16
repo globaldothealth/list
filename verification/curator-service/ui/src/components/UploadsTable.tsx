@@ -22,7 +22,6 @@ const styles = (theme: Theme) =>
             marginTop: theme.spacing(2),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -69,6 +68,7 @@ interface TableRow {
     status: string;
     created: Date;
     sourceUrl: string;
+    sourceName: string;
     numCreated: number;
     numUpdated: number;
 }
@@ -121,6 +121,10 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                 field: 'sourceUrl',
                             },
                             {
+                                title: 'Source name',
+                                field: 'sourceName',
+                            },
+                            {
                                 title: '# created cases',
                                 field: 'numCreated',
                                 render: (rowData): JSX.Element => (
@@ -128,7 +132,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
@@ -144,7 +148,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
@@ -172,6 +176,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                     created: u.upload.created,
                                                     status: u.upload.status,
                                                     sourceUrl: u.sourceUrl,
+                                                    sourceName: u.sourceName,
                                                     numCreated:
                                                         u.upload.summary
                                                             .numCreated ?? 0,
@@ -208,15 +213,12 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         <span className={classes.spacer}></span>
                                         <TablePagination
                                             {...props}
-                                            classes={{
-                                                ...props.classes,
-                                                root: classes.paginationRoot,
-                                            }}
                                         ></TablePagination>
                                     </div>
                                 );
                             },
                         }}
+                        style={{ fontFamily: 'Inter' }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/

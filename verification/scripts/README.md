@@ -5,11 +5,11 @@ This directory contains various scripts to manage the verification part of the G
 ## Bootstrapping admin roles
 
 When the application is first used, logged-in users have no roles associated with them.
-To bootstrap the admin process, you can assign a user with a given email the admin, reader and curator roles:
+To bootstrap the admin process, you can assign a user with a given email the admin and curator roles:
 
 ```shell
 mongo "mongodb://user:pass@some-connection-string/somedb" \
-  --eval 'var email="some-email@foo.bar"; var roles=["admin", "reader", "curator"];' \
+  --eval 'var email="some-email@foo.bar"; var roles=["admin", "curator"];' \
   roles.js
 ```
 

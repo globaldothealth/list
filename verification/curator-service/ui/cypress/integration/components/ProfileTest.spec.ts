@@ -4,13 +4,12 @@ describe('Profile', function () {
         cy.login({
             name: 'Alice Smith',
             email: 'alice@test.com',
-            roles: ['reader', 'curator'],
+            roles: ['curator'],
         });
         cy.visit('/profile');
 
         cy.contains('Alice Smith');
         cy.contains('alice@test.com');
-        cy.contains('reader');
         cy.contains('curator');
     });
 });

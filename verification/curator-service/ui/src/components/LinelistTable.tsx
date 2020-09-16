@@ -6,13 +6,11 @@ import {
     DialogContentText,
     DialogTitle,
     IconButton,
-    InputAdornment,
     Menu,
     MenuItem,
     Paper,
     TablePagination,
     Theme,
-    Tooltip,
     Typography,
     makeStyles,
     withStyles,
@@ -22,16 +20,13 @@ import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import HelpIcon from '@material-ui/icons/HelpOutline';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
-import SearchIcon from '@material-ui/icons/Search';
-import TextField from '@material-ui/core/TextField';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
@@ -53,7 +48,6 @@ interface LinelistTableState {
     url: string;
     error: string;
     pageSize: number;
-    search: string;
     // The rows which are selected on the current page.
     selectedRowsCurrentPage: TableRow[];
     // The total number of rows selected. This can be larger than
@@ -61,6 +55,9 @@ interface LinelistTableState {
     numSelectedRows: number;
     totalNumRows: number;
     deleteDialogOpen: boolean;
+    isLoading: boolean;
+    isDownloading: boolean;
+    isDeleting: boolean;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -82,7 +79,7 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
-    searchQuery: string;
+    search: string;
 }
 
 interface Props
@@ -90,12 +87,6 @@ interface Props
         WithStyles<typeof styles> {
     user: User;
 }
-
-const HtmlTooltip = withStyles((theme: Theme) => ({
-    tooltip: {
-        maxWidth: '500px',
-    },
-}))(Tooltip);
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -108,12 +99,11 @@ const styles = (theme: Theme) =>
             display: 'flex',
             justifyContent: 'center',
         },
-        downloadButton: {
-            marginLeft: theme.spacing(2),
+        dialogLoadingSpinner: {
             marginRight: theme.spacing(2),
+            padding: '6px',
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
@@ -126,195 +116,15 @@ const styles = (theme: Theme) =>
         toolbarItems: {
             color: 'white',
         },
-        topBar: {
-            display: 'flex',
-            alignItems: 'center',
-        },
     });
-
-const searchBarStyles = makeStyles((theme: Theme) => ({
-    searchRoot: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        display: 'flex',
-        alignItems: 'center',
-        flex: 1,
-    },
-    divider: {
-        backgroundColor: '#0E7569',
-        height: '40px',
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        width: '1px',
-    },
-}));
-
-const StyledSearchTextField = withStyles({
-    root: {
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        '& .MuiOutlinedInput-root': {
-            borderRadius: '8px',
-            '& fieldset': {
-                border: '1px solid #0E7569',
-            },
-            '&.Mui-focused fieldset': {
-                border: '1px solid #0E7569',
-            },
-        },
-    },
-})(TextField);
-
-function SearchBar(props: {
-    searchQuery: string;
-    onSearchChange: (search: string) => void;
-}): JSX.Element {
-    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    React.useEffect(() => {
-        setSearch(props.searchQuery ?? '');
-    }, [props.searchQuery]);
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = (): void => {
-        setAnchorEl(null);
-    };
-
-    const clickItem = (text: string): void => {
-        setSearch(search + (search ? ` ${text}:` : `${text}:`));
-        handleClose();
-    };
-
-    const classes = searchBarStyles();
-    return (
-        <div className={classes.searchRoot}>
-            <StyledSearchTextField
-                id="search-field"
-                onKeyPress={(ev): void => {
-                    if (ev.key === 'Enter') {
-                        ev.preventDefault();
-                        props.onSearchChange(search);
-                    }
-                }}
-                onChange={(event): void => {
-                    setSearch(event.target.value);
-                }}
-                placeholder="Search"
-                value={search}
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                    margin: 'dense',
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <Button
-                                color="primary"
-                                startIcon={<FilterListIcon />}
-                                onClick={handleClick}
-                            >
-                                Filter
-                            </Button>
-                            <div className={classes.divider}></div>
-                            <SearchIcon color="primary" />
-                        </InputAdornment>
-                    ),
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <HtmlTooltip
-                                color="primary"
-                                title={
-                                    <React.Fragment>
-                                        <h4>Search syntax</h4>
-                                        <h5>Full text search</h5>
-                                        Example:{' '}
-                                        <i>"got infected at work" -India</i>
-                                        <br />
-                                        You can use arbitrary strings to search
-                                        over those text fields:
-                                        {[
-                                            'notes',
-                                            'curator',
-                                            'occupation',
-                                            'nationalities',
-                                            'ethnicity',
-                                            'country',
-                                            'admin1',
-                                            'admin2',
-                                            'admin3',
-                                            'place',
-                                            'location name',
-                                            'pathogen name',
-                                            'source url',
-                                            'upload ID',
-                                        ].join(', ')}
-                                        <h5>Keywords search</h5>
-                                        Example:{' '}
-                                        <i>
-                                            curator:foo@bar.com,fez@meh.org
-                                            country:Japan gender:female
-                                            occupation:"healthcare worker"
-                                        </i>
-                                        <br />
-                                        Values are OR'ed for the same keyword
-                                        and all keywords are AND'ed.
-                                        <br />
-                                        Keyword values can be quoted for
-                                        multi-words matches and concatenated
-                                        with a comma to union them.
-                                        <br />
-                                        Only equality operator is supported.
-                                        <br />
-                                        Supported keywords are shown when the
-                                        search bar is clicked.
-                                    </React.Fragment>
-                                }
-                                placement="left"
-                            >
-                                <HelpIcon />
-                            </HtmlTooltip>
-                        </InputAdornment>
-                    ),
-                }}
-            />
-            <Menu
-                anchorEl={anchorEl}
-                getContentAnchorEl={null}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                {[
-                    'curator',
-                    'gender',
-                    'nationality',
-                    'occupation',
-                    'country',
-                    'outcome',
-                    'caseid',
-                    'sourceurl',
-                    'uploadid',
-                    'admin1',
-                    'admin2',
-                    'admin3',
-                ].map((text) => (
-                    <MenuItem key={text} onClick={(): void => clickItem(text)}>
-                        {text}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </div>
-    );
-}
 
 const rowMenuStyles = makeStyles((theme: Theme) => ({
     menuItemTitle: {
         marginLeft: theme.spacing(1),
+    },
+    dialogLoadingSpinner: {
+        marginRight: theme.spacing(2),
+        padding: '6px',
     },
 }));
 
@@ -327,6 +137,7 @@ function RowMenu(props: {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
         false,
     );
+    const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -347,6 +158,7 @@ function RowMenu(props: {
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
+            setIsDeleting(true);
             props.setError('');
             const deleteUrl = '/api/cases/' + props.rowId;
             await axios.delete(deleteUrl);
@@ -355,6 +167,7 @@ function RowMenu(props: {
             props.setError(e.toString());
         } finally {
             setDeleteDialogOpen(false);
+            setIsDeleting(false);
             handleClose();
         }
     };
@@ -400,30 +213,66 @@ function RowMenu(props: {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Case {props.rowId} will be permanently deleted and can
-                        not be recovered.
+                        Case {props.rowId} will be permanently deleted.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={(): void => {
-                            setDeleteDialogOpen(false);
-                        }}
-                        color="primary"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDelete} color="primary">
-                        Yes
-                    </Button>
+                    {isDeleting ? (
+                        <CircularProgress
+                            classes={{ root: classes.dialogLoadingSpinner }}
+                        />
+                    ) : (
+                        <>
+                            <Button
+                                onClick={(): void => {
+                                    setDeleteDialogOpen(false);
+                                }}
+                                color="primary"
+                                autoFocus
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDelete} color="primary">
+                                Yes
+                            </Button>
+                        </>
+                    )}
                 </DialogActions>
             </Dialog>
         </>
     );
 }
 
+export function DownloadButton(props: { search: string }): JSX.Element {
+    const [downloading, setDownloading] = React.useState(false);
+
+    const downloadCases = (): void => {
+        const requestBody = props.search.trim() ? { query: props.search } : {};
+        setDownloading(true);
+        axios
+            .post('/api/cases/download', requestBody)
+            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .catch((e) => console.error(e))
+            .finally(() => setDownloading(false));
+    };
+
+    return (
+        <Button
+            variant="outlined"
+            color="primary"
+            onClick={downloadCases}
+            disabled={downloading}
+            startIcon={
+                downloading ? <CircularProgress size={20} /> : <SaveAltIcon />
+            }
+        >
+            Download
+        </Button>
+    );
+}
+
 class LinelistTable extends React.Component<Props, LinelistTableState> {
+    maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
@@ -434,27 +283,27 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             url: '/api/cases/',
             error: '',
             pageSize: 50,
-            search: this.props.location.state?.searchQuery ?? '',
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
             deleteDialogOpen: false,
+            isLoading: false,
+            isDownloading: false,
+            isDeleting: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
             this,
         );
-        this.downloadCases = this.downloadCases.bind(this);
         this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
+        this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
+        this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
     }
 
     componentDidMount(): void {
         // history.location.state can be updated with new values on which we
         // must refresh the table
         this.unlisten = this.props.history.listen((_, __) => {
-            this.setState({
-                search: this.props.history.location.state?.searchQuery ?? '',
-            });
             this.tableRef.current?.onQueryChange();
         });
     }
@@ -464,9 +313,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     async deleteCases(): Promise<void> {
+        this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.state.search } };
+            requestBody = { data: { query: this.props.location.state.search } };
         } else {
             requestBody = {
                 data: {
@@ -482,7 +332,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         } catch (e) {
             this.setState({ error: e.toString() });
         } finally {
-            this.setState({ deleteDialogOpen: false });
+            this.setState({ deleteDialogOpen: false, isDeleting: false });
         }
     }
 
@@ -499,7 +349,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdate';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
                 cases: rowData.map((row) => {
                     return {
@@ -508,12 +358,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     };
                 }),
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
@@ -522,41 +378,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdateQuery';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
-                query: this.state.search,
+                query: this.props.location.state.search,
                 case: {
                     'caseReference.verificationStatus': verificationStatus,
                 },
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
-    downloadCases(): void {
-        const requestBody = this.state.search.trim()
-            ? { query: this.state.search }
-            : {};
-        this.setState({ error: '' });
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
-            .catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
-                });
-            });
-    }
-
     downloadSelectedCases(): void {
+        this.setState({ error: '', isDownloading: true });
         let requestBody = {};
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.state.search };
+            requestBody = { query: this.props.location.state.search };
         } else {
             requestBody = {
                 caseIds: this.state.selectedRowsCurrentPage.map(
@@ -564,15 +412,46 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ),
             };
         }
-        this.setState({ error: '' });
         axios
             .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .then((response) => {
+                fileDownload(response.data, 'cases.csv');
+                this.setState({ isDownloading: false });
+            })
             .catch((e) => {
                 this.setState({
                     error: e.response?.data?.message || e.toString(),
+                    isDownloading: false,
                 });
             });
+    }
+
+    confirmationDialogTitle(): string {
+        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+            return 'Error';
+        }
+        return (
+            'Are you sure you want to delete ' +
+            (this.state.numSelectedRows === 1
+                ? '1 case'
+                : `${this.state.numSelectedRows} cases`) +
+            '?'
+        );
+    }
+
+    confirmationDialogBody(): string {
+        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+            return (
+                `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
+                ' An admin can preform the deletion if it is valid.'
+            );
+        }
+        return (
+            (this.state.numSelectedRows === 1
+                ? '1 case'
+                : `${this.state.numSelectedRows} cases`) +
+            ' will be permanently deleted.'
+        );
     }
 
     render(): JSX.Element {
@@ -648,24 +527,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <div className={classes.topBar}>
-                    <SearchBar
-                        searchQuery={this.state.search}
-                        onSearchChange={(search: string): void => {
-                            this.setState({ search: search });
-                            this.tableRef.current.onQueryChange();
-                        }}
-                    ></SearchBar>
-                    <Button
-                        className={classes.downloadButton}
-                        variant="outlined"
-                        color="primary"
-                        onClick={this.downloadCases}
-                        startIcon={<SaveAltIcon />}
-                    >
-                        Download
-                    </Button>
-                </div>
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
@@ -675,35 +536,41 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     // would trigger the onRowClick action.
                     onClick={(e): void => e.stopPropagation()}
                 >
-                    <DialogTitle>
-                        Are you sure you want to delete{' '}
-                        {this.state.numSelectedRows === 1
-                            ? '1 case'
-                            : `${this.state.numSelectedRows} cases`}
-                        ?
-                    </DialogTitle>
+                    <DialogTitle>{this.confirmationDialogTitle()}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {this.state.numSelectedRows === 1
-                                ? '1 case'
-                                : `${this.state.numSelectedRows} cases`}{' '}
-                            will be permanently deleted and can not be
-                            recovered.
+                            {this.confirmationDialogBody()}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button
-                            onClick={(): void => {
-                                this.setState({ deleteDialogOpen: false });
-                            }}
-                            color="primary"
-                            autoFocus
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={this.deleteCases} color="primary">
-                            Yes
-                        </Button>
+                        {this.state.isDeleting ? (
+                            <CircularProgress
+                                classes={{ root: classes.dialogLoadingSpinner }}
+                            />
+                        ) : (
+                            <>
+                                <Button
+                                    onClick={(): void => {
+                                        this.setState({
+                                            deleteDialogOpen: false,
+                                        });
+                                    }}
+                                    color="primary"
+                                    autoFocus
+                                >
+                                    Cancel
+                                </Button>
+                                {this.state.numSelectedRows <=
+                                    this.maxDeletionThreshold && (
+                                    <Button
+                                        onClick={this.deleteCases}
+                                        color="primary"
+                                    >
+                                        Yes
+                                    </Button>
+                                )}
+                            </>
+                        )}
                     </DialogActions>
                 </Dialog>
                 <MaterialTable
@@ -808,12 +675,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'sourceUrl',
                         },
                     ]}
+                    isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            const trimmedQ = this.state.search.trim();
+                            const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
@@ -894,10 +762,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
-                                        classes={{
-                                            ...props.classes,
-                                            root: classes.paginationRoot,
-                                        }}
                                     ></TablePagination>
                                 </div>
                             ) : (
@@ -929,6 +793,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     : `${this.state.numSelectedRows} rows selected`,
                         },
                     }}
+                    style={{ fontFamily: 'Inter' }}
                     options={{
                         search: false,
                         emptyRowsWhenPaging: false,
@@ -973,7 +838,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...(this.state.search.trim() !== ''
+                                  ...((this.props.location.state?.search?.trim() ??
+                                      '') !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -1086,18 +952,31 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="download selected rows">
-                                              <SaveAltIcon
-                                                  classes={{
-                                                      root:
-                                                          classes.toolbarItems,
-                                                  }}
-                                              />
+                                              {this.state.isDownloading ? (
+                                                  <CircularProgress
+                                                      size={24}
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              ) : (
+                                                  <SaveAltIcon
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              )}
                                           </span>
                                       ),
-                                      tooltip: 'Download selected rows',
+                                      tooltip: this.state.isDownloading
+                                          ? 'Downloading...'
+                                          : 'Download selected rows',
                                       onClick: (): void => {
                                           this.downloadSelectedCases();
                                       },
+                                      disabled: this.state.isDownloading,
                                   },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the

@@ -1,10 +1,5 @@
-import json
 import os
-import pytest
-import tempfile
 import unittest
-
-from datetime import date
 
 from thai import thai
 
