@@ -1,4 +1,4 @@
-import { parse, SearchParserResult } from 'search-query-parser';
+import { SearchParserResult, parse } from 'search-query-parser';
 
 export interface ParsedSearch {
     fullTextSearch?: string;
@@ -16,13 +16,13 @@ export class ParsingError extends Error {}
 const keywords = new Map<string, string>([
     ['curator', 'revisionMetadata.creationMetadata.curator'],
     ['gender', 'demographics.gender'],
-    ['nationality', 'demographics.nationality'],
+    ['nationality', 'demographics.nationalities'],
     ['occupation', 'demographics.occupation'],
     ['country', 'location.country'],
     ['outcome', 'outcome'],
     ['caseid', '_id'],
     ['uploadid', 'caseReference.uploadIds'],
-    ['source', 'caseReference.sourceUrl'],
+    ['sourceurl', 'caseReference.sourceUrl'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],

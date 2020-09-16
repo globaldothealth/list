@@ -1,12 +1,17 @@
 import * as usersController from './controllers/users';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
+import {
+    AuthController,
+    mustBeAuthenticated,
+    mustHaveAnyRole,
+} from './controllers/auth';
 import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
+import EmailClient from './clients/email-client';
 import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
@@ -44,6 +49,10 @@ app.use(
 
 dotenv.config();
 const env = validateEnv();
+
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
 
 // Express configuration.
 app.set('port', env.PORT);
@@ -131,11 +140,22 @@ new OpenApiValidator({
 })
     .install(app)
     .then(() => {
+        return new EmailClient(
+            env.EMAIL_USER_ADDRESS,
+            env.EMAIL_USER_PASSWORD,
+        ).initialize();
+    })
+    .catch((e) => {
+        console.error('Failed to instantiate email client:', e);
+        process.exit(1);
+    })
+    .then((emailClient) => {
         // Configure curator API routes.
         const apiRouter = express.Router();
 
         // Configure sources controller.
         const sourcesController = new SourcesController(
+            emailClient,
             awsLambdaClient,
             awsEventsClient,
             env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
@@ -177,7 +197,7 @@ new OpenApiValidator({
         );
 
         // Configure uploads controller.
-        const uploadsController = new UploadsController();
+        const uploadsController = new UploadsController(emailClient);
         apiRouter.get(
             '/sources/uploads',
             mustHaveAnyRole(['curator']),
@@ -221,29 +241,25 @@ new OpenApiValidator({
             env.DATASERVER_URL,
             geocoders,
         );
-        apiRouter.get(
-            '/cases',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
-            casesController.list,
-        );
+        apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listSymptoms,
         );
         apiRouter.get(
             '/cases/placesOfTransmission',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listPlacesOfTransmission,
         );
         apiRouter.get(
             '/cases/occupations',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.get,
         );
         apiRouter.post(
@@ -253,7 +269,7 @@ new OpenApiValidator({
         );
         apiRouter.post(
             '/cases/download',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.download,
         );
         apiRouter.post(
@@ -293,9 +309,21 @@ new OpenApiValidator({
         );
 
         // Configure users controller.
-        apiRouter.get('/users', usersController.list);
-        apiRouter.put('/users/:id', usersController.updateRoles);
-        apiRouter.get('/users/roles', usersController.listRoles);
+        apiRouter.get(
+            '/users',
+            mustHaveAnyRole(['admin']),
+            usersController.list,
+        );
+        apiRouter.put(
+            '/users/:id',
+            mustHaveAnyRole(['admin']),
+            usersController.updateRoles,
+        );
+        apiRouter.get(
+            '/users/roles',
+            mustHaveAnyRole(['admin']),
+            usersController.listRoles,
+        );
 
         // Suggest locations based on the request's "q" query param.
         const geocodeSuggester = new GeocodeSuggester(geocoders);

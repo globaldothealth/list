@@ -6,6 +6,13 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/index';
 import supertest from 'supertest';
 
+const mockInitialize = jest.fn().mockResolvedValue({});
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 beforeAll(() => {
     mongoServer = new MongoMemoryServer();
@@ -38,7 +45,7 @@ describe('GET', () => {
             .get('/api/users/roles')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body.roles).toEqual(['admin', 'curator', 'reader']);
+        expect(res.body.roles).toEqual(['admin', 'curator']);
     });
 
     it('list should return 200', async () => {
@@ -58,7 +65,7 @@ describe('GET', () => {
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
                 googleID: `testGoogleID${i}`,
-                roles: ['reader'],
+                roles: ['curator'],
             }).save();
         }
         // Fetch first page as an admin.
@@ -119,8 +126,13 @@ describe('PUT', () => {
         expect(res.body.email).toEqual(userRes.body.email);
     });
     it('cannot update an nonexistent user', async () => {
-        return supertest
-            .agent(app)
+        const request = supertest.agent(app);
+        await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        return request
             .put('/api/users/5ea86423bae6982635d2e1f8')
             .send({ ...baseUser, ...{ roles: ['admin'] } })
             .expect(404);

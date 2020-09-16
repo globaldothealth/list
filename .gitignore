@@ -338,6 +338,10 @@ target/
 #   install all needed dependencies.
 #Pipfile.lock
 
+# poetry
+pyproject.toml
+poetry.lock
+
 # celery beat schedule file
 celerybeat-schedule
 

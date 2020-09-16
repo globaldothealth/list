@@ -249,7 +249,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                 content={props.c.caseReference?.sourceId}
                             />
 
-                            <RowHeader title="Data source link" />
+                            <RowHeader title="Data source URL" />
                             <RowContent
                                 content={props.c.caseReference?.sourceUrl}
                                 isLink
@@ -357,7 +357,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                             content={props.c.demographics?.occupation}
                         />
 
-                        <RowHeader title="Nationality" />
+                        <RowHeader title="Nationalities" />
                         <RowContent
                             content={props.c.demographics?.nationalities?.join(
                                 ', ',

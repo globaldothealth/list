@@ -6,11 +6,7 @@ import collections
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
-import google.auth.transport.requests
 import requests
-
-from enum import Enum
-from google.oauth2 import service_account
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
@@ -21,10 +17,13 @@ UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
 
+# Expected date fields format.
+DATE_FORMAT = "%m/%d/%YZ"
+
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
 # usage on the server-side and is known to cause OOMs so increase with caution.
-CASES_BATCH_SIZE = 1000
+CASES_BATCH_SIZE = 250
 
 s3_client = boto3.client("s3")
 
@@ -164,7 +163,7 @@ def filter_cases_by_date(
         confirmed_event = [e for e in case["events"]
                            if e["name"] == "confirmed"][0]
         case_date = datetime.datetime.strptime(
-            confirmed_event["dateRange"]["start"], "%m/%d/%YZ")
+            confirmed_event["dateRange"]["start"], DATE_FORMAT)
         delta_days = (case_date - cutoff_date).days
         if op == "EQ":
             return delta_days == 0

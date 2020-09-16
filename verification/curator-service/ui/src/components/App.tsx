@@ -1,16 +1,18 @@
 import {
     AppBar,
+    Avatar,
     CssBaseline,
+    Divider,
     Fab,
     IconButton,
     Menu,
     MenuItem,
     Toolbar,
+    Typography,
     useMediaQuery,
-    Avatar,
-    Divider,
 } from '@material-ui/core';
-import { Link, Route, Switch, useHistory } from 'react-router-dom';
+import LinelistTable, { DownloadButton } from './LinelistTable';
+import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
@@ -23,7 +25,6 @@ import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
-import LinelistTable from './LinelistTable';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -34,6 +35,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PeopleIcon from '@material-ui/icons/People';
 import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
+import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
@@ -52,10 +54,8 @@ const theme = createMuiTheme({
             paper: '#ffffff',
         },
         primary: {
-            main: '#31A497',
+            main: '#0E7569',
             contrastText: '#ffffff',
-            light: '#6AD6C8',
-            dark: '#0E7569',
         },
         secondary: {
             main: '#00C6AF',
@@ -92,6 +92,19 @@ const theme = createMuiTheme({
             colorSecondary: {
                 '&$checked': {
                     color: '#31A497',
+                },
+            },
+        },
+        MuiTablePagination: {
+            root: {
+                border: 'unset',
+                fontFamily: 'Inter',
+                '& .MuiTablePagination-input': {
+                    fontFamily: 'Inter',
+                },
+                '&&& .MuiTypography-root': {
+                    fontFamily: 'Inter',
+                    fontSize: '14px',
                 },
             },
         },
@@ -174,13 +187,23 @@ const useStyles = makeStyles((theme: Theme) => ({
     createNewIcon: {
         marginRight: '12px',
     },
+    covidTitle: {
+        fontSize: '28px',
+        marginLeft: '14px',
+        marginTop: '8px',
+    },
+    searchBar: {
+        flex: 1,
+        marginLeft: theme.spacing(4),
+        marginRight: theme.spacing(2),
+    },
     avatar: {
         width: theme.spacing(3),
         height: theme.spacing(3),
     },
 }));
 
-function ProfileMenu(props: { user: User }) {
+function ProfileMenu(props: { user?: User }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -201,7 +224,7 @@ function ProfileMenu(props: { user: User }) {
                 aria-haspopup="true"
                 onClick={handleClick}
             >
-                <Avatar alt={props.user.email} src={props.user.picture} />
+                <Avatar alt={props.user?.email} src={props.user?.picture} />
             </IconButton>
             <Menu
                 anchorEl={anchorEl}
@@ -209,7 +232,7 @@ function ProfileMenu(props: { user: User }) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                {props.user.email ? (
+                {props.user ? (
                     <>
                         <Link to="/profile" onClick={handleClose}>
                             <MenuItem>Profile</MenuItem>
@@ -249,14 +272,13 @@ function ProfileMenu(props: { user: User }) {
     );
 }
 
+interface LocationState {
+    search: string;
+}
+
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
-    const [user, setUser] = useState<User>({
-        _id: '',
-        name: '',
-        email: '',
-        roles: [],
-    });
+    const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
@@ -265,6 +287,7 @@ export default function App(): JSX.Element {
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const lastLocation = useLastLocation();
     const history = useHistory();
+    const location = useLocation<LocationState>();
     const menuList = [
         {
             text: 'Home',
@@ -275,9 +298,8 @@ export default function App(): JSX.Element {
         {
             text: 'Linelist',
             icon: <ListIcon />,
-            to: '/cases',
-            displayCheck: (): boolean =>
-                hasAnyRole(['reader', 'curator', 'admin']),
+            to: { pathname: '/cases', state: { search: '' } },
+            displayCheck: (): boolean => user !== undefined,
         },
         {
             text: 'Sources',
@@ -304,13 +326,17 @@ export default function App(): JSX.Element {
     }, [showMenu]);
 
     useEffect(() => {
-        const menuIndex = menuList.findIndex(
-            (menuItem) => menuItem.to === history.location.pathname,
-        );
+        const menuIndex = menuList.findIndex((menuItem) => {
+            const pathname =
+                typeof menuItem.to === 'string'
+                    ? menuItem.to
+                    : menuItem.to.pathname;
+            return pathname === location.pathname;
+        });
         if (menuIndex !== -1) {
             setSelectedMenuIndex(menuIndex);
         }
-    }, [history.location.pathname, menuList]);
+    }, [location.pathname, menuList]);
 
     const getUser = (): void => {
         axios
@@ -325,7 +351,7 @@ export default function App(): JSX.Element {
                 });
             })
             .catch((e) => {
-                setUser({ _id: '', name: '', email: '', roles: [] });
+                setUser(undefined);
             });
     };
 
@@ -381,7 +407,27 @@ export default function App(): JSX.Element {
                             <MenuIcon />
                         </IconButton>
                         <GHListLogo />
-                        <span className={classes.spacer}></span>
+                        {location.pathname === '/cases' && user ? (
+                            <>
+                                <div className={classes.searchBar}>
+                                    <SearchBar
+                                        searchQuery={
+                                            location.state?.search ?? ''
+                                        }
+                                        onSearchChange={(searchQuery): void => {
+                                            history.push('/cases', {
+                                                search: searchQuery,
+                                            });
+                                        }}
+                                    ></SearchBar>
+                                </div>
+                                <DownloadButton
+                                    search={location.state?.search ?? ''}
+                                ></DownloadButton>
+                            </>
+                        ) : (
+                            <span className={classes.spacer}></span>
+                        )}
                         <ProfileMenu user={user} />
                     </Toolbar>
                 </AppBar>
@@ -396,6 +442,9 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerContents}>
                         <div className={classes.drawerHeader}></div>
+                        <Typography className={classes.covidTitle}>
+                            COVID-19
+                        </Typography>
                         {hasAnyRole(['curator']) && (
                             <>
                                 <Fab
@@ -477,32 +526,32 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {hasAnyRole(['curator', 'reader', 'admin']) && (
+                        {user && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
-                                <SourceTable user={user} />
+                                <SourceTable />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/uploads">
                                 <UploadsTable />
                             </Route>
                         )}
-                        {user.email && (
+                        {user && (
                             <Route path="/profile">
                                 <Profile user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['admin']) && (
+                        {user && hasAnyRole(['admin']) && (
                             <Route path="/users">
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/sources/automated">
                                 <AutomatedSourceForm
                                     user={user}
@@ -510,7 +559,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
                                     user={user}
@@ -518,7 +567,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/new">
                                 <CaseForm
                                     user={user}
@@ -526,7 +575,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route
                                 path="/cases/edit/:id"
                                 render={({ match }) => {
@@ -540,7 +589,7 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {user && (
                             <Route
                                 path="/cases/view/:id"
                                 render={({ match }): JSX.Element => {
@@ -555,7 +604,7 @@ export default function App(): JSX.Element {
                             />
                         )}
                         <Route exact path="/">
-                            <Charts />
+                            {hasAnyRole(['curator', 'admin']) && <Charts />}
                         </Route>
                     </Switch>
                 </main>
