@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
+import { Source, SourceDocument } from '../model/source';
 
-import { Source } from '../model/source';
+import EmailClient from '../clients/email-client';
+import { UploadDocument } from '../model/upload';
 
 /**
  * UploadsController handles single uploads, that is a batch of cases sent
  * together that can be verified by a curator together as well.
  */
 export default class UploadsController {
+    constructor(private readonly emailClient: EmailClient) {}
+
     /**
      * Creates a new upload for the source present in the req.params.sourceId.
      * The source with the added upload is sent in the response.
@@ -24,6 +28,9 @@ export default class UploadsController {
             const updatedSource = await source.save();
             const result =
                 updatedSource.uploads[updatedSource.uploads.length - 1];
+            if (result.status === 'ERROR') {
+                this.sendErrorNotification(updatedSource, result);
+            }
             res.status(201).json(result);
             return;
         } catch (err) {
@@ -59,6 +66,9 @@ export default class UploadsController {
             }
             await upload.set(req.body).validate();
             const result = await source.save();
+            if (upload.status === 'ERROR') {
+                this.sendErrorNotification(result, upload);
+            }
             res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
@@ -77,10 +87,24 @@ export default class UploadsController {
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const changesOnlyMatcher = req.query.changes_only
+            ? [
+                  {
+                      $match: {
+                          $or: [
+                              { 'uploads.status': { $ne: 'SUCCESS' } },
+                              { 'uploads.summary.numCreated': { $gt: 0 } },
+                              { 'uploads.summary.numUpdated': { $gt: 0 } },
+                          ],
+                      },
+                  },
+              ]
+            : [];
         try {
             const [uploads, total] = await Promise.all([
                 Source.aggregate([
                     { $unwind: '$uploads' },
+                    ...changesOnlyMatcher,
                     { $skip: limit * (page - 1) },
                     { $limit: limit + 1 },
                     {
@@ -94,6 +118,7 @@ export default class UploadsController {
                 ]),
                 Source.aggregate([
                     { $unwind: '$uploads' },
+                    ...changesOnlyMatcher,
                     { $count: 'total' },
                 ]),
             ]);
@@ -116,4 +141,32 @@ export default class UploadsController {
             return;
         }
     };
+
+    private async sendErrorNotification(
+        source: SourceDocument,
+        upload: UploadDocument,
+    ): Promise<void> {
+        if (source.notificationRecipients?.length > 0) {
+            const subject = 'Automated upload failed for source';
+            const text = `An automated upload failed for the following source in G.h List;
+                    \n
+                    \tID: ${source._id}
+                    \tName: ${source.name}
+                    \tURL: ${source.origin.url}
+                    \tFormat: ${source.format}
+                    \tSchedule: ${source.automation.schedule.awsScheduleExpression}
+                    \tParser: ${source.automation.parser?.awsLambdaArn}
+                    \n
+                    Upload details:
+                    \n
+                    \tID: ${upload._id}
+                    \tError: ${upload.summary?.error}
+                    \tStart: ${upload.created}`;
+            await this.emailClient.send(
+                source.notificationRecipients,
+                subject,
+                text,
+            );
+        }
+    }
 }

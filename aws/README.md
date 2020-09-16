@@ -94,9 +94,24 @@ Once you're done with it, don't forget to delete the pod: `kubectl delete pod cu
 
 ### Secrets
 
-Deployments require secrets to connect to MongoDB for example or set up OAuth, we are using kubernetes-managed secrets via kustomize to generate secrets and reference them in the deployment files.
+Deployments require secrets to connect to MongoDB for example or set up OAuth.
 
-When you want to generate a new secret, follow the [official instructions](https://kubernetes.io/docs/concepts/configuration/secret/) using a kustomization.yaml file that looks like this:
+Here is the list of environment variables that should be filled with secrets and their purpose:
+
+- `AWS_ACCESS_KEY_ID`: _(optional)_ Amazon Web Services Access Key ID for a service account used to talk to Lambda/Cloudwatch AWS services. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this access key from the [AWS console](https://console.aws.amazon.com/).
+- `AWS_SECRET_ACCESS_KEY`: _(optional)_ Amazon Web Services Secret Access Key that is shown to you only once when generating a new access key from the AWS console or CLI. This must be the secret access key correpsonding to the specified `AWS_ACCESS_KEY_ID`. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this secret access key from the [AWS console](https://console.aws.amazon.com/).
+- `DB_CONNECTION_STRING`: _(required)_ The Mongo DB connection string as per [official documentation](https://docs.mongodb.com/manual/reference/connection-string/). Cases, sources, users and sessions are stored in MongoDB so this is required. Configure this connection string from the [Mongo Atlas console](https://cloud.mongodb.com/v2/5ea89a90db26a511f1804cf8#security/database/users).
+- `GOOGLE_OAUTH_CLIENT_ID`: _(required)_ Google OAuth20 client ID used to sign-in people in the curator web portal. Chances are you want to sign-in when working on the curator portal so this is required. This client should have the desired javascript origins and redirect URIs setup depending on where you host the curator web portal. Configure this client ID from the [Google Cloud console](https://console.cloud.google.com).
+- `GOOGLE_OAUTH_CLIENT_SECRET`: _(required)_ Google OAuth20 client secret used to sign-in people in the curator web portal. Chances are you want to sign-in when working on the curator portal so this is required. Must correspond to the specified `GOOGLE_OAUTH_CLIENT_ID`. Configure this client secret from the [Google Cloud console](https://console.cloud.google.com).
+- `MAPBOX_TOKEN`: _(optional)_ Mapbox private token used to perform geocoding of new cases. It must have Configure this token from the [Mapbox console](https://account.mapbox.com/auth/signin/). The mapbox account should have the [Boudaries API](https://www.mapbox.com/boundaries/) enabled to properly geocode all administrative areas.
+- `REACT_APP_PUBLIC_MAPBOX_TOKEN`: This is not really a secret as it is a public mapbox token but still it is nice to have it documented here close to its private counterpart (`MAPBOX_TOKEN`) used for geocoding. As it is a public token, make sure it is restricted only to the origins where the curator portal UI is running.
+- `SESSION_COOKIE_KEY`: _(optional)_ Session cookies contain IDs that are encrypted using this key.
+
+#### Secrets in production
+
+We are using kubernetes-managed secrets via kustomize to generate secrets and reference them in the deployment files.
+
+When you want to generate a new secret, follow the [official instructions](https://kubernetes.io/docs/concepts/configuration/secret/) for example using a kustomization.yaml file that looks like this:
 
 ```yaml
 secretGenerator:
@@ -121,6 +136,27 @@ Apply with `kubectl apply -k .`.
 If you generated a new secret, you need to set it in the appropriate deployment files.
 
 To get a list of existing secrets, you can do `kubectl get secrets`.
+Note that some secrets are automatically managed in prod like let's encrypt certs for example, you shouldn't have to do anything with them.
+
+#### How-to rotate secrets
+
+If for some reason a secret has been compromised or if you want to perform a rotation as part of a routine exercise (thank you for doing that!) here is the procedure:
+
+1. Identify the secret that needs to be rotated.
+
+2. Contact [administrators](https://github.com/orgs/globaldothealth/people) that are in charge of the infrastructure and tell them to rotate a new secret.
+
+3. Go to the web console where the secret can be rotated and rotated it, the link should be in the list of secrets above.
+
+4. Generate a new version of the secrets in production by following the kustomize setup described above (`kubectl apply -k .`).
+
+5. Change reference to new secret in deployment configs.
+
+6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml`)
+
+7. Verify new deployment works as intended.
+
+8. Destroy old secrets from their respective management console if they still exist.
 
 ## Labels
 
@@ -156,7 +192,7 @@ To push a new release follow the [github UI flow](https://github.com/globaldothe
 
 Tag main with the `0.1.2` tag:
 
-```
+```shell
 git checkout main
 git tag 0.1.2
 ```
@@ -191,7 +227,7 @@ Just change the image tag referenced in the deployment file to an earlier versio
 ### Deleting a release
 
 If for some reason you need to delete a tag, you can do it with `git tag -d 1.2.3` then `git push origin :refs/tags/0.1.2` to delete it remotely.
- 
+
 Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
 
 ### Deprecated packages

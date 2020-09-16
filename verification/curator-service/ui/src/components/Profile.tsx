@@ -63,11 +63,6 @@ export default function Profile(props: { user: User }): JSX.Element {
                         );
                     };
                     switch (role) {
-                        case 'reader':
-                            return tooltip(
-                                'readers can read the linelist data',
-                                role,
-                            );
                         case 'curator':
                             return tooltip(
                                 'curators can submit and verify cases and ingestion sources',

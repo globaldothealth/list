@@ -242,6 +242,15 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: changes_only
+          in: query
+          description: > 
+            Filters successful uploads to only include those that created or modified 
+            cases. The response will still include non-successful uploads.
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           $ref: "#/components/responses/200UploadsArray"
@@ -974,6 +983,13 @@ components:
               enum:
                 - EQ
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
@@ -1078,6 +1094,8 @@ components:
               description: >
                 Age bracket, start is included, end is excluded if different
                 than start.
+                If no end is specified it means that the age bracket is from
+                start and above.
               properties:
                 start:
                   type: number
@@ -1412,7 +1430,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:

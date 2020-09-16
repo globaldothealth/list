@@ -5,7 +5,6 @@
             "notes": "text",
             "revisionMetadata.creationMetadata.curator": "text",
             "demographics.occupation": "text",
-            "demographics.nationalities": "text",
             "demographics.ethnicity": "text",
             "location.country": "text",
             "location.administrativeAreaLevel1": "text",
@@ -95,6 +94,11 @@
         "name": "demographicsNationalitiesIdx",
         "key": {
             "demographics.nationalities": -1
+        },
+        "partialFilterExpression": {
+            "demographics.nationalities.0": {
+                "$exists": true
+            }
         },
         "collation": {
             "locale": "en_US",

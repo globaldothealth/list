@@ -15,11 +15,20 @@ describe('App', function () {
     });
 
     it('Shows charts on home page', function () {
+        cy.login();
         cy.visit('/');
 
         cy.contains('Completeness');
         cy.contains('Cumulative');
         cy.contains('Freshness');
+    });
+
+    it('Does not show charts on home page when logged-out', function () {
+        cy.visit('/');
+
+        cy.contains('Completeness').should('not.exist');
+        cy.contains('Cumulative').should('not.exist');
+        cy.contains('Freshness').should('not.exist');
     });
 
     it('shows login button when logged out', function () {
@@ -57,7 +66,7 @@ describe('App', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Home');
-        cy.contains('Linelist').should('not.exist');
+        cy.contains('Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
@@ -84,18 +93,6 @@ describe('App', function () {
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Uploads');
-        cy.contains('Manage users').should('not.exist');
-    });
-
-    it('Homepage with logged in reader', function () {
-        cy.login({ roles: ['reader'] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Sources').should('not.exist');
         cy.contains('Manage users').should('not.exist');
     });
 
