@@ -39,6 +39,13 @@ const minimalCreateRequest = {
     },
 };
 
+const mockInitialize = jest.fn().mockResolvedValue({});
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: mockInitialize };
+    });
+});
+
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 let mongoServer: MongoMemoryServer;
@@ -71,18 +78,11 @@ describe('Cases', () => {
         curatorRequest = supertest.agent(app);
         await curatorRequest
             .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['reader', 'curator'] } })
+            .send({ ...baseUser, ...{ roles: ['curator'] } })
             .expect(200);
     });
     afterEach(async () => {
         await curatorRequest.post('/api/geocode/clear').expect(200);
-    });
-    it('denies access to non readers', async () => {
-        return supertest
-            .agent(app)
-            .get('/api/cases?limit=10&page=1&q=')
-            .expect(403, /reader/)
-            .expect('Content-Type', /json/);
     });
     it('proxies list calls', async () => {
         mockedAxios.get.mockResolvedValueOnce({
@@ -276,7 +276,7 @@ describe('Cases', () => {
         const adminRequest = supertest.agent(app);
         await adminRequest
             .post('/auth/register')
-            .send({ ...baseUser, ...{ roles: ['reader', 'curator', 'admin'] } })
+            .send({ ...baseUser, ...{ roles: ['curator', 'admin'] } })
             .expect(200);
         await adminRequest
             .delete('/api/cases')

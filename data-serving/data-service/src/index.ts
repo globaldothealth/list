@@ -3,7 +3,9 @@ import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    batchDeleteCheckThreshold,
     batchUpsertDropUnchangedCases,
+    createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
@@ -32,6 +34,10 @@ if (process.env.NODE_ENV !== 'test') {
 
 dotenv.config();
 const env = validateEnv();
+
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
 
 // Express configuration.
 app.set('port', env.PORT);
@@ -125,8 +131,17 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.update,
         );
-        apiRouter.delete('/cases', caseController.batchDel);
-        apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
+        apiRouter.delete(
+            '/cases',
+            batchDeleteCheckThreshold,
+            createBatchDeleteCaseRevisions,
+            caseController.batchDel,
+        );
+        apiRouter.delete(
+            '/cases/:id([a-z0-9]{24})',
+            createCaseRevision,
+            caseController.del,
+        );
         app.use('/api', apiRouter);
     });
 

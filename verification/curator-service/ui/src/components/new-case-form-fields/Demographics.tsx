@@ -110,7 +110,7 @@ export default function Demographics(): JSX.Element {
             <div className={classes.fieldRow}>
                 <FormikAutocomplete
                     name="nationalities"
-                    label="Nationality"
+                    label="Nationalities"
                     initialValue={initialValues.nationalities}
                     multiple={true}
                     optionsLocation="https://raw.githubusercontent.com/globaldothealth/list/main/suggest/nationalities.txt"

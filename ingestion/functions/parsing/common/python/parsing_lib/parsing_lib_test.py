@@ -6,7 +6,6 @@ import boto3
 import json
 import os
 import pytest
-import requests
 import sys
 import tempfile
 import datetime
@@ -190,12 +189,14 @@ def test_run_lambda_e2e(
     assert response["count_created"] == num_created
     assert response["count_updated"] == num_updated
 
+
 def test_batch_of():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    items = iter([1,2,3,4,5])
-    assert parsing_lib.batch_of(items, 3) == [1,2,3]
-    assert parsing_lib.batch_of(items, 3) == [4,5]
+    items = iter([1, 2, 3, 4, 5])
+    assert parsing_lib.batch_of(items, 3) == [1, 2, 3]
+    assert parsing_lib.batch_of(items, 3) == [4, 5]
     assert parsing_lib.batch_of(items, 3) == []
+
 
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
@@ -248,6 +249,7 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
     with pytest.raises(ValueError, match=parsing_lib.ENV_FIELD):
         del input_event[parsing_lib.ENV_FIELD]
         parsing_lib.extract_event_fields(input_event)
+
 
 def test_prepare_cases_adds_upload_id():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
@@ -411,7 +413,7 @@ def test_filter_cases_by_date_unsupported_op(
         assert requests_mock.request_history[-1].json() == {"status": "ERROR", "summary": {
             "error": "SOURCE_CONFIGURATION_ERROR"}}
         return
-    assert "Should have raised a ValueError exception" == False
+    assert not "Should have raised a ValueError exception"
 
 
 def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():

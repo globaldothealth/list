@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -28,12 +28,13 @@ _ETHNICITY_INDEX = 9
 _NOTES_INDIGENOUS_GROUP_INDEX = 10
 
 commorbidities = {
-                  "Diabetes": "diabetes mellitus", 
-                  "Gestante": "pregnancy",
-                  "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
-                  "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
-                  "Doenças cardíacas crônicas": "heart disease" 
-                  }
+    "Diabetes": "diabetes mellitus",
+    "Gestante": "pregnancy",
+    "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
+    "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
+    "Doenças cardíacas crônicas": "heart disease"
+}
+
 
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
@@ -42,11 +43,13 @@ def convert_gender(raw_gender: str):
         return "Female"
     return None
 
+
 def convert_age(age: float):
     return {
         "start": age,
         "end": age
     }
+
 
 def convert_confirmation_method(raw_test: str):
     if raw_test == "RT-PCR":
@@ -56,16 +59,17 @@ def convert_confirmation_method(raw_test: str):
     else:
         print(f'unknown confirmation method: {raw_test}')
         return "Unknown"
-    
+
 
 def convert_profession(raw_profession: str):
     if raw_profession == "Sim":
         return "Healthcare worker"
     return None
 
+
 def convert_ethnicity(raw_ethnicity: str):
-    #I have checked these against the UK government list of ethnicities, with the exception of 
-    #indigenous which I have added as it is not on the list
+    # I have checked these against the UK government list of ethnicities, with the exception of
+    # indigenous which I have added as it is not on the list
     if raw_ethnicity == "Preta":
         return "Black"
     elif raw_ethnicity == "Parda":
@@ -78,11 +82,12 @@ def convert_ethnicity(raw_ethnicity: str):
         return "Indigenous"
     return None
 
+
 def convert_preexisting_conditions(raw_commorbidities: str):
     preexistingConditions = {}
     if raw_commorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-        
+
         commorbidities_list = []
 
         for key in commorbidities:
@@ -93,23 +98,30 @@ def convert_preexisting_conditions(raw_commorbidities: str):
         return preexistingConditions
     return None
 
+
 def convert_location(raw_entry: str):
     query = ", ".join(word for word in [raw_entry, "Amapá", "Brazil"] if word)
     return {"query": query}
 
-def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_notes_indigenousEthnicity: str):
+
+def convert_notes(
+        raw_commorbidities: str, raw_notes_neighbourhood: str,
+        raw_notes_indigenousEthnicity: str):
     raw_notes = []
     if "Imunossupressão" in raw_commorbidities:
         raw_notes.append("Patient with immunosupression")
     if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_commorbidities:
-        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
+        raw_notes.append(
+            "primary immunodeficiency disease or chromosomal disease")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
     if raw_notes_indigenousEthnicity:
-        raw_notes.append("Indigenous ethnicity: " + raw_notes_indigenousEthnicity)
+        raw_notes.append("Indigenous ethnicity: " +
+                         raw_notes_indigenousEthnicity)
 
     notes = (', ').join(raw_notes)
     return notes
+
 
 def convert_date(raw_date: str):
     """
@@ -119,6 +131,7 @@ def convert_date(raw_date: str):
     """
     date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
     return date.strftime("%m/%d/%YZ")
+
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
@@ -130,9 +143,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
-        next(reader) # Skip the header.
+        next(reader)  # Skip the header.
         for row in reader:
-            if float(row[_AGE_INDEX]) > 110: #We have entries as high as 351 - unclear if this is days.
+            # We have entries as high as 351 - unclear if this is days.
+            if float(row[_AGE_INDEX]) > 110:
                 print(f'age too high: {row[_AGE_INDEX]}')
                 continue
             case = {
@@ -159,9 +173,13 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     },
                 ],
                 "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
-                "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX], row[_NOTES_BAIRRO_INDEX], row[_NOTES_INDIGENOUS_GROUP_INDEX])
+                "notes": convert_notes(
+                    row[_PREEXISTING_CONDITIONS_INDEX],
+                    row[_NOTES_BAIRRO_INDEX],
+                    row[_NOTES_INDIGENOUS_GROUP_INDEX])
             }
             yield case
+
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

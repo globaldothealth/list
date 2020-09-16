@@ -4,8 +4,6 @@ import os
 import pytest
 import tempfile
 
-from datetime import date
-
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
 _PARSED_CASE = (

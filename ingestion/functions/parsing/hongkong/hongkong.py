@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -17,7 +17,8 @@ except ImportError:
 
 # Fixed location, all cases are for Hong Kong.
 _LOCATION = {
-    "country": "China", # "One country, two systems". We only store countries here.
+    # "One country, two systems". We only store countries here.
+    "country": "China",
     "administrativeAreaLevel1": "Hong Kong",
     "geoResolution": "Admin1",
     "name": "Hong Kong",
@@ -36,6 +37,7 @@ _OUTCOME_INDEX = 6
 _NOTES_INDEX = 8
 _CERTAINTY_INDEX = 9
 
+
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -51,6 +53,7 @@ def convert_date(raw_date: str):
     date = datetime.strptime(raw_date, f"%d/%m/{formatYear}")
     return date.strftime("%m/%d/%YZ")
 
+
 def convert_gender(raw_gender: str):
     if raw_gender.upper() == "M":
         return "Male"
@@ -58,17 +61,19 @@ def convert_gender(raw_gender: str):
         return "Female"
     return None
 
+
 def convert_age(age: float):
     return {
         "start": age,
         "end": age,
     }
 
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
-        next(reader) # Skip the header.
+        next(reader)  # Skip the header.
         cases = []
         for row in reader:
             # CSV contains both "Probable" and "Confirmed" cases.
@@ -97,8 +102,15 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         },
                     },
                 ],
-                "notes": row[_NOTES_INDEX],
             }
+            # Parse some specific notes or put them as is as notes.
+            notes = row[_NOTES_INDEX]
+            if notes == "Imported case":
+                case["travelHistory"] = {
+                    "traveledPrior30Days": True,
+                }
+            else:
+                case["notes"] = notes
             # If patient was symptomatic, the onset date is set otherwise they are marked
             # as "Asymptomatic" in the date column in the CSV.
             # There are other values as well such as "Pending" or "Unknown".
@@ -135,6 +147,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 })
             cases.append(case)
         return cases
+
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

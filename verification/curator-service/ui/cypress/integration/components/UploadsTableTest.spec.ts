@@ -34,6 +34,7 @@ describe('Uploads table', function () {
         ]);
         cy.visit('/uploads');
         cy.contains('www.example.com');
+        cy.get('td[value="New source"]').should('have.length', 3);
         cy.contains('5ef8e943dfe6e00030892d58');
         cy.contains('2020-01-01');
         cy.contains('IN_PROGRESS');

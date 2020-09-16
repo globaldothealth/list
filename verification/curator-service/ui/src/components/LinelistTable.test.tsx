@@ -308,7 +308,7 @@ it('can cancel delete action', async () => {
     expect(row).toBeInTheDocument();
 });
 
-it('cannot edit data as a reader only', async () => {
+it('cannot edit data if not curator', async () => {
     const cases = [
         {
             _id: 'abc123',
@@ -359,7 +359,7 @@ it('cannot edit data as a reader only', async () => {
                     _id: 'testUser',
                     name: 'Alice Smith',
                     email: 'foo@bar.com',
-                    roles: ['reader'],
+                    roles: [],
                 }}
             />
         </MemoryRouter>,
