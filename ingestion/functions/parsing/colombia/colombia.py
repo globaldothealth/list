@@ -53,19 +53,13 @@ def get_ethnicity(raw_entry):
     ethnicity_map = {'Otro': 'Other',
                      'Negro': 'Black',
                      'Indigeno': 'Indigenous'}
-
     if ethnicity_map.get(raw_entry['Pertenencia etnica'], None):
         if raw_entry['Pertenencia etnica'] == 'Indígena':
             if raw_entry['Nombre grupo etnico'] != '' and raw_entry['Nombre grupo etnico'] != 'Sin Comunidad' and raw_entry['Nombre grupo etnico'] != 'Sin definir':
-                ethnicity = f"Indigenous, {raw_entry['Nombre grupo etnico']}"
-            else:
-                ethnicity = "Indigenous"
-        else:
-            ethnicity = ethnicity_map.get(
-                raw_entry['Pertenencia etnica'], None)
-        return ethnicity
-    else:
-        return None
+                return f"Indigenous, {raw_entry['Nombre grupo etnico']}"
+            return "Indigenous"
+        return ethnicity_map.get(raw_entry['Pertenencia etnica'], None)
+    return None
 
 
 def convert_demographics(age: str, sex: str):
@@ -208,10 +202,10 @@ def parse_cases(raw_data_file, source_id, source_url):
 
             if entry['Tipo recuperación'] == 'PCR':
                 notes.append(
-                    f"Patient recovery was confirmed by a negative PCR test.")
+                    "Patient recovery was confirmed by a negative PCR test.")
             elif entry['Tipo recuperación'] == 'Tiempo':
                 notes.append(
-                    f"Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+                    "Patient recovery was confirmed by 21 days elapsing with no symptoms.")
             if notes:
                 case["notes"] = " \n".join(notes)
             yield case
