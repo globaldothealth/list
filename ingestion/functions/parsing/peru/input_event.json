@@ -1,8 +1,8 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "test/peru/head200_content.csv",
-    "sourceUrl": "https://foo.bar",
-    "sourceId": "5f4fa7dc9767ff004b750977"
+    "s3Key": "5f61c2974228810028e6eb66/2020/09/16/0748/content.csv",
+    "sourceUrl": "https://cloud.minsa.gob.pe/s/Y8w3wHsEdYQSZRp/download",
+    "sourceId": "5f61c2974228810028e6eb66"
 }
 
