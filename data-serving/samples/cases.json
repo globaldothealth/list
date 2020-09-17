@@ -2,7 +2,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f8",
-            "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19"
+            "sourceUrl": "https://www.colorado.gov/pacific/cdphe/news/10-new-presumptive-positive-cases-colorado-cdphe-confirms-limited-community-spread-covid-19",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -256,7 +257,8 @@
         "notes": "Case 55; mainland China travel via the Lok Ma Chau border crossing",
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f0",
-            "sourceUrl": "https://www.scmp.com/news/hong-kong/health-environment/article/3050681/coronavirus-hong-kong-confirms-three-news-cases"
+            "sourceUrl": "https://www.scmp.com/news/hong-kong/health-environment/article/3050681/coronavirus-hong-kong-confirms-three-news-cases",
+            "verificationStatus": "UNVERIFIED"
         },
         "travelHistory": {
             "travel": [
@@ -330,7 +332,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f1",
-            "sourceUrl": "https://twitter.com/DHSCgovuk/status/1238837700943323136"
+            "sourceUrl": "https://twitter.com/DHSCgovuk/status/1238837700943323136",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "000-1-34326",
@@ -378,7 +381,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f2",
-            "sourceUrl": "http://wjw.hubei.gov.cn/fbjd/dtyw/202002/t20200218_2091007.shtml"
+            "sourceUrl": "http://wjw.hubei.gov.cn/fbjd/dtyw/202002/t20200218_2091007.shtml",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "000-2-18700",
@@ -426,7 +430,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f3",
-            "sourceUrl": "github.com/dsfsi/covid19za"
+            "sourceUrl": "github.com/dsfsi/covid19za",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "001-23950",
@@ -474,6 +479,7 @@
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f4",
             "sourceUrl": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/",
+            "verificationStatus": "UNVERIFIED",
             "additionalSources": [
                 {
                     "sourceUrl": "daily totals confirmed on https://www.worldometers.info/coronavirus/"
@@ -533,7 +539,8 @@
         "notes": "C960191",
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f5",
-            "sourceUrl": "PH Data Drop"
+            "sourceUrl": "PH Data Drop",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-113677",
@@ -581,7 +588,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f6",
-            "sourceUrl": "https://covid19-phdmah.hub.arcgis.com/"
+            "sourceUrl": "https://covid19-phdmah.hub.arcgis.com/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-138000",
@@ -631,7 +639,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e1f7",
-            "sourceUrl": "https://t.me/indiacovid/4560"
+            "sourceUrl": "https://t.me/indiacovid/4560",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-162325",
@@ -681,7 +690,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e100",
-            "sourceUrl": "https://twitter.com/PIBAhmedabad/status/1261669285484793857"
+            "sourceUrl": "https://twitter.com/PIBAhmedabad/status/1261669285484793857",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-186650",
@@ -731,7 +741,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e101",
-            "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/"
+            "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-210974",
@@ -780,7 +791,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e101",
-            "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/"
+            "sourceUrl": "https://www.deshgujarat.com/2020/05/22/gujarat-covid19-cases-update/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-235299",
@@ -830,7 +842,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e102",
-            "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-25-05-20-COVID-19-6-PM.pdf"
+            "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-25-05-20-COVID-19-6-PM.pdf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-259623",
@@ -880,7 +893,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e103",
-            "sourceUrl": "mohfw.gov.in"
+            "sourceUrl": "mohfw.gov.in",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-283948",
@@ -930,7 +944,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e104",
-            "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay29.pdf"
+            "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay29.pdf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-308271",
@@ -980,7 +995,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e104",
-            "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay31.pdf"
+            "sourceUrl": "https://arogya.maharashtra.gov.in/pdf/ncovidepressnotemay31.pdf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-332596",
@@ -1030,7 +1046,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e105",
-            "sourceUrl": "https://twitter.com/ANI/status/1254410536969809922"
+            "sourceUrl": "https://twitter.com/ANI/status/1254410536969809922",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-47997",
@@ -1086,7 +1103,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e106",
-            "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-21-05-20-COVID-19-6-PM.pdf"
+            "sourceUrl": "https://stopcorona.tn.gov.in/wp-content/uploads/2020/03/Media-Bulletin-21-05-20-COVID-19-6-PM.pdf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-72321",
@@ -1138,7 +1156,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e107",
-            "sourceUrl": "https://m.weibo.cn/status/4468161329843481"
+            "sourceUrl": "https://m.weibo.cn/status/4468161329843481",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "002-9665",
@@ -1188,7 +1207,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e108",
-            "sourceUrl": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain"
+            "sourceUrl": "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Spain",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "003-23162",
@@ -1238,7 +1258,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e109",
-            "sourceUrl": "https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14"
+            "sourceUrl": "https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "003-47489",
@@ -1294,7 +1315,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "003-71812",
@@ -1350,7 +1372,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "003-96137",
@@ -1366,7 +1389,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -1467,7 +1491,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e111",
-            "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus"
+            "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "005-14468",
@@ -1518,7 +1543,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e111",
-            "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus"
+            "sourceUrl": "http://www.dph.illinois.gov/topics-services/diseases-and-conditions/diseases-a-z-list/coronavirus",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "005-38804",
@@ -1569,7 +1595,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e112",
-            "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "006-10920",
@@ -1619,7 +1646,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e112",
-            "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases"
+            "sourceUrl": "https://coronavirus.health.ny.gov/county-county-breakdown-positive-cases",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "006-35245",
@@ -1667,7 +1695,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e113",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-1002481",
@@ -1715,7 +1744,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e113",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-1026806",
@@ -1730,7 +1760,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -1832,7 +1863,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e113",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-1075455",
@@ -1880,7 +1912,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e114",
-            "sourceUrl": "https://github.com/statistikat/coronaDAT/raw/master/archive/20200408/data/20200408_230000.rds"
+            "sourceUrl": "https://github.com/statistikat/coronaDAT/raw/master/archive/20200408/data/20200408_230000.rds",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-1099780",
@@ -1930,7 +1963,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e115",
-            "sourceUrl": "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/bekraftade-fall-i-sverige"
+            "sourceUrl": "https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/bekraftade-fall-i-sverige",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-1124102",
@@ -1945,7 +1979,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -2048,7 +2083,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e116",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-151825",
@@ -2098,7 +2134,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200531.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200531.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-176150",
@@ -2149,7 +2186,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200316.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200316.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-200474",
@@ -2200,7 +2238,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200328.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-2248",
@@ -2249,7 +2288,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200326.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200326.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-249123",
@@ -2300,7 +2340,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200331.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200331.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-273448",
@@ -2351,7 +2392,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200405.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-297773",
@@ -2402,7 +2444,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200411.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200411.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-322096",
@@ -2453,7 +2496,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-346420",
@@ -2504,7 +2548,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-370745",
@@ -2520,7 +2565,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -2623,7 +2669,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-419394",
@@ -2639,7 +2686,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -2744,7 +2792,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-468042",
@@ -2793,7 +2842,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-492367",
@@ -2844,7 +2894,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-516691",
@@ -2895,7 +2946,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e118",
-            "sourceUrl": "stopcoronavirus.rf"
+            "sourceUrl": "stopcoronavirus.rf",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-541014",
@@ -2911,7 +2963,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -3013,7 +3066,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200415.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200415.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-589665",
@@ -3064,7 +3118,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200423.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200423.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-613989",
@@ -3115,7 +3170,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e117",
-            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200507.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-20200507.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-638312",
@@ -3131,7 +3187,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "location": {
             "administrativeAreaLevel2": "Moscow",
@@ -3182,7 +3239,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "location": {
             "administrativeAreaLevel2": "Moscow",
@@ -3233,7 +3291,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "location": {
             "country": "Russia",
@@ -3282,7 +3341,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -3396,7 +3456,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e119",
-            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
+            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-759935",
@@ -3458,7 +3519,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e119",
-            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
+            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-784259",
@@ -3520,7 +3582,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e119",
-            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
+            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-808583",
@@ -3582,7 +3645,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e119",
-            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_"
+            "sourceUrl": "https://www.data.gouv.fr/fr/datasets/donnees-hospitalieres-relatives-a-lepidemie-de-covid-19/#_",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-832907",
@@ -3631,7 +3695,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-857231",
@@ -3680,7 +3745,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-881556",
@@ -3729,7 +3795,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-905880",
@@ -3777,7 +3844,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-930203",
@@ -3825,7 +3893,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-954529",
@@ -3873,7 +3942,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e120",
-            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv"
+            "sourceUrl": "https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "007-978854",
@@ -3921,7 +3991,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e121",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-103177",
@@ -3968,7 +4039,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e121",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-127501",
@@ -4015,7 +4087,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e121",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-151826",
@@ -4062,7 +4135,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e121",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-176150",
@@ -4109,7 +4183,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e121",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/belarus/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-200474",
@@ -4159,7 +4234,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-2248",
@@ -4211,7 +4287,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-249123",
@@ -4263,7 +4340,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-273448",
@@ -4312,7 +4390,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e123",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/serbia/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/serbia/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-297773",
@@ -4359,7 +4438,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-322096",
@@ -4409,7 +4489,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-346420",
@@ -4461,7 +4542,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-370745",
@@ -4510,7 +4592,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e125",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-39507",
@@ -4557,7 +4640,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-419394",
@@ -4604,7 +4688,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-443718",
@@ -4651,7 +4736,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-468042",
@@ -4699,7 +4785,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-492367",
@@ -4747,7 +4834,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e122",
-            "sourceUrl": "https://coronavirus.data.gov.uk/"
+            "sourceUrl": "https://coronavirus.data.gov.uk/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-516691",
@@ -4794,7 +4882,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e127",
-            "sourceUrl": "https://www.kyivpost.com/ukraine-politics/covid-19-in-ukraine-340-dead-13691-cases-507-new-infections.html"
+            "sourceUrl": "https://www.kyivpost.com/ukraine-politics/covid-19-in-ukraine-340-dead-13691-cases-507-new-infections.html",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-541014",
@@ -4841,7 +4930,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e125",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-56534",
@@ -4888,7 +4978,8 @@
         },
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e125",
-            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/"
+            "sourceUrl": "https://www.worldometers.info/coronavirus/country/turkey/",
+            "verificationStatus": "UNVERIFIED"
         },
         "importedCase": {
             "ID": "008-75891",
@@ -4902,7 +4993,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -4970,7 +5062,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5026,7 +5119,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5094,7 +5188,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5150,7 +5245,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5206,7 +5302,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5262,7 +5359,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5318,7 +5416,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
@@ -5374,7 +5473,8 @@
     {
         "caseReference": {
             "sourceId": "5ea86423bae6982635d2e110",
-            "sourceUrl": "https://epistat.wiv-isp.be/Covid/"
+            "sourceUrl": "https://epistat.wiv-isp.be/Covid/",
+            "verificationStatus": "UNVERIFIED"
         },
         "demographics": {
             "ageRange": {
