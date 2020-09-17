@@ -13,7 +13,14 @@ import {
     useMediaQuery,
 } from '@material-ui/core';
 import LinelistTable, { DownloadButton } from './LinelistTable';
-import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
+import {
+    Link,
+    Redirect,
+    Route,
+    Switch,
+    useHistory,
+    useLocation,
+} from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
@@ -313,7 +320,8 @@ export default function App(): JSX.Element {
             text: 'Home',
             icon: <HomeIcon />,
             to: '/',
-            displayCheck: (): boolean => true,
+            // Readers only see the linelist, home button is useless to them.
+            displayCheck: (): boolean => !isJustReader(),
         },
         {
             text: 'Linelist',
@@ -380,6 +388,13 @@ export default function App(): JSX.Element {
             return false;
         }
         return user?.roles?.some((r: string) => requiredRoles.includes(r));
+    };
+
+    const isJustReader = (): boolean => {
+        if (!user) {
+            return false;
+        }
+        return user?.roles.length === 0;
     };
 
     const toggleDrawer = (): void => {
@@ -567,6 +582,11 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
+                        {isJustReader() && (
+                            <Route exact path="/">
+                                <Redirect to="/cases" />
+                            </Route>
+                        )}
                         {user && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />

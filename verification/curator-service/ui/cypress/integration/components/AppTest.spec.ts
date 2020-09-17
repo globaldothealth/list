@@ -66,7 +66,7 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
+        cy.contains('Home').should('not.exist');
         cy.contains('Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
