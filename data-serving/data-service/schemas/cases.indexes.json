@@ -184,15 +184,5 @@
             "locale": "en_US",
             "strength": 2
         }
-    },
-    {
-        "name": "locationQueryIdx",
-        "key": {
-            "location.query": -1
-        },
-        "collation": {
-            "locale": "en_US",
-            "strength": 2
-        }
     }
 ]

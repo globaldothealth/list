@@ -252,6 +252,8 @@ paths:
               required:
                 - curator
       responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpsert"
         "207":
           $ref: "#/components/responses/207BatchUpsertCaseResponse"
         "422":
@@ -552,8 +554,10 @@ components:
               - index
               - message
       required:
+        - phase
         - numCreated
         - numUpdated
+        - errors
     Case:
       description: A single line-list case.
       properties:
@@ -779,8 +783,6 @@ components:
     Location:
       type: object
       properties:
-        query:
-          type: string
         country:
           type: string
         administrativeAreaLevel1:
@@ -908,6 +910,12 @@ components:
             anyOf:
               - $ref: "#/components/schemas/Case"
               - $ref: "#/components/schemas/CaseArray"
+    "200BatchCaseUpsert":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchUpsertCaseResponse"
     "207BatchUpsertCaseResponse":
       description: Multi-status
       content:

@@ -391,7 +391,7 @@ describe('POST', () => {
     it('batch upsert with no cases should return 400', () => {
         return request(app).post('/api/cases/batchUpsert').send({}).expect(400);
     });
-    it('batch upsert with only valid cases should return 207 with counts', async () => {
+    it('batch upsert with only valid cases should return 200 with counts', async () => {
         const newCaseWithoutEntryId = new Case(minimalCase);
         const newCaseWithEntryId = new Case(fullCase);
         newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
@@ -416,7 +416,7 @@ describe('POST', () => {
                 ],
                 ...curatorMetadata,
             })
-            .expect(207);
+            .expect(200);
 
         const unchangedDbCase = await Case.findById(
             unchangedCaseWithEntryId._id,
@@ -463,7 +463,7 @@ describe('POST', () => {
                 ],
                 ...curatorMetadata,
             })
-            .expect(207);
+            .expect(200);
 
         const unchangedDbCase = await Case.findById(
             unchangedCaseWithEntryId._id,
