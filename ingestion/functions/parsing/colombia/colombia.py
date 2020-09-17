@@ -163,7 +163,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     }
                 })
                 if entry["Estado"] != "Fallecido":
-                    notes.append("Did not die from Covid-19.")
+                    notes.append("Patient died from something other than Covid-19.")
 
             if entry["atención"] == "Recuperado":
                 case["events"].append({
@@ -207,7 +207,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 notes.append(
                     "Patient recovery was confirmed by 21 days elapsing with no symptoms.")
             if notes:
-                case["notes"] = " \n".join(notes)
+                case["notes"] = "\n".join(notes)
             yield case
 
 
