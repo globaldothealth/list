@@ -1,12 +1,13 @@
 import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
+import { batchUpsertDropUnchangedCases } from './preprocessor';
 
 class InvalidParamError extends Error {}
 
@@ -225,9 +226,11 @@ export class CasesController {
      *
      * @returns {object} Detailing the nature of any issues encountered.
      */
-    private async batchGeocode(
+    batchGeocode = async (
         req: Request,
-    ): Promise<{ index: number; message: string }[]> {
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
         const caseCount = req.body.cases.length;
         const geocodeErrors: { index: number; message: string }[] = [];
         for (let index = 0; index < caseCount; index++) {
@@ -253,32 +256,29 @@ export class CasesController {
                 }
             }
         }
-        return geocodeErrors;
-    }
+        if (geocodeErrors.length > 0) {
+            res.status(207).send({
+                phase: 'GEOCODE',
+                numCreated: 0,
+                numUpdated: 0,
+                errors: geocodeErrors,
+            });
+            return;
+        }
+        next();
+    };
 
     /**
      * Batch upserts cases.
      *
      * Handles HTTP POST /api/cases/batchUpsert.
      *
-     * Note that this method performs geocoding first as required, then batch
-     * validate the cases then if no errors have happened performs the batch
+     * Batch validate the cases then if no errors have happened performs the batch
      * upsert.
      */
     batchUpsert = async (req: Request, res: Response): Promise<void> => {
         try {
-            // 1. Batch geocode what is needed.
-            const geocodeErrors = await this.batchGeocode(req);
-            if (geocodeErrors.length > 0) {
-                res.status(207).send({
-                    phase: 'GEOCODE',
-                    numCreated: 0,
-                    numUpdated: 0,
-                    errors: geocodeErrors,
-                });
-                return;
-            }
-            // 2. Batch validate cases.
+            // Batch validate cases first.
             const errors = await this.batchValidate(req.body.cases);
             if (errors.length > 0) {
                 res.status(207).send({

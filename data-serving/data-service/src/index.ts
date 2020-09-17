@@ -127,6 +127,7 @@ new OpenApiValidator({
         apiRouter.post('/cases/download', caseController.download);
         apiRouter.post(
             '/cases/batchUpsert',
+            caseController.batchGeocode,
             batchUpsertDropUnchangedCases,
             setBatchUpsertFields,
             createBatchUpsertCaseRevisions,
