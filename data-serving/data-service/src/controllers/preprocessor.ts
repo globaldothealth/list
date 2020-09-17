@@ -264,7 +264,7 @@ export const createCaseRevision = async (
 
 export const batchDeleteCheckThreshold = async (
     request: Request,
-    response: Response<any>,
+    response: Response,
     next: NextFunction,
 ): Promise<void> => {
     if (request.body.query) {
@@ -291,7 +291,7 @@ export const createBatchDeleteCaseRevisions = async (
     response: Response,
     next: NextFunction,
 ): Promise<void> => {
-    let casesToDelete: any;
+    let casesToDelete: { case: CaseDocument }[];
     if (request.body.caseIds !== undefined) {
         casesToDelete = (
             await Case.find({

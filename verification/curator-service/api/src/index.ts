@@ -346,6 +346,7 @@ new OpenApiValidator({
                 err: ValidationError,
                 req: Request,
                 res: Response,
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 next: NextFunction,
             ) => {
                 res.status(err.status || 500).json({
