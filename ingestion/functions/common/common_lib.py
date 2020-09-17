@@ -59,10 +59,16 @@ def finalize_upload(
     """Records the results of an upload via the G.h Source API."""
     put_api_url = f"{get_source_api_url(env)}/sources/{source_id}/uploads/{upload_id}"
     print(f"Updating upload via {put_api_url}")
-    update = {
-        "status": "ERROR", "summary": {"error": error.name}} if error else {
-        "status": "SUCCESS",
-        "summary": {"numCreated": count_created, "numUpdated": count_updated}}
+    update = {"summary": {}}
+    if error:
+        update["status"] = "ERROR"
+        update["summary"]["error"] = error.name
+    else:
+        update["status"] = "SUCCESS"
+    if count_created:
+        update["summary"]["numCreated"] = count_created
+    if count_updated:
+        update["summary"]["numUpdated"] = count_updated
     res = requests.put(put_api_url,
                        json=update,
                        headers=headers,
@@ -73,8 +79,10 @@ def finalize_upload(
 
 
 def complete_with_error(
-        exception, env=None, upload_error=None, source_id=None, upload_id=None,
-        headers=None, cookies=None):
+        exception, env=None, upload_error=None,
+        source_id=None, upload_id=None,
+        headers=None, cookies=None,
+        count_created=0, count_updated=0):
     """
     Logs and raises the provided exception.
 
@@ -84,7 +92,9 @@ def complete_with_error(
     print(exception)
     if env and upload_error and source_id and upload_id:
         finalize_upload(env, source_id, upload_id, headers, cookies,
-                        error=upload_error)
+                        error=upload_error,
+                        count_created=count_created,
+                        count_updated=count_updated)
     raise exception
 
 
