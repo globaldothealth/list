@@ -130,8 +130,11 @@ def write_to_server(
         upload_error = (common_lib.UploadError.VALIDATION_ERROR
                         if res.status_code == 207 else
                         common_lib.UploadError.DATA_UPLOAD_ERROR)
-        common_lib.complete_with_error(e, env, upload_error,
-                                       source_id, upload_id, headers, cookies)
+        common_lib.complete_with_error(
+            e, env, upload_error,
+            source_id, upload_id, headers, cookies,
+            count_created=counter['numCreated'],
+            count_updated=counter['numUpdated'])
         return
     print(f'sent {counter["total"]} cases')
     return counter['numCreated'], counter['numUpdated']
