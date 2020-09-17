@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { User, userRoles } from '../model/user';
 
 /**
@@ -47,22 +46,18 @@ export const list = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Update a single user's roles.
+ * Update a single user.
  */
-export const updateRoles = async (
+export const updateUser = async (
     req: Request,
     res: Response,
 ): Promise<void> => {
     try {
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { roles: req.body.roles },
-            {
-                // Return the udpated object.
-                new: true,
-                runValidators: true,
-            },
-        );
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+            // Return the udpated object.
+            new: true,
+            runValidators: true,
+        });
         if (!user) {
             res.status(404).json({
                 message: `user with id ${req.params.id} could not be found`,

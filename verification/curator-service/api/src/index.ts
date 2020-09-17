@@ -12,6 +12,7 @@ import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
+import GeocodeProxy from './controllers/geocode';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
@@ -28,8 +29,6 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import axios from 'axios';
-import GeocodeProxy from './controllers/geocode';
 
 const app = express();
 
@@ -290,7 +289,7 @@ new OpenApiValidator({
         apiRouter.put(
             '/users/:id',
             mustHaveAnyRole(['admin']),
-            usersController.updateRoles,
+            usersController.updateUser,
         );
         apiRouter.get(
             '/users/roles',

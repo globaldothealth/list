@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
         enum: userRoles,
     },
     picture: String,
+    hasSeenWelcomePopup: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export type UserDocument = mongoose.Document & {
@@ -22,6 +26,7 @@ export type UserDocument = mongoose.Document & {
     email: string;
     roles: [string];
     picture?: string;
+    hasSeenWelcomePopup?: boolean;
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);

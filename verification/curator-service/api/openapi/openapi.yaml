@@ -834,15 +834,23 @@ paths:
           pattern: '^[a-f\d]{24}$'
     put:
       tags: [User]
-      summary: Updates a specific user's roles
+      summary: Updates a specific user. Can only update roles and hasSeenWelcomePopup.
       operationId: updateUser
       requestBody:
-        description: New roles for the user
+        description: New properties for the user
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RoleArray"
+              type: object
+              additionalProperties: false
+              properties:
+                hasSeenWelcomePopup:
+                  type: boolean
+                roles:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Role"
       responses:
         "200":
           $ref: "#/components/responses/200User"

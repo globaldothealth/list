@@ -108,7 +108,7 @@ describe('GET', () => {
 });
 
 describe('PUT', () => {
-    it('should update roles', async () => {
+    it('should update user', async () => {
         const request = supertest.agent(app);
         const userRes = await request
             .post('/auth/register')
@@ -117,15 +117,28 @@ describe('PUT', () => {
             .expect('Content-Type', /json/);
         const res = await request
             .put(`/api/users/${userRes.body._id}`)
-            .send({ roles: ['admin', 'curator'] })
+            .send({ roles: ['admin', 'curator'], hasSeenWelcomePopup: true })
             .expect(200, /curator/)
             .expect('Content-Type', /json/);
         // Check what changed.
         expect(res.body.roles).toEqual(['admin', 'curator']);
+        expect(res.body.hasSeenWelcomePopup).toEqual(true);
         // Check stuff that didn't change.
         expect(res.body.email).toEqual(userRes.body.email);
     });
-    it('cannot update an nonexistent user', async () => {
+    it('cannot send additional properties', async () => {
+        const request = supertest.agent(app);
+        const userRes = await request
+            .post('/auth/register')
+            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .expect(200, /admin/)
+            .expect('Content-Type', /json/);
+        return request
+            .put(`/api/users/${userRes.body._id}`)
+            .send({ roles: ['admin', 'curator'], email: 'email@email.com' })
+            .expect(400);
+    });
+    it('cannot update a nonexistent user', async () => {
         const request = supertest.agent(app);
         await request
             .post('/auth/register')
@@ -134,7 +147,7 @@ describe('PUT', () => {
             .expect('Content-Type', /json/);
         return request
             .put('/api/users/5ea86423bae6982635d2e1f8')
-            .send({ ...baseUser, ...{ roles: ['admin'] } })
+            .send({ roles: ['admin'] })
             .expect(404);
     });
     it('should not update to an invalid role', async () => {
