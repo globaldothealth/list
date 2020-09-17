@@ -1,6 +1,7 @@
 import {
     AppBar,
     Avatar,
+    ButtonBase,
     CssBaseline,
     Divider,
     Fab,
@@ -24,6 +25,7 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
+import { ReactComponent as GHMapLogo } from './assets/GHMapLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -167,14 +169,22 @@ const useStyles = makeStyles((theme: Theme) => ({
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
+    mapButton: {
+        backgroundColor: '#CAD9E3',
+        borderRadius: '8px',
+        height: '42px',
+    },
+    viewMapText: {
+        margin: '0 12px',
+    },
     divider: {
         backgroundColor: '#0A7369',
         height: '1px',
         opacity: '0.2',
+        margin: '24px 0',
         width: '100%',
     },
     termsText: {
-        marginTop: theme.spacing(2),
         marginBottom: theme.spacing(3),
     },
     content: {
@@ -528,6 +538,21 @@ export default function App(): JSX.Element {
                             )}
                         </List>
                         <div className={classes.spacer}></div>
+                        <ButtonBase
+                            href="http://covid-19.global.health/#coverage"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            data-testid="mapButton"
+                            classes={{ root: classes.mapButton }}
+                        >
+                            <Typography
+                                variant="caption"
+                                classes={{ root: classes.viewMapText }}
+                            >
+                                View cases on
+                            </Typography>
+                            <GHMapLogo />
+                        </ButtonBase>
                         <div className={classes.divider}></div>
                         <div className={classes.termsText}>
                             <div>Global.health</div>
