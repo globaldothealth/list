@@ -117,12 +117,12 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     renderDate(rowData.created),
                             },
                             {
-                                title: 'Source URL',
-                                field: 'sourceUrl',
-                            },
-                            {
                                 title: 'Source name',
                                 field: 'sourceName',
+                            },
+                            {
+                                title: 'Source URL',
+                                field: 'sourceUrl',
                             },
                             {
                                 title: '# created cases',
