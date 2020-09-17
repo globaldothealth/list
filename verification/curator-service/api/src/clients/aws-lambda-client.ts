@@ -5,7 +5,7 @@ import {
 
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 
 export interface RetrievalPayload {
     bucket: string;
