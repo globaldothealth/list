@@ -1,4 +1,4 @@
-import { GeocodeResult, Resolution } from './geocoder';
+import { GeocodeResult } from './geocoder';
 
 import { Admin } from '../model/admin';
 import LRUCache from 'lru-cache';

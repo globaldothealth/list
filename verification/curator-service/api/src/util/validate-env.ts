@@ -9,13 +9,10 @@ export default function validateEnv(): Readonly<{
     DB_CONNECTION_STRING: string;
     EMAIL_USER_ADDRESS: string;
     EMAIL_USER_PASSWORD: string;
-    ENABLE_FAKE_GEOCODER: boolean;
     ENABLE_LOCAL_AUTH: boolean;
     GLOBAL_RETRIEVAL_FUNCTION_ARN: string;
     GOOGLE_OAUTH_CLIENT_ID: string;
     GOOGLE_OAUTH_CLIENT_SECRET: string;
-    MAPBOX_PERMANENT_GEOCODE: boolean;
-    MAPBOX_TOKEN: string;
     PORT: number;
     SERVICE_ENV: string;
     SESSION_COOKIE_KEY: string;
@@ -63,11 +60,6 @@ export default function validateEnv(): Readonly<{
                 'Password of the email address account used to send notification emails.',
             devDefault: '',
         }),
-        ENABLE_FAKE_GEOCODER: bool({
-            desc: 'Whether to enable the fake seedable geocoder',
-            devDefault: true,
-            default: false,
-        }),
         ENABLE_LOCAL_AUTH: bool({
             desc: 'Whether to enable local auth strategy for testing',
             devDefault: true,
@@ -85,15 +77,6 @@ export default function validateEnv(): Readonly<{
         GOOGLE_OAUTH_CLIENT_SECRET: str({
             desc: 'OAuth client secret from the Google developer console',
             devDefault: 'replace to enable auth',
-        }),
-        MAPBOX_PERMANENT_GEOCODE: bool({
-            desc: 'Whether to use the permanent geocode endpoint',
-            devDefault: false,
-            default: true,
-        }),
-        MAPBOX_TOKEN: str({
-            desc: 'Mapbox token to use for geocoding',
-            devDefault: '',
         }),
         PORT: port({ default: 3001 }),
         SERVICE_ENV: str({

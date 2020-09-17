@@ -2,13 +2,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../../src/index';
 import request from 'supertest';
 
-const mockInitialize = jest.fn().mockResolvedValue({});
-jest.mock('../../src/clients/email-client', () => {
-    return jest.fn().mockImplementation(() => {
-        return { initialize: mockInitialize };
-    });
-});
-
 jest.mock('../../src/geocoding/mapbox');
 
 let mongoServer: MongoMemoryServer;
@@ -33,7 +26,7 @@ describe('FakeGeocoder', () => {
             })
             .expect(200);
     });
-    it('can clear geocodes', () => {
+    it('can clear geocodes', async () => {
         return request(app).post('/api/geocode/clear').expect(200);
     });
 });
