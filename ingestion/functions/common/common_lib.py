@@ -97,7 +97,7 @@ def login(email: str):
     endpoint = "http://localhost:3001/auth/register"
     res = requests.post(endpoint, json={
         "email": email,
-        "roles": ['curator', 'reader'],
+        "roles": ['curator'],
     })
     if not res or res.status_code != 200:
         raise RuntimeError(

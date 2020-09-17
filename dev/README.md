@@ -50,7 +50,7 @@ Note that the user must be logged-in into the portal before you can issue this c
 If for some obscure reason the command above do not work, here is how to update a user in mongo directly:
 
 ```mongo
-db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'reader', 'curator']}})
+db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'curator']}})
 ```
 
 ### Let's run this thing!

@@ -20,6 +20,7 @@ Resources:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
+      MemorySize: 512
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
@@ -127,6 +128,18 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+  GermanyParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/germany/
+      Handler: germany.lambda_handler
+      Description: Parse case data for Germany
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
   PeruParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -169,6 +182,18 @@ Resources:
       CodeUri: parsing/riograndedosul/
       Handler: riograndedosul.lambda_handler
       Description: Parse case data for the Rio Grande do Sul State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  ColombiaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/colombia/
+      Handler: colombia.lambda_handler
+      Description: Parse case data for Colombia
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

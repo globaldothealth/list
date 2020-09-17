@@ -6,6 +6,6 @@ set -e
 pushd `pwd`
 # We have to run docker-compose from this directory for it to pick up the .env file.
 cd `dirname "$0"`
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec mongo mongo covid19 --eval "var email='$1'; var roles=['admin', 'curator', 'reader'];" /verification/scripts/roles.js
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec mongo mongo covid19 --eval "var email='$1'; var roles=['admin', 'curator'];" /verification/scripts/roles.js
 # Restore directory.
 popd

@@ -30,11 +30,27 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            # TODO: Remove this pending https://github.com/globaldothealth/list/issues/961.
+            # Run with node debug mode set to http, net, and tls.
+            - name: NODE_DEBUG
+              value: "http,net,tls"
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: data-dev-ddhhd4mmhf
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
@@ -64,7 +80,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/dataservice:0.0.19
+          image: ghcr.io/globaldothealth/list/dataservice:0.1.1
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -79,12 +95,24 @@ spec:
                 secretKeyRef:
                   name: data-prod-bdh6659ckt
                   key: db_connection_string
+            - name: SERVICE_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-prod-4mtk8mh9t2
+                  key: mapbox_token
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
               memory: "512Mi"
+              cpu: "150m"
+            limits:
+              memory: "768Mi"
               cpu: "250m"
 ---
 apiVersion: v1

@@ -5,7 +5,7 @@ describe('Linelist table', function () {
         cy.login({
             email: 'test@bar.com',
             name: 'test',
-            roles: ['admin', 'curator', 'reader'],
+            roles: ['admin', 'curator'],
         });
     });
 
@@ -45,11 +45,11 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
-        cy.contains('View case').should('not.exist');
+        cy.contains(/View case\b/).should('not.exist');
         cy.contains('td', 'France').click({ force: true });
-        cy.contains('View case');
+        cy.contains(/View case\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains('View case').should('not.exist');
+        cy.contains(/View case\b/).should('not.exist');
     });
 
     it('Can delete a case', function () {
@@ -146,44 +146,56 @@ describe('Linelist table', function () {
         cy.addCase({
             country: 'United Kingdom',
         });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
+        cy.wait('@getCases');
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
+        cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
 
-        cy.server();
-        cy.route('POST', `/api/cases/batchUpdateQuery`).as('updateCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
         // Mark them verified.
+        cy.route('POST', `/api/cases/batchUpdateQuery`).as('updateCases');
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
+        cy.wait('@getCases');
         cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
         cy.contains('rows').click();
 
         // Check only France rows are changed
         cy.get('li').contains('10').click();
+        cy.wait('@getCases');
         cy.get('[data-testid="verified-svg"]').should('have.length', 7);
         cy.get('[data-testid="unverified-svg"]').should('have.length', 2);
 
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
+        cy.wait('@getCases');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
         cy.get('input[type="checkbox"]').eq(0).click();
         cy.contains('Select all 7 rows').click();
 
         // Mark them unverified.
         cy.get('button[title="Unverify selected rows"]').click();
         cy.wait('@updateCases');
+        cy.wait('@getCases');
         cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
         cy.contains('rows').click();
         cy.get('li').contains('10').click();
+        cy.wait('@getCases');
         cy.get('[data-testid="verified-svg"]').should('not.exist');
         cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
     });
@@ -210,6 +222,36 @@ describe('Linelist table', function () {
         cy.contains('France').should('not.exist');
         cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
+    });
+
+    it('Search query is saved in browser history', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('United Kingdom');
+        cy.contains('Filter').click();
+        cy.get('li').contains('country').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.contains('United Kingdom').should('not.exist');
+
+        // Navigate to case details and back
+        cy.get('td[value="France"]').click();
+        cy.contains(/View case\b/);
+        cy.get('button[aria-label="close overlay"').click();
+        cy.contains(/View case\b/).should('not.exist');
+
+        // Search is maintained
+        cy.get('input[id="search-field"]').should(
+            'have.value',
+            'country:France',
+        );
+        cy.get('td[value="France"]');
+        cy.contains('United Kingdom').should('not.exist');
     });
 
     it('Can select all rows across pages only after searching', function () {
