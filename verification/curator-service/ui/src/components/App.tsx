@@ -37,6 +37,7 @@ import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
+import TermsOfService from './TermsOfService';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
 import User from './User';
@@ -156,12 +157,25 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: drawerWidth,
     },
     drawerContents: {
-        marginLeft: '12px',
-        marginRight: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        marginLeft: '24px',
+        marginRight: '32px',
     },
     drawerHeader: {
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
+    },
+    divider: {
+        backgroundColor: '#0A7369',
+        height: '1px',
+        opacity: '0.2',
+        width: '100%',
+    },
+    termsText: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(3),
     },
     content: {
         flexGrow: 1,
@@ -251,19 +265,15 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                     </a>
                 )}
                 <Divider className={classes.divider} />
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://global.health"
-                >
+                <Link to="/terms" onClick={handleClose}>
                     <MenuItem>About Global.Health</MenuItem>
-                </a>
+                </Link>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
                     href="https://github.com/globaldothealth/list/issues/new/choose"
+                    onClick={handleClose}
                 >
                     <MenuItem>Report an issue</MenuItem>
                 </a>
@@ -517,6 +527,12 @@ export default function App(): JSX.Element {
                                     ),
                             )}
                         </List>
+                        <div className={classes.spacer}></div>
+                        <div className={classes.divider}></div>
+                        <div className={classes.termsText}>
+                            <div>Global.health</div>
+                            <Link to="/terms">Terms of use</Link>
+                        </div>
                     </div>
                 </Drawer>
                 <main
@@ -603,6 +619,9 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
+                        <Route exact path="/terms">
+                            <TermsOfService />
+                        </Route>
                         <Route exact path="/">
                             {hasAnyRole(['curator', 'admin']) && <Charts />}
                         </Route>
