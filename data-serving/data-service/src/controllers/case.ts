@@ -1,79 +1,558 @@
 import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
+import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
+import { batchUpsertDropUnchangedCases } from './preprocessor';
 
-/**
- * Get a specific case.
- *
- * Handles HTTP GET /api/cases/:id.
- */
-export const get = async (req: Request, res: Response): Promise<void> => {
-    const c = await Case.findById(req.params.id).lean();
-    if (!c) {
-        res.status(404).send({
-            message: `Case with ID ${req.params.id} not found.`,
-        });
-        return;
-    }
-    res.json(c);
-};
+class InvalidParamError extends Error {}
 
-/**
- * Streams a CSV attachment of all cases.
- *
- * Handles HTTP POST /api/cases/download.
- */
-export const download = async (req: Request, res: Response): Promise<void> => {
-    let cases: any;
-    try {
-        if (req.body.query) {
-            cases = await casesMatchingSearchQuery({
-                searchQuery: req.body.query as string,
-                count: false,
+type BatchValidationErrors = { index: number; message: string }[];
+
+export class CasesController {
+    constructor(private readonly geocoders: Geocoder[]) {}
+
+    /**
+     * Get a specific case.
+     *
+     * Handles HTTP GET /api/cases/:id.
+     */
+    get = async (req: Request, res: Response): Promise<void> => {
+        const c = await Case.findById(req.params.id).lean();
+        if (!c) {
+            res.status(404).send({
+                message: `Case with ID ${req.params.id} not found.`,
             });
-        } else if (req.body.caseIds) {
-            cases = await Case.find({ _id: { $in: req.body.caseIds } }).lean();
-        } else {
-            cases = await Case.find({}).lean();
-        }
-
-        res.setHeader('Content-Type', 'text/csv');
-        res.setHeader(
-            'Content-Disposition',
-            'attachment; filename="cases.csv"',
-        );
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Pragma', 'no-cache');
-        axios
-            .get<string>(
-                'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
-            )
-            .then((yamlRes) => {
-                const dataDictionary = yaml.safeLoad(yamlRes.data);
-                const columns = (dataDictionary as Array<{
-                    name: string;
-                    description: string;
-                }>).map((datum) => datum.name);
-                stringify(cases, {
-                    header: true,
-                    columns: columns,
-                }).pipe(res);
-            });
-    } catch (e) {
-        if (e instanceof ParsingError) {
-            res.status(422).json({ message: e.message });
             return;
         }
-        console.error(e);
-        res.status(500).json(e);
-        return;
+        res.json(c);
+    };
+
+    /**
+     * Streams a CSV attachment of all cases.
+     *
+     * Handles HTTP POST /api/cases/download.
+     */
+    download = async (req: Request, res: Response): Promise<void> => {
+        let cases: any;
+        try {
+            if (req.body.query) {
+                cases = await casesMatchingSearchQuery({
+                    searchQuery: req.body.query as string,
+                    count: false,
+                });
+            } else if (req.body.caseIds) {
+                cases = await Case.find({
+                    _id: { $in: req.body.caseIds },
+                }).lean();
+            } else {
+                cases = await Case.find({}).lean();
+            }
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader(
+                'Content-Disposition',
+                'attachment; filename="cases.csv"',
+            );
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Pragma', 'no-cache');
+            axios
+                .get<string>(
+                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+                )
+                .then((yamlRes) => {
+                    const dataDictionary = yaml.safeLoad(yamlRes.data);
+                    const columns = (dataDictionary as Array<{
+                        name: string;
+                        description: string;
+                    }>).map((datum) => datum.name);
+                    stringify(cases, {
+                        header: true,
+                        columns: columns,
+                    }).pipe(res);
+                });
+        } catch (e) {
+            if (e instanceof ParsingError) {
+                res.status(422).json({ message: e.message });
+                return;
+            }
+            console.error(e);
+            res.status(500).json(e);
+            return;
+        }
+    };
+
+    /**
+     * List all cases.
+     *
+     * Handles HTTP GET /api/cases.
+     */
+    list = async (req: Request, res: Response): Promise<void> => {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        if (page < 1) {
+            res.status(422).json({ message: 'page must be > 0' });
+            return;
+        }
+        if (limit < 1) {
+            res.status(422).json({ message: 'limit must be > 0' });
+            return;
+        }
+        // Filter query param looks like &q=some%20search%20query
+        if (
+            typeof req.query.q !== 'string' &&
+            typeof req.query.q !== 'undefined'
+        ) {
+            res.status(422).json({ message: 'q must be a unique string' });
+            return;
+        }
+        try {
+            const casesQuery = casesMatchingSearchQuery({
+                searchQuery: req.query.q || '',
+                count: false,
+            }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
+            const countQuery = casesMatchingSearchQuery({
+                searchQuery: req.query.q || '',
+                count: true,
+            }) as Query<number>;
+            // Do a fetch of documents and another fetch in parallel for total documents
+            // count used in pagination.
+            const [docs, total] = await Promise.all([
+                casesQuery
+                    .sort({ 'revisionMetadata.creationMetadata.date': -1 })
+                    .skip(limit * (page - 1))
+                    .limit(limit + 1),
+                countQuery,
+            ]);
+            // If we have more items than limit, add a response param
+            // indicating that there is more to fetch on the next page.
+            if (docs.length == limit + 1) {
+                docs.splice(limit);
+                res.json({
+                    cases: docs,
+                    nextPage: page + 1,
+                    total: total,
+                });
+                return;
+            }
+            // If we fetched all available data, just return it.
+            res.json({ cases: docs, total: total });
+        } catch (e) {
+            if (e instanceof ParsingError) {
+                res.status(422).json({ message: e.message });
+                return;
+            }
+            console.error(e);
+            res.status(500).json(e);
+            return;
+        }
+    };
+
+    /**
+     * Create one or many identical cases.
+     *
+     * Handles HTTP POST /api/cases.
+     */
+    create = async (req: Request, res: Response): Promise<void> => {
+        const numCases = Number(req.query.num_cases) || 1;
+        try {
+            if (!(await this.geocode(req))) {
+                res.status(404).send({
+                    message: `no geolocation found for ${req.body['location']?.query}`,
+                });
+                return;
+            }
+            const c = new Case(req.body);
+
+            let result;
+            if (req.query.validate_only) {
+                await c.validate();
+                result = c;
+            } else {
+                if (numCases === 1) {
+                    result = await c.save();
+                } else {
+                    const cases = Array.from(
+                        { length: numCases },
+                        () => new Case(req.body),
+                    );
+                    result = { cases: await Case.insertMany(cases) };
+                }
+            }
+            res.status(201).json(result);
+        } catch (err) {
+            if (
+                err.name === 'ValidationError' ||
+                err instanceof InvalidParamError
+            ) {
+                res.status(422).json(err);
+                return;
+            }
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
+     * Batch validates cases.
+     */
+    private batchValidate = async (
+        // We're about to validate the cases, cannot type them yet.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cases: any[],
+    ): Promise<BatchValidationErrors> => {
+        const errors: { index: number; message: string }[] = [];
+        await Promise.all(
+            // We're about to validate this data; any is fine, here.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cases.map((c: any, index: number) => {
+                return new Case(c).validate().catch((e) => {
+                    errors.push({ index: index, message: e.message });
+                });
+            }),
+        );
+        return errors;
+    };
+
+    /**
+     * Perform geocoding for each case (of multiple `cases` specified in the
+     * request body), in accordance with the above geocoding logic.
+     *
+     * TODO: Use a batch geocode API like https://docs.mapbox.com/api/search/#batch-geocoding.
+     *
+     * @returns {object} Detailing the nature of any issues encountered.
+     */
+    batchGeocode = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        const caseCount = req.body.cases.length;
+        const geocodeErrors: { index: number; message: string }[] = [];
+        for (let index = 0; index < caseCount; index++) {
+            const c = req.body.cases[index];
+            try {
+                const geocodeResult = await this.geocode({
+                    body: c,
+                });
+                if (!geocodeResult) {
+                    geocodeErrors.push({
+                        index: index,
+                        message: `no geolocation found for ${c.location?.query}`,
+                    });
+                }
+            } catch (err) {
+                if (err instanceof InvalidParamError) {
+                    geocodeErrors.push({
+                        index: index,
+                        message: err.message,
+                    });
+                } else {
+                    throw err;
+                }
+            }
+        }
+        if (geocodeErrors.length > 0) {
+            res.status(207).send({
+                phase: 'GEOCODE',
+                numCreated: 0,
+                numUpdated: 0,
+                errors: geocodeErrors,
+            });
+            return;
+        }
+        next();
+    };
+
+    /**
+     * Batch upserts cases.
+     *
+     * Handles HTTP POST /api/cases/batchUpsert.
+     *
+     * Batch validate the cases then if no errors have happened performs the batch
+     * upsert.
+     */
+    batchUpsert = async (req: Request, res: Response): Promise<void> => {
+        try {
+            // Batch validate cases first.
+            const errors = await this.batchValidate(req.body.cases);
+            if (errors.length > 0) {
+                res.status(207).send({
+                    phase: 'VALIDATE',
+                    numCreated: 0,
+                    numUpdated: 0,
+                    errors: errors,
+                });
+                return;
+            }
+            const bulkWriteResult = await Case.bulkWrite(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                req.body.cases.map((c: any) => {
+                    if (
+                        c.caseReference?.sourceId &&
+                        c.caseReference?.sourceEntryId
+                    ) {
+                        console.error('updating case', c);
+                        return {
+                            updateOne: {
+                                filter: {
+                                    'caseReference.sourceId':
+                                        c.caseReference.sourceId,
+                                    'caseReference.sourceEntryId':
+                                        c.caseReference.sourceEntryId,
+                                },
+                                update: c,
+                                upsert: true,
+                            },
+                        };
+                    } else {
+                        return {
+                            insertOne: {
+                                document: c,
+                            },
+                        };
+                    }
+                }),
+                { ordered: false },
+            );
+            res.status(200).json({
+                phase: 'UPSERT',
+                numCreated:
+                    (bulkWriteResult.insertedCount || 0) +
+                    (bulkWriteResult.upsertedCount || 0),
+                numUpdated: bulkWriteResult.modifiedCount,
+                errors: [],
+            });
+            return;
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                res.status(422).json(err);
+                return;
+            }
+            console.warn(err);
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
+     * Update a specific case.
+     *
+     * Handles HTTP PUT /api/cases/:id.
+     */
+    update = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
+                runValidators: true,
+            });
+            if (!c) {
+                res.status(404).send({
+                    message: `Case with ID ${req.params.id} not found.`,
+                });
+                return;
+            }
+            res.json(c);
+        } catch (err) {
+            if (err.name === 'ValidationError') {
+                res.status(422).json(err);
+                return;
+            }
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
+     * Updates multiple cases.
+     *
+     * Handles HTTP POST /api/cases/batchUpdate.
+     */
+    batchUpdate = async (req: Request, res: Response): Promise<void> => {
+        if (!req.body.cases.every((c: any) => c._id)) {
+            res.status(422).json({
+                message: 'Every case must specify its _id',
+            });
+            return;
+        }
+        try {
+            const bulkWriteResult = await Case.bulkWrite(
+                req.body.cases.map((c: any) => {
+                    return {
+                        updateOne: {
+                            filter: {
+                                _id: c._id,
+                            },
+                            update: c,
+                        },
+                    };
+                }),
+                { ordered: false },
+            );
+            res.json({ numModified: bulkWriteResult.modifiedCount });
+        } catch (err) {
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
+     * Upserts a case based on a compound index of
+     * caseReference.{dataSourceId, dataEntryId}.
+     *
+     * On success, the returned status code indicates whether than item was created
+     * (201) or updated (200).
+     *
+     * Handles HTTP PUT /api/cases.
+     */
+    upsert = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const c = await Case.findOne({
+                'caseReference.sourceId': req.body.caseReference?.sourceId,
+                'caseReference.sourceEntryId':
+                    req.body.caseReference?.sourceEntryId,
+            });
+            if (
+                req.body.caseReference?.sourceId &&
+                req.body.caseReference?.sourceEntryId &&
+                c
+            ) {
+                c.set(req.body);
+                const result = await c.save();
+                res.status(200).json(result);
+                return;
+            } else {
+                // Geocode new cases.
+                if (!(await this.geocode(req))) {
+                    res.status(404).send({
+                        message: `no geolocation found for ${req.body['location']?.query}`,
+                    });
+                    return;
+                }
+                const c = new Case(req.body);
+                const result = await c.save();
+                res.status(201).json(result);
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            if (
+                err.name === 'ValidationError' ||
+                err instanceof InvalidParamError
+            ) {
+                res.status(422).json(err.message);
+                return;
+            }
+            res.status(500).json(err.message);
+            return;
+        }
+    };
+
+    /**
+     * Deletes multiple cases.
+     *
+     * Handles HTTP DELETE /api/cases.
+     */
+    batchDel = async (req: Request, res: Response): Promise<void> => {
+        if (req.body.caseIds !== undefined) {
+            Case.deleteMany(
+                {
+                    _id: {
+                        $in: req.body.caseIds,
+                    },
+                },
+                (err) => {
+                    if (err) {
+                        res.status(500).json(err);
+                        return;
+                    }
+                    res.status(204).end();
+                },
+            );
+            return;
+        }
+
+        const casesQuery = casesMatchingSearchQuery({
+            searchQuery: req.body.query,
+            count: false,
+        });
+        Case.deleteMany(casesQuery, (err) => {
+            if (err) {
+                res.status(500).json(err);
+                return;
+            }
+            res.status(204).end();
+        });
+    };
+
+    /**
+     * Delete a specific case.
+     *
+     * Handles HTTP DELETE /api/cases/:id.
+     */
+    del = async (req: Request, res: Response): Promise<void> => {
+        const c = await Case.findByIdAndDelete(req.params.id, req.body);
+        if (!c) {
+            res.status(404).send({
+                message: `Case with ID ${req.params.id} not found.`,
+            });
+            return;
+        }
+        res.status(204).end();
+    };
+
+    /**
+     * Geocodes request content if no lat lng were provided.
+     *
+     * @returns {boolean} Whether lat lng were either provided or geocoded
+     */
+    // For batch requests, the case body is nested.
+    // While we could define a type here, the right change is probably to use a
+    // batch geocoding API for such cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async geocode(req: Request | any): Promise<boolean> {
+        // Geocode query if no lat lng were provided.
+        const location = req.body['location'];
+        if (location?.geometry?.latitude && location.geometry?.longitude) {
+            return true;
+        }
+        if (!location?.query) {
+            throw new InvalidParamError(
+                'location.query must be specified to be able to geocode',
+            );
+        }
+        const opts: GeocodeOptions = {};
+        if (location['limitToResolution']) {
+            opts.limitToResolution = [];
+            location['limitToResolution']
+                .split(',')
+                .forEach((supplied: string) => {
+                    const resolution =
+                        Resolution[supplied as keyof typeof Resolution];
+                    if (!resolution) {
+                        throw new InvalidParamError(
+                            `invalid limitToResolution: ${supplied}`,
+                        );
+                    }
+                    opts.limitToResolution?.push(resolution);
+                });
+        }
+        for (const geocoder of this.geocoders) {
+            const features = await geocoder.geocode(location?.query, opts);
+            if (features.length === 0) {
+                continue;
+            }
+            // Currently a 1:1 match between the GeocodeResult and the data service API.
+            req.body['location'] = features[0];
+            return true;
+        }
+        return false;
     }
-};
+}
 
 // Returns a mongoose query for all cases matching the given search query.
 // If count is true, it returns a query for the number of cases matching
@@ -109,133 +588,6 @@ export const casesMatchingSearchQuery = (opts: {
         }
     });
     return opts.count ? countQuery : casesQuery.lean();
-};
-
-/**
- * List all cases.
- *
- * Handles HTTP GET /api/cases.
- */
-export const list = async (req: Request, res: Response): Promise<void> => {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    if (page < 1) {
-        res.status(422).json({ message: 'page must be > 0' });
-        return;
-    }
-    if (limit < 1) {
-        res.status(422).json({ message: 'limit must be > 0' });
-        return;
-    }
-    // Filter query param looks like &q=some%20search%20query
-    if (typeof req.query.q !== 'string' && typeof req.query.q !== 'undefined') {
-        res.status(422).json({ message: 'q must be a unique string' });
-        return;
-    }
-    try {
-        const casesQuery = casesMatchingSearchQuery({
-            searchQuery: req.query.q || '',
-            count: false,
-        }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
-        const countQuery = casesMatchingSearchQuery({
-            searchQuery: req.query.q || '',
-            count: true,
-        }) as Query<number>;
-        // Do a fetch of documents and another fetch in parallel for total documents
-        // count used in pagination.
-        const [docs, total] = await Promise.all([
-            casesQuery
-                .sort({ 'revisionMetadata.creationMetadata.date': -1 })
-                .skip(limit * (page - 1))
-                .limit(limit + 1),
-            countQuery,
-        ]);
-        // If we have more items than limit, add a response param
-        // indicating that there is more to fetch on the next page.
-        if (docs.length == limit + 1) {
-            docs.splice(limit);
-            res.json({
-                cases: docs,
-                nextPage: page + 1,
-                total: total,
-            });
-            return;
-        }
-        // If we fetched all available data, just return it.
-        res.json({ cases: docs, total: total });
-    } catch (e) {
-        if (e instanceof ParsingError) {
-            res.status(422).json({ message: e.message });
-            return;
-        }
-        console.error(e);
-        res.status(500).json(e);
-        return;
-    }
-};
-
-/**
- * Create one or many identical cases.
- *
- * Handles HTTP POST /api/cases.
- */
-export const create = async (req: Request, res: Response): Promise<void> => {
-    const numCases = Number(req.query.num_cases) || 1;
-    try {
-        const c = new Case(req.body);
-
-        let result;
-        if (req.query.validate_only) {
-            await c.validate();
-            result = c;
-        } else {
-            if (numCases === 1) {
-                result = await c.save();
-            } else {
-                const cases = Array.from(
-                    { length: numCases },
-                    () => new Case(req.body),
-                );
-                result = { cases: await Case.insertMany(cases) };
-            }
-        }
-        res.status(201).json(result);
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err);
-            return;
-        }
-        res.status(500).json(err);
-        return;
-    }
-};
-
-/**
- * Batch validates cases.
- *
- * Handles HTTP POST /api/cases/batchValidate.
- */
-export const batchValidate = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
-    try {
-        const errors: { index: number; message: string }[] = [];
-        await Promise.all(
-            // We're about to validate this data; any is fine, here.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            req.body.cases.map((c: any, index: number) => {
-                return new Case(c).validate().catch((e) => {
-                    errors.push({ index: index, message: e.message });
-                });
-            }),
-        );
-        res.status(207).json({ errors: errors });
-        return;
-    } catch (err) {
-        res.status(500).json(err);
-        return;
-    }
 };
 
 /**
@@ -290,7 +642,7 @@ export const findCasesWithCaseReferenceData = async (
  *   cases, filtering on provided case reference data, in order to provide
  *   an accurate list of updated case IDs.
  */
-const findCaseIdsWithCaseReferenceData = async (
+export const findCaseIdsWithCaseReferenceData = async (
     req: Request,
 ): Promise<string[]> => {
     return (
@@ -299,227 +651,6 @@ const findCaseIdsWithCaseReferenceData = async (
             /* fieldsToSelect= */ { _id: 1 },
         )
     ).map((c) => String(c._id));
-};
-
-/**
- * Batch upserts cases.
- *
- * Handles HTTP POST /api/cases/batchUpsert.
- *
- * Note that this method is _not_ atomic, and that validation _should_ be
- * performed prior to invocation. Upserted cases are not validated, and while
- * any validation issues for created cases will cause the API to return 422,
- * all provided cases without validation errors will be written.
- *
- * TODO: Wrap batchValidate in this method.
- */
-export const batchUpsert = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
-    try {
-        const bulkWriteResult = await Case.bulkWrite(
-            // Case data should be validated prior to this point.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            req.body.cases.map((c: any) => {
-                if (
-                    c.caseReference?.sourceId &&
-                    c.caseReference?.sourceEntryId
-                ) {
-                    return {
-                        updateOne: {
-                            filter: {
-                                'caseReference.sourceId':
-                                    c.caseReference.sourceId,
-                                'caseReference.sourceEntryId':
-                                    c.caseReference.sourceEntryId,
-                            },
-                            update: c,
-                            upsert: true,
-                        },
-                    };
-                } else {
-                    return {
-                        insertOne: {
-                            document: c,
-                        },
-                    };
-                }
-            }),
-            { ordered: false },
-        );
-        res.status(207).json({
-            numCreated:
-                (bulkWriteResult.insertedCount || 0) +
-                (bulkWriteResult.upsertedCount || 0),
-            numUpdated: bulkWriteResult.modifiedCount,
-        });
-        return;
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err);
-            return;
-        }
-        console.warn(err);
-        res.status(500).json(err);
-        return;
-    }
-};
-
-/**
- * Update a specific case.
- *
- * Handles HTTP PUT /api/cases/:id.
- */
-export const update = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const c = await Case.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        });
-        if (!c) {
-            res.status(404).send({
-                message: `Case with ID ${req.params.id} not found.`,
-            });
-            return;
-        }
-        res.json(c);
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err);
-            return;
-        }
-        res.status(500).json(err);
-        return;
-    }
-};
-
-/**
- * Updates multiple cases.
- *
- * Handles HTTP POST /api/cases/batchUpdate.
- */
-export const batchUpdate = async (
-    req: Request,
-    res: Response,
-): Promise<void> => {
-    if (!req.body.cases.every((c: any) => c._id)) {
-        res.status(422).json({ message: 'Every case must specify its _id' });
-        return;
-    }
-    try {
-        const bulkWriteResult = await Case.bulkWrite(
-            req.body.cases.map((c: any) => {
-                return {
-                    updateOne: {
-                        filter: {
-                            _id: c._id,
-                        },
-                        update: c,
-                    },
-                };
-            }),
-            { ordered: false },
-        );
-        res.json({ numModified: bulkWriteResult.modifiedCount });
-    } catch (err) {
-        res.status(500).json(err);
-        return;
-    }
-};
-
-/**
- * Upserts a case based on a compound index of
- * caseReference.{dataSourceId, dataEntryId}.
- *
- * On success, the returned status code indicates whether than item was created
- * (201) or updated (200).
- *
- * Handles HTTP PUT /api/cases.
- */
-export const upsert = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const c = await Case.findOne({
-            'caseReference.sourceId': req.body.caseReference?.sourceId,
-            'caseReference.sourceEntryId':
-                req.body.caseReference?.sourceEntryId,
-        });
-        if (
-            req.body.caseReference?.sourceId &&
-            req.body.caseReference?.sourceEntryId &&
-            c
-        ) {
-            c.set(req.body);
-            const result = await c.save();
-            res.status(200).json(result);
-            return;
-        } else {
-            const c = new Case(req.body);
-            const result = await c.save();
-            res.status(201).json(result);
-            return;
-        }
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            res.status(422).json(err.message);
-            return;
-        }
-        res.status(500).json(err.message);
-        return;
-    }
-};
-
-/**
- * Deletes multiple cases.
- *
- * Handles HTTP DELETE /api/cases.
- */
-export const batchDel = async (req: Request, res: Response): Promise<void> => {
-    if (req.body.caseIds !== undefined) {
-        Case.deleteMany(
-            {
-                _id: {
-                    $in: req.body.caseIds,
-                },
-            },
-            (err) => {
-                if (err) {
-                    res.status(500).json(err);
-                    return;
-                }
-                res.status(204).end();
-            },
-        );
-        return;
-    }
-
-    const casesQuery = casesMatchingSearchQuery({
-        searchQuery: req.body.query,
-        count: false,
-    });
-    Case.deleteMany(casesQuery, (err) => {
-        if (err) {
-            res.status(500).json(err);
-            return;
-        }
-        res.status(204).end();
-    });
-};
-
-/**
- * Delete a specific case.
- *
- * Handles HTTP DELETE /api/cases/:id.
- */
-export const del = async (req: Request, res: Response): Promise<void> => {
-    const c = await Case.findByIdAndDelete(req.params.id, req.body);
-    if (!c) {
-        res.status(404).send({
-            message: `Case with ID ${req.params.id} not found.`,
-        });
-        return;
-    }
-    res.status(204).end();
 };
 
 /**
