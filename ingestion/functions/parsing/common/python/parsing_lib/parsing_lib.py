@@ -102,12 +102,13 @@ def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
 
 def write_to_server(
         cases: Generator[Dict, None, None],
-        env: str, source_id: str, upload_id: str, headers, cookies):
+        env: str, source_id: str, upload_id: str, headers, cookies,
+        cases_batch_size):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
     while True:
-        batch = batch_of(cases, CASES_BATCH_SIZE)
+        batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
             break
@@ -130,8 +131,11 @@ def write_to_server(
         upload_error = (common_lib.UploadError.VALIDATION_ERROR
                         if res.status_code == 207 else
                         common_lib.UploadError.DATA_UPLOAD_ERROR)
-        common_lib.complete_with_error(e, env, upload_error,
-                                       source_id, upload_id, headers, cookies)
+        common_lib.complete_with_error(
+            e, env, upload_error,
+            source_id, upload_id, headers, cookies,
+            count_created=counter['numCreated'],
+            count_updated=counter['numUpdated'])
         return
     print(f'sent {counter["total"]} cases')
     return counter['numCreated'], counter['numUpdated']
@@ -241,7 +245,8 @@ def run_lambda(
                 env, source_id, upload_id,
                 api_creds, cookies),
             env, source_id, upload_id,
-            api_creds, cookies)
+            api_creds, cookies,
+            CASES_BATCH_SIZE)
         common_lib.finalize_upload(
             env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)
