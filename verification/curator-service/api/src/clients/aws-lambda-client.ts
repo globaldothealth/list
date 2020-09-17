@@ -5,6 +5,7 @@ import {
 
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
+import { logger } from '../index';
 
 export interface RetrievalPayload {
     bucket: string;
@@ -95,7 +96,7 @@ export default class AwsLambdaClient {
                 })
                 .promise();
             if (res.FunctionError) {
-                console.error(res);
+                logger.error(res);
                 throw Error(
                     `Retrieving source "${sourceId}" content: ${res.FunctionError}`,
                 );
@@ -105,7 +106,7 @@ export default class AwsLambdaClient {
                 res.Payload?.toString() || '',
             ) as RetrievalPayload;
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             throw e;
         }
     };
@@ -124,7 +125,7 @@ export default class AwsLambdaClient {
                 }) || []
             );
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             throw e;
         }
     };
