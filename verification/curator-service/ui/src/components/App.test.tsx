@@ -49,3 +49,24 @@ it('renders without crashing when logged out', async () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
 });
+
+it('has link to map', async () => {
+    const axiosResponse = {
+        data: {},
+        status: 403,
+        statusText: 'Forbidden',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValue(axiosResponse);
+    const { getByTestId } = render(
+        <MemoryRouter>
+            <App />
+        </MemoryRouter>,
+    );
+
+    expect(getByTestId('mapButton')).toHaveAttribute(
+        'href',
+        'http://covid-19.global.health/#coverage',
+    );
+});
