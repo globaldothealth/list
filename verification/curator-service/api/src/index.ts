@@ -12,6 +12,7 @@ import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
+import GeocodeProxy from './controllers/geocode';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
@@ -26,10 +27,20 @@ import mongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
+import pino from 'pino';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
-import axios from 'axios';
-import GeocodeProxy from './controllers/geocode';
+
+// The Pino team recommends against using pino-pretty/prettyPrint in
+// production. Without a prettifier, Pino logs JSON messages. This is faster,
+// and decouples log writing and reading concerns, but requires that viewers
+// install pino-pretty globally and pipe all logs commands to it.
+//
+// Instead, prettifying programmatically, since we only use it for HTTP errors,
+// as opposed to all requests.
+export const logger = pino({
+    prettyPrint: { colorize: process.env.NODE_ENV !== 'production' },
+});
 
 const app = express();
 
@@ -59,7 +70,7 @@ app.set('port', env.PORT);
 // MONGO_URL is provided by the in memory version of jest-mongodb.
 // DB_CONNECTION_STRING is what we use in prod.
 const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-console.log(
+logger.info(
     'Connecting to MongoDB instance',
     // Print only after username and password to not log them.
     mongoURL.substring(mongoURL.indexOf('@')),
@@ -73,10 +84,10 @@ mongoose
         useFindAndModify: false,
     })
     .then(() => {
-        console.log('Connected to the database');
+        logger.info('Connected to the database');
     })
     .catch((e) => {
-        console.error('Failed to connect to DB', e);
+        logger.error('Failed to connect to DB', e);
         process.exit(1);
     });
 
@@ -144,7 +155,7 @@ new OpenApiValidator({
         ).initialize();
     })
     .catch((e) => {
-        console.error('Failed to instantiate email client:', e);
+        logger.error('Failed to instantiate email client:', e);
         process.exit(1);
     })
     .then((emailClient) => {
@@ -357,7 +368,7 @@ new OpenApiValidator({
 
         // Serve static UI content if static directory was specified.
         if (env.STATIC_DIR) {
-            console.log('Serving static files from', env.STATIC_DIR);
+            logger.info('Serving static files from', env.STATIC_DIR);
             app.use(express.static(env.STATIC_DIR));
             // Send index to any unmatched route.
             // This must be the LAST handler installed on the app.
@@ -368,7 +379,7 @@ new OpenApiValidator({
         }
     })
     .catch((e) => {
-        console.error('Failed to install OpenAPI validator:', e);
+        logger.error('Failed to install OpenAPI validator:', e);
         process.exit(1);
     });
 

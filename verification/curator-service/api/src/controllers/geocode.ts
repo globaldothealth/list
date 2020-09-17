@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+
 import axios from 'axios';
+import { logger } from '../index';
 
 /** Dumb proxy to geocoder in data service */
 export default class GeocodeProxy {
@@ -13,7 +15,7 @@ export default class GeocodeProxy {
             res.status(response.status).json(response.data);
             return;
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
