@@ -29,6 +29,7 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import axios from 'axios';
+import GeocodeProxy from './controllers/geocode';
 
 const app = express();
 
@@ -297,35 +298,16 @@ new OpenApiValidator({
             usersController.listRoles,
         );
 
+        const geocodeProxy = new GeocodeProxy(env.DATASERVER_URL);
+
         // Forward geocode requests to data service.
         apiRouter.get(
             '/geocode/suggest',
             mustHaveAnyRole(['curator']),
-            async (req: Request, res: Response) => {
-                const response = await axios.get(
-                    env.DATASERVER_URL + '/api' + req.url,
-                    req.body,
-                );
-                res.status(response.status).json(response.data);
-            },
+            geocodeProxy.suggest,
         );
-        apiRouter.post('/geocode/seed', async (req: Request, res: Response) => {
-            const response = await axios.post(
-                env.DATASERVER_URL + '/api' + req.url,
-                req.body,
-            );
-            res.status(response.status).send();
-        });
-        apiRouter.post(
-            '/geocode/clear',
-            async (req: Request, res: Response) => {
-                const response = await axios.post(
-                    env.DATASERVER_URL + '/api' + req.url,
-                    req.body,
-                );
-                res.status(response.status).send();
-            },
-        );
+        apiRouter.post('/geocode/seed', geocodeProxy.seed);
+        apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
         app.use('/api', apiRouter);
 
