@@ -1,4 +1,5 @@
-import app, { logger } from './index';
+import app from './index';
+import { logger } from './util/logger';
 
 // Start Express server.
 const server = app.listen(app.get('port'), () => {
