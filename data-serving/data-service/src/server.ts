@@ -1,9 +1,9 @@
-import app from './index';
+import app, { logger } from './index';
 
 // Start Express server.
 const server = app.listen(app.get('port'), async () => {
-    console.log(`Data service listening on port ${app.get('port')}`);
-    console.log('  Press CTRL-C to stop\n');
+    logger.info(`Data service listening on port ${app.get('port')}`);
+    logger.info('  Press CTRL-C to stop\n');
 });
 
 // Set global 1-hour timeout.
