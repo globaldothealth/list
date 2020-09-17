@@ -102,8 +102,15 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         },
                     },
                 ],
-                "notes": row[_NOTES_INDEX],
             }
+            # Parse some specific notes or put them as is as notes.
+            notes = row[_NOTES_INDEX]
+            if notes == "Imported case":
+                case["travelHistory"] = {
+                    "traveledPrior30Days": True,
+                }
+            else:
+                case["notes"] = notes
             # If patient was symptomatic, the onset date is set otherwise they are marked
             # as "Asymptomatic" in the date column in the CSV.
             # There are other values as well such as "Pending" or "Unknown".
