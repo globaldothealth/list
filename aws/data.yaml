@@ -46,6 +46,9 @@ spec:
             - name: MAPBOX_TOKEN
               valueFrom:
                 secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
                   name: curator-dev-bch28c9gkm
                   key: mapbox_token
           resources:
@@ -99,6 +102,9 @@ spec:
             - name: MAPBOX_TOKEN
               valueFrom:
                 secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
                   name: curator-prod-4mtk8mh9t2
                   key: mapbox_token
           resources:
