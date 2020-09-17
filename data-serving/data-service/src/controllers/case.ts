@@ -200,7 +200,7 @@ export class CasesController {
      * Batch validates cases.
      */
     private batchValidate = async (
-        // We're about to valide the cases, cannot type them yet.
+        // We're about to validate the cases, cannot type them yet.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cases: any[],
     ): Promise<BatchValidationErrors> => {
@@ -296,6 +296,7 @@ export class CasesController {
                         c.caseReference?.sourceId &&
                         c.caseReference?.sourceEntryId
                     ) {
+                        console.error('updating case', c);
                         return {
                             updateOne: {
                                 filter: {
@@ -318,7 +319,7 @@ export class CasesController {
                 }),
                 { ordered: false },
             );
-            res.status(207).json({
+            res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
                     (bulkWriteResult.insertedCount || 0) +
@@ -425,7 +426,7 @@ export class CasesController {
                 res.status(200).json(result);
                 return;
             } else {
-                // Try to geocode new cases.
+                // Geocode new cases.
                 if (!(await this.geocode(req))) {
                     res.status(404).send({
                         message: `no geolocation found for ${req.body['location']?.query}`,
