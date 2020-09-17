@@ -58,6 +58,7 @@ describe('App', function () {
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
+        cy.contains('Terms of use');
     });
 
     it('Homepage with logged in user with no roles', function () {
@@ -70,6 +71,7 @@ describe('App', function () {
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
+        cy.contains('Terms of use');
     });
 
     it('Homepage with logged in admin', function () {
@@ -82,6 +84,7 @@ describe('App', function () {
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users');
+        cy.contains('Terms of use');
     });
 
     it('Homepage with logged in curator', function () {
@@ -94,6 +97,7 @@ describe('App', function () {
         cy.contains('Sources');
         cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
+        cy.contains('Terms of use');
     });
 
     it('Can open new case modal from create new button', function () {
@@ -148,5 +152,15 @@ describe('App', function () {
         cy.visit('/cases/new');
         cy.get('button[aria-label="close overlay"').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
+    });
+
+    it('Can navigate to terms of service', function () {
+        cy.login();
+        cy.visit('/');
+
+        cy.contains('Global.health Terms of Use').should('not.exist');
+        cy.contains('Terms of use').click();
+        cy.url().should('eq', 'http://localhost:3002/terms');
+        cy.contains('Global.health Terms of Use');
     });
 });
