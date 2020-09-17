@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import axios from 'axios';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 
 /** Dumb proxy to geocoder in data service */
 export default class GeocodeProxy {

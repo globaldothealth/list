@@ -12,7 +12,7 @@ import { User, UserDocument } from '../model/user';
 
 import { Router } from 'express';
 import axios from 'axios';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 import passport from 'passport';
 
 /**

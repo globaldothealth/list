@@ -6,7 +6,7 @@ import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
 import { batchUpsertDropUnchangedCases } from './preprocessor';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 

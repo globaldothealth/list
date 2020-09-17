@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { UserDocument } from '../model/user';
 import axios from 'axios';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix

@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import AwsLambdaClient from './aws-lambda-client';
 import assertString from '../util/assert-string';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 
 /**
  * Client to interact with the AWS CloudWatch Events API.

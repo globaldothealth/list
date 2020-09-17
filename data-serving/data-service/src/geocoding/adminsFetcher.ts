@@ -2,7 +2,7 @@ import { Admin } from '../model/admin';
 import { GeocodeResult } from './geocoder';
 import LRUCache from 'lru-cache';
 import axios from 'axios';
-import { logger } from '../index';
+import { logger } from '../util/logger';
 
 // Mapbox boundaries types definitions, not part of the mapbox SDK.
 interface BoundariesResponse {
