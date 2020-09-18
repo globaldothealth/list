@@ -15,7 +15,7 @@ export default function VerificationStatusIndicator(props: Props): JSX.Element {
         helpText = 'Verified';
         iconElement = <VerifiedIcon data-testid="verified-svg" />;
     } else {
-        helpText = 'Pending verification';
+        helpText = 'Unverified';
         iconElement = <UnverifiedIcon data-testid="unverified-svg" />;
     }
     return (

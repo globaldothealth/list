@@ -243,6 +243,10 @@ function RowMenu(props: {
     );
 }
 
+const downloadFilename = `globalhealth_covid19_cases_${renderDate(
+    new Date(),
+)}.csv`;
+
 export function DownloadButton(props: { search: string }): JSX.Element {
     const [downloading, setDownloading] = React.useState(false);
 
@@ -251,7 +255,7 @@ export function DownloadButton(props: { search: string }): JSX.Element {
         setDownloading(true);
         axios
             .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .then((response) => fileDownload(response.data, downloadFilename))
             .catch((e) => console.error(e))
             .finally(() => setDownloading(false));
     };
@@ -415,7 +419,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         axios
             .post('/api/cases/download', requestBody)
             .then((response) => {
-                fileDownload(response.data, 'cases.csv');
+                fileDownload(response.data, downloadFilename);
                 this.setState({ isDownloading: false });
             })
             .catch((e) => {
