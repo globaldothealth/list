@@ -19,7 +19,6 @@ except ImportError:
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
-
     The date is listed in YYYYmmdd format, but the data server API will
     assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
     """

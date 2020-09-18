@@ -70,11 +70,6 @@ spec:
                 secretKeyRef:
                   name: curator-dev-bch28c9gkm
                   key: aws_secret_access_key
-            - name: MAPBOX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: curator-dev-bch28c9gkm
-                  key: mapbox_token
             - name: EMAIL_USER_ADDRESS
               valueFrom:
                 secretKeyRef:
@@ -114,7 +109,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:0.1.0
+          image: ghcr.io/globaldothealth/list/curatorservice:0.1.1
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -160,11 +155,6 @@ spec:
                 secretKeyRef:
                   name: curator-prod-4mtk8mh9t2
                   key: aws_secret_access_key
-            - name: MAPBOX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: curator-prod-4mtk8mh9t2
-                  key: mapbox_token
             - name: EMAIL_USER_ADDRESS
               valueFrom:
                 secretKeyRef:
