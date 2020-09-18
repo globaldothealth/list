@@ -6,8 +6,5 @@
   "include": [
     "src/**/*.ts",
     "**/*.test.ts"
-  ],
-  "lib": [
-    "es2020"
   ]
 }
