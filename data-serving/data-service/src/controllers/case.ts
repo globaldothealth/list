@@ -5,7 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
-import { batchUpsertDropUnchangedCases } from './preprocessor';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
@@ -39,6 +38,8 @@ export class CasesController {
      * Handles HTTP POST /api/cases/download.
      */
     download = async (req: Request, res: Response): Promise<void> => {
+        // Goofy Mongoose types require this.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let cases: any;
         try {
             if (req.body.query) {
@@ -373,6 +374,8 @@ export class CasesController {
      * Handles HTTP POST /api/cases/batchUpdate.
      */
     batchUpdate = async (req: Request, res: Response): Promise<void> => {
+        // Consider defining a type for the request-format cases.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (!req.body.cases.every((c: any) => c._id)) {
             res.status(422).json({
                 message: 'Every case must specify its _id',
@@ -381,6 +384,8 @@ export class CasesController {
         }
         try {
             const bulkWriteResult = await Case.bulkWrite(
+                // Consider defining a type for the request-format cases.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
                     return {
                         updateOne: {
@@ -560,7 +565,9 @@ export class CasesController {
 export const casesMatchingSearchQuery = (opts: {
     searchQuery: string;
     count: boolean;
-}) => {
+    // Goofy Mongoose types require this.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}): any => {
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
@@ -614,6 +621,8 @@ export const findCasesWithCaseReferenceData = async (
             (c: any) =>
                 c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
         )
+        // Case data should be validated prior to this point.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((c: any) => {
             return {
                 'caseReference.sourceId': c.caseReference.sourceId,
