@@ -297,7 +297,6 @@ export class CasesController {
                         c.caseReference?.sourceId &&
                         c.caseReference?.sourceEntryId
                     ) {
-                        logger.error('updating case', c);
                         return {
                             updateOne: {
                                 filter: {
