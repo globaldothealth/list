@@ -321,7 +321,7 @@ export default function App(): JSX.Element {
             icon: <HomeIcon />,
             to: '/',
             // Readers only see the linelist, home button is useless to them.
-            displayCheck: (): boolean => !isJustReader(),
+            displayCheck: (): boolean => user !== undefined && !isJustReader(),
         },
         {
             text: 'Linelist',
