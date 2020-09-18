@@ -201,6 +201,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
         marginLeft: -drawerWidth,
+        paddingLeft: '24px',
         width: '100%',
     },
     contentShift: {
@@ -209,6 +210,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.enteringScreen,
         }),
         marginLeft: 0,
+        paddingLeft: 0,
         width: `calc(100% - ${drawerWidth}px)`,
     },
     createNewButton: {
