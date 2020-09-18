@@ -53,7 +53,7 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Charts');
+        cy.contains('Charts').should('not.exist');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
