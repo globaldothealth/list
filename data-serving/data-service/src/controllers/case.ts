@@ -1,13 +1,14 @@
 import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
+import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
+import { batchUpsertDropUnchangedCases } from './preprocessor';
+import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
-import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
-import { batchUpsertDropUnchangedCases } from './preprocessor';
 
 class InvalidParamError extends Error {}
 
@@ -80,7 +81,7 @@ export class CasesController {
                 res.status(422).json({ message: e.message });
                 return;
             }
-            console.error(e);
+            logger.error(e);
             res.status(500).json(e);
             return;
         }
@@ -146,7 +147,7 @@ export class CasesController {
                 res.status(422).json({ message: e.message });
                 return;
             }
-            console.error(e);
+            logger.error(e);
             res.status(500).json(e);
             return;
         }
@@ -332,7 +333,7 @@ export class CasesController {
                 res.status(422).json(err);
                 return;
             }
-            console.warn(err);
+            logger.warn(err);
             res.status(500).json(err);
             return;
         }
@@ -438,7 +439,7 @@ export class CasesController {
                 return;
             }
         } catch (err) {
-            console.error(err);
+            logger.error(err);
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -673,7 +674,7 @@ export const listSymptoms = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }
@@ -702,7 +703,7 @@ export const listPlacesOfTransmission = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }
@@ -730,7 +731,7 @@ export const listOccupations = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }
