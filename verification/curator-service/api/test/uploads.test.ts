@@ -120,8 +120,10 @@ describe('GET', () => {
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
     });
-    it('should filter for changes only', async () => {
-        const sourceWithError = await new Source(fullSource).save();
+    it('should filter for changes only and sort by created date', async () => {
+        const sourceWithError = new Source(fullSource);
+        sourceWithError.uploads[0].created = new Date(2020, 2, 3);
+        await sourceWithError.save();
 
         const sourceWithNoChanges = new Source(fullSource);
         sourceWithNoChanges.uploads = [
@@ -137,6 +139,7 @@ describe('GET', () => {
             new Upload({
                 status: 'SUCCESS',
                 summary: new UploadSummary({ numCreated: 3 }),
+                created: new Date(2020, 2, 1),
             }),
         ];
         await sourceWithCreatedUploads.save();
@@ -146,6 +149,7 @@ describe('GET', () => {
             new Upload({
                 status: 'SUCCESS',
                 summary: new UploadSummary({ numUpdated: 3 }),
+                created: new Date(2020, 2, 2),
             }),
         ];
         await sourceWithUpdatedUploads.save();
@@ -160,10 +164,10 @@ describe('GET', () => {
             sourceWithError.uploads[0]._id.toString(),
         );
         expect(res.body.uploads[1].upload._id).toEqual(
-            sourceWithCreatedUploads.uploads[0]._id.toString(),
+            sourceWithUpdatedUploads.uploads[0]._id.toString(),
         );
         expect(res.body.uploads[2].upload._id).toEqual(
-            sourceWithUpdatedUploads.uploads[0]._id.toString(),
+            sourceWithCreatedUploads.uploads[0]._id.toString(),
         );
     });
     it('rejects negative page param', (done) => {

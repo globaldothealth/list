@@ -19,18 +19,20 @@ export default class GeocodeSuggester {
      * If no results are found, an empty array is returned.
      */
     suggest = async (req: Request, res: Response): Promise<void> => {
-        try {
-            for (const geocoder of this.geocoders) {
-                const suggestions = await geocoder.geocode(
-                    req.query.q.toString(),
-                );
-                if (suggestions.length > 0) {
-                    res.json(suggestions);
-                    return;
+        if (req.query.q) {
+            try {
+                for (const geocoder of this.geocoders) {
+                    const suggestions = await geocoder.geocode(
+                        req.query.q.toString(),
+                    );
+                    if (suggestions.length > 0) {
+                        res.json(suggestions);
+                        return;
+                    }
                 }
+            } catch (e) {
+                res.status(500).send(e);
             }
-        } catch (e) {
-            res.status(500).send(e);
         }
         res.json([]);
     };
