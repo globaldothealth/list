@@ -49,7 +49,6 @@ const genderValues = [
 ];
 
 const TooltipText = () => {
-  const classes = styles();
   return (
     <StyledTooltip>
       <ul>
