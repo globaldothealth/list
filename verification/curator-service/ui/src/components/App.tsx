@@ -317,7 +317,7 @@ export default function App(): JSX.Element {
     const location = useLocation<LocationState>();
     const menuList = [
         {
-            text: 'Home',
+            text: 'Charts',
             icon: <HomeIcon />,
             to: '/',
             // Readers only see the linelist, home button is useless to them.
