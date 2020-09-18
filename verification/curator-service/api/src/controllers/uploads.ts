@@ -115,6 +115,7 @@ export default class UploadsController {
                             upload: '$uploads',
                         },
                     },
+                    { $sort: { 'upload.created': -1 } },
                 ]),
                 Source.aggregate([
                     { $unwind: '$uploads' },
