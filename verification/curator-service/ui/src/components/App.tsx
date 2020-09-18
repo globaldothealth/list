@@ -13,7 +13,14 @@ import {
     useMediaQuery,
 } from '@material-ui/core';
 import LinelistTable, { DownloadButton } from './LinelistTable';
-import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
+import {
+    Link,
+    Redirect,
+    Route,
+    Switch,
+    useHistory,
+    useLocation,
+} from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
@@ -308,38 +315,40 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const menuList = [
-        {
-            text: 'Home',
-            icon: <HomeIcon />,
-            to: '/',
-            displayCheck: (): boolean => true,
-        },
-        {
-            text: 'Linelist',
-            icon: <ListIcon />,
-            to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean => user !== undefined,
-        },
-        {
-            text: 'Sources',
-            icon: <LinkIcon />,
-            to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Uploads',
-            icon: <PublishIcon />,
-            to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Manage users',
-            icon: <PeopleIcon />,
-            to: '/users',
-            displayCheck: (): boolean => hasAnyRole(['admin']),
-        },
-    ];
+    const menuList = user
+        ? [
+              {
+                  text: 'Charts',
+                  icon: <HomeIcon />,
+                  to: '/',
+                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
+              },
+              {
+                  text: 'Linelist',
+                  icon: <ListIcon />,
+                  to: { pathname: '/cases', state: { search: '' } },
+                  displayCheck: (): boolean => true,
+              },
+              {
+                  text: 'Sources',
+                  icon: <LinkIcon />,
+                  to: '/sources',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Uploads',
+                  icon: <PublishIcon />,
+                  to: '/uploads',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Manage users',
+                  icon: <PeopleIcon />,
+                  to: '/users',
+                  displayCheck: (): boolean => hasAnyRole(['admin']),
+              },
+          ]
+        : [];
 
     useEffect(() => {
         setDrawerOpen(showMenu);
@@ -648,7 +657,11 @@ export default function App(): JSX.Element {
                             <TermsOfService />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) && <Charts />}
+                            {hasAnyRole(['curator', 'admin']) ? (
+                                <Charts />
+                            ) : (
+                                user && <Redirect to="/cases" />
+                            )}
                         </Route>
                     </Switch>
                 </main>
