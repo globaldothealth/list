@@ -14,10 +14,7 @@ const userSchema = new mongoose.Schema({
         enum: userRoles,
     },
     picture: String,
-    hasSeenWelcomePopup: {
-        type: Boolean,
-        default: false,
-    },
+    hasSeenWelcomePopup: Boolean,
 });
 
 export type UserDocument = mongoose.Document & {
