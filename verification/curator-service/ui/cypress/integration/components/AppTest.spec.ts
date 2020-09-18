@@ -9,8 +9,8 @@ describe('App', function () {
         cy.visit('/cases');
         cy.url().should('eq', 'http://localhost:3002/cases');
 
-        cy.contains('Home');
-        cy.contains('span', 'Home').click();
+        cy.contains('Charts');
+        cy.contains('span', 'Charts').click();
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
@@ -53,7 +53,7 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
+        cy.contains('Charts').should('not.exist');
         cy.contains('Linelist').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
@@ -65,8 +65,11 @@ describe('App', function () {
         cy.login({ roles: [] });
         cy.visit('/');
 
+        // Readers-only are redirected to the linelist.
+        cy.url().should('eq', 'http://localhost:3002/cases');
+
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
+        cy.contains('Charts').should('not.exist');
         cy.contains('Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
@@ -79,7 +82,7 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
+        cy.contains('Charts');
         cy.contains('Linelist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
@@ -92,7 +95,7 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new');
-        cy.contains('Home');
+        cy.contains('Charts');
         cy.contains('Linelist');
         cy.contains('Sources');
         cy.contains('Uploads');
