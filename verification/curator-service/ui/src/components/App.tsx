@@ -315,39 +315,40 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const menuList = [
-        {
-            text: 'Charts',
-            icon: <HomeIcon />,
-            to: '/',
-            // Readers only see the linelist, home button is useless to them.
-            displayCheck: (): boolean => user !== undefined && !isJustReader(),
-        },
-        {
-            text: 'Linelist',
-            icon: <ListIcon />,
-            to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean => user !== undefined,
-        },
-        {
-            text: 'Sources',
-            icon: <LinkIcon />,
-            to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Uploads',
-            icon: <PublishIcon />,
-            to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Manage users',
-            icon: <PeopleIcon />,
-            to: '/users',
-            displayCheck: (): boolean => hasAnyRole(['admin']),
-        },
-    ];
+    const menuList = user
+        ? [
+              {
+                  text: 'Charts',
+                  icon: <HomeIcon />,
+                  to: '/',
+                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
+              },
+              {
+                  text: 'Linelist',
+                  icon: <ListIcon />,
+                  to: { pathname: '/cases', state: { search: '' } },
+                  displayCheck: (): boolean => true,
+              },
+              {
+                  text: 'Sources',
+                  icon: <LinkIcon />,
+                  to: '/sources',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Uploads',
+                  icon: <PublishIcon />,
+                  to: '/uploads',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Manage users',
+                  icon: <PeopleIcon />,
+                  to: '/users',
+                  displayCheck: (): boolean => hasAnyRole(['admin']),
+              },
+          ]
+        : [];
 
     useEffect(() => {
         setDrawerOpen(showMenu);
@@ -388,13 +389,6 @@ export default function App(): JSX.Element {
             return false;
         }
         return user?.roles?.some((r: string) => requiredRoles.includes(r));
-    };
-
-    const isJustReader = (): boolean => {
-        if (!user) {
-            return false;
-        }
-        return user?.roles.length === 0;
     };
 
     const toggleDrawer = (): void => {
@@ -582,11 +576,6 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {isJustReader() && (
-                            <Route exact path="/">
-                                <Redirect to="/cases" />
-                            </Route>
-                        )}
                         {user && (
                             <Route exact path="/cases">
                                 <LinelistTable user={user} />
@@ -668,7 +657,11 @@ export default function App(): JSX.Element {
                             <TermsOfService />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) && <Charts />}
+                            {hasAnyRole(['curator', 'admin']) ? (
+                                <Charts />
+                            ) : (
+                                user && <Redirect to="/cases" />
+                            )}
                         </Route>
                     </Switch>
                 </main>
