@@ -164,8 +164,8 @@ export class AuthController {
 
     /**
      * Configures OAuth passport strategy.
-     * @param clientID the OAuth client ID as gotten from the Google developer logger.
-     * @param clientSecret the OAuth client secret as gotten from the Google developer logger.
+     * @param clientID the OAuth client ID as gotten from the Google developer console.
+     * @param clientSecret the OAuth client secret as gotten from the Google developer console.
      */
     configurePassport(clientID: string, clientSecret: string): void {
         passport.serializeUser<UserDocument, string>((user, done) => {
