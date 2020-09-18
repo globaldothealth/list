@@ -140,6 +140,9 @@ def sample_data():
     with open(file_path) as event_file:
         return json.load(event_file)
 
+class FakeContext:
+    def get_remaining_time_in_millis(self):
+        return 42
 
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
@@ -181,7 +184,7 @@ def test_run_lambda_e2e(
         json={"_id": upload_id, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
-    response = parsing_lib.run_lambda(input_event, "", fake_parsing_fn)
+    response = parsing_lib.run_lambda(input_event, FakeContext(), fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == full_source_url
@@ -290,7 +293,7 @@ def test_write_to_server_returns_created_and_updated_count(
               "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        iter([_PARSED_CASE]), "env", _SOURCE_ID, "upload_id", {}, {}, parsing_lib.CASES_BATCH_SIZE)
+        iter([_PARSED_CASE]), "env", _SOURCE_ID, "upload_id", {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
@@ -311,7 +314,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE, _PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {}, 1)
+            "env", _SOURCE_ID, upload_id, {}, {}, 1, lambda: 42)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == full_source_url
@@ -338,7 +341,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {}, parsing_lib.CASES_BATCH_SIZE)
+            "env", _SOURCE_ID, upload_id, {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
