@@ -224,50 +224,55 @@ export class CasesController {
      * Perform geocoding for each case (of multiple `cases` specified in the
      * request body), in accordance with the above geocoding logic.
      *
-     * TODO: Use a batch geocode API like https://docs.mapbox.com/api/search/#batch-geocoding.
-     *
-     * @returns {object} Detailing the nature of any issues encountered.
+     * TODO: https://github.com/globaldothealth/list/issues/1131 rate limit.
      */
     batchGeocode = async (
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
-        const caseCount = req.body.cases.length;
         const geocodeErrors: { index: number; message: string }[] = [];
-        for (let index = 0; index < caseCount; index++) {
-            const c = req.body.cases[index];
-            try {
-                const geocodeResult = await this.geocode({
-                    body: c,
+        Promise.all(
+            req.body.cases.map((c: any, index: number) => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const geocodeResult = await this.geocode({
+                            body: c,
+                        });
+                        if (!geocodeResult) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: `no geolocation found for ${c.location?.query}`,
+                            });
+                        }
+                        resolve();
+                    } catch (err) {
+                        if (err instanceof InvalidParamError) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: err.message,
+                            });
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    }
                 });
-                if (!geocodeResult) {
-                    geocodeErrors.push({
-                        index: index,
-                        message: `no geolocation found for ${c.location?.query}`,
+            }),
+        )
+            .then(() => {
+                if (geocodeErrors.length > 0) {
+                    res.status(207).send({
+                        phase: 'GEOCODE',
+                        numCreated: 0,
+                        numUpdated: 0,
+                        errors: geocodeErrors,
                     });
+                    return;
                 }
-            } catch (err) {
-                if (err instanceof InvalidParamError) {
-                    geocodeErrors.push({
-                        index: index,
-                        message: err.message,
-                    });
-                } else {
-                    throw err;
-                }
-            }
-        }
-        if (geocodeErrors.length > 0) {
-            res.status(207).send({
-                phase: 'GEOCODE',
-                numCreated: 0,
-                numUpdated: 0,
-                errors: geocodeErrors,
-            });
-            return;
-        }
-        next();
+                next();
+            })
+            .catch((e) => res.send(e));
     };
 
     /**
