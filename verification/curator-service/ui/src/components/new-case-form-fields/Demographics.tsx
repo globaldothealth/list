@@ -48,25 +48,23 @@ const genderValues = [
     'Other',
 ];
 
-const TooltipText = () => {
-  return (
-    <StyledTooltip>
-      <ul>
-        <li><strong>Gender:</strong> Enter the Gender of the case provided. If none provided leave blank</li>
-        <li><strong>Age:</strong> Enter the age of the case.
-          <ul>
-            <li>If a range is provided enter in the Min and max fields.</li>
-            <li>If an exact age is provided just enter the age field.</li>
-            <li>Note: If the data source provides an age range such as 65{'>'} or 65+ then set the minimum age range as 65 and the maximum to the upper bound set for age of 120.</li>
-          </ul>
-        </li>
-        <li><strong>Race / Ethnicity:</strong> Enter the Ethnicity of the case provided. If none provided leave blank</li>
-        <li><strong>Nationality:</strong> Enter the Nationality of the case. If none provided leave blank</li>
-        <li><strong>Occupation:</strong> Enter the Occupation of the case. A drop down list is provided, but if the occupation for the case is not available you can type in with free text. If none is provided leave blank</li>
-      </ul>
-    </StyledTooltip>
-  )
-};
+const TooltipText = () => (
+  <StyledTooltip>
+    <ul>
+      <li><strong>Gender:</strong> Enter the Gender of the case provided. If none provided leave blank</li>
+      <li><strong>Age:</strong> Enter the age of the case.
+        <ul>
+          <li>If a range is provided enter in the Min and max fields.</li>
+          <li>If an exact age is provided just enter the age field.</li>
+          <li>Note: If the data source provides an age range such as 65{'>'} or 65+ then set the minimum age range as 65 and the maximum to the upper bound set for age of 120.</li>
+        </ul>
+      </li>
+      <li><strong>Race / Ethnicity:</strong> Enter the Ethnicity of the case provided. If none provided leave blank</li>
+      <li><strong>Nationality:</strong> Enter the Nationality of the case. If none provided leave blank</li>
+      <li><strong>Occupation:</strong> Enter the Occupation of the case. A drop down list is provided, but if the occupation for the case is not available you can type in with free text. If none is provided leave blank</li>
+    </ul>
+  </StyledTooltip>
+);
 
 export default function Demographics(): JSX.Element {
     const classes = styles();

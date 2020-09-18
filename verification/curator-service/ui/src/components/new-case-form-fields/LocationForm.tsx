@@ -18,27 +18,25 @@ import axios from 'axios';
 import { hasKey } from '../Utils';
 import throttle from 'lodash/throttle';
 
-const TooltipText = () => {
-  return (
-    <StyledTooltip>
-      <ul>
-        <li>Enter the location for the case.
-          <ul>
-            <li>Start typing the location and the field will be auto completed with supported locations.</li>
-            <li>You can enter a location up to Admin level 3, for example in the USA this is county level location data.</li>
-            <li>Specific locations are not supported</li>
-          </ul>
-        </li>
-        <li><strong>Example:</strong> If your case has 'Location = USA, California, Santa Clara' type 'Santa Clara' and select that option from the drop down list. On selection the rest of the location fields would be prepopulated.
-          <ul>
-            <li>If you need to change the location you can press X in the location field and then retype the location and select. This will change the prepoulated fields to the new location.</li>
-            <li>If you cannot find a specific location you can enter it manually by clicking the 'Specify Geocode manually' button and entering the required location fields</li>
-          </ul>
-        </li>
-      </ul>
-    </StyledTooltip>
-  )
-};
+const TooltipText = () => (
+  <StyledTooltip>
+    <ul>
+      <li>Enter the location for the case.
+        <ul>
+          <li>Start typing the location and the field will be auto completed with supported locations.</li>
+          <li>You can enter a location up to Admin level 3, for example in the USA this is county level location data.</li>
+          <li>Specific locations are not supported</li>
+        </ul>
+      </li>
+      <li><strong>Example:</strong> If your case has 'Location = USA, California, Santa Clara' type 'Santa Clara' and select that option from the drop down list. On selection the rest of the location fields would be prepopulated.
+        <ul>
+          <li>If you need to change the location you can press X in the location field and then retype the location and select. This will change the prepoulated fields to the new location.</li>
+          <li>If you cannot find a specific location you can enter it manually by clicking the 'Specify Geocode manually' button and entering the required location fields</li>
+        </ul>
+      </li>
+    </ul>
+  </StyledTooltip>
+);
 
 function LocationForm(): JSX.Element {
     const { values, initialValues, setFieldValue } = useFormikContext<
