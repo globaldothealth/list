@@ -32,11 +32,6 @@ _PARSED_CASE = (
             },
             {
                 "name": "outcome",
-                "dateRange":
-                        {
-                            "start": None,
-                            "end": None
-                        },
                 "value": "Unknown"
             }
         ],

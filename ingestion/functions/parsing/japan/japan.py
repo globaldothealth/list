@@ -1,6 +1,3 @@
-#Now change japan_test and sample data as well
-#To test you will need to change input_event to the new data in localhost
-
 import json
 import os
 import sys
@@ -58,33 +55,33 @@ def convert_date(raw_date: str):
     date = datetime.strptime(raw_date["dateAnnounced"], "%Y-%m-%d")
     return date.strftime("%m/%d/%YZ")
 
-def convert_death_date(raw_death_date: str):
-    if "deceasedDate" in raw_death_date:
-        death_date = datetime.strptime(raw_death_date["deceasedDate"], "%Y-%m-%d")
-        return death_date.strftime("%m/%d/%YZ")
-    else:
-        return None
-
 def convert_additionalSources(additional_sourceURL: str):
-    additionalSources_list = []
-    additionalSources = {}
+    sources = []
     if "sourceURL" in additional_sourceURL:
-        additionalSources["sourceUrl"] = additional_sourceURL["sourceURL"]
+      sources.append({"sourceUrl": additional_sourceURL["sourceURL"]})
     if "deathSourceURL" in additional_sourceURL:
-        additionalSources["sourceUrl"] = additional_sourceURL["deathSourceURL"]
-    additionalSources_list.append(additionalSources)
-    return additionalSources_list
+      sources.append({"sourceUrl": additional_sourceURL["deathSourceURL"]})
+    return sources or None
 
-def convert_outcome(raw_outcome: str):
+def convert_outcome(raw_outcome: str, raw_death_date: str):
     if "patientStatus" in raw_outcome:
         if raw_outcome["patientStatus"] == "Deceased":
-            return "Death"
+            death_date = datetime.strptime(raw_death_date["deceasedDate"], "%Y-%m-%d")
+            return {"name": "outcome",
+                    "dateRange":{
+                        "start": death_date.strftime("%m/%d/%YZ"),
+                        "end": death_date.strftime("%m/%d/%YZ")
+                        },
+                    "value": "Death"}
         elif raw_outcome["patientStatus"] == "Discharged" or raw_outcome["patientStatus"] == "Recovered":
-            return "Recovered"
+            return {"name": "outcome",
+                    "value": "Recovered"}
         else:
-            return "Unknown"       
+            return {"name": "outcome",
+                    "value": "Unknown"}       
     else:
-        return "Unknown"
+        return {"name": "outcome",
+                "value": "Unknown"}
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
@@ -107,25 +104,17 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "dateRange":
                         {
                             "start": convert_date(entry),
-                            "end": convert_date(entry),
+                            "end": convert_date(entry)
                         }
                     },
-                    {
-                        "name": "outcome",
-                        "dateRange":
-                        {
-                            "start": convert_death_date(entry),
-                            "end": convert_death_date(entry),
-                        },
-                        "value": convert_outcome(entry)
-                    }
+                        convert_outcome(entry, entry)
                 ],
                 "demographics": {
                     "ageRange": convert_age(entry),
                     "gender": convert_gender(entry)
                 },
                 "notes": detect_notes(entry)
-            } for entry in cases if (entry["patientId"] != "-1" and entry["confirmedPatient"] == True))
+            } for entry in cases if (entry["patientId"] != "-1" and entry["confirmedPatient"]))
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
