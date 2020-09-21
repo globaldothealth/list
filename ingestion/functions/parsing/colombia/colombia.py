@@ -1,7 +1,6 @@
-import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -39,61 +38,40 @@ def convert_gender(raw_gender):
     return None
 
 
-# def convert_location(raw_entry):
-#     department = raw_entry["Departamento o Distrito "]
-#     city = raw_entry["Ciudad de ubicación"]
-# #     district = raw_entry["DISTRITO"]
-
-#     query_terms = ("Colombia",)
-#     location = {"country": "Colombia"}
-#     if department:
-#         location["administrativeAreaLevel1"] = department
-#         query_terms = (department,) + query_terms
-#     if city:
-#         location["administrativeAreaLevel2"] = city
-#         query_terms = (city,) + query_terms
-
-
-#     location["query"] = ", ".join(query_terms)
-#     return location
-
 def convert_location(raw_entry):
-    #     print(raw_entry['DISTRITO'])
     query_terms = [
         term for term in [
             raw_entry.get("Ciudad de ubicación", ""),
             raw_entry.get("Departamento o Distrito ", ""),
             "Colombia"]
-        if term != '']
+        if term]
 
     return {"query": ", ".join(query_terms)}
 
 
-def make_notes(raw_entry):
-
-    return notes
-
-
 def get_ethnicity(raw_entry):
-
     ethnicity_map = {'Otro': 'Other',
                      'Negro': 'Black',
                      'Indigeno': 'Indigenous'}
-
     if ethnicity_map.get(raw_entry['Pertenencia etnica'], None):
         if raw_entry['Pertenencia etnica'] == 'Indígena':
             if raw_entry['Nombre grupo etnico'] != '' and raw_entry['Nombre grupo etnico'] != 'Sin Comunidad' and raw_entry['Nombre grupo etnico'] != 'Sin definir':
-                ethnicity = f"Indigenous, {raw_entry['Nombre grupo etnico']}"
-            else:
-                ethnicity = "Indigenous"
-        else:
-            ethnicity = ethnicity_map.get(
-                raw_entry['Pertenencia etnica'], None)
+                return f"Indigenous, {raw_entry['Nombre grupo etnico']}"
+            return "Indigenous"
+        return ethnicity_map.get(raw_entry['Pertenencia etnica'], None)
+    return None
 
-    else:
-        ethnicity = "Unknown"
 
-    return ethnicity
+def convert_demographics(age: str, sex: str):
+    demo = {}
+    if age:
+        demo["ageRange"] = {
+            "start": float(age),
+            "end": float(age)
+        }
+    if sex:
+        demo["gender"] = convert_gender(sex)
+    return demo or None
 
 
 def parse_cases(raw_data_file, source_id, source_url):
@@ -113,30 +91,19 @@ def parse_cases(raw_data_file, source_id, source_url):
     symptom_map = {'Leve': 'Mild',
                    'Moderado': 'Moderate',
                    'Grave': 'Serious'}
-    count = 0
+
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        cases = []
         for entry in reader:
+            notes = []
             case = {
                 "caseReference": {
                     "sourceId": source_id,
                     "sourceEntryId": entry["ID de caso"],
-                    "sourceUrl": source_url
-                },
-                "location": convert_location(entry),
-                "notes": '',
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["Edad"]),
-                        "end": float(entry["Edad"])
-                    },
-                    "gender": convert_gender(entry["Sexo"]),
-                    "ethnicity": get_ethnicity(entry)
-                }
-
-            }
-
+                    "sourceUrl": source_url},
+                "demographics": convert_demographics(
+                    entry["Edad"],
+                    entry["Sexo"])}
             if entry["Fecha diagnostico"] != '':
                 case["events"] = [
                     {
@@ -159,7 +126,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     },
                 ]
-                case["notes"] += "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later. \n"
+                notes.append(
+                    "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later.")
 
             # If patient was symptomatic, mark date of onsetSymptoms, otherwise
             # asymptomatic
@@ -181,7 +149,7 @@ def parse_cases(raw_data_file, source_id, source_url):
 
             # Include severity of symptoms
             if entry["Estado"] in ['Leve', 'Moderado', 'Grave']:
-                case["symptoms"]["values"] = symptom_map.get(entry['Estado'])
+                case["symptoms"]["values"] = [symptom_map.get(entry['Estado'])]
 
             # Patient Outcome
             # If patient died, mark date
@@ -195,7 +163,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     }
                 })
                 if entry["Estado"] != "Fallecido":
-                    case["notes"] += "Did not die from Covid-19 \n"
+                    notes.append("Patient died from something other than Covid-19.")
 
             if entry["atención"] == "Recuperado":
                 case["events"].append({
@@ -216,31 +184,30 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "name": "icuAdmission",
                     "value": "Yes"
                 })
-
             # Travel History - we currently do not have any travel dates, so
             # unknown whether in last 30 days (awaiting response)
             if entry["Tipo"].lower() == "importado":
-                case["travelHistory"] = {
-                    "traveledPrior30Days": 'Unknown',
-                    "Country": {
-                        "name": entry['País de procedencia']
-                    }
-                }
-                case["notes"] += "Case caught disease abroad and brought it into Colombia \n"
+                notes.append(
+                    f"Case is reported as importing the disease into Colombia, and country of origin is {entry['País de procedencia']}.")
             elif entry['Tipo'].lower() == 'relacionado':
-                case["notes"] += "Case was transmitted within Colombia \n"
+                notes.append("Case was transmitted within Colombia.")
             elif entry['Tipo'].lower() == 'en estudio':
-                case["notes"] += "Case transmission under investigation (unknown) \n"
+                notes.append(
+                    "Case transmission under investigation (currently unknown).")
 
             # Add notes for each case, including date reported online and how
             # recovery was confirmed
-            case["notes"] += f"Date reported online was {convert_date(entry['fecha reporte web'])}. \n"
+            notes.append(
+                f"Date reported online was {convert_date(entry['fecha reporte web'])}.")
 
             if entry['Tipo recuperación'] == 'PCR':
-                case["notes"] += f"Patient recovery was confirmed by a negative PCR test. \n"
+                notes.append(
+                    "Patient recovery was confirmed by a negative PCR test.")
             elif entry['Tipo recuperación'] == 'Tiempo':
-                case["notes"] += f"Patient recovery was confirmed by 21 days elapsing with no symptoms. \n"
-
+                notes.append(
+                    "Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+            if notes:
+                case["notes"] = "\n".join(notes)
             yield case
 
 

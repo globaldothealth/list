@@ -1,6 +1,7 @@
 import {
     AppBar,
     Avatar,
+    ButtonBase,
     CssBaseline,
     Divider,
     Fab,
@@ -12,7 +13,14 @@ import {
     useMediaQuery,
 } from '@material-ui/core';
 import LinelistTable, { DownloadButton } from './LinelistTable';
-import { Link, Route, Switch, useHistory, useLocation } from 'react-router-dom';
+import {
+    Link,
+    Redirect,
+    Route,
+    Switch,
+    useHistory,
+    useLocation,
+} from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
@@ -24,6 +32,7 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
+import { ReactComponent as GHMapLogo } from './assets/GHMapLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -37,6 +46,7 @@ import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
+import TermsOfService from './TermsOfService';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
 import User from './User';
@@ -156,12 +166,33 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: drawerWidth,
     },
     drawerContents: {
-        marginLeft: '12px',
-        marginRight: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        marginLeft: '24px',
+        marginRight: '32px',
     },
     drawerHeader: {
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
+    },
+    mapButton: {
+        backgroundColor: '#CAD9E3',
+        borderRadius: '8px',
+        height: '42px',
+    },
+    viewMapText: {
+        margin: '0 12px',
+    },
+    divider: {
+        backgroundColor: '#0A7369',
+        height: '1px',
+        opacity: '0.2',
+        margin: '24px 0',
+        width: '100%',
+    },
+    termsText: {
+        marginBottom: theme.spacing(3),
     },
     content: {
         flexGrow: 1,
@@ -170,6 +201,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
         marginLeft: -drawerWidth,
+        paddingLeft: '24px',
         width: '100%',
     },
     contentShift: {
@@ -178,6 +210,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.enteringScreen,
         }),
         marginLeft: 0,
+        paddingLeft: 0,
         width: `calc(100% - ${drawerWidth}px)`,
     },
     createNewButton: {
@@ -251,19 +284,24 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                     </a>
                 )}
                 <Divider className={classes.divider} />
+                <Link to="/terms" onClick={handleClose}>
+                    <MenuItem>About Global.Health</MenuItem>
+                </Link>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
-                    href="https://global.health"
+                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                    onClick={handleClose}
                 >
-                    <MenuItem>About Global.Health</MenuItem>
+                    <MenuItem>Data dictionary</MenuItem>
                 </a>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
                     href="https://github.com/globaldothealth/list/issues/new/choose"
+                    onClick={handleClose}
                 >
                     <MenuItem>Report an issue</MenuItem>
                 </a>
@@ -288,38 +326,40 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const menuList = [
-        {
-            text: 'Home',
-            icon: <HomeIcon />,
-            to: '/',
-            displayCheck: (): boolean => true,
-        },
-        {
-            text: 'Linelist',
-            icon: <ListIcon />,
-            to: { pathname: '/cases', state: { search: '' } },
-            displayCheck: (): boolean => user !== undefined,
-        },
-        {
-            text: 'Sources',
-            icon: <LinkIcon />,
-            to: '/sources',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Uploads',
-            icon: <PublishIcon />,
-            to: '/uploads',
-            displayCheck: (): boolean => hasAnyRole(['curator']),
-        },
-        {
-            text: 'Manage users',
-            icon: <PeopleIcon />,
-            to: '/users',
-            displayCheck: (): boolean => hasAnyRole(['admin']),
-        },
-    ];
+    const menuList = user
+        ? [
+              {
+                  text: 'Charts',
+                  icon: <HomeIcon />,
+                  to: '/',
+                  displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
+              },
+              {
+                  text: 'Linelist',
+                  icon: <ListIcon />,
+                  to: { pathname: '/cases', state: { search: '' } },
+                  displayCheck: (): boolean => true,
+              },
+              {
+                  text: 'Sources',
+                  icon: <LinkIcon />,
+                  to: '/sources',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Uploads',
+                  icon: <PublishIcon />,
+                  to: '/uploads',
+                  displayCheck: (): boolean => hasAnyRole(['curator']),
+              },
+              {
+                  text: 'Manage users',
+                  icon: <PeopleIcon />,
+                  to: '/users',
+                  displayCheck: (): boolean => hasAnyRole(['admin']),
+              },
+          ]
+        : [];
 
     useEffect(() => {
         setDrawerOpen(showMenu);
@@ -517,6 +557,27 @@ export default function App(): JSX.Element {
                                     ),
                             )}
                         </List>
+                        <div className={classes.spacer}></div>
+                        <ButtonBase
+                            href="http://covid-19.global.health/#coverage"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            data-testid="mapButton"
+                            classes={{ root: classes.mapButton }}
+                        >
+                            <Typography
+                                variant="caption"
+                                classes={{ root: classes.viewMapText }}
+                            >
+                                View cases on
+                            </Typography>
+                            <GHMapLogo />
+                        </ButtonBase>
+                        <div className={classes.divider}></div>
+                        <div className={classes.termsText}>
+                            <div>Global.health</div>
+                            <Link to="/terms">Terms of use</Link>
+                        </div>
                     </div>
                 </Drawer>
                 <main
@@ -603,8 +664,15 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
+                        <Route exact path="/terms">
+                            <TermsOfService />
+                        </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) && <Charts />}
+                            {hasAnyRole(['curator', 'admin']) ? (
+                                <Charts />
+                            ) : (
+                                user && <Redirect to="/cases" />
+                            )}
                         </Route>
                     </Switch>
                 </main>

@@ -43,6 +43,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-dev-bch28c9gkm
+                  key: mapbox_token
           resources:
             requests:
               memory: "256Mi"
@@ -72,7 +80,7 @@ spec:
     spec:
       containers:
         - name: data
-          image: ghcr.io/globaldothealth/list/dataservice:0.1.0
+          image: ghcr.io/globaldothealth/list/dataservice:0.1.1
           ports:
             - containerPort: 3000
           livenessProbe:
@@ -91,6 +99,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['environment']
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # Note: There is no strong separation of secrets between
+                  # services, no big deal if that's named after a secret that
+                  # was originally read from the curator service.
+                  name: curator-prod-4mtk8mh9t2
+                  key: mapbox_token
           resources:
             requests:
               memory: "512Mi"

@@ -422,6 +422,7 @@ class BulkCaseForm extends React.Component<
         const casesToSend = cases.flatMap((c) =>
             Array.from({ length: c.caseCount || 1 }, () => c),
         );
+        // TODO: Split and send smaller batches.
         const response = await axios.post<BatchUpsertResponse>(
             '/api/cases/batchUpsert',
             {

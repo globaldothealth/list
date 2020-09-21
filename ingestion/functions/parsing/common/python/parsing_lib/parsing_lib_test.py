@@ -140,6 +140,9 @@ def sample_data():
     with open(file_path) as event_file:
         return json.load(event_file)
 
+class FakeContext:
+    def get_remaining_time_in_millis(self):
+        return 42
 
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
@@ -181,7 +184,7 @@ def test_run_lambda_e2e(
         json={"_id": upload_id, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
-    response = parsing_lib.run_lambda(input_event, "", fake_parsing_fn)
+    response = parsing_lib.run_lambda(input_event, FakeContext(), fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == full_source_url
@@ -290,7 +293,7 @@ def test_write_to_server_returns_created_and_updated_count(
               "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        iter([_PARSED_CASE]), "env", _SOURCE_ID, "upload_id", {}, {})
+        iter([_PARSED_CASE]), "env", _SOURCE_ID, "upload_id", {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
@@ -303,20 +306,21 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
-        "POST", full_source_url, json={}, status_code=500),
+        "POST", full_source_url, [{"json": {"numCreated": 1, "numUpdated": 0}, "status_code": 200}, {"json": {}, "status_code": 500}])
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
 
     try:
         parsing_lib.write_to_server(
-            iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {})
+            iter([_PARSED_CASE, _PARSED_CASE]),
+            "env", _SOURCE_ID, upload_id, {}, {}, 1, lambda: 42)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
-        assert requests_mock.request_history[1].url == update_upload_url
+        assert requests_mock.request_history[1].url == full_source_url
+        assert requests_mock.request_history[-1].url == update_upload_url
         assert requests_mock.request_history[-1].json(
-        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.DATA_UPLOAD_ERROR.name}}
+        ) == {"status": "ERROR", "summary": {"error": common_lib.UploadError.DATA_UPLOAD_ERROR.name, 'numCreated': 1}}
         return
     # We got the wrong exception or no exception, fail the test.
     assert False
@@ -337,7 +341,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {})
+            "env", _SOURCE_ID, upload_id, {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url

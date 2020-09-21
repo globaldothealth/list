@@ -12,10 +12,7 @@ import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
-import FakeGeocoder from './geocoding/fake';
-import GeocodeSuggester from './geocoding/suggest';
-import { Geocoder } from './geocoding/geocoder';
-import MapboxGeocoder from './geocoding/mapbox';
+import GeocodeProxy from './controllers/geocode';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
@@ -32,6 +29,7 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import { logger } from './util/logger';
 
 const app = express();
 
@@ -61,7 +59,7 @@ app.set('port', env.PORT);
 // MONGO_URL is provided by the in memory version of jest-mongodb.
 // DB_CONNECTION_STRING is what we use in prod.
 const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-console.log(
+logger.info(
     'Connecting to MongoDB instance',
     // Print only after username and password to not log them.
     mongoURL.substring(mongoURL.indexOf('@')),
@@ -75,10 +73,10 @@ mongoose
         useFindAndModify: false,
     })
     .then(() => {
-        console.log('Connected to the database');
+        logger.info('Connected to the database');
     })
     .catch((e) => {
-        console.error('Failed to connect to DB', e);
+        logger.error('Failed to connect to DB', e);
         process.exit(1);
     });
 
@@ -146,7 +144,7 @@ new OpenApiValidator({
         ).initialize();
     })
     .catch((e) => {
-        console.error('Failed to instantiate email client:', e);
+        logger.error('Failed to instantiate email client:', e);
         process.exit(1);
     })
     .then((emailClient) => {
@@ -214,33 +212,8 @@ new OpenApiValidator({
             uploadsController.update,
         );
 
-        // Chain geocoders so that during dev/integration tests we can use the fake one.
-        // It might also just be useful to have various geocoders plugged-in at some point.
-        const geocoders = new Array<Geocoder>();
-        if (env.ENABLE_FAKE_GEOCODER) {
-            console.log('Using fake geocoder');
-            const fakeGeocoder = new FakeGeocoder();
-            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-            geocoders.push(fakeGeocoder);
-        }
-        if (env.MAPBOX_TOKEN !== '') {
-            console.log('Using mapbox geocoder');
-            geocoders.push(
-                new MapboxGeocoder(
-                    env.MAPBOX_TOKEN,
-                    env.MAPBOX_PERMANENT_GEOCODE
-                        ? 'mapbox.places-permanent'
-                        : 'mapbox.places',
-                ),
-            );
-        }
-
         // Configure cases controller proxying to data service.
-        const casesController = new CasesController(
-            env.DATASERVER_URL,
-            geocoders,
-        );
+        const casesController = new CasesController(env.DATASERVER_URL);
         apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
@@ -325,13 +298,16 @@ new OpenApiValidator({
             usersController.listRoles,
         );
 
-        // Suggest locations based on the request's "q" query param.
-        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        const geocodeProxy = new GeocodeProxy(env.DATASERVER_URL);
+
+        // Forward geocode requests to data service.
         apiRouter.get(
             '/geocode/suggest',
             mustHaveAnyRole(['curator']),
-            geocodeSuggester.suggest,
+            geocodeProxy.suggest,
         );
+        apiRouter.post('/geocode/seed', geocodeProxy.seed);
+        apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
         app.use('/api', apiRouter);
 
@@ -370,6 +346,7 @@ new OpenApiValidator({
                 err: ValidationError,
                 req: Request,
                 res: Response,
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 next: NextFunction,
             ) => {
                 res.status(err.status || 500).json({
@@ -381,7 +358,7 @@ new OpenApiValidator({
 
         // Serve static UI content if static directory was specified.
         if (env.STATIC_DIR) {
-            console.log('Serving static files from', env.STATIC_DIR);
+            logger.info('Serving static files from', env.STATIC_DIR);
             app.use(express.static(env.STATIC_DIR));
             // Send index to any unmatched route.
             // This must be the LAST handler installed on the app.
@@ -392,7 +369,7 @@ new OpenApiValidator({
         }
     })
     .catch((e) => {
-        console.error('Failed to install OpenAPI validator:', e);
+        logger.error('Failed to install OpenAPI validator:', e);
         process.exit(1);
     });
 
