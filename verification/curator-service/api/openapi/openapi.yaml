@@ -512,7 +512,7 @@ paths:
       operationId: downloadCases
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               maxProperties: 1
@@ -525,10 +525,9 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
@@ -762,7 +761,7 @@ paths:
               type: object
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/clear:
     post:
       tags: [Geocode]
@@ -770,7 +769,7 @@ paths:
       operationId: clearGeocodes
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/suggest:
     get:
       tags: [Suggest, Geocode]
@@ -1537,11 +1536,11 @@ components:
               - index
               - message
       required:
-        - phase
         - numCreated
         - numUpdated
-        - errors
   responses:
+    "200":
+      description: OK
     "200Auth":
       description: OK
       content:

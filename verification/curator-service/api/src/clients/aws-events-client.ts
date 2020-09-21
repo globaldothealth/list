@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk';
 import AwsLambdaClient from './aws-lambda-client';
 import assertString from '../util/assert-string';
+import { logger } from '../util/logger';
 
 /**
  * Client to interact with the AWS CloudWatch Events API.
@@ -90,7 +91,7 @@ export default class AwsEventsClient {
                     // method to worry about, and it isn't any more robust than
                     // this mechanism.
                     if (err.statusCode === 409) {
-                        console.log(
+                        logger.info(
                             `Permission with statement ID ${statementId} already exists; continuing.`,
                         );
                         return response.RuleArn;
@@ -100,7 +101,7 @@ export default class AwsEventsClient {
             }
             return response.RuleArn;
         } catch (err) {
-            console.warn(
+            logger.warn(
                 `Unable to create AWS CloudWatch Events rule with:
                 name: ${ruleName}
                 schedule: ${scheduleExpression}`,
@@ -135,7 +136,7 @@ export default class AwsEventsClient {
                 .deleteRule(deleteRuleParams)
                 .promise();
         } catch (err) {
-            console.warn(
+            logger.warn(
                 `Unable to delete AWS CloudWatch Events rule with:
                 name: ${ruleName}`,
             );

@@ -13,7 +13,8 @@
             "location.place": "text",
             "location.name": "text",
             "pathogen.name": "text",
-            "caseReference.sourceUrl": "text"
+            "caseReference.sourceUrl": "text",
+            "caseReference.verificationStatus": "text"
         }
     },
     {
@@ -169,6 +170,26 @@
         "name": "caseReferenceUpdateMetadataCuratorIdx",
         "key": {
             "caseReference.updateMetadata.curator": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceSourceUrlIdx",
+        "key": {
+            "caseReference.sourceUrl": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceVerificationStatusIdx",
+        "key": {
+            "caseReference.verificationStatus": -1
         },
         "collation": {
             "locale": "en_US",

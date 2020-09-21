@@ -1,6 +1,7 @@
 {
+    "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f0b9a7ead3a2b003edc0e7f/2020/07/12/2320/content.json",
-    "sourceUrl": "https://foo.bar",
-    "sourceId": "5f0b9a7ead3a2b003edc0e7f"
+    "s3Key": "test/colombia/colombia_test_200.csv",
+    "sourceUrl": "s3://epid-sources-raw/test/colombia/colombia_test_200.csv",
+    "sourceId": "5f462389dd7c71003587b1ed"
 }
