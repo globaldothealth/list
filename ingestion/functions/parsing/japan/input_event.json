@@ -2,6 +2,6 @@
     "env": "local",
     "s3Bucket": "epid-sources-raw",
     "sourceUrl": "https://foo.bar",
-    "s3Key": "5f3d37acf6cb0300299f5c6e/2020/08/20/0902/content.json",
-    "sourceId": "5f3d37acf6cb0300299f5c6e"
+    "s3Key": "5f6209479d3e3000302d0f6c/2020/09/21/1014/content.json",
+    "sourceId": "5f6209479d3e3000302d0f6c"
 }
