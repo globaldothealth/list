@@ -11,7 +11,12 @@ _PARSED_CASE = (
         "caseReference": {
             "sourceId": _SOURCE_ID,
             "sourceEntryId": "HKD130",
-            "sourceUrl": _SOURCE_URL
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [ 
+                                {
+                                    "sourceUrl": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html"
+                                }
+                                ]
         },
         "location": {
             "query": "Sapporo, Hokkaido, Japan"
@@ -24,6 +29,15 @@ _PARSED_CASE = (
                             "start": "03/13/2020Z",
                             "end": "03/13/2020Z"
                         }
+            },
+            {
+                "name": "outcome",
+                "dateRange":
+                        {
+                            "start": None,
+                            "end": None
+                        },
+                "value": "Unknown"
             }
         ],
         "demographics": {
@@ -48,7 +62,7 @@ def sample_data():
 
 def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
     from japan import japan  # Import locally to avoid superseding mock
-    with tempfile.NamedTemporaryFile("w") as f:
+    with tempfile.NamedTemporaryFile("w+t", delete = False) as f:
         json.dump(sample_data, f)
         f.flush()
 
