@@ -26,4 +26,8 @@ describe('constructed object', () => {
                 '`gender`',
         );
     });
+    it('falls back to raw string for unsupported errors', () => {
+        const o = new CaseValidationError(42, 'some error');
+        expect(o.formattedIssues).toEqual(['some error']);
+    });
 });

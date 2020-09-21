@@ -29,6 +29,12 @@ export default class CaseValidationError {
      * @param apiResponse The raw text response received from the validation API.
      */
     constructor(public readonly rowNumber: number, apiResponse: string) {
+        // Geocoding errors are not prefixed like validation errors, in that
+        // case just return the error as is.
+        if (!apiResponse.startsWith(CaseValidationError.leadingErrorText)) {
+            this.formattedIssues = [apiResponse];
+            return;
+        }
         const sortedErrorsByField = apiResponse
             .substr(CaseValidationError.leadingErrorText.length)
             .split(CaseValidationError.errorDelimiter)
