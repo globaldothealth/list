@@ -33,6 +33,13 @@ export default class CasesController {
         }
     };
 
+    todaysDate = (): string => {
+        const today = new Date();
+        return `${today.getFullYear()}_${
+            today.getMonth() + 1
+        }_${today.getDate()}`;
+    };
+
     /** Download forwards the request to the data service and streams the
      * streamed response as a csv attachment. */
     download = async (req: Request, res: Response): Promise<void> => {
@@ -46,7 +53,7 @@ export default class CasesController {
                 res.setHeader('Content-Type', 'text/csv');
                 res.setHeader(
                     'Content-Disposition',
-                    'attachment; filename="cases.csv"',
+                    `attachment; filename="globalhealth_covid19_cases_${this.todaysDate()}.csv"`,
                 );
                 res.setHeader('Cache-Control', 'no-cache');
                 res.setHeader('Pragma', 'no-cache');
