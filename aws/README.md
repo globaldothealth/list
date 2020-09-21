@@ -255,7 +255,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 Our ingress routes to the dev and prod curator services were installed with:
 
 ```shell
-kubectl apply -f curator-ingress.yaml
+kubectl apply -f curator-ingress.yaml -f curator-ingress-config-map.yaml
 ```
 
 The curator services are exposed here:
