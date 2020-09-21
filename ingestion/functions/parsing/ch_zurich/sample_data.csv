@@ -1,2 +1,5 @@
-Date,Area,AgeYear,Gender,NewConfCases,NewDeaths,Source
-2020-02-27,Canton_ZH,33,F,2,0,https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html
+Week,Year,Area,AgeYearCat,Gender,NewConfCases,NewDeaths,Source
+9,2020,Canton_ZH,0-9,F,1,0,https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html
+9,2020,Canton_ZH,0-9,M,1,0,https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html
+9,2020,Canton_ZH,100+,F,1,0,https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html
+11,2020,Canton_ZH,60-69,unbekannt,1,0,https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html
