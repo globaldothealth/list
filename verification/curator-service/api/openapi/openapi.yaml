@@ -512,7 +512,7 @@ paths:
       operationId: downloadCases
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               maxProperties: 1
@@ -525,10 +525,9 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
