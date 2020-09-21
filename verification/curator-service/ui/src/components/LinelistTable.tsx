@@ -447,7 +447,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         if (this.state.numSelectedRows > this.maxDeletionThreshold) {
             return (
                 `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
-                ' An admin can preform the deletion if it is valid.'
+                ' An admin can perform the deletion if it is valid.'
             );
         }
         return (
