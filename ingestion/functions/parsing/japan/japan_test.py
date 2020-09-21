@@ -62,7 +62,7 @@ def sample_data():
 
 def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
     from japan import japan  # Import locally to avoid superseding mock
-    with tempfile.NamedTemporaryFile("w+t", delete = False) as f:
+    with tempfile.NamedTemporaryFile("w") as f:
         json.dump(sample_data, f)
         f.flush()
 
