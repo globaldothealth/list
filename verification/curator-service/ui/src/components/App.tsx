@@ -291,6 +291,15 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
+                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                    onClick={handleClose}
+                >
+                    <MenuItem>Data dictionary</MenuItem>
+                </a>
+                <a
+                    className={classes.link}
+                    rel="noopener noreferrer"
+                    target="_blank"
                     href="https://github.com/globaldothealth/list/issues/new/choose"
                     onClick={handleClose}
                 >
