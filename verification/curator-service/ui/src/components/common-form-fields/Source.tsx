@@ -16,7 +16,7 @@ import { throttle } from 'lodash';
 interface SourceProps {
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
-    disableFreeSolo?: boolean;
+    freeSolo?: boolean;
 }
 
 // TODO: format this text to have newlines in it
@@ -27,17 +27,17 @@ const tooltipText =
 
 export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
+        const freeSolo =
+            this.props.freeSolo === undefined ? true : this.props.freeSolo;
         return (
             <Scroll.Element name="source">
                 <FieldTitle
                     title="Data Source"
-                    tooltip={
-                        this.props.disableFreeSolo ? undefined : tooltipText
-                    }
+                    tooltip={freeSolo ? tooltipText : undefined}
                 ></FieldTitle>
                 <SourcesAutocomplete
                     initialValue={this.props.initialValue}
-                    disableFreeSolo={this.props.disableFreeSolo}
+                    freeSolo={freeSolo}
                 />
                 {this.props.hasSourceEntryId && (
                     <FastField
@@ -70,7 +70,7 @@ interface ListSourcesResponse {
 
 interface SourceAutocompleteProps {
     initialValue?: CaseReferenceForm;
-    disableFreeSolo?: boolean;
+    freeSolo: boolean;
 }
 
 export interface CaseReferenceForm extends CaseReference {
@@ -227,7 +227,7 @@ export function SourcesAutocomplete(
                             (caseRef) =>
                                 caseRef.sourceUrl === params.inputValue,
                         ) &&
-                        !props.disableFreeSolo
+                        props.freeSolo
                     ) {
                         filtered.push({
                             inputValue: params.inputValue,
@@ -243,7 +243,7 @@ export function SourcesAutocomplete(
                     return filtered;
                 }}
                 autoSelect
-                freeSolo={!props.disableFreeSolo ?? false}
+                freeSolo={props.freeSolo}
                 selectOnFocus
                 handleHomeEndKeys
                 options={options}
@@ -282,7 +282,7 @@ export function SourcesAutocomplete(
             />
             {/* If this is a new source, show option to add name */}
             {inputValue &&
-                !props.disableFreeSolo &&
+                props.freeSolo &&
                 !options.find((option) => option.sourceUrl === inputValue) && (
                     <>
                         <FastField

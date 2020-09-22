@@ -146,7 +146,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                         <Form>
                             <Paper className={classes.allFormSections}>
                                 <div className={classes.formSection}>
-                                    <Source disableFreeSolo={true} />
+                                    <Source freeSolo={false} />
                                 </div>
                                 <DateField
                                     name="startDate"
