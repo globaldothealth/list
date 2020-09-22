@@ -220,9 +220,13 @@ then push it to the repo:
 
 `git push origin 0.1.2`
 
-Github actions will automatically build the image: `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
+Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
+This tag can then be referenced in the deployment files:
+- Submit a PR to change the current image version to the new one. [Example](https://github.com/globaldothealth/list/pull/1170).
+- Apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
+
+In a few seconds the push should be complete.
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
