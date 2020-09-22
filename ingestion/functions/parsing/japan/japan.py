@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from datetime import datetime
+from typing import Dict
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -46,7 +47,7 @@ def detect_notes(raw_notes):
     else:
         return None
 
-def convert_date(raw_date: str):
+def convert_date(raw_date: Dict):
     """
     Convert raw date field into a value interpretable by the dataserver.
 ​
@@ -55,15 +56,15 @@ def convert_date(raw_date: str):
     date = datetime.strptime(raw_date["dateAnnounced"], "%Y-%m-%d")
     return date.strftime("%m/%d/%YZ")
 
-def convert_additionalSources(additional_sourceURL: str):
+def convert_additional_sources(additional_source_url: Dict):
     sources = []
-    if "sourceURL" in additional_sourceURL:
-      sources.append({"sourceUrl": additional_sourceURL["sourceURL"]})
-    if "deathSourceURL" in additional_sourceURL:
-      sources.append({"sourceUrl": additional_sourceURL["deathSourceURL"]})
+    if "sourceURL" in additional_source_url:
+      sources.append({"sourceUrl": additional_source_url["sourceURL"]})
+    if "deathSourceURL" in additional_source_url:
+      sources.append({"sourceUrl": additional_source_url["deathSourceURL"]})
     return sources or None
 
-def convert_outcome(raw_outcome: str, raw_death_date: str):
+def convert_outcome(raw_outcome: Dict, raw_death_date: Dict):
     if "patientStatus" in raw_outcome:
         if raw_outcome["patientStatus"] == "Deceased":
             death_date = datetime.strptime(raw_death_date["deceasedDate"], "%Y-%m-%d")
@@ -75,13 +76,9 @@ def convert_outcome(raw_outcome: str, raw_death_date: str):
                     "value": "Death"}
         elif raw_outcome["patientStatus"] == "Discharged" or raw_outcome["patientStatus"] == "Recovered":
             return {"name": "outcome",
-                    "value": "Recovered"}
-        else:
-            return {"name": "outcome",
-                    "value": "Unknown"}       
-    else:
-        return {"name": "outcome",
-                "value": "Unknown"}
+                    "value": "Recovered"}      
+    return {"name": "outcome",
+            "value": "Unknown"}
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
@@ -95,7 +92,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "sourceId": source_id,
                     "sourceEntryId": entry["patientId"],
                     "sourceUrl": source_url,
-                    "additionalSources": convert_additionalSources(entry)
+                    "additionalSources": convert_additional_sources(entry)
                 },
                 "location": convert_location(entry),
                 "events": [
