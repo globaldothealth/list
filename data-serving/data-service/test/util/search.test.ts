@@ -20,6 +20,22 @@ describe('search query', () => {
         expect(() => parseSearchQuery('country:')).toThrow(/country/);
     });
 
+    it('consolidates keywords in query', () => {
+        const res = parseSearchQuery('country: other gender:   Female');
+        expect(res).toEqual({
+            filters: [
+                {
+                    path: 'demographics.gender',
+                    values: ['Female'],
+                },
+                {
+                    path: 'location.country',
+                    values: ['other'],
+                },
+            ],
+        });
+    });
+
     it('is parses tokens', () => {
         const res = parseSearchQuery(
             'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss ' +
