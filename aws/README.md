@@ -68,6 +68,25 @@ To update the deployments use:
 kubectl apply -f data.yaml -f curator.yaml
 ```
 
+## Reading server logs
+
+To read the server logs first find the pod whose logs you want to read.
+
+```shell
+kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+curator-dev-6cff5859df-dddbw    1/1     Running   0          148m
+curator-prod-5bf5c88f58-g2489   1/1     Running   0          139m
+data-dev-566fb67694-xfzkj       1/1     Running   0          148m
+data-prod-5b78bdc66d-dwf2k      1/1     Running   4          139m
+```
+
+Then call logs on the pod you want to read from.
+
+```shell
+kubectl logs data-prod-5b78bdc66d-dwf2k
+```
+
 ## Getting access to the cluster
 
 Ask an admin to run `kubectl edit -n kube-system configmap/aws-auth` and add the appropriate user there. Instructions can be found in the [official docs](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html).
