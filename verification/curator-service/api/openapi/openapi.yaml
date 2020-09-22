@@ -204,13 +204,15 @@ paths:
           pattern: '^[a-f\d]{24}$'
       - name: parse_start_date
         in: query
-        description: The date on which to begin parsing/ingesting data.
+        description: >
+          The date on which to begin parsing/ingesting data (inclusive).
         required: false
         schema:
           type: string
       - name: parse_end_date
         in: query
-        description: The date on which to end parsing/ingesting data.
+        description: >
+          The date on which to end parsing/ingesting data (inclusive).
         required: false
         schema:
           type: string
