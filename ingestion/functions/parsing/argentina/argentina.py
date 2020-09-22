@@ -22,14 +22,14 @@ from datetime import date, datetime
 import csv
 
 
+private_public_map = {'Público': 'Public', 'Privado': 'Private'}
+
+
 def convert_date(date_str: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    The date is listed in YYYYmmdd format, but the data server API will
-    assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
-
-    Adding line to ensure date has type str
+    The date is listed in YYYY-mm-dd format
     """
     date = datetime.strptime(date_str, "%Y-%m-%d")
 
@@ -41,14 +41,12 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "F":
         return "Female"
-    return None
 
 
 def convert_location(entry):
     '''
     The only information we have is the province where case was diagnosed/hospitalised
     '''
-
     if entry['carga_provincia_nombre']:
         return {"query": f"{entry['carga_provincia_nombre']}, Argentina"}
     else:
@@ -63,9 +61,8 @@ def convert_age(entry):
         if entry['edad_años_meses'] == 'Años':
             return float(entry['edad'])
         elif entry['edad_años_meses'] == 'Meses':
-            return float(float(entry['edad']) / 12)
-    else:
-        return None
+            return float(entry['edad']) / 12
+    return None
 
 
 def get_confirmed_event(entry):
@@ -87,7 +84,18 @@ def get_confirmed_event(entry):
         confirmed_value = 'Clinical Diagnosis'
     else:
         confirmed_value = 'Method Unknown'
-    return confirmation_date, confirmed_value, note
+
+    confirmed_event = [{
+        "name": "confirmed",
+        "value": confirmed_value,
+        "dateRange":
+        {
+            "start": confirmation_date,
+            "end": confirmation_date
+        }}
+    ]
+
+    return confirmed_event, note
 
 
 def convert_residential_location(entry):
@@ -98,7 +106,7 @@ def convert_residential_location(entry):
         entry.get("residencia_provincia_nombre", ""),
         entry.get("residencia_departamento_nombre", ""),
         entry.get("residencia_pais_nombre", "")]
-        if term != '']
+        if term]
 
     return ", ".join(query_terms)
 
@@ -120,9 +128,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     best proxy we have. The other location date refers to the residential address of the patient.
 
     """
-
-    private_public_map = {'Público': 'Public', 'Privado': 'Private'}
-
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         for entry in reader:
@@ -144,23 +149,9 @@ def parse_cases(raw_data_file, source_id, source_url):
                     }
                 }
 
-                confirmation_date, confirmed_value, confirmation_note = get_confirmed_event(
-                    entry)
-                case["events"] = [
-                    {
-                        "name": "confirmed",
-                                "value": confirmed_value,
-                                "dateRange":
-                                {
-                                    "start": confirmation_date,
-                                    "end": confirmation_date
-                                }
-                    }
-                ]
+                case["events"], confirmation_note = get_confirmed_event(entry)
                 notes.append(confirmation_note)
 
-                # maybe change to elif clause and check if can parse field as
-                # date
                 if entry["fecha_inicio_sintomas"]:
                     case["symptoms"] = {
                         "status": "Symptomatic",
