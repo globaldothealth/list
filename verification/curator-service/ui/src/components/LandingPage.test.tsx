@@ -13,7 +13,6 @@ test('shows all content', async () => {
     expect(getByText(/Trustworthy line list data/)).toBeInTheDocument();
     expect(getByText(/Welcome to G.h List/)).toBeInTheDocument();
     expect(getByText('Login to get started')).toBeInTheDocument();
-    expect(getByText('Global.health website')).toBeInTheDocument();
     expect(getByText('Global.health map')).toHaveAttribute(
         'href',
         'http://covid-19.global.health/',
