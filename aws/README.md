@@ -222,9 +222,7 @@ then push it to the repo:
 
 Github actions will automatically build the image: `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
-
-To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
+This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
