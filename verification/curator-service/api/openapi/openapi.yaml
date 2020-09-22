@@ -202,6 +202,18 @@ paths:
         schema:
           type: string
           pattern: '^[a-f\d]{24}$'
+      - name: parse_start_date
+        in: query
+        description: The date on which to begin parsing/ingesting data.
+        required: false
+        schema:
+          type: string
+      - name: parse_end_date
+        in: query
+        description: The date on which to end parsing/ingesting data.
+        required: false
+        schema:
+          type: string
     post:
       tags: [Source]
       summary: Trigger a retrieval of the content for the specified source

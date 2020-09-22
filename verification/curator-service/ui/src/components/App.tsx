@@ -56,6 +56,7 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
+import AutomatedBackfill from './AutomatedBackfill';
 
 const theme = createMuiTheme({
     palette: {
@@ -530,6 +531,14 @@ export default function App(): JSX.Element {
                                             New automated source
                                         </MenuItem>
                                     </Link>
+                                    <Link
+                                        to="/sources/backfill"
+                                        onClick={closeCreateNewPopup}
+                                    >
+                                        <MenuItem>
+                                            New automated source backfill
+                                        </MenuItem>
+                                    </Link>
                                 </Menu>
                             </>
                         )}
@@ -623,6 +632,14 @@ export default function App(): JSX.Element {
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
+                        {user && hasAnyRole(['curator']) && (
+                            <Route path="/sources/backfill">
+                                <AutomatedBackfill
                                     user={user}
                                     onModalClose={onModalClose}
                                 />
