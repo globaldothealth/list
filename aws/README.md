@@ -80,7 +80,7 @@ Data and curator are exposed as kubernetes services inside the cluster (but have
 
 You can check DNS resolution within the cluster by running:
 
-```
+```shell
 kubectl run curl --image=radial/busyboxplus:curl -i --tty
 [ root@curl:/ ]$ nslookup curator
 Server:    10.100.0.10
@@ -279,9 +279,9 @@ To log into the dashboard:
 
 1. Start a proxy (the dashboard isn't exposed externally): `kubectl proxy`
 
-2. Go to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/)
+2. Get the token to login as the `dashboard-reader` user by running the `display_dashboard_token.sh` script in this directory.
 
-3. Get the token to login as the `dashboard-reader` user: `kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep dashboard-reader | awk '{print $1}')`, copy the `token` in the login screen and continue to the dashboard.
+3. Go to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) and copy the token into the login screen.
 
 ## HTTPS / certs management
 
