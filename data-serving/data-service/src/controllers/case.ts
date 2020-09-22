@@ -40,19 +40,19 @@ export class CasesController {
     download = async (req: Request, res: Response): Promise<void> => {
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let cases: any;
+        let casesQuery: any;
         try {
             if (req.body.query) {
-                cases = await casesMatchingSearchQuery({
+                casesQuery = casesMatchingSearchQuery({
                     searchQuery: req.body.query as string,
                     count: false,
                 });
             } else if (req.body.caseIds) {
-                cases = await Case.find({
+                casesQuery = Case.find({
                     _id: { $in: req.body.caseIds },
                 }).lean();
             } else {
-                cases = await Case.find({}).lean();
+                casesQuery = Case.find({}).lean();
             }
 
             res.setHeader('Content-Type', 'text/csv');
@@ -72,10 +72,15 @@ export class CasesController {
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    stringify(cases, {
-                        header: true,
-                        columns: columns,
-                    }).pipe(res);
+                    casesQuery
+                        .cursor()
+                        .pipe(
+                            stringify({
+                                header: true,
+                                columns: columns,
+                            }),
+                        )
+                        .pipe(res);
                 });
         } catch (e) {
             if (e instanceof ParsingError) {
