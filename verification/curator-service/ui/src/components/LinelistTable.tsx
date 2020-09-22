@@ -84,6 +84,7 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
+    setSearchLoading: (a: boolean) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -653,7 +654,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
-                            this.setState({ error: '' });
+                            this.setState({ isLoading: true, error: '' });
+                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
                             response
                                 .then((result) => {
@@ -716,6 +718,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             e.toString(),
                                     });
                                     reject(e);
+                                })
+                                .finally(() => {
+                                    this.setState({ isLoading: false });
+                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }

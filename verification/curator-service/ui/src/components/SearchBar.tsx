@@ -57,6 +57,7 @@ const StyledSearchTextField = withStyles({
 export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
+    loading: boolean;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -95,6 +96,7 @@ export default function SearchBar(props: {
                 value={search}
                 variant="outlined"
                 fullWidth
+                disabled={props.loading}
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
