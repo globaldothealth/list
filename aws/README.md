@@ -264,6 +264,25 @@ The curator services are exposed here:
 - [dev](https://dev-curator.ghdsi.org)
 - [prod](https://curator.ghdsi.org)
 
+## Kubernetes dashboard
+
+The kubernetes dashboard has been deployed following the [official instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), mainly:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+kubectl apply -f dashboard.yaml
+```
+
+The [dashboard.yaml](dashboard.yaml) file contains the user configuration that is needed to log into the dashboard. The user has the `read` role that gives read access to all resources (except secrets to avoid privilege escalation).
+
+To log into the dashboard:
+
+1. Start a proxy (the dashboard isn't exposed externally): `kubectl proxy`
+
+2. Go to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/)
+
+3. Get the token to login as the `dashboard-reader` user: `kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep dashboard-user | awk '{print $1}')`, copy the `token` in the login screen and continue to the dashboard.
+
 ## HTTPS / certs management
 
 Certificates are managed automatically by [certs manager](https://cert-manager.io).
