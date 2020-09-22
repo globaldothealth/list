@@ -230,7 +230,7 @@ For example if a source publishes its data every day at a URL like `https://sour
 
 Some sources are provided as [zip files](https://en.wikipedia.org/wiki/Zip_(file_format)). Those are supported by the retrieval function assuming it contains a single file in the archive containing the line list data, it will extract that single file and the parsing functions will have access to it so you can write a parser without caring about the zip file at all.
 
-If you need other archive or compression formats supported please file an issue in this repository indicating the source and the desired support, thank you.
+If you need other archive or compression formats supported please [file an issue in this repository](https://github.com/globaldothealth/list/issues/new?assignees=&labels=Importer&template=feature_request.md&title=Additional%20compression%20support\) indicating the type of support needed, thank you.
 
 ### Encoding of sources
 
