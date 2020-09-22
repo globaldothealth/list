@@ -496,9 +496,7 @@ class BulkCaseForm extends React.Component<
             upsertResponse = await this.batchUpsertCases(cases);
         } catch (e) {
             this.setState({
-                errorMessage: `System error during upload: ${JSON.stringify(
-                    e,
-                )}`,
+                errorMessage: `System error during upload: ${e.message}`,
             });
             await this.finalizeUpload(
                 caseReference.sourceId,
@@ -561,9 +559,7 @@ class BulkCaseForm extends React.Component<
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {
                 this.setState({
-                    errorMessage: `System error during source creation: ${JSON.stringify(
-                        e,
-                    )}`,
+                    errorMessage: `System error during source creation: ${e.message}`,
                 });
                 return;
             }
