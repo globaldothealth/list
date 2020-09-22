@@ -77,7 +77,7 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers, cookies)
 
-def raw_content(url:str, content: bytes) -> io.BytesIO:
+def raw_content(url: str, content: bytes) -> io.BytesIO:
     # Detect the mimetype of a given URL.
     print(f'Guessing mimetype of {url}')
     mimetype, _ = mimetypes.guess_type(url)
