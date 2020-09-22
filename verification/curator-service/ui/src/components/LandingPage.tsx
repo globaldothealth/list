@@ -52,8 +52,14 @@ export default function LandingPage(): JSX.Element {
                 <div>
                     <Typography>More information</Typography>
                     <div className={classes.link}>
-                        {/* TODO: add prod link once available */}
-                        <a>Global.health website</a>
+                        {/* TODO: add in once link is available
+                        <a
+                            href=""
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            Global.health website
+                        </a> */}
                     </div>
                     <div className={classes.link}>
                         <a
