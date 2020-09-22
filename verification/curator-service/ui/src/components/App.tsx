@@ -426,6 +426,8 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
+    const [searchLoading, setSearchLoading] = React.useState(false);
+
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -459,6 +461,7 @@ export default function App(): JSX.Element {
                                                 search: searchQuery,
                                             });
                                         }}
+                                        loading={searchLoading}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
@@ -589,7 +592,10 @@ export default function App(): JSX.Element {
                     <Switch>
                         {user && (
                             <Route exact path="/cases">
-                                <LinelistTable user={user} />
+                                <LinelistTable
+                                    user={user}
+                                    setSearchLoading={setSearchLoading}
+                                />
                             </Route>
                         )}
                         {hasAnyRole(['curator']) && (
