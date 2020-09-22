@@ -92,9 +92,8 @@ it('loads and displays cases', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                setSearchLoading={(x: boolean): void => {
-                    console.log(`search loading ? ${x}`);
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
@@ -154,9 +153,8 @@ it('API errors are displayed', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                setSearchLoading={(x: boolean): void => {
-                    console.log(`search loading ? ${x}`);
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
@@ -219,9 +217,8 @@ it('can delete a row', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                setSearchLoading={(x: boolean): void => {
-                    console.log(`search loading ? ${x}`);
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
@@ -310,9 +307,8 @@ it('can cancel delete action', async () => {
         <MemoryRouter>
             <LinelistTable
                 user={curator}
-                setSearchLoading={(x: boolean): void => {
-                    console.log(`search loading ? ${x}`);
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
@@ -381,9 +377,8 @@ it('cannot edit data if not curator', async () => {
                     email: 'foo@bar.com',
                     roles: [],
                 }}
-                setSearchLoading={(x: boolean): void => {
-                    console.log(`search loading ? ${x}`);
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
