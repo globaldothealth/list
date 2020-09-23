@@ -1,0 +1,138 @@
+{
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": [
+            "name",
+            "origin"
+        ],
+        "properties": {
+            "_id": {
+                "bsonType": "objectId"
+            },
+            "name": {
+                "bsonType": "string"
+            },
+            "origin": {
+                "bsonType": "object",
+                "required": ["url"],
+                "properties": {
+                    "url": {
+                        "bsonType": "string"
+                    },
+                    "license": {
+                        "bsonType": "string"
+                    }
+                }
+            },
+            "format": {
+                "bsonType": "string"
+            },
+            "automation": {
+                "bsonType": "object",
+                "properties": {
+                    "parser": {
+                        "bsonType": "object",
+                        "required": [
+                            "awsLambdaArn"
+                        ],
+                        "properties": {
+                            "awsLambdaArn": {
+                                "bsonType": "string"
+                            }
+                        }
+                    },
+                    "regexParsing": {
+                        "bsonType": "object",
+                        "required": [
+                            "fields"
+                        ],
+                        "properties": {
+                            "fields": {
+                                "bsonType": "array",
+                                "items": {
+                                  "bsonType": "object",
+                                  "required": [
+                                      "name",
+                                      "regex"
+                                  ],
+                                  "properties": {
+                                    "name": {
+                                        "bsonType": "string"
+                                    },
+                                    "regex": {
+                                        "bsonType": "string"
+                                    }
+                                  }
+                                }
+                            }
+                        }
+                    },
+                    "schedule": {
+                        "bsonType": "object",
+                        "required": [
+                            "awsScheduleExpression"
+                        ],
+                        "properties": {
+                            "awsRuleArn": {
+                                "bsonType": "string"
+                            },
+                            "awsScheduleExpression": {
+                                "bsonType": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "uploads": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "object",
+                  "required": [
+                      "status",
+                      "summary",
+                      "created"
+                  ],
+                  "properties": {
+                    "status": {
+                        "bsonType": "string"
+                    },
+                    "summary": {
+                        "bsonType": "object",
+                        "properties": {
+                            "numCreated": {
+                                "bsonType": "int"
+                            },
+                            "numUpdated": {
+                                "bsonType": "int"
+                            },
+                            "error": {
+                                "bsonType": "string"
+                            }
+                        }
+                    },
+                    "created": {
+                        "bsonType": "date"
+                    }
+                  }
+                }
+            },
+            "dateFilter": {
+                "bsonType": "object",
+                "properties": {
+                    "numDaysBeforeToday": {
+                        "bsonType": "int"
+                    },
+                    "op": {
+                        "bsonType": "string"
+                    }
+                }
+            },
+            "notificationRecipients": {
+                "bsonType": "array",
+                "items": {
+                  "bsonType": "string"
+                }
+            }
+        }
+    }
+}
