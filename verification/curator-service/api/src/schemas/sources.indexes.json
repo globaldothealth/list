@@ -1,0 +1,14 @@
+[
+    {
+        "name": "uploadsSortOrderIdx",
+        "key": {
+            "uploads.created": -1,
+            "name": -1
+        },
+        "partialFilterExpression": {
+            "uploads.0": {
+                "$exists": true
+            }
+        }
+    }
+]
