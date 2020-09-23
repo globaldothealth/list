@@ -59,6 +59,12 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
+    if event.get(DATE_FILTER_FIELD) and event.get(DATE_RANGE_FIELD):
+        error_message = (
+            f"At most one of fields {DATE_FILTER_FIELD} and {DATE_RANGE_FIELD} can be provided."
+        )
+        e = ValueError(error_message)
+        common_lib.complete_with_error(e)
     return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(DATE_RANGE_FIELD, {}), event.get(AUTH_FIELD, None)
 

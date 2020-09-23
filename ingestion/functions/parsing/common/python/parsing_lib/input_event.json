@@ -7,10 +7,6 @@
     "uploadIds": [
         "123456789012345678901234"
     ],
-    "dateFilter": {
-        "numDaysBeforeToday": 3,
-        "op": "LT"
-    },
     "dateRange": {
         "start": "2020-01-01",
         "end": "2020-09-21"
