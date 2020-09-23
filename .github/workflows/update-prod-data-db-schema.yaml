@@ -1,4 +1,4 @@
-name: Update prod database schema
+name: Update prod data-service database schema
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - "data-serving/data-service/schemas/**"
-      - ".github/workflows/update-prod-db-schema.yaml"
+      - ".github/workflows/update-prod-data-db-schema.yaml"
 
 jobs:
   update-case-data:
@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: "12.x"
       
-      - name: Update prod schema
+      - name: Update prod cases schema
         env:
           CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
           DB: "covid19"

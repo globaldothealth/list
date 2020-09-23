@@ -1,0 +1,32 @@
+name: Update prod curator-service database schema
+
+on:
+  push:
+    # Run workflow when the schema changes.
+    branches: [main]
+    paths:
+      - "verification/curator-service/api/src/schemas/**"
+      - ".github/workflows/update-prod-curator-db-schema.yaml"
+
+jobs:
+  update-case-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      
+      - name: Update prod sources schema
+        env:
+          CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
+          DB: "covid19"
+          COLL: "sources"
+          # Those are relative to the setup-db directory, not the working dir.
+          SCHEMA: "../../../verification/curator-service/api/src/schemas/sources.schema.json"
+          INDEXES: "../../../verification/curator-service/api/src/schemas/sources.indexes.json"
+        run: npm --prefix data-serving/scripts/setup-db run setup
