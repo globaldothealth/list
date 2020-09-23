@@ -30,13 +30,7 @@ import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
-
-interface User {
-    _id: string;
-    name: string;
-    email: string;
-    roles: string[];
-}
+import User from './User';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
