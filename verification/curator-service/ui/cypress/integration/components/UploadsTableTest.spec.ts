@@ -107,7 +107,7 @@ describe('Uploads table', function () {
         cy.contains('United Kingdom');
         cy.contains('Germany').should('not.exist');
 
-        cy.contains('Linelist').click({ force: true });
+        cy.contains('Line list').click({ force: true });
         cy.get('input[id="search-field"]').should('have.value', '');
         cy.contains('France');
         cy.contains('United States');
