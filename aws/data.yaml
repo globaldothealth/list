@@ -110,10 +110,10 @@ spec:
           resources:
             requests:
               memory: "512Mi"
-              cpu: "150m"
+              cpu: "500m"
             limits:
               memory: "1.5Gi"
-              cpu: "500m"
+              cpu: "1000m"
 ---
 apiVersion: v1
 kind: Service
