@@ -101,11 +101,10 @@ describe('invokeRetrieval', () => {
         invokeSpy.mockResolvedValueOnce({
             Payload: JSON.stringify(payload),
         });
-        const res = await client.invokeRetrieval(
-            'some-source-id',
-            '2020-09-01',
-            '2020-09-21',
-        );
+        const res = await client.invokeRetrieval('some-source-id', {
+            start: '2020-09-01',
+            end: '2020-09-21',
+        });
         expect(invokeSpy).toHaveBeenCalledTimes(1);
         expect(res).toEqual(payload);
     });

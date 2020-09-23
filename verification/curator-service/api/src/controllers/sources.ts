@@ -249,10 +249,16 @@ export default class SourcesController {
     /** Trigger retrieval of the source's content in S3. */
     retrieve = async (req: Request, res: Response): Promise<void> => {
         try {
+            const parseDateRange =
+                req.query.parse_start_date && req.query.parse_end_date
+                    ? {
+                          start: req.query.parse_start_date as string,
+                          end: req.query.parse_end_date as string,
+                      }
+                    : undefined;
             const output = await this.lambdaClient.invokeRetrieval(
                 req.params.id,
-                req.query.parse_start_date as string,
-                req.query.parse_end_date as string,
+                parseDateRange,
             );
             res.json(output);
         } catch (err) {

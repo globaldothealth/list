@@ -500,17 +500,18 @@ describe('retrieval', () => {
         await curatorRequest
             .post(`/api/sources/${sourceId}/retrieve`)
             .expect(200);
-        expect(mockInvoke).toHaveBeenCalledWith(sourceId, undefined, undefined);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, undefined);
     });
     it('forwards optional date params', async () => {
         const sourceId = '424242424242424242424242';
         const startDate = '2020-09-01';
         const endDate = '2020-09-12';
+        const parseRange = { start: startDate, end: endDate };
         await curatorRequest
             .post(
                 `/api/sources/${sourceId}/retrieve?parse_start_date=${startDate}&parse_end_date=${endDate}`,
             )
             .expect(200);
-        expect(mockInvoke).toHaveBeenCalledWith(sourceId, startDate, endDate);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, parseRange);
     });
 });
