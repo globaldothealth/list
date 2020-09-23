@@ -18,7 +18,7 @@ _PARSED_CASE = [
          "sourceUrl":"foo.bar"
       },
       "location":{
-         "query":"Germany, Schleswig-Holstein, SK Flensburg",
+         "query":"SK Flensburg, Schleswig-Holstein, Germany",
          "limitToResolution": "Admin2"
       },
       "events":[
