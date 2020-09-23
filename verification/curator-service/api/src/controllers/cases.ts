@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { UserDocument } from '../model/user';
 import axios from 'axios';
+import { logger } from '../util/logger';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -23,13 +24,20 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
             res.status(500).send(err);
         }
+    };
+
+    todaysDate = (): string => {
+        const today = new Date();
+        return `${today.getFullYear()}_${
+            today.getMonth() + 1
+        }_${today.getDate()}`;
     };
 
     /** Download forwards the request to the data service and streams the
@@ -45,14 +53,14 @@ export default class CasesController {
                 res.setHeader('Content-Type', 'text/csv');
                 res.setHeader(
                     'Content-Disposition',
-                    'attachment; filename="cases.csv"',
+                    `attachment; filename="globalhealth_covid19_cases_${this.todaysDate()}.csv"`,
                 );
                 res.setHeader('Cache-Control', 'no-cache');
                 res.setHeader('Pragma', 'no-cache');
                 response.data.pipe(res);
             });
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -69,7 +77,7 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -89,7 +97,7 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -106,7 +114,7 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -123,7 +131,7 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -146,7 +154,7 @@ export default class CasesController {
             );
             res.status(response.status).end();
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -163,7 +171,7 @@ export default class CasesController {
             );
             res.status(response.status).end();
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -184,7 +192,7 @@ export default class CasesController {
             );
             res.status(response.status).json(response.data);
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -231,7 +239,7 @@ export default class CasesController {
             res.status(upsertResponse.status).send(upsertResponse.data);
             return;
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -260,7 +268,7 @@ export default class CasesController {
             });
             return;
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;
@@ -289,7 +297,7 @@ export default class CasesController {
             });
             return;
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
                 return;

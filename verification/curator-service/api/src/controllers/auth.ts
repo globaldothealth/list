@@ -1,4 +1,8 @@
 import {
+    Strategy as BearerStrategy,
+    IVerifyOptions,
+} from 'passport-http-bearer';
+import {
     Strategy as GoogleStrategy,
     Profile,
     VerifyCallback,
@@ -6,12 +10,9 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import { User, UserDocument } from '../model/user';
 
-import {
-    Strategy as BearerStrategy,
-    IVerifyOptions,
-} from 'passport-http-bearer';
 import { Router } from 'express';
 import axios from 'axios';
+import { logger } from '../util/logger';
 import passport from 'passport';
 
 /**
@@ -137,7 +138,7 @@ export class AuthController {
      * configureLocalAuth will get or create the user present in the request.
      */
     configureLocalAuth(): void {
-        console.log('Configuring local auth for tests');
+        logger.info('Configuring local auth for tests');
         // /register creates a user if necessary and log them in.
         this.router.post(
             '/register',
@@ -154,7 +155,7 @@ export class AuthController {
                         res.json(user);
                         return;
                     }
-                    console.log(err);
+                    logger.error(err);
                     res.sendStatus(500);
                 });
             },
@@ -185,7 +186,7 @@ export class AuthController {
                     return;
                 })
                 .catch((e) => {
-                    console.error('Failed to get user:', e);
+                    logger.error('Failed to get user:', e);
                     done(e, undefined);
                 });
         });
@@ -224,7 +225,7 @@ export class AuthController {
                             });
                         }
                         if (picture !== user.picture) {
-                            console.log(
+                            logger.info(
                                 'User has a different picture, updating it',
                             );
                             user = await User.findOneAndUpdate(

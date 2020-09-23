@@ -1,8 +1,11 @@
 import codecs
+import io
 import json
+import mimetypes
 import os
 import sys
-import io
+import tempfile
+import zipfile
 from chardet import detect
 
 import boto3
@@ -74,6 +77,25 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers, cookies)
 
+def raw_content(url: str, content: bytes) -> io.BytesIO:
+    # Detect the mimetype of a given URL.
+    print(f'Guessing mimetype of {url}')
+    mimetype, _ = mimetypes.guess_type(url)
+    if mimetype == "application/zip":
+        print('File seems to be a zip file, decompressing it now')
+        # Writing the zip file to temp dir.
+        with tempfile.NamedTemporaryFile("wb", delete=False) as temp:
+            temp.write(content)
+            temp.flush()
+            # Opening the zip file, extracting its first file.
+            with zipfile.ZipFile(temp.name, "r") as zf:
+                for name in zf.namelist():
+                    with zf.open(name) as f:
+                        return io.BytesIO(f.read())
+    elif not mimetype:
+        print('Could not determine mimetype')
+    return io.BytesIO(content)
+
 
 def retrieve_content(
         env, source_id, upload_id, url, source_format, api_headers, cookies):
@@ -97,7 +119,7 @@ def retrieve_content(
         # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = io.BytesIO(r.content)
+        bytesio = raw_content(url, r.content)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
