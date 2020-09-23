@@ -5,7 +5,6 @@
             "name",
             "origin"
         ],
-        "additionalProperties": false,
         "properties": {
             "_id": {
                 "bsonType": "objectId"
@@ -16,7 +15,6 @@
             "origin": {
                 "bsonType": "object",
                 "required": ["url"],
-                "additionalProperties": false,
                 "properties": {
                     "url": {
                         "bsonType": "string"
@@ -31,14 +29,12 @@
             },
             "automation": {
                 "bsonType": "object",
-                "additionalProperties": false,
                 "properties": {
                     "parser": {
                         "bsonType": "object",
                         "required": [
                             "awsLambdaArn"
                         ],
-                        "additionalProperties": false,
                         "properties": {
                             "awsLambdaArn": {
                                 "bsonType": "string"
@@ -50,7 +46,6 @@
                         "required": [
                             "fields"
                         ],
-                        "additionalProperties": false,
                         "properties": {
                             "fields": {
                                 "bsonType": "array",
@@ -60,7 +55,6 @@
                                       "name",
                                       "regex"
                                   ],
-                                  "additionalProperties": false,
                                   "properties": {
                                     "name": {
                                         "bsonType": "string"
@@ -78,7 +72,6 @@
                         "required": [
                             "awsScheduleExpression"
                         ],
-                        "additionalProperties": false,
                         "properties": {
                             "awsRuleArn": {
                                 "bsonType": "string"
@@ -99,17 +92,12 @@
                       "summary",
                       "created"
                   ],
-                  "additionalProperties": false,
                   "properties": {
-                    "_id": {
-                        "bsonType": "string"
-                    },
                     "status": {
                         "bsonType": "string"
                     },
                     "summary": {
                         "bsonType": "object",
-                        "additionalProperties": false,
                         "properties": {
                             "numCreated": {
                                 "bsonType": "int"
@@ -130,7 +118,6 @@
             },
             "dateFilter": {
                 "bsonType": "object",
-                "additionalProperties": false,
                 "properties": {
                     "numDaysBeforeToday": {
                         "bsonType": "int"
