@@ -84,7 +84,11 @@ export default class AwsLambdaClient {
     /**
      * Invoke retrieval function lambda synchronously, returning its output.
      */
-    invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
+    invokeRetrieval = async (
+        sourceId: string,
+        parseStartDateString?: string,
+        parseEndDateString?: string,
+    ): Promise<RetrievalPayload> => {
         try {
             const res = await this.lambdaClient
                 .invoke({
@@ -92,6 +96,13 @@ export default class AwsLambdaClient {
                     Payload: JSON.stringify({
                         env: this.serviceEnv,
                         sourceId: sourceId,
+                        parsingDateRange:
+                            parseStartDateString && parseEndDateString
+                                ? {
+                                      start: parseEndDateString,
+                                      end: parseEndDateString,
+                                  }
+                                : undefined,
                     }),
                 })
                 .promise();

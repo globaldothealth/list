@@ -492,12 +492,25 @@ describe('DELETE', () => {
             .delete('/api/sources/424242424242424242424242')
             .expect(404, done);
     });
+});
 
-    describe('retrieval', () => {
-        it('can be invoked', (done) => {
-            curatorRequest
-                .post('/api/sources/424242424242424242424242/retrieve')
-                .expect(200, done);
-        });
+describe('retrieval', () => {
+    it('can be invoked', async () => {
+        const sourceId = '424242424242424242424242';
+        await curatorRequest
+            .post(`/api/sources/${sourceId}/retrieve`)
+            .expect(200);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, undefined, undefined);
+    });
+    it('forwards optional date params', async () => {
+        const sourceId = '424242424242424242424242';
+        const startDate = '2020-09-01';
+        const endDate = '2020-09-12';
+        await curatorRequest
+            .post(
+                `/api/sources/${sourceId}/retrieve?parse_start_date=${startDate}&parse_end_date=${endDate}`,
+            )
+            .expect(200);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, startDate, endDate);
     });
 });
