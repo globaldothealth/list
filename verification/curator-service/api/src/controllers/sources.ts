@@ -251,6 +251,8 @@ export default class SourcesController {
         try {
             const output = await this.lambdaClient.invokeRetrieval(
                 req.params.id,
+                req.query.parse_start_date as string,
+                req.query.parse_end_date as string,
             );
             res.json(output);
         } catch (err) {

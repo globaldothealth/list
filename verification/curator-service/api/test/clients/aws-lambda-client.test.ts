@@ -1,9 +1,10 @@
+import AwsLambdaClient, {
+    LambdaFunction,
+    RetrievalPayload,
+} from '../../src/clients/aws-lambda-client';
+
 import AWS from 'aws-sdk';
 import AWSMock from 'aws-sdk-mock';
-import AwsLambdaClient, {
-    RetrievalPayload,
-    LambdaFunction,
-} from '../../src/clients/aws-lambda-client';
 
 let client: AwsLambdaClient;
 const addPermissionSpy = jest
@@ -100,7 +101,11 @@ describe('invokeRetrieval', () => {
         invokeSpy.mockResolvedValueOnce({
             Payload: JSON.stringify(payload),
         });
-        const res = await client.invokeRetrieval('some-source-id');
+        const res = await client.invokeRetrieval(
+            'some-source-id',
+            '2020-09-01',
+            '2020-09-21',
+        );
         expect(invokeSpy).toHaveBeenCalledTimes(1);
         expect(res).toEqual(payload);
     });
