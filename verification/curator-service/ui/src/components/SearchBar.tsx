@@ -192,22 +192,28 @@ export default function SearchBar(props: {
                 onClose={handleClose}
             >
                 {[
-                    'curator',
-                    'gender',
-                    'nationality',
-                    'occupation',
-                    'country',
-                    'outcome',
-                    'caseid',
-                    'sourceurl',
-                    'verificationstatus',
-                    'uploadid',
-                    'admin1',
-                    'admin2',
-                    'admin3',
-                ].map((text) => (
-                    <MenuItem key={text} onClick={(): void => clickItem(text)}>
-                        {text}
+                    { desc: 'curator email', value: 'curator' },
+                    { desc: 'gender', value: 'gender' },
+                    { desc: 'nationality', value: 'nationality' },
+                    { desc: 'occupation', value: 'occupation' },
+                    { desc: 'country', value: 'country' },
+                    { desc: 'outcome', value: 'outcome' },
+                    { desc: 'unique case ID', value: 'caseid' },
+                    { desc: 'source URL', value: 'sourceurl' },
+                    {
+                        desc: 'verification status',
+                        value: 'verificationstatus',
+                    },
+                    { desc: 'unique upload ID', value: 'uploadid' },
+                    { desc: 'location admin 1', value: 'admin1' },
+                    { desc: 'location admin 2', value: 'admin2' },
+                    { desc: 'location admin 3', value: 'admin3' },
+                ].map((item) => (
+                    <MenuItem
+                        key={item.value}
+                        onClick={(): void => clickItem(item.value)}
+                    >
+                        {item.desc}
                     </MenuItem>
                 ))}
             </Menu>
