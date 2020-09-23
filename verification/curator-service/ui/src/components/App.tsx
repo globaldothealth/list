@@ -32,7 +32,6 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
-import { ReactComponent as GHMapLogo } from './assets/GHMapLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LandingPage from './LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
@@ -154,6 +153,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     menuButton: {
         marginRight: theme.spacing(2),
     },
+    mapLink: {
+        margin: '0 8px 0 16px',
+    },
     hide: {
         display: 'none',
     },
@@ -179,14 +181,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     drawerLinks: {
         marginBottom: '24px',
-    },
-    mapButton: {
-        backgroundColor: '#CAD9E3',
-        borderRadius: '8px',
-        height: '36px',
-    },
-    viewMapText: {
-        margin: '0 12px',
     },
     drawerLink: {
         backgroundColor: '#FFFFFF',
@@ -475,7 +469,22 @@ export default function App(): JSX.Element {
                         ) : (
                             <span className={classes.spacer}></span>
                         )}
-                        {user && <ProfileMenu user={user} />}
+                        {user && (
+                            <>
+                                <Typography>
+                                    <a
+                                        className={classes.mapLink}
+                                        data-testid="mapLink"
+                                        href="http://covid-19.global.health"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        G.h Map
+                                    </a>
+                                </Typography>
+                                <ProfileMenu user={user} />{' '}
+                            </>
+                        )}
                     </Toolbar>
                 </AppBar>
                 {user && (
@@ -570,21 +579,6 @@ export default function App(): JSX.Element {
                             </List>
                             <div className={classes.spacer}></div>
                             <div className={classes.drawerLinks}>
-                                <ButtonBase
-                                    href="http://covid-19.global.health/#coverage"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    data-testid="mapButton"
-                                    classes={{ root: classes.mapButton }}
-                                >
-                                    <Typography
-                                        variant="caption"
-                                        classes={{ root: classes.viewMapText }}
-                                    >
-                                        View cases on
-                                    </Typography>
-                                    <GHMapLogo />
-                                </ButtonBase>
                                 <ButtonBase
                                     href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
                                     rel="noopener noreferrer"
