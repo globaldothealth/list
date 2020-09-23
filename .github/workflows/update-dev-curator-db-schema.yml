@@ -1,4 +1,4 @@
-name: Update prod curator-service database schema
+name: Update dev curator-service database schema
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
     branches: [main]
     paths:
       - "verification/curator-service/api/src/schemas/**"
-      - ".github/workflows/update-prod-curator-db-schema.yaml"
+      - ".github/workflows/update-dev-curator-db-schema.yaml"
 
 jobs:
-  update-sources-data:
+  update-sources-data-dev:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,9 +21,9 @@ jobs:
         with:
           node-version: "12.x"
       
-      - name: Update prod sources schema
+      - name: Update dev sources schema
         env:
-          CONN: ${{ secrets.DB_CONNECTION_URL_PROD }}
+          CONN: ${{ secrets.DB_CONNECTION_URL_DEV }}
           DB: "covid19"
           COLL: "sources"
           # Those are relative to the setup-db directory, not the working dir.
