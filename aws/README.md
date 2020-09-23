@@ -68,6 +68,25 @@ To update the deployments use:
 kubectl apply -f data.yaml -f curator.yaml
 ```
 
+## Reading server logs
+
+To read the server logs first find the pod whose logs you want to read.
+
+```shell
+kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+curator-dev-6cff5859df-dddbw    1/1     Running   0          148m
+curator-prod-5bf5c88f58-g2489   1/1     Running   0          139m
+data-dev-566fb67694-xfzkj       1/1     Running   0          148m
+data-prod-5b78bdc66d-dwf2k      1/1     Running   4          139m
+```
+
+Then call logs on the pod you want to read from.
+
+```shell
+kubectl logs data-prod-5b78bdc66d-dwf2k
+```
+
 ## Getting access to the cluster
 
 Ask an admin to run `kubectl edit -n kube-system configmap/aws-auth` and add the appropriate user there. Instructions can be found in the [official docs](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html).
@@ -80,7 +99,7 @@ Data and curator are exposed as kubernetes services inside the cluster (but have
 
 You can check DNS resolution within the cluster by running:
 
-```
+```shell
 kubectl run curl --image=radial/busyboxplus:curl -i --tty
 [ root@curl:/ ]$ nslookup curator
 Server:    10.100.0.10
@@ -94,9 +113,24 @@ Once you're done with it, don't forget to delete the pod: `kubectl delete pod cu
 
 ### Secrets
 
-Deployments require secrets to connect to MongoDB for example or set up OAuth, we are using kubernetes-managed secrets via kustomize to generate secrets and reference them in the deployment files.
+Deployments require secrets to connect to MongoDB for example or set up OAuth.
 
-When you want to generate a new secret, follow the [official instructions](https://kubernetes.io/docs/concepts/configuration/secret/) using a kustomization.yaml file that looks like this:
+Here is the list of environment variables that should be filled with secrets and their purpose:
+
+- `AWS_ACCESS_KEY_ID`: _(optional)_ Amazon Web Services Access Key ID for a service account used to talk to Lambda/Cloudwatch AWS services. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this access key from the [AWS console](https://console.aws.amazon.com/).
+- `AWS_SECRET_ACCESS_KEY`: _(optional)_ Amazon Web Services Secret Access Key that is shown to you only once when generating a new access key from the AWS console or CLI. This must be the secret access key correpsonding to the specified `AWS_ACCESS_KEY_ID`. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this secret access key from the [AWS console](https://console.aws.amazon.com/).
+- `DB_CONNECTION_STRING`: _(required)_ The Mongo DB connection string as per [official documentation](https://docs.mongodb.com/manual/reference/connection-string/). Cases, sources, users and sessions are stored in MongoDB so this is required. Configure this connection string from the [Mongo Atlas console](https://cloud.mongodb.com/v2/5ea89a90db26a511f1804cf8#security/database/users).
+- `GOOGLE_OAUTH_CLIENT_ID`: _(required)_ Google OAuth20 client ID used to sign-in people in the curator web portal. Chances are you want to sign-in when working on the curator portal so this is required. This client should have the desired javascript origins and redirect URIs setup depending on where you host the curator web portal. Configure this client ID from the [Google Cloud console](https://console.cloud.google.com).
+- `GOOGLE_OAUTH_CLIENT_SECRET`: _(required)_ Google OAuth20 client secret used to sign-in people in the curator web portal. Chances are you want to sign-in when working on the curator portal so this is required. Must correspond to the specified `GOOGLE_OAUTH_CLIENT_ID`. Configure this client secret from the [Google Cloud console](https://console.cloud.google.com).
+- `MAPBOX_TOKEN`: _(optional)_ Mapbox private token used to perform geocoding of new cases. It must have Configure this token from the [Mapbox console](https://account.mapbox.com/auth/signin/). The mapbox account should have the [Boudaries API](https://www.mapbox.com/boundaries/) enabled to properly geocode all administrative areas.
+- `REACT_APP_PUBLIC_MAPBOX_TOKEN`: This is not really a secret as it is a public mapbox token but still it is nice to have it documented here close to its private counterpart (`MAPBOX_TOKEN`) used for geocoding. As it is a public token, make sure it is restricted only to the origins where the curator portal UI is running.
+- `SESSION_COOKIE_KEY`: _(optional)_ Session cookies contain IDs that are encrypted using this key.
+
+#### Secrets in production
+
+We are using kubernetes-managed secrets via kustomize to generate secrets and reference them in the deployment files.
+
+When you want to generate a new secret, follow the [official instructions](https://kubernetes.io/docs/concepts/configuration/secret/) for example using a kustomization.yaml file that looks like this:
 
 ```yaml
 secretGenerator:
@@ -121,6 +155,27 @@ Apply with `kubectl apply -k .`.
 If you generated a new secret, you need to set it in the appropriate deployment files.
 
 To get a list of existing secrets, you can do `kubectl get secrets`.
+Note that some secrets are automatically managed in prod like let's encrypt certs for example, you shouldn't have to do anything with them.
+
+#### How-to rotate secrets
+
+If for some reason a secret has been compromised or if you want to perform a rotation as part of a routine exercise (thank you for doing that!) here is the procedure:
+
+1. Identify the secret that needs to be rotated.
+
+2. Contact [administrators](https://github.com/orgs/globaldothealth/people) that are in charge of the infrastructure and tell them to rotate a new secret.
+
+3. Go to the web console where the secret can be rotated and rotated it, the link should be in the list of secrets above.
+
+4. Generate a new version of the secrets in production by following the kustomize setup described above (`kubectl apply -k .`).
+
+5. Change reference to new secret in deployment configs.
+
+6. Apply configuration changes. (`kubectl apply -f curator.yaml -f data.yaml`)
+
+7. Verify new deployment works as intended.
+
+8. Destroy old secrets from their respective management console if they still exist.
 
 ## Labels
 
@@ -156,7 +211,7 @@ To push a new release follow the [github UI flow](https://github.com/globaldothe
 
 Tag main with the `0.1.2` tag:
 
-```
+```shell
 git checkout main
 git tag 0.1.2
 ```
@@ -165,11 +220,13 @@ then push it to the repo:
 
 `git push origin 0.1.2`
 
-Github actions will automatically build the image: `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
+Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
+This tag can then be referenced in the deployment files:
+- Submit a PR to change the current image version to the new one. [Example](https://github.com/globaldothealth/list/pull/1170).
+- Apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
 
-To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
+In a few seconds the push should be complete.
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
@@ -191,7 +248,7 @@ Just change the image tag referenced in the deployment file to an earlier versio
 ### Deleting a release
 
 If for some reason you need to delete a tag, you can do it with `git tag -d 1.2.3` then `git push origin :refs/tags/0.1.2` to delete it remotely.
- 
+
 Note that because our packages are public, it is not possible to delete a package as github does not allow for that.
 
 ### Deprecated packages
@@ -219,13 +276,33 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 Our ingress routes to the dev and prod curator services were installed with:
 
 ```shell
-kubectl apply -f curator-ingress.yaml
+kubectl apply -f curator-ingress.yam
+kubectl apply -f curator-ingress-config-map.yaml -n ingress-nginx
 ```
 
 The curator services are exposed here:
 
 - [dev](https://dev-curator.ghdsi.org)
 - [prod](https://curator.ghdsi.org)
+
+## Kubernetes dashboard
+
+The kubernetes dashboard has been deployed following the [official instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), mainly:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+kubectl apply -f dashboard.yaml
+```
+
+The [dashboard.yaml](dashboard.yaml) file contains the user configuration that is needed to log into the dashboard. The user has the `read` role that gives read access to all resources (except secrets to avoid privilege escalation).
+
+To log into the dashboard:
+
+1. Start a proxy (the dashboard isn't exposed externally): `kubectl proxy`
+
+2. Get the token to login as the `dashboard-reader` user by running the `display_dashboard_token.sh` script in this directory.
+
+3. Go to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) and copy the token into the login screen.
 
 ## HTTPS / certs management
 

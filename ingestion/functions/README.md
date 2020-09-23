@@ -143,7 +143,7 @@ sam build
 sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
 ```
 
-If you get a 403 error, go to the [user administration page](http://localhost:3002/sources) and assign the `curator` and `reader` roles to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
+If you get a 403 error, go to the [user administration page](http://localhost:3002/sources) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
 
 Upon success you'll see in the output something like
 `{"bucket":"epid-sources-raw","key":"5f311a9795e338003016593a/2020/08/10/1009/content.csv"}`
@@ -171,14 +171,14 @@ is run on pull requests.
 ### Writing a parser
 
 At minima, a parser must generate a list of cases that conform to the openAPI
-specifications.
+specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
 
 Its main function must yield cases one by one using [python generators](https://wiki.python.org/moin/Generators). A common library will take care of sending those cases to the server for you.
 
-If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
-
-For geocoding, the parser can either hardcode a location with latitude/longitude included, in which case no geocoding will be attempted on the server.
+For geocoding, the parser can either hardcode a location with a name, geoResolution and latitude/longitude included, in which case no geocoding will be attempted on the server.
 If it doesn't have that information it can output a `location.query` which will get geocoded by the server. If geocodes are to be restricted to a certain administrative area level, one can pass the `location.limitToResolution`. Details about those parameters are in the OpenAPI spec for the `NewCase` schema definition.
+
+Fields and nested structs should be referably not set rather than set to an empty value (for example unknown age shouldn't be set to '' and unknown demographics altogether shouldn't be set to {}).
 
 #### Debugging of parsers
 
@@ -209,9 +209,8 @@ To accomodate for that, here is the procedure to write a parser that only import
 1. write the parser, it must produces all cases for its input source, the `parsing/common/parsing_lib.py` library will ensure no duplicates are entered if you follow the next steps
 2. edit your source in the curator portal UI: set the date filter to only fetch data up to 3 days ago
 3. run the parser once to import all the data up to 3 days before today
-   1. Follow [this issue](https://github.com/globaldothealth/list/issues/781] for how to do this from the UI, in the meantime run the parser locally as described in this document.
 4. edit the source again to only fetch data up to 3 days ago
-5. set the daily cron expression in your source and have the parser run every day
+5. set the AWS Schedule Expression for your source and have the parser run every day
 
 That parser will now import a day worth of data with a lag of 3 days, this delay is deemed is acceptable given the inability to dedupe cases.
 
@@ -227,6 +226,12 @@ If a source has a time-based URL scheme you can use the following date formattin
 
 For example if a source publishes its data every day at a URL like `https://source.com/data/year-month-day.json` you can set the source URL to `https://source.com/data/$FULLYEAR-$FULLMONTH-$FULLDAY.json` and it will fetch the URL `https://source.com/data/2020-04-20.json` on the 4th of April 2020.
 
+### Compressed sources
+
+Some sources are provided as [zip files](https://en.wikipedia.org/wiki/Zip_(file_format)). Those are supported by the retrieval function assuming it contains a single file in the archive containing the line list data, it will extract that single file and the parsing functions will have access to it so you can write a parser without caring about the zip file at all.
+
+If you need other archive or compression formats supported please [file an issue in this repository](https://github.com/globaldothealth/list/issues/new?assignees=&labels=Importer&template=feature_request.md&title=Additional%20compression%20support) indicating the type of support needed, thank you.
+
 ### Encoding of sources
 
 When the retrieval function stores the contents of a source in S3, the data is automatically encoded in utf-8 so that parsers do not have to care about which
@@ -238,9 +243,16 @@ You can find a list of issues/FR for parsers using the [importer tag](https://gi
 
 Here is an overview of parsers written so far and some details about the data they collect.
 
-| Parser                      | Code                                                                                            | Remarks                                                                                                                                                                                                                                                                                             | FR   |
-|-----------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)     | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
-| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich) | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided)                                                                                                                                                                                | #483 |
-| Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)  |                                                                                                                                                                                                                                                                                                     | #518 |
-| Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)     |                                                                                                                                                                                                                                                                                                     | #481 |
+| Parser                      | Code                                                                                                 | Remarks                                                                                                                                                                                                                                                                                             | FR   |
+|-----------------------------|------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)          | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
+| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich)      | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided). Granularity for cases is weekly, not daily so we use the first day of the given week arbitrarily. | #483                                                                                                 || Thailand                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/thai)           |                                                                                                                                                                                                                                                                                                     | #516 |
+| Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)       |                                                                                                                                                                                                                                                                                                     | #518 |
+| Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)          |                                                                                                                                                                                                                                                                                                     | #481 |
+| Estonia                     | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/estonia)        |                                                                                                                                                                                                                                                                                                     | #502 |
+| Amapa, Brazil               | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_amapa)   | There are no patient ID/case ID in the raw API so we aren't able to dedupe. There are two files in the source for Amapa, one for confirmed cases and one for confirmed deaths; some of these cases may also be deaths but without patient IDs we are unable to confirm.                             | #495 |
+| Paraiba, Brazil             | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_paraiba) | There are no patient ID/case ID in the raw API so we aren't able to dedupe. This data only includes deaths from Covid-19 so the outcome of all cases will be death. There is no date of confirmation.                                                                                               | #499 |
+| Peru                        | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/peru)           | Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test                                                                                                                                                                                                                             | #484 |
+| Taiwan                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/taiwan)         | No per-case ID so unable to dedupe.                                                                                                                                                                                                                                                                 | #517 |
+| Colombia                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/colombia)         | Assuming the date confirmed is the date of diagnosis (Fecha diagnostico) rather than Fecha de notificación (generally several days earlier). When date of diagnosis, using date reported online as proxy. Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since symptoms, or a negative PCR/antigen test. No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'. | #504 |
+| Germany                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/germany)         |  | #482 |

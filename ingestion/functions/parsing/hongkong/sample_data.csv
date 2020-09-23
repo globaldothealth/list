@@ -1,5 +1,5 @@
 Case no.,Report date,Date of onset,Gender,Age,Name of hospital admitted,Hospitalised/Discharged/Deceased,HK/Non-HK resident,Case classification*,Confirmed/probable
 1,23/01/2020,1/1/20,M,39,,Discharged,Non-HK resident,Imported case,Confirmed
 2,24/01/2020,Asymptomatic,F,40,,Hospitalized,Non-HK resident,Imported case,Confirmed
-3,25/01/2020,Asymptomatic,F,40,,Deceased,Non-HK resident,Imported case,Confirmed
+3,25/01/2020,Asymptomatic,F,40,,Deceased,Non-HK resident,Bad luck,Confirmed
 4,26/01/2020,Asymptomatic,F,40,,Discharged,Non-HK resident,Imported case,Probable

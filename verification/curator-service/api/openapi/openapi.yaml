@@ -242,6 +242,15 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
+        - name: changes_only
+          in: query
+          description: > 
+            Filters successful uploads to only include those that created or modified 
+            cases. The response will still include non-successful uploads.
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           $ref: "#/components/responses/200UploadsArray"
@@ -503,7 +512,7 @@ paths:
       operationId: downloadCases
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               maxProperties: 1
@@ -516,10 +525,9 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
@@ -753,7 +761,7 @@ paths:
               type: object
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/clear:
     post:
       tags: [Geocode]
@@ -761,7 +769,7 @@ paths:
       operationId: clearGeocodes
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/suggest:
     get:
       tags: [Suggest, Geocode]
@@ -974,6 +982,13 @@ components:
               enum:
                 - EQ
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
@@ -1078,6 +1093,8 @@ components:
               description: >
                 Age bracket, start is included, end is excluded if different
                 than start.
+                If no end is specified it means that the age bracket is from
+                start and above.
               properties:
                 start:
                   type: number
@@ -1412,7 +1429,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:
@@ -1520,11 +1536,11 @@ components:
               - index
               - message
       required:
-        - phase
         - numCreated
         - numUpdated
-        - errors
   responses:
+    "200":
+      description: OK
     "200Auth":
       description: OK
       content:

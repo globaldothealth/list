@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -27,42 +27,51 @@ _LOCATION = {
     }
 }
 
-_DATE_INDEX = 0
-_AGE_INDEX = 2
-_GENDER_INDEX = 3
-_CONFIRMED_INDEX = 4
-_SOURCE_INDEX = 6
 
-
-def convert_date(raw_date):
+def convert_date(year: str, week: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    The date is listed in YYYY-mm-dd format, but the date filtering API
-    expects mm/dd/YYYYZ format.
+    The date is given by year and week number, the date filtering API
+    expects mm/dd/YYYYZ format so we use the first day of the given week.
     """
-    date = datetime.strptime(raw_date, "%Y-%m-%d")
+    date = datetime.fromisocalendar(int(year), int(week), 1)
     return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender: str):
-    if raw_gender.upper() == "M":
+    if raw_gender == "M":
         return "Male"
-    elif raw_gender.upper() == "F":
+    elif raw_gender == "F":
         return "Female"
     return None
 
 
 def convert_demographics(gender: str, age: str):
     demo = {}
-    if gender:
-        demo["gender"] = convert_gender(gender)
-    if age:
-        demo["ageRange"] = {
-            "start": float(age),
-            "end": float(age),
-        }
-    return demo
+    if gender.lower() != 'unbekannt':
+        demo["gender"] = convert_gender(gender.upper())
+    if age != 'unbekannt':
+        # 100+
+        if age.endswith("+"):
+            demo["ageRange"] = {
+                "start": float(age[:-1]),
+                "end": 120,
+            }
+        # 45-55
+        elif '-' in age:
+            start, _, end = age.partition('-')
+            demo["ageRange"] = {
+                "start": float(start),
+                "end": float(end),
+            }
+        # 42
+        elif age.isalpha():
+            demo["ageRange"] = {
+                "start": float(age),
+                "end": float(age),
+            }
+    return demo or None
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -74,15 +83,17 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
            to dedupe.
         2. We can't link confirmed cases and confirmed deaths because of (1)
            so we're only importing confirmed cases and ignoring deaths.
+        3. Granularity for cases is weekly, not daily so we use the first day of
+           the given week arbitrarily.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header.
+        reader = csv.DictReader(f)
         for row in reader:
-            num_confirmed_cases = int(row[_CONFIRMED_INDEX])
+            num_confirmed_cases = int(row['NewConfCases'])
             if not num_confirmed_cases:
                 continue
             try:
+                when = convert_date(row["Year"], row["Week"])
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
@@ -94,13 +105,13 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": convert_date(row[_DATE_INDEX]),
-                                "end": convert_date(row[_DATE_INDEX]),
+                                "start": when,
+                                "end": when,
                             },
                         },
                     ],
                     "demographics": convert_demographics(
-                        row[_GENDER_INDEX], row[_AGE_INDEX]),
+                        row['Gender'], row['AgeYearCat']),
                 }
                 for _ in range(num_confirmed_cases):
                     yield case

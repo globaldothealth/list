@@ -26,7 +26,7 @@ describe('FakeGeocoder', () => {
             })
             .expect(200);
     });
-    it('can clear geocodes', () => {
+    it('can clear geocodes', async () => {
         return request(app).post('/api/geocode/clear').expect(200);
     });
 });

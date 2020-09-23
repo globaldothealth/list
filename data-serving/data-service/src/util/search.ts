@@ -1,4 +1,4 @@
-import { parse, SearchParserResult } from 'search-query-parser';
+import { SearchParserResult, parse } from 'search-query-parser';
 
 export interface ParsedSearch {
     fullTextSearch?: string;
@@ -16,13 +16,14 @@ export class ParsingError extends Error {}
 const keywords = new Map<string, string>([
     ['curator', 'revisionMetadata.creationMetadata.curator'],
     ['gender', 'demographics.gender'],
-    ['nationality', 'demographics.nationality'],
+    ['nationality', 'demographics.nationalities'],
     ['occupation', 'demographics.occupation'],
     ['country', 'location.country'],
     ['outcome', 'outcome'],
     ['caseid', '_id'],
     ['uploadid', 'caseReference.uploadIds'],
-    ['source', 'caseReference.sourceUrl'],
+    ['sourceurl', 'caseReference.sourceUrl'],
+    ['verificationstatus', 'caseReference.verificationStatus'],
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
@@ -30,6 +31,12 @@ const keywords = new Map<string, string>([
 
 export default function parseSearchQuery(q: string): ParsedSearch {
     q = q.trim();
+    // parse() doesn't handle most-likely mistyped queries like
+    // "curator: foo@bar.com" (with a space after the semicolon).
+    // Change the query here to account for that: this regexp removes all
+    // whitespace after semicolons so that
+    // "curator: foo@bar.com" becomes "curator:foo@bar.com".
+    q = q.replace(/(\w:)(\s+)/g, '$1');
     const parsedSearch = parse(q, {
         offsets: false,
         keywords: [...keywords.keys()],

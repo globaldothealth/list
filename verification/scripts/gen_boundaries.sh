@@ -23,8 +23,9 @@ Admin 2 file: $2
 Admin 3 file: $3"
 
 # Generate one JSON object per line and append the result to the final file.
-cat $1 | jq -c '.adm1.data.all | to_entries[] | {id: .key, name: .value.name}' > ${SCRIPT_PATH}/boundaries.json
-cat $2 | jq -c '.adm2.data.all | to_entries[] | {id: .key, name: .value.name}' >> ${SCRIPT_PATH}/boundaries.json
-cat $3 | jq -c '.adm3.data.all | to_entries[] | {id: .key, name: .value.name}' >> ${SCRIPT_PATH}/boundaries.json
+# Some entries have an English name which we will prefer.
+cat $1 | jq -c '.adm1.data.all | to_entries[] | {id: .key, name: (.value.name_en // .value.name) }' > ${SCRIPT_PATH}/boundaries.json
+cat $2 | jq -c '.adm2.data.all | to_entries[] | {id: .key, name: (.value.name_en // .value.name) }' >> ${SCRIPT_PATH}/boundaries.json
+cat $3 | jq -c '.adm3.data.all | to_entries[] | {id: .key, name: (.value.name_en // .value.name) }' >> ${SCRIPT_PATH}/boundaries.json
 
 echo -e 'Fin!'
