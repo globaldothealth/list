@@ -1,5 +1,6 @@
 import {
     Button,
+    IconButton,
     InputAdornment,
     Menu,
     MenuItem,
@@ -10,6 +11,7 @@ import {
     withStyles,
 } from '@material-ui/core';
 
+import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
@@ -114,6 +116,14 @@ export default function SearchBar(props: {
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
+                            {search && (
+                                <IconButton
+                                    color="primary"
+                                    onClick={(): void => setSearch('')}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            )}
                             <HtmlTooltip
                                 color="primary"
                                 title={
