@@ -118,7 +118,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
         valid_event["env"],
         lambda_arn, source_id, upload_id, {}, None,
         response["key"],
-        origin_url, date_filter)
+        origin_url, date_filter, valid_event["parsingDateRange"])
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
@@ -127,11 +127,12 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     assert response["upload_id"] == upload_id
 
 
-def test_extract_event_fields_returns_env_and_source_id(valid_event):
+def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
     from retrieval import retrieval
-    env, source_id, _ = retrieval.extract_event_fields(valid_event)
+    env, source_id, date_range, _ = retrieval.extract_event_fields(valid_event)
     assert env == valid_event["env"]
     assert source_id == valid_event["sourceId"]
+    assert date_range == valid_event["parsingDateRange"]
 
 
 def test_extract_event_fields_raises_error_if_event_lacks_env():

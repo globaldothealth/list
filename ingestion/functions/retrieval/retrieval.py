@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
+PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
@@ -41,7 +42,9 @@ def extract_event_fields(event):
             f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event: {event}")
         print(error_message)
         raise ValueError(error_message)
-    return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get('auth', {})
+    return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get(
+        PARSING_DATE_RANGE_FIELD), event.get(
+        'auth', {})
 
 
 def get_source_details(env, source_id, upload_id, api_headers, cookies):
@@ -146,7 +149,7 @@ def upload_to_s3(
 
 def invoke_parser(
     env, parser_arn, source_id, upload_id, api_headers, cookies, s3_object_key,
-        source_url, date_filter):
+        source_url, date_filter, parsing_date_range):
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -155,6 +158,7 @@ def invoke_parser(
         "sourceUrl": source_url,
         "uploadId": upload_id,
         "dateFilter": date_filter,
+        "dateRange": parsing_date_range,
     }
     print(f"Invoking parser (ARN: {parser_arn})")
     # This is asynchronous due to the "Event" invocation type.
@@ -222,7 +226,8 @@ def lambda_handler(event, context):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_id, local_auth = extract_event_fields(event)
+    env, source_id, parsing_date_range, local_auth = extract_event_fields(
+        event)
     auth_headers = None
     cookies = None
     if local_auth and env == 'local':
@@ -239,8 +244,9 @@ def lambda_handler(event, context):
     upload_to_s3(file_name, s3_object_key, env,
                  source_id, upload_id, auth_headers, cookies)
     if parser_arn:
-        invoke_parser(env, parser_arn, source_id, upload_id,
-                      auth_headers, cookies, s3_object_key, url, date_filter)
+        invoke_parser(
+            env, parser_arn, source_id, upload_id, auth_headers, cookies,
+            s3_object_key, url, date_filter, parsing_date_range)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
