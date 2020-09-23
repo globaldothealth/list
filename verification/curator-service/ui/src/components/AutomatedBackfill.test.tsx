@@ -102,6 +102,6 @@ it('displays spinner post backfill', async () => {
     expect(getByText(/backfill source/i)).toBeDisabled();
     expect(getByText(/cancel/i)).toBeDisabled();
     expect(getByTestId('progress')).toBeInTheDocument();
-    expect(getByText(/retrieving data for backfill/i)).toBeInTheDocument();
+    expect(getByText(/retrieving source/i)).toBeInTheDocument();
     waitForElementToBeRemoved(() => getByTestId('progress'));
 });
