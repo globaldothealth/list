@@ -30,13 +30,7 @@ import React from 'react';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
-
-interface User {
-    _id: string;
-    name: string;
-    email: string;
-    roles: string[];
-}
+import User from './User';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -496,9 +490,7 @@ class BulkCaseForm extends React.Component<
             upsertResponse = await this.batchUpsertCases(cases);
         } catch (e) {
             this.setState({
-                errorMessage: `System error during upload: ${JSON.stringify(
-                    e,
-                )}`,
+                errorMessage: `System error during upload: ${e.message}`,
             });
             await this.finalizeUpload(
                 caseReference.sourceId,
@@ -561,9 +553,7 @@ class BulkCaseForm extends React.Component<
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {
                 this.setState({
-                    errorMessage: `System error during source creation: ${JSON.stringify(
-                        e,
-                    )}`,
+                    errorMessage: `System error during source creation: ${e.message}`,
                 });
                 return;
             }

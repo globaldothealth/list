@@ -78,7 +78,7 @@ describe('Manage users page', function () {
 
         // Home page has logged-in user links
         cy.visit('/');
-        cy.contains('Linelist');
+        cy.contains('Line list');
 
         // Profile page is updated
         cy.visit('/profile');
