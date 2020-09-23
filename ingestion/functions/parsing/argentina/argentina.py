@@ -85,7 +85,7 @@ def get_confirmed_event(entry):
     else:
         confirmed_value = 'Method Unknown'
 
-    confirmed_event = [{
+    confirmed_event = {
         "name": "confirmed",
         "value": confirmed_value,
         "dateRange":
@@ -93,7 +93,6 @@ def get_confirmed_event(entry):
             "start": confirmation_date,
             "end": confirmation_date
         }}
-    ]
 
     return confirmed_event, note
 
@@ -149,7 +148,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                     }
                 }
 
-                case["events"], confirmation_note = get_confirmed_event(entry)
+                confirmed_event, confirmation_note = get_confirmed_event(entry)
+                case["events"] = [confirmed_event]
                 notes.append(confirmation_note)
 
                 if entry["fecha_inicio_sintomas"]:
