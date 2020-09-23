@@ -1,4 +1,4 @@
-import { CleanEnv, cleanEnv, port, str, bool } from 'envalid';
+import { CleanEnv, cleanEnv, port, str, bool, num } from 'envalid';
 
 export default function validateEnv(): Readonly<{
     DB_CONNECTION_STRING: string;
@@ -7,6 +7,7 @@ export default function validateEnv(): Readonly<{
     MAPBOX_PERMANENT_GEOCODE: boolean;
     MAPBOX_TOKEN: string;
     ENABLE_FAKE_GEOCODER: boolean;
+    MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC: number;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -36,6 +37,12 @@ export default function validateEnv(): Readonly<{
             desc: 'Whether to enable the fake seedable geocoder',
             devDefault: true,
             default: false,
+        }),
+        MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC: num({
+            desc:
+                'number of requests per seconds allowed to mapbox geocode endpoint',
+            devDefault: 50,
+            default: 600,
         }),
     });
 }

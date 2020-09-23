@@ -16,19 +16,21 @@ import {
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
-import { OpenApiValidator } from 'express-openapi-validator';
-import YAML from 'yamljs';
-import bodyParser from 'body-parser';
 import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
+import { OpenApiValidator } from 'express-openapi-validator';
+import YAML from 'yamljs';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
 import expressStatusMonitor from 'express-status-monitor';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import { logger } from './util/logger';
+import { RateLimiter } from 'limiter';
 
 const app = express();
 
@@ -96,20 +98,24 @@ new OpenApiValidator({
         // It might also just be useful to have various geocoders plugged-in at some point.
         const geocoders = new Array<Geocoder>();
         if (env.ENABLE_FAKE_GEOCODER) {
-            console.log('Using fake geocoder');
+            logger.info('Using fake geocoder');
             const fakeGeocoder = new FakeGeocoder();
             apiRouter.post('/geocode/seed', fakeGeocoder.seed);
             apiRouter.post('/geocode/clear', fakeGeocoder.clear);
             geocoders.push(fakeGeocoder);
         }
         if (env.MAPBOX_TOKEN !== '') {
-            console.log('Using mapbox geocoder');
+            logger.info('Using mapbox geocoder');
             geocoders.push(
                 new MapboxGeocoder(
                     env.MAPBOX_TOKEN,
                     env.MAPBOX_PERMANENT_GEOCODE
                         ? 'mapbox.places-permanent'
                         : 'mapbox.places',
+                    new RateLimiter(
+                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC,
+                        'second',
+                    ),
                 ),
             );
         }
@@ -183,7 +189,7 @@ new OpenApiValidator({
         // MONGO_URL is provided by the in memory version of jest-mongodb.
         // DB_CONNECTION_STRING is what we use in prod.
         const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-        console.log(
+        logger.info(
             'Connecting to MongoDB instance',
             // Print only after username and password to not log them.
             mongoURL.substring(mongoURL.indexOf('@')),
@@ -197,7 +203,7 @@ new OpenApiValidator({
         });
         await Case.ensureIndexes();
     } catch (e) {
-        console.error('Failed to connect to the database. :(', e);
+        logger.error('Failed to connect to the database. :(', e);
         process.exit(1);
     }
 })();

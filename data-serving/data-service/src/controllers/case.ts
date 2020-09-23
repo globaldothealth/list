@@ -1,13 +1,13 @@
 import { Case, CaseDocument } from '../model/case';
 import { DocumentQuery, Query } from 'mongoose';
+import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
 
 import axios from 'axios';
+import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
-import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
-import { batchUpsertDropUnchangedCases } from './preprocessor';
 
 class InvalidParamError extends Error {}
 
@@ -38,19 +38,21 @@ export class CasesController {
      * Handles HTTP POST /api/cases/download.
      */
     download = async (req: Request, res: Response): Promise<void> => {
-        let cases: any;
+        // Goofy Mongoose types require this.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let casesQuery: any;
         try {
             if (req.body.query) {
-                cases = await casesMatchingSearchQuery({
+                casesQuery = casesMatchingSearchQuery({
                     searchQuery: req.body.query as string,
                     count: false,
                 });
             } else if (req.body.caseIds) {
-                cases = await Case.find({
+                casesQuery = Case.find({
                     _id: { $in: req.body.caseIds },
                 }).lean();
             } else {
-                cases = await Case.find({}).lean();
+                casesQuery = Case.find({}).lean();
             }
 
             res.setHeader('Content-Type', 'text/csv');
@@ -70,17 +72,22 @@ export class CasesController {
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    stringify(cases, {
-                        header: true,
-                        columns: columns,
-                    }).pipe(res);
+                    casesQuery
+                        .cursor()
+                        .pipe(
+                            stringify({
+                                header: true,
+                                columns: columns,
+                            }),
+                        )
+                        .pipe(res);
                 });
         } catch (e) {
             if (e instanceof ParsingError) {
                 res.status(422).json({ message: e.message });
                 return;
             }
-            console.error(e);
+            logger.error(e);
             res.status(500).json(e);
             return;
         }
@@ -146,7 +153,7 @@ export class CasesController {
                 res.status(422).json({ message: e.message });
                 return;
             }
-            console.error(e);
+            logger.error(e);
             res.status(500).json(e);
             return;
         }
@@ -222,50 +229,55 @@ export class CasesController {
      * Perform geocoding for each case (of multiple `cases` specified in the
      * request body), in accordance with the above geocoding logic.
      *
-     * TODO: Use a batch geocode API like https://docs.mapbox.com/api/search/#batch-geocoding.
-     *
-     * @returns {object} Detailing the nature of any issues encountered.
+     * TODO: https://github.com/globaldothealth/list/issues/1131 rate limit.
      */
     batchGeocode = async (
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
-        const caseCount = req.body.cases.length;
         const geocodeErrors: { index: number; message: string }[] = [];
-        for (let index = 0; index < caseCount; index++) {
-            const c = req.body.cases[index];
-            try {
-                const geocodeResult = await this.geocode({
-                    body: c,
+        Promise.all(
+            req.body.cases.map((c: any, index: number) => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const geocodeResult = await this.geocode({
+                            body: c,
+                        });
+                        if (!geocodeResult) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: `no geolocation found for ${c.location?.query}`,
+                            });
+                        }
+                        resolve();
+                    } catch (err) {
+                        if (err instanceof InvalidParamError) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: err.message,
+                            });
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    }
                 });
-                if (!geocodeResult) {
-                    geocodeErrors.push({
-                        index: index,
-                        message: `no geolocation found for ${c.location?.query}`,
+            }),
+        )
+            .then(() => {
+                if (geocodeErrors.length > 0) {
+                    res.status(207).send({
+                        phase: 'GEOCODE',
+                        numCreated: 0,
+                        numUpdated: 0,
+                        errors: geocodeErrors,
                     });
+                    return;
                 }
-            } catch (err) {
-                if (err instanceof InvalidParamError) {
-                    geocodeErrors.push({
-                        index: index,
-                        message: err.message,
-                    });
-                } else {
-                    throw err;
-                }
-            }
-        }
-        if (geocodeErrors.length > 0) {
-            res.status(207).send({
-                phase: 'GEOCODE',
-                numCreated: 0,
-                numUpdated: 0,
-                errors: geocodeErrors,
-            });
-            return;
-        }
-        next();
+                next();
+            })
+            .catch((e) => res.send(e));
     };
 
     /**
@@ -332,7 +344,7 @@ export class CasesController {
                 res.status(422).json(err);
                 return;
             }
-            console.warn(err);
+            logger.warn(err);
             res.status(500).json(err);
             return;
         }
@@ -372,6 +384,8 @@ export class CasesController {
      * Handles HTTP POST /api/cases/batchUpdate.
      */
     batchUpdate = async (req: Request, res: Response): Promise<void> => {
+        // Consider defining a type for the request-format cases.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (!req.body.cases.every((c: any) => c._id)) {
             res.status(422).json({
                 message: 'Every case must specify its _id',
@@ -380,6 +394,8 @@ export class CasesController {
         }
         try {
             const bulkWriteResult = await Case.bulkWrite(
+                // Consider defining a type for the request-format cases.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
                     return {
                         updateOne: {
@@ -438,7 +454,7 @@ export class CasesController {
                 return;
             }
         } catch (err) {
-            console.error(err);
+            logger.error(err);
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -559,7 +575,9 @@ export class CasesController {
 export const casesMatchingSearchQuery = (opts: {
     searchQuery: string;
     count: boolean;
-}) => {
+    // Goofy Mongoose types require this.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}): any => {
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
@@ -613,6 +631,8 @@ export const findCasesWithCaseReferenceData = async (
             (c: any) =>
                 c.caseReference?.sourceId && c.caseReference?.sourceEntryId,
         )
+        // Case data should be validated prior to this point.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((c: any) => {
             return {
                 'caseReference.sourceId': c.caseReference.sourceId,
@@ -673,7 +693,7 @@ export const listSymptoms = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }
@@ -702,7 +722,7 @@ export const listPlacesOfTransmission = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }
@@ -730,7 +750,7 @@ export const listOccupations = async (
         });
         return;
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         res.status(500).json(e);
         return;
     }

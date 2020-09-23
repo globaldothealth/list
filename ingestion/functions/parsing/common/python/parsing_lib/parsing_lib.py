@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 import collections
+import time
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
@@ -103,20 +104,27 @@ def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
 def write_to_server(
         cases: Generator[Dict, None, None],
         env: str, source_id: str, upload_id: str, headers, cookies,
-        cases_batch_size):
+        cases_batch_size: int, remaining_time_func: Callable[[], float]):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
+    start_time = time.time()
     while True:
         batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
             break
-        print(f"Sending {len(batch)} cases to {put_api_url}")
-        counter['total'] += len(batch)
+        print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         res = requests.post(put_api_url, json={"cases": batch},
                             headers=headers, cookies=cookies)
         if res and res.status_code == 200:
+            counter['total'] += len(batch)
+            now = time.time()
+            cps = int(counter['total'] / (now - start_time))
+            print(f'\tCurrent speed: {cps} cases/sec')
+            remaining_sec = int(remaining_time_func() / 1000)
+            max_estimate = int(counter['total'] + remaining_sec * cps)
+            print(f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
             res_json = res.json()
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
@@ -137,7 +145,7 @@ def write_to_server(
             count_created=counter['numCreated'],
             count_updated=counter['numUpdated'])
         return
-    print(f'sent {counter["total"]} cases')
+    print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
     return counter['numCreated'], counter['numUpdated']
 
 
@@ -246,7 +254,7 @@ def run_lambda(
                 api_creds, cookies),
             env, source_id, upload_id,
             api_creds, cookies,
-            CASES_BATCH_SIZE)
+            CASES_BATCH_SIZE, context.get_remaining_time_in_millis)
         common_lib.finalize_upload(
             env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)
