@@ -319,6 +319,7 @@ export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+    const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
@@ -378,6 +379,7 @@ export default function App(): JSX.Element {
     }, [location.pathname, menuList]);
 
     const getUser = (): void => {
+        setIsLoadingUser(true);
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -391,7 +393,8 @@ export default function App(): JSX.Element {
             })
             .catch((e) => {
                 setUser(undefined);
-            });
+            })
+            .finally(() => setIsLoadingUser(false));
     };
 
     const hasAnyRole = (requiredRoles: string[]): boolean => {
@@ -715,6 +718,8 @@ export default function App(): JSX.Element {
                                 <Charts />
                             ) : user ? (
                                 <Redirect to="/cases" />
+                            ) : isLoadingUser ? (
+                                <></>
                             ) : (
                                 <LandingPage />
                             )}
