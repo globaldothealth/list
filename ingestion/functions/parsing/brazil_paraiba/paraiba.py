@@ -38,6 +38,7 @@ commorbidities = {
                   "Hipertensão": "hypertension"
                  }
 
+
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
