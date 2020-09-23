@@ -3,7 +3,10 @@ import datetime
 import json
 import os
 import pytest
+import tempfile
+import io
 import sys
+import zipfile
 
 from moto import mock_s3
 from unittest.mock import MagicMock, patch
@@ -374,3 +377,24 @@ def test_upload_to_s3_raises_error_on_s3_error(
 
     # We got the wrong exception or no exception, fail the test.
     assert not "Should have raised an exception."
+
+def test_raw_content_unzips():
+    from retrieval import retrieval
+    # Creating a fake zip file with one file in it.
+    name = None
+    with tempfile.NamedTemporaryFile('w', delete=False) as temp:
+        name = temp.name
+    with zipfile.ZipFile(name, 'w') as zf:
+        zf.writestr('somefile', 'foo')
+
+    url = 'http://mock/url.zip'
+    with open(name, "rb") as f:
+        wrappedBytes = retrieval.raw_content(url, f.read())
+        # Content should be the content of the first file in the zip.
+        assert wrappedBytes.read() == b'foo'
+
+def test_raw_content_ignores_unknown_mimetypes():
+    from retrieval import retrieval
+    url = 'http://mock/url'
+    wrappedBytes = retrieval.raw_content(url, b'foo')
+    assert wrappedBytes.read() == b'foo'
