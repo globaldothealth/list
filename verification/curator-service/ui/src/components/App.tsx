@@ -177,23 +177,34 @@ const useStyles = makeStyles((theme: Theme) => ({
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
+    drawerLinks: {
+        marginBottom: '24px',
+    },
     mapButton: {
         backgroundColor: '#CAD9E3',
         borderRadius: '8px',
-        height: '42px',
+        height: '36px',
     },
     viewMapText: {
         margin: '0 12px',
     },
-    divider: {
-        backgroundColor: '#0A7369',
-        height: '1px',
-        opacity: '0.2',
-        margin: '24px 0',
+    drawerLink: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: '8px',
+        display: 'flex',
+        height: '36px',
+        marginTop: '12px',
         width: '100%',
     },
-    termsText: {
-        marginBottom: theme.spacing(3),
+    drawerInnerLink: {
+        alignItems: 'center',
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'center',
+        width: '100%',
+    },
+    drawerLinkText: {
+        color: '#0E7569',
     },
     content: {
         flexGrow: 1,
@@ -363,9 +374,7 @@ export default function App(): JSX.Element {
                     : menuItem.to.pathname;
             return pathname === location.pathname;
         });
-        if (menuIndex !== -1) {
-            setSelectedMenuIndex(menuIndex);
-        }
+        setSelectedMenuIndex(menuIndex);
     }, [location.pathname, menuList]);
 
     const getUser = (): void => {
@@ -557,25 +566,56 @@ export default function App(): JSX.Element {
                                 )}
                             </List>
                             <div className={classes.spacer}></div>
-                            <ButtonBase
-                                href="http://covid-19.global.health/#coverage"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                data-testid="mapButton"
-                                classes={{ root: classes.mapButton }}
-                            >
-                                <Typography
-                                    variant="caption"
-                                    classes={{ root: classes.viewMapText }}
+                            <div className={classes.drawerLinks}>
+                                <ButtonBase
+                                    href="http://covid-19.global.health/#coverage"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                    data-testid="mapButton"
+                                    classes={{ root: classes.mapButton }}
                                 >
-                                    View cases on
-                                </Typography>
-                                <GHMapLogo />
-                            </ButtonBase>
-                            <div className={classes.divider}></div>
-                            <div className={classes.termsText}>
-                                <div>Global.health</div>
-                                <Link to="/terms">Terms of use</Link>
+                                    <Typography
+                                        variant="caption"
+                                        classes={{ root: classes.viewMapText }}
+                                    >
+                                        View cases on
+                                    </Typography>
+                                    <GHMapLogo />
+                                </ButtonBase>
+                                <ButtonBase
+                                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                    data-testid="dictionaryButton"
+                                    classes={{ root: classes.drawerLink }}
+                                >
+                                    <Typography
+                                        variant="body2"
+                                        classes={{
+                                            root: classes.drawerLinkText,
+                                        }}
+                                    >
+                                        Data dictionary
+                                    </Typography>
+                                </ButtonBase>
+                                <ButtonBase
+                                    classes={{ root: classes.drawerLink }}
+                                >
+                                    <Link
+                                        to="/terms"
+                                        data-testid="termsButton"
+                                        className={classes.drawerInnerLink}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            classes={{
+                                                root: classes.drawerLinkText,
+                                            }}
+                                        >
+                                            Terms of use
+                                        </Typography>
+                                    </Link>
+                                </ButtonBase>
                             </div>
                         </div>
                     </Drawer>
