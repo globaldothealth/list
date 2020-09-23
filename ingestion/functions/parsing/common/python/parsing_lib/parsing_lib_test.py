@@ -171,7 +171,7 @@ def test_run_lambda_e2e(
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
-    del input_event[parsing_lib.UPLOAD_IDS_FIELD]
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
     base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
@@ -230,7 +230,7 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
-        input_event[parsing_lib.UPLOAD_IDS_FIELD],
+        input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
         {},  # Date filter isn't provided, per the following test case.
