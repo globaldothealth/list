@@ -11,13 +11,14 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            'common/python'))
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "common/python"
+        )
+    )
     import parsing_lib
 
 _AGE_INDEX = 5
 _GENDER_INDEX = 4
-_ETHNICITY = 20
+_ETHNICITY = 21
 _COUNTY = 1
 _DATE_CONFIRMED = 7
 _DATE_SYMPTOMS = 8
@@ -29,26 +30,24 @@ _SORETHROAT = 14
 _SHORTBREATH = 15
 _OTHER = 16
 _COMORBIDITIES = 17
-_INDIGENOUS = 21
+_INDIGENOUS = 22
 _NEIGHBORHOOD = 24
 
 _COMORBIDITIES_MAP = {
-    'Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)': 'chronic kidney disease',
-    'Asm': 'asthma',
-    'Doença Cardiovascular Crônica': 'cardiovascular disease',
-    'Doenças cardíacas crônicas': 'heart disease',
-    'Doença Hematológica Crônic': "hematopoietic system disease",
-    'Doença Renal Crônic': 'kidney disease',
-    'Doença Hepática Crônic': 'liver disease',
-    'Doença Neurológica Crônic': "nervous system disease",
-    'Pneumatopatia Crônica': 'pneumopathy',
-    'Doenças respiratórias crônicas descompensadas': 'respiratory system disease',
-    'Diabetes': 'diabetes mellitus',
-    'Síndrome de Down': "Down syndrome",
-    'Obesidad': 'obesity',
-    'Outro': 'other',
-    'Puérpera': 'recently gave birth',
-    'Gestante': 'pregnancy'
+    "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
+    "Asm": "asthma",
+    "Doença Cardiovascular Crônica": "cardiovascular disease",
+    "Doenças cardíacas crônicas": "heart disease",
+    "Doença Renal Crônic": "kidney disease",
+    "Doença Hepática Crônic": "liver disease",
+    "Doença Neurológica Crônic": "nervous system disease",
+    "Pneumatopatia Crônica": "pneumopathy",
+    "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
+    "Diabetes": "diabetes mellitus",
+    "Síndrome de Down": "Down syndrome",
+    "Obesidad": "obesity",
+    "Puérpera": "recently gave birth",
+    "Gestante": "pregnancy",
 }
 
 
@@ -72,46 +71,50 @@ def convert_events(date_confirmed, date_symptoms, hospitalized, date_death):
     events = [
         {
             "name": "confirmed",
-            "dateRange":
-            {
+            "dateRange": {
                 "start": convert_date(date_confirmed),
                 "end": convert_date(date_confirmed),
             },
         }
     ]
     if date_symptoms:
-        events.append({
-            "name": "onsetSymptoms",
-            "dateRange":
+        events.append(
             {
-                "start": convert_date(date_symptoms),
-                "end": convert_date(date_symptoms),
-            },
-        })
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": convert_date(date_symptoms),
+                    "end": convert_date(date_symptoms),
+                },
+            }
+        )
     if hospitalized != "NAO":
-        events.append({
-            "name": "hospitalAdmission",
-            "dateRange":
+        events.append(
             {
-                "start": convert_date(date_confirmed),
-                "end": convert_date(date_confirmed),
-            },
-            "value": "Yes"
-        })
+                "name": "hospitalAdmission",
+                "dateRange": {
+                    "start": convert_date(date_confirmed),
+                    "end": convert_date(date_confirmed),
+                },
+                "value": "Yes",
+            }
+        )
     if date_death:
-        events.append({
-            "name": "outcome",
-            "dateRange":
+        events.append(
             {
-                "start": convert_date(date_death),
-                "end": convert_date(date_death),
-            },
-            "value": "Death"
-        })
+                "name": "outcome",
+                "dateRange": {
+                    "start": convert_date(date_death),
+                    "end": convert_date(date_death),
+                },
+                "value": "Death",
+            }
+        )
     return events
 
 
-def convert_symptoms(fever: str, cough: str, sorethroat: str, shortbreath: str, other: str):
+def convert_symptoms(
+    fever: str, cough: str, sorethroat: str, shortbreath: str, other: str
+):
     symptoms = []
     if fever == "SIM":
         symptoms.append("Fever")
@@ -162,42 +165,47 @@ def convert_demographics(gender: str, age: str, ethnicity: str):
         demo["gender"] = convert_gender(gender)
     if age:
         if age == "80 e mais":
-            demo["ageRange"] = {
-                "start": 80,
-                "end": 120
-            }
+            demo["ageRange"] = {"start": 80, "end": 120}
         elif age == "<1":
-            demo["ageRange"] = {
-                "start": 0,
-                "end": 0
-            }
+            demo["ageRange"] = {"start": 0, "end": 0}
         else:
-            age_range = age.split(' a ')
+            age_range = age.split(" a ")
             demo["ageRange"] = {
                 "start": float(age_range[0]),
-                "end": float(age_range[1])
+                "end": float(age_range[1]),
             }
     if ethnicity != "NAO INFORMADO":
         demo["ethnicity"] = convert_ethnicity(ethnicity.title())
     return demo
 
 
-def convert_notes(raw_commorbidities: str, raw_notes_neighbourhood: str, raw_notes_indigenousEthnicity: str):
+def convert_notes(
+    raw_commorbidities: str,
+    raw_notes_neighbourhood: str,
+    raw_notes_indigenousEthnicity: str,
+):
     raw_notes = []
-    if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_commorbidities:
-        raw_notes.append(
-            "primary immunodeficiency disease or chromosomal disease")
+    if (
+        "Portador de doenças cromossômicas ou estado de fragilidade imunológica"
+        in raw_commorbidities
+    ):
+        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
     if "Imunossupressão" in raw_commorbidities:
         raw_notes.append("Patient with immunosupression")
     if "Imunodeficiênci" in raw_commorbidities:
         raw_notes.append("Patient with immunodeficiency")
+    if "Doença Hematológica Crônic" in raw_commorbidities:
+        raw_notes.append("Hematologic disease")
+    if "Outro" in raw_commorbidities:
+        raw_notes.append("Unspecified pre-existing condition")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood.title())
     if raw_notes_indigenousEthnicity != "NAO ENCONTRADO":
-        raw_notes.append("Indigenous ethnicity: " +
-                         raw_notes_indigenousEthnicity.title())
-    notes = (', ').join(raw_notes)
-    if notes == '':
+        raw_notes.append(
+            "Indigenous ethnicity: " + raw_notes_indigenousEthnicity.title()
+        )
+    notes = (", ").join(raw_notes)
+    if notes == "":
         return None
     return notes
 
@@ -207,34 +215,51 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f, delimiter=';')
+        reader = csv.reader(f, delimiter=";")
         next(reader)  # Skip the header.
         for row in reader:
             try:
                 case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceUrl": source_url
+                    "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
+                    "location": {
+                        "query": ", ".join(
+                            [row[_COUNTY], "Rio Grande do Sul", "Brazil"]
+                        )
                     },
-                    "location": {"query": ", ".join([row[_COUNTY], "Rio Grande do Sul", "Brazil"])},
                     "events": convert_events(
                         row[_DATE_CONFIRMED],
                         row[_DATE_SYMPTOMS],
                         row[_HOSPITALIZED],
-                        row[_DATE_DEATH]),
+                        row[_DATE_DEATH],
+                    ),
                     "demographics": convert_demographics(
-                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]),
+                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]
+                    ),
                 }
-                if "SIM" in (row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER]):
+                if "SIM" in (
+                    row[_FEVER],
+                    row[_COUGH],
+                    row[_SORETHROAT],
+                    row[_SHORTBREATH],
+                    row[_OTHER],
+                ):
                     case["symptoms"] = {
                         "status": "Symptomatic",
-                        "values": convert_symptoms(row[_FEVER], row[_COUGH], row[_SORETHROAT], row[_SHORTBREATH], row[_OTHER])
+                        "values": convert_symptoms(
+                            row[_FEVER],
+                            row[_COUGH],
+                            row[_SORETHROAT],
+                            row[_SHORTBREATH],
+                            row[_OTHER],
+                        ),
                     }
                 if row[_COMORBIDITIES]:
                     case["preexistingConditions"] = convert_preexisting_conditions(
-                        row[_COMORBIDITIES])
+                        row[_COMORBIDITIES]
+                    )
                 notes = convert_notes(
-                    row[_COMORBIDITIES], row[_NEIGHBORHOOD], row[_INDIGENOUS])
+                    row[_COMORBIDITIES], row[_NEIGHBORHOOD], row[_INDIGENOUS]
+                )
                 if notes:
                     case["notes"] = notes
                 yield case
