@@ -1,6 +1,7 @@
 import {
     AppBar,
     Avatar,
+    ButtonBase,
     CssBaseline,
     Divider,
     Fab,
@@ -24,6 +25,7 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
+import { ReactComponent as GHMapLogo } from './assets/GHMapLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
@@ -37,6 +39,7 @@ import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
+import TermsOfService from './TermsOfService';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
 import User from './User';
@@ -156,12 +159,33 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: drawerWidth,
     },
     drawerContents: {
-        marginLeft: '12px',
-        marginRight: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        marginLeft: '24px',
+        marginRight: '32px',
     },
     drawerHeader: {
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
+    },
+    mapButton: {
+        backgroundColor: '#CAD9E3',
+        borderRadius: '8px',
+        height: '42px',
+    },
+    viewMapText: {
+        margin: '0 12px',
+    },
+    divider: {
+        backgroundColor: '#0A7369',
+        height: '1px',
+        opacity: '0.2',
+        margin: '24px 0',
+        width: '100%',
+    },
+    termsText: {
+        marginBottom: theme.spacing(3),
     },
     content: {
         flexGrow: 1,
@@ -203,7 +227,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-function ProfileMenu(props: { user: User }) {
+function ProfileMenu(props: { user?: User }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -224,7 +248,7 @@ function ProfileMenu(props: { user: User }) {
                 aria-haspopup="true"
                 onClick={handleClick}
             >
-                <Avatar alt={props.user.email} src={props.user.picture} />
+                <Avatar alt={props.user?.email} src={props.user?.picture} />
             </IconButton>
             <Menu
                 anchorEl={anchorEl}
@@ -232,7 +256,7 @@ function ProfileMenu(props: { user: User }) {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                {props.user.email ? (
+                {props.user ? (
                     <>
                         <Link to="/profile" onClick={handleClose}>
                             <MenuItem>Profile</MenuItem>
@@ -251,19 +275,15 @@ function ProfileMenu(props: { user: User }) {
                     </a>
                 )}
                 <Divider className={classes.divider} />
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://global.health"
-                >
+                <Link to="/terms" onClick={handleClose}>
                     <MenuItem>About Global.Health</MenuItem>
-                </a>
+                </Link>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
                     href="https://github.com/globaldothealth/list/issues/new/choose"
+                    onClick={handleClose}
                 >
                     <MenuItem>Report an issue</MenuItem>
                 </a>
@@ -273,24 +293,18 @@ function ProfileMenu(props: { user: User }) {
 }
 
 interface LocationState {
-    searchQuery: string;
+    search: string;
 }
 
 export default function App(): JSX.Element {
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
-    const [user, setUser] = useState<User>({
-        _id: '',
-        name: '',
-        email: '',
-        roles: [],
-    });
+    const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [linelistSearchQuery, setLinelistSearchQuery] = React.useState('');
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
@@ -304,9 +318,8 @@ export default function App(): JSX.Element {
         {
             text: 'Linelist',
             icon: <ListIcon />,
-            to: { pathname: '/cases', state: { searchQuery: '' } },
-            displayCheck: (): boolean =>
-                hasAnyRole(['reader', 'curator', 'admin']),
+            to: { pathname: '/cases', state: { search: '' } },
+            displayCheck: (): boolean => user !== undefined,
         },
         {
             text: 'Sources',
@@ -333,19 +346,17 @@ export default function App(): JSX.Element {
     }, [showMenu]);
 
     useEffect(() => {
-        const menuIndex = menuList.findIndex(
-            (menuItem) => menuItem.to === location.pathname,
-        );
+        const menuIndex = menuList.findIndex((menuItem) => {
+            const pathname =
+                typeof menuItem.to === 'string'
+                    ? menuItem.to
+                    : menuItem.to.pathname;
+            return pathname === location.pathname;
+        });
         if (menuIndex !== -1) {
             setSelectedMenuIndex(menuIndex);
         }
     }, [location.pathname, menuList]);
-
-    useEffect(() => {
-        if (location.state) {
-            setLinelistSearchQuery(location.state.searchQuery ?? '');
-        }
-    }, [location.state]);
 
     const getUser = (): void => {
         axios
@@ -360,7 +371,7 @@ export default function App(): JSX.Element {
                 });
             })
             .catch((e) => {
-                setUser({ _id: '', name: '', email: '', roles: [] });
+                setUser(undefined);
             });
     };
 
@@ -416,18 +427,22 @@ export default function App(): JSX.Element {
                             <MenuIcon />
                         </IconButton>
                         <GHListLogo />
-                        {location.pathname === '/cases' ? (
+                        {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={linelistSearchQuery}
+                                        searchQuery={
+                                            location.state?.search ?? ''
+                                        }
                                         onSearchChange={(searchQuery): void => {
-                                            setLinelistSearchQuery(searchQuery);
+                                            history.push('/cases', {
+                                                search: searchQuery,
+                                            });
                                         }}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
-                                    search={linelistSearchQuery}
+                                    search={location.state?.search ?? ''}
                                 ></DownloadButton>
                             </>
                         ) : (
@@ -522,6 +537,27 @@ export default function App(): JSX.Element {
                                     ),
                             )}
                         </List>
+                        <div className={classes.spacer}></div>
+                        <ButtonBase
+                            href="http://covid-19.global.health/#coverage"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            data-testid="mapButton"
+                            classes={{ root: classes.mapButton }}
+                        >
+                            <Typography
+                                variant="caption"
+                                classes={{ root: classes.viewMapText }}
+                            >
+                                View cases on
+                            </Typography>
+                            <GHMapLogo />
+                        </ButtonBase>
+                        <div className={classes.divider}></div>
+                        <div className={classes.termsText}>
+                            <div>Global.health</div>
+                            <Link to="/terms">Terms of use</Link>
+                        </div>
                     </div>
                 </Drawer>
                 <main
@@ -531,35 +567,32 @@ export default function App(): JSX.Element {
                 >
                     <div className={classes.drawerHeader} />
                     <Switch>
-                        {hasAnyRole(['curator', 'reader', 'admin']) && (
+                        {user && (
                             <Route exact path="/cases">
-                                <LinelistTable
-                                    user={user}
-                                    search={linelistSearchQuery}
-                                />
+                                <LinelistTable user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/sources">
-                                <SourceTable user={user} />
+                                <SourceTable />
                             </Route>
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {hasAnyRole(['curator']) && (
                             <Route exact path="/uploads">
                                 <UploadsTable />
                             </Route>
                         )}
-                        {user.email && (
+                        {user && (
                             <Route path="/profile">
                                 <Profile user={user} />
                             </Route>
                         )}
-                        {hasAnyRole(['admin']) && (
+                        {user && hasAnyRole(['admin']) && (
                             <Route path="/users">
                                 <Users user={user} onUserChange={getUser} />
                             </Route>
                         )}{' '}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/sources/automated">
                                 <AutomatedSourceForm
                                     user={user}
@@ -567,7 +600,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
                                     user={user}
@@ -575,7 +608,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/new">
                                 <CaseForm
                                     user={user}
@@ -583,7 +616,7 @@ export default function App(): JSX.Element {
                                 />
                             </Route>
                         )}
-                        {hasAnyRole(['curator']) && (
+                        {user && hasAnyRole(['curator']) && (
                             <Route
                                 path="/cases/edit/:id"
                                 render={({ match }) => {
@@ -597,7 +630,7 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
-                        {hasAnyRole(['curator', 'reader']) && (
+                        {user && (
                             <Route
                                 path="/cases/view/:id"
                                 render={({ match }): JSX.Element => {
@@ -611,8 +644,11 @@ export default function App(): JSX.Element {
                                 }}
                             />
                         )}
+                        <Route exact path="/terms">
+                            <TermsOfService />
+                        </Route>
                         <Route exact path="/">
-                            <Charts />
+                            {hasAnyRole(['curator', 'admin']) && <Charts />}
                         </Route>
                     </Switch>
                 </main>

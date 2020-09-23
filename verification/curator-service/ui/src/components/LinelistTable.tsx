@@ -20,6 +20,7 @@ import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
 import { Link } from 'react-router-dom';
@@ -54,6 +55,9 @@ interface LinelistTableState {
     numSelectedRows: number;
     totalNumRows: number;
     deleteDialogOpen: boolean;
+    isLoading: boolean;
+    isDownloading: boolean;
+    isDeleting: boolean;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -75,13 +79,13 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
+    search: string;
 }
 
 interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    search: string;
 }
 
 const styles = (theme: Theme) =>
@@ -94,6 +98,10 @@ const styles = (theme: Theme) =>
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+        },
+        dialogLoadingSpinner: {
+            marginRight: theme.spacing(2),
+            padding: '6px',
         },
         spacer: { flex: 1 },
         tablePaginationBar: {
@@ -114,6 +122,10 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     menuItemTitle: {
         marginLeft: theme.spacing(1),
     },
+    dialogLoadingSpinner: {
+        marginRight: theme.spacing(2),
+        padding: '6px',
+    },
 }));
 
 function RowMenu(props: {
@@ -125,6 +137,7 @@ function RowMenu(props: {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
         false,
     );
+    const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
@@ -145,6 +158,7 @@ function RowMenu(props: {
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
+            setIsDeleting(true);
             props.setError('');
             const deleteUrl = '/api/cases/' + props.rowId;
             await axios.delete(deleteUrl);
@@ -153,6 +167,7 @@ function RowMenu(props: {
             props.setError(e.toString());
         } finally {
             setDeleteDialogOpen(false);
+            setIsDeleting(false);
             handleClose();
         }
     };
@@ -202,33 +217,47 @@ function RowMenu(props: {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={(): void => {
-                            setDeleteDialogOpen(false);
-                        }}
-                        color="primary"
-                        autoFocus
-                    >
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDelete} color="primary">
-                        Yes
-                    </Button>
+                    {isDeleting ? (
+                        <CircularProgress
+                            classes={{ root: classes.dialogLoadingSpinner }}
+                        />
+                    ) : (
+                        <>
+                            <Button
+                                onClick={(): void => {
+                                    setDeleteDialogOpen(false);
+                                }}
+                                color="primary"
+                                autoFocus
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDelete} color="primary">
+                                Yes
+                            </Button>
+                        </>
+                    )}
                 </DialogActions>
             </Dialog>
         </>
     );
 }
 
+const downloadFilename = `globalhealth_covid19_cases_${renderDate(
+    new Date(),
+)}.csv`;
+
 export function DownloadButton(props: { search: string }): JSX.Element {
+    const [downloading, setDownloading] = React.useState(false);
+
     const downloadCases = (): void => {
         const requestBody = props.search.trim() ? { query: props.search } : {};
+        setDownloading(true);
         axios
             .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
-            .catch((e) => {
-                console.error(e);
-            });
+            .then((response) => fileDownload(response.data, downloadFilename))
+            .catch((e) => console.error(e))
+            .finally(() => setDownloading(false));
     };
 
     return (
@@ -236,7 +265,10 @@ export function DownloadButton(props: { search: string }): JSX.Element {
             variant="outlined"
             color="primary"
             onClick={downloadCases}
-            startIcon={<SaveAltIcon />}
+            disabled={downloading}
+            startIcon={
+                downloading ? <CircularProgress size={20} /> : <SaveAltIcon />
+            }
         >
             Download
         </Button>
@@ -246,6 +278,8 @@ export function DownloadButton(props: { search: string }): JSX.Element {
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unlisten: () => void = () => {};
 
     constructor(props: Props) {
         super(props);
@@ -257,6 +291,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             numSelectedRows: 0,
             totalNumRows: 0,
             deleteDialogOpen: false,
+            isLoading: false,
+            isDownloading: false,
+            isDeleting: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
@@ -267,16 +304,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
     }
 
-    componentDidUpdate(prevProps: Props): void {
-        if (prevProps.search !== this.props.search) {
+    componentDidMount(): void {
+        // history.location.state can be updated with new values on which we
+        // must refresh the table
+        this.unlisten = this.props.history.listen((_, __) => {
             this.tableRef.current?.onQueryChange();
-        }
+        });
+    }
+
+    componentWillUnmount(): void {
+        this.unlisten();
     }
 
     async deleteCases(): Promise<void> {
+        this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.props.search } };
+            requestBody = { data: { query: this.props.location.state.search } };
         } else {
             requestBody = {
                 data: {
@@ -292,7 +336,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         } catch (e) {
             this.setState({ error: e.toString() });
         } finally {
-            this.setState({ deleteDialogOpen: false });
+            this.setState({ deleteDialogOpen: false, isDeleting: false });
         }
     }
 
@@ -309,7 +353,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdate';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
                 cases: rowData.map((row) => {
                     return {
@@ -318,12 +362,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     };
                 }),
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
@@ -332,26 +382,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const updateUrl = this.state.url + 'batchUpdateQuery';
-            this.setState({ error: '' });
+            this.setState({ error: '', isLoading: true });
             const response = axios.post(updateUrl, {
-                query: this.props.search,
+                query: this.props.location.state.search,
                 case: {
                     'caseReference.verificationStatus': verificationStatus,
                 },
             });
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ isLoading: false });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                        isLoading: false,
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
     downloadSelectedCases(): void {
+        this.setState({ error: '', isDownloading: true });
         let requestBody = {};
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.props.search };
+            requestBody = { query: this.props.location.state.search };
         } else {
             requestBody = {
                 caseIds: this.state.selectedRowsCurrentPage.map(
@@ -359,13 +416,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ),
             };
         }
-        this.setState({ error: '' });
         axios
             .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
+            .then((response) => {
+                fileDownload(response.data, downloadFilename);
+                this.setState({ isDownloading: false });
+            })
             .catch((e) => {
                 this.setState({
                     error: e.response?.data?.message || e.toString(),
+                    isDownloading: false,
                 });
             });
     }
@@ -487,20 +547,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button
-                            onClick={(): void => {
-                                this.setState({ deleteDialogOpen: false });
-                            }}
-                            color="primary"
-                            autoFocus
-                        >
-                            Cancel
-                        </Button>
-                        {this.state.numSelectedRows <=
-                            this.maxDeletionThreshold && (
-                            <Button onClick={this.deleteCases} color="primary">
-                                Yes
-                            </Button>
+                        {this.state.isDeleting ? (
+                            <CircularProgress
+                                classes={{ root: classes.dialogLoadingSpinner }}
+                            />
+                        ) : (
+                            <>
+                                <Button
+                                    onClick={(): void => {
+                                        this.setState({
+                                            deleteDialogOpen: false,
+                                        });
+                                    }}
+                                    color="primary"
+                                    autoFocus
+                                >
+                                    Cancel
+                                </Button>
+                                {this.state.numSelectedRows <=
+                                    this.maxDeletionThreshold && (
+                                    <Button
+                                        onClick={this.deleteCases}
+                                        color="primary"
+                                    >
+                                        Yes
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </DialogActions>
                 </Dialog>
@@ -606,12 +679,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'sourceUrl',
                         },
                     ]}
+                    isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
                             listUrl += '&page=' + (query.page + 1);
-                            const trimmedQ = this.props.search.trim();
+                            const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
@@ -768,7 +842,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...(this.props.search.trim() !== ''
+                                  ...((this.props.location.state?.search?.trim() ??
+                                      '') !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -881,18 +956,31 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="download selected rows">
-                                              <SaveAltIcon
-                                                  classes={{
-                                                      root:
-                                                          classes.toolbarItems,
-                                                  }}
-                                              />
+                                              {this.state.isDownloading ? (
+                                                  <CircularProgress
+                                                      size={24}
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              ) : (
+                                                  <SaveAltIcon
+                                                      classes={{
+                                                          root:
+                                                              classes.toolbarItems,
+                                                      }}
+                                                  />
+                                              )}
                                           </span>
                                       ),
-                                      tooltip: 'Download selected rows',
+                                      tooltip: this.state.isDownloading
+                                          ? 'Downloading...'
+                                          : 'Download selected rows',
                                       onClick: (): void => {
                                           this.downloadSelectedCases();
                                       },
+                                      disabled: this.state.isDownloading,
                                   },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the
