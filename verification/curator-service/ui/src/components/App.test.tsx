@@ -66,9 +66,9 @@ it('has drawer links', async () => {
         </MemoryRouter>,
     );
 
-    expect(await findByTestId('mapButton')).toHaveAttribute(
+    expect(await findByTestId('mapLink')).toHaveAttribute(
         'href',
-        'http://covid-19.global.health/#coverage',
+        'http://covid-19.global.health',
     );
     expect(await findByTestId('dictionaryButton')).toHaveAttribute(
         'href',
