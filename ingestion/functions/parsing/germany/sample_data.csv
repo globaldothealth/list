@@ -1,0 +1,2 @@
+ObjectId,IdBundesland,Bundesland,Landkreis,Altersgruppe,Geschlecht,AnzahlFall,AnzahlTodesfall,Meldedatum,IdLandkreis,Datenstand,NeuerFall,NeuerTodesfall,Refdatum,NeuGenesen,AnzahlGenesen,IstErkrankungsbeginn,Altersgruppe2
+28886606,1,Schleswig-Holstein,SK Flensburg,A05-A14,W,1,0,2020/08/15 00:00:00,1001,"18.08.2020, 00:00 Uhr",0,-9,2020/08/15 00:00:00,-9,0,0,Nicht übermittelt

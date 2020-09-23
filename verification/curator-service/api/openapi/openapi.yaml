@@ -762,7 +762,7 @@ paths:
               type: object
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/clear:
     post:
       tags: [Geocode]
@@ -770,7 +770,7 @@ paths:
       operationId: clearGeocodes
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/suggest:
     get:
       tags: [Suggest, Geocode]
@@ -983,6 +983,13 @@ components:
               enum:
                 - EQ
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
@@ -1423,7 +1430,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:
@@ -1531,11 +1537,11 @@ components:
               - index
               - message
       required:
-        - phase
         - numCreated
         - numUpdated
-        - errors
   responses:
+    "200":
+      description: OK
     "200Auth":
       description: OK
       content:

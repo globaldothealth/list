@@ -12,6 +12,14 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
+const mockSend = jest.fn().mockResolvedValue({});
+const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { send: mockSend, initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {
@@ -27,6 +35,8 @@ beforeEach(async () => {
     await Upload.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
+
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {
@@ -199,65 +209,117 @@ describe('POST', () => {
         expect(res.body._id).toEqual(upload._id.toString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
+    it('should send a notification email if status is error and recipients defined', async () => {
+        const source = await new Source(fullSource).save();
+        const upload = new Upload(minimalUpload);
+        upload.status = 'ERROR';
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(source.notificationRecipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if status not error', async () => {
+        const source = await new Source(fullSource).save();
+        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+});
 
-    describe('PUT', () => {
-        it('should return 415 if input missing body', () => {
-            return curatorRequest
-                .put(
-                    '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
-                )
-                .send()
-                .expect(415);
-        });
-        it('should return 400 if parent source ID malformed', () => {
-            return curatorRequest
-                .put('/api/sources/abc123/uploads/012345678901234567890123')
-                .send(minimalUpload)
-                .expect(400);
-        });
-        it('should return 404 if parent source ID not found', () => {
-            return curatorRequest
-                .put(
-                    '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
-                )
-                .send(minimalUpload)
-                .expect(404);
-        });
-        it('should return 400 if upload ID malformed', () => {
-            return curatorRequest
-                .put('/api/sources/012345678901234567890123/uploads/abc123')
-                .send(minimalUpload)
-                .expect(400);
-        });
-        it('should return 404 if upload ID not found', async () => {
-            const source = await new Source(minimalSource).save();
-            return curatorRequest
-                .put(
-                    `/api/sources/${source._id}/uploads/123456789012345678901234`,
-                )
-                .send(minimalUpload)
-                .expect(404);
-        });
-        it('should return 200 with updated upload for valid input', async () => {
-            const source = await new Source(fullSource).save();
-            const newSummary = {
-                numCreated: 123456,
-                numUpdated: 789,
-            };
+describe('PUT', () => {
+    it('should return 415 if input missing body', () => {
+        return curatorRequest
+            .put(
+                '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
+            )
+            .send()
+            .expect(415);
+    });
+    it('should return 400 if parent source ID malformed', () => {
+        return curatorRequest
+            .put('/api/sources/abc123/uploads/012345678901234567890123')
+            .send(minimalUpload)
+            .expect(400);
+    });
+    it('should return 404 if parent source ID not found', () => {
+        return curatorRequest
+            .put(
+                '/api/sources/012345678901234567890123/uploads/123456789012345678901234',
+            )
+            .send(minimalUpload)
+            .expect(404);
+    });
+    it('should return 400 if upload ID malformed', () => {
+        return curatorRequest
+            .put('/api/sources/012345678901234567890123/uploads/abc123')
+            .send(minimalUpload)
+            .expect(400);
+    });
+    it('should return 404 if upload ID not found', async () => {
+        const source = await new Source(minimalSource).save();
+        return curatorRequest
+            .put(`/api/sources/${source._id}/uploads/123456789012345678901234`)
+            .send(minimalUpload)
+            .expect(404);
+    });
+    it('should return 200 with updated upload for valid input', async () => {
+        const source = await new Source(fullSource).save();
+        const newSummary = {
+            numCreated: 123456,
+            numUpdated: 789,
+        };
 
-            const res = await curatorRequest
-                .put(
-                    `/api/sources/${source._id}/uploads/${source.uploads[0]._id}`,
-                )
-                .send({
-                    summary: newSummary,
-                })
-                .expect('Content-Type', /json/)
-                .expect(200);
-            const dbSource = await Source.findById(source._id);
+        const res = await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                summary: newSummary,
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+        const dbSource = await Source.findById(source._id);
 
-            expect(res.body.uploads[0].summary).toEqual(newSummary);
-            expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
-        });
+        expect(res.body.uploads[0].summary).toEqual(newSummary);
+        expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
+    });
+    it('should send a notification email if updated status is error and recipients defined', async () => {
+        fullSource.uploads[0].status = 'SUCCESS';
+        const source = await new Source(fullSource).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'ERROR',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(source.notificationRecipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if updated status is not error', async () => {
+        const source = await new Source(fullSource).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'IN_PROGRESS',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).not.toHaveBeenCalled();
     });
 });

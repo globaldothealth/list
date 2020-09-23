@@ -68,6 +68,7 @@ interface TableRow {
     status: string;
     created: Date;
     sourceUrl: string;
+    sourceName: string;
     numCreated: number;
     numUpdated: number;
 }
@@ -116,6 +117,10 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     renderDate(rowData.created),
                             },
                             {
+                                title: 'Source name',
+                                field: 'sourceName',
+                            },
+                            {
                                 title: 'Source URL',
                                 field: 'sourceUrl',
                             },
@@ -127,7 +132,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
@@ -143,7 +148,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         to={{
                                             pathname: '/cases',
                                             state: {
-                                                searchQuery: `uploadid:${rowData.id}`,
+                                                search: `uploadid:${rowData.id}`,
                                             },
                                         }}
                                     >
@@ -171,6 +176,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                                     created: u.upload.created,
                                                     status: u.upload.status,
                                                     sourceUrl: u.sourceUrl,
+                                                    sourceName: u.sourceName,
                                                     numCreated:
                                                         u.upload.summary
                                                             .numCreated ?? 0,

@@ -94,7 +94,7 @@ export function login(opts: {
         body: {
             name: opts?.name ?? 'superuser',
             email: opts?.email ?? 'superuser@test.com',
-            roles: opts?.roles ?? ['admin', 'curator', 'reader'],
+            roles: opts?.roles ?? ['admin', 'curator'],
         },
     });
 }

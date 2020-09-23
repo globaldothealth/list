@@ -19,7 +19,6 @@ except ImportError:
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
-
     The date is listed in YYYYmmdd format, but the data server API will
     assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
     """
@@ -45,6 +44,18 @@ def convert_location(raw_entry):
         if term != "EN INVESTIGACIÓN"]
 
     return {"query":  ", ".join(query_terms)}
+
+
+def convert_demographics(age: str, sex: str):
+    demo = {}
+    if age:
+        demo["ageRange"] = {
+            "start": float(age),
+            "end": float(age)
+        }
+    if sex:
+        demo["gender"] = convert_gender(sex)
+    return demo or None
 
 
 def parse_cases(raw_data_file, source_id, source_url):
@@ -80,13 +91,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     }
                 ],
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["EDAD"]),
-                        "end": float(entry["EDAD"])
-                    },
-                    "gender": convert_gender(entry["SEXO"])
-                }
+                "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
             }
             yield case
 

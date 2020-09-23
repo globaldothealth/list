@@ -60,6 +60,8 @@ export default class EmailClient {
     /**
      * Sends an email via the configured transport.
      *
+     * TODO: Add support for HTML email content.
+     *
      * @param addressees - Addressees to whom the email is sent.
      * @param subject - Subject of the email.
      * @param text - Body/content of the email.

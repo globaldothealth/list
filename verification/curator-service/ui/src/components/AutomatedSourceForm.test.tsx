@@ -30,6 +30,7 @@ it('renders form', async () => {
     expect(getByTestId('name')).toBeInTheDocument();
     expect(getByTestId('url')).toBeInTheDocument();
     expect(getByTestId('format')).toBeInTheDocument();
+    expect(getByTestId('recipients')).toBeInTheDocument();
 
     // Buttons
     expect(getByText(/create source/i)).toBeEnabled();
