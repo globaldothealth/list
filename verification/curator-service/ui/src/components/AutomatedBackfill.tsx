@@ -93,14 +93,39 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
     const [errorMessage, setErrorMessage] = React.useState('');
     const [successMessage, setSuccessMessage] = React.useState('');
 
+    /**
+     * Convert the supplied date to a local YYYY-MM-DD format.
+     *
+     * Our date picker component returns a timezoned datetime, but for the
+     * purposes of backfill, users really just want to select a timezone-less
+     * date, as opposed to an instant in time.
+     *
+     * Converting to this format allows a proper range comparison for retrieval
+     * and parsing.
+     */
+    const isoDateString = (date: Date): string => {
+        const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+        const msLocal = date.getTime() - offsetMs;
+        return new Date(msLocal).toISOString().split('T')[0];
+    };
+
     const triggerBackfill = async (
         values: AutomatedBackfillValues,
     ): Promise<void> => {
         try {
+            // This will never happen, because of Yup validation.
+            if (values.startDate === null || values.endDate === null) {
+                setErrorMessage('Please enter valid dates');
+                return;
+            }
+            const utcStartDateString = isoDateString(
+                new Date(values.startDate),
+            );
+            const utcEndDateString = isoDateString(new Date(values.endDate));
+            const baseUri = `/api/sources/${values.caseReference?.sourceId}/retrieve`;
+            const fullUri = `${baseUri}?parse_start_date=${utcStartDateString}&parse_end_date=${utcEndDateString}`;
             const response = await axios.post<RetrievalResult>(
-                `/api/sources/${values.caseReference?.sourceId}/retrieve
-                ?parse_start_date=${values.startDate}
-                &parse_end_date=${values.endDate}`,
+                encodeURI(fullUri),
             );
             setErrorMessage('');
             setSuccessMessage(`Created upload ${response.data.upload_id}.`);
