@@ -118,6 +118,22 @@ Resources:
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
+  CanadaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/canada/
+      Handler: canada.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Canada
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      MemorySize: 512
+      Layers:
+        - !Ref ParsingLibLayer
+        - !Ref CommonLibLayer
   CHZurichParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
