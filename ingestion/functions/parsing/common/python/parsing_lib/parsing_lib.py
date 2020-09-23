@@ -14,7 +14,7 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
-UPLOAD_IDS_FIELD = "uploadIds"
+UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
 DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
@@ -65,7 +65,7 @@ def extract_event_fields(event: Dict):
         )
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(DATE_RANGE_FIELD, {}), event.get(AUTH_FIELD, None)
 
 
