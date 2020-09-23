@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.

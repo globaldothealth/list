@@ -1,17 +1,11 @@
-import csv
-import json
 import os
-import tempfile
 import unittest
-from datetime import date
-
-import pytest
 
 from ch_zurich import zurich
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://gd.zh.ch/internet/gesundheitsdirektion/de/themen/coronavirus.html"
-_PARSED_CASE = (
+_PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
@@ -32,19 +26,115 @@ _PARSED_CASE = (
                 "name": "confirmed",
                 "dateRange":
                         {
-                            "start": "02/27/2020Z",
-                            "end": "02/27/2020Z",
+                            "start": "02/24/2020Z",
+                            "end": "02/24/2020Z",
                         },
             },
         ],
         "demographics": {
             "ageRange": {
-                "start": 33,
-                "end": 33,
+                "start": 0,
+                "end": 9,
             },
             "gender": "Female",
         },
-    })
+    }, {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceUrl": _SOURCE_URL,
+        },
+        "location": {
+            "country": "Switzerland",
+            "administrativeAreaLevel1": "Zurich",
+            "geoResolution": "Admin1",
+            "name": "Zurich canton",
+            "geometry": {
+                "longitude": "8.651071",
+                "latitude": "47.42568",
+            },
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "02/24/2020Z",
+                            "end": "02/24/2020Z",
+                        },
+            },
+        ],
+        "demographics": {
+            "ageRange": {
+                "start": 0,
+                "end": 9,
+            },
+            "gender": "Male",
+        },
+    }, {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceUrl": _SOURCE_URL,
+        },
+        "location": {
+            "country": "Switzerland",
+            "administrativeAreaLevel1": "Zurich",
+            "geoResolution": "Admin1",
+            "name": "Zurich canton",
+            "geometry": {
+                "longitude": "8.651071",
+                "latitude": "47.42568",
+            },
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "02/24/2020Z",
+                            "end": "02/24/2020Z",
+                        },
+            },
+        ],
+        "demographics": {
+            "ageRange": {
+                "start": 100,
+                "end": 120,
+            },
+            "gender": "Female",
+        },
+    }, {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceUrl": _SOURCE_URL,
+        },
+        "location": {
+            "country": "Switzerland",
+            "administrativeAreaLevel1": "Zurich",
+            "geoResolution": "Admin1",
+            "name": "Zurich canton",
+            "geometry": {
+                "longitude": "8.651071",
+                "latitude": "47.42568",
+            },
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "03/09/2020Z",
+                            "end": "03/09/2020Z",
+                        },
+            },
+        ],
+        "demographics": {
+            "ageRange": {
+                "start": 60,
+                "end": 69,
+            },
+        },
+    },
+]
 
 
 class CHZurichTest(unittest.TestCase):
@@ -55,4 +145,4 @@ class CHZurichTest(unittest.TestCase):
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
         result = zurich.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
-        self.assertCountEqual(list(result), [_PARSED_CASE, _PARSED_CASE])
+        self.assertCountEqual(list(result), _PARSED_CASES)

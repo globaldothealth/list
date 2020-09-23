@@ -3,14 +3,11 @@ import os
 import sys
 import tempfile
 import collections
+import time
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
-import google.auth.transport.requests
 import requests
-
-from enum import Enum
-from google.oauth2 import service_account
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
@@ -21,10 +18,13 @@ UPLOAD_IDS_FIELD = "uploadIds"
 DATE_FILTER_FIELD = "dateFilter"
 AUTH_FIELD = "auth"
 
+# Expected date fields format.
+DATE_FORMAT = "%m/%d/%YZ"
+
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
 # usage on the server-side and is known to cause OOMs so increase with caution.
-CASES_BATCH_SIZE = 1000
+CASES_BATCH_SIZE = 250
 
 s3_client = boto3.client("s3")
 
@@ -103,20 +103,28 @@ def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
 
 def write_to_server(
         cases: Generator[Dict, None, None],
-        env: str, source_id: str, upload_id: str, headers, cookies):
+        env: str, source_id: str, upload_id: str, headers, cookies,
+        cases_batch_size: int, remaining_time_func: Callable[[], float]):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
+    start_time = time.time()
     while True:
-        batch = batch_of(cases, CASES_BATCH_SIZE)
+        batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
             break
-        print(f"Sending {len(batch)} cases to {put_api_url}")
-        counter['total'] += len(batch)
+        print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         res = requests.post(put_api_url, json={"cases": batch},
                             headers=headers, cookies=cookies)
         if res and res.status_code == 200:
+            counter['total'] += len(batch)
+            now = time.time()
+            cps = int(counter['total'] / (now - start_time))
+            print(f'\tCurrent speed: {cps} cases/sec')
+            remaining_sec = int(remaining_time_func() / 1000)
+            max_estimate = int(counter['total'] + remaining_sec * cps)
+            print(f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
             res_json = res.json()
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
@@ -131,10 +139,13 @@ def write_to_server(
         upload_error = (common_lib.UploadError.VALIDATION_ERROR
                         if res.status_code == 207 else
                         common_lib.UploadError.DATA_UPLOAD_ERROR)
-        common_lib.complete_with_error(e, env, upload_error,
-                                       source_id, upload_id, headers, cookies)
+        common_lib.complete_with_error(
+            e, env, upload_error,
+            source_id, upload_id, headers, cookies,
+            count_created=counter['numCreated'],
+            count_updated=counter['numUpdated'])
         return
-    print(f'sent {counter["total"]} cases')
+    print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
     return counter['numCreated'], counter['numUpdated']
 
 
@@ -164,7 +175,7 @@ def filter_cases_by_date(
         confirmed_event = [e for e in case["events"]
                            if e["name"] == "confirmed"][0]
         case_date = datetime.datetime.strptime(
-            confirmed_event["dateRange"]["start"], "%m/%d/%YZ")
+            confirmed_event["dateRange"]["start"], DATE_FORMAT)
         delta_days = (case_date - cutoff_date).days
         if op == "EQ":
             return delta_days == 0
@@ -242,7 +253,8 @@ def run_lambda(
                 env, source_id, upload_id,
                 api_creds, cookies),
             env, source_id, upload_id,
-            api_creds, cookies)
+            api_creds, cookies,
+            CASES_BATCH_SIZE, context.get_remaining_time_in_millis)
         common_lib.finalize_upload(
             env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)

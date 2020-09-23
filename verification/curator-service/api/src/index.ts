@@ -1,16 +1,18 @@
 import * as usersController from './controllers/users';
 
-import { AuthController, mustHaveAnyRole } from './controllers/auth';
+import {
+    AuthController,
+    mustBeAuthenticated,
+    mustHaveAnyRole,
+} from './controllers/auth';
 import { NextFunction, Request, Response } from 'express';
 import session, { SessionOptions } from 'express-session';
 
 import AwsEventsClient from './clients/aws-events-client';
 import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
-import FakeGeocoder from './geocoding/fake';
-import GeocodeSuggester from './geocoding/suggest';
-import { Geocoder } from './geocoding/geocoder';
-import MapboxGeocoder from './geocoding/mapbox';
+import EmailClient from './clients/email-client';
+import GeocodeProxy from './controllers/geocode';
 import { OpenApiValidator } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
@@ -27,6 +29,7 @@ import passport from 'passport';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import { logger } from './util/logger';
 
 const app = express();
 
@@ -45,6 +48,10 @@ app.use(
 dotenv.config();
 const env = validateEnv();
 
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
+
 // Express configuration.
 app.set('port', env.PORT);
 
@@ -52,7 +59,7 @@ app.set('port', env.PORT);
 // MONGO_URL is provided by the in memory version of jest-mongodb.
 // DB_CONNECTION_STRING is what we use in prod.
 const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-console.log(
+logger.info(
     'Connecting to MongoDB instance',
     // Print only after username and password to not log them.
     mongoURL.substring(mongoURL.indexOf('@')),
@@ -66,10 +73,10 @@ mongoose
         useFindAndModify: false,
     })
     .then(() => {
-        console.log('Connected to the database');
+        logger.info('Connected to the database');
     })
     .catch((e) => {
-        console.error('Failed to connect to DB', e);
+        logger.error('Failed to connect to DB', e);
         process.exit(1);
     });
 
@@ -131,11 +138,22 @@ new OpenApiValidator({
 })
     .install(app)
     .then(() => {
+        return new EmailClient(
+            env.EMAIL_USER_ADDRESS,
+            env.EMAIL_USER_PASSWORD,
+        ).initialize();
+    })
+    .catch((e) => {
+        logger.error('Failed to instantiate email client:', e);
+        process.exit(1);
+    })
+    .then((emailClient) => {
         // Configure curator API routes.
         const apiRouter = express.Router();
 
         // Configure sources controller.
         const sourcesController = new SourcesController(
+            emailClient,
             awsLambdaClient,
             awsEventsClient,
             env.GLOBAL_RETRIEVAL_FUNCTION_ARN,
@@ -177,7 +195,7 @@ new OpenApiValidator({
         );
 
         // Configure uploads controller.
-        const uploadsController = new UploadsController();
+        const uploadsController = new UploadsController(emailClient);
         apiRouter.get(
             '/sources/uploads',
             mustHaveAnyRole(['curator']),
@@ -194,56 +212,27 @@ new OpenApiValidator({
             uploadsController.update,
         );
 
-        // Chain geocoders so that during dev/integration tests we can use the fake one.
-        // It might also just be useful to have various geocoders plugged-in at some point.
-        const geocoders = new Array<Geocoder>();
-        if (env.ENABLE_FAKE_GEOCODER) {
-            console.log('Using fake geocoder');
-            const fakeGeocoder = new FakeGeocoder();
-            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-            geocoders.push(fakeGeocoder);
-        }
-        if (env.MAPBOX_TOKEN !== '') {
-            console.log('Using mapbox geocoder');
-            geocoders.push(
-                new MapboxGeocoder(
-                    env.MAPBOX_TOKEN,
-                    env.MAPBOX_PERMANENT_GEOCODE
-                        ? 'mapbox.places-permanent'
-                        : 'mapbox.places',
-                ),
-            );
-        }
-
         // Configure cases controller proxying to data service.
-        const casesController = new CasesController(
-            env.DATASERVER_URL,
-            geocoders,
-        );
-        apiRouter.get(
-            '/cases',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
-            casesController.list,
-        );
+        const casesController = new CasesController(env.DATASERVER_URL);
+        apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listSymptoms,
         );
         apiRouter.get(
             '/cases/placesOfTransmission',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listPlacesOfTransmission,
         );
         apiRouter.get(
             '/cases/occupations',
-            mustHaveAnyRole(['reader', 'curator']),
+            mustHaveAnyRole(['curator']),
             casesController.listOccupations,
         );
         apiRouter.get(
             '/cases/:id([a-z0-9]{24})',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.get,
         );
         apiRouter.post(
@@ -253,7 +242,7 @@ new OpenApiValidator({
         );
         apiRouter.post(
             '/cases/download',
-            mustHaveAnyRole(['reader', 'curator', 'admin']),
+            mustBeAuthenticated,
             casesController.download,
         );
         apiRouter.post(
@@ -293,17 +282,32 @@ new OpenApiValidator({
         );
 
         // Configure users controller.
-        apiRouter.get('/users', usersController.list);
-        apiRouter.put('/users/:id', usersController.updateRoles);
-        apiRouter.get('/users/roles', usersController.listRoles);
+        apiRouter.get(
+            '/users',
+            mustHaveAnyRole(['admin']),
+            usersController.list,
+        );
+        apiRouter.put(
+            '/users/:id',
+            mustHaveAnyRole(['admin']),
+            usersController.updateRoles,
+        );
+        apiRouter.get(
+            '/users/roles',
+            mustHaveAnyRole(['admin']),
+            usersController.listRoles,
+        );
 
-        // Suggest locations based on the request's "q" query param.
-        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        const geocodeProxy = new GeocodeProxy(env.DATASERVER_URL);
+
+        // Forward geocode requests to data service.
         apiRouter.get(
             '/geocode/suggest',
             mustHaveAnyRole(['curator']),
-            geocodeSuggester.suggest,
+            geocodeProxy.suggest,
         );
+        apiRouter.post('/geocode/seed', geocodeProxy.seed);
+        apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
         app.use('/api', apiRouter);
 
@@ -342,6 +346,7 @@ new OpenApiValidator({
                 err: ValidationError,
                 req: Request,
                 res: Response,
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 next: NextFunction,
             ) => {
                 res.status(err.status || 500).json({
@@ -353,7 +358,7 @@ new OpenApiValidator({
 
         // Serve static UI content if static directory was specified.
         if (env.STATIC_DIR) {
-            console.log('Serving static files from', env.STATIC_DIR);
+            logger.info('Serving static files from', env.STATIC_DIR);
             app.use(express.static(env.STATIC_DIR));
             // Send index to any unmatched route.
             // This must be the LAST handler installed on the app.
@@ -364,7 +369,7 @@ new OpenApiValidator({
         }
     })
     .catch((e) => {
-        console.error('Failed to install OpenAPI validator:', e);
+        logger.error('Failed to install OpenAPI validator:', e);
         process.exit(1);
     });
 

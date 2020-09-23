@@ -1,8 +1,8 @@
-import { GeocodeResult, Resolution } from './geocoder';
-
 import { Admin } from '../model/admin';
+import { GeocodeResult } from './geocoder';
 import LRUCache from 'lru-cache';
 import axios from 'axios';
+import { logger } from '../util/logger';
 
 // Mapbox boundaries types definitions, not part of the mapbox SDK.
 interface BoundariesResponse {
@@ -64,7 +64,7 @@ export default class MapboxAdminsFetcher {
                 this.cache.set(geocode, resp);
             } catch (e) {
                 // Fail gracefully, not being able to fetch all admins isn't a huge deal.
-                console.error(`Retrieving admins from url: ${url}:`, e);
+                logger.error(`Retrieving admins from url: ${url}:`, e);
                 return;
             }
         }

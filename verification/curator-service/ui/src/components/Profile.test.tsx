@@ -10,14 +10,14 @@ test('shows profile when passed user information', async () => {
                 _id: 'abc123',
                 name: 'Alice Smith',
                 email: 'foo@bar.com',
-                roles: ['admin', 'reader'],
+                roles: ['admin', 'curator'],
             }}
         />,
     );
     expect(screen.getByText(/Alice Smith/i)).toBeInTheDocument();
     expect(screen.getByText(/foo@bar.com/i)).toBeInTheDocument();
     expect(screen.getByText(/admin/i)).toBeInTheDocument();
-    expect(screen.getByText(/reader/i)).toBeInTheDocument();
+    expect(screen.getByText(/curator/i)).toBeInTheDocument();
 });
 
 test('shows login message when not passed user information', async () => {

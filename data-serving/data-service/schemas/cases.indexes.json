@@ -5,7 +5,6 @@
             "notes": "text",
             "revisionMetadata.creationMetadata.curator": "text",
             "demographics.occupation": "text",
-            "demographics.nationalities": "text",
             "demographics.ethnicity": "text",
             "location.country": "text",
             "location.administrativeAreaLevel1": "text",
@@ -14,7 +13,8 @@
             "location.place": "text",
             "location.name": "text",
             "pathogen.name": "text",
-            "caseReference.sourceUrl": "text"
+            "caseReference.sourceUrl": "text",
+            "caseReference.verificationStatus": "text"
         }
     },
     {
@@ -96,6 +96,11 @@
         "key": {
             "demographics.nationalities": -1
         },
+        "partialFilterExpression": {
+            "demographics.nationalities.0": {
+                "$exists": true
+            }
+        },
         "collation": {
             "locale": "en_US",
             "strength": 2
@@ -165,6 +170,26 @@
         "name": "caseReferenceUpdateMetadataCuratorIdx",
         "key": {
             "caseReference.updateMetadata.curator": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceSourceUrlIdx",
+        "key": {
+            "caseReference.sourceUrl": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
+        "name": "caseReferenceVerificationStatusIdx",
+        "key": {
+            "caseReference.verificationStatus": -1
         },
         "collation": {
             "locale": "en_US",
