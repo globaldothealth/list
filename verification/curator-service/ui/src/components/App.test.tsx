@@ -51,7 +51,7 @@ it('renders without crashing when logged out', async () => {
     expect(queryByTestId('profile-menu')).not.toBeInTheDocument();
 });
 
-it('has link to map', async () => {
+it('has drawer links', async () => {
     const axiosResponse = {
         data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
         status: 200,
@@ -70,4 +70,9 @@ it('has link to map', async () => {
         'href',
         'http://covid-19.global.health/#coverage',
     );
+    expect(await findByTestId('dictionaryButton')).toHaveAttribute(
+        'href',
+        'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+    );
+    expect(await findByTestId('termsButton')).toHaveAttribute('href', '/terms');
 });
