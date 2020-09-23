@@ -18,6 +18,16 @@ export interface LambdaFunction {
 }
 
 /**
+ * Defines the time period over which Lambda functions should parse/ingest data.
+ *
+ * Note that start and end are YYYY-MM-DD format strings.
+ */
+export interface ParseDateRange {
+    start: string;
+    end: string;
+}
+
+/**
  * Client to interact with the AWS Lambda API.
  *
  * This class instantiates the connection to AWS on construction. All
@@ -83,8 +93,14 @@ export default class AwsLambdaClient {
 
     /**
      * Invoke retrieval function lambda synchronously, returning its output.
+     *
+     * @param sourceId - ID of the source to be retrieved.
+     * @param parseDateRange - Range over which to perform parsing (inclusive).
      */
-    invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
+    invokeRetrieval = async (
+        sourceId: string,
+        parseDateRange?: ParseDateRange,
+    ): Promise<RetrievalPayload> => {
         try {
             const res = await this.lambdaClient
                 .invoke({
@@ -92,6 +108,12 @@ export default class AwsLambdaClient {
                     Payload: JSON.stringify({
                         env: this.serviceEnv,
                         sourceId: sourceId,
+                        parsingDateRange: parseDateRange
+                            ? {
+                                  start: parseDateRange.start,
+                                  end: parseDateRange.end,
+                              }
+                            : undefined,
                     }),
                 })
                 .promise();

@@ -25,6 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
+import AutomatedBackfill from './AutomatedBackfill';
 import AutomatedSourceForm from './AutomatedSourceForm';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
@@ -549,6 +550,14 @@ export default function App(): JSX.Element {
                                                 New automated source
                                             </MenuItem>
                                         </Link>
+                                        <Link
+                                            to="/sources/backfill"
+                                            onClick={closeCreateNewPopup}
+                                        >
+                                            <MenuItem>
+                                                New automated source backfill
+                                            </MenuItem>
+                                        </Link>
                                     </Menu>
                                 </>
                             )}
@@ -663,6 +672,14 @@ export default function App(): JSX.Element {
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
+                        {user && hasAnyRole(['curator']) && (
+                            <Route path="/sources/backfill">
+                                <AutomatedBackfill
                                     user={user}
                                     onModalClose={onModalClose}
                                 />
