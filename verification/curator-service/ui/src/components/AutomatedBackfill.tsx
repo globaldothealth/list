@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography, CircularProgress } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Source, { CaseReferenceForm } from './common-form-fields/Source';
 
@@ -59,6 +59,13 @@ const useStyles = makeStyles(() => ({
         marginTop: 'auto',
     },
     cancelButton: {
+        marginLeft: '1em',
+    },
+    progressIndicator: {
+        alignItems: 'center',
+        display: 'flex',
+    },
+    progressText: {
         marginLeft: '1em',
     },
 }));
@@ -218,6 +225,18 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                             >
                                 Cancel
                             </Button>
+                            <span style={{ flexGrow: 1 }}></span>
+                            {isSubmitting && (
+                                <div className={classes.progressIndicator}>
+                                    <CircularProgress data-testid="progress" />
+                                    <span className={classes.progressText}>
+                                        <strong>
+                                            Retrieving source. This can take a
+                                            couple minutes.
+                                        </strong>
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
