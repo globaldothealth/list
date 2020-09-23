@@ -9,6 +9,7 @@ import { DateField } from './common-form-fields/FormikFields';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Paper } from '@material-ui/core';
 import React from 'react';
+import User from './User';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -16,13 +17,6 @@ interface RetrievalResult {
     bucket: string;
     key: string;
     upload_id: string;
-}
-
-interface User {
-    _id: string;
-    name: string;
-    email: string;
-    roles: string[];
 }
 
 // Return type isn't meaningful.
@@ -149,8 +143,8 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                     startDate: null,
                     endDate: null,
                 }}
-                onSubmit={async (values): Promise<void> => {
-                    await triggerBackfill(values);
+                onSubmit={(values): Promise<void> => {
+                    return triggerBackfill(values);
                 }}
             >
                 {({ isSubmitting, submitForm }): JSX.Element => (
