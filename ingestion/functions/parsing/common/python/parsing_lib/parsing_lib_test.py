@@ -233,9 +233,20 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.UPLOAD_IDS_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        input_event[parsing_lib.DATE_FILTER_FIELD],
+        {},  # Date filter isn't provided, per the following test case.
         input_event[parsing_lib.DATE_RANGE_FIELD],
         input_event[parsing_lib.AUTH_FIELD])
+
+
+def test_extract_event_fields_errors_if_date_filter_and_range_provided(
+        input_event):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    with pytest.raises(ValueError, match=parsing_lib.DATE_FILTER_FIELD):
+        input_event[parsing_lib.DATE_FILTER_FIELD] = {
+            "numDaysBeforeToday": 3,
+            "op": "LT"
+        }
+        parsing_lib.extract_event_fields(input_event)
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
