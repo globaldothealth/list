@@ -167,10 +167,10 @@ spec:
                   key: email_user_password
           resources:
             requests:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "150m"
             limits:
-              memory: "512Mi"
+              memory: "1Gi"
               cpu: "250m"
 ---
 apiVersion: v1
