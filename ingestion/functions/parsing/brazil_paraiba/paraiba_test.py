@@ -1,8 +1,6 @@
 import os
 import unittest
 
-import pytest
-
 from brazil_paraiba import paraiba
 
 _SOURCE_ID = "abc123"
