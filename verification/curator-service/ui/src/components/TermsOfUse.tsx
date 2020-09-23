@@ -9,7 +9,7 @@ const styles = makeStyles(() => ({
     },
 }));
 
-export default function TermsOfService(): JSX.Element {
+export default function TermsOfUse(): JSX.Element {
     const classes = styles();
     return (
         <div className={classes.root}>
