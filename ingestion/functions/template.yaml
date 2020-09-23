@@ -6,6 +6,8 @@ Globals:
   Function:
     Runtime: python3.8
     Timeout: 900
+    EventInvokeConfig:
+      MaximumRetryAttempts: 0
     Layers:
       - !Ref CommonLibLayer
 
