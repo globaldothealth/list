@@ -100,7 +100,7 @@ spec:
     matchLabels:
       environment: prod
       app: curator
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:

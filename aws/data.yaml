@@ -71,7 +71,7 @@ spec:
     matchLabels:
       environment: prod
       app: data
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -112,7 +112,7 @@ spec:
               memory: "4Gi"
               cpu: "500m"
             limits:
-              memory: "8Gi"
+              memory: "6Gi"
               cpu: "1000m"
 ---
 apiVersion: v1
