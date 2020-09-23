@@ -192,6 +192,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
                 {/* Don't use FastField here */}
                 <Field
                     className={classes.field}
+                    data-testid={props.name}
                     name={props.name}
                     label={props.label}
                     format="yyyy/MM/dd"
