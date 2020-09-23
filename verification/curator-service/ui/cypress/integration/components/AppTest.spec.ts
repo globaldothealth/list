@@ -140,6 +140,18 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
+    it('Can open new automated backfill modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New automated source backfill').click();
+        cy.contains('New automated source backfill');
+        cy.url().should('eq', 'http://localhost:3002/sources/backfill');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
     it('Closing modal shows previous page', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/sources');
