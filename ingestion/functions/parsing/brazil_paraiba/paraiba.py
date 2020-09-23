@@ -15,13 +15,13 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-_DATE_DEATH_INDEX = 6
-_GENDER_INDEX = 3
-_AGE_INDEX = 5
-_METHOD_CONFIRMATION_INDEX = 0
-_DATE_SYMPTOMS_INDEX = 2
-_MUNICIPALITY_INDEX = 1
-_PREEXISTING_CONDITIONS_INDEX = 4
+_DATE_DEATH_INDEX = "Data do Óbito"
+_GENDER_INDEX = "Sexo"
+_AGE_INDEX = "Idade"
+_METHOD_CONFIRMATION_INDEX = "Método"
+_DATE_SYMPTOMS_INDEX = "Inicio Sintomas"
+_MUNICIPALITY_INDEX = "Município de Residência"
+_PREEXISTING_CONDITIONS_INDEX = "Doenças preexistentes"
 
 commorbidities = {
                   "Diabetes Mellitus": "diabetes mellitus", 
@@ -142,8 +142,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         3. There is no date of confirmation.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader) # Skip the header.
+        reader = csv.DictReader(f)
         for row in reader:
             if datetime.strptime(row[_DATE_SYMPTOMS_INDEX], "%Y-%m-%d") < datetime.strptime("2019-11-01", "%Y-%m-%d"): #One date is recorded as year 2000
                 print("date out of range:" + row[_DATE_SYMPTOMS_INDEX])
