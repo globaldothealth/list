@@ -150,12 +150,12 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                 </div>
                                 <DateField
                                     name="startDate"
-                                    label="First date to backfill"
+                                    label="First date to backfill (inclusive)"
                                     required
                                 ></DateField>
                                 <DateField
                                     name="endDate"
-                                    label="Last date to backfill"
+                                    label="Last date to backfill (inclusive)"
                                     required
                                 ></DateField>
                             </Paper>
