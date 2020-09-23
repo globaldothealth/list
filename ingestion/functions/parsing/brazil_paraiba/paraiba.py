@@ -15,13 +15,13 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-_DATE_DEATH_INDEX = "Data do Óbito"
-_GENDER_INDEX = "Sexo"
-_AGE_INDEX = "Idade"
-_METHOD_CONFIRMATION_INDEX = "Método"
-_DATE_SYMPTOMS_INDEX = "Inicio Sintomas"
-_MUNICIPALITY_INDEX = "Município de Residência"
-_PREEXISTING_CONDITIONS_INDEX = "Doenças preexistentes"
+_DATE_DEATH = "Data do Óbito"
+_GENDER = "Sexo"
+_AGE = "Idade"
+_METHOD_CONFIRMATION = "Método"
+_DATE_SYMPTOMS = "Inicio Sintomas"
+_MUNICIPALITY = "Município de Residência"
+_PREEXISTING_CONDITIONS = "Doenças preexistentes"
 
 commorbidities = {
                   "Diabetes Mellitus": "diabetes mellitus", 
@@ -144,44 +144,44 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if datetime.strptime(row[_DATE_SYMPTOMS_INDEX], "%Y-%m-%d") < datetime.strptime("2019-11-01", "%Y-%m-%d"): #One date is recorded as year 2000
-                print("date out of range:" + row[_DATE_SYMPTOMS_INDEX])
+            if datetime.strptime(row[_DATE_SYMPTOMS], "%Y-%m-%d") < datetime.strptime("2019-11-01", "%Y-%m-%d"): #One date is recorded as year 2000
+                print("date out of range:" + row[_DATE_SYMPTOMS])
                 continue
             case = {
                 "caseReference": {
                     "sourceId": source_id,
                     "sourceUrl": source_url
                 },
-                "location": convert_location(row[_MUNICIPALITY_INDEX]),
+                "location": convert_location(row[_MUNICIPALITY]),
                 "demographics": {
-                    "gender": convert_gender(row[_GENDER_INDEX]),
-                    "ageRange": convert_age(row[_AGE_INDEX]),
+                    "gender": convert_gender(row[_GENDER]),
+                    "ageRange": convert_age(row[_AGE]),
                 },
                 "events": [
                     {
                         "name": "confirmed",
-                        "value": convert_confirmation_method(row[_METHOD_CONFIRMATION_INDEX])
+                        "value": convert_confirmation_method(row[_METHOD_CONFIRMATION])
                     },
                     {
                         "name" : "onsetSymptoms",
                         "dateRange":
                         {
-                            "start": convert_date(row[_DATE_SYMPTOMS_INDEX]),
-                            "end": convert_date(row[_DATE_SYMPTOMS_INDEX])
+                            "start": convert_date(row[_DATE_SYMPTOMS]),
+                            "end": convert_date(row[_DATE_SYMPTOMS])
                         },                      
                     },
                     {
                         "name" : "outcome",
                         "dateRange":
                         {
-                            "start": convert_date(row[_DATE_DEATH_INDEX]),
-                            "end": convert_date(row[_DATE_DEATH_INDEX])
+                            "start": convert_date(row[_DATE_DEATH]),
+                            "end": convert_date(row[_DATE_DEATH])
                         }, 
                         "value" : "Death"                       
                     }
                 ],
-                "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
-                "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX])
+                "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS]),
+                "notes": convert_notes(row[_PREEXISTING_CONDITIONS])
             }
             yield case
         
