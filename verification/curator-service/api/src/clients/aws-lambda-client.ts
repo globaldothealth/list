@@ -83,6 +83,10 @@ export default class AwsLambdaClient {
 
     /**
      * Invoke retrieval function lambda synchronously, returning its output.
+     *
+     * @param sourceId - ID of the source to be retrieved.
+     * @param parseStartDateString - YYYY-MM-DD on which to begin parsing (inclusive).
+     * @param parseEndDateString - YYYY-MM-DD on which to end parsing (inclusive).
      */
     invokeRetrieval = async (
         sourceId: string,
