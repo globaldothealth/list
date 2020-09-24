@@ -297,7 +297,7 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
 
     # Produce a reasonable human readable name based on admin hierarchy.
     location['name'] = ', '.join([part for part in 
-      [admin1, admin2, admin3]
+      [admin3, admin2, admin1, country]
     if part])
 
     try:
@@ -353,11 +353,11 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
     Converts the case reference field from the source field.
 
     Returns:
-      None: When the input is empty.
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
           'sourceUrl': str,
+          'verificationStatus': 'VERIFIED',
           'additionalSources': [
            {
              'sourceUrl': str
@@ -365,8 +365,11 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
           ]
         }
     '''
+    caseReference = {
+      'verificationStatus': 'VERIFIED',
+    }
     if not source:
-        return None
+      return caseReference
 
     sources = parse_list(source, ', ')
 
@@ -376,10 +379,7 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
       if not sourceUrls:
         return None
       
-      caseReference = {
-        'sourceUrl': sourceUrls[0],
-        'verificationStatus': 'VERIFIED',
-      }
+      caseReference['sourceUrl'] = sourceUrls[0]
 
       if len(sourceUrls) > 1:
         caseReference['additionalSources'] = [{
