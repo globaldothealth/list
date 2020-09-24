@@ -97,6 +97,12 @@ export default class SourcesController {
                 });
                 return;
             }
+            // Undefined fields are removed from the request body by openapi
+            // validator, if we want to unset the dateFilter we have to pass an
+            // empty object and set it undefined ourselves here.
+            if (JSON.stringify(req.body.dateFilter) === '{}') {
+                req.body.dateFilter = undefined;
+            }
             await source.set(req.body).validate();
             await this.updateAutomationScheduleAwsResources(source);
             const result = await source.save();
