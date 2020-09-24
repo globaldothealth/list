@@ -175,12 +175,17 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 this.state.url + oldRowData._id,
                 newSource,
             );
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ error: '' });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
