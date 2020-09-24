@@ -153,7 +153,7 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'creationMetadata': {
                         'curator': 'covid19_spreadsheets@googlegroups.com',
                         'date': {
-                            "$date": format_iso_8601_date(datetime.today()),
+                            "$date": format_iso_8601_date(datetime.now()),
                         },
                     },
                 }
