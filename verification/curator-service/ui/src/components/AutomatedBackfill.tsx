@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { Button, Typography, CircularProgress } from '@material-ui/core';
+import { Button, CircularProgress, Typography } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Source, { CaseReferenceForm } from './common-form-fields/Source';
 
@@ -12,6 +12,7 @@ import React from 'react';
 import User from './User';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
+import { useInterval } from '../hooks/useInterval';
 
 interface RetrievalResult {
     bucket: string;
@@ -68,7 +69,27 @@ const useStyles = makeStyles(() => ({
     progressText: {
         marginLeft: '1em',
     },
+    uploadDetails: {
+        marginLeft: '2em',
+    },
 }));
+
+interface SourceResponse {
+    uploads: Upload[];
+}
+
+interface Upload {
+    _id: string;
+    status: string;
+    summary: UploadSummary;
+    created: Date;
+}
+
+interface UploadSummary {
+    numCreated?: number;
+    numUpdated?: number;
+    error?: string;
+}
 
 interface Props {
     user: User;
@@ -93,6 +114,36 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
     const classes = useStyles();
     const [errorMessage, setErrorMessage] = React.useState('');
     const [successMessage, setSuccessMessage] = React.useState('');
+    const [sourceId, setSourceId] = React.useState('');
+    const [uploadId, setUploadId] = React.useState('');
+    const [uploadStatus, setUploadStatus] = React.useState('');
+
+    useInterval(async () => {
+        if (uploadStatus === 'IN_PROGRESS') {
+            const response = await axios.get<SourceResponse>(
+                `/api/sources/${sourceId}`,
+            );
+            const upload = response.data.uploads.find(
+                (u) => u._id === uploadId,
+            );
+            if (!upload) {
+                setUploadStatus('');
+                setErrorMessage(
+                    'Internal error saving upload. Please try again after a few minutes.',
+                );
+            } else if (upload.status === 'ERROR') {
+                setUploadStatus(upload.status);
+                setErrorMessage(
+                    `Upload failed with error: ${upload.summary.error}`,
+                );
+            } else if (upload.status === 'SUCCESS') {
+                setUploadStatus(upload.status);
+                setSuccessMessage(
+                    `Upload ${uploadId} completed successfully (created ${upload.summary.numCreated} and updated ${upload.summary.numUpdated} cases).`,
+                );
+            }
+        }
+    }, 10000);
 
     /**
      * Convert the supplied date to a local YYYY-MM-DD format.
@@ -114,22 +165,29 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
         values: AutomatedBackfillValues,
     ): Promise<void> => {
         try {
+            setErrorMessage('');
+            setSuccessMessage('');
             // This will never happen, because of Yup validation.
-            if (values.startDate === null || values.endDate === null) {
-                setErrorMessage('Please enter valid dates');
+            if (
+                values.caseReference === undefined ||
+                values.startDate === null ||
+                values.endDate === null
+            ) {
+                setErrorMessage('Please enter valid source and dates');
                 return;
             }
+            setSourceId(values.caseReference.sourceId);
             const utcStartDateString = isoDateString(
                 new Date(values.startDate),
             );
             const utcEndDateString = isoDateString(new Date(values.endDate));
-            const baseUri = `/api/sources/${values.caseReference?.sourceId}/retrieve`;
+            const baseUri = `/api/sources/${values.caseReference.sourceId}/retrieve`;
             const fullUri = `${baseUri}?parse_start_date=${utcStartDateString}&parse_end_date=${utcEndDateString}`;
             const response = await axios.post<RetrievalResult>(
                 encodeURI(fullUri),
             );
-            setErrorMessage('');
-            setSuccessMessage(`Created upload ${response.data.upload_id}.`);
+            setUploadStatus('IN_PROGRESS');
+            setUploadId(response.data.upload_id);
         } catch (e) {
             setSuccessMessage('');
             setErrorMessage(e.response?.data?.message || e.toString());
@@ -206,12 +264,38 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                                 {errorMessage}
                             </MuiAlert>
                         )}
+                        {(isSubmitting || uploadStatus === 'IN_PROGRESS') && (
+                            <MuiAlert
+                                className={classes.statusMessage}
+                                data-testid="progressDetails"
+                                elevation={6}
+                                severity="info"
+                                variant="filled"
+                            >
+                                <strong>Backfill in progress.</strong>
+                                <br />
+                                This can take up to 15 minutes. Do not run
+                                another backfill until this completes.
+                                <br />
+                                This page will automatically update with upload
+                                details.
+                                {uploadId && (
+                                    <>
+                                        <br />
+                                        Upload ID: {uploadId}.
+                                    </>
+                                )}
+                            </MuiAlert>
+                        )}
                         <div className={classes.buttonBar}>
                             <Button
                                 variant="contained"
                                 color="primary"
                                 data-testid="submit"
-                                disabled={isSubmitting}
+                                disabled={
+                                    isSubmitting ||
+                                    uploadStatus === 'IN_PROGRESS'
+                                }
                                 onClick={submitForm}
                             >
                                 Backfill source
@@ -219,21 +303,22 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                             <Button
                                 className={classes.cancelButton}
                                 color="primary"
-                                disabled={isSubmitting}
+                                disabled={
+                                    isSubmitting ||
+                                    uploadStatus === 'IN_PROGRESS'
+                                }
                                 onClick={props.onModalClose}
                                 variant="outlined"
                             >
                                 Cancel
                             </Button>
                             <span style={{ flexGrow: 1 }}></span>
-                            {isSubmitting && (
+                            {(isSubmitting ||
+                                uploadStatus === 'IN_PROGRESS') && (
                                 <div className={classes.progressIndicator}>
                                     <CircularProgress data-testid="progress" />
                                     <span className={classes.progressText}>
-                                        <strong>
-                                            Retrieving source. This can take a
-                                            couple minutes.
-                                        </strong>
+                                        <strong>Processing backfill.</strong>
                                     </span>
                                 </div>
                             )}

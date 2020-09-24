@@ -46,6 +46,7 @@ it('renders form', async () => {
             />
         </MemoryRouter>,
     );
+    await wait(() => expect(mockedAxios.get).toHaveBeenCalledTimes(1));
 
     // Header text
     expect(getByTestId('header-title')).toBeInTheDocument();
@@ -64,7 +65,7 @@ it('renders form', async () => {
     expect(getByText(/cancel/i)).toBeEnabled();
 });
 
-it('displays spinner post backfill', async () => {
+it('displays spinner and status post backfill', async () => {
     const { getByTestId, getByText } = render(
         <MemoryRouter>
             <AutomatedBackfill
@@ -102,6 +103,7 @@ it('displays spinner post backfill', async () => {
     expect(getByText(/backfill source/i)).toBeDisabled();
     expect(getByText(/cancel/i)).toBeDisabled();
     expect(getByTestId('progress')).toBeInTheDocument();
-    expect(getByText(/retrieving source/i)).toBeInTheDocument();
+    expect(getByTestId('progressDetails')).toBeInTheDocument();
+    expect(getByText(/processing backfill/i)).toBeInTheDocument();
     waitForElementToBeRemoved(() => getByTestId('progress'));
 });
