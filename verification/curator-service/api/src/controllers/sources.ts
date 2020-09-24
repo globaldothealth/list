@@ -47,6 +47,7 @@ export default class SourcesController {
         try {
             const [docs, total] = await Promise.all([
                 Source.find(filter)
+                    .sort({ name: 1 })
                     .skip(limit * (page - 1))
                     .limit(limit + 1)
                     .lean(),
