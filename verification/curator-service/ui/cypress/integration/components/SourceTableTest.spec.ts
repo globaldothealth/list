@@ -1,5 +1,3 @@
-import { groupBy } from 'cypress/types/lodash';
-
 /* eslint-disable no-undef */
 describe('Sources table', function () {
     beforeEach(() => {
