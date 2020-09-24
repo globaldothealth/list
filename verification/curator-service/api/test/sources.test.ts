@@ -73,8 +73,13 @@ describe('unauthenticated access', () => {
 
 describe('GET', () => {
     it('list should return 200', async () => {
-        const source = await new Source({
+        const source1 = await new Source({
             name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const source2 = await new Source({
+            name: 'another-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
@@ -82,8 +87,10 @@ describe('GET', () => {
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body.sources).toHaveLength(1);
-        expect(res.body.sources[0]._id).toEqual(source.id);
+        expect(res.body.sources).toHaveLength(2);
+        // Ordered by name.
+        expect(res.body.sources[0]._id).toEqual(source2.id);
+        expect(res.body.sources[1]._id).toEqual(source1.id);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });

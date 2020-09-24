@@ -10,5 +10,11 @@
                 "$exists": true
             }
         }
+    },
+    {
+        "name": "nameIdx",
+        "key": {
+            "name": -1
+        }
     }
 ]
