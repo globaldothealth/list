@@ -562,7 +562,11 @@ export class CasesController {
                 continue;
             }
             // Currently a 1:1 match between the GeocodeResult and the data service API.
-            req.body['location'] = features[0];
+            // We also store the original query to match it later on and help debugging.
+            req.body['location'] = {
+                query: location?.query,
+                ...features[0],
+            };
             return true;
         }
         return false;
