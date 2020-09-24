@@ -121,9 +121,8 @@ export function PlacesAutocomplete(
                             ...l,
                         };
                     });
-
-                    setOptions(newOptions);
                 }
+                setOptions(newOptions);
             }
         });
 
