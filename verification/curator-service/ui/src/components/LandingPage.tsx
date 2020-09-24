@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@material-ui/core';
+import { Button, Paper, Typography } from '@material-ui/core';
 
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
@@ -28,8 +28,8 @@ const useStyles = makeStyles(() => ({
     link: {
         margin: '4px 0',
     },
-    loginLink: {
-        margin: '25px 0',
+    loginButton: {
+        margin: '35px 0 30px',
     },
 }));
 
@@ -84,11 +84,14 @@ export default function LandingPage(): JSX.Element {
                     </div>
                 </div>
             </div>
-            <Typography variant="h6" classes={{ root: classes.loginLink }}>
-                <a href={process.env.REACT_APP_LOGIN_URL}>
-                    Login to get started
-                </a>
-            </Typography>
+            <Button
+                variant="contained"
+                color="primary"
+                href={process.env.REACT_APP_LOGIN_URL}
+                classes={{ root: classes.loginButton }}
+            >
+                Login to get started
+            </Button>
             <HealthmapInsignias />
         </Paper>
     );
