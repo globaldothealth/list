@@ -51,7 +51,7 @@ const useStyles = makeStyles(() => ({
     },
     statusMessage: {
         marginTop: '2em',
-        maxWidth: '80%',
+        maxWidth: '60%',
     },
     buttonBar: {
         alignItems: 'center',
@@ -134,12 +134,19 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
             } else if (upload.status === 'ERROR') {
                 setUploadStatus(upload.status);
                 setErrorMessage(
-                    `Upload failed with error: ${upload.summary.error}`,
+                    `Upload ${upload._id} failed with error: ${upload.summary.error}`,
                 );
             } else if (upload.status === 'SUCCESS') {
                 setUploadStatus(upload.status);
+                const baseMessage = `Upload ${uploadId} completed successfully.`;
+                const createMessage = upload.summary?.numCreated
+                    ? `Created ${upload.summary.numCreated} case(s).`
+                    : '';
+                const updateMessage = upload.summary?.numUpdated
+                    ? `Updated ${upload.summary.numUpdated} case(s).`
+                    : '';
                 setSuccessMessage(
-                    `Upload ${uploadId} completed successfully (created ${upload.summary.numCreated} and updated ${upload.summary.numUpdated} cases).`,
+                    baseMessage.concat(createMessage, updateMessage),
                 );
             }
         }
