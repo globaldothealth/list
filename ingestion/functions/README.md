@@ -143,7 +143,7 @@ sam build
 sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
 ```
 
-If you get a 403 error, go to the [user administration page](http://localhost:3002/sources) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
+If you get a 403 error, go to the [user administration page](http://localhost:3002/users) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
 
 Upon success you'll see in the output something like
 `{"bucket":"epid-sources-raw","key":"5f311a9795e338003016593a/2020/08/10/1009/content.csv"}`
