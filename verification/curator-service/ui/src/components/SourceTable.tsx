@@ -18,7 +18,6 @@ import ParsersAutocomplete from './ParsersAutocomplete';
 import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
-import { isUndefined } from 'util';
 import ChipInput from 'material-ui-chip-input';
 
 interface ListResponse {
@@ -158,7 +157,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         oldRowData: TableRow | undefined,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            if (isUndefined(oldRowData)) {
+            if (oldRowData === undefined) {
                 return reject();
             }
             if (
@@ -172,7 +171,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 return reject();
             }
             const newSource = this.updateSourceFromRowData(newRowData);
-            this.setState({ error: '' });
             const response = axios.put(
                 this.state.url + oldRowData._id,
                 newSource,
@@ -221,7 +219,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
-                    : undefined,
+                    : {},
             notificationRecipients: rowData.notificationRecipients,
         };
     }
@@ -412,7 +410,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 rowData.dateFilter
                                                     ?.numDaysBeforeToday
                                             }{' '}
-                                            days ago
+                                            day(s) ago
                                         </div>
                                     ) : rowData.dateFilter?.op === 'LT' ? (
                                         <div>
@@ -421,7 +419,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 rowData.dateFilter
                                                     ?.numDaysBeforeToday
                                             }{' '}
-                                            ago
+                                            day(s) ago
                                         </div>
                                     ) : (
                                         <div>None</div>
