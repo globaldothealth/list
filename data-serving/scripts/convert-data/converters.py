@@ -337,31 +337,6 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
         log_error(id, field_name, f'{field_name}.values', value, e)
 
 
-def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
-        str, str]:
-    '''
-    Populates a revisionMetadata field with an initial revision number of 0 and
-    the data moderator's initials where available.
-
-    Returns:
-      Dict[str, str]: Always. The dictionary is in the format:
-        {
-          'id': int,
-          'moderator': str
-        }
-    '''
-    revision_metadata = {
-        'revisionNumber': 0
-    }
-
-    if data_moderator_initials:
-        revision_metadata['creationMetadata'] = {
-            'curator': str(data_moderator_initials)
-        }
-
-    return revision_metadata
-
-
 def convert_notes_field(notes_fields: [str]) -> str:
     '''
     Creates a notes field from a list of original notes fields.
@@ -401,7 +376,10 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
       if not sourceUrls:
         return None
       
-      caseReference = { 'sourceUrl': sourceUrls[0] }
+      caseReference = {
+        'sourceUrl': sourceUrls[0],
+        'verificationStatus': 'VERIFIED',
+      }
 
       if len(sourceUrls) > 1:
         caseReference['additionalSources'] = [{
