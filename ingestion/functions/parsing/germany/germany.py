@@ -86,7 +86,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 case = {
                     "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                     "location": {
-                        "query": ", ".join(("Germany", row[_ADMIN1], row[_ADMIN2])),
+                        "query": ", ".join((row[_ADMIN2], row[_ADMIN1], "Germany")),
                         "limitToResolution": "Admin2",
                     },
                     "events": [

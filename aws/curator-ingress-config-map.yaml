@@ -1,0 +1,9 @@
+# Overrides for the curator ingress that cannot be configured by annotations.
+apiVersion: v1
+data:
+  # https://github.com/globaldothealth/list/issues/1107#issuecomment-696028794
+  # Default config + CSV added to it.
+  gzip-types: 'text/csv application/atom+xml application/javascript application/x-javascript application/json application/rss+xml application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/svg+xml image/x-icon text/css text/plain text/x-component'
+kind: ConfigMap
+metadata:
+  name: ingress-nginx-controller

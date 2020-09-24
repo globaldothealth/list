@@ -117,14 +117,6 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     renderDate(rowData.created),
                             },
                             {
-                                title: 'Source name',
-                                field: 'sourceName',
-                            },
-                            {
-                                title: 'Source URL',
-                                field: 'sourceUrl',
-                            },
-                            {
                                 title: '# created cases',
                                 field: 'numCreated',
                                 render: (rowData): JSX.Element => (
@@ -155,6 +147,14 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                         {rowData.numUpdated}
                                     </Link>
                                 ),
+                            },
+                            {
+                                title: 'Source name',
+                                field: 'sourceName',
+                            },
+                            {
+                                title: 'Source URL',
+                                field: 'sourceUrl',
                             },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>

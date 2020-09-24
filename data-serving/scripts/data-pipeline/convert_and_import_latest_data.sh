@@ -73,6 +73,7 @@ function setup_db() {
 function import_data() {
     print 'Importing data'
     mongoimport \
+        --db $db \
         --collection $collection \
         --file $CONVERTED_DATA_PATH \
         --jsonArray \
