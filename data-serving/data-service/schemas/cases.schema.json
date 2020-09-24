@@ -235,6 +235,9 @@
                   "bsonType": "object",
                   "additionalProperties": false,
                   "properties": {
+                    "query": {
+                      "bsonType": "string"
+                    },
                     "country": {
                       "bsonType": "string"
                     },
