@@ -115,10 +115,15 @@ export function PlacesAutocomplete(
                 let newOptions = [] as Loc[];
 
                 if (results) {
-                    newOptions = [...newOptions, ...results];
-                }
+                    newOptions = results.map((l) => {
+                        return {
+                            query: inputValue,
+                            ...l,
+                        };
+                    });
 
-                setOptions(newOptions);
+                    setOptions(newOptions);
+                }
             }
         });
 
