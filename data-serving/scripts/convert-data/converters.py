@@ -297,7 +297,7 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
 
     # Produce a reasonable human readable name based on admin hierarchy.
     location['name'] = ', '.join([part for part in 
-      [admin1, admin2, admin3]
+      [admin3, admin2, admin1, country]
     if part])
 
     try:
@@ -337,31 +337,6 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
         log_error(id, field_name, f'{field_name}.values', value, e)
 
 
-def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
-        str, str]:
-    '''
-    Populates a revisionMetadata field with an initial revision number of 0 and
-    the data moderator's initials where available.
-
-    Returns:
-      Dict[str, str]: Always. The dictionary is in the format:
-        {
-          'id': int,
-          'moderator': str
-        }
-    '''
-    revision_metadata = {
-        'revisionNumber': 0
-    }
-
-    if data_moderator_initials:
-        revision_metadata['creationMetadata'] = {
-            'curator': str(data_moderator_initials)
-        }
-
-    return revision_metadata
-
-
 def convert_notes_field(notes_fields: [str]) -> str:
     '''
     Creates a notes field from a list of original notes fields.
@@ -378,11 +353,11 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
     Converts the case reference field from the source field.
 
     Returns:
-      None: When the input is empty.
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
           'sourceUrl': str,
+          'verificationStatus': 'VERIFIED',
           'additionalSources': [
            {
              'sourceUrl': str
@@ -390,8 +365,11 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
           ]
         }
     '''
+    caseReference = {
+      'verificationStatus': 'VERIFIED',
+    }
     if not source:
-        return None
+      return caseReference
 
     sources = parse_list(source, ', ')
 
@@ -401,7 +379,7 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
       if not sourceUrls:
         return None
       
-      caseReference = { 'sourceUrl': sourceUrls[0] }
+      caseReference['sourceUrl'] = sourceUrls[0]
 
       if len(sourceUrls) > 1:
         caseReference['additionalSources'] = [{

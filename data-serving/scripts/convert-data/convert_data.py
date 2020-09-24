@@ -5,6 +5,7 @@ schema.
 
 import argparse
 import csv
+from datetime import datetime
 import logging
 from importlib import machinery
 import itertools
@@ -12,12 +13,13 @@ import json
 import progressbar
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
-    convert_imported_case, convert_location, convert_revision_metadata_field,
+    convert_imported_case, convert_location,
     convert_notes_field, convert_case_reference_field, convert_travel_history)
 from typing import Any
 from constants import (
     DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
     GEOCODER_MODULE, GEOCODER_REPO_PATH, LOSSY_FIELDS)
+from utils import format_iso_8601_date
 import tarfile
 import os
 
@@ -143,8 +145,18 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'preexistingConditions',
                     csv_case['chronic_disease'])
 
-                json_case['revisionMetadata'] = convert_revision_metadata_field(
-                    csv_case['data_moderator_initials'])
+                json_case['revisionMetadata'] = {
+                    'revisionNumber': 0,
+                    # Using the googlegroups alias that contained all curators as we need
+                    # a valid email in the curator field and we can't deduce it from just
+                    # the initials that are present in the CSV.
+                    'creationMetadata': {
+                        'curator': 'covid19_spreadsheets@googlegroups.com',
+                        'date': {
+                            "$date": format_iso_8601_date(datetime.now()),
+                        },
+                    },
+                }
 
                 json_case['notes'] = convert_notes_field(
                     [csv_case['notes_for_discussion'],
