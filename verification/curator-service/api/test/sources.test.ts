@@ -183,6 +183,40 @@ describe('PUT', () => {
         expect(res.body.origin.url).toEqual('http://foo.bar');
         expect(mockPutRule).not.toHaveBeenCalled();
     });
+    it('should update date filtering of a source', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        let res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {
+                    numDaysBeforeToday: '3',
+                    op: 'EQ',
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toEqual({
+            numDaysBeforeToday: 3,
+            op: 'EQ',
+        });
+        // Now clear the date filter.
+        res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {},
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toBeUndefined();
+
+        expect(mockPutRule).not.toHaveBeenCalledTimes(2);
+    });
     it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
