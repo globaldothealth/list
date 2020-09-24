@@ -41,32 +41,38 @@ it('renders without crashing when logged out', async () => {
         headers: {},
     };
     mockedAxios.get.mockResolvedValue(axiosResponse);
-    render(
+    const { queryByTestId } = render(
         <MemoryRouter>
             <App />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
     expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
+    expect(queryByTestId('profile-menu')).not.toBeInTheDocument();
 });
 
-it('has link to map', async () => {
+it('has drawer links', async () => {
     const axiosResponse = {
-        data: {},
-        status: 403,
-        statusText: 'Forbidden',
+        data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
+        status: 200,
+        statusText: 'OK',
         config: {},
         headers: {},
     };
     mockedAxios.get.mockResolvedValue(axiosResponse);
-    const { getByTestId } = render(
+    const { findByTestId } = render(
         <MemoryRouter>
             <App />
         </MemoryRouter>,
     );
 
-    expect(getByTestId('mapButton')).toHaveAttribute(
+    expect(await findByTestId('mapLink')).toHaveAttribute(
         'href',
-        'http://covid-19.global.health/#coverage',
+        'http://covid-19.global.health',
     );
+    expect(await findByTestId('dictionaryButton')).toHaveAttribute(
+        'href',
+        'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+    );
+    expect(await findByTestId('termsButton')).toHaveAttribute('href', '/terms');
 });

@@ -959,7 +959,6 @@ describe('PUT', () => {
             })
             .expect('Content-Type', /json/)
             .expect(200);
-        console.log('UPDATE RES:', res);
 
         expect(await CaseRevision.collection.countDocuments()).toEqual(1);
         expect((await CaseRevision.find())[0].case.toObject()).toEqual(

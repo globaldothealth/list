@@ -6,6 +6,8 @@ Globals:
   Function:
     Runtime: python3.8
     Timeout: 900
+    EventInvokeConfig:
+      MaximumRetryAttempts: 0
     Layers:
       - !Ref CommonLibLayer
 
@@ -200,6 +202,18 @@ Resources:
       CodeUri: parsing/mexico/
       Handler: mexico.lambda_handler
       Description: Parse case data for Mexico
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  ArgentinaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/argentina/
+      Handler: argentina.lambda_handler
+      Description: Parse case data for Argentina
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

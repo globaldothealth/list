@@ -274,4 +274,31 @@ describe('Bulk upload form', function () {
         cy.visit('/cases');
         cy.contains('No records to display');
     });
+
+    it('Fails gracefully when no header in CSV', function () {
+        cy.addSource('Bulk source', 'www.bulksource.com');
+
+        cy.visit('/cases');
+        cy.contains('No records to display');
+
+        cy.visit('/');
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New bulk upload').click();
+        cy.get('div[data-testid="caseReference"]').type('www.bulksource.com');
+        cy.contains('li', 'www.bulksource.com').click();
+        const csvFixture = '../fixtures/no_header.csv';
+        cy.get('input[type="file"]').attachFile(csvFixture);
+        cy.server();
+        cy.route('POST', '/api/cases/batchUpsert').as('batchUpsert');
+        cy.get('button[data-testid="submit"]').click();
+        cy.wait('@batchUpsert');
+        cy.contains(
+            'li',
+            'location.query must be specified to be able to geocode',
+        );
+        cy.get('button[aria-label="close overlay"').click();
+
+        cy.visit('/cases');
+        cy.contains('No records to display');
+    });
 });

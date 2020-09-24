@@ -59,6 +59,21 @@ _PARSED_CASES = [
         },
         "notes": 'Case was not in quarantine',
     },
+    {
+        'caseReference': {
+            'sourceId': 'abc123', 
+            'sourceEntryId': '3219', 
+            'sourceUrl': 'https://foo.bar'
+        },
+        'location': {'query': 'เมือง, ไม่พบข้อมูล, Thailand'},
+        'events': [
+            {'name': 'confirmed', 'dateRange': {'start': '07/13/2020Z', 'end': '07/13/2020Z'}}
+        ], 
+        'demographics': {
+            'ageRange': {'start': 43.0, 'end': 43.0}, 'gender': 'Male'
+        }, 
+        'notes': 'Case was in quarantine'
+    },
 ]
 
 
