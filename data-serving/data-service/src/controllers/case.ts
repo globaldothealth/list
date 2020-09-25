@@ -9,12 +9,12 @@ import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 
-class InvalidParamError extends Error {}
+class InvalidParamError extends Error { }
 
 type BatchValidationErrors = { index: number; message: string }[];
 
 export class CasesController {
-    constructor(private readonly geocoders: Geocoder[]) {}
+    constructor(private readonly geocoders: Geocoder[]) { }
 
     /**
      * Get a specific case.
@@ -213,15 +213,15 @@ export class CasesController {
         cases: any[],
     ): Promise<BatchValidationErrors> => {
         const errors: { index: number; message: string }[] = [];
-        await Promise.all(
-            // We're about to validate this data; any is fine, here.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            cases.map((c: any, index: number) => {
-                return new Case(c).validate().catch((e) => {
-                    errors.push({ index: index, message: e.message });
-                });
-            }),
-        );
+        // Do not parallelize these requests as it causes an out of memory error
+        // for a large number of cases. However this does take a long time to run
+        // in parallel, so if Mongo creates a batch validate method that should be used here.
+        for (let index = 0; index < cases.length; index++) {
+            const c = cases[index];
+            await new Case(c).validate().catch((e) => {
+                errors.push({ index: index, message: e.message });
+            });
+        }
         return errors;
     };
 
@@ -237,47 +237,44 @@ export class CasesController {
         next: NextFunction,
     ): Promise<void> => {
         const geocodeErrors: { index: number; message: string }[] = [];
-        Promise.all(
-            req.body.cases.map((c: any, index: number) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const geocodeResult = await this.geocode({
-                            body: c,
-                        });
-                        if (!geocodeResult) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: `no geolocation found for ${c.location?.query}`,
-                            });
-                        }
-                        resolve();
-                    } catch (err) {
-                        if (err instanceof InvalidParamError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    }
-                });
-            }),
-        )
-            .then(() => {
-                if (geocodeErrors.length > 0) {
-                    res.status(207).send({
-                        phase: 'GEOCODE',
-                        numCreated: 0,
-                        numUpdated: 0,
-                        errors: geocodeErrors,
+        try {
+            // Do not parallelize these requests as it causes an out of memory error
+            // for a large number of cases.
+            for (let index = 0; index < req.body.cases.length; index++) {
+                try {
+                    const c = req.body.cases[index];
+                    const geocodeResult = await this.geocode({
+                        body: c,
                     });
-                    return;
+                    if (!geocodeResult) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: `no geolocation found for ${c.location?.query}`,
+                        });
+                    }
+                } catch (err) {
+                    if (err instanceof InvalidParamError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
+                    }
                 }
-                next();
-            })
-            .catch((e) => res.send(e));
+            }
+            if (geocodeErrors.length > 0) {
+                res.status(207).send({
+                    phase: 'GEOCODE',
+                    numCreated: 0,
+                    numUpdated: 0,
+                    errors: geocodeErrors,
+                });
+                return;
+            }
+
+            next();
+        } catch (e) {
+            res.send(e);
+        }
     };
 
     /**
@@ -301,41 +298,35 @@ export class CasesController {
                 });
                 return;
             }
-            const bulkWriteResult = await Case.bulkWrite(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                req.body.cases.map((c: any) => {
-                    if (
-                        c.caseReference?.sourceId &&
-                        c.caseReference?.sourceEntryId
-                    ) {
-                        return {
-                            updateOne: {
-                                filter: {
-                                    'caseReference.sourceId':
-                                        c.caseReference.sourceId,
-                                    'caseReference.sourceEntryId':
-                                        c.caseReference.sourceEntryId,
-                                },
-                                update: c,
-                                upsert: true,
-                            },
-                        };
-                    } else {
-                        return {
-                            insertOne: {
-                                document: c,
-                            },
-                        };
-                    }
-                }),
-                { ordered: false },
-            );
+            // Use this method rather than Case.bulkWrite() as that method
+            // causes an out of memory error for a large number of cases.
+            const bulk = Case.collection.initializeUnorderedBulkOp();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            req.body.cases.map((c: any) => {
+                delete c.caseCount;
+                if (
+                    c.caseReference?.sourceId &&
+                    c.caseReference?.sourceEntryId
+                ) {
+                    delete c._id;
+                    bulk.find({
+                        'caseReference.sourceId': c.caseReference.sourceId,
+                        'caseReference.sourceEntryId':
+                            c.caseReference.sourceEntryId,
+                    })
+                        .upsert()
+                        .updateOne({ $set: c });
+                } else {
+                    bulk.insert(c);
+                }
+            });
+            const bulkWriteResult = await bulk.execute();
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult.insertedCount || 0) +
-                    (bulkWriteResult.upsertedCount || 0),
-                numUpdated: bulkWriteResult.modifiedCount,
+                    (bulkWriteResult.nInserted || 0) +
+                    (bulkWriteResult.nUpserted || 0),
+                numUpdated: bulkWriteResult.nModified,
                 errors: [],
             });
             return;
@@ -585,8 +576,8 @@ export const casesMatchingSearchQuery = (opts: {
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
-              $text: { $search: parsedSearch.fullTextSearch },
-          }
+            $text: { $search: parsedSearch.fullTextSearch },
+        }
         : {};
 
     // Always search with case-insensitivity.
@@ -646,9 +637,9 @@ export const findCasesWithCaseReferenceData = async (
 
     return providedCaseReferenceData.length > 0
         ? Case.find()
-              .or(providedCaseReferenceData)
-              .select(fieldsToSelect)
-              .exec()
+            .or(providedCaseReferenceData)
+            .select(fieldsToSelect)
+            .exec()
         : [];
 };
 
