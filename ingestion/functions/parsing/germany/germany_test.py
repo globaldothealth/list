@@ -19,7 +19,6 @@ _PARSED_CASE = [
       },
       "location":{
          "query":"SK Flensburg, Schleswig-Holstein, Germany",
-         "limitToResolution": "Admin2"
       },
       "events":[
          {
