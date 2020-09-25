@@ -1,6 +1,5 @@
 import os
 import sys
-from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -18,8 +17,7 @@ except ImportError:
 
 import os
 import sys
-from datetime import date, datetime
-import csv
+from datetime import datetime
 
 
 private_public_map = {'Público': 'Public', 'Privado': 'Private'}

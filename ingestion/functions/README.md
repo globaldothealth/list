@@ -49,6 +49,10 @@ Serverless Application Model
 Python and executed on a version 3.8 runtime. See set up instructions and
 common commands, below.
 
+If you are using VSCode you can find [common settings](https://github.com/globaldothealth/list/blob/main/dev/.vscode/settings.json) around linting/style. The [CI pipeline](https://github.com/globaldothealth/list/blob/main/.github/workflows/ingestion-functions-python.yml) runs flake8 so make sure you at least have this running in your editor.
+
+You can find more information on linting in visual studio [here](https://code.visualstudio.com/docs/python/linting).
+
 ### Setup for folks without AWS access
 
 If you're a first-time contributor to the project and don't have access to the S3 bucket containing the service account keys, you can run the ingestion and parsing functions fully locally, in the `retrieval/valid_scheduled_event.json`, add this auth param to it:
@@ -132,7 +136,7 @@ You need AWS sam CLi installed on your system, [follow the instructions](https:/
 
 Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
 
-Go to the UI at http://localhost:3002/sources and add a new source for your parser, once you give it a name, a URL and save it, it will be given an ID.
+Go to the [UI](http://localhost:3002/sources) and add a new source for your parser, once you give it a name, a URL and save it, it will be given an ID.
 
 Put that ID in the `retrieval/valid_scheduled_event.json` file.
 
