@@ -68,6 +68,25 @@ To update the deployments use:
 kubectl apply -f data.yaml -f curator.yaml
 ```
 
+## Reading server logs
+
+To read the server logs first find the pod whose logs you want to read.
+
+```shell
+kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+curator-dev-6cff5859df-dddbw    1/1     Running   0          148m
+curator-prod-5bf5c88f58-g2489   1/1     Running   0          139m
+data-dev-566fb67694-xfzkj       1/1     Running   0          148m
+data-prod-5b78bdc66d-dwf2k      1/1     Running   4          139m
+```
+
+Then call logs on the pod you want to read from.
+
+```shell
+kubectl logs data-prod-5b78bdc66d-dwf2k
+```
+
 ## Getting access to the cluster
 
 Ask an admin to run `kubectl edit -n kube-system configmap/aws-auth` and add the appropriate user there. Instructions can be found in the [official docs](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html).
@@ -80,7 +99,7 @@ Data and curator are exposed as kubernetes services inside the cluster (but have
 
 You can check DNS resolution within the cluster by running:
 
-```
+```shell
 kubectl run curl --image=radial/busyboxplus:curl -i --tty
 [ root@curl:/ ]$ nslookup curator
 Server:    10.100.0.10
@@ -201,11 +220,13 @@ then push it to the repo:
 
 `git push origin 0.1.2`
 
-Github actions will automatically build the image: `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
+Github actions will automatically build the image, e.g. `ghcr.io/globaldothealth/list/curatorservice:0.1.2`.
 
-This tag can then be referenced in the deployment files, change the current image version to the new one and apply the change: `kubectl apply -f curator.yaml`.
+This tag can then be referenced in the deployment files:
+- Submit a PR to change the current image version to the new one. [Example](https://github.com/globaldothealth/list/pull/1170).
+- Apply the change: `kubectl apply -f curator.yaml -f data.yaml`.
 
-To push a new release of the data service, follow the same procedure but change `curator` to `data` in the tag.
+In a few seconds the push should be complete.
 
 You can list the existing tags/versions with `git tag` or on the [github repo](https://github.com/globaldothealth/list/releases).
 
@@ -263,6 +284,25 @@ The curator services are exposed here:
 
 - [dev](https://dev-curator.ghdsi.org)
 - [prod](https://curator.ghdsi.org)
+
+## Kubernetes dashboard
+
+The kubernetes dashboard has been deployed following the [official instructions](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/), mainly:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+kubectl apply -f dashboard.yaml
+```
+
+The [dashboard.yaml](dashboard.yaml) file contains the user configuration that is needed to log into the dashboard. The user has the `read` role that gives read access to all resources (except secrets to avoid privilege escalation).
+
+To log into the dashboard:
+
+1. Start a proxy (the dashboard isn't exposed externally): `kubectl proxy`
+
+2. Get the token to login as the `dashboard-reader` user by running the `display_dashboard_token.sh` script in this directory.
+
+3. Go to the [dashboard](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) and copy the token into the login screen.
 
 ## HTTPS / certs management
 

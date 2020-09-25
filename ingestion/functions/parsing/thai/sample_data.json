@@ -29,6 +29,21 @@
             "ProvinceEn": "Songkhla",
             "Detail": null,
             "StatQuarantine": 0
+        },
+        {
+            "ConfirmDate": "2020-07-13 00:00:00",
+            "No": "3219",
+            "Age": 43,
+            "Gender": "\u0e0a\u0e32\u0e22",
+            "GenderEn": "Male",
+            "Nation": "Egypt",
+            "NationEn": null,
+            "Province": "\u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25",
+            "ProvinceId": 78,
+            "District": "\u0e40\u0e21\u0e37\u0e2d\u0e07",
+            "ProvinceEn": "Unknown",
+            "Detail": null,
+            "StatQuarantine": 1
         }
     ]
 }

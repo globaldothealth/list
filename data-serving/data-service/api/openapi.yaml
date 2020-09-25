@@ -783,6 +783,8 @@ components:
     Location:
       type: object
       properties:
+        query:
+          type: string
         country:
           type: string
         administrativeAreaLevel1:

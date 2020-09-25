@@ -6,6 +6,7 @@ import Geocoder from '../../src/geocoding/mapbox';
 import { MapiRequest } from '@mapbox/mapbox-sdk/lib/classes/mapi-request';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
 import axios from 'axios';
+import { RateLimiter } from 'limiter';
 
 // Typings defined by DefinitelyTyped are not fully compatible with the response we get.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +53,11 @@ describe('geocode', () => {
             },
         });
         features.push(lyon);
-        const geocoder = new Geocoder('token', 'mapbox.places');
+        const geocoder = new Geocoder(
+            'token',
+            'mapbox.places',
+            new RateLimiter(100, 'second'),
+        );
         let feats = await geocoder.geocode('some query', {
             limitToResolution: [Resolution.Admin3, Resolution.Admin2],
         });
@@ -74,7 +79,11 @@ describe('geocode', () => {
         expect(callCount).toBe(1);
     });
     it('can return no results', async () => {
-        const geocoder = new Geocoder('token', 'mapbox.places');
+        const geocoder = new Geocoder(
+            'token',
+            'mapbox.places',
+            new RateLimiter(100, 'second'),
+        );
         const feats = await geocoder.geocode('some query');
         expect(feats).toHaveLength(0);
     });

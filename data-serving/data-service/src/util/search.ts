@@ -31,6 +31,12 @@ const keywords = new Map<string, string>([
 
 export default function parseSearchQuery(q: string): ParsedSearch {
     q = q.trim();
+    // parse() doesn't handle most-likely mistyped queries like
+    // "curator: foo@bar.com" (with a space after the semicolon).
+    // Change the query here to account for that: this regexp removes all
+    // whitespace after semicolons so that
+    // "curator: foo@bar.com" becomes "curator:foo@bar.com".
+    q = q.replace(/(\w:)(\s+)/g, '$1');
     const parsedSearch = parse(q, {
         offsets: false,
         keywords: [...keywords.keys()],

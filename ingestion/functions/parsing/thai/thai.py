@@ -37,8 +37,10 @@ def convert_gender(raw_gender):
 
 def convert_location(entry):
     query_terms = [
+        # District doesn't have English translations.
         entry['District'],
-        entry['ProvinceEn'] or entry['Province'],
+        # Province sometimes has English translations or not or 'Unknown'
+        (entry['ProvinceEn'] if entry['ProvinceEn'] != 'Unknown' else '') or entry['Province'],
         'Thailand',
     ]
     return {"query":  ", ".join([term for term in query_terms if term])}
