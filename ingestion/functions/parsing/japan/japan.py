@@ -16,12 +16,14 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
+
 def convert_gender(raw_gender):
     if "gender" in raw_gender:
         if raw_gender["gender"] == "M":
             return "Male"
         if raw_gender["gender"] == "F":
             return "Female"
+
 
 def convert_age(raw_age):
     age_range = {}
@@ -32,6 +34,7 @@ def convert_age(raw_age):
     else:
         return None
 
+
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
@@ -39,13 +42,15 @@ def convert_location(raw_entry):
             raw_entry.get("detectedPrefecture", ""),
             "Japan"]
         if term and term != "Unspecified"]
-    return {"query":  ", ".join(query_terms)}
+    return {"query": ", ".join(query_terms)}
+
 
 def detect_notes(raw_notes):
     if "notes" in raw_notes:
         return raw_notes["notes"]
     else:
         return None
+
 
 def convert_date(raw_date: Dict):
     """
@@ -56,29 +61,33 @@ def convert_date(raw_date: Dict):
     date = datetime.strptime(raw_date["dateAnnounced"], "%Y-%m-%d")
     return date.strftime("%m/%d/%YZ")
 
+
 def convert_additional_sources(additional_source_url: Dict):
     sources = []
     if "sourceURL" in additional_source_url:
-      sources.append({"sourceUrl": additional_source_url["sourceURL"]})
+        sources.append({"sourceUrl": additional_source_url["sourceURL"]})
     if "deathSourceURL" in additional_source_url:
-      sources.append({"sourceUrl": additional_source_url["deathSourceURL"]})
+        sources.append({"sourceUrl": additional_source_url["deathSourceURL"]})
     return sources or None
+
 
 def convert_outcome(raw_outcome: Dict, raw_death_date: Dict):
     if "patientStatus" in raw_outcome:
         if raw_outcome["patientStatus"] == "Deceased":
-            death_date = datetime.strptime(raw_death_date["deceasedDate"], "%Y-%m-%d")
+            death_date = datetime.strptime(
+                raw_death_date["deceasedDate"], "%Y-%m-%d")
             return {"name": "outcome",
-                    "dateRange":{
+                    "dateRange": {
                         "start": death_date.strftime("%m/%d/%YZ"),
                         "end": death_date.strftime("%m/%d/%YZ")
-                        },
+                    },
                     "value": "Death"}
         elif raw_outcome["patientStatus"] == "Discharged" or raw_outcome["patientStatus"] == "Recovered":
             return {"name": "outcome",
-                    "value": "Recovered"}      
+                    "value": "Recovered"}
     return {"name": "outcome",
             "value": "Unknown"}
+
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
@@ -104,7 +113,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                             "end": convert_date(entry)
                         }
                     },
-                        convert_outcome(entry, entry)
+                    convert_outcome(entry, entry)
                 ],
                 "demographics": {
                     "ageRange": convert_age(entry),
@@ -112,6 +121,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 },
                 "notes": detect_notes(entry)
             } for entry in cases if (entry["patientId"] != "-1" and entry["confirmedPatient"]))
+
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

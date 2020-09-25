@@ -1,7 +1,5 @@
-import csv
 import os
 import unittest
-from datetime import date
 from colombia import colombia
 
 

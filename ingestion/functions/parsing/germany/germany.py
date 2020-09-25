@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -77,7 +77,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header.
-        cases = []
         for row in reader:
             num_confirmed_cases = int(row[_CASECOUNT])
             if num_confirmed_cases < 1:
