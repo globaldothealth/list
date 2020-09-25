@@ -21,7 +21,7 @@ describe('validate', () => {
     });
 
     it('a regex-parsing with fields missing a name is invalid', async () => {
-        const missingName = { ..._.cloneDeep(fullModel) };
+        const missingName = _.cloneDeep(fullModel);
         delete missingName.fields[0].name;
 
         return new RegexPasing(missingName).validate((e) => {
@@ -30,7 +30,7 @@ describe('validate', () => {
     });
 
     it('a regex-parsing with fields missing a regex is invalid', async () => {
-        const missingRegex = { ..._.cloneDeep(fullModel) };
+        const missingRegex = _.cloneDeep(fullModel);
         delete missingRegex.fields[0].regex;
 
         return new RegexPasing(missingRegex).validate((e) => {
@@ -39,6 +39,6 @@ describe('validate', () => {
     });
 
     it('a fully specified regex-parsing is valid', async () => {
-        return new RegexPasing(_.cloneDeep(fullModel)).validate();
+        return new RegexPasing(fullModel).validate();
     });
 });
