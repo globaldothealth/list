@@ -31,17 +31,18 @@ _SHORTBREATH = 15
 _OTHER = 16
 _COMORBIDITIES = 17
 _INDIGENOUS = 22
+_HEALTHCARE_WORKER = 23
 _NEIGHBORHOOD = 24
 
 _COMORBIDITIES_MAP = {
     "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
     "Asm": "asthma",
-    "Doença Cardiovascular Crônica": "cardiovascular disease",
+    "Doença Cardiovascular Crônica": "cardiovascular system disease",
     "Doenças cardíacas crônicas": "heart disease",
     "Doença Renal Crônic": "kidney disease",
     "Doença Hepática Crônic": "liver disease",
     "Doença Neurológica Crônic": "nervous system disease",
-    "Pneumatopatia Crônica": "pneumopathy",
+    "Pneumatopatia Crônica": "lung disease",
     "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "Diabetes": "diabetes mellitus",
     "Síndrome de Down": "Down syndrome",
@@ -157,7 +158,7 @@ def convert_ethnicity(raw_ethnicity: str):
         return "Indigenous"
 
 
-def convert_demographics(gender: str, age: str, ethnicity: str):
+def convert_demographics(gender: str, age: str, ethnicity: str, health_professional: str):
     if not any((gender, age, ethnicity)):
         return None
     demo = {}
@@ -176,6 +177,8 @@ def convert_demographics(gender: str, age: str, ethnicity: str):
             }
     if ethnicity != "NAO INFORMADO":
         demo["ethnicity"] = convert_ethnicity(ethnicity.title())
+    if health_professional == "SIM":
+        demo["occupation"] = "Healthcare worker"
     return demo
 
 
@@ -198,6 +201,10 @@ def convert_notes(
         raw_notes.append("Hematologic disease")
     if "Outro" in raw_commorbidities:
         raw_notes.append("Unspecified pre-existing condition")
+    if "Puérpera" in raw_commorbidities:
+        raw_notes.append("recently gave birth")
+    if "Gestante" in raw_commorbidities:
+        raw_notes.append("pregnant")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood.title())
     if raw_notes_indigenousEthnicity != "NAO ENCONTRADO":
@@ -233,7 +240,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         row[_DATE_DEATH],
                     ),
                     "demographics": convert_demographics(
-                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY]
+                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY], row[_HEALTHCARE_WORKER]
                     ),
                 }
                 if "SIM" in (
