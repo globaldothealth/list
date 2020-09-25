@@ -9,12 +9,12 @@ import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 
-class InvalidParamError extends Error { }
+class InvalidParamError extends Error {}
 
 type BatchValidationErrors = { index: number; message: string }[];
 
 export class CasesController {
-    constructor(private readonly geocoders: Geocoder[]) { }
+    constructor(private readonly geocoders: Geocoder[]) {}
 
     /**
      * Get a specific case.
@@ -576,8 +576,8 @@ export const casesMatchingSearchQuery = (opts: {
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
-            $text: { $search: parsedSearch.fullTextSearch },
-        }
+              $text: { $search: parsedSearch.fullTextSearch },
+          }
         : {};
 
     // Always search with case-insensitivity.
@@ -637,9 +637,9 @@ export const findCasesWithCaseReferenceData = async (
 
     return providedCaseReferenceData.length > 0
         ? Case.find()
-            .or(providedCaseReferenceData)
-            .select(fieldsToSelect)
-            .exec()
+              .or(providedCaseReferenceData)
+              .select(fieldsToSelect)
+              .exec()
         : [];
 };
 
