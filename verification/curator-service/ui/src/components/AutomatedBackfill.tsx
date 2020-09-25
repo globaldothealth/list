@@ -140,10 +140,10 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                 setUploadStatus(upload.status);
                 const baseMessage = `Upload ${uploadId} completed successfully.`;
                 const createMessage = upload.summary?.numCreated
-                    ? `Created ${upload.summary.numCreated} case(s).`
+                    ? ` Created ${upload.summary.numCreated} case(s).`
                     : '';
                 const updateMessage = upload.summary?.numUpdated
-                    ? `Updated ${upload.summary.numUpdated} case(s).`
+                    ? ` Updated ${upload.summary.numUpdated} case(s).`
                     : '';
                 setSuccessMessage(
                     baseMessage.concat(createMessage, updateMessage),
