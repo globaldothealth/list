@@ -1,0 +1,18 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+command_line = -m pytest .
+include = 
+    parsing/*
+    retrieval/*
+    common/*
+
+[report]
+omit = */__init__.py
+
+[html]
+directory = coverage_html_report
+title = Ingestion functions coverage report
+
+[json]
+output = coverage.json

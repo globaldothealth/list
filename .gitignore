@@ -14,6 +14,11 @@ covid-19-map-*.json
 # Secrets for kubernetes.
 kustomization.yaml
 
+# Python coverage
+coverage_html_report
+.coverage
+coverage.json
+
 # MongoDB global configs
 globalConfig.json
 

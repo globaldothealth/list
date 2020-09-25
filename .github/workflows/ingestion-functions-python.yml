@@ -39,3 +39,11 @@ jobs:
       run: |
         pip install pytest
         pytest
+    - name: Generate and upload coverage
+      run: |
+        coverage run
+        coverage json
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: coverage.json
