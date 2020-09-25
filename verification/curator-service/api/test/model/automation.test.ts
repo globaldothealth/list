@@ -39,7 +39,7 @@ const Wrapper = mongoose.model<WrapperDocument>('Wrapper', wrapperSchema);
 
 describe('validate', () => {
     it('an automation without a schedule is valid', async () => {
-        const missingSchedule = { ..._.cloneDeep(fullModel) };
+        const missingSchedule = _.cloneDeep(fullModel);
         delete missingSchedule.schedule;
 
         return new Automation(missingSchedule).validate();
@@ -47,7 +47,7 @@ describe('validate', () => {
 
     it('an automation with both a parser and regexParsing is invalid', async () => {
         const bothParsing = {
-            ..._.cloneDeep(fullModel),
+            ...fullModel,
             regexParsing: regexParsingModel,
         };
         const wrapper = { automation: bothParsing };
@@ -58,7 +58,7 @@ describe('validate', () => {
     });
 
     it('a fully specified automation with parser is valid', async () => {
-        return new Automation(_.cloneDeep(fullModel)).validate();
+        return new Automation(fullModel).validate();
     });
 
     it('a fully specified automation with regexParsing is valid', async () => {

@@ -9,7 +9,7 @@ const Parser = mongoose.model<ParserDocument>('Parser', parserSchema);
 
 describe('validate', () => {
     it('a parser without an AWS lambda ARN is invalid', async () => {
-        const missingArn = { ..._.cloneDeep(fullModel) };
+        const missingArn = _.cloneDeep(fullModel);
         delete missingArn.awsLambdaArn;
 
         return new Parser(missingArn).validate((e) => {
@@ -18,6 +18,6 @@ describe('validate', () => {
     });
 
     it('a fully specified parser is valid', async () => {
-        return new Parser(_.cloneDeep(fullModel)).validate();
+        return new Parser(fullModel).validate();
     });
 });
