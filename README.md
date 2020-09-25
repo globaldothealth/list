@@ -94,8 +94,12 @@ Each automatically ingested data source used has a required license and terms of
 
 If you are the owner of a data source included here and would like us to remove data, add or alter an attribution, or add or alter license information, please open an issue on this repository and we will happily consider your request.
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fglobaldothealth%2Flist.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fglobaldothealth%2Flist?ref=badge_large)
+
 ## Stats
 
 ![code size](https://img.shields.io/github/languages/code-size/globaldothealth/list) ![repo size](https://img.shields.io/github/repo-size/globaldothealth/list)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fglobaldothealth%2Flist.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fglobaldothealth%2Flist?ref=badge_shield)
 
 ![commit activity](https://img.shields.io/github/commit-activity/w/globaldothealth/list)
