@@ -37,10 +37,9 @@ jobs:
       working-directory: ingestion/functions
       run: pytest
     - name: Generate and upload coverage
-      working-directory: ingestion/functions
       run: |
-        coverage run
-        coverage json
+        coverage run --rcfile=ingestion/functions/.coveragerc
+        coverage json --rcfile=ingestion/functions/.coveragerc
     - uses: actions/upload-artifact@v1
       with:
         name: coverage-json
