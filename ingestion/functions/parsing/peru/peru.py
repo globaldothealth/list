@@ -43,7 +43,7 @@ def convert_location(raw_entry):
             "Peru"]
         if term != "EN INVESTIGACIÓN"]
 
-    return {"query":  ", ".join(query_terms)}
+    return {"query": ", ".join(query_terms)}
 
 
 def convert_demographics(age: str, sex: str):
