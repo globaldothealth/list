@@ -135,6 +135,9 @@
           "geoResolution": {
             "bsonType": "string"
           },
+          "query":  {
+            "bsonType": "string"
+          },
           "geometry": {
             "bsonType": "object",
             "additionalProperties": false,
@@ -232,6 +235,9 @@
                   "bsonType": "object",
                   "additionalProperties": false,
                   "properties": {
+                    "query": {
+                      "bsonType": "string"
+                    },
                     "country": {
                       "bsonType": "string"
                     },

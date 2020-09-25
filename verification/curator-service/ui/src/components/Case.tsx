@@ -51,9 +51,7 @@ export interface Location {
     geometry: Geometry;
     name: string;
     place: string;
-    // These two fields are either required or supplemental for requests, but
-    // aren't part of the returned case objects.
-    // Required to perform geocoding.
+    // Set this field to perform geocoding and fill the rest of the location object.
     query?: string;
     // Optional to hint geocoding results.
     limitToResolution?: string;

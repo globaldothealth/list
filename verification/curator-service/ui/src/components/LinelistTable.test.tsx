@@ -90,7 +90,11 @@ it('loads and displays cases', async () => {
 
     const { findByText, findByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
 
@@ -147,7 +151,11 @@ it('API errors are displayed', async () => {
 
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
 
@@ -207,7 +215,11 @@ it('can delete a row', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -293,7 +305,11 @@ it('can cancel delete action', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -361,6 +377,8 @@ it('cannot edit data if not curator', async () => {
                     email: 'foo@bar.com',
                     roles: [],
                 }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );
