@@ -158,9 +158,9 @@ def convert_ethnicity(raw_ethnicity: str):
         return "Indigenous"
 
 
-def convert_demographics(gender: str, age: str, ethnicity: str, health_professional: str):
-    if not any((gender, age, ethnicity)):
-        return None
+def convert_demographics(
+    gender: str, age: str, ethnicity: str, health_professional: str
+):
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
@@ -179,7 +179,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, health_professio
         demo["ethnicity"] = convert_ethnicity(ethnicity.title())
     if health_professional == "SIM":
         demo["occupation"] = "Healthcare worker"
-    return demo
+    return demo or None
 
 
 def convert_notes(
@@ -212,9 +212,7 @@ def convert_notes(
             "Indigenous ethnicity: " + raw_notes_indigenousEthnicity.title()
         )
     notes = (", ").join(raw_notes)
-    if notes == "":
-        return None
-    return notes
+    return notes or None
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -240,7 +238,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         row[_DATE_DEATH],
                     ),
                     "demographics": convert_demographics(
-                        row[_GENDER_INDEX], row[_AGE_INDEX], row[_ETHNICITY], row[_HEALTHCARE_WORKER]
+                        row[_GENDER_INDEX],
+                        row[_AGE_INDEX],
+                        row[_ETHNICITY],
+                        row[_HEALTHCARE_WORKER],
                     ),
                 }
                 if "SIM" in (
