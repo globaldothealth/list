@@ -12,11 +12,11 @@ _PARSED_CASE = (
             "sourceId": _SOURCE_ID,
             "sourceEntryId": "HKD130",
             "sourceUrl": _SOURCE_URL,
-            "additionalSources": [ 
-                                {
-                                    "sourceUrl": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html"
-                                }
-                                ]
+            "additionalSources": [
+                {
+                    "sourceUrl": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html"
+                }
+            ]
         },
         "location": {
             "query": "Sapporo, Hokkaido, Japan"
