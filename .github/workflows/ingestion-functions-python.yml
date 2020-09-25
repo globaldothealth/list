@@ -41,7 +41,11 @@ jobs:
       run: |
         coverage run
         coverage json
-    - name: Upload test coverage
+    - uses: actions/upload-artifact@v1
+      with:
+        name: coverage-json
+        path: ingestion/functions/coverage.json
+    - name: Upload test coverage to codecov
       uses: codecov/codecov-action@v1
       with:
         file: ingestion/functions/coverage.json
