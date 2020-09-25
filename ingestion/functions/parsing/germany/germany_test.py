@@ -1,43 +1,37 @@
-import csv
-import json
 import os
-import tempfile
 import unittest
-from datetime import date
-
-import pytest
 
 from germany import germany
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
 _PARSED_CASE = [
-   {
-      "caseReference":{
-         "sourceId":"abc123",
-         "sourceUrl":"foo.bar"
-      },
-      "location":{
-         "query":"SK Flensburg, Schleswig-Holstein, Germany",
-         "limitToResolution": "Country,Admin1,Admin2",
-      },
-      "events":[
-         {
-            "name":"confirmed",
-            "dateRange":{
-               "start":"08/15/2020Z",
-               "end":"08/15/2020Z"
+    {
+        "caseReference": {
+            "sourceId": "abc123",
+            "sourceUrl": "foo.bar"
+        },
+        "location": {
+            "query": "SK Flensburg, Schleswig-Holstein, Germany",
+            "limitToResolution": "Country,Admin1,Admin2",
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": "08/15/2020Z",
+                    "end": "08/15/2020Z"
+                }
             }
-         }
-      ],
-      "demographics":{
-         "gender":"Female",
-         "ageRange":{
-            "start":5.0,
-            "end":14.0
-         }
-      }
-   }
+        ],
+        "demographics": {
+            "gender": "Female",
+            "ageRange": {
+                "start": 5.0,
+                "end": 14.0
+            }
+        }
+    }
 ]
 
 

@@ -606,10 +606,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
+                            headerStyle: { whiteSpace: 'nowrap' },
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
@@ -630,6 +633,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 rowData.age[0] === rowData.age[1]
                                     ? rowData.age[0]
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Gender',
@@ -642,6 +646,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
