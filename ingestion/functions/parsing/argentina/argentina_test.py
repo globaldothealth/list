@@ -1,6 +1,5 @@
 import os
 import unittest
-from datetime import date
 from argentina import argentina
 
 
@@ -9,6 +8,7 @@ _SOURCE_URL = "placeholder_URL"
 
 # result = argentina.parse_cases(sample_data_file,'placeholder_ID','placeholder_URL')
 # sample_data_file= '/Users/felson/Documents/DPhil/global_health/github/list/ingestion/functions/parsing/argentina/sample_data.csv'
+
 
 class ArgentinaTest(unittest.TestCase):
     def setUp(self):

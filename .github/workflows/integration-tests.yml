@@ -10,7 +10,6 @@ on:
       - "data-serving/data-service/**"
       - "data-serving/samples/**"
   pull_request:
-    branches: [main]
     paths:
       - ".github/workflows/integration-tests.yml"
       - "dev/docker-compose.yml"

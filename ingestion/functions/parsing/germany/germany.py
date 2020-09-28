@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -77,7 +77,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.reader(f)
         next(reader)  # Skip the header.
-        cases = []
         for row in reader:
             num_confirmed_cases = int(row[_CASECOUNT])
             if num_confirmed_cases < 1:
@@ -87,7 +86,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                     "location": {
                         "query": ", ".join((row[_ADMIN2], row[_ADMIN1], "Germany")),
-                        "limitToResolution": "Admin2",
+                        # Mapbox doesn't fare well with Germany's districts so
+                        # we restrict to district (Admin2) and above to fail
+                        # gracefully.
+                        "limitToResolution": "Country,Admin1,Admin2",
                     },
                     "events": [
                         {

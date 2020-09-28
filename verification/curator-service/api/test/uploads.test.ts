@@ -6,6 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import { Upload } from '../src/model/upload';
 import { UploadSummary } from '../src/model/upload-summary';
+import _ from 'lodash';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
 import minimalSource from './model/data/source.minimal.json';
@@ -238,6 +239,19 @@ describe('POST', () => {
             .expect(201);
         expect(mockSend).not.toHaveBeenCalled();
     });
+    it('should not send a notification email if no schedule configured', async () => {
+        const noSchedule = _.cloneDeep(fullSource);
+        delete noSchedule.automation.schedule;
+        const source = await new Source(noSchedule).save();
+        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        upload.status = 'ERROR';
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
 });
 
 describe('PUT', () => {
@@ -296,8 +310,9 @@ describe('PUT', () => {
         expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
     it('should send a notification email if updated status is error and recipients defined', async () => {
-        fullSource.uploads[0].status = 'SUCCESS';
-        const source = await new Source(fullSource).save();
+        const successSource = _.cloneDeep(fullSource);
+        successSource.uploads[0].status = 'SUCCESS';
+        const source = await new Source(successSource).save();
 
         await curatorRequest
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
@@ -320,6 +335,21 @@ describe('PUT', () => {
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
             .send({
                 status: 'IN_PROGRESS',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+    it('should not send a notification email if schedule not configured', async () => {
+        const noSchedule = _.cloneDeep(fullSource);
+        delete noSchedule.automation.schedule;
+        const source = await new Source(noSchedule).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'ERROR',
             })
             .expect('Content-Type', /json/)
             .expect(200);
