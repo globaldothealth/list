@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { Geocoder } from './geocoder';
+import { GeocodeOptions, Geocoder, Resolution } from './geocoder';
 
 /**
  * GeocodeSuggester can be used to suggest GeocodeResults based on a provided
@@ -21,9 +21,26 @@ export default class GeocodeSuggester {
     suggest = async (req: Request, res: Response): Promise<void> => {
         if (req.query.q) {
             try {
+                const opts: GeocodeOptions = {};
+                if (req.query['limitToResolution']) {
+                    opts.limitToResolution = [];
+                    (req.query['limitToResolution'] as string)
+                        .split(',')
+                        .forEach((supplied: string) => {
+                            const resolution =
+                                Resolution[supplied as keyof typeof Resolution];
+                            if (!resolution) {
+                                throw new Error(
+                                    `invalid limitToResolution: ${supplied}`,
+                                );
+                            }
+                            opts.limitToResolution?.push(resolution);
+                        });
+                }
                 for (const geocoder of this.geocoders) {
                     const suggestions = await geocoder.geocode(
                         req.query.q.toString(),
+                        opts,
                     );
                     if (suggestions.length > 0) {
                         res.json(suggestions);
