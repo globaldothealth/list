@@ -521,7 +521,14 @@ describe('POST', () => {
             })
             .expect(201)
             .expect('Content-Type', /json/);
-        expect(await Case.collection.countDocuments()).toEqual(1);
+        expect(
+            await Case.collection.findOne({ 'location.name': 'Canada' }),
+        ).toBeDefined();
+        expect(
+            await Case.collection.findOne({
+                'travelHistory.travel[0].location.name': 'Montreal',
+            }),
+        ).toBeDefined();
     });
     it('throws if cannot geocode', async () => {
         await request(app).post('/api/geocode/clear').expect(200);
