@@ -18,6 +18,7 @@ OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
+READ_CHUNK_BYTES = 2048
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
@@ -80,6 +81,7 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers, cookies)
 
+
 def raw_content(url: str, content: bytes) -> io.BytesIO:
     # Detect the mimetype of a given URL.
     print(f'Guessing mimetype of {url}')
@@ -128,23 +130,19 @@ def retrieve_content(
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         print(f'Source encoding is presumably {detected_enc}')
-        source_encoding = detected_enc['encoding']
-        if source_encoding != "utf-8":
-            with codecs.open(f"/tmp/{key_filename_part}", "wb", 'utf-8') as f:
-                # Write the output file as utf-8 in chunks because decoding the
-                # whole data in one shot becomes really slow with big files.
-                content = bytesio.read(2048)
-                while content:
-                    f.write(codecs.decode(content, source_encoding))
-                    content = bytesio.read(2048)
-        else:
-            with open(f"/tmp/{key_filename_part}", "wb") as f:
-                f.write(r.content)
-        s3_object_key = (
-            f"{source_id}"
-            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-            f"{key_filename_part}")
-        return (f.name, s3_object_key)
+        with codecs.open(f"/tmp/{key_filename_part}", "w", 'utf-8') as outfile:
+            text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
+            # Write the output file as utf-8 in chunks because decoding the
+            # whole data in one shot becomes really slow with big files.
+            content = text_stream.read(READ_CHUNK_BYTES)
+            while content:
+                outfile.write(content)
+                content = text_stream.read(READ_CHUNK_BYTES)
+            s3_object_key = (
+                f"{source_id}"
+                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{key_filename_part}")
+            return (outfile.name, s3_object_key)
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND

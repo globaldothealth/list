@@ -75,13 +75,12 @@ def convert_demographics(gender: str, age: str):
 
 def convert_notes(immigration_status: str):
     return (
-        f"Case is an immigrant" if immigration_status == "是"
+        "Case is an immigrant" if immigration_status == "是"
         else "Case is from Taiwan")
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
-    
     Remarks: No per-case ID is available so we can't dedupe cases.
     """
     with open(raw_data_file, "r") as f:
