@@ -735,6 +735,10 @@ export default function App(): JSX.Element {
                                 <LandingPage />
                             )}
                         </Route>
+                        {/* Redirect any unavailable URLs to / */}
+                        <Route path="/">
+                            <Redirect to="/" />
+                        </Route>
                     </Switch>
                 </main>
             </ThemeProvider>
