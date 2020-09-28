@@ -1,7 +1,6 @@
 import {
     AppBar,
     Avatar,
-    ButtonBase,
     CssBaseline,
     Divider,
     Fab,
@@ -180,26 +179,16 @@ const useStyles = makeStyles((theme: Theme) => ({
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
-    drawerLinks: {
-        marginBottom: '24px',
-    },
-    drawerLink: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: '8px',
-        display: 'flex',
-        height: '36px',
+    divider: {
+        backgroundColor: '#0A7369',
+        height: '1px',
+        opacity: '0.2',
+        margin: '24px 0',
         marginTop: '12px',
         width: '100%',
     },
-    drawerInnerLink: {
-        alignItems: 'center',
-        display: 'flex',
-        height: '100%',
-        justifyContent: 'center',
-        width: '100%',
-    },
-    drawerLinkText: {
-        color: '#0E7569',
+    termsLink: {
+        margin: '12px 0 24px',
     },
     content: {
         flexGrow: 1,
@@ -587,42 +576,22 @@ export default function App(): JSX.Element {
                                 )}
                             </List>
                             <div className={classes.spacer}></div>
-                            <div className={classes.drawerLinks}>
-                                <ButtonBase
-                                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    data-testid="dictionaryButton"
-                                    classes={{ root: classes.drawerLink }}
-                                >
-                                    <Typography
-                                        variant="body2"
-                                        classes={{
-                                            root: classes.drawerLinkText,
-                                        }}
-                                    >
-                                        Data dictionary
-                                    </Typography>
-                                </ButtonBase>
-                                <ButtonBase
-                                    classes={{ root: classes.drawerLink }}
-                                >
-                                    <Link
-                                        to="/terms"
-                                        data-testid="termsButton"
-                                        className={classes.drawerInnerLink}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            classes={{
-                                                root: classes.drawerLinkText,
-                                            }}
-                                        >
-                                            Terms of use
-                                        </Typography>
-                                    </Link>
-                                </ButtonBase>
-                            </div>
+                            <div className={classes.divider}></div>
+                            <a
+                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                data-testid="dictionaryButton"
+                            >
+                                Data dictionary
+                            </a>
+                            <Link
+                                to="/terms"
+                                className={classes.termsLink}
+                                data-testid="termsButton"
+                            >
+                                Terms of use
+                            </Link>
                         </div>
                     </Drawer>
                 )}
