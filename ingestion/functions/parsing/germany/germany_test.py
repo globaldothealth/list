@@ -13,7 +13,7 @@ _PARSED_CASE = [
         },
         "location": {
             "query": "SK Flensburg, Schleswig-Holstein, Germany",
-            "limitToResolution": "Admin2"
+            "limitToResolution": "Country,Admin1,Admin2",
         },
         "events": [
             {
