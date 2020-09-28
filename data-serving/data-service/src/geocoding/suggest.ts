@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 
 import { GeocodeOptions, Geocoder, Resolution } from './geocoder';
 
+class InvalidParamError extends Error {}
+
 /**
  * GeocodeSuggester can be used to suggest GeocodeResults based on a provided
  * list of geocoders.
@@ -30,9 +32,10 @@ export default class GeocodeSuggester {
                             const resolution =
                                 Resolution[supplied as keyof typeof Resolution];
                             if (!resolution) {
-                                throw new Error(
+                                throw new InvalidParamError(
                                     `invalid limitToResolution: ${supplied}`,
                                 );
+                                return;
                             }
                             opts.limitToResolution?.push(resolution);
                         });
@@ -48,7 +51,13 @@ export default class GeocodeSuggester {
                     }
                 }
             } catch (e) {
-                res.status(500).send(e);
+                if (e instanceof InvalidParamError) {
+                    res.status(422);
+                } else {
+                    res.status(500);
+                }
+                res.send({ message: e.message });
+                return;
             }
         }
         res.json([]);

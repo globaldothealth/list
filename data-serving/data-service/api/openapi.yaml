@@ -517,6 +517,10 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200LocationArray"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     BatchUpdateResponse:
