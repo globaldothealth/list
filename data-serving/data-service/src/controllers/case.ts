@@ -217,15 +217,15 @@ export class CasesController {
         cases: any[],
     ): Promise<BatchValidationErrors> => {
         const errors: { index: number; message: string }[] = [];
-        await Promise.all(
-            // We're about to validate this data; any is fine, here.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            cases.map((c: any, index: number) => {
-                return new Case(c).validate().catch((e) => {
-                    errors.push({ index: index, message: e.message });
-                });
-            }),
-        );
+        // Do not parallelize these requests as it causes an out of memory error
+        // for a large number of cases. However this does take a long time to run
+        // sequentially, so if Mongo creates a batch validate method that should be used here.
+        for (let index = 0; index < cases.length; index++) {
+            const c = cases[index];
+            await new Case(c).validate().catch((e) => {
+                errors.push({ index: index, message: e.message });
+            });
+        }
         return errors;
     };
 
@@ -241,47 +241,43 @@ export class CasesController {
         next: NextFunction,
     ): Promise<void> => {
         const geocodeErrors: { index: number; message: string }[] = [];
-        Promise.all(
-            req.body.cases.map((c: any, index: number) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        await this.geocode({
-                            body: c,
-                        });
-                        resolve();
-                    } catch (err) {
-                        if (err instanceof GeocodeNotFoundError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-                        } else if (err instanceof InvalidParamError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    }
-                });
-            }),
-        )
-            .then(() => {
-                if (geocodeErrors.length > 0) {
-                    res.status(207).send({
-                        phase: 'GEOCODE',
-                        numCreated: 0,
-                        numUpdated: 0,
-                        errors: geocodeErrors,
+        try {
+            // Do not parallelize these requests as it causes an out of memory error
+            // for a large number of cases.
+            for (let index = 0; index < req.body.cases.length; index++) {
+                const c = req.body.cases[index];
+                try {
+                    await this.geocode({
+                        body: c,
                     });
-                    return;
+                } catch (err) {
+                    if (err instanceof GeocodeNotFoundError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
+                    } else if (err instanceof InvalidParamError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
+                    }
                 }
-                next();
-            })
-            .catch((e) => res.send(e));
+            }
+            if (geocodeErrors.length > 0) {
+                res.status(207).send({
+                    phase: 'GEOCODE',
+                    numCreated: 0,
+                    numUpdated: 0,
+                    errors: geocodeErrors,
+                });
+                return;
+            }
+
+            next();
+        } catch (e) {
+            res.send(e);
+        }
     };
 
     /**
@@ -305,41 +301,38 @@ export class CasesController {
                 });
                 return;
             }
-            const bulkWriteResult = await Case.bulkWrite(
+            let bulkWriteResult;
+            if (req.body.cases.length > 0) {
+                // Use this method rather than Case.bulkWrite() as that method
+                // causes an out of memory error for a large number of cases.
+                const bulk = Case.collection.initializeUnorderedBulkOp();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
+                    delete c.caseCount;
                     if (
                         c.caseReference?.sourceId &&
                         c.caseReference?.sourceEntryId
                     ) {
-                        return {
-                            updateOne: {
-                                filter: {
-                                    'caseReference.sourceId':
-                                        c.caseReference.sourceId,
-                                    'caseReference.sourceEntryId':
-                                        c.caseReference.sourceEntryId,
-                                },
-                                update: c,
-                                upsert: true,
-                            },
-                        };
+                        delete c._id;
+                        bulk.find({
+                            'caseReference.sourceId': c.caseReference.sourceId,
+                            'caseReference.sourceEntryId':
+                                c.caseReference.sourceEntryId,
+                        })
+                            .upsert()
+                            .updateOne({ $set: c });
                     } else {
-                        return {
-                            insertOne: {
-                                document: c,
-                            },
-                        };
+                        bulk.insert(c);
                     }
-                }),
-                { ordered: false },
-            );
+                });
+                bulkWriteResult = await bulk.execute();
+            }
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult.insertedCount || 0) +
-                    (bulkWriteResult.upsertedCount || 0),
-                numUpdated: bulkWriteResult.modifiedCount,
+                    (bulkWriteResult?.nInserted || 0) +
+                    (bulkWriteResult?.nUpserted || 0),
+                numUpdated: bulkWriteResult?.nModified || 0,
                 errors: [],
             });
             return;

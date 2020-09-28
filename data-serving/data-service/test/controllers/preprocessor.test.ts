@@ -41,6 +41,12 @@ afterAll(() => {
     return mongoServer.stop();
 });
 
+interface RevisionMetadataType {
+    revisionNumber: number;
+    creationMetadata: { curator: string; date: string };
+    updateMetadata?: { curator: string; date: string };
+}
+
 describe('create', () => {
     it('sets create metadata', async () => {
         const requestBody = {
@@ -55,16 +61,17 @@ describe('create', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            ...minimalCase,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: 'creator@gmail.com',
-                    date: Date.now(),
-                },
-            },
-        });
+        const revisionMetadata: RevisionMetadataType =
+            requestBody.revisionMetadata;
+        expect(requestBody.caseReference).toEqual(minimalCase.caseReference);
+        expect(revisionMetadata.revisionNumber).toEqual(0);
+        expect(revisionMetadata.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(revisionMetadata.creationMetadata.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata.updateMetadata).toEqual(undefined);
     });
     it('does not create a case revision', async () => {
         const requestBody = {
@@ -113,20 +120,27 @@ describe('update', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            ...minimalCase,
-            revisionMetadata: {
-                revisionNumber: 1,
-                creationMetadata: {
-                    curator: 'creator@gmail.com',
-                    date: Date.parse('2020-01-01'),
-                },
-                updateMetadata: {
-                    curator: 'updater@gmail.com',
-                    date: Date.now(),
-                },
-            },
-        });
+        expect(requestBody.caseReference).toEqual(minimalCase.caseReference);
+
+        const revisionMetadata: RevisionMetadataType =
+            requestBody.revisionMetadata;
+        expect(revisionMetadata.revisionNumber).toEqual(1);
+        expect(revisionMetadata.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata.updateMetadata?.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(revisionMetadata.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
     });
     it('sets update metadata and replaces existing update metadata', async () => {
         const c = new Case({
@@ -161,20 +175,26 @@ describe('update', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            ...minimalCase,
-            revisionMetadata: {
-                revisionNumber: 2,
-                creationMetadata: {
-                    curator: 'creator@gmail.com',
-                    date: Date.parse('2020-01-01'),
-                },
-                updateMetadata: {
-                    curator: 'updater2@gmail.com',
-                    date: Date.now(),
-                },
-            },
-        });
+        expect(requestBody.caseReference).toEqual(minimalCase.caseReference);
+        const revisionMetadata: RevisionMetadataType =
+            requestBody.revisionMetadata;
+        expect(revisionMetadata.revisionNumber).toEqual(2);
+        expect(revisionMetadata.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata.updateMetadata?.curator).toEqual(
+            'updater2@gmail.com',
+        );
+        expect(revisionMetadata.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
     });
     it('creates a case revision', async () => {
         const c = new Case({
@@ -233,16 +253,17 @@ describe('upsert', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            ...upsertCase,
-            revisionMetadata: {
-                revisionNumber: 0,
-                creationMetadata: {
-                    curator: 'creator@gmail.com',
-                    date: Date.now(),
-                },
-            },
-        });
+        expect(requestBody.caseReference).toEqual(upsertCase.caseReference);
+        const revisionMetadata: RevisionMetadataType =
+            requestBody.revisionMetadata;
+        expect(revisionMetadata.revisionNumber).toEqual(0);
+        expect(revisionMetadata.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(revisionMetadata.creationMetadata.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata.updateMetadata).toEqual(undefined);
     });
     it('with existing case sets update metadata', async () => {
         const upsertCase = {
@@ -276,20 +297,26 @@ describe('upsert', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            ...upsertCase,
-            revisionMetadata: {
-                revisionNumber: 1,
-                creationMetadata: {
-                    curator: 'creator@gmail.com',
-                    date: Date.parse('2020-01-01'),
-                },
-                updateMetadata: {
-                    curator: 'updater@gmail.com',
-                    date: Date.now(),
-                },
-            },
-        });
+        expect(requestBody.caseReference).toEqual(upsertCase.caseReference);
+        const revisionMetadata: RevisionMetadataType =
+            requestBody.revisionMetadata;
+        expect(revisionMetadata.revisionNumber).toEqual(1);
+        expect(revisionMetadata.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata.updateMetadata?.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(revisionMetadata.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
     });
     it('with no existing case does not create a case revision', async () => {
         const upsertCase = {
@@ -393,34 +420,45 @@ describe('batch upsert', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            cases: [
-                {
-                    ...existingCaseWithUpdate,
-                    revisionMetadata: {
-                        revisionNumber: 1,
-                        creationMetadata: {
-                            curator: 'creator@gmail.com',
-                            date: Date.parse('2020-01-01'),
-                        },
-                        updateMetadata: {
-                            curator: 'updater@gmail.com',
-                            date: Date.now(),
-                        },
-                    },
-                },
-                {
-                    ...newCase,
-                    revisionMetadata: {
-                        revisionNumber: 0,
-                        creationMetadata: {
-                            curator: 'updater@gmail.com',
-                            date: Date.now(),
-                        },
-                    },
-                },
-            ],
-        });
+
+        expect(requestBody.cases[0].caseReference).toEqual(
+            existingCaseWithUpdate.caseReference,
+        );
+        const revisionMetadata0: RevisionMetadataType =
+            requestBody.cases[0].revisionMetadata;
+        expect(revisionMetadata0.revisionNumber).toEqual(1);
+        expect(revisionMetadata0.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata0.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata0.updateMetadata?.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(revisionMetadata0.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
+
+        expect(requestBody.cases[1].caseReference).toEqual(
+            newCase.caseReference,
+        );
+        const revisionMetadata1: RevisionMetadataType =
+            requestBody.cases[1].revisionMetadata;
+        expect(revisionMetadata1.revisionNumber).toEqual(0);
+        expect(revisionMetadata1.creationMetadata.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata1.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(new Date().toISOString().substring(0, 16));
+        expect(revisionMetadata1.updateMetadata).toEqual(undefined);
     });
     it('does not add update metadata if case semantically unchanged', async () => {
         const existingCase = {
@@ -603,40 +641,51 @@ describe('batch update', () => {
         );
 
         expect(nextFn).toHaveBeenCalledTimes(1);
-        expect(requestBody).toEqual({
-            cases: [
-                {
-                    ...minimalCase,
-                    _id: c._id,
-                    revisionMetadata: {
-                        revisionNumber: 1,
-                        creationMetadata: {
-                            curator: 'creator@gmail.com',
-                            date: Date.parse('2020-01-01'),
-                        },
-                        updateMetadata: {
-                            curator: 'updater@gmail.com',
-                            date: Date.now(),
-                        },
-                    },
-                },
-                {
-                    ...minimalCase,
-                    _id: c2._id,
-                    revisionMetadata: {
-                        revisionNumber: 2,
-                        creationMetadata: {
-                            curator: 'creator2@gmail.com',
-                            date: Date.parse('2020-01-01'),
-                        },
-                        updateMetadata: {
-                            curator: 'updater@gmail.com',
-                            date: Date.now(),
-                        },
-                    },
-                },
-            ],
-        });
+        expect(requestBody.cases[0].caseReference).toEqual(
+            minimalCase.caseReference,
+        );
+        const revisionMetadata0: RevisionMetadataType =
+            requestBody.cases[0].revisionMetadata;
+        expect(revisionMetadata0.revisionNumber).toEqual(1);
+        expect(revisionMetadata0.creationMetadata.curator).toEqual(
+            'creator@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata0.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata0.updateMetadata?.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(revisionMetadata0.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
+
+        expect(requestBody.cases[1].caseReference).toEqual(
+            minimalCase.caseReference,
+        );
+        const revisionMetadata1: RevisionMetadataType =
+            requestBody.cases[1].revisionMetadata;
+        expect(revisionMetadata1.revisionNumber).toEqual(2);
+        expect(revisionMetadata1.creationMetadata.curator).toEqual(
+            'creator2@gmail.com',
+        );
+        expect(
+            new Date(revisionMetadata1.creationMetadata.date)
+                .toISOString()
+                .substring(0, 16),
+        ).toEqual(
+            new Date(Date.parse('2020-01-01')).toISOString().substring(0, 16),
+        );
+        expect(revisionMetadata1.updateMetadata?.curator).toEqual(
+            'updater@gmail.com',
+        );
+        expect(revisionMetadata1.updateMetadata?.date.substring(0, 16)).toEqual(
+            new Date().toISOString().substring(0, 16),
+        );
     });
     it('with existing cases creates case revisions', async () => {
         const c = new Case({
