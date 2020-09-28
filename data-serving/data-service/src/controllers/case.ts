@@ -245,34 +245,22 @@ export class CasesController {
             // Do not parallelize these requests as it causes an out of memory error
             // for a large number of cases.
             for (let index = 0; index < req.body.cases.length; index++) {
+                const c = req.body.cases[index];
                 try {
-                    const c = req.body.cases[index];
-                  
-                    try {
-                      await this.geocode({
-                          body: c,
-                      });
-                    } catch (err) {
-                    if (!geocodeResult) {
+                    await this.geocode({
+                        body: c,
+                    });
+                } catch (err) {
+                    if (err instanceof GeocodeNotFoundError) {
                         geocodeErrors.push({
                             index: index,
-                            message: `no geolocation found for ${c.location?.query}`,
+                            message: err.message,
                         });
-                    }
-                } catch (err) {
-                        if (err instanceof GeocodeNotFoundError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-                        } else if (err instanceof InvalidParamError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-}
+                    } else if (err instanceof InvalidParamError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
                     }
                 }
             }
