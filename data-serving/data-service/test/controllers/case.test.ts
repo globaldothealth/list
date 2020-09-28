@@ -5,6 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
+import caseMustGeocode from './../model/data/case.mustgeocode.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
@@ -491,6 +492,47 @@ describe('POST', () => {
         expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
             unchangedCaseUploadIds[1],
         );
+    });
+    it('geocodes everything that is necessary', async () => {
+        await request(app)
+            .post('/api/geocode/seed')
+            .send({
+                country: 'Canada',
+                geoResolution: 'Country',
+                geometry: { latitude: 42.42, longitude: 11.11 },
+                name: 'Canada',
+            })
+            .expect(200);
+        await request(app)
+            .post('/api/geocode/seed')
+            .send({
+                administrativeAreaLevel1: 'Quebec',
+                country: 'Canada',
+                geoResolution: 'Admin1',
+                geometry: { latitude: 33.33, longitude: 99.99 },
+                name: 'Montreal',
+            })
+            .expect(200);
+        await request(app)
+            .post('/api/cases')
+            .send({
+                ...caseMustGeocode,
+                ...curatorMetadata,
+            })
+            .expect(201)
+            .expect('Content-Type', /json/);
+        expect(await Case.collection.countDocuments()).toEqual(1);
+    });
+    it('throws if cannot geocode', async () => {
+        await request(app).post('/api/geocode/clear').expect(200);
+        await request(app)
+            .post('/api/cases')
+            .send({
+                ...caseMustGeocode,
+                ...curatorMetadata,
+            })
+            .expect(404, /Geocode not found/)
+            .expect('Content-Type', /json/);
     });
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
