@@ -23,7 +23,14 @@ describe('Geocodes', () => {
         await request(app).post('/api/geocode/seed').send(lyon).expect(200);
         return request(app)
             .get('/api/geocode/suggest')
-            .query({ q: 'Lyon' })
+            .query({ q: 'Lyon', limitToResolution: 'Country,Admin1' })
             .expect(200, [lyon]);
+    });
+
+    it('throws if invalid restriction is given', async () => {
+        return request(app)
+            .get('/api/geocode/suggest')
+            .query({ q: 'Lyon', limitToResolution: 'nopenope' })
+            .expect(422, /nopenope/);
     });
 });
