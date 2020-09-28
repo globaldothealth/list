@@ -215,7 +215,7 @@ export class CasesController {
         const errors: { index: number; message: string }[] = [];
         // Do not parallelize these requests as it causes an out of memory error
         // for a large number of cases. However this does take a long time to run
-        // in parallel, so if Mongo creates a batch validate method that should be used here.
+        // sequentially, so if Mongo creates a batch validate method that should be used here.
         for (let index = 0; index < cases.length; index++) {
             const c = cases[index];
             await new Case(c).validate().catch((e) => {
@@ -298,35 +298,38 @@ export class CasesController {
                 });
                 return;
             }
-            // Use this method rather than Case.bulkWrite() as that method
-            // causes an out of memory error for a large number of cases.
-            const bulk = Case.collection.initializeUnorderedBulkOp();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            req.body.cases.map((c: any) => {
-                delete c.caseCount;
-                if (
-                    c.caseReference?.sourceId &&
-                    c.caseReference?.sourceEntryId
-                ) {
-                    delete c._id;
-                    bulk.find({
-                        'caseReference.sourceId': c.caseReference.sourceId,
-                        'caseReference.sourceEntryId':
-                            c.caseReference.sourceEntryId,
-                    })
-                        .upsert()
-                        .updateOne({ $set: c });
-                } else {
-                    bulk.insert(c);
-                }
-            });
-            const bulkWriteResult = await bulk.execute();
+            let bulkWriteResult;
+            if (req.body.cases.length > 0) {
+                // Use this method rather than Case.bulkWrite() as that method
+                // causes an out of memory error for a large number of cases.
+                const bulk = Case.collection.initializeUnorderedBulkOp();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                req.body.cases.map((c: any) => {
+                    delete c.caseCount;
+                    if (
+                        c.caseReference?.sourceId &&
+                        c.caseReference?.sourceEntryId
+                    ) {
+                        delete c._id;
+                        bulk.find({
+                            'caseReference.sourceId': c.caseReference.sourceId,
+                            'caseReference.sourceEntryId':
+                                c.caseReference.sourceEntryId,
+                        })
+                            .upsert()
+                            .updateOne({ $set: c });
+                    } else {
+                        bulk.insert(c);
+                    }
+                });
+                bulkWriteResult = await bulk.execute();
+            }
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult.nInserted || 0) +
-                    (bulkWriteResult.nUpserted || 0),
-                numUpdated: bulkWriteResult.nModified,
+                    (bulkWriteResult?.nInserted || 0) +
+                    (bulkWriteResult?.nUpserted || 0),
+                numUpdated: bulkWriteResult?.nModified || 0,
                 errors: [],
             });
             return;
