@@ -119,7 +119,11 @@ export default function SearchBar(props: {
                             {search && (
                                 <IconButton
                                     color="primary"
-                                    onClick={(): void => setSearch('')}
+                                    aria-label="clear search"
+                                    onClick={(): void => {
+                                        setSearch('');
+                                        props.onSearchChange('');
+                                    }}
                                 >
                                     <CloseIcon />
                                 </IconButton>
