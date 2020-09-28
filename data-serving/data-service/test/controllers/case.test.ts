@@ -595,7 +595,8 @@ describe('POST', () => {
             .send({
                 cases: [existingCase],
                 ...curatorMetadata,
-            });
+            })
+            .expect(200);
 
         const caseInDb = await Case.findById(existingCase._id);
         expect(caseInDb?.revisionMetadata.revisionNumber).toEqual(0);

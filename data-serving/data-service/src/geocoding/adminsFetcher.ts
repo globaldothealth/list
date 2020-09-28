@@ -83,6 +83,16 @@ export default class MapboxAdminsFetcher {
                         (await this.getName(feature.properties.id)) ||
                         undefined;
             }
+            // TODO: Remove once the schema accepts undefined values
+            if (geocode.administrativeAreaLevel1 === undefined) {
+                delete geocode.administrativeAreaLevel1;
+            }
+            if (geocode.administrativeAreaLevel2 === undefined) {
+                delete geocode.administrativeAreaLevel2;
+            }
+            if (geocode.administrativeAreaLevel3 === undefined) {
+                delete geocode.administrativeAreaLevel3;
+            }
         }
     }
 
