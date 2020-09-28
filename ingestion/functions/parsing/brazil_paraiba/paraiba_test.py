@@ -6,6 +6,7 @@ from brazil_paraiba import paraiba
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
 
+
 class ParaibaTest(unittest.TestCase):
     def setUp(self):
         # Default of 1500 is not enough to show diffs when there is one.
@@ -24,13 +25,13 @@ class ParaibaTest(unittest.TestCase):
                 },
                 "location": {
                     "query": "Santa Rita, Paraíba, Brazil"
-                    },
+                },
                 "demographics": {
                     "gender": "Male",
                     "ageRange": {
-                                "start": 80.0,
-                                "end": 80.0
-                                },
+                        "start": 80.0,
+                        "end": 80.0
+                    },
                 },
                 "events": [
                     {
@@ -38,28 +39,29 @@ class ParaibaTest(unittest.TestCase):
                         "value": "PCR test"
                     },
                     {
-                        "name" : "onsetSymptoms",
+                        "name": "onsetSymptoms",
                         "dateRange":
                         {
                             "start": "04/27/2020Z",
                             "end": "04/27/2020Z"
-                        },                      
+                        },
                     },
                     {
-                        "name" : "outcome",
+                        "name": "outcome",
                         "dateRange":
                         {
                             "start": "05/10/2020Z",
                             "end": "05/10/2020Z"
-                        }, 
-                        "value" : "Death"                       
+                        },
+                        "value": "Death"
                     }
                 ],
                 "preexistingConditions": {
-                                            "hasPreexistingConditions": True,
-                                            "values":
-                                            ["diabetes mellitus", "heart disease", "respiratory system disease"]
-                                        },
+                    "hasPreexistingConditions": True,
+                    "values":
+                    ["diabetes mellitus", "heart disease",
+                     "respiratory system disease"]
+                },
                 "notes": ''
             }
         ])

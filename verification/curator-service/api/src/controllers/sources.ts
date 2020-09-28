@@ -47,6 +47,7 @@ export default class SourcesController {
         try {
             const [docs, total] = await Promise.all([
                 Source.find(filter)
+                    .sort({ name: 1 })
                     .skip(limit * (page - 1))
                     .limit(limit + 1)
                     .lean(),
@@ -96,6 +97,12 @@ export default class SourcesController {
                     message: `source with id ${req.params.id} could not be found`,
                 });
                 return;
+            }
+            // Undefined fields are removed from the request body by openapi
+            // validator, if we want to unset the dateFilter we have to pass an
+            // empty object and set it undefined ourselves here.
+            if (JSON.stringify(req.body.dateFilter) === '{}') {
+                req.body.dateFilter = undefined;
             }
             await source.set(req.body).validate();
             await this.updateAutomationScheduleAwsResources(source);

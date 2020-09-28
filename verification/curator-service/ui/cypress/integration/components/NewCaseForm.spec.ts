@@ -183,6 +183,8 @@ describe('New case form', function () {
         cy.get('button[data-testid="addTravelHistory"').click();
         cy.get('div[data-testid="travelHistory[0].purpose"]').click();
         cy.get('li[data-value="Unknown"').click();
+        cy.get('div[data-testid="travelHistory[0].location"]').type('France');
+        cy.contains('li', 'France').click();
         cy.server();
         cy.route('POST', '/api/cases?num_cases=1').as('addCase');
         cy.get('button[data-testid="submit"]').click();

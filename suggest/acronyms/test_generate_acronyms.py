@@ -4,6 +4,7 @@ import tempfile
 
 import generate
 
+
 class TestGenerator(unittest.TestCase):
 
     def test_generate_acronyms(self):
@@ -22,7 +23,7 @@ class TestGenerator(unittest.TestCase):
                 f.write("All Success is Sure\n")
                 # Existing acronym
                 f.write("Something already existing (SAE)\n")
-        
+
             generate.AcronymGenerator().Generate(filePath)
 
             with open(filePath, "r") as f:

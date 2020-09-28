@@ -9,6 +9,8 @@ import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
 
+class GeocodeNotFoundError extends Error {}
+
 class InvalidParamError extends Error {}
 
 type BatchValidationErrors = { index: number; message: string }[];
@@ -167,12 +169,7 @@ export class CasesController {
     create = async (req: Request, res: Response): Promise<void> => {
         const numCases = Number(req.query.num_cases) || 1;
         try {
-            if (!(await this.geocode(req))) {
-                res.status(404).send({
-                    message: `no geolocation found for ${req.body['location']?.query}`,
-                });
-                return;
-            }
+            await this.geocode(req);
             const c = new Case(req.body);
 
             let result;
@@ -192,6 +189,12 @@ export class CasesController {
             }
             res.status(201).json(result);
         } catch (err) {
+            if (err instanceof GeocodeNotFoundError) {
+                res.status(404).json({
+                    message: err.message,
+                });
+                return;
+            }
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -199,6 +202,7 @@ export class CasesController {
                 res.status(422).json(err);
                 return;
             }
+            console.error(err);
             res.status(500).json(err);
             return;
         }
@@ -243,9 +247,12 @@ export class CasesController {
             for (let index = 0; index < req.body.cases.length; index++) {
                 try {
                     const c = req.body.cases[index];
-                    const geocodeResult = await this.geocode({
-                        body: c,
-                    });
+                  
+                    try {
+                      await this.geocode({
+                          body: c,
+                      });
+                    } catch (err) {
                     if (!geocodeResult) {
                         geocodeErrors.push({
                             index: index,
@@ -253,11 +260,19 @@ export class CasesController {
                         });
                     }
                 } catch (err) {
-                    if (err instanceof InvalidParamError) {
-                        geocodeErrors.push({
-                            index: index,
-                            message: err.message,
-                        });
+                        if (err instanceof GeocodeNotFoundError) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: err.message,
+                            });
+                            resolve();
+                        } else if (err instanceof InvalidParamError) {
+                            geocodeErrors.push({
+                                index: index,
+                                message: err.message,
+                            });
+                            resolve();
+}
                     }
                 }
             }
@@ -436,19 +451,16 @@ export class CasesController {
                 return;
             } else {
                 // Geocode new cases.
-                if (!(await this.geocode(req))) {
-                    res.status(404).send({
-                        message: `no geolocation found for ${req.body['location']?.query}`,
-                    });
-                    return;
-                }
+                await this.geocode(req);
                 const c = new Case(req.body);
                 const result = await c.save();
                 res.status(201).json(result);
                 return;
             }
         } catch (err) {
-            logger.error(err);
+            if (err instanceof GeocodeNotFoundError) {
+                res.status(404).json({ message: err.message });
+            }
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -515,19 +527,17 @@ export class CasesController {
     };
 
     /**
-     * Geocodes request content if no lat lng were provided.
-     *
-     * @returns {boolean} Whether lat lng were either provided or geocoded
+     * Geocodes a single location.
+     * @returns The geocoded location.
+     * @throws GeocodeNotFoundError if no geocode could be found.
+     * @throws InvalidParamError if location.query is not specified and location
+     *         is not complete already.
      */
-    // For batch requests, the case body is nested.
-    // While we could define a type here, the right change is probably to use a
-    // batch geocoding API for such cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async geocode(req: Request | any): Promise<boolean> {
-        // Geocode query if no lat lng were provided.
-        const location = req.body['location'];
+    private async geocodeLocation(location: any): Promise<any> {
+        // Geocode using location.query if no lat lng were provided.
         if (location?.geometry?.latitude && location.geometry?.longitude) {
-            return true;
+            return location;
         }
         if (!location?.query) {
             throw new InvalidParamError(
@@ -557,13 +567,33 @@ export class CasesController {
             }
             // Currently a 1:1 match between the GeocodeResult and the data service API.
             // We also store the original query to match it later on and help debugging.
-            req.body['location'] = {
+            return {
                 query: location?.query,
                 ...features[0],
             };
-            return true;
         }
-        return false;
+        throw new GeocodeNotFoundError(
+            `Geocode not found for ${location.query}`,
+        );
+    }
+
+    /**
+     * Geocodes request content if no lat lng were provided.
+     * This geocodes both case location and case travel locations if specified.
+     *
+     * @throws GeocodeNotFoundError if no geocode could be found.
+     * @throws InvalidParamError if location.query is not specified and location
+     *         is not complete already.
+     */
+    // For batch requests, the case body is nested.
+    // While we could define a type here, the right change is probably to use a
+    // batch geocoding API for such cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async geocode(req: Request | any): Promise<void> {
+        req.body['location'] = await this.geocodeLocation(req.body['location']);
+        for (const travel of req.body.travelHistory?.travel || []) {
+            travel['location'] = await this.geocodeLocation(travel.location);
+        }
     }
 }
 

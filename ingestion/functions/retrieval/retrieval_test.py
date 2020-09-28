@@ -4,7 +4,6 @@ import json
 import os
 import pytest
 import tempfile
-import io
 import sys
 import zipfile
 
@@ -378,6 +377,7 @@ def test_upload_to_s3_raises_error_on_s3_error(
     # We got the wrong exception or no exception, fail the test.
     assert not "Should have raised an exception."
 
+
 def test_raw_content_unzips():
     from retrieval import retrieval
     # Creating a fake zip file with one file in it.
@@ -392,6 +392,7 @@ def test_raw_content_unzips():
         wrappedBytes = retrieval.raw_content(url, f.read())
         # Content should be the content of the first file in the zip.
         assert wrappedBytes.read() == b'foo'
+
 
 def test_raw_content_ignores_unknown_mimetypes():
     from retrieval import retrieval
