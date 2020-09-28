@@ -16,7 +16,7 @@ const createNewMetadata = (curatorEmail: string): any => {
         revisionNumber: 0,
         creationMetadata: {
             curator: curatorEmail,
-            date: new Date().toISOString(),
+            date: Date.now(),
         },
     };
 };
@@ -28,11 +28,11 @@ const createUpdateMetadata = (c: CaseDocument, curatorEmail: string): any => {
         revisionNumber: ++c.revisionMetadata.revisionNumber,
         creationMetadata: {
             curator: c.revisionMetadata.creationMetadata.curator,
-            date: c.revisionMetadata.creationMetadata.date,
+            date: c.revisionMetadata.creationMetadata.date.getTime(),
         },
         updateMetadata: {
             curator: curatorEmail,
-            date: new Date().toISOString(),
+            date: Date.now(),
         },
     };
 };
