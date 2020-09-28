@@ -801,9 +801,21 @@ paths:
           allowReserved: true
           schema:
             type: string
+        - name: limitToResolution
+          in: query
+          allowReserved: true
+          schema:
+            type: string
+          description: >
+            Comma-separated list of resolutions to restrict geocoding to.
+            Allowed values are: Point, Admin3, Admin2, Admin1, Country.
       responses:
         "200":
           $ref: "#/components/responses/200LocationArray"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /users:
     get:
       tags: [User]
