@@ -116,8 +116,7 @@ def convert_notes(
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
     if raw_notes_indigenousEthnicity:
-        raw_notes.append("Indigenous ethnicity: " +
-                         raw_notes_indigenousEthnicity)
+        raw_notes.append("Indigenous ethnicity: " + raw_notes_indigenousEthnicity)
 
     notes = (', ').join(raw_notes)
     return notes

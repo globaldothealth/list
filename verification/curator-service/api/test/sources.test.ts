@@ -73,8 +73,13 @@ describe('unauthenticated access', () => {
 
 describe('GET', () => {
     it('list should return 200', async () => {
-        const source = await new Source({
+        const source1 = await new Source({
             name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const source2 = await new Source({
+            name: 'another-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
@@ -82,8 +87,10 @@ describe('GET', () => {
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body.sources).toHaveLength(1);
-        expect(res.body.sources[0]._id).toEqual(source.id);
+        expect(res.body.sources).toHaveLength(2);
+        // Ordered by name.
+        expect(res.body.sources[0]._id).toEqual(source2.id);
+        expect(res.body.sources[1]._id).toEqual(source1.id);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });
@@ -182,6 +189,40 @@ describe('PUT', () => {
         // Check stuff that didn't change.
         expect(res.body.origin.url).toEqual('http://foo.bar');
         expect(mockPutRule).not.toHaveBeenCalled();
+    });
+    it('should update date filtering of a source', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        let res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {
+                    numDaysBeforeToday: '3',
+                    op: 'EQ',
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toEqual({
+            numDaysBeforeToday: 3,
+            op: 'EQ',
+        });
+        // Now clear the date filter.
+        res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {},
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toBeUndefined();
+
+        expect(mockPutRule).not.toHaveBeenCalledTimes(2);
     });
     it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({

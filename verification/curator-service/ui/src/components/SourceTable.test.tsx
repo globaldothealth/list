@@ -83,7 +83,7 @@ it('loads and displays sources', async () => {
     expect(await findByText(new RegExp(awsLambdaArn))).toBeInTheDocument();
     expect(await findByText(new RegExp(awsRuleArn))).toBeInTheDocument();
     expect(
-        await findByText('Only parse data from 666 days ago'),
+        await findByText('Only parse data from 666 day(s) ago'),
     ).toBeInTheDocument();
     expect(
         await findByText(
