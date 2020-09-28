@@ -17,7 +17,8 @@ except ImportError:
     )
     import parsing_lib
 
-with open('dictionaries.json') as json_file:
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")) as json_file:
     maps = json.load(json_file)
 
 _COMORBIDITIES_DICT = maps['comorbidities']
