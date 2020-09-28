@@ -62,9 +62,12 @@ def convert_demographics(row):
     demo = {}
 
     if row["Age Bracket"]:
+        raw = row["Age Bracket"]
+        age = float(raw.split(" ", 1)[
+                    0]) / 12 if " months" in raw.lower() else float(row["Age Bracket"])
         demo["ageRange"] = {
-            "start": float(row["Age Bracket"].split(" ", 1)[0]),
-            "end": float(row["Age Bracket"].split(" ", 1)[0])
+            "start": age,
+            "end": age
         }
     if row["Gender"]:
         demo["gender"] = convert_gender(row["Gender"])

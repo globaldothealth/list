@@ -37,8 +37,8 @@ _PARSED_CASES = [
         ],
         "demographics": {
             "ageRange": {
-                "start": 65.0,
-                "end": 65.0
+                "start": 0.5,
+                "end": 0.5
             },
             "gender": "Male",
             "nationalities": [
