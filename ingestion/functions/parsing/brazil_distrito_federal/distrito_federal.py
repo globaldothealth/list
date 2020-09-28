@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -11,16 +11,16 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "common/python"
-        )
-    )
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "common/python"))
     import parsing_lib
 
 _AGE = "Faixa Etária"
 _GENDER = "Sexo"
 _MUNICIPALITY = "RA"
-_STATE = "UF" #This stands for Unidade Federada which is the same as State
-_DATE_CONFIRMED = "Data Cadastro" #Is this right
+# UF stands for Unidade Federada which is the same as State
+_STATE = "UF"
+_DATE_CONFIRMED = "Data Cadastro"
 _DATE_SYMPTOMS = "dataPrimeirosintomas"
 _DEATH = "Óbito"
 _LUNG = "Pneumopatia"
@@ -45,14 +45,16 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
+    # Some date fields are empty
     if raw_date:
-    	if "-" in raw_date: #can I change this
-        	date = datetime.strptime(raw_date, "%Y-%m-%d") #There is variation in how dates are reported
-    	else: #Some are empty
-        	date = datetime.strptime(raw_date, "%d/%m/%Y")
-    	return date.strftime("%m/%d/%YZ") 
+        # There is variation in how dates are reported
+        if "-" in raw_date:
+            date = datetime.strptime(raw_date, "%Y-%m-%d")
+        else:
+            date = datetime.strptime(raw_date, "%d/%m/%Y")
+        return date.strftime("%m/%d/%YZ")
     else:
-    	return None
+        return None
 
 
 def convert_gender(raw_gender: str):
@@ -92,11 +94,13 @@ def convert_events(date_confirmed, date_symptoms, death):
         )
     return events
 
-def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str, cardiovascular: str, obesity: str): 
 
+def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
+                                   cardiovascular: str, obesity: str):
     preexistingConditions = {}
     if all((lung, kidney, metabolic, cardiovascular, obesity)) == "Sim":
         return None
+
     preexistingConditions["hasPreexistingConditions"] = True
     commorbidities_list = []
 
@@ -114,6 +118,7 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str, cardi
     preexistingConditions["values"] = commorbidities_list
     return preexistingConditions
 
+
 def convert_demographics(gender: str, age: str):
     if not any((gender, age)):
         return None
@@ -123,14 +128,13 @@ def convert_demographics(gender: str, age: str):
     if age:
         if age == ">= 60 anos":
             demo["ageRange"] = {"start": 60, "end": 120}
-        elif age == "<= 19 anos": #No age resolution below 19 years
+        # No age resolution provided below 19 years
+        elif age == "<= 19 anos":
             demo["ageRange"] = {"start": 0, "end": 19}
         else:
             age_range = age.split(" a ")
-            demo["ageRange"] = {
-                "start": float(age_range[0]),
-                "end": float("".join([i for i in age_range[1] if not i.isalpha()])),
-            }
+            demo["ageRange"] = {"start": float(age_range[0]), "end": float(
+                "".join([i for i in age_range[1] if not i.isalpha()])), }
     return demo
 
 
@@ -156,7 +160,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            if row[_STATE] == "DISTRITO FEDERAL": #There are a few entries for other states
+            # There are a few entries for other states
+            if row[_STATE] == "DISTRITO FEDERAL":
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
@@ -176,7 +181,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     }
                     case["preexistingConditions"] = convert_preexisting_conditions(
                         row[_LUNG], row[_KIDNEY], row[_METABOLIC], row[_CARDIOVASCULAR], row[_OBESITY]
-                        )
+                    )
                     notes = convert_notes(
                         row[_HEMATOLOGIC], row[_IMMUNOSUPPRESSED], row[_OTHERS]
                     )

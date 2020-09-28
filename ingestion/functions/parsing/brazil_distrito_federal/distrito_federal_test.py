@@ -1,12 +1,5 @@
-import csv
-import json
 import os
-import tempfile
 import unittest
-from datetime import date
-
-import pytest
-
 from brazil_distrito_federal import distrito_federal
 
 _SOURCE_ID = "abc123"
