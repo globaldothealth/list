@@ -45,11 +45,14 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
-    if "-" in raw_date: #can I change this
-        date = datetime.strptime(raw_date, "%Y-%m-%d") #There is variation in how dates are reported
+    if raw_date:
+    	if "-" in raw_date: #can I change this
+        	date = datetime.strptime(raw_date, "%Y-%m-%d") #There is variation in how dates are reported
+    	else: #Some are empty
+        	date = datetime.strptime(raw_date, "%d/%m/%Y")
+    	return date.strftime("%m/%d/%YZ") 
     else:
-        date = datetime.strptime(raw_date, "%d/%m/%Y")
-    return date.strftime("%m/%d/%YZ")
+    	return None
 
 
 def convert_gender(raw_gender: str):
