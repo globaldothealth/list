@@ -843,12 +843,6 @@ components:
           required:
             - sourceId
             - sourceUrl
-        location:
-          required:
-            - country
-            - geoResolution
-            - geometry
-            - name
         curator:
           $ref: "#/components/schemas/Curator"
       required:
