@@ -106,7 +106,18 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
+        uuid_column = ""
+        uuid_prefix = ""
         for row in reader:
+            # The column used to denote case UUID changes in April.
+            # It resets back to 1 when this happens.
+            # Prefix old values ("Patient Number") to distinguish.
+            if not uuid_column:
+                if "Entry_ID" in row:
+                    uuid_column = "Entry_ID"
+                else:
+                    uuid_column = "Patient Number"
+                    uuid_prefix = "P"
             case = {
                 "caseReference": {
                     "sourceId": source_id,
@@ -130,7 +141,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             update_for_status(row, case)
             for i in range(int(row["Num Cases"])):
                 c = copy.deepcopy(case)
-                c["caseReference"]["sourceEntryId"] = f"{row['Entry_ID']}-{i + 1}"
+                c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
                 yield c
 
 
