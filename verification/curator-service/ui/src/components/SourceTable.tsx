@@ -328,7 +328,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV'].map((value) => (
+                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
                                             <MenuItem
                                                 key={`format-${value}`}
                                                 value={value || ''}
