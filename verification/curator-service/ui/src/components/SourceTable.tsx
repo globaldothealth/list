@@ -426,6 +426,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             }{' '}
                                             day(s) ago
                                         </div>
+                                    ) : rowData.dateFilter?.op === 'GT' ? (
+                                        <div>
+                                            Parse all data after{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            day(s) ago
+                                        </div>
                                     ) : (
                                         <div>None</div>
                                     ),
