@@ -8,6 +8,8 @@ Set-up and initial load testing was tracked in [this github issue](https://githu
 
 Dev starts to hit its CPU thresholdlimit ~10 QPS (simulated with ~20 users and a spawn rate of 1), while the RAM usage doesn't increase at all (50Mb->60Mb). Response latency increases to unreasonable levels when load on CPU is too high.
 
+Curator service in prod has a [768m](https://github.com/globaldothealth/list/blob/main/aws/curator.yaml#L174) vCPU limit so a quick extrapolation would allow for 30QPS to prod, the mongo cluster is also better provisioned (M20 cluster type vs M0 for dev) so in reality higher numbers are to be expected.
+
 Latest load test results:
 
 ```text
