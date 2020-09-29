@@ -8,7 +8,32 @@ Set-up and initial load testing was tracked in [this github issue](https://githu
 
 Dev starts to cpu-choke at ~10 QPS (simulated with ~20 users and a spawn rate of 1), it's using the allowed 250m vCPUs fully while the RAM usage doesn't increase at all (50Mb->60Mb).
 
-![repsonse time](screenshots/response_times_(ms)_1601386056.png)
+Latest load test results:
+
+```
+ Name                                                          # reqs      # fails  |     Avg     Min     Max  Median  |   req/s failures/s
+--------------------------------------------------------------------------------------------------------------------------------------------
+ GET /api/cases                                                  5033     0(0.00%)  |     672     150    5042     450  |    6.01    0.00
+ GET /api/sources                                                1032     0(0.00%)  |     573     141    3533     400  |    1.23    0.00
+ GET /api/sources/uploads                                         998     0(0.00%)  |     553     139    3167     390  |    1.19    0.00
+ GET /api/users                                                   514     0(0.00%)  |     601     140    3289     420  |    0.61    0.00
+ GET /auth/profile                                                532     0(0.00%)  |     506     132    5066     330  |    0.64    0.00
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregated                                                      8109     0(0.00%)  |     630     132    5066     420  |    9.69    0.00
+
+Response time percentiles (approximated)
+ Type     Name                                                              50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|------------------------------------------------------------|---------|------|------|------|------|------|------|------|------|------|------|------|
+ GET      /api/cases                                                        450    660    830    960   1400   2000   3100   3500   3900   5000   5000   5033
+ GET      /api/sources                                                      400    570    740    830   1200   1700   2600   3000   3400   3500   3500   1032
+ GET      /api/sources/uploads                                              390    570    720    800   1100   1700   2500   2700   3200   3200   3200    998
+ GET      /api/users                                                        420    600    740    870   1300   1900   2500   2700   3300   3300   3300    514
+ GET      /auth/profile                                                     330    520    670    750   1100   1400   2100   2200   5100   5100   5100    532
+--------|------------------------------------------------------------|---------|------|------|------|------|------|------|------|------|------|------|------|
+ None     Aggregated                                                        420    630    780    900   1300   1900   2900   3300   3900   5100   5100   8109
+ ```
+
+![response time](screenshots/response_times_(ms)_1601386056.png)
 
 ![total reqs](screenshots/total_requests_per_second_1601386056.png)
 
