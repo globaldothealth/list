@@ -22,8 +22,11 @@ def convert_date(raw_date):
     Convert raw date field into a value interpretable by the dataserver.
     Dates are listed in YYYY/mm/dd format
     """
-    date = datetime.strptime(raw_date, "%Y/%m/%d")
-    return date.strftime("%m/%d/%Y")
+    try:
+        date = datetime.strptime(raw_date, "%Y/%m/%d")
+        return date.strftime("%m/%d/%YZ")
+    except BaseException:
+        pass
 
 
 def convert_gender(raw_gender):
@@ -31,7 +34,6 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "mujer":
         return "Female"
-    return None
 
 
 def convert_location(raw_entry):
@@ -49,9 +51,11 @@ def convert_nationality(two_letter_country_code):
     if two_letter_country_code == 'cu':
         return "Cuban"
     else:
-        country = pycountry.countries.get(alpha_2=two_letter_country_code).name
-        if country:
-            return country
+        try:
+            return pycountry.countries.get(
+                alpha_2=two_letter_country_code).name
+        except BaseException:
+            pass
 
 
 def parse_cases(raw_data_file, source_id, source_url):
@@ -109,16 +113,13 @@ def parse_cases(raw_data_file, source_id, source_url):
                                     entry['pais'])]}}
 
                     if entry.get("consulta_medico", ""):
-                        try:
-                            case["events"].append({
-                                "name": "firstClinicalConsultation",
-                                "dateRange": {
-                                    "start": convert_date(entry["consulta_medico"]),
-                                    "end": convert_date(entry["consulta_medico"])
-                                }}
-                            )
-                        except BaseException:
-                            pass
+                        case["events"].append({
+                            "name": "firstClinicalConsultation",
+                            "dateRange": {
+                                "start": convert_date(entry["consulta_medico"]),
+                                "end": convert_date(entry["consulta_medico"])
+                            }}
+                        )
 
                     if entry.get('posible_procedencia_contagio', ""):
                         if 'crucero' in entry['posible_procedencia_contagio']:
@@ -140,7 +141,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                                                     }
                                                 }]
                                         }
-                
+
                                         if entry.get('arribo_a_cuba_foco', ""):
                                             notes.append(
                                                 f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'])}")
