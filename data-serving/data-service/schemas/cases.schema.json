@@ -93,7 +93,7 @@
           "additionalProperties": false,
           "properties": {
             "sampleCollectionDate": {
-              "bsonType": ["date", "string"]
+              "bsonType": ["date"]
             },
             "repositoryUrl": {
               "bsonType": "string"
@@ -178,10 +178,10 @@
               "additionalProperties": false,
               "properties": {
                 "start": {
-                  "bsonType": ["date", "string"]
+                  "bsonType": ["date"]
                 },
                 "end": {
-                  "bsonType": ["date", "string"]
+                  "bsonType": ["date"]
                 }
               }
             }
@@ -286,10 +286,10 @@
                   "additionalProperties": false,
                   "properties": {
                     "start": {
-                      "bsonType": ["date", "string"]
+                      "bsonType": ["date"]
                     },
                     "end": {
-                      "bsonType": ["date", "string"]
+                      "bsonType": ["date"]
                     }
                   }
                 },
@@ -378,7 +378,7 @@
                 "bsonType": "string"
               },
               "date": {
-                "bsonType": ["date", "string"]
+                "bsonType": ["date"]
               },
               "notes": {
                 "bsonType": "string"
@@ -393,7 +393,7 @@
                 "bsonType": "string"
               },
               "date": {
-                "bsonType": ["date", "string"]
+                "bsonType": ["date"]
               },
               "notes": {
                 "bsonType": "string"
