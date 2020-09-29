@@ -147,7 +147,10 @@ export default class UploadsController {
         source: SourceDocument,
         upload: UploadDocument,
     ): Promise<void> {
-        if (source.notificationRecipients?.length > 0) {
+        if (
+            source.automation?.schedule &&
+            source.notificationRecipients?.length > 0
+        ) {
             const subject = 'Automated upload failed for source';
             const text = `An automated upload failed for the following source in G.h List;
                     \n
