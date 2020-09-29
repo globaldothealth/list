@@ -1012,6 +1012,7 @@ components:
               type: string
               enum:
                 - EQ
+                - GT
                 - LT
         notificationRecipients:
           description: >
