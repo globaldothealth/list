@@ -1,7 +1,11 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f0b9a7ead3a2b003edc0e7f/2020/07/12/2320/content.json",
+    "s3Key": "5f6a9df8310dcb0a1156782c/2020/09/28/2358/content.csv",
     "sourceUrl": "https://foo.bar",
-    "sourceId": "5f0b9a7ead3a2b003edc0e7f"
+    "sourceId": "5f6a9df8310dcb0a1156782c",
+    "dateFilter": {
+        "numDaysBeforeToday": 4,
+        "op": "GT"
+    }
 }

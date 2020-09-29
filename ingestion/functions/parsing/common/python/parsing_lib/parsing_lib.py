@@ -205,6 +205,8 @@ def filter_cases_by_date(
                 return delta_days == 0
             elif op == "LT":
                 return delta_days < 0
+            elif op == "GT":
+                return delta_days > 0
             else:
                 e = ValueError(f'Unsupported date filter operand: {op}')
                 common_lib.complete_with_error(
