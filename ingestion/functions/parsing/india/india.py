@@ -41,16 +41,16 @@ def convert_location(row):
     city = row["Detected City"]
 
     query_terms = ("India",)
-    resolutions = ("Country",)
+    resolutions = ["Country"]
     if state:
         query_terms = (state,) + query_terms
-        resolutions = ("Admin1",) + resolutions
+        resolutions.insert(0, "Admin1")
     if district:
         query_terms = (district,) + query_terms
-        resolutions = ("Admin2",) + resolutions
+        resolutions.insert(0, "Admin2")
     if city:
         query_terms = (city,) + query_terms
-        resolutions = ("Admin3",) + resolutions
+        resolutions.insert(0, "Admin3")
 
     return {
         "query": ", ".join(query_terms),
