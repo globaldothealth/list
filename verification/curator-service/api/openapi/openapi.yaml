@@ -1000,6 +1000,7 @@ components:
             - null
             - CSV
             - JSON
+            - XLSX
         dateFilter:
           type: object
           properties:
