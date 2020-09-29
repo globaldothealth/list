@@ -67,7 +67,7 @@ This repository contains the servers and scripts that support its data curation 
   - [Curator service](verification/curator-service/api/README.md)
   - [Curator UI](verification/curator-service/ui/README.md)
   - [Data service](data-serving/data-service/README.md)
-  - [Geocoding](verification/curator-service/api/src/geocoding/README.md)
+  - [Geocoding](data-serving/data-service/src/geocoding/README.md)
   - [API](verification/curator-service/api/openapi/openapi.yaml)
 - Scripts
   - Data service

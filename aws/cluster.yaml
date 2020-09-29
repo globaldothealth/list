@@ -11,7 +11,7 @@ metadata:
 availabilityZones: ["us-east-1a", "us-east-1b"]
 
 managedNodeGroups:
-  - name: managed-worker-ng
+  - name: large-managed-worker-ng
     minSize: 2
     maxSize: 2
     desiredCapacity: 2

@@ -1,4 +1,5 @@
-import json
+import copy
+import csv
 import os
 import sys
 from datetime import datetime
@@ -32,70 +33,116 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "F":
         return "Female"
-    return None
 
 
-def convert_location(raw_entry):
-    state = raw_entry["detectedstate"]
-    district = raw_entry["detecteddistrict"]
-    city = raw_entry["detectedcity"]
+def convert_location(row):
+    state = row["Detected State"]
+    district = row["Detected District"]
+    city = row["Detected City"]
 
     query_terms = ("India",)
-    location = {"country": "India"}
+    resolutions = ["Country"]
     if state:
-        location["administrativeAreaLevel1"] = state
         query_terms = (state,) + query_terms
+        resolutions.insert(0, "Admin1")
     if district:
-        location["administrativeAreaLevel2"] = district
         query_terms = (district,) + query_terms
+        resolutions.insert(0, "Admin2")
     if city:
-        location["administrativeAreaLevel3"] = city
         query_terms = (city,) + query_terms
+        resolutions.insert(0, "Admin3")
 
-    location["query"] = ", ".join(query_terms)
-    return location
+    return {
+        "query": ", ".join(query_terms),
+        "limitToResolution": ",".join(resolutions)
+    }
 
 
-def parse_cases(raw_data_file, source_id, source_url):
-    """
-    Parses G.h-format case data from raw API data.
+def convert_demographics(row):
+    demo = {}
 
-    Two primary caveats at present:
-        1. We aren't converting all fields yet.
-        2. We're restricting ourselves to data with an `agebracket` present.
-           This data has an interesting format in which some rows represent
-           aggregate data. We need to add handling logic; until we've done so,
-           this filter is used to process strictly line list data.
-    """
+    if row["Age Bracket"]:
+        raw = row["Age Bracket"]
+        age = float(raw.split(" ", 1)[
+                    0]) / 12 if " months" in raw.lower() else float(row["Age Bracket"])
+        demo["ageRange"] = {
+            "start": age,
+            "end": age
+        }
+    if row["Gender"]:
+        demo["gender"] = convert_gender(row["Gender"])
+    if row["Nationality"]:
+        demo["nationalities"] = [row["Nationality"]]
+
+    return demo or None
+
+
+def convert_sources(row):
+    additionalSources = [{"sourceUrl": row[col]}
+                         for col in ["Source_1", "Source_2", "Source_3"]
+                         if row[col]]
+    return additionalSources or None
+
+
+def update_for_status(row, case):
+    if row["Current Status"] == "Hospitalized":
+        case["events"].append({
+            "name": "hospitalAdmission",
+            "value": "Yes"
+        })
+    elif row["Current Status"] == "Recovered":
+        case["events"].append({
+            "name": "outcome",
+            "value": "Recovered"
+        })
+    elif row["Current Status"] == "Deceased":
+        case["events"].append({
+            "name": "outcome",
+            "value": "Death"
+        })
+
+
+def parse_cases(raw_data_file: str, source_id: str, source_url: str):
+    """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
-        cases = json.load(f)
-        return (
-            {
+        reader = csv.DictReader(f)
+        uuid_column = ""
+        uuid_prefix = ""
+        for row in reader:
+            # The column used to denote case UUID changes in April.
+            # It resets back to 1 when this happens.
+            # Prefix old values ("Patient Number") to distinguish.
+            if not uuid_column:
+                if "Entry_ID" in row:
+                    uuid_column = "Entry_ID"
+                else:
+                    uuid_column = "Patient Number"
+                    uuid_prefix = "P"
+            case = {
                 "caseReference": {
                     "sourceId": source_id,
-                    "sourceEntryId": entry["entryid"],
-                    "sourceUrl": source_url
+                    "sourceUrl": source_url,
+                    "additionalSources": convert_sources(row)
                 },
-                "location": convert_location(entry),
+                "location": convert_location(row),
                 "events": [
                     {
                         "name": "confirmed",
                         "dateRange":
-                        {
-                            "start": convert_date(entry["dateannounced"]),
-                            "end": convert_date(entry["dateannounced"])
-                        }
+                            {
+                                "start": convert_date(row["Date Announced"]),
+                                "end": convert_date(row["Date Announced"])
+                            }
                     }
                 ],
-                "demographics": {
-                    "ageRange": {
-                        "start": float(entry["agebracket"].split(" ", 1)[0]),
-                        "end": float(entry["agebracket"].split(" ", 1)[0])
-                    },
-                    "gender": convert_gender(entry["gender"])
-                },
-                "notes": entry["notes"] or None
-            } for entry in cases["raw_data"] if entry["agebracket"])
+                "demographics": convert_demographics(row),
+                "notes": row["Notes"] or None
+            }
+            update_for_status(row, case)
+            for i in range(int(row["Num Cases"])):
+                c = copy.deepcopy(case)
+                c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
+                yield c
 
 
 def lambda_handler(event, context):
