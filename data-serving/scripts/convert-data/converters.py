@@ -9,7 +9,7 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
+from parsers import (parse_age, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
                      parse_longitude, parse_range, parse_sex, parse_string_list,
                      parse_url)
@@ -154,7 +154,7 @@ def convert_event(id: str, dates: Any, value: str, field_name: str, event_name: 
         }
 
         if value:
-          event['value'] = value
+            event['value'] = value
 
         return event
     except ValueError as e:
@@ -296,9 +296,9 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
         location['geometry'] = geometry
 
     # Produce a reasonable human readable name based on admin hierarchy.
-    location['name'] = ', '.join([part for part in 
-      [admin3, admin2, admin1, country]
-    if part])
+    location['name'] = ', '.join([part for part in
+                                  [admin3, admin2, admin1, country]
+                                  if part])
 
     try:
         parsed_geo_resolution = parse_geo_resolution(geo_resolution)
@@ -366,29 +366,29 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
         }
     '''
     caseReference = {
-      'verificationStatus': 'VERIFIED',
+        'verificationStatus': 'VERIFIED',
     }
     if not source:
-      return caseReference
+        return caseReference
 
     sources = parse_list(source, ', ')
 
     try:
-      sourceUrls = [ parse_url(source) for source in sources ]
+        sourceUrls = [parse_url(source) for source in sources]
 
-      if not sourceUrls:
-        return None
-      
-      caseReference['sourceUrl'] = sourceUrls[0]
+        if not sourceUrls:
+            return None
 
-      if len(sourceUrls) > 1:
-        caseReference['additionalSources'] = [{
-            'sourceUrl': sourceUrl
-        } for sourceUrl in sourceUrls[1:]]
+        caseReference['sourceUrl'] = sourceUrls[0]
 
-      return caseReference
+        if len(sourceUrls) > 1:
+            caseReference['additionalSources'] = [{
+                'sourceUrl': sourceUrl
+            } for sourceUrl in sourceUrls[1:]]
+
+        return caseReference
     except ValueError as e:
-       log_error(id, 'source', 'caseReference.sourceUrl', source, e)
+        log_error(id, 'source', 'caseReference.sourceUrl', source, e)
 
 
 def convert_travel_history(geocoder: Any, id: str, dates: str,
@@ -428,16 +428,17 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
     if not location_list and not date_range:
         return None
     if not location_list:
-        return { 'travel': [{'dateRange': date_range}] }
+        return {'travel': [{'dateRange': date_range}]}
     if not date_range:
-        return { 'travel': [{'location': l} for l in location_list if l] }
+        return {'travel': [{'location': loc} for loc in location_list if loc]}
 
     # We believe it will be useful to have dates associated with each travel
     # location, but in the existing data, travel history only has one (or no)
     # date associated with the entire field.
-    return { 'travel':
-      [{'dateRange': date_range, 'location': l} for l in location_list if l]
-    }
+    return {'travel':
+            [{'dateRange': date_range, 'location': loc}
+                for loc in location_list if loc]
+            }
 
 
 def convert_imported_case(values_to_archive: Dict[str, Any]) -> Dict[str, Any]:
