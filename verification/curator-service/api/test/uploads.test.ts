@@ -165,10 +165,10 @@ describe('GET', () => {
             sourceWithError.uploads[0]._id.toString(),
         );
         expect(res.body.uploads[1].upload._id).toEqual(
-            sourceWithUpdatedUploads.uploads[0]._id.toString(),
+            sourceWithCreatedUploads.uploads[0]._id.toString(),
         );
         expect(res.body.uploads[2].upload._id).toEqual(
-            sourceWithCreatedUploads.uploads[0]._id.toString(),
+            sourceWithUpdatedUploads.uploads[0]._id.toString(),
         );
     });
     it('rejects negative page param', (done) => {
