@@ -6,7 +6,7 @@ Set-up and initial load testing was tracked in [this github issue](https://githu
 
 ## TL;DR results
 
-Dev starts to cpu-choke at ~10 QPS (simulated with ~20 users and a spawn rate of 1), it's using the allowed 250m vCPUs fully while the RAM usage doesn't increase at all (50Mb->60Mb).
+Dev starts to hit its CPU thresholdlimit ~10 QPS (simulated with ~20 users and a spawn rate of 1), while the RAM usage doesn't increase at all (50Mb->60Mb). Response latency increases to unreasonable levels when load on CPU is too high.
 
 Latest load test results:
 
@@ -48,7 +48,7 @@ So basically: read-only traffic doesn't impact RAM usage much, curator service b
 Install Python 3.8, locust and the necessary dependencies with:
 
 ```shell
-pip3 install -r requirements.txt
+python3.8 -m pip install -r requirements.txt
 ```
 
 Get access to serialized credentials stored in S3 or generate your own and put them in an S3 bucket that you can access, then set the required environment variables when running locust:
