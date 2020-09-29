@@ -10,7 +10,7 @@ Dev starts to cpu-choke at ~10 QPS (simulated with ~20 users and a spawn rate of
 
 Latest load test results:
 
-```
+```text
  Name                                                          # reqs      # fails  |     Avg     Min     Max  Median  |   req/s failures/s
 --------------------------------------------------------------------------------------------------------------------------------------------
  GET /api/cases                                                  5033     0(0.00%)  |     672     150    5042     450  |    6.01    0.00
@@ -75,7 +75,7 @@ Note: When testing a local instance, make sure the user whose serialized credent
 
 Check the response time percentiles in the UI if they feel reasonable, the number of failures if any and overall memory usage of the docker containers using `docker stats`, the output should look something like:
 
-```raw
+```text
 CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
 59381efc5cbd        dev_curatorui_1     5.99%               730.8MiB / 1.944GiB   36.70%              1.86MB / 176kB      0B / 0B             42
 4b107a29e174        dev_curator_1       2.78%               92.41MiB / 1.944GiB   4.64%               732kB / 647kB       0B / 0B             36
