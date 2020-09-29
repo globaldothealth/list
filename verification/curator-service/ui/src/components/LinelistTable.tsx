@@ -617,10 +617,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
