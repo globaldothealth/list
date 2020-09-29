@@ -40,7 +40,7 @@ def main():
 
     csv_path = extract_csv(args.ncov2019_path)
     num_cases = len(open(csv_path).readlines())
-    num_to_convert = int(args.sample_rate*num_cases)
+    num_to_convert = int(args.sample_rate * num_cases)
     print(f'Converting {num_to_convert} / {num_cases} cases from {csv_path}')
 
     print('Converting data to new schema and writing to', args.outfile)
@@ -75,7 +75,7 @@ def extract_csv(repo_path: str) -> str:
 
 def convert(infile: str, outfile: str, geocoder: Any,
             sample_rate: int, num_to_convert: int) -> None:
-    conversion_interval = int(1/sample_rate)
+    conversion_interval = int(1 / sample_rate)
     bar = progressbar.ProgressBar(
         maxval=num_to_convert,
         widgets=[progressbar.Bar('=', '[', ']'),

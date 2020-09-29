@@ -13,13 +13,11 @@
   '''
 
 import re
-import numbers
-import math
 import datetime
 from typing import Any, Callable, Dict, List, Tuple
 from constants import (COMMON_LOCATION_ABBREVIATIONS,
                        VALID_GEO_RESOLUTIONS, VALID_SEXES)
-from utils import is_url, trim_string_list
+from utils import trim_string_list
 from geocode_util import lookup_location
 
 
@@ -251,7 +249,7 @@ def parse_location_list(geocoder: Any, value: Any) -> [Dict[str, Any]]:
         separator = ':'
 
     locations = parse_list(value, separator) if separator else [value]
-    return [parse_location(geocoder, l) for l in locations if l]
+    return [parse_location(geocoder, loc) for loc in locations if loc]
 
 
 def parse_sex(value: Any) -> str:
@@ -383,8 +381,8 @@ def parse_string_list(value: Any) -> List[str]:
 
 
 def parse_url(value: Any) -> str:
-  # TODO: Too noisy right now. Use a more accurate URL parser before throwing.
-  # if not is_url(value):
-  #  raise ValueError('not a valid URL')
+    # TODO: Too noisy right now. Use a more accurate URL parser before throwing.
+    # if not is_url(value):
+    #  raise ValueError('not a valid URL')
 
-  return value
+    return value
