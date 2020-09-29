@@ -1,2 +1,2 @@
-MÃ©todo,MunicÃ­pio de ResidÃªncia,Inicio Sintomas,Sexo,DoenÃ§as preexistentes,Idade,Data do Ã“bito
-Swab,Santa Rita,2020-04-27,Masculino,"Diabetes Mellitus,Cardiopatia,DoenÃ§a RespiratÃ³ria",80,2020-05-10
+ÿid;dataNotificacao;dataInicioSintomas;dataNascimento;sintomas;profissionalSaude;cbo;condicoes;estadoTeste;dataTeste;tipoTeste;resultadoTeste;paisOrigem;sexo;estado;estadoIBGE;municipio;municipioIBGE;origem;cnes;estadoNotificacao;estadoNotificacaoIBGE;municipioNotificacao;municipioNotificacaoIBGE;excluido;validado;idade;dataEncerramento;evolucaoCaso;classificacaoFinal,
+ymF8MCjS33;2020-04-26T03:00:00.000Z;2020-04-16T03:00:00.000Z;1973-02-10T03:00:00.000Z;Tosse, Outros;Não;null;Diabetes;Concluído;2020-04-26T03:00:00.000Z;TESTE RÁPIDO - ANTICORPO;Positivo;undefined;Feminino;PARAÍBA;25;João Pessoa;2507507;undefined;3726401;PARAÍBA;25;João Pessoa;2507507;undefined;undefined;47;2020-04-29T03:00:00.000Z;Internado em UTI;Confirmado Laboratorial
