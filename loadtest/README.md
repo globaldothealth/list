@@ -2,7 +2,21 @@
 
 This directory contains [locust](https://locust.io) load testing tasks to load test the Global.health APIs.
 
-Set-up and initial load testing was tracked in [this github issue]().
+Set-up and initial load testing was tracked in [this github issue](https://github.com/globaldothealth/list/issues/1263).
+
+## TL;DR results
+
+Dev starts to cpu-choke at ~10 QPS (simulated with ~20 users and a spawn rate of 1), it's using the allowed 250m vCPUs fully while the RAM usage doesn't increase at all (50Mb->60Mb).
+
+![repsonse time](screenshots/response_times_(ms)_1601386056.png)
+
+![total reqs](screenshots/total_requests_per_second_1601386056.png)
+
+![users](screenshots/number_of_users_1601386056.png)
+
+Data service resource usage at 10QPS did not increase significantly, CPU constraints seem to be on the curator service only.
+
+So basically: read-only traffic doesn't impact RAM usage much, curator service bottlenet is its CPU limits.
 
 ## Initial setup
 
@@ -17,6 +31,8 @@ Get access to serialized credentials stored in S3 or generate your own and put t
 ```shell
 S3_BUCKET='epid-ingestion' S3_OBJECT='covid-19-map-277002-0943eeb6776b.json'
 ```
+
+You can check the [ingestion docs](/ingestion/functions/README.md) for how to generate/get those creds.
 
 ## Local load test
 
@@ -56,11 +72,11 @@ Follow the link to the locust UI and start the load test there, you can tune the
 
 Check the response time percentiles in the UI if they feel reasonable, the number of failures if any and memory/cpu usage of pods using `kubectl top pods`.
 
-A more visual way of looking at dev resource usage would be the [kubernetes dashboard](/aws/README.md#Kubernetes-dashboard)
+A more visual way of looking at dev resource usage would be the [kubernetes dashboard](/aws/README.md#Kubernetes-dashboard), searching for "dev" will help you filter out production pods.
 
 ## Prod load test
 
-Please don't, load test locally and in dev but avoid hitting prod with crazy load as we do currently not have a way of segregating traffic and shedding excessive load traffic that could impact users.
+Please don't. Load test locally and in dev but avoid hitting prod with crazy load as we do currently not have a way of segregating traffic and shedding excessive load traffic that could impact real users.
 
 ## Known caveats
 
