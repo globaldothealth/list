@@ -69,6 +69,7 @@ This repository contains the servers and scripts that support its data curation 
   - [Data service](data-serving/data-service/README.md)
   - [Geocoding](data-serving/data-service/src/geocoding/README.md)
   - [API](verification/curator-service/api/openapi/openapi.yaml)
+  - [Load testing](loadtest/README.md)
 - Scripts
   - Data service
     - [Converting legacy CSV data to schema-conformant JSON](data-serving/scripts/convert-data/README.md)
