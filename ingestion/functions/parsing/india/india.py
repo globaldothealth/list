@@ -109,15 +109,33 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         uuid_column = ""
         uuid_prefix = ""
         for row in reader:
+            # Only rows representing 1 case are line list style data with
+            # demographic information. Additionally, most rows representing
+            # bulk data are actually transposed daily-count data -- in other
+            # words, they represent things like the current number of
+            # hospitalized patients, which we can't disaggregate into our
+            # dataset.
+            if int(row["Num Cases"]) != 1:
+                continue
+
             # The column used to denote case UUID changes in April.
             # It resets back to 1 when this happens.
             # Prefix old values ("Patient Number") to distinguish.
             if not uuid_column:
                 if "Entry_ID" in row:
                     uuid_column = "Entry_ID"
+                    uuid_prefix = ""
                 else:
                     uuid_column = "Patient Number"
                     uuid_prefix = "P"
+
+            # Some states publish updates on patients. In these cases, the
+            # values are keyed on a special state-specific ID. If that's
+            # available, we should use that to dedupe.
+            if row["State Patient Number"]:
+                uuid_column = "State Patient Number"
+                uuid_prefix = ""
+
             case = {
                 "caseReference": {
                     "sourceId": source_id,
@@ -139,10 +157,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "notes": row["Notes"] or None
             }
             update_for_status(row, case)
-            for i in range(int(row["Num Cases"])):
-                c = copy.deepcopy(case)
-                c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
-                yield c
+            case["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}"
+            yield case
 
 
 def lambda_handler(event, context):

@@ -9,7 +9,7 @@ _PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297634-1",
+            "sourceEntryId": "OR-A-123",
             "sourceUrl": _SOURCE_URL,
             "additionalSources": [
                 {
@@ -46,70 +46,6 @@ _PARSED_CASES = [
             ]
         },
         "notes": "was also suffering from Diabetes, hypertension."
-    },
-    {
-        "caseReference": {
-            "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297649-1",
-            "sourceUrl": _SOURCE_URL,
-            "additionalSources": [
-                {
-                    "sourceUrl": "https://twitter.com/PIB_Patna/status/1308375952653611008"
-                }
-            ]
-        },
-        "location": {
-            "limitToResolution": "Admin2,Admin1,Country",
-            "query": "Arwal, Bihar, India"
-        },
-        "events": [
-            {
-                "name": "confirmed",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        }
-            },
-            {
-                "name": "hospitalAdmission",
-                "value": "Yes"
-            }
-        ],
-        "demographics": None,
-        "notes": None
-    },
-    {
-        "caseReference": {
-            "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297649-2",
-            "sourceUrl": _SOURCE_URL,
-            "additionalSources": [
-                {
-                    "sourceUrl": "https://twitter.com/PIB_Patna/status/1308375952653611008"
-                }
-            ]
-        },
-        "location": {
-            "limitToResolution": "Admin2,Admin1,Country",
-            "query": "Arwal, Bihar, India"
-        },
-        "events": [
-            {
-                "name": "confirmed",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        }
-            },
-            {
-                "name": "hospitalAdmission",
-                "value": "Yes"
-            }
-        ],
-        "demographics": None,
-        "notes": None
     },
 ]
 
