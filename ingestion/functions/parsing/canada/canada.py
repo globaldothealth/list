@@ -68,7 +68,7 @@ def parse_cases(raw_data_file, source_id, source_url):
             ],
             "demographics": {
                 "ageRange": convert_age(line[2]), # age
-                "gender": line[3] if line[3] in ('Male', 'Female') else '', # sex
+                "gender": line[3] if line[3] in ('Male', 'Female') else None, # sex
             },
             "notes": line[13] if len(line[13]) > 0 else None # additional_info
         } 
