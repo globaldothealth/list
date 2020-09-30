@@ -20,21 +20,31 @@ export default function TermsOfUse(): JSX.Element {
                         The Global.health website and its contents herein,
                         including all data and mapping are the copyright of
                         Boston Children's Hospital, all rights reserved. When
-                        linking to the website, attribute the Website as
-                        "Global.health....."
+                        linking to the website, attribute the Website as{' '}
+                        <a
+                            href="http://www.global.health"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            www.global.health
+                        </a>
                     </li>
                     <li>
-                        The Global.health data is licensed under Creative
-                        Commons Attribution 4.0 International by the Boston
-                        Children's Hospital. Attribute any use of the data to
-                        "TBC"
-                    </li>
-                    <li>
-                        For any publications that use the Global.health data,
-                        please cite the publication: Xu, B., Gutierrez, B.,
-                        Mekaru, S. et al. Epidemiological data from the COVID-19
-                        outbreak, real-time case information. Sci Data 7, 106
-                        (2020).{' '}
+                        The Global.health data is licensed under{' '}
+                        <a
+                            href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            Creative Commons Attribution 4.0 International
+                        </a>{' '}
+                        by the Boston Children's Hospital. Attribute any use of
+                        the data to: Global.health consortium, Detailed
+                        Epidemiological Data from the COVID-19 Outbreak,
+                        Accessed on yyyy-mm-dd from global.health and: Xu, B.,
+                        Gutierrez, B., Mekaru, S. et al. Epidemiological data
+                        from the COVID-19 outbreak, real-time case information.
+                        Sci Data 7, 106 (2020).{' '}
                         <a
                             href="https://doi.org/10.1038/s41597-020-0448-0"
                             rel="noopener noreferrer"
