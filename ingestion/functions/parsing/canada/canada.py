@@ -29,7 +29,7 @@ def convert_location(health_region, province, country):
     if province != "Not Reported":
         terms.append(province)
     if country != "Not Reported":
-        terms.append(country)
+        raise ValueError("Country not specified")
     return {"query":  ", ".join(terms)}
 
 # dd-MM-yyyy -> yyyy-MM-dd
