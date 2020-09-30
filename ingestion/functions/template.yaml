@@ -152,6 +152,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 3008
       Layers:
         - !Ref ParsingLibLayer
   BrazilAmapaParsingFunction:
@@ -236,7 +237,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      MemorySize: 512
+      MemorySize: 3008
       Layers:
         - !Ref ParsingLibLayer
 # Declare values that can be imported to other CloudFormation stacks, or should
