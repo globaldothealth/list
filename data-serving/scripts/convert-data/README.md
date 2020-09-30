@@ -21,7 +21,7 @@ To use this script, you need to clone `https://github.com/beoutbreakprepared/nCo
 git clone https://github.com/beoutbreakprepared/nCoV2019.git /path/to/nCoV2019
 ```
 
-You will also need to supply a sourceId as this is a required field in the mongo DB. You should create a mongo Source (either in the mongo shell or the Portal UI) with the URL set to [this documentation](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data), then grab the sourceId and add it to your command. The documentation link will be the main sourceURL for all of the cases and their actual source will be in additionalSources. This was done so that the table of automated ingestion sources is not cluttered with non-automated ingestion sources.
+You will also need to supply a sourceId as this is a required field in the mongo DB. You should create a mongo Source (either in the mongo shell or the Portal UI) with the URL set to https://github.com/globaldothealth/list#data, then grab the sourceId and add it to your command. The documentation link will be the main sourceURL for all of the cases and their actual source will be in additionalSources. This was done so that the table of automated ingestion sources is not cluttered with non-automated ingestion sources.
 
 If you wish to convert [all spreadsheets data](https://github.com/beoutbreakprepared/nCoV2019/tree/master/latest_data), you can run the following
 
