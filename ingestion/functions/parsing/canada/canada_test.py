@@ -13,7 +13,13 @@ _PARSED_CASE = (
         "caseReference": {
             "sourceId": _SOURCE_ID,
             "sourceEntryId": "1",
-            "sourceUrl": _SOURCE_URL
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [
+                "https://news.ontario.ca/mohltc/en/2020/01/ontario-confirms-first-case-of-wuhan-novel-coronavirus.html",
+                "https://globalnews.ca/news/6497313/coronavirus-timeine-cases-canada/",
+                "https://globalnews.ca/news/6462626/coronavirus-toronto-hospital/",
+                "http://abc.xyz"
+            ]
         },
         "location": {
             "query": "Toronto, Ontario, Canada"
