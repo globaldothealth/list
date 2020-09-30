@@ -16,6 +16,9 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
+# Cf. https://github.com/globaldothealth/list/issues/1046
+_KNOWN_BAD_CASES = {"10890", "10891"}
+
 
 def convert_gender(raw_gender):
     if "gender" in raw_gender:
@@ -120,7 +123,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "gender": convert_gender(entry)
                 },
                 "notes": detect_notes(entry)
-            } for entry in cases if (entry["patientId"] != "-1" and entry["confirmedPatient"]))
+            } for entry in cases if (
+                entry["patientId"] != "-1"
+                and entry["confirmedPatient"]
+                and entry["patientId"] not in _KNOWN_BAD_CASES))
 
 
 def lambda_handler(event, context):

@@ -14,5 +14,20 @@
 	    "prefectureSourceURL": "http://www.pref.hokkaido.lg.jp/file.jsp?id=1279351",
 	    "sourceURL": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html",
 	    "confirmedPatient": true
+	}, {
+	    "patientId": "10890",
+	    "dateAnnounced": "2020-03-13",
+	    "ageBracket": 50,
+	    "gender": "F",
+	    "residence": "Sapporo",
+	    "detectedCityTown": "Sapporo",
+	    "detectedPrefecture": "Hokkaido",
+	    "patientStatus": "Unspecified",
+	    "relatedPatients": "Contact with Hokkaido#109",
+	    "prefecturePatientNumber": "Hokkaido#130",
+	    "cityPrefectureNumber": "Sapporo#52",
+	    "prefectureSourceURL": "http://www.pref.hokkaido.lg.jp/file.jsp?id=1279351",
+	    "sourceURL": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html",
+	    "confirmedPatient": true
 	}
 ]
