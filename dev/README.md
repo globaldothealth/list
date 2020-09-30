@@ -28,14 +28,23 @@ the curator UI to manage case report data sources and view or update case data, 
 **Important:** running the full stack correctly requires having access to a few secrets: you should create a `.env` file
 in `${REPOSITORY_ROOT}/dev` that looks like this:
 
-```shell
+```text
 AWS_ACCESS_KEY_ID=<AWS access key ID>
 AWS_SECRET_ACCESS_KEY=<AWS secret access key to authenticate AWS API calls>
+EMAIL_USER_ADDRESS=<Email address of the account used to send notification emails>
+EMAIL_USER_PASSWORD=<Password for the above email address>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 MAPBOX_TOKEN=<Mapbox API token>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 ```
+
+These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
+other secret values, contact one of:
+
+- <calremmel email>
+- <gtuli email>
+- <spencer email>
 
 #### Permissions
 
