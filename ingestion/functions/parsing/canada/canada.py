@@ -24,12 +24,13 @@ def convert_age(raw_age):
 
 def convert_location(health_region, province, country):
     terms = []
+    if country == "Not Reported":
+        raise ValueError("Country is not reported")
     if health_region != "Not Reported":
         terms.append(health_region)
     if province != "Not Reported":
         terms.append(province)
-    if country != "Not Reported":
-        raise ValueError("Country not specified")
+    terms.append(country)
     return {"query":  ", ".join(terms)}
 
 # dd-MM-yyyy -> yyyy-MM-dd
