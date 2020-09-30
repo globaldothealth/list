@@ -59,7 +59,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 for _ in range(num_confirmed_cases):
                     yield case
             except ValueError as ve:
-                print(ve)
+                raise ValueError("Unhandled data: {}".format(ve))
 
 
 def lambda_handler(event, context):
