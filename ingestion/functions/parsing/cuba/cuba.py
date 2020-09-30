@@ -80,8 +80,16 @@ def parse_cases(raw_data_file, source_id, source_url):
         hospital_map = {}
         for centre_type in ['centros_aislamiento', 'centros_diagnostico']:
             for centre in json_data[centre_type]:
-                hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
-                    ", " + json_data[centre_type][centre]['provincia']
+                hospital_map[centre] = (
+                    json_data[centre_type][centre]['nombre'] +
+                    ", " +
+                    json_data[centre_type][centre]['provincia'])
+
+        # Get schema_version and print if it changes
+        schema_version = json_data['schema-version']
+        if schema_version != 7:
+            print(
+                f'Schema version has been updated from 7 to {schema_version}')
 
         for day in json_data['casos']['dias']:
             if 'diagnosticados' in json_data['casos']['dias'][day]:
@@ -137,7 +145,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                                             "travel": [
                                                 {
                                                     "location": {
-                                                        "query": "Cuba"
+                                                        "query": country
                                                     }
                                                 }]
                                         }
@@ -171,6 +179,9 @@ def parse_cases(raw_data_file, source_id, source_url):
                     if entry['info']:
                         notes.append(
                             f"Notes provided are as follows: \n {entry['info']}")
+
+                    if schema_version:
+                        notes.append(f'Using schema version {schema_version}')
 
                     case["notes"] = "\n".join(notes)
 
