@@ -294,10 +294,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     href="https://github.com/globaldothealth/list#globalhealth-list"
                     rel="noopener noreferrer"
                     target="_blank"
-                    data-testid="forkme"
                     onClick={handleClose}
                 >
-                    <MenuItem>Fork me on github</MenuItem>
+                    <MenuItem>View source on Github</MenuItem>
                 </a>
             </Menu>
         </div>
