@@ -3,6 +3,7 @@
 # arrives by magic here, check out
 # https://requests-mock.readthedocs.io/en/latest/pytest.html?highlight=pytest#pytest
 import boto3
+import copy
 import json
 import os
 import pytest
@@ -502,6 +503,26 @@ def test_filter_cases_by_date_outside_range():
         {"start": "2020-06-03", "end": "2020-06-04"},
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert not next(cases, None)
+
+
+def test_filter_cases_by_date_handles_two_date_formats():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    # Date format is %m/%d/%YZ in CASE_JUNE_FIFTH.
+    # Date parsing also handles strings without the 'Z'.
+    other_date_format_case = copy.deepcopy(
+        CASE_JUNE_FIFTH)
+    other_date_format_case["events"][0]["dateRange"]["start"] = "06/05/2020"
+    other_date_format_case["events"][0]["dateRange"]["end"] = "06/05/2020"
+
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH, other_date_format_case),
+        None,
+        {"start": "2020-06-05", "end": "2020-06-05"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+
+    assert next(cases) == CASE_JUNE_FIFTH
+    assert next(cases) == other_date_format_case
 
 
 def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():

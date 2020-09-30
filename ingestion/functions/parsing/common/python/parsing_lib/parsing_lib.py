@@ -20,7 +20,7 @@ DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
 # Expected date fields format.
-DATE_FORMAT = "%m/%d/%YZ"
+DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
@@ -163,6 +163,22 @@ def get_today() -> datetime.datetime:
     return datetime.datetime.today()
 
 
+def get_case_date(date_string) -> datetime.datetime:
+    """Return a datetime parsed from a case."""
+    case_date = ""
+    for fmt in (DATE_FORMATS):
+        try:
+            return datetime.datetime.strptime(
+                date_string,
+                fmt)
+        except ValueError:
+            pass
+    if not case_date:
+        raise ValueError(f"Date {date_string} from case could not be parsed.")
+
+    return case_date
+
+
 def filter_cases_by_date(
         case_data: Generator[Dict, None, None],
         date_filter: Dict, date_range: Dict, env: str,
@@ -180,8 +196,7 @@ def filter_cases_by_date(
         def case_is_within_range(case, start, end):
             confirmed_event = [e for e in case["events"]
                                if e["name"] == "confirmed"][0]
-            case_date = datetime.datetime.strptime(
-                confirmed_event["dateRange"]["start"], DATE_FORMAT)
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
             return start <= case_date <= end
 
         start = datetime.datetime.strptime(date_range["start"], "%Y-%m-%d")
@@ -198,8 +213,7 @@ def filter_cases_by_date(
         def case_is_within_range(case, cutoff_date, op):
             confirmed_event = [e for e in case["events"]
                                if e["name"] == "confirmed"][0]
-            case_date = datetime.datetime.strptime(
-                confirmed_event["dateRange"]["start"], DATE_FORMAT)
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
             delta_days = (case_date - cutoff_date).days
             if op == "EQ":
                 return delta_days == 0
