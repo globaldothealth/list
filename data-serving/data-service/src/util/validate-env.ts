@@ -7,7 +7,7 @@ export default function validateEnv(): Readonly<{
     MAPBOX_PERMANENT_GEOCODE: boolean;
     MAPBOX_TOKEN: string;
     ENABLE_FAKE_GEOCODER: boolean;
-    MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC: number;
+    MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN: number;
 }> &
     CleanEnv & {
         readonly [varName: string]: string | undefined;
@@ -38,7 +38,7 @@ export default function validateEnv(): Readonly<{
             devDefault: true,
             default: false,
         }),
-        MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC: num({
+        MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN: num({
             desc:
                 'number of requests per seconds allowed to mapbox geocode endpoint',
             devDefault: 50,
