@@ -91,24 +91,25 @@ main() {
     if [ -z "${source_id}"  ]
     then   
         print "-e flag for source_id is required"
-    else
-        print "Running with:\n
-        [-m] MongoDB connection string: $mongodb_connection_string
-        [-d] database: $db
-        [-c] collection: $collection
-        [-r] sample rate: $sample_rate
-        [-s] schema path: $schema_path
-        [-i] indexes path: $indexes_path
-        [-e] source_id: $source_id"
-
-        fetch_latest_data
-        convert_data
-        setup_db
-        import_data
-        cleanup
-
-        print 'Fin!'
+        exit -1
     fi
+
+    print "Running with:\n
+    [-m] MongoDB connection string: $mongodb_connection_string
+    [-d] database: $db
+    [-c] collection: $collection
+    [-r] sample rate: $sample_rate
+    [-s] schema path: $schema_path
+    [-i] indexes path: $indexes_path
+    [-e] source_id: $source_id"
+
+    fetch_latest_data
+    convert_data
+    setup_db
+    import_data
+    cleanup
+
+    print 'Fin!'
 }
 
 main
