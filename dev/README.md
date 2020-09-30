@@ -46,6 +46,10 @@ other secret values, contact one of:
 - <gtuli email>
 - <spencer email>
 
+Note that for local development, it's fine to use your own values for these
+secrets if you have them. For instance, if you have a developer Mapbox API
+token, or if you'd like to use a different GMail account for mailing notifications, or different OAuth client values.
+
 #### Permissions
 
 Give your user all the permissions to access the portal and make CRUD updates.
