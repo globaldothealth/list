@@ -15,8 +15,25 @@ python3 -m pip install -r requirements.txt
 `convert_data.py` is a script to convert the line-list data from its original format, a CSV, to the new MongoDB
 schema-compliant json format.
 
+To use this script, you need to clone `https://github.com/beoutbreakprepared/nCoV2019.git` into your --ncov2019_path.
+
 ```console
-python3 convert_data.py --ncov2019_path=/path/to/nCoV2019 [--sample_rate=.1] [--outfile=cases.json]
+git clone https://github.com/beoutbreakprepared/nCoV2019.git /path/to/nCoV2019
+```
+
+You will also need to supply a sourceId as this is a required field in the mongo DB. You should create a mongo Source (either in the mongo shell or the Portal UI) with the URL set to [this documentation](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data), then grab the sourceId and add it to your command. The documentation link will be the main sourceURL for all of the cases and their actual source will be in additionalSources. This was done so that the table of automated ingestion sources is not cluttered with non-automated ingestion sources.
+
+If you wish to convert [all spreadsheets data](https://github.com/beoutbreakprepared/nCoV2019/tree/master/latest_data), you can run the following
+
+```console
+python3 convert_data.py --ncov2019_path=/path/to/nCoV2019 --source_id=<sourceID> --outfile=cases.json [--sample_rate=.1]
+```
+
+If you wish to convert your own csv in the spreadsheets format (e.g. a specific subset of the spreadsheets data),
+add the --filename argument.
+
+```console
+python3 convert_data.py --ncov2019_path=/path/to/nCoV2019 --filename=my_data.csv --source_id=<sourceID> --outfile=cases.json [--sample_rate=.1]
 ```
 
 Errors will be written to `conversion_errors.tsv`.
