@@ -40,7 +40,7 @@ export default function validateEnv(): Readonly<{
         }),
         MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN: num({
             desc:
-                'number of requests per seconds allowed to mapbox geocode endpoint',
+                'number of requests per minute allowed to mapbox geocode endpoint',
             devDefault: 50,
             default: 600,
         }),
