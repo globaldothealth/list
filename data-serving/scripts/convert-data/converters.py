@@ -81,9 +81,9 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
     if age_range is not None:
       has_start = 'start' in age_range.keys()
       has_end = 'end' in age_range.keys()
-      if ~has_start & has_end:
+      if not has_start and has_end:
         age_range['start'] = 0
-      elif has_start & ~has_end:
+      elif has_start and not has_end:
         age_range['end'] = 120
     return age_range
 
