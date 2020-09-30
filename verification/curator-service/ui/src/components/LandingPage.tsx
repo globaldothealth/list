@@ -38,7 +38,7 @@ export default function LandingPage(): JSX.Element {
     return (
         <Paper classes={{ root: classes.paper }}>
             <Typography variant="h4">
-                Trustworthy line list data to power your research
+                Detailed line list data to power your research
             </Typography>
             <div className={classes.body}>
                 <Typography
