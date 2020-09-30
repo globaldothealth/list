@@ -1,6 +1,7 @@
 import csv
 import os
 import sys
+import re
 from datetime import date, datetime
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -37,6 +38,20 @@ def convert_location(health_region, province, country):
 def convert_date(raw):
     return datetime.strftime(datetime.strptime(raw, "%d-%m-%Y"), "%Y-%m-%d")
 
+def additional_sources(case_source, additional_source):
+    def parse(source):
+        if len(source) == 0:
+            return None
+        segments = source.split(";")
+        # The url might be (1) https://abc.def or [1] https://abc.def.
+        rtn = []
+        for segment in segments:
+            rst = re.findall(r"(http.*)", segment)
+            if len(rst) != 0:
+                rtn.append(rst[0].strip())
+        return rtn
+    return parse(case_source) + parse(additional_source)
+
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
@@ -53,7 +68,8 @@ def parse_cases(raw_data_file, source_id, source_url):
             "caseReference": {
                 "sourceId": source_id,
                 "sourceEntryId": line[0], # case_id
-                "sourceUrl": source_url
+                "sourceUrl": source_url,
+                "additionalSources": additional_sources(line[12], line[14]) # case_source, additional_source
             },
             "location": convert_location(line[4], line[5], line[6]), # health_region, province, country
             "events": [
