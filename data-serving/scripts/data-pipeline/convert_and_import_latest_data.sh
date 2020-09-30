@@ -8,14 +8,14 @@ readonly SCRIPT_PATH="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly NCOV2019_REPO_PATH='/tmp/nCoV2019'
 readonly CONVERTED_DATA_PATH='cases.json'
 
-mongodb_connection_string='mongodb://127.0.0.1:27017'
+mongodb_connection_string='mongodb://127.0.0.1:27017/'
 db='covid19'
 collection='cases'
 sample_rate=1
 schema_path="$SCRIPT_PATH/../../data-service/schemas/cases.schema.json"
 indexes_path="$SCRIPT_PATH/../../data-service/schemas/cases.indexes.json"
 
-while getopts :m:d:c:r:s:i flag
+while getopts :m:d:c:r:s:i:e: flag
 do
     case "${flag}" in
         m) mongodb_connection_string=${OPTARG};;
@@ -24,6 +24,7 @@ do
         r) sample_rate=${OPTARG};;
         s) schema_path=${OPTARG};;
         i) indexes_path=${OPTARG};;
+        e) source_id=${OPTARG};;
         ?) echo $USAGE; exit 1
     esac
 done
@@ -52,7 +53,8 @@ function convert_data() {
     python3 $SCRIPT_PATH/../convert-data/convert_data.py \
         --outfile=$CONVERTED_DATA_PATH \
         --ncov2019_path=$NCOV2019_REPO_PATH \
-        --sample_rate=$sample_rate
+        --sample_rate=$sample_rate \
+        --source_id=$source_id
 
     if [ ! -f $CONVERTED_DATA_PATH ]; then
         err 'Data conversion failed'
@@ -73,11 +75,10 @@ function setup_db() {
 function import_data() {
     print 'Importing data'
     mongoimport \
-        --db $db \
         --collection $collection \
         --file $CONVERTED_DATA_PATH \
         --jsonArray \
-        --uri="$mongodb_connection_string"
+        --uri="$mongodb_connection_string$db"
 }
 
 function cleanup() {
@@ -87,21 +88,27 @@ function cleanup() {
 
 # Establish run order
 main() {
-    print "Running with:\n
-    [-m] MongoDB connection string: $mongodb_connection_string
-    [-d] database: $db
-    [-c] collection: $collection
-    [-r] sample rate: $sample_rate
-    [-s] schema path: $schema_path
-    [-i] indexes path: $indexes_path"
+    if [ -z "${source_id}"  ]
+    then   
+        print "-e flag for source_id is required"
+    else
+        print "Running with:\n
+        [-m] MongoDB connection string: $mongodb_connection_string
+        [-d] database: $db
+        [-c] collection: $collection
+        [-r] sample rate: $sample_rate
+        [-s] schema path: $schema_path
+        [-i] indexes path: $indexes_path
+        [-e] source_id: $source_id"
 
-    fetch_latest_data
-    convert_data
-    setup_db
-    import_data
-    cleanup
+        fetch_latest_data
+        convert_data
+        setup_db
+        import_data
+        cleanup
 
-    print 'Fin!'
+        print 'Fin!'
+    fi
 }
 
 main

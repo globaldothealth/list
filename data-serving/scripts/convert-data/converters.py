@@ -384,8 +384,7 @@ def convert_case_reference_field(id: str, source: str, sourceId: str) -> Dict[st
         sourceUrls = [parse_url(source) for source in sources]
 
         caseReference['sourceId'] = sourceId
-        caseReference['sourceUrl'] = 'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data'
-
+        caseReference['sourceUrl'] = 'https://github.com/globaldothealth/list#data'
         caseReference['additionalSources'] = [{
             'sourceUrl': sourceUrl
         } for sourceUrl in sourceUrls]
