@@ -20,6 +20,8 @@ import { useInterval } from '../hooks/useInterval';
  * Parsing functions, on AWS Lambda, have a 15 minute limit. It's possible for
  * retrieval to take a few minutes as well, so we allot five additional minutes
  * for that, too.
+ *
+ * This is 20 minutes, times 60 seconds per minute, to milliseconds.
  */
 const _BACKFILL_TIME_LIMIT_MS = 20 * 60 * 1000;
 
