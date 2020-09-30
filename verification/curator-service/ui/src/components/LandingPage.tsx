@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() => ({
     paper: {
-        height: '440px',
+        height: 'auto',
         left: '50%',
         maxWidth: '100%',
         padding: '45px',
