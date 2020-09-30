@@ -62,8 +62,8 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
         - "x months": Single age in months.
         - "x weeks": Single age in weeks.
         - "x - y": Age range.
-        - "x -": Age range start.
-        - "- y": Age range end.
+        - "x - 120": Age range start.
+        - "0 - y": Age range end.
 
     Raises:
       ValueError if the value can't be successfully parsed into an age.
@@ -77,7 +77,15 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
         }
         where start == end if value represents a single age.
     '''
-    return convert_range(ages, parse_age, lambda x: x)
+    age_range = convert_range(ages, parse_age, lambda x: x)
+    if age_range is not None:
+      has_start = 'start' in age_range.keys()
+      has_end = 'end' in age_range.keys()
+      if ~has_start & has_end:
+        age_range['start'] = 0
+      elif has_start & ~has_end:
+        age_range['end'] = 120
+    return age_range
 
 
 def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
@@ -348,7 +356,7 @@ def convert_notes_field(notes_fields: [str]) -> str:
     return notes or None
 
 
-def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
+def convert_case_reference_field(id: str, source: str, sourceId: str) -> Dict[str, str]:
     '''
     Converts the case reference field from the source field.
 
@@ -356,6 +364,7 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
+          'sourceId': str,
           'sourceUrl': str,
           'verificationStatus': 'VERIFIED',
           'additionalSources': [
@@ -368,23 +377,18 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
     caseReference = {
         'verificationStatus': 'VERIFIED',
     }
-    if not source:
-        return caseReference
 
     sources = parse_list(source, ', ')
 
     try:
         sourceUrls = [parse_url(source) for source in sources]
 
-        if not sourceUrls:
-            return None
+        caseReference['sourceId'] = sourceId
+        caseReference['sourceUrl'] = 'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data'
 
-        caseReference['sourceUrl'] = sourceUrls[0]
-
-        if len(sourceUrls) > 1:
-            caseReference['additionalSources'] = [{
-                'sourceUrl': sourceUrl
-            } for sourceUrl in sourceUrls[1:]]
+        caseReference['additionalSources'] = [{
+            'sourceUrl': sourceUrl
+        } for sourceUrl in sourceUrls]
 
         return caseReference
     except ValueError as e:
