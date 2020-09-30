@@ -940,6 +940,7 @@ components:
                 - PARSING_ERROR
                 - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
+                - TIMEOUT
         created:
           $ref: "#/components/schemas/Date"
     UploadsArray:
