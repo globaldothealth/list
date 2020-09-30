@@ -200,6 +200,8 @@ Example of a location which will trigger geocoding with restricted results:
 
 Travel history locations can be geocoded in the same way, travel history should only contain travels prior to the case's location.
 
+Prefer sending queries that go from smallest to biggest regions as mapbox can get confused by the former and geocode to a totally different country that the one you were expecting.
+
 Fields and nested structs should be referably not set (or set to `None`) rather than set to an empty value (for example unknown age shouldn't be set to `''` and unknown demographics altogether shouldn't be set to `{}`).
 
 Once you are done writing the parser, it needs to be included in the [SAM template](/ingestion/functions/template.yaml) to be made available in production, you can refer to how other functions were added there for example:
