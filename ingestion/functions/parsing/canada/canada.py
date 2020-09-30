@@ -33,12 +33,9 @@ def convert_location(health_region, province, country):
     terms.append(country)
     return {"query":  ", ".join(terms)}
 
-# dd-MM-yyyy -> yyyy-MM-dd
+# dd-mm-yyyy -> yyyy-mm-dd
 def convert_date(raw):
-    segments = raw.split("-")
-    if len(segments) != 3:
-        return None
-    return "-".join(reversed(segments))
+    return datetime.strftime(datetime.strptime(raw, "%d-%m-%Y"), "%Y-%m-%d")
 
 def parse_cases(raw_data_file, source_id, source_url):
     """
