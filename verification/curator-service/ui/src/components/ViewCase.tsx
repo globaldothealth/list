@@ -273,7 +273,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             {props.c.caseReference?.additionalSources && (
                                 <>
-                                    <RowHeader title="other sources" />
+                                    <RowHeader title="Additional sources" />
                                     <MultilinkRowContent
                                         links={props.c.caseReference?.additionalSources?.map(
                                             (e) => {
@@ -777,7 +777,7 @@ function MultilinkRowContent(props: {
     return (
         <Grid item xs={8}>
             {props.links?.map((e) => (
-                <p key={e.title}>
+                <p key={e.title} style={{ margin: 0 }}>
                     <a
                         href={createHref(e.link)}
                         rel="noopener noreferrer"
