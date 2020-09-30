@@ -138,7 +138,7 @@ parsing/example
 At minima, a parser must generate a list of cases that conform to the openAPI
 specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
 
-FTR a minimal case can look like this:
+A minimal case looks like this:
 
 ```text
 {
