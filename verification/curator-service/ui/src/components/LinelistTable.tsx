@@ -293,6 +293,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
+        this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
+            this,
+        );
     }
 
     componentDidMount(): void {
@@ -396,7 +399,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogTitle(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return 'Error';
         }
         return (
@@ -409,7 +412,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogBody(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return (
                 `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
                 ' An admin can perform the deletion if it is valid.'
@@ -420,6 +423,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ? '1 case'
                 : `${this.state.numSelectedRows} cases`) +
             ' will be permanently deleted.'
+        );
+    }
+
+    showConfirmationDialogError(): boolean {
+        return (
+            !this.props.user.roles.includes('admin') &&
+            this.state.numSelectedRows > this.maxDeletionThreshold
         );
     }
 
@@ -529,8 +539,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 >
                                     Cancel
                                 </Button>
-                                {this.state.numSelectedRows <=
-                                    this.maxDeletionThreshold && (
+                                {!this.showConfirmationDialogError() && (
                                     <Button
                                         onClick={this.deleteCases}
                                         color="primary"
