@@ -53,8 +53,6 @@ def convert_date(raw_date):
         else:
             date = datetime.strptime(raw_date, "%d/%m/%Y")
         return date.strftime("%m/%d/%YZ")
-    else:
-        return None
 
 
 def convert_gender(raw_gender: str):
@@ -102,20 +100,22 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
         return None
 
     preexistingConditions["hasPreexistingConditions"] = True
-    commorbidities_list = []
+    comorbidities = []
 
     if lung == "Sim":
-        commorbidities_list.append(_COMORBIDITIES_MAP["Pneumopatia"])
+        comorbidities.append(_COMORBIDITIES_MAP["Pneumopatia"])
     if kidney == "Sim":
-        commorbidities_list.append(_COMORBIDITIES_MAP["Nefropatia"])
+        comorbidities.append(_COMORBIDITIES_MAP["Nefropatia"])
     if metabolic == "Sim":
-        commorbidities_list.append(_COMORBIDITIES_MAP["Distúrbios Metabólicos"])
+        comorbidities.append(_COMORBIDITIES_MAP["Distúrbios Metabólicos"])
     if cardiovascular == "Sim":
-        commorbidities_list.append(_COMORBIDITIES_MAP["Cardiovasculopatia"])
+        comorbidities.append(_COMORBIDITIES_MAP["Cardiovasculopatia"])
     if obesity == "Sim":
-        commorbidities_list.append(_COMORBIDITIES_MAP["Obesidade"])
+        comorbidities.append(_COMORBIDITIES_MAP["Obesidade"])
 
-    preexistingConditions["values"] = commorbidities_list
+    if comorbidities:
+        preexistingConditions["values"] = comorbidities
+
     return preexistingConditions
 
 
@@ -132,9 +132,9 @@ def convert_demographics(gender: str, age: str):
         elif age == "<= 19 anos":
             demo["ageRange"] = {"start": 0, "end": 19}
         else:
-            age_range = age.split(" a ")
-            demo["ageRange"] = {"start": float(age_range[0]), "end": float(
-                "".join([i for i in age_range[1] if not i.isalpha()])), }
+        # Age in format '20 a 29 anos'
+            age_range = age.partition(" a ")
+            demo["ageRange"] = {"start": float(age_range[0]), "end": float("".join([i for i in age_range[2] if not i.isalpha()]))}
     return demo
 
 
@@ -147,10 +147,8 @@ def convert_notes(hematologic: str, immunosuppressed: str, other: str):
     if other == "Sim":
         raw_notes.append("Unspecified pre-existing condition")
 
-    notes = (", ").join(raw_notes)
-    if notes == "":
-        return None
-    return notes
+    if raw_notes:
+        return (", ").join(raw_notes)
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -189,7 +187,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         case["notes"] = notes
                     yield case
                 except ValueError as ve:
-                    raise ValueError("Unhandled data: {}".format(ve))
+                    raise ValueError(f"error converting case: {ve}")
 
 
 def lambda_handler(event, context):
