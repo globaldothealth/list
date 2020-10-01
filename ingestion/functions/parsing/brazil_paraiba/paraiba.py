@@ -38,11 +38,9 @@ _COMORBIDITIES_MAP = {
     "Obesidade": "obesity",
 }
 
-_NONE_TYPES = ["Não", "null", "undefined"]
+_NONE_TYPES = set(["Não", "null", "undefined"])
 
 _SYMPTOMS_MAP = {
-    # Not in symptom ontology
-    "Coriza": "coryza",
     "Dor de Cabeça": "headache",
     "Distúrbios Gustativos": "taste alteration",
     # Symptom ontology does not have a specific term for smell alterations
@@ -174,7 +172,7 @@ def convert_demographics(gender: str, age: str, occupation: str):
     return demo
 
 
-def convert_notes(raw_comorbidities: str):
+def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     raw_notes = []
     if "Imunossupressão" in raw_comorbidities:
         raw_notes.append("Patient with immunosuppression")
@@ -182,6 +180,8 @@ def convert_notes(raw_comorbidities: str):
         raw_notes.append("primary immunodeficiency disease or chromosomal disease")
     if "Puérpera" in raw_comorbidities:
         raw_notes.append("recently gave birth")
+    if "Coriza" in raw_comorbidities:
+        raw_notes.append("Patient with coryza")
     notes = (', ').join(raw_notes)
     return notes
 
@@ -217,7 +217,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         )
                     }
                     notes = convert_notes(
-                        row[_COMORBIDITIES]
+                        row[_COMORBIDITIES], row[_SYMPTOMS]
                     )
                     if notes:
                         case["notes"] = notes
