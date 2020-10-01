@@ -5,6 +5,8 @@ advance the response to infectious diseases.
 
 This repository contains the servers and scripts that support its data curation efforts.
 
+Should you have any questions please feel free to get in touch via: ghdsi.info@gmail.com 
+
 ## Data
 
 The data exposed on Global.health was curated using two methods. ~60,000 cases were manually curated by humans analyzing sources and inputting data into spreadsheets. This data was ported from the spreadsheets into the Curator Portal as described [here](https://github.com/globaldothealth/list/blob/main/data-serving/scripts/convert-data#converting-line-list-data). The rest of the data was automatically ingested from sources through a process described [here](https://github.com/globaldothealth/list/tree/main/ingestion/functions#ingestion-functions). Each case is marked as `VERIFIED` if a human has confirmed this data is valid or `UNVERIFIED` if it has not yet been reviewed.
