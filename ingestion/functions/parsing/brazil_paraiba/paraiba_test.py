@@ -46,7 +46,7 @@ class ParaibaTest(unittest.TestCase):
                 ],
                 "symptoms": {
                     "status": "Symptomatic",
-                    "values": ["cough", "others"]
+                    "values": ["cough"]
                 },
                 "demographics": {
                     "gender": "Female",
@@ -60,6 +60,7 @@ class ParaibaTest(unittest.TestCase):
                     "values": [
                         "diabetes mellitus"
                     ]
-                }
+                },
+                "notes": "Other symptoms reported"
             }
         ])
