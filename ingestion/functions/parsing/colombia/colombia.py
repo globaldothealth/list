@@ -101,6 +101,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                     "sourceId": source_id,
                     "sourceEntryId": entry["ID de caso"],
                     "sourceUrl": source_url},
+                "location": convert_location(entry),
                 "demographics": convert_demographics(
                     entry["Edad"],
                     entry["Sexo"])}
