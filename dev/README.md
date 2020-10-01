@@ -42,9 +42,9 @@ REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
 other secret values, contact one of:
 
-- <calremmel email>
-- <gtuli email>
-- <spencer email>
+- Christopher.Remmel@childrens.harvard.edu
+- Gaurav.Tuli@childrens.harvard.edu
+- Spencer.Marks@childrens.harvard.edu
 
 Note that for local development, it's fine to use your own values for these
 secrets if you have them. For instance, if you have a developer Mapbox API
