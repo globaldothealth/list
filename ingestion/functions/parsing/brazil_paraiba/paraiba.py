@@ -48,8 +48,7 @@ _SYMPTOMS_MAP = {
     "Dor de garganta": "throat pain",
     "Dispneia": "dyspnea",
     "Febre": "fever",
-    "Tosse": "cough",
-    "Outros": "others"
+    "Tosse": "cough"
 }
 
 
@@ -177,11 +176,13 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     if "Imunossupressão" in raw_comorbidities:
         raw_notes.append("Patient with immunosuppression")
     if "Portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
-        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
+        raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
     if "Puérpera" in raw_comorbidities:
-        raw_notes.append("recently gave birth")
-    if "Coriza" in raw_comorbidities:
+        raw_notes.append("Recently gave birth")
+    if "Coriza" in raw_symptoms:
         raw_notes.append("Patient with coryza")
+    if "Outros" in raw_symptoms:
+        raw_notes.append("Other symptoms reported")
     notes = (', ').join(raw_notes)
     return notes
 
