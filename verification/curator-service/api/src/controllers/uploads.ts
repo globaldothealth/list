@@ -105,7 +105,7 @@ export default class UploadsController {
                 Source.aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
-                    { $sort: { 'upload.created': -1, sourceName: -1 } },
+                    { $sort: { 'uploads.created': -1, sourceName: -1 } },
                     { $skip: limit * (page - 1) },
                     { $limit: limit + 1 },
                     {
