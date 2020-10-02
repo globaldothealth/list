@@ -106,7 +106,10 @@ def retrieve_content(
         env, source_id, upload_id, url, source_format, api_headers, cookies):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        if source_format != "JSON" and source_format != "CSV":
+        if (
+            source_format != "JSON"
+            and source_format != "CSV"
+            and source_format != "XSLX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,

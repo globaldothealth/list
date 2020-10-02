@@ -51,7 +51,7 @@ describe('App', function () {
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
 
-        cy.contains('Trustworthy line list data');
+        cy.contains('Detailed line list data');
         cy.contains('Terms of use');
         cy.contains('Login to get started');
     });
