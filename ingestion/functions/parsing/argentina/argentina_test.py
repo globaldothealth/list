@@ -7,9 +7,6 @@ from argentina import argentina
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
 
-# result = argentina.parse_cases(sample_data_file,'placeholder_ID','placeholder_URL')
-# sample_data_file= '/Users/felson/Documents/DPhil/global_health/github/list/ingestion/functions/parsing/argentina/sample_data.csv'
-
 
 class ArgentinaTest(unittest.TestCase):
     def setUp(self):
@@ -26,7 +23,7 @@ class ArgentinaTest(unittest.TestCase):
         self.assertCountEqual(list(result), [{'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000007',
                                                                 'sourceUrl': 'placeholder_URL'},
-                                              'location': {'query': 'Formosa, Argentina', 'limitToCountry': 'Argentina'},
+                                              'location': {'query': 'Formosa, Argentina'},
                                               'demographics': {'ageRange': {'start': 26.0, 'end': 26.0}, 'gender': 'Male'},
                                               'events': [{'name': 'confirmed',
                                                           'value': 'Laboratory Test',
@@ -36,8 +33,7 @@ class ArgentinaTest(unittest.TestCase):
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000010',
                                                                 'sourceUrl': 'placeholder_URL'},
-                                              'location': {'query': 'Buenos Aires, Argentina',
-                                                           'limitToCountry': 'Argentina'},
+                                              'location': {'query': 'Buenos Aires, Argentina'},
                                               'demographics': {'ageRange': {'start': 7.0, 'end': 7.0}, 'gender': 'Male'},
                                               'events': [{'name': 'confirmed',
                                                           'value': 'Laboratory Test',
@@ -47,8 +43,7 @@ class ArgentinaTest(unittest.TestCase):
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000012',
                                                                 'sourceUrl': 'placeholder_URL'},
-                                              'location': {'query': 'Buenos Aires, Argentina',
-                                                           'limitToCountry': 'Argentina'},
+                                              'location': {'query': 'Buenos Aires, Argentina'},
                                               'demographics': {'ageRange': {'start': 46.0, 'end': 46.0}, 'gender': 'Male'},
                                               'events': [{'name': 'confirmed',
                                                           'value': 'Laboratory Test',
@@ -64,8 +59,7 @@ class ArgentinaTest(unittest.TestCase):
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000015',
                                                                 'sourceUrl': 'placeholder_URL'},
-                                              'location': {'query': 'Buenos Aires, Argentina',
-                                                           'limitToCountry': 'Argentina'},
+                                              'location': {'query': 'Buenos Aires, Argentina'},
                                               'demographics': {'ageRange': {'start': 29.0, 'end': 29.0},
                                                                'gender': 'Female'},
                                               'events': [{'name': 'confirmed',
