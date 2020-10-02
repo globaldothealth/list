@@ -45,7 +45,7 @@ def convert_location(state_code: str, municipality_code: str):
             query_list.append(_STATES[state_code])
         except KeyError:
             print(f"State Code Missing: {state_code}")
-    query_string = ", ".join(query_list + ["MEXICO"])
+    query_string = ", ".join(query_list + ["MÉXICO"])
     return {"query": query_string}
 
 
