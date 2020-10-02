@@ -84,18 +84,8 @@ def convert_sources(row):
     return additionalSources or None
 
 
-def update_for_status(row, case):
-    if row["Current Status"] == "Hospitalized":
-        case["events"].append({
-            "name": "hospitalAdmission",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Yes"
-        })
-    elif row["Current Status"] == "Recovered":
+def update_for_outcome(row, case):
+    if row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
             "dateRange":
@@ -117,9 +107,9 @@ def update_for_status(row, case):
         })
 
 
-def convert_confirmed_event(row):
+def populate_relevant_confirmations(row):
     """
-    Populates a confirmed event, if required.
+    Populates a confirmed event (and hospitalization), if required.
 
     Only cases with a status of Hospitalized represent a report of case
     confirmation. Other reported statuses (e.g. Recovered) represent an
@@ -134,6 +124,15 @@ def convert_confirmed_event(row):
                 "start": convert_date(row["Date Announced"]),
                 "end": convert_date(row["Date Announced"])
             }
+        })
+        events.append({
+            "name": "hospitalAdmission",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
+            "value": "Yes"
         })
     return events
 
@@ -173,11 +172,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "additionalSources": convert_sources(row)
                 },
                 "location": convert_location(row),
-                "events": convert_confirmed_event(row),
+                "events": populate_relevant_confirmations(row),
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
-            update_for_status(row, case)
+            update_for_outcome(row, case)
             for i in range(int(row["Num Cases"])):
                 c = copy.deepcopy(case)
                 c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
