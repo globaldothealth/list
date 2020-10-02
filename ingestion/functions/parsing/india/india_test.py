@@ -9,7 +9,7 @@ _PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297634-1",
+            "sourceEntryId": "OR-A-123-1",
             "sourceUrl": _SOURCE_URL,
             "additionalSources": [
                 {
@@ -23,15 +23,12 @@ _PARSED_CASES = [
         },
         "events": [
             {
-                "name": "confirmed",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        }
-            },
-            {
                 "name": "outcome",
+                "dateRange":
+                {
+                    "start": "09/22/2020Z",
+                    "end": "09/22/2020Z",
+                },
                 "value": "Death"
             }
         ],
@@ -50,7 +47,7 @@ _PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297649-1",
+            "sourceEntryId": "Entry-297649-1",
             "sourceUrl": _SOURCE_URL,
             "additionalSources": [
                 {
@@ -73,6 +70,11 @@ _PARSED_CASES = [
             },
             {
                 "name": "hospitalAdmission",
+                "dateRange":
+                        {
+                            "start": "09/22/2020Z",
+                            "end": "09/22/2020Z"
+                        },
                 "value": "Yes"
             }
         ],
@@ -82,7 +84,7 @@ _PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "297649-2",
+            "sourceEntryId": "Entry-297649-2",
             "sourceUrl": _SOURCE_URL,
             "additionalSources": [
                 {
@@ -105,6 +107,11 @@ _PARSED_CASES = [
             },
             {
                 "name": "hospitalAdmission",
+                "dateRange":
+                        {
+                            "start": "09/22/2020Z",
+                            "end": "09/22/2020Z"
+                        },
                 "value": "Yes"
             }
         ],
