@@ -39,4 +39,4 @@ jobs:
         run: python3 -m pip install -r ./data-serving/scripts/data-pipeline/requirements.txt
 
       - name: Run update script on dev db (1% of data)
-        run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m "${{ secrets.DB_CONNECTION_URL_DEV }}" -r .01
+        run: ./data-serving/scripts/data-pipeline/convert_and_import_latest_data.sh -m "${{ secrets.DB_CONNECTION_URL_DEV }}" -r .01 -e 5f744e06befe6418d8798673
