@@ -18,14 +18,16 @@ except ImportError:
     import parsing_lib
 
 
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")) as json_file:
+with open(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")
+) as json_file:
     maps = json.load(json_file)
 
-_COMORBIDITIES_DICT = maps['comorbidities']
+_COMORBIDITIES_DICT = maps["comorbidities"]
 
-_STATES = maps['states']
+_STATES = maps["states"]
 
-_MUNICIPALITIES = maps['municipalities']
+_MUNICIPALITIES = maps["municipalities"]
 
 
 def convert_location(state_code: str, municipality_code: str):
@@ -33,11 +35,14 @@ def convert_location(state_code: str, municipality_code: str):
     Codes beginning with 9 denote missing information
     """
     query_list = []
-    if state_code[0] != "9":
-        query_list.append(_STATES[state_code])
-    if municipality_code[0] != "9":
+    if (
+        municipality_code[0] != "9"
+        and (state_code + municipality_code) in _MUNICIPALITIES.keys()
+    ):
         query_list.append(_MUNICIPALITIES[state_code + municipality_code])
-    query_string = ", ".join(query_list + ["MEXICO"])
+    if state_code[0] != "9" and state_code in _STATES.keys():
+        query_list.append(_STATES[state_code])
+    query_string = ", ".join(query_list + ["MÉXICO"])
     return {"query": query_string}
 
 
