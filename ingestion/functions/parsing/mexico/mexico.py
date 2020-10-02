@@ -35,14 +35,17 @@ def convert_location(state_code: str, municipality_code: str):
     Codes beginning with 9 denote missing information
     """
     query_list = []
-    if (
-        municipality_code[0] != "9"
-        and (state_code + municipality_code) in _MUNICIPALITIES.keys()
-    ):
-        query_list.append(_MUNICIPALITIES[state_code + municipality_code])
-    if state_code[0] != "9" and state_code in _STATES.keys():
-        query_list.append(_STATES[state_code])
-    query_string = ", ".join(query_list + ["MÉXICO"])
+    if municipality_code[0] != "9":
+        try:
+            query_list.append(_MUNICIPALITIES[state_code + municipality_code])
+        except KeyError:
+            print(f"Municipality code missing: {municipality_code}")
+    if state_code[0] != "9":
+        try:
+            query_list.append(_STATES[state_code])
+        except KeyError:
+            print(f"State Code Missing: {state_code}")
+    query_string = ", ".join(query_list + ["MEXICO"])
     return {"query": query_string}
 
 
@@ -114,9 +117,9 @@ def convert_demographics(gender: str, age: str, nationality: str, national_origi
     if age:
         demo["ageRange"] = {"start": float(age), "end": float(age)}
     if nationality == "1":
-        demo["nationalities"] = "Mexican"
+        demo["nationalities"] = ["Mexican"]
     elif nationality == "2":
-        demo["nationalities"] = national_origin
+        demo["nationalities"] = [national_origin]
     return demo or None
 
 
@@ -199,7 +202,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     case["notes"] = notes
                 yield case
             except ValueError as ve:
-                raise ValueError("Unhandled data: {}".format(ve))
+                raise ValueError(f"Unhandled data: {ve}")
 
 
 def lambda_handler(event, context):
