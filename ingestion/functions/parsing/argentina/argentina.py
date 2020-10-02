@@ -16,12 +16,6 @@ except ImportError:
     import parsing_lib
 
 
-import os
-import sys
-from datetime import date, datetime
-import csv
-
-
 private_public_map = {'Público': 'Public', 'Privado': 'Private'}
 
 
@@ -46,20 +40,17 @@ def convert_gender(raw_gender):
 def convert_location(entry):
     '''
     The only information we have is the province where case was diagnosed/hospitalised
+    Geocoding function can't parse CABA so replacing with Buenos Aires.
     '''
     if entry['carga_provincia_nombre']:
         if entry['carga_provincia_nombre'] == 'CABA':
             return {
-                "query": "Buenos Aires, Argentina",
-                "limitToCountry": "Argentina"}
+                "query": "Buenos Aires, Argentina"}
         else:
-
             return {
-                "query": f"{entry['carga_provincia_nombre']}, Argentina",
-                "limitToCountry": "Argentina"}
+                "query": f"{entry['carga_provincia_nombre']}, Argentina"}
     else:
-        return {"query": "Argentina",
-                "limitToCountry": "Argentina"}
+        return {"query": "Argentina"}
 
 
 def convert_age(entry):
