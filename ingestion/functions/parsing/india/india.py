@@ -84,40 +84,87 @@ def convert_sources(row):
     return additionalSources or None
 
 
-def update_for_status(row, case):
-    if row["Current Status"] == "Hospitalized":
-        case["events"].append({
-            "name": "hospitalAdmission",
-            "value": "Yes"
-        })
-    elif row["Current Status"] == "Recovered":
+def update_for_outcome(row, case):
+    if row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
             "value": "Recovered"
         })
     elif row["Current Status"] == "Deceased":
         case["events"].append({
             "name": "outcome",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
             "value": "Death"
         })
+
+
+def populate_relevant_confirmations(row):
+    """
+    Populates a confirmed event (and hospitalization), if required.
+
+    Only cases with a status of Hospitalized represent a report of case
+    confirmation. Other reported statuses (e.g. Recovered) represent an
+    outcome event on a case that should already exist.
+    """
+    events = []
+    if row["Current Status"] == "Hospitalized":
+        events.append({
+            "name": "confirmed",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            }
+        })
+        events.append({
+            "name": "hospitalAdmission",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
+            "value": "Yes"
+        })
+    return events
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        uuid_column = ""
-        uuid_prefix = ""
         for row in reader:
+            # Rows with a status of Hospitalized are new, confirmed cases.
+            # Other statuses represent further developments in a case; we can
+            # use and properly attribute those for cases that have a State
+            # Patient Number, but not others.
+            if not row["State Patient Number"] and row["Current Status"] != "Hospitalized":
+                continue
+
+            # Some states publish updates on patients. In these cases, the
+            # values are keyed on a special state-specific ID. If that's
+            # available, we should use that to dedupe.
+            if row["State Patient Number"]:
+                uuid_column = "State Patient Number"
+                uuid_prefix = ""
             # The column used to denote case UUID changes in April.
             # It resets back to 1 when this happens.
             # Prefix old values ("Patient Number") to distinguish.
-            if not uuid_column:
-                if "Entry_ID" in row:
-                    uuid_column = "Entry_ID"
-                else:
-                    uuid_column = "Patient Number"
-                    uuid_prefix = "P"
+            elif "Entry_ID" in row:
+                uuid_column = "Entry_ID"
+                uuid_prefix = "Entry-"
+            else:
+                uuid_column = "Patient Number"
+                uuid_prefix = "Patient-"
+
             case = {
                 "caseReference": {
                     "sourceId": source_id,
@@ -125,20 +172,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "additionalSources": convert_sources(row)
                 },
                 "location": convert_location(row),
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                            {
-                                "start": convert_date(row["Date Announced"]),
-                                "end": convert_date(row["Date Announced"])
-                            }
-                    }
-                ],
+                "events": populate_relevant_confirmations(row),
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
-            update_for_status(row, case)
+            update_for_outcome(row, case)
             for i in range(int(row["Num Cases"])):
                 c = copy.deepcopy(case)
                 c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
