@@ -48,9 +48,18 @@ def convert_location(entry):
     The only information we have is the province where case was diagnosed/hospitalised
     '''
     if entry['carga_provincia_nombre']:
-        return {"query": f"{entry['carga_provincia_nombre']}, Argentina"}
+        if entry['carga_provincia_nombre'] == 'CABA':
+            return {
+                "query": "Buenos Aires, Argentina",
+                "limitToCountry": "Argentina"}
+        else:
+
+            return {
+                "query": f"{entry['carga_provincia_nombre']}, Argentina",
+                "limitToCountry": "Argentina"}
     else:
-        return {"query": "Argentina"}
+        return {"query": "Argentina",
+                "limitToCountry": "Argentina"}
 
 
 def convert_age(entry):
