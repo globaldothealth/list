@@ -1,4 +1,8 @@
 {
     "env": "local",
-    "sourceId": "5f77335466b1ce0028f328b1"
+    "sourceId": "5f77335466b1ce0028f328b1",
+    "parsingDateRange": {
+        "start": "2020-09-01",
+        "end": "2020-09-21"
+    }
 }
