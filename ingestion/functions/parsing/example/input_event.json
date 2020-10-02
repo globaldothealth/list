@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f59e8c47ef66004bc9c91ce/2020/09/10/0855/content.csv",
+    "sourceUrl": "http://foobar.com",
+    "sourceId": "5f59e8c47ef66004bc9c91ce"
+}
