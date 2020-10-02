@@ -27,7 +27,7 @@ _PARSED_CASE = {
     "demographics": {
         "gender": "Male",
         "ageRange": {"start": 56.0, "end": 56.0},
-        "nationalities": "Mexican",
+        "nationalities": ["Mexican"],
     },
     "preexistingConditions": {"values": ["obesity"]},
     "notes": "Smoker",
