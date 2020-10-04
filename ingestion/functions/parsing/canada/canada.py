@@ -16,8 +16,20 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-# Input format: '60-69' -> {"start": 60, "end": 69}
+# Input format: 
+# 1. '60-69' -> {"start": 60, "end": 69}
+# 2. '<10' -> {"start": 0, "end": 10}
+# 3. '>90' -> {"start": 90, "end": 10}
+# 4. '90+' -> {"start": 90}
 def convert_age(raw_age):
+    if len(raw_age) == 0:
+        return None
+    if raw_age[0] == '<':
+        return { "start": 0 , "end": int(raw_age[1:]) }    
+    if raw_age[0] == '>':
+        return { "start": int(raw_age[1:]) }    
+    if raw_age.endswith('+'):
+        return { "start": int(raw_age[:-1]) }
     segments = raw_age.split("-")
     if len(segments) != 2:
         return None
