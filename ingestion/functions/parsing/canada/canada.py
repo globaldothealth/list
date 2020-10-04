@@ -57,21 +57,21 @@ def parse_cases(raw_data_file, source_id, source_url):
     Parses G.h-format case data from raw API data.
     """
 
-    def parse_csv_line(line):
+    def parse_csv_line(row):
         """
         Parse one csv line within the csv file.
         """
 
-        date_report = convert_date(line[7]) # date_report
+        date_report = convert_date(row["date_report"])
 
         return {
             "caseReference": {
                 "sourceId": source_id,
-                "sourceEntryId": line[0], # case_id
+                "sourceEntryId": row["case_id"],
                 "sourceUrl": source_url,
-                "additionalSources": additional_sources(line[12], line[14]) # case_source, additional_source
+                "additionalSources": additional_sources(row["case_source"], row["additional_source"])
             },
-            "location": convert_location(line[4], line[5], line[6]), # health_region, province, country
+            "location": convert_location(row["health_region"], row["province"], row["country"]),
             "events": [
                 {
                     "name": "confirmed",
@@ -83,15 +83,14 @@ def parse_cases(raw_data_file, source_id, source_url):
                 }
             ],
             "demographics": {
-                "ageRange": convert_age(line[2]), # age
-                "gender": line[3] if line[3] in ('Male', 'Female') else None, # sex
+                "ageRange": convert_age(row["age"]),
+                "gender": row["sex"] if row["sex"] in ('Male', 'Female') else None,
             },
-            "notes": line[13] if len(line[13]) > 0 else None # additional_info
+            "notes": row["additional_info"] if len(row["additional_info"]) > 0 else None
         } 
 
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader, None)  # skip the headers
+        reader = csv.DictReader(f)
         return [parse_csv_line(row) for row in reader]    
 
 def lambda_handler(event, context):
