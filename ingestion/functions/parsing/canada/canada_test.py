@@ -5,44 +5,56 @@ import tempfile
 
 from datetime import date
 
-
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
-_PARSED_CASE = (
-    {
-        "caseReference": {
-            "sourceId": _SOURCE_ID,
-            "sourceEntryId": "1",
-            "sourceUrl": _SOURCE_URL,
-            "additionalSources": [
-                "https://news.ontario.ca/mohltc/en/2020/01/ontario-confirms-first-case-of-wuhan-novel-coronavirus.html",
-                "https://globalnews.ca/news/6497313/coronavirus-timeine-cases-canada/",
-                "https://globalnews.ca/news/6462626/coronavirus-toronto-hospital/",
-                "http://abc.xyz"
-            ]
-        },
-        "location": {
-            "query": "Toronto, Ontario, Canada"
-        },
-        "events": [
-            {
-                "name": "confirmed",
-                "dateRange":
-                        {
-                            "start": "01/25/2020",
-                            "end": "01/25/2020"
-                        }
+_PARSED_CASE = ({
+    "caseReference": {
+        "sourceId":
+        _SOURCE_ID,
+        "sourceEntryId":
+        "1",
+        "sourceUrl":
+        _SOURCE_URL,
+        "additionalSources": [
+            "https://news.ontario.ca/mohltc/en/2020/01/ontario-confirms-first-case-of-wuhan-novel-coronavirus.html",
+            "https://globalnews.ca/news/6497313/coronavirus-timeine-cases-canada/",
+            "https://globalnews.ca/news/6462626/coronavirus-toronto-hospital/",
+            "http://abc.xyz"
+        ]
+    },
+    "location": {
+        "query": "Toronto, Ontario, Canada"
+    },
+    "travelHistory": {
+        "travelledPrior30Days":
+        True,
+        "travel": [{
+            "location": {
+                "query": "Japan"
             }
-        ],
-        "demographics": {
-            "ageRange": {
-                "start": 50,
-                "end": 59
-            },
-            "gender": "Male"
+        }, {
+            "location": {
+                "query": "China"
+            }
+        }]
+    },
+    "events": [{
+        "name": "confirmed",
+        "dateRange": {
+            "start": "01/25/2020",
+            "end": "01/25/2020"
+        }
+    }],
+    "demographics": {
+        "ageRange": {
+            "start": 50,
+            "end": 59
         },
-        "notes": None
-    })
+        "gender": "Male"
+    },
+    "notes":
+    None
+})
 
 
 @pytest.fixture()
@@ -61,6 +73,4 @@ def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
         f.flush()
 
         result, = canada.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL)
-        print(result)
         assert result == _PARSED_CASE
-

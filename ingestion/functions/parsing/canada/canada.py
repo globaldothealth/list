@@ -16,7 +16,7 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-# Input format: '60-69' -> {"start": 60, "end": 69} 
+# Input format: '60-69' -> {"start": 60, "end": 69}
 def convert_age(raw_age):
     segments = raw_age.split("-")
     if len(segments) != 2:
@@ -52,6 +52,15 @@ def additional_sources(case_source, additional_source):
         return rtn
     return parse(case_source) + parse(additional_source)
 
+def convert_travel(s):
+    if len(s) == 0:
+        return {"travelledPrior30Days": False}
+    travel = [{"location": {"query": country.strip()}} for country in s.split(",")]
+    if len(travel) == 0:
+        return {"travelledPrior30Days": False}
+    else:
+        return {"travelledPrior30Days": True, "travel": travel}
+
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
@@ -72,6 +81,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "additionalSources": additional_sources(row["case_source"], row["additional_source"])
             },
             "location": convert_location(row["health_region"], row["province"], row["country"]),
+            "travelHistory": convert_travel(row["travel_history_country"]),
             "events": [
                 {
                     "name": "confirmed",
@@ -87,11 +97,11 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "gender": row["sex"] if row["sex"] in ('Male', 'Female') else None,
             },
             "notes": row["additional_info"] if len(row["additional_info"]) > 0 else None
-        } 
+        }
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        return [parse_csv_line(row) for row in reader]    
+        return [parse_csv_line(row) for row in reader]
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
