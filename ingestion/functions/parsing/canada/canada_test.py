@@ -29,8 +29,8 @@ _PARSED_CASE = (
                 "name": "confirmed",
                 "dateRange":
                         {
-                            "start": "2020-01-25",
-                            "end": "2020-01-25"
+                            "start": "01/25/2020",
+                            "end": "01/25/2020"
                         }
             }
         ],
