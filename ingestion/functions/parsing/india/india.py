@@ -85,6 +85,16 @@ def convert_sources(row):
 
 
 def update_for_outcome(row, case):
+    if row["Current Status"] == "Hospitalized":
+        case["events"].append({
+            "name": "hospitalAdmission",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
+            "value": "Yes"
+        })
     if row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
@@ -105,36 +115,6 @@ def update_for_outcome(row, case):
             },
             "value": "Death"
         })
-
-
-def populate_relevant_confirmations(row):
-    """
-    Populates a confirmed event (and hospitalization), if required.
-
-    Only cases with a status of Hospitalized represent a report of case
-    confirmation. Other reported statuses (e.g. Recovered) represent an
-    outcome event on a case that should already exist.
-    """
-    events = []
-    if row["Current Status"] == "Hospitalized":
-        events.append({
-            "name": "confirmed",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            }
-        })
-        events.append({
-            "name": "hospitalAdmission",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Yes"
-        })
-    return events
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -172,7 +152,16 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "additionalSources": convert_sources(row)
                 },
                 "location": convert_location(row),
-                "events": populate_relevant_confirmations(row),
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange":
+                            {
+                                "start": convert_date(row["Date Announced"]),
+                                "end": convert_date(row["Date Announced"])
+                            }
+                    }
+                ],
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
