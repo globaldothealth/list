@@ -86,7 +86,12 @@ _PARSED_CASES = [
                 "value": "Yes"
             }
         ],
-        "demographics": None,
+        "demographics": {
+            "ageRange": {
+                "start": 28,
+                "end": 35
+            }
+        },
         "notes": None
     },
     {
@@ -123,7 +128,12 @@ _PARSED_CASES = [
                 "value": "Yes"
             }
         ],
-        "demographics": None,
+        "demographics": {
+            "ageRange": {
+                "start": 28,
+                "end": 35
+            }
+        },
         "notes": None
     },
 ]
