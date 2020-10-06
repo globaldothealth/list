@@ -78,9 +78,13 @@ def convert_demographics(row):
 
 
 def convert_sources(row):
+    # Sources must be unique, per our case schema.
+    included = set()
     additionalSources = [{"sourceUrl": row[col]}
                          for col in ["Source_1", "Source_2", "Source_3"]
-                         if row[col]]
+                         if row[col] and
+                         row[col] not in included and not included.add(
+                             row[col])]
     return additionalSources or None
 
 
