@@ -28,10 +28,6 @@ You can see your profile in the UI at https://curator.ghdsi.org/profile.
 
 Given proper permissions, one can see the users in the UI at https://curator.ghdsi.org/users.
 
-## Gecoding
-
-Gecoding is described in details in `src/geocoding/README.md`.
-
 ## Open API
 
 The developer-focused Open API definitions can be found in `openapi/openapi.yaml` and a Swagger UI is exposed at the `/api-docs` HTTP endpoint.

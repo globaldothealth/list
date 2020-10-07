@@ -1,0 +1,2 @@
+nome_munic;codigo_ibge;dia;mes;datahora;casos;casos_novos;casos_pc;casos_mm7d;obitos;obitos_novos;obitos_pc;obitos_mm7d;letalidade;nome_ra;cod_ra;nome_drs;cod_drs;pop;pop_60;area;map_leg;map_leg_s;latitude;longitude;semana_epidem
+Itapevi;3522505;31;3;2020-03-31;6;5;2,524041e+00;   0,8571429;0;0;0,000000e+00;  0,0000000;0,0000000000;RM de São Paulo;10;Grande São Paulo;10;237714;23105;8266;<10;7.0;-23,5488;-46,9327;14
