@@ -1,5 +1,6 @@
 import {
     Button,
+    IconButton,
     InputAdornment,
     Menu,
     MenuItem,
@@ -10,6 +11,7 @@ import {
     withStyles,
 } from '@material-ui/core';
 
+import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
@@ -57,6 +59,7 @@ const StyledSearchTextField = withStyles({
 export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
+    loading: boolean;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -95,6 +98,7 @@ export default function SearchBar(props: {
                 value={search}
                 variant="outlined"
                 fullWidth
+                disabled={props.loading}
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
@@ -112,6 +116,18 @@ export default function SearchBar(props: {
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
+                            {search && (
+                                <IconButton
+                                    color="primary"
+                                    aria-label="clear search"
+                                    onClick={(): void => {
+                                        setSearch('');
+                                        props.onSearchChange('');
+                                    }}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            )}
                             <HtmlTooltip
                                 color="primary"
                                 title={
@@ -180,22 +196,28 @@ export default function SearchBar(props: {
                 onClose={handleClose}
             >
                 {[
-                    'curator',
-                    'gender',
-                    'nationality',
-                    'occupation',
-                    'country',
-                    'outcome',
-                    'caseid',
-                    'sourceurl',
-                    'verificationstatus',
-                    'uploadid',
-                    'admin1',
-                    'admin2',
-                    'admin3',
-                ].map((text) => (
-                    <MenuItem key={text} onClick={(): void => clickItem(text)}>
-                        {text}
+                    { desc: 'curator email', value: 'curator' },
+                    { desc: 'gender', value: 'gender' },
+                    { desc: 'nationality', value: 'nationality' },
+                    { desc: 'occupation', value: 'occupation' },
+                    { desc: 'country', value: 'country' },
+                    { desc: 'outcome', value: 'outcome' },
+                    { desc: 'case ID', value: 'caseid' },
+                    { desc: 'source URL', value: 'sourceurl' },
+                    {
+                        desc: 'verification status',
+                        value: 'verificationstatus',
+                    },
+                    { desc: 'upload ID', value: 'uploadid' },
+                    { desc: 'location admin 1', value: 'admin1' },
+                    { desc: 'location admin 2', value: 'admin2' },
+                    { desc: 'location admin 3', value: 'admin3' },
+                ].map((item) => (
+                    <MenuItem
+                        key={item.value}
+                        onClick={(): void => clickItem(item.value)}
+                    >
+                        {item.desc}
                     </MenuItem>
                 ))}
             </Menu>

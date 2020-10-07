@@ -30,6 +30,7 @@ import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
+import { RateLimiter } from 'limiter';
 
 const app = express();
 
@@ -111,6 +112,10 @@ new OpenApiValidator({
                     env.MAPBOX_PERMANENT_GEOCODE
                         ? 'mapbox.places-permanent'
                         : 'mapbox.places',
+                    new RateLimiter(
+                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN,
+                        'minute',
+                    ),
                 ),
             );
         }

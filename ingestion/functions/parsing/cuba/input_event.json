@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/cuba/test_content.json",
+    "sourceUrl": "s3://epid-sources-raw/test/cuba/test_content.json",
+    "sourceId": "5f36d00420a86b00357e2de9"
+}

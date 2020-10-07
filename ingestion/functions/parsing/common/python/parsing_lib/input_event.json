@@ -4,10 +4,10 @@
     "s3Key": "5f0b9a7ead3a2b003edc0e7f/2020/07/12/2320/content.json",
     "sourceUrl": "https://foo.bar",
     "sourceId": "5f0b9a7ead3a2b003edc0e7f",
-    "uploadIds": ["123456789012345678901234"],
-    "dateFilter": {
-        "numDaysBeforeToday": 3,
-        "op": "LT"
+    "uploadId": "123456789012345678901234",
+    "dateRange": {
+        "start": "2020-01-01",
+        "end": "2020-09-21"
     },
     "auth": {
         "email": "test@fixture.com"

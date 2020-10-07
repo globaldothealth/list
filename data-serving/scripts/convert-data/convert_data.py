@@ -5,6 +5,7 @@ schema.
 
 import argparse
 import csv
+from datetime import datetime
 import logging
 from importlib import machinery
 import itertools
@@ -12,12 +13,13 @@ import json
 import progressbar
 from converters import (
     convert_demographics, convert_dictionary_field, convert_events,
-    convert_imported_case, convert_location, convert_revision_metadata_field,
+    convert_imported_case, convert_location,
     convert_notes_field, convert_case_reference_field, convert_travel_history)
 from typing import Any
 from constants import (
     DATA_CSV_FILENAME, DATA_GZIP_FILENAME, DATA_REPO_PATH, GEOCODER_DB_FILENAME,
     GEOCODER_MODULE, GEOCODER_REPO_PATH, LOSSY_FIELDS)
+from utils import format_iso_8601_date
 import tarfile
 import os
 
@@ -31,22 +33,25 @@ def main():
         description='Convert CSV line-list data into json compliant with the '
         'MongoDB schema.')
     parser.add_argument('--ncov2019_path', type=str, required=True)
+    parser.add_argument('--filename', type=str)
+    parser.add_argument('--source_id', type=str, required=True)
     parser.add_argument('--outfile', type=str, required=True)
     parser.add_argument('--sample_rate', default=1.0, type=float)
 
     args = parser.parse_args()
 
-    csv_path = extract_csv(args.ncov2019_path)
+    csv_path = args.filename if args.filename is not None else extract_csv(args.ncov2019_path)
     num_cases = len(open(csv_path).readlines())
-    num_to_convert = int(args.sample_rate*num_cases)
+    num_to_convert = int(args.sample_rate * num_cases)
     print(f'Converting {num_to_convert} / {num_cases} cases from {csv_path}')
 
     print('Converting data to new schema and writing to', args.outfile)
     convert(csv_path, args.outfile, load_geocoder(
-        args.ncov2019_path), args.sample_rate, num_to_convert)
+        args.ncov2019_path), args.sample_rate, num_to_convert, args.source_id)
 
     # Clean up the CSV file we unzipped.
-    os.remove(csv_path)
+    if args.filename is None:
+        os.remove(csv_path)
 
     print('Great success! 🎉')
 
@@ -72,8 +77,8 @@ def extract_csv(repo_path: str) -> str:
 
 
 def convert(infile: str, outfile: str, geocoder: Any,
-            sample_rate: int, num_to_convert: int) -> None:
-    conversion_interval = int(1/sample_rate)
+            sample_rate: int, num_to_convert: int, source_id: str) -> None:
+    conversion_interval = int(1 / sample_rate)
     bar = progressbar.ProgressBar(
         maxval=num_to_convert,
         widgets=[progressbar.Bar('=', '[', ']'),
@@ -87,6 +92,9 @@ def convert(infile: str, outfile: str, geocoder: Any,
             for i, csv_case in enumerate(itertools.islice(
                     csvreader, None, None, conversion_interval)):
                 bar.update(i)
+                # Confirmation date is a required field in the mongo DB
+                if not csv_case['date_confirmation']:
+                    continue
                 if i != 0:
                     f.write(',')
 
@@ -143,15 +151,25 @@ def convert(infile: str, outfile: str, geocoder: Any,
                     'preexistingConditions',
                     csv_case['chronic_disease'])
 
-                json_case['revisionMetadata'] = convert_revision_metadata_field(
-                    csv_case['data_moderator_initials'])
+                json_case['revisionMetadata'] = {
+                    'revisionNumber': 0,
+                    # Using the googlegroups alias that contained all curators as we need
+                    # a valid email in the curator field and we can't deduce it from just
+                    # the initials that are present in the CSV.
+                    'creationMetadata': {
+                        'curator': 'covid19_spreadsheets@googlegroups.com',
+                        'date': {
+                            "$date": format_iso_8601_date(datetime.utcnow()),
+                        },
+                    },
+                }
 
                 json_case['notes'] = convert_notes_field(
                     [csv_case['notes_for_discussion'],
                      csv_case['additional_information']])
 
                 json_case['caseReference'] = convert_case_reference_field(
-                    csv_case['ID'], csv_case['source'])
+                    csv_case['ID'], csv_case['source'], source_id)
 
                 json_case['travelHistory'] = convert_travel_history(
                     geocoder, csv_case['ID'],

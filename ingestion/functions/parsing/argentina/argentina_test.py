@@ -3,10 +3,8 @@ import unittest
 from datetime import date
 from argentina import argentina
 
-
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
-
 
 class ArgentinaTest(unittest.TestCase):
     def setUp(self):

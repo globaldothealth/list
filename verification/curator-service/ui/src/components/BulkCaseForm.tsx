@@ -27,16 +27,11 @@ import CaseValidationError from './bulk-case-form-fields/CaseValidationError';
 import FileUpload from './bulk-case-form-fields/FileUpload';
 import { Paper } from '@material-ui/core';
 import React from 'react';
+import User from './User';
 import ValidationErrorList from './bulk-case-form-fields/ValidationErrorList';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
-
-interface User {
-    _id: string;
-    name: string;
-    email: string;
-    roles: string[];
-}
+import { toUTCDate } from './util/date';
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -240,8 +235,8 @@ class BulkCaseForm extends React.Component<
             events.push({
                 name: 'confirmed',
                 dateRange: {
-                    start: c.dateConfirmed,
-                    end: c.dateConfirmed,
+                    start: toUTCDate(c.dateConfirmed),
+                    end: toUTCDate(c.dateConfirmed),
                 },
                 value: c.confirmationMethod,
             });
@@ -251,8 +246,8 @@ class BulkCaseForm extends React.Component<
                 name: 'hospitalAdmission',
                 dateRange: c.dateHospitalized
                     ? {
-                          start: c.dateHospitalized,
-                          end: c.dateHospitalized,
+                          start: toUTCDate(c.dateHospitalized),
+                          end: toUTCDate(c.dateHospitalized),
                       }
                     : undefined,
                 value: 'Yes',
@@ -263,8 +258,8 @@ class BulkCaseForm extends React.Component<
                 name: 'icuAdmission',
                 dateRange: c.dateIcuAdmission
                     ? {
-                          start: c.dateIcuAdmission,
-                          end: c.dateIcuAdmission,
+                          start: toUTCDate(c.dateIcuAdmission),
+                          end: toUTCDate(c.dateIcuAdmission),
                       }
                     : undefined,
                 value: 'Yes',
@@ -275,8 +270,8 @@ class BulkCaseForm extends React.Component<
                 name: 'outcome',
                 dateRange: c.dateOutcome
                     ? {
-                          start: c.dateOutcome,
-                          end: c.dateOutcome,
+                          start: toUTCDate(c.dateOutcome),
+                          end: toUTCDate(c.dateOutcome),
                       }
                     : undefined,
                 value: c.outcome,
@@ -286,8 +281,8 @@ class BulkCaseForm extends React.Component<
             events.push({
                 name: 'onsetSymptoms',
                 dateRange: {
-                    start: c.dateSymptomOnset,
-                    end: c.dateSymptomOnset,
+                    start: toUTCDate(c.dateSymptomOnset),
+                    end: toUTCDate(c.dateSymptomOnset),
                 },
             });
         }
@@ -381,7 +376,7 @@ class BulkCaseForm extends React.Component<
         return {
             caseReference: {
                 sourceId: caseReference.sourceId,
-                sourceEntryId: c.sourceEntryId,
+                sourceEntryId: c.sourceEntryId?.toString(),
                 sourceUrl: caseReference.sourceUrl,
                 uploadIds: [uploadId],
                 verificationStatus: VerificationStatus.Verified,
@@ -496,9 +491,7 @@ class BulkCaseForm extends React.Component<
             upsertResponse = await this.batchUpsertCases(cases);
         } catch (e) {
             this.setState({
-                errorMessage: `System error during upload: ${JSON.stringify(
-                    e,
-                )}`,
+                errorMessage: `System error during upload: ${e.message}`,
             });
             await this.finalizeUpload(
                 caseReference.sourceId,
@@ -561,9 +554,7 @@ class BulkCaseForm extends React.Component<
                 values.caseReference.sourceId = newCaseReference.sourceId;
             } catch (e) {
                 this.setState({
-                    errorMessage: `System error during source creation: ${JSON.stringify(
-                        e,
-                    )}`,
+                    errorMessage: `System error during source creation: ${e.message}`,
                 });
                 return;
             }

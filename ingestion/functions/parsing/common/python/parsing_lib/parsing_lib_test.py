@@ -3,6 +3,7 @@
 # arrives by magic here, check out
 # https://requests-mock.readthedocs.io/en/latest/pytest.html?highlight=pytest#pytest
 import boto3
+import copy
 import json
 import os
 import pytest
@@ -140,9 +141,11 @@ def sample_data():
     with open(file_path) as event_file:
         return json.load(event_file)
 
+
 class FakeContext:
     def get_remaining_time_in_millis(self):
         return 42
+
 
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
@@ -169,7 +172,7 @@ def test_run_lambda_e2e(
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
-    del input_event[parsing_lib.UPLOAD_IDS_FIELD]
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
     base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
@@ -184,7 +187,9 @@ def test_run_lambda_e2e(
         json={"_id": upload_id, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
-    response = parsing_lib.run_lambda(input_event, FakeContext(), fake_parsing_fn)
+    response = parsing_lib.run_lambda(
+        input_event, FakeContext(),
+        fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == full_source_url
@@ -226,11 +231,23 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
         input_event[parsing_lib.SOURCE_ID_FIELD],
-        input_event[parsing_lib.UPLOAD_IDS_FIELD],
+        input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        input_event[parsing_lib.DATE_FILTER_FIELD],
+        {},  # Date filter isn't provided, per the following test case.
+        input_event[parsing_lib.DATE_RANGE_FIELD],
         input_event[parsing_lib.AUTH_FIELD])
+
+
+def test_extract_event_fields_errors_if_date_filter_and_range_provided(
+        input_event):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    with pytest.raises(ValueError, match=parsing_lib.DATE_FILTER_FIELD):
+        input_event[parsing_lib.DATE_FILTER_FIELD] = {
+            "numDaysBeforeToday": 3,
+            "op": "LT"
+        }
+        parsing_lib.extract_event_fields(input_event)
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
@@ -293,7 +310,10 @@ def test_write_to_server_returns_created_and_updated_count(
               "numUpdated": num_updated})
 
     count_created, count_updated = parsing_lib.write_to_server(
-        iter([_PARSED_CASE]), "env", _SOURCE_ID, "upload_id", {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
+        iter([_PARSED_CASE]),
+        "env", _SOURCE_ID, "upload_id", {},
+        {},
+        parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
@@ -306,7 +326,11 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     requests_mock.register_uri(
-        "POST", full_source_url, [{"json": {"numCreated": 1, "numUpdated": 0}, "status_code": 200}, {"json": {}, "status_code": 500}])
+        "POST", full_source_url,
+        [{"json": {"numCreated": 1, "numUpdated": 0},
+          "status_code": 200},
+         {"json": {},
+          "status_code": 500}])
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.register_uri("PUT", update_upload_url, json={})
@@ -341,7 +365,9 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {}, parsing_lib.CASES_BATCH_SIZE, lambda: 42)
+            "env", _SOURCE_ID, upload_id, {},
+            {},
+            parsing_lib.CASES_BATCH_SIZE, lambda: 42)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -353,45 +379,73 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_today(mock_today):
+def test_filter_cases_by_date_keeps_exact_with_EQ(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
+        None,
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_not_today(mock_today):
+def test_filter_cases_by_date_removes_nonexact_with_EQ(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 10, 10)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "EQ"},
+        None,
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert not next(cases, None)
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_exactly_before_today(mock_today):
+def test_filter_cases_by_date_removes_exact_with_LT(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
         {"numDaysBeforeToday": 3, "op": "LT"},
+        None,
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert not next(cases, None)
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_before_today(mock_today):
+def test_filter_cases_by_date_keeps_before_LT(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 10)
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
         {"numDaysBeforeToday": 3, "op": "LT"},
+        None,
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert next(cases) == CASE_JUNE_FIFTH
+
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_removes_exact_with_GT(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "GT"},
+        None,
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert not next(cases, None)
+
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_keeps_after_GT(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 7)
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH,),
+        {"numDaysBeforeToday": 3, "op": "GT"},
+        None,
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert next(cases) == CASE_JUNE_FIFTH
 
@@ -410,6 +464,7 @@ def test_filter_cases_by_date_unsupported_op(
         next(parsing_lib.filter_cases_by_date(
             [CASE_JUNE_FIFTH],
             {"numDaysBeforeToday": 3, "op": "NOPE"},
+            None,
             "env", _SOURCE_ID, upload_id, {}, {}))  # api_creds
     except ValueError as ve:
         assert "NOPE" in str(ve)
@@ -418,6 +473,56 @@ def test_filter_cases_by_date_unsupported_op(
             "error": "SOURCE_CONFIGURATION_ERROR"}}
         return
     assert not "Should have raised a ValueError exception"
+
+
+def test_filter_cases_by_date_within_range():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH,),
+        None,
+        {"start": "2020-06-04", "end": "2020-06-06"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert next(cases) == CASE_JUNE_FIFTH
+
+
+def test_filter_cases_by_date_equals_range():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH,),
+        None,
+        {"start": "2020-06-05", "end": "2020-06-05"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert next(cases) == CASE_JUNE_FIFTH
+
+
+def test_filter_cases_by_date_outside_range():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH,),
+        None,
+        {"start": "2020-06-03", "end": "2020-06-04"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert not next(cases, None)
+
+
+def test_filter_cases_by_date_handles_two_date_formats():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    # Date format is %m/%d/%YZ in CASE_JUNE_FIFTH.
+    # Date parsing also handles strings without the 'Z'.
+    other_date_format_case = copy.deepcopy(
+        CASE_JUNE_FIFTH)
+    other_date_format_case["events"][0]["dateRange"]["start"] = "06/05/2020"
+    other_date_format_case["events"][0]["dateRange"]["end"] = "06/05/2020"
+
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH, other_date_format_case),
+        None,
+        {"start": "2020-06-05", "end": "2020-06-05"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+
+    assert next(cases) == CASE_JUNE_FIFTH
+    assert next(cases) == other_date_format_case
 
 
 def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():

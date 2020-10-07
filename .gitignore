@@ -3,6 +3,9 @@
 # Log file for conversion warnings
 conversion_errors.tsv
 
+# local vscode settings
+.vscode/
+
 # Plausible GCP project service account credentials.
 # (Out of an abundance of caution.)
 covid-19-map-*.json
@@ -377,6 +380,7 @@ dmypy.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+*.vscode
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
