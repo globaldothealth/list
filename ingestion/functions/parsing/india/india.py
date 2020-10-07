@@ -114,7 +114,7 @@ def update_for_outcome(row, case):
             },
             "value": "Yes"
         })
-    if row["Current Status"] == "Recovered":
+    elif row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
             "dateRange":
