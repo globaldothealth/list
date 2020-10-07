@@ -9,7 +9,6 @@ The provided file will be rewritten with the acronyms added at the end of the li
 """
 
 import argparse
-import pathlib
 
 from better_profanity import profanity
 
@@ -17,6 +16,7 @@ parser = argparse.ArgumentParser(
     description='Acronym generation script')
 parser.add_argument('-f', '--file', type=str,
                     help='Path to the file containing the list of sentences to generate acronyms for')
+
 
 class AcronymGenerator:
     def Generate(self, filePath: str):
@@ -37,7 +37,8 @@ class AcronymGenerator:
                 # Generate acronym from words if they have a length > 2 and if they are
                 # alphanumeric to avoid stuff already in parenthesis and stop words like
                 # "an", "of" etc.
-                acronym = "".join([w[0].upper() for w in words if len(w) > 2 and w.isalpha()])
+                acronym = "".join([w[0].upper()
+                                   for w in words if len(w) > 2 and w.isalpha()])
                 # Check for profanity when generating acronyms, it's pretty common to generate
                 # bad words from a large input corpus.
                 if len(acronym) > 1 and not profanity.contains_profanity(acronym):

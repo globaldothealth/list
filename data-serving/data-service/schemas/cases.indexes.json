@@ -127,6 +127,16 @@
         }
     },
     {
+        "name": "locationQueryIdx",
+        "key": {
+            "location.query": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
+    },
+    {
         "name": "locationAdmin2Idx",
         "key": {
             "location.administrativeAreaLevel2": -1

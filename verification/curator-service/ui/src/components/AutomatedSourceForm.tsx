@@ -17,6 +17,7 @@ import { useHistory } from 'react-router-dom';
 enum Format {
     Csv = 'CSV',
     Json = 'JSON',
+    Xlsx = 'XLSX',
 }
 
 const useStyles = makeStyles(() => ({

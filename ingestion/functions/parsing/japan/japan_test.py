@@ -11,7 +11,12 @@ _PARSED_CASE = (
         "caseReference": {
             "sourceId": _SOURCE_ID,
             "sourceEntryId": "HKD130",
-            "sourceUrl": _SOURCE_URL
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [
+                {
+                    "sourceUrl": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html"
+                }
+            ]
         },
         "location": {
             "query": "Sapporo, Hokkaido, Japan"
@@ -24,6 +29,10 @@ _PARSED_CASE = (
                             "start": "03/13/2020Z",
                             "end": "03/13/2020Z"
                         }
+            },
+            {
+                "name": "outcome",
+                "value": "Unknown"
             }
         ],
         "demographics": {

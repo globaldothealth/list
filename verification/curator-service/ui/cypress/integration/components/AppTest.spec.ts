@@ -31,14 +31,6 @@ describe('App', function () {
         cy.contains('Freshness').should('not.exist');
     });
 
-    it('shows login button when logged out', function () {
-        cy.visit('/');
-
-        cy.get('button[data-testid="profile-menu"]').click();
-
-        cy.contains('Login');
-    });
-
     it('shows logout button when logged in', function () {
         cy.login({ name: 'Alice Smith', email: 'alice@test.com', roles: [] });
         cy.visit('/');
@@ -54,23 +46,26 @@ describe('App', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Charts').should('not.exist');
-        cy.contains('Linelist').should('not.exist');
+        cy.contains('Line list').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
+
+        cy.contains('Detailed line list data');
         cy.contains('Terms of use');
+        cy.contains('Login to get started');
     });
 
     it('Homepage with logged in user with no roles', function () {
         cy.login({ roles: [] });
         cy.visit('/');
 
-        // Readers-only are redirected to the linelist.
+        // Readers-only are redirected to the line list.
         cy.url().should('eq', 'http://localhost:3002/cases');
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Charts').should('not.exist');
-        cy.contains('Linelist');
+        cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
@@ -83,7 +78,7 @@ describe('App', function () {
 
         cy.contains('Create new').should('not.exist');
         cy.contains('Charts');
-        cy.contains('Linelist');
+        cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users');
@@ -96,7 +91,7 @@ describe('App', function () {
 
         cy.contains('Create new');
         cy.contains('Charts');
-        cy.contains('Linelist');
+        cy.contains('Line list');
         cy.contains('Sources');
         cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
@@ -140,6 +135,18 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
+    it('Can open new automated backfill modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New automated source backfill').click();
+        cy.contains('New automated source backfill');
+        cy.url().should('eq', 'http://localhost:3002/sources/backfill');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
     it('Closing modal shows previous page', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/sources');
@@ -160,6 +167,7 @@ describe('App', function () {
     it('Can navigate to terms of service', function () {
         cy.login();
         cy.visit('/');
+        cy.contains('Line list');
 
         cy.contains('Global.health Terms of Use').should('not.exist');
         cy.contains('Terms of use').click();

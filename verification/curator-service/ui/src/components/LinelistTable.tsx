@@ -84,6 +84,7 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
+    setSearchLoading: (a: boolean) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -292,6 +293,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
+        this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
+            this,
+        );
     }
 
     componentDidMount(): void {
@@ -395,7 +399,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogTitle(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return 'Error';
         }
         return (
@@ -408,7 +412,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogBody(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return (
                 `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
                 ' An admin can perform the deletion if it is valid.'
@@ -419,6 +423,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ? '1 case'
                 : `${this.state.numSelectedRows} cases`) +
             ' will be permanently deleted.'
+        );
+    }
+
+    showConfirmationDialogError(): boolean {
+        return (
+            !this.props.user.roles.includes('admin') &&
+            this.state.numSelectedRows > this.maxDeletionThreshold
         );
     }
 
@@ -528,8 +539,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 >
                                     Cancel
                                 </Button>
-                                {this.state.numSelectedRows <=
-                                    this.maxDeletionThreshold && (
+                                {!this.showConfirmationDialogError() && (
                                     <Button
                                         onClick={this.deleteCases}
                                         color="primary"
@@ -605,18 +615,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
+                            headerStyle: { whiteSpace: 'nowrap' },
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
@@ -629,6 +644,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 rowData.age[0] === rowData.age[1]
                                     ? rowData.age[0]
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Gender',
@@ -641,6 +657,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -653,7 +670,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
-                            this.setState({ error: '' });
+                            this.setState({ isLoading: true, error: '' });
+                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
                             response
                                 .then((result) => {
@@ -716,6 +734,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             e.toString(),
                                     });
                                     reject(e);
+                                })
+                                .finally(() => {
+                                    this.setState({ isLoading: false });
+                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
