@@ -32,7 +32,7 @@ _COMORBIDITIES_MAP = {
     "Gestante": "pregnancy",
     "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
-    "Doenças cardí­acas crônicas": "heart disease"
+    "Doenças cardíacas crônicas": "heart disease"
 }
 
 
