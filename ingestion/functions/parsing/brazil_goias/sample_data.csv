@@ -1,0 +1,2 @@
+data_notificacao;data_inicio_sintomas;ano_epi;semana_epi;sexo;raca_cor;faixa_etaria;diabetes;doenca_cardiovascular;doenca_respiratoria;imunossupressao;codigo_ibge;municipio;regiao_saude;recuperado
+20200718;20200712;2020;29;FEMININO;PARDA;20 a 29 anos;SIM;SIM;NAO;NAO;520140;APARECIDA DE GOIANIA;CENTRO SUL;SIM
