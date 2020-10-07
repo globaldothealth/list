@@ -63,12 +63,27 @@ def convert_demographics(row):
 
     if row["Age Bracket"]:
         raw = row["Age Bracket"]
-        age = float(raw.split(" ", 1)[
-                    0]) / 12 if " months" in raw.lower() else float(row["Age Bracket"])
-        demo["ageRange"] = {
-            "start": age,
-            "end": age
-        }
+        # Handle ranges, e.g. "28-35"
+        if "-" in raw:
+            parts = raw.split("-", 1)
+            demo["ageRange"] = {
+                "start": float(parts[0]),
+                "end": float(parts[1])
+            }
+        # Handle months, e.g. "6 months"
+        elif " months" in raw.lower():
+            age = float(raw.split(" ", 1)[0]) / 12
+            demo["ageRange"] = {
+                "start": age,
+                "end": age
+            }
+        # Handle standard ages
+        else:
+            age = float(raw)
+            demo["ageRange"] = {
+                "start": age,
+                "end": age
+            }
     if row["Gender"]:
         demo["gender"] = convert_gender(row["Gender"])
     if row["Nationality"]:
@@ -78,14 +93,28 @@ def convert_demographics(row):
 
 
 def convert_sources(row):
+    # Sources must be unique, per our case schema.
+    included = set()
     additionalSources = [{"sourceUrl": row[col]}
                          for col in ["Source_1", "Source_2", "Source_3"]
-                         if row[col]]
+                         if row[col] and
+                         row[col] not in included and not included.add(
+                             row[col])]
     return additionalSources or None
 
 
 def update_for_outcome(row, case):
-    if row["Current Status"] == "Recovered":
+    if row["Current Status"] == "Hospitalized":
+        case["events"].append({
+            "name": "hospitalAdmission",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
+            "value": "Yes"
+        })
+    elif row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
             "dateRange":
@@ -105,36 +134,6 @@ def update_for_outcome(row, case):
             },
             "value": "Death"
         })
-
-
-def populate_relevant_confirmations(row):
-    """
-    Populates a confirmed event (and hospitalization), if required.
-
-    Only cases with a status of Hospitalized represent a report of case
-    confirmation. Other reported statuses (e.g. Recovered) represent an
-    outcome event on a case that should already exist.
-    """
-    events = []
-    if row["Current Status"] == "Hospitalized":
-        events.append({
-            "name": "confirmed",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            }
-        })
-        events.append({
-            "name": "hospitalAdmission",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Yes"
-        })
-    return events
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -172,7 +171,16 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "additionalSources": convert_sources(row)
                 },
                 "location": convert_location(row),
-                "events": populate_relevant_confirmations(row),
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange":
+                            {
+                                "start": convert_date(row["Date Announced"]),
+                                "end": convert_date(row["Date Announced"])
+                            }
+                    }
+                ],
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
