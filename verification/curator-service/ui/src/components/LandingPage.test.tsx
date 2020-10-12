@@ -10,7 +10,7 @@ test('shows all content', async () => {
         </MemoryRouter>,
     );
 
-    expect(getByText(/Trustworthy line list data/)).toBeInTheDocument();
+    expect(getByText(/Detailed line list data/)).toBeInTheDocument();
     expect(getByText(/Welcome to G.h List/)).toBeInTheDocument();
     expect(getByText('Login to get started')).toBeInTheDocument();
     expect(getByText('Global.health map')).toHaveAttribute(

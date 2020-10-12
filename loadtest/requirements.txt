@@ -1,0 +1,4 @@
+boto3==1.13.26
+google-auth==1.16.1
+google==2.0.3
+locust==1.2.3

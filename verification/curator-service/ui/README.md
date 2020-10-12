@@ -1,4 +1,4 @@
-# Global Health Curator Portal UI
+# Global.health Curator Portal UI
 
 This directory contains the code for the UI of the Global Health Curator Portal accessible here:
 
