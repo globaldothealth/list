@@ -211,17 +211,24 @@ describe('Linelist table', function () {
     it('Can search', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
-            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'Germany',
         });
         cy.visit('/cases');
         cy.contains('France');
+        cy.contains('Germany');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('uruguay{enter}');
         cy.contains('France').should('not.exist');
+        cy.contains('Germany').should('not.exist');
         cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
+        cy.contains('Germany').should('not.exist');
+        cy.get('button[aria-label="clear search"]').click();
+        cy.contains('France');
+        cy.contains('Germany');
     });
 
     it('Search query is saved in browser history', function () {

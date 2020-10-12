@@ -105,6 +105,7 @@ export default class UploadsController {
                 Source.aggregate([
                     { $unwind: '$uploads' },
                     ...changesOnlyMatcher,
+                    { $sort: { 'uploads.created': -1, name: -1 } },
                     { $skip: limit * (page - 1) },
                     { $limit: limit + 1 },
                     {
@@ -115,7 +116,6 @@ export default class UploadsController {
                             upload: '$uploads',
                         },
                     },
-                    { $sort: { 'upload.created': -1, sourceName: -1 } },
                 ]),
                 Source.aggregate([
                     { $unwind: '$uploads' },
@@ -147,7 +147,10 @@ export default class UploadsController {
         source: SourceDocument,
         upload: UploadDocument,
     ): Promise<void> {
-        if (source.notificationRecipients?.length > 0) {
+        if (
+            source.automation?.schedule &&
+            source.notificationRecipients?.length > 0
+        ) {
             const subject = 'Automated upload failed for source';
             const text = `An automated upload failed for the following source in G.h List;
                     \n

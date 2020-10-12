@@ -1,11 +1,12 @@
 """Exports MongoDB data to a csv or json file."""
+
 import argparse
 import subprocess
 import yaml
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 parser = argparse.ArgumentParser(
     description='Exports MongoDB data to a csv or json file')
