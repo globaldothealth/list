@@ -111,16 +111,18 @@ def convert_events(date_confirmed, date_symptoms, test_type, outcome):
             "value": convert_test(test_type)
         }
     ]
+    # One case dated July 2019
     if date_symptoms:
-        events.append(
-            {
-                "name": "onsetSymptoms",
-                "dateRange": {
-                    "start": convert_date(date_symptoms),
-                    "end": convert_date(date_symptoms)
-                },
-            }
-        )
+        if datetime.strptime(date_symptoms.split("T")[0], "%Y-%m-%d") > datetime.strptime("2019-11-01", "%Y-%m-%d"):
+            events.append(
+                {
+                    "name": "onsetSymptoms",
+                    "dateRange": {
+                        "start": convert_date(date_symptoms),
+                        "end": convert_date(date_symptoms)
+                    }
+                }
+            )
     if outcome:
         events.append(
             convert_outcome(outcome)
@@ -204,44 +206,40 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            if row[_DATE_SYMPTOMS]:
-                if datetime.strptime(row[_DATE_SYMPTOMS].split("T")[0], "%Y-%m-%d") < datetime.strptime("2019-11-01", "%Y-%m-%d"):
-                    print(f'date before earliest allowed date: {row[_DATE_SYMPTOMS]}')
-                    continue
-                if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "ACRE":
-                    try:
-                        case = {
-                            "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
-                            "location": {
-                                "query": ", ".join(
-                                    [row[_MUNICIPALITY], "Acre", "Brazil"]
-                                )
-                            },
-                            "events": convert_events(
-                                row[_DATE_CONFIRMED],
-                                row[_DATE_SYMPTOMS],
-                                row[_TEST_TYPE],
-                                row[_OUTCOME]
-                            ),
-                            "symptoms": convert_symptoms(row[_SYMPTOMS]),
-                            "demographics": convert_demographics(
-                                row[_GENDER], row[_AGE], row[_HEALTHCARE_PROFESSIONAL], row[_SECURITY_PROFESSIONAL], row[_ETHNICITY]
-                            ),
-                            "preexistingConditions": convert_preexisting_conditions(
-                                row[_COMORBIDITIES]
+            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "ACRE":
+                try:
+                    case = {
+                        "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
+                        "location": {
+                            "query": ", ".join(
+                                [row[_MUNICIPALITY], "Acre", "Brazil"]
                             )
-                        }
-                        notes = convert_notes(
-                            row[_COMORBIDITIES], row[_SYMPTOMS]
+                        },
+                        "events": convert_events(
+                            row[_DATE_CONFIRMED],
+                            row[_DATE_SYMPTOMS],
+                            row[_TEST_TYPE],
+                            row[_OUTCOME]
+                        ),
+                        "symptoms": convert_symptoms(row[_SYMPTOMS]),
+                        "demographics": convert_demographics(
+                            row[_GENDER], row[_AGE], row[_HEALTHCARE_PROFESSIONAL], row[_SECURITY_PROFESSIONAL], row[_ETHNICITY]
+                        ),
+                        "preexistingConditions": convert_preexisting_conditions(
+                            row[_COMORBIDITIES]
                         )
-                        if notes:
-                            case["notes"] = notes
-                        yield case
-                    except ValueError as ve:
-                        raise ValueError(f"error converting case: {ve}")
-#try else continue?? 
+                    }
+                    notes = convert_notes(
+                        row[_COMORBIDITIES], row[_SYMPTOMS]
+                    )
+                    if notes:
+                        case["notes"] = notes
+                    yield case
+                except ValueError as ve:
+                    raise ValueError(f"error converting case: {ve}")
+
 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)
