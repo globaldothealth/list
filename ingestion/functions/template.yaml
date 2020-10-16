@@ -310,3 +310,4 @@ Outputs:
   RetrievalFunction:
     Description: "Retrieval Lambda function ARN"
     Value: !GetAtt RetrievalFunction.Arn
+
