@@ -32,15 +32,16 @@ _MUNICIPALITIES = maps["municipalities"]
 
 def convert_location(state_code: str, municipality_code: str):
     """
-    Codes beginning with 9 denote missing information
+    Convert state and municipality codes into location query.
     """
     query_list = []
-    if municipality_code[0] != "9":
+    missing_value_prefix = "9"
+    if municipality_code[0] != missing_value_prefix:
         try:
             query_list.append(_MUNICIPALITIES[state_code + municipality_code])
         except KeyError:
             print(f"Municipality code missing: {municipality_code}")
-    if state_code[0] != "9":
+    if state_code[0] != missing_value_prefix:
         try:
             query_list.append(_STATES[state_code])
         except KeyError:
