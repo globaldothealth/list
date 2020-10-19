@@ -66,7 +66,7 @@ def extract_event_fields(event: Dict):
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
     return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(DATE_RANGE_FIELD, {}), event.get(AUTH_FIELD, None)
+        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):

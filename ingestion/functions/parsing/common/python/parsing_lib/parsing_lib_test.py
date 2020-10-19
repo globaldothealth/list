@@ -234,7 +234,7 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        {},  # Date filter isn't provided, per the following test case.
+        None,  # Date filter isn't provided, per the following test case.
         input_event[parsing_lib.DATE_RANGE_FIELD],
         input_event[parsing_lib.AUTH_FIELD])
 
