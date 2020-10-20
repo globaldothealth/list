@@ -54,3 +54,11 @@ class AmapaTest(unittest.TestCase):
                 "notes": "Neighbourhood: AGRESTE"
             }
         ])
+
+    def test_drop_broken_date(self):
+        current_dir = os.path.dirname(__file__)
+        sample_data_file = os.path.join(current_dir, "broken_date.csv")
+
+        result = amapa.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
+        self.assertCountEqual(list(result), [])
+

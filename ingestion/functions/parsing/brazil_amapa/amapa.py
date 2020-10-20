@@ -126,10 +126,11 @@ def convert_date(raw_date: str):
 
     The date filtering API expects mm/dd/YYYYZ format.
     """
-    if raw_date:
+    try:
         date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
         return date.strftime("%m/%d/%YZ")
-
+    except:
+        return None
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
@@ -143,7 +144,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         reader = csv.DictReader(f)
         for row in reader:
             # We have entries as high as 351 - unclear if this is days.
-            if float(row[_AGE]) <= 110:
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if float(row[_AGE]) <= 110 and confirmation_date is not None:
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
@@ -161,8 +163,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": convert_date(row[_DATE_CONFIRMED]),
-                                "end": convert_date(row[_DATE_CONFIRMED]),
+                                "start": confirmation_date,
+                                "end": confirmation_date,
                             },
                             "value": convert_confirmation_method(row[_METHOD_CONFIRMATION])
                         },
