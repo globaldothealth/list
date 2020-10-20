@@ -127,7 +127,7 @@ def convert_date(raw_date: str):
     The date filtering API expects mm/dd/YYYYZ format.
     """
     try:
-        date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
         return date.strftime("%m/%d/%YZ")
     except:
         return None
