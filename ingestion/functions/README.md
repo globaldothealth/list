@@ -303,6 +303,18 @@ When a parser is running locally via `sam local invoke`, you can access its cont
 
 For live parsers, you can look in the [AWS console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) directly, all `print()` calls are logged to Cloudwatch which is useful for debugging.
 
+Example live debugging workflow:
+
+1. [Check the Curator portal for errors](https://curator.ghdsi.org/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
+2. Use the AWS console to find the logs. I'm doing this in the command line, so `aws logs describe-log-groups` shows the log groups. Only one of them has "Mexico" in the name, so that's the one I want.
+3. `aws logs describe-log-streams --log-group-name {GROUP_NAME}` shows me the log stream names, conveniently ordered by date as it's the latest (the last in the list) that I want. They also are named after the date, if you're searching for a particular run.
+4. `aws logs get-log-events --log-group-name {GROUP_NAME} --log-stream-name '{STREAM_NAME}'` shows the log events. Notice that the stream name is in single quotes to avoid shell expansion of its name.
+5. Read the logs, identify the error.
+6. Fix the error.
+7. Submit pull request.
+
+Steps 5-6 may take longer than indicated.
+
 ### Deployment
 
 Deployment is accomplished automatically via a dedicated
