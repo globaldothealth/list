@@ -126,11 +126,17 @@ def convert_date(raw_date: str):
 
     The date filtering API expects mm/dd/YYYYZ format.
     """
+    if raw_date.startswith("None"):
+        return None
     try:
         date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
         return date.strftime("%m/%d/%YZ")
-    except:
-        return None
+    except ValueError:
+        try:
+            date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            return date.strftime("%m/%d/%YZ")
+        except:
+            return None
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
