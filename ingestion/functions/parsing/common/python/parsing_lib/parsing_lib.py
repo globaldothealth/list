@@ -59,12 +59,6 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    if event.get(DATE_FILTER_FIELD) and event.get(DATE_RANGE_FIELD):
-        error_message = (
-            f"At most one of fields {DATE_FILTER_FIELD} and {DATE_RANGE_FIELD} can be provided."
-        )
-        e = ValueError(error_message)
-        common_lib.complete_with_error(e)
     return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
         S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
 
@@ -189,6 +183,9 @@ def filter_cases_by_date(
     If a date_range is provided, returns only cases within the specified start
     and end bounds (inclusive). Else if date_filter is provided, returns the
     cases within that specification. Else, returns all cases.
+
+    Notice that if _both_ date_range and date_filter are provided, then date_range is used
+    and date_filter is ignored.
     """
     if date_range:
         print(f'Filtering cases using date range {date_range}')
