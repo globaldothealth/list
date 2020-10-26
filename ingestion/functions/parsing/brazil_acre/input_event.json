@@ -1,7 +1,7 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f7dddf22d0ee7002fe0d56d/2020/10/07/1532/content.csv",
+    "s3Key": "acre_test_no_dupes/acre_no_dupes.csv",
     "sourceUrl": "http://covid19.ac.gov.br/monitoramento/notificacoes/csv",
     "sourceId": "5f7dddf22d0ee7002fe0d56d"
 }
