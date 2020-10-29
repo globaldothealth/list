@@ -129,7 +129,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str):
         else:
             # Age in format '20 a 29 anos'
             age_range = age.partition(" a ")
-            demo["ageRange"] = {"start": float(age_range[0]), "end": float("".join([i for i in age_range[2] if not i.isalpha()]))}
+            demo["ageRange"] = {"start": float(age_range[0]), "end": float(age_range[2][:2])}
     if ethnicity:
         demo["ethnicity"] = convert_ethnicity(ethnicity)
     return demo
