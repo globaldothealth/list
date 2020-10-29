@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -13,11 +14,6 @@ except ImportError:
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
     import parsing_lib
-
-
-import os
-import sys
-from datetime import datetime
 
 
 private_public_map = {'Público': 'Public', 'Privado': 'Private'}
@@ -44,9 +40,15 @@ def convert_gender(raw_gender):
 def convert_location(entry):
     '''
     The only information we have is the province where case was diagnosed/hospitalised
+    Geocoding function can't parse CABA so replacing with Buenos Aires.
     '''
     if entry['carga_provincia_nombre']:
-        return {"query": f"{entry['carga_provincia_nombre']}, Argentina"}
+        if entry['carga_provincia_nombre'] == 'CABA':
+            return {
+                "query": "Buenos Aires, Argentina"}
+        else:
+            return {
+                "query": f"{entry['carga_provincia_nombre']}, Argentina"}
     else:
         return {"query": "Argentina"}
 

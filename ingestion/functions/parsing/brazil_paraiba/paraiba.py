@@ -56,9 +56,11 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
-    if raw_date not in _NONE_TYPES:
+    try:
         date = datetime.strptime(raw_date.split("T")[0], "%Y-%m-%d")
         return date.strftime("%m/%d/%YZ")
+    except:
+        return None
 
 
 def convert_gender(raw_gender: str):
@@ -194,7 +196,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "PARAÍBA":
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "PARAÍBA" and confirmation_date is not None:
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
