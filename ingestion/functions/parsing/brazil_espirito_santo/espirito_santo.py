@@ -90,7 +90,6 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
-    # Some date fields are empty
     if raw_date:
         date = datetime.strptime(raw_date, "%Y-%m-%d")
         return date.strftime("%m/%d/%YZ")
@@ -271,7 +270,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            # There are a few entries for other states
             if row[_CLASSIFICATION] == "Confirmados":
                 try:
                     case = {
