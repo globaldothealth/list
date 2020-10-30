@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f7dfafa75d469002ffdd0ac/2020/10/07/1733/content.csv",
+    "sourceUrl": "http://datasets.saude.go.gov.br/coronavirus/casos_confirmados.csv",
+    "sourceId": "5f7dfafa75d469002ffdd0ac"
+}
