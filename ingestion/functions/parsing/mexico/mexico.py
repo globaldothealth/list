@@ -18,26 +18,35 @@ except ImportError:
     import parsing_lib
 
 
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")) as json_file:
+with open(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")
+) as json_file:
     maps = json.load(json_file)
 
-_COMORBIDITIES_DICT = maps['comorbidities']
+_COMORBIDITIES_DICT = maps["comorbidities"]
 
-_STATES = maps['states']
+_STATES = maps["states"]
 
-_MUNICIPALITIES = maps['municipalities']
+_MUNICIPALITIES = maps["municipalities"]
 
 
 def convert_location(state_code: str, municipality_code: str):
     """
-    Codes beginning with 9 denote missing information
+    Convert state and municipality codes into location query.
     """
     query_list = []
-    if state_code[0] != "9":
-        query_list.append(_STATES[state_code])
-    if municipality_code[0] != "9":
-        query_list.append(_MUNICIPALITIES[state_code + municipality_code])
-    query_string = ", ".join(query_list + ["MEXICO"])
+    missing_value_prefix = "9"
+    if municipality_code[0] != missing_value_prefix:
+        try:
+            query_list.append(_MUNICIPALITIES[state_code + municipality_code])
+        except KeyError:
+            print(f"Municipality code missing: {municipality_code}")
+    if state_code[0] != missing_value_prefix:
+        try:
+            query_list.append(_STATES[state_code])
+        except KeyError:
+            print(f"State Code Missing: {state_code}")
+    query_string = ", ".join(query_list + ["MÉXICO"])
     return {"query": query_string}
 
 
@@ -109,9 +118,9 @@ def convert_demographics(gender: str, age: str, nationality: str, national_origi
     if age:
         demo["ageRange"] = {"start": float(age), "end": float(age)}
     if nationality == "1":
-        demo["nationalities"] = "Mexican"
+        demo["nationalities"] = ["Mexican"]
     elif nationality == "2":
-        demo["nationalities"] = national_origin
+        demo["nationalities"] = [national_origin]
     return demo or None
 
 
@@ -194,7 +203,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     case["notes"] = notes
                 yield case
             except ValueError as ve:
-                raise ValueError("Unhandled data: {}".format(ve))
+                raise ValueError(f"Unhandled data: {ve}")
 
 
 def lambda_handler(event, context):
