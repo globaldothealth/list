@@ -23,6 +23,14 @@ _PARSED_CASES = [
         },
         "events": [
             {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "09/22/2020Z",
+                            "end": "09/22/2020Z"
+                        }
+            },
+            {
                 "name": "outcome",
                 "dateRange":
                 {
@@ -78,7 +86,12 @@ _PARSED_CASES = [
                 "value": "Yes"
             }
         ],
-        "demographics": None,
+        "demographics": {
+            "ageRange": {
+                "start": 28,
+                "end": 35
+            }
+        },
         "notes": None
     },
     {
@@ -115,7 +128,12 @@ _PARSED_CASES = [
                 "value": "Yes"
             }
         ],
-        "demographics": None,
+        "demographics": {
+            "ageRange": {
+                "start": 28,
+                "end": 35
+            }
+        },
         "notes": None
     },
 ]

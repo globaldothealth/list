@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from typing import Dict
 
+
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
@@ -68,7 +69,12 @@ def convert_additional_sources(additional_source_url: Dict):
         sources.append({"sourceUrl": additional_source_url["sourceURL"]})
     if "deathSourceURL" in additional_source_url:
         sources.append({"sourceUrl": additional_source_url["deathSourceURL"]})
-    return sources or None
+    if "citySourceURL" in additional_source_url:
+        sources.append({"sourceUrl": additional_source_url["citySourceURL"]})
+    if "prefectureSourceURL" in additional_source_url:
+        sources.append({"sourceUrl": additional_source_url["prefectureSourceURL"]})
+    # Ensure only unique entries in additional sources
+    return list({v["sourceUrl"]: v for v in sources}.values()) or None
 
 
 def convert_outcome(raw_outcome: Dict, raw_death_date: Dict):
