@@ -11,6 +11,34 @@ class ColombiaTest(unittest.TestCase):
     def setUp(self):
         self.maxDiff = 10000
 
+    def test_no_report_date(self):
+        '''
+        There are situations in the wild where we don't see the report date
+        https://ghdsi.slack.com/archives/C01D5EKJEE7/p1604282468000300
+        '''
+        current_dir = os.path.dirname(__file__)
+        sample_data_file = os.path.join(current_dir, "no_diagnostic_date.csv")
+        result = colombia.parse_cases(
+            sample_data_file, _SOURCE_ID, _SOURCE_URL)
+        self.assertCountEqual(
+            list(result), [
+                {'caseReference': {'sourceId': 'place_holder_ID',
+                                   'sourceEntryId': '1',
+                                   'sourceUrl': 'place_holder_URL'},
+                 'location': {'query': 'Bogotá D.C., Bogotá D.C., Colombia'},
+                 'demographics': {'ageRange': {'start': 19.0, 'end': 19.0},
+                                  'gender': 'Female'},
+                 'events': [{'name': 'confirmed',
+                             'dateRange': {'start': '03/06/2020Z', 'end': '03/06/2020Z'}},
+                            {'name': 'onsetSymptoms',
+                             'dateRange': {'start': '02/27/2020Z', 'end': '02/27/2020Z'}},
+                            {'name': 'outcome',
+                             'value': 'Recovered',
+                             'dateRange': {'start': '03/13/2020Z', 'end': '03/13/2020Z'}}],
+                 'symptoms': {'status': 'Symptomatic', 'values': ['Mild']},
+                 'notes': 'No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later.\nCase is reported as importing the disease into Colombia, and country of origin is ITALIA.\nDate reported online was 03/06/2020.\nPatient recovery was confirmed by a negative PCR test.'},
+            ])
+
     def test_parse(self):
         '''
         Includes imported and internally transmitted cases

@@ -107,18 +107,19 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "demographics": convert_demographics(
                     entry["Edad"],
                     entry["Sexo"])}
-            if entry["Fecha diagnostico"] != '':
-                case["events"] = [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
+            if 'Fecha diagnostico' in entry:
+                if entry["Fecha diagnostico"] != '':
+                    case["events"] = [
                         {
-                            "start": convert_date(entry["Fecha diagnostico"]),
-                            "end": convert_date(entry["Fecha diagnostico"])
-                        }
-                    },
-                ]
-            elif entry["Fecha diagnostico"] == '':
+                            "name": "confirmed",
+                            "dateRange":
+                            {
+                                "start": convert_date(entry["Fecha diagnostico"]),
+                                "end": convert_date(entry["Fecha diagnostico"])
+                            }
+                        },
+                    ]
+            else: # empty or not included
                 case["events"] = [
                     {
                         "name": "confirmed",
