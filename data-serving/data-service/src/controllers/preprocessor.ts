@@ -40,10 +40,13 @@ const createUpdateMetadata = (c: CaseDocument, curatorEmail: string): any => {
 export const getCase = async (
     request: Request,
 ): Promise<CaseDocument | null> => {
-    const caseReference = request.body.caseReference;
+    const caseReference = request.body?.caseReference;
 
-    if (request.method == 'PUT' && request.params?.id) {
-        // Update.
+    if (
+        (request.method == 'PUT' || request.method == 'DELETE') &&
+        request.params?.id
+    ) {
+        // Update or delete.
         return Case.findById(request.params.id);
     } else if (
         request.method == 'PUT' &&
@@ -255,6 +258,72 @@ export const createCaseRevision = async (
             case: c,
         }).save();
     }
+
+    next();
+};
+
+export const batchDeleteCheckThreshold = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    if (request.body.query) {
+        const maxCasesThreshold = request.body['maxCasesThreshold'];
+        if (maxCasesThreshold) {
+            const total = await casesMatchingSearchQuery({
+                searchQuery: request.body.query,
+                count: true,
+            });
+            if (total > Number(maxCasesThreshold)) {
+                response.status(422).json({
+                    message: `query ${request.body.query} will delete ${total} cases which is more than the maximum allowed of ${maxCasesThreshold}, only admins are not subject to the maximum number of cases restriction. Please contact one if you wish to move forward with the deletion.`,
+                });
+                return;
+            }
+        }
+    }
+
+    next();
+};
+
+export const createBatchDeleteCaseRevisions = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+): Promise<void> => {
+    let casesToDelete: { case: CaseDocument }[];
+    if (request.body.caseIds !== undefined) {
+        casesToDelete = (
+            await Case.find({
+                _id: {
+                    $in: request.body.caseIds,
+                },
+            }).exec()
+        ).map((c) => {
+            return {
+                case: c,
+            };
+        });
+    } else {
+        const casesQuery = casesMatchingSearchQuery({
+            searchQuery: request.body.query,
+            count: false,
+        });
+        casesToDelete = (await Case.find(casesQuery).exec()).map((c) => {
+            return {
+                case: c,
+            };
+        });
+    }
+
+    await CaseRevision.insertMany(casesToDelete, {
+        ordered: false,
+        rawResult: true,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore Mongoose types don't include the `lean` option from its
+        // documentation: https://mongoosejs.com/docs/api.html#model_Model.insertMany
+        lean: true,
+    });
 
     next();
 };

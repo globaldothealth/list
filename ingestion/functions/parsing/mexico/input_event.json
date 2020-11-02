@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f77335466b1ce0028f328b1/2020/10/02/1410/content.csv",
+    "sourceUrl": "http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip",
+    "sourceId": "5f77335466b1ce0028f328b1"
+}

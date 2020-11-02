@@ -93,7 +93,7 @@
           "additionalProperties": false,
           "properties": {
             "sampleCollectionDate": {
-              "bsonType": "date"
+              "bsonType": ["date"]
             },
             "repositoryUrl": {
               "bsonType": "string"
@@ -133,6 +133,9 @@
             "bsonType": "string"
           },
           "geoResolution": {
+            "bsonType": "string"
+          },
+          "query":  {
             "bsonType": "string"
           },
           "geometry": {
@@ -175,10 +178,10 @@
               "additionalProperties": false,
               "properties": {
                 "start": {
-                  "bsonType": "date"
+                  "bsonType": ["date"]
                 },
                 "end": {
-                  "bsonType": "date"
+                  "bsonType": ["date"]
                 }
               }
             }
@@ -232,6 +235,9 @@
                   "bsonType": "object",
                   "additionalProperties": false,
                   "properties": {
+                    "query": {
+                      "bsonType": "string"
+                    },
                     "country": {
                       "bsonType": "string"
                     },
@@ -280,10 +286,10 @@
                   "additionalProperties": false,
                   "properties": {
                     "start": {
-                      "bsonType": "date"
+                      "bsonType": ["date"]
                     },
                     "end": {
-                      "bsonType": "date"
+                      "bsonType": ["date"]
                     }
                   }
                 },
@@ -372,7 +378,7 @@
                 "bsonType": "string"
               },
               "date": {
-                "bsonType": "date"
+                "bsonType": ["date"]
               },
               "notes": {
                 "bsonType": "string"
@@ -387,7 +393,7 @@
                 "bsonType": "string"
               },
               "date": {
-                "bsonType": "date"
+                "bsonType": ["date"]
               },
               "notes": {
                 "bsonType": "string"

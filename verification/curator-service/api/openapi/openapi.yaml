@@ -202,6 +202,24 @@ paths:
         schema:
           type: string
           pattern: '^[a-f\d]{24}$'
+      - name: parse_start_date
+        in: query
+        description: >
+          The date on which to begin parsing/ingesting data (inclusive).
+          Provided in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          pattern: '^[\d]{4}-[\d]{2}-[\d]{2}$'
+      - name: parse_end_date
+        in: query
+        description: >
+          The date on which to end parsing/ingesting data (inclusive).
+          Provided in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          pattern: '^[\d]{4}-[\d]{2}-[\d]{2}$'
     post:
       tags: [Source]
       summary: Trigger a retrieval of the content for the specified source
@@ -245,8 +263,8 @@ paths:
         - name: changes_only
           in: query
           description: > 
-            Filters the list of uploads to only return uploads that created or
-            modified cases
+            Filters successful uploads to only include those that created or modified 
+            cases. The response will still include non-successful uploads.
           required: false
           schema:
             type: boolean
@@ -512,7 +530,7 @@ paths:
       operationId: downloadCases
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               maxProperties: 1
@@ -525,10 +543,9 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
@@ -762,7 +779,7 @@ paths:
               type: object
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/clear:
     post:
       tags: [Geocode]
@@ -770,7 +787,7 @@ paths:
       operationId: clearGeocodes
       responses:
         "200":
-          description: OK
+          $ref: "#/components/responses/200"
   /geocode/suggest:
     get:
       tags: [Suggest, Geocode]
@@ -784,9 +801,21 @@ paths:
           allowReserved: true
           schema:
             type: string
+        - name: limitToResolution
+          in: query
+          allowReserved: true
+          schema:
+            type: string
+          description: >
+            Comma-separated list of resolutions to restrict geocoding to.
+            Allowed values are: Point, Admin3, Admin2, Admin1, Country.
       responses:
         "200":
           $ref: "#/components/responses/200LocationArray"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /users:
     get:
       tags: [User]
@@ -911,6 +940,7 @@ components:
                 - PARSING_ERROR
                 - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
+                - TIMEOUT
         created:
           $ref: "#/components/schemas/Date"
     UploadsArray:
@@ -971,6 +1001,7 @@ components:
             - null
             - CSV
             - JSON
+            - XLSX
         dateFilter:
           type: object
           properties:
@@ -982,7 +1013,15 @@ components:
               type: string
               enum:
                 - EQ
+                - GT
                 - LT
+        notificationRecipients:
+          description: >
+            List of addresses to be notified of important changes to the source.
+          type: array
+          items:
+            type: string
+            format: email
         automation:
           type: object
           properties:
@@ -1087,6 +1126,8 @@ components:
               description: >
                 Age bracket, start is included, end is excluded if different
                 than start.
+                If no end is specified it means that the age bracket is from
+                start and above.
               properties:
                 start:
                   type: number
@@ -1421,7 +1462,6 @@ components:
       enum:
         - admin
         - curator
-        - reader
     RoleArray:
       type: object
       properties:
@@ -1529,11 +1569,11 @@ components:
               - index
               - message
       required:
-        - phase
         - numCreated
         - numUpdated
-        - errors
   responses:
+    "200":
+      description: OK
     "200Auth":
       description: OK
       content:

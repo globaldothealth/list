@@ -16,7 +16,7 @@ declare global {
                 transmissionPlaces?: string[];
                 uploadIds?: string[];
             }) => void;
-            login: (opts: {
+            login: (opts?: {
                 name: string;
                 email: string;
                 roles: string[];
@@ -83,7 +83,7 @@ export function addCase(opts: {
     });
 }
 
-export function login(opts: {
+export function login(opts?: {
     name: string;
     email: string;
     roles: string[];
@@ -94,7 +94,7 @@ export function login(opts: {
         body: {
             name: opts?.name ?? 'superuser',
             email: opts?.email ?? 'superuser@test.com',
-            roles: opts?.roles ?? ['admin', 'curator', 'reader'],
+            roles: opts?.roles ?? ['admin', 'curator'],
         },
     });
 }

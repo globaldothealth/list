@@ -9,12 +9,13 @@ describe('App', function () {
         cy.visit('/cases');
         cy.url().should('eq', 'http://localhost:3002/cases');
 
-        cy.contains('Home');
-        cy.contains('span', 'Home').click();
+        cy.contains('Charts');
+        cy.contains('span', 'Charts').click();
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
     it('Shows charts on home page', function () {
+        cy.login();
         cy.visit('/');
 
         cy.contains('Completeness');
@@ -22,12 +23,12 @@ describe('App', function () {
         cy.contains('Freshness');
     });
 
-    it('shows login button when logged out', function () {
+    it('Does not show charts on home page when logged-out', function () {
         cy.visit('/');
 
-        cy.get('button[data-testid="profile-menu"]').click();
-
-        cy.contains('Login');
+        cy.contains('Completeness').should('not.exist');
+        cy.contains('Cumulative').should('not.exist');
+        cy.contains('Freshness').should('not.exist');
     });
 
     it('shows logout button when logged in', function () {
@@ -44,23 +45,31 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist').should('not.exist');
+        cy.contains('Charts').should('not.exist');
+        cy.contains('Line list').should('not.exist');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
+
+        cy.contains('Detailed line list data');
+        cy.contains('Terms of use');
+        cy.contains('Login to get started');
     });
 
     it('Homepage with logged in user with no roles', function () {
         cy.login({ roles: [] });
         cy.visit('/');
 
+        // Readers-only are redirected to the line list.
+        cy.url().should('eq', 'http://localhost:3002/cases');
+
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist').should('not.exist');
+        cy.contains('Charts').should('not.exist');
+        cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
+        cy.contains('Terms of use');
     });
 
     it('Homepage with logged in admin', function () {
@@ -68,11 +77,12 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist');
+        cy.contains('Charts');
+        cy.contains('Line list');
         cy.contains('Sources').should('not.exist');
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users');
+        cy.contains('Terms of use');
     });
 
     it('Homepage with logged in curator', function () {
@@ -80,23 +90,12 @@ describe('App', function () {
         cy.visit('/');
 
         cy.contains('Create new');
-        cy.contains('Home');
-        cy.contains('Linelist');
+        cy.contains('Charts');
+        cy.contains('Line list');
         cy.contains('Sources');
         cy.contains('Uploads');
         cy.contains('Manage users').should('not.exist');
-    });
-
-    it('Homepage with logged in reader', function () {
-        cy.login({ roles: ['reader'] });
-        cy.visit('/');
-
-        cy.contains('Create new').should('not.exist');
-        cy.contains('Home');
-        cy.contains('Linelist');
-        cy.contains('Uploads').should('not.exist');
-        cy.contains('Sources').should('not.exist');
-        cy.contains('Manage users').should('not.exist');
+        cy.contains('Terms of use');
     });
 
     it('Can open new case modal from create new button', function () {
@@ -136,6 +135,18 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/');
     });
 
+    it('Can open new automated backfill modal from create new button', function () {
+        cy.login({ roles: ['curator'] });
+        cy.visit('/');
+
+        cy.get('button[data-testid="create-new-button"]').click();
+        cy.contains('li', 'New automated source backfill').click();
+        cy.contains('New automated source backfill');
+        cy.url().should('eq', 'http://localhost:3002/sources/backfill');
+        cy.get('button[aria-label="close overlay"').click();
+        cy.url().should('eq', 'http://localhost:3002/');
+    });
+
     it('Closing modal shows previous page', function () {
         cy.login({ roles: ['curator'] });
         cy.visit('/sources');
@@ -151,5 +162,16 @@ describe('App', function () {
         cy.visit('/cases/new');
         cy.get('button[aria-label="close overlay"').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
+    });
+
+    it('Can navigate to terms of service', function () {
+        cy.login();
+        cy.visit('/');
+        cy.contains('Line list');
+
+        cy.contains('Global.health Terms of Use').should('not.exist');
+        cy.contains('Terms of use').click();
+        cy.url().should('eq', 'http://localhost:3002/terms');
+        cy.contains('Global.health Terms of Use');
     });
 });

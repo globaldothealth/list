@@ -1,9 +1,11 @@
-import * as caseController from './controllers/case';
+import * as cases from './controllers/case';
 import * as homeController from './controllers/home';
 
 import { Request, Response } from 'express';
 import {
+    batchDeleteCheckThreshold,
     batchUpsertDropUnchangedCases,
+    createBatchDeleteCaseRevisions,
     createBatchUpdateCaseRevisions,
     createBatchUpsertCaseRevisions,
     createCaseRevision,
@@ -14,6 +16,10 @@ import {
 } from './controllers/preprocessor';
 
 import { Case } from './model/case';
+import FakeGeocoder from './geocoding/fake';
+import GeocodeSuggester from './geocoding/suggest';
+import { Geocoder } from './geocoding/geocoder';
+import MapboxGeocoder from './geocoding/mapbox';
 import { OpenApiValidator } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
@@ -23,6 +29,8 @@ import expressStatusMonitor from 'express-status-monitor';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
+import { logger } from './util/logger';
+import { RateLimiter } from 'limiter';
 
 const app = express();
 
@@ -32,6 +40,10 @@ if (process.env.NODE_ENV !== 'test') {
 
 dotenv.config();
 const env = validateEnv();
+
+if (env.SERVICE_ENV !== 'prod') {
+    require('longjohn');
+}
 
 // Express configuration.
 app.set('port', env.PORT);
@@ -82,19 +94,46 @@ new OpenApiValidator({
     .install(app)
     .then(() => {
         const apiRouter = express.Router();
+        // Chain geocoders so that during dev/integration tests we can use the fake one.
+        // It might also just be useful to have various geocoders plugged-in at some point.
+        const geocoders = new Array<Geocoder>();
+        if (env.ENABLE_FAKE_GEOCODER) {
+            logger.info('Using fake geocoder');
+            const fakeGeocoder = new FakeGeocoder();
+            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+            geocoders.push(fakeGeocoder);
+        }
+        if (env.MAPBOX_TOKEN !== '') {
+            logger.info('Using mapbox geocoder');
+            geocoders.push(
+                new MapboxGeocoder(
+                    env.MAPBOX_TOKEN,
+                    env.MAPBOX_PERMANENT_GEOCODE
+                        ? 'mapbox.places-permanent'
+                        : 'mapbox.places',
+                    new RateLimiter(
+                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN,
+                        'minute',
+                    ),
+                ),
+            );
+        }
+        const caseController = new cases.CasesController(geocoders);
+
         apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
         apiRouter.get('/cases', caseController.list);
-        apiRouter.get('/cases/symptoms', caseController.listSymptoms);
+        apiRouter.get('/cases/symptoms', cases.listSymptoms);
         apiRouter.get(
             '/cases/placesOfTransmission',
-            caseController.listPlacesOfTransmission,
+            cases.listPlacesOfTransmission,
         );
-        apiRouter.get('/cases/occupations', caseController.listOccupations);
+        apiRouter.get('/cases/occupations', cases.listOccupations);
         apiRouter.post('/cases', setRevisionMetadata, caseController.create);
         apiRouter.post('/cases/download', caseController.download);
-        apiRouter.post('/cases/batchValidate', caseController.batchValidate);
         apiRouter.post(
             '/cases/batchUpsert',
+            caseController.batchGeocode,
             batchUpsertDropUnchangedCases,
             setBatchUpsertFields,
             createBatchUpsertCaseRevisions,
@@ -125,8 +164,22 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.update,
         );
-        apiRouter.delete('/cases', caseController.batchDel);
-        apiRouter.delete('/cases/:id([a-z0-9]{24})', caseController.del);
+        apiRouter.delete(
+            '/cases',
+            batchDeleteCheckThreshold,
+            createBatchDeleteCaseRevisions,
+            caseController.batchDel,
+        );
+        apiRouter.delete(
+            '/cases/:id([a-z0-9]{24})',
+            createCaseRevision,
+            caseController.del,
+        );
+
+        // Suggest locations based on the request's "q" query param.
+        const geocodeSuggester = new GeocodeSuggester(geocoders);
+        apiRouter.get('/geocode/suggest', geocodeSuggester.suggest);
+
         app.use('/api', apiRouter);
     });
 
@@ -136,7 +189,7 @@ new OpenApiValidator({
         // MONGO_URL is provided by the in memory version of jest-mongodb.
         // DB_CONNECTION_STRING is what we use in prod.
         const mongoURL = process.env.MONGO_URL || env.DB_CONNECTION_STRING;
-        console.log(
+        logger.info(
             'Connecting to MongoDB instance',
             // Print only after username and password to not log them.
             mongoURL.substring(mongoURL.indexOf('@')),
@@ -150,7 +203,7 @@ new OpenApiValidator({
         });
         await Case.ensureIndexes();
     } catch (e) {
-        console.error('Failed to connect to the database. :(', e);
+        logger.error('Failed to connect to the database. :(', e);
         process.exit(1);
     }
 })();

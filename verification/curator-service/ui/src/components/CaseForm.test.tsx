@@ -72,7 +72,7 @@ it('renders form', async () => {
     expect(getAllByText(/Location/i)).toHaveLength(2);
     expect(getAllByText(/Events/i)).toHaveLength(1);
     expect(getByTestId('caseReference')).toBeInTheDocument();
-    expect(getByText(/Nationality/i)).toBeInTheDocument();
+    expect(getByText(/Nationalities/i)).toBeInTheDocument();
 });
 
 it('can add and remove genome sequencing sections', async () => {

@@ -90,7 +90,11 @@ it('loads and displays cases', async () => {
 
     const { findByText, findByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
 
@@ -147,7 +151,11 @@ it('API errors are displayed', async () => {
 
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
 
@@ -207,7 +215,11 @@ it('can delete a row', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -293,7 +305,11 @@ it('can cancel delete action', async () => {
     // Load table
     const { getByText, findByText, getByTestId } = render(
         <MemoryRouter>
-            <LinelistTable user={curator} />
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
@@ -308,7 +324,7 @@ it('can cancel delete action', async () => {
     expect(row).toBeInTheDocument();
 });
 
-it('cannot edit data as a reader only', async () => {
+it('cannot edit data if not curator', async () => {
     const cases = [
         {
             _id: 'abc123',
@@ -359,8 +375,10 @@ it('cannot edit data as a reader only', async () => {
                     _id: 'testUser',
                     name: 'Alice Smith',
                     email: 'foo@bar.com',
-                    roles: ['reader'],
+                    roles: [],
                 }}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
             />
         </MemoryRouter>,
     );

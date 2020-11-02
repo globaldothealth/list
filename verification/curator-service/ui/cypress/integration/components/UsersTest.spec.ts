@@ -8,7 +8,7 @@ describe('Manage users page', function () {
         cy.login({
             name: 'Bob',
             email: 'bob@test.com',
-            roles: ['curator', 'reader'],
+            roles: ['curator'],
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
@@ -18,12 +18,8 @@ describe('Manage users page', function () {
         cy.get('div[data-testid="Alice-select-roles"]')
             .contains('curator')
             .should('not.exist');
-        cy.get('div[data-testid="Alice-select-roles"]')
-            .contains('reader')
-            .should('not.exist');
         cy.contains('Bob');
         cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
-        cy.get('div[data-testid="Bob-select-roles"]').contains('reader');
         cy.get('div[data-testid="Bob-select-roles"]')
             .contains('admin')
             .should('not.exist');
@@ -33,13 +29,12 @@ describe('Manage users page', function () {
         cy.login({
             name: 'Bob',
             email: 'bob@test.com',
-            roles: ['curator', 'reader'],
+            roles: ['curator'],
         });
         cy.login({ name: 'Alice', email: 'alice@test.com', roles: ['admin'] });
         cy.visit('/users');
         cy.contains('Bob');
         cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
-        cy.get('div[data-testid="Bob-select-roles"]').contains('reader');
         cy.get('div[data-testid="Bob-select-roles"]')
             .contains('admin')
             .should('not.exist');
@@ -53,22 +48,20 @@ describe('Manage users page', function () {
         cy.wait('@updateUser');
         cy.wait('@getUsers');
         cy.get('div[data-testid="Bob-select-roles"]').click();
-        cy.get('li[data-value="reader"]').click();
+        cy.get('li[data-value="curator"]').click();
         cy.wait('@updateUser');
         cy.wait('@getUsers');
 
-        cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
         cy.get('div[data-testid="Bob-select-roles"]').contains('admin');
         cy.get('div[data-testid="Bob-select-roles"]')
-            .contains('reader')
+            .contains('curator')
             .should('not.exist');
 
         // Roles are maintained on refresh
         cy.visit('/users');
-        cy.get('div[data-testid="Bob-select-roles"]').contains('curator');
         cy.get('div[data-testid="Bob-select-roles"]').contains('admin');
         cy.get('div[data-testid="Bob-select-roles"]')
-            .contains('reader')
+            .contains('curator')
             .should('not.exist');
     });
 
@@ -80,16 +73,16 @@ describe('Manage users page', function () {
         cy.server();
         cy.route('PUT', '/api/users/*').as('updateUser');
         cy.get('div[data-testid="Alice-select-roles"]').click();
-        cy.get('li[data-value="reader"]').click();
+        cy.get('li[data-value="curator"]').click();
         cy.wait('@updateUser');
 
-        // Home page has reader links
+        // Home page has logged-in user links
         cy.visit('/');
-        cy.contains('Linelist');
+        cy.contains('Line list');
 
         // Profile page is updated
         cy.visit('/profile');
         cy.contains('admin');
-        cy.contains('reader');
+        cy.contains('curator');
     });
 });

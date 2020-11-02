@@ -30,6 +30,10 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
+            # TODO: Remove this pending https://github.com/globaldothealth/list/issues/961.
+            # Run with node debug mode set to http, net, and tls.
+            - name: NODE_DEBUG
+              value: "http,net,tls"
             - name: SERVICE_ENV
               valueFrom:
                 fieldRef:
@@ -66,17 +70,22 @@ spec:
                 secretKeyRef:
                   name: curator-dev-bch28c9gkm
                   key: aws_secret_access_key
-            - name: MAPBOX_TOKEN
+            - name: EMAIL_USER_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: curator-dev-bch28c9gkm
-                  key: mapbox_token
+                  name: curator-dev-969ttc49f5
+                  key: email_user_address
+            - name: EMAIL_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: curator-dev-969ttc49f5
+                  key: email_user_password
           resources:
             requests:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "512Mi"
+              memory: "256Mi"
               cpu: "250m"
 ---
 apiVersion: apps/v1
@@ -91,7 +100,7 @@ spec:
     matchLabels:
       environment: prod
       app: curator
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -100,7 +109,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:0.0.18
+          image: ghcr.io/globaldothealth/list/curatorservice:1.0.1
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -146,18 +155,23 @@ spec:
                 secretKeyRef:
                   name: curator-prod-4mtk8mh9t2
                   key: aws_secret_access_key
-            - name: MAPBOX_TOKEN
+            - name: EMAIL_USER_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  name: curator-prod-4mtk8mh9t2
-                  key: mapbox_token
+                  name: curator-prod-9gkgc49f9h
+                  key: email_user_address
+            - name: EMAIL_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: curator-prod-9gkgc49f9h
+                  key: email_user_password
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "768m"
 ---
 apiVersion: v1
 kind: Service

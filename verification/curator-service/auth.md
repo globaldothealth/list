@@ -12,7 +12,6 @@ The different roles are:
 
 - admin
 - curator
-- reader
 
 A user can have no roles.
 
@@ -20,11 +19,11 @@ Here are the permissions granted to each roles:
 
 - Admin
   - List users based on their roles
-  - Assign/unassign role to users 
+  - Assign/unassign role to users
 - Curator
   - CRUD cases and ingestion sources
-- Reader
-  - Read-only access to cases and sources
+
+By default all logged-in users have read-only access to the linelist data and sources used to populate it.
 
 ## Unit-testing
 
