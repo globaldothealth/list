@@ -1,10 +1,6 @@
 import os
 import sys
-<<<<<<< HEAD
-from datetime import date, datetime
-=======
 from datetime import datetime
->>>>>>> main
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -18,15 +14,6 @@ except ImportError:
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
     import parsing_lib
-<<<<<<< HEAD
-
-
-def convert_date(raw_date: str):
-    """ 
-    Convert raw date field into a value interpretable by the dataserver.
-=======
-
->>>>>>> main
 
 def convert_date(raw_date: str):
     """
@@ -49,15 +36,6 @@ def convert_gender(raw_gender):
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
-<<<<<<< HEAD
-            raw_entry.get("DISTRITO", ""),
-            raw_entry.get("PROVINCIA", ""),
-            raw_entry.get("DEPARTAMENTO", ""),
-            "Peru"]
-        if term != "EN INVESTIGACIÓN"]
-
-    return {"query":  ", ".join(query_terms)}
-=======
             raw_entry.get("DEPARTAMENTO", ""),
             raw_entry.get("PROVINCIA", ""),
             raw_entry.get("DISTRITO", ""),
@@ -77,7 +55,6 @@ def convert_demographics(age: str, sex: str):
     if sex:
         demo["gender"] = convert_gender(sex)
     return demo or None
->>>>>>> main
 
 
 def parse_cases(raw_data_file, source_id, source_url):
@@ -94,39 +71,6 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-<<<<<<< HEAD
-        cases = []
-        for entry in reader:
-            if entry["UUID"]:
-                case =  {
-                        "caseReference": {
-                            "sourceId": source_id,
-                            "sourceEntryId": entry["UUID"],
-                            "sourceUrl": source_url
-                        },
-                        "location": convert_location(entry),
-                        "events": [
-                            {
-                                "name": "confirmed",
-                                "value": conf_methods.get(entry['METODODX']),
-                                "dateRange":
-                                {
-                                    "start": convert_date(entry["FECHA_RESULTADO"]),
-                                    "end": convert_date(entry["FECHA_RESULTADO"])
-                                }
-                            }
-                        ],
-                        "demographics": {
-                            "ageRange": {
-                                "start": float(entry["EDAD"]),
-                                "end": float(entry["EDAD"])
-                            },
-                            "gender": convert_gender(entry["SEXO"])
-                        }
-                    }
-                yield case
-    
-=======
         for entry in reader:
             case = {
                 "caseReference": {
@@ -149,7 +93,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
             }
             yield case
->>>>>>> main
 
 
 def lambda_handler(event, context):
