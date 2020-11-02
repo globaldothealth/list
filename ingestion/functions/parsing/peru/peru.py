@@ -64,33 +64,34 @@ def parse_cases(raw_data_file, source_id, source_url):
         reader = csv.DictReader(f)
         cases = []
         for entry in reader:
-            case =  {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceEntryId": entry["UUID"],
-                        "sourceUrl": source_url
-                    },
-                    "location": convert_location(entry),
-                    "events": [
-                        {
-                            "name": "confirmed",
-                            "value": conf_methods.get(entry['METODODX']),
-                            "dateRange":
-                            {
-                                "start": convert_date(entry["FECHA_RESULTADO"]),
-                                "end": convert_date(entry["FECHA_RESULTADO"])
-                            }
-                        }
-                    ],
-                    "demographics": {
-                        "ageRange": {
-                            "start": float(entry["EDAD"]),
-                            "end": float(entry["EDAD"])
+            if entry["UUID"]:
+                case =  {
+                        "caseReference": {
+                            "sourceId": source_id,
+                            "sourceEntryId": entry["UUID"],
+                            "sourceUrl": source_url
                         },
-                        "gender": convert_gender(entry["SEXO"])
+                        "location": convert_location(entry),
+                        "events": [
+                            {
+                                "name": "confirmed",
+                                "value": conf_methods.get(entry['METODODX']),
+                                "dateRange":
+                                {
+                                    "start": convert_date(entry["FECHA_RESULTADO"]),
+                                    "end": convert_date(entry["FECHA_RESULTADO"])
+                                }
+                            }
+                        ],
+                        "demographics": {
+                            "ageRange": {
+                                "start": float(entry["EDAD"]),
+                                "end": float(entry["EDAD"])
+                            },
+                            "gender": convert_gender(entry["SEXO"])
+                        }
                     }
-                }
-            yield case
+                yield case
     
 
 
