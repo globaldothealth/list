@@ -104,7 +104,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "demographics": convert_demographics(
                     entry["Edad"],
                     entry["Sexo"])}
-            if entry["Fecha diagnostico"] != '':
+            if entry["Fecha diagnostico"]:
                 case["events"] = [
                     {
                         "name": "confirmed",
@@ -115,7 +115,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         }
                     },
                 ]
-            elif entry["Fecha diagnostico"] == '':
+            elif not entry["Fecha diagnostico"]:
                 case["events"] = [
                     {
                         "name": "confirmed",
