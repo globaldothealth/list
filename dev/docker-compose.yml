@@ -23,9 +23,10 @@ services:
             AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
             DATASERVER_URL: "http://data:3000"
+            EMAIL_USER_ADDRESS: "${EMAIL_USER_ADDRESS}"
+            EMAIL_USER_PASSWORD: "${EMAIL_USER_PASSWORD}"
             GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
             GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
-            MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
         healthcheck:
             test: ["CMD", "curl", "-f", "http://curator:3001"]
             interval: 30s
@@ -44,6 +45,7 @@ services:
             - mongo
         environment:
             DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+            MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
         healthcheck:
             test: ["CMD", "curl", "-f", "http://data:3000"]
             interval: 30s

@@ -5,6 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from './../../src/index';
 import fullCase from './../model/data/case.full.json';
 import minimalCase from './../model/data/case.minimal.json';
+import caseMustGeocode from './../model/data/case.mustgeocode.json';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
@@ -391,7 +392,7 @@ describe('POST', () => {
     it('batch upsert with no cases should return 400', () => {
         return request(app).post('/api/cases/batchUpsert').send({}).expect(400);
     });
-    it('batch upsert with only valid cases should return 207 with counts', async () => {
+    it('batch upsert with only valid cases should return 200 with counts', async () => {
         const newCaseWithoutEntryId = new Case(minimalCase);
         const newCaseWithEntryId = new Case(fullCase);
         newCaseWithEntryId.caseReference.sourceEntryId = 'newId';
@@ -416,7 +417,7 @@ describe('POST', () => {
                 ],
                 ...curatorMetadata,
             })
-            .expect(207);
+            .expect(200);
 
         const unchangedDbCase = await Case.findById(
             unchangedCaseWithEntryId._id,
@@ -463,7 +464,7 @@ describe('POST', () => {
                 ],
                 ...curatorMetadata,
             })
-            .expect(207);
+            .expect(200);
 
         const unchangedDbCase = await Case.findById(
             unchangedCaseWithEntryId._id,
@@ -491,6 +492,54 @@ describe('POST', () => {
         expect(changedDbCase?.caseReference?.uploadIds[2]).toEqual(
             unchangedCaseUploadIds[1],
         );
+    });
+    it('geocodes everything that is necessary', async () => {
+        await request(app)
+            .post('/api/geocode/seed')
+            .send({
+                country: 'Canada',
+                geoResolution: 'Country',
+                geometry: { latitude: 42.42, longitude: 11.11 },
+                name: 'Canada',
+            })
+            .expect(200);
+        await request(app)
+            .post('/api/geocode/seed')
+            .send({
+                administrativeAreaLevel1: 'Quebec',
+                country: 'Canada',
+                geoResolution: 'Admin1',
+                geometry: { latitude: 33.33, longitude: 99.99 },
+                name: 'Montreal',
+            })
+            .expect(200);
+        await request(app)
+            .post('/api/cases')
+            .send({
+                ...caseMustGeocode,
+                ...curatorMetadata,
+            })
+            .expect(201)
+            .expect('Content-Type', /json/);
+        expect(
+            await Case.collection.findOne({ 'location.name': 'Canada' }),
+        ).toBeDefined();
+        expect(
+            await Case.collection.findOne({
+                'travelHistory.travel[0].location.name': 'Montreal',
+            }),
+        ).toBeDefined();
+    });
+    it('throws if cannot geocode', async () => {
+        await request(app).post('/api/geocode/clear').expect(200);
+        await request(app)
+            .post('/api/cases')
+            .send({
+                ...caseMustGeocode,
+                ...curatorMetadata,
+            })
+            .expect(404, /Geocode not found/)
+            .expect('Content-Type', /json/);
     });
     it('batch upsert should result in create and update metadata', async () => {
         const existingCase = new Case(fullCase);
@@ -546,7 +595,8 @@ describe('POST', () => {
             .send({
                 cases: [existingCase],
                 ...curatorMetadata,
-            });
+            })
+            .expect(200);
 
         const caseInDb = await Case.findById(existingCase._id);
         expect(caseInDb?.revisionMetadata.revisionNumber).toEqual(0);
@@ -555,43 +605,17 @@ describe('POST', () => {
         );
         expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
-    it('batch upsert with any invalid case should return 422', async () => {
+    it('batch upsert with any invalid case should return 207', async () => {
         await request(app)
             .post('/api/cases/batchUpsert')
             .send({ cases: [minimalCase, invalidRequest], ...curatorMetadata })
-            .expect(422);
+            .expect(207, /VALIDATE/);
     });
-    it('batch validate with no body should return 415', () => {
-        return request(app).post('/api/cases/batchValidate').expect(415);
-    });
-    it('batch validate with no cases should return 400', () => {
+    it('batch upsert with empty cases should return 400', async () => {
         return request(app)
-            .post('/api/cases/batchValidate')
-            .send({})
-            .expect(400);
-    });
-    it('batch validate with empty cases should return empty 207', async () => {
-        const res = await request(app)
-            .post('/api/cases/batchValidate')
+            .post('/api/cases/batchUpsert')
             .send({ cases: [] })
-            .expect(207);
-        expect(res.body.errors).toHaveLength(0);
-    });
-    it('batch validate with only valid cases should return empty 207', async () => {
-        const res = await request(app)
-            .post('/api/cases/batchValidate')
-            .send({ cases: [minimalCase] })
-            .expect(207);
-        expect(res.body.errors).toHaveLength(0);
-    });
-    it('batch validate returns errors for invalid cases in 207', async () => {
-        const res = await request(app)
-            .post('/api/cases/batchValidate')
-            .send({ cases: [minimalRequest, invalidRequest] })
-            .expect(207);
-        expect(res.body.errors).toHaveLength(1);
-        expect(res.body.errors[0].index).toBe(1);
-        expect(res.body.errors[0].message).toMatch('Case validation failed');
+            .expect(400);
     });
     describe('download', () => {
         it('should return 200 OK', async () => {
@@ -948,7 +972,7 @@ describe('PUT', () => {
         await c.save();
 
         const newNotes = 'abc';
-        const res = await request(app)
+        return request(app)
             .put('/api/cases')
             .send({
                 caseReference: {
@@ -1012,7 +1036,7 @@ describe('PUT', () => {
         expect(res.body).not.toHaveProperty('curator');
     });
     it('upsert new item should not create a case revision', async () => {
-        const res = await request(app)
+        await request(app)
             .put('/api/cases')
             .send(minimalRequest)
             .expect('Content-Type', /json/)
@@ -1067,7 +1091,12 @@ describe('DELETE', () => {
         const c = new Case(minimalCase);
         await c.save();
 
-        return await request(app).delete(`/api/cases/${c._id}`).expect(204);
+        await request(app).delete(`/api/cases/${c._id}`).expect(204);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
     });
     it('delete absent item should return 404 NOT FOUND', () => {
         return request(app)
@@ -1109,6 +1138,14 @@ describe('DELETE', () => {
             .send({ caseIds: [c._id, c2._id] })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(0);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+        expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+            c2.toObject(),
+        );
     });
     it('delete multiple cases with query should return 204 OK', async () => {
         // Simulate index creation used in unit tests, in production they are
@@ -1144,6 +1181,7 @@ describe('DELETE', () => {
             .send({ query: 'gender:Male' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(3);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
 
         // Deletes matched queries
         await request(app)
@@ -1151,11 +1189,25 @@ describe('DELETE', () => {
             .send({ query: 'at work gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(2);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(1);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+
         await request(app)
             .delete('/api/cases')
             .send({ query: 'gender:Female' })
             .expect(204);
         expect(await Case.collection.countDocuments()).toEqual(1);
+
+        expect(await CaseRevision.collection.countDocuments()).toEqual(2);
+        expect((await CaseRevision.find())[0].case.toObject()).toEqual(
+            c.toObject(),
+        );
+        expect((await CaseRevision.find())[1].case.toObject()).toEqual(
+            c2.toObject(),
+        );
     });
     it('delete multiple cases cannot go over threshold', async () => {
         // Simulate index creation used in unit tests, in production they are
@@ -1175,5 +1227,7 @@ describe('DELETE', () => {
             .delete('/api/cases')
             .send({ query: 'foo', maxCasesThreshold: 2 })
             .expect(422, /more than the maximum allowed/);
+        expect(await Case.collection.countDocuments()).toEqual(3);
+        expect(await CaseRevision.collection.countDocuments()).toEqual(0);
     });
 });

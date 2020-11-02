@@ -18,7 +18,7 @@ function mockGetAxios(getUsersResponse: any): void {
         switch (url) {
             case '/api/users/roles':
                 return Promise.resolve({
-                    data: { roles: ['admin', 'curator', 'reader'] },
+                    data: { roles: ['admin', 'curator'] },
                 });
             case '/api/users/':
             case '/api/users/?limit=10&page=1':
@@ -35,7 +35,7 @@ test('lists users', async () => {
             _id: 'abc123',
             name: 'Alice Smith',
             email: 'foo@bar.com',
-            roles: ['admin', 'reader'],
+            roles: ['admin'],
         },
         {
             _id: 'abc321',
@@ -68,6 +68,7 @@ test('lists users', async () => {
     expect(await findByText('foo@bar.com')).toBeInTheDocument();
     expect(await findByText('Name not provided')).toBeInTheDocument();
     expect(await findByText('foo2@bar.com')).toBeInTheDocument();
+    expect(await findByText('Picture')).toBeInTheDocument();
     expect(queryByText('Carol Smith')).not.toBeInTheDocument();
     expect(mockedAxios.get).toHaveBeenCalledWith('/api/users/?limit=10&page=1');
 });
@@ -78,7 +79,7 @@ test('updates roles on selection', async () => {
             _id: 'abc123',
             name: 'Alice Smith',
             email: 'foo@bar.com',
-            roles: ['admin', 'reader'],
+            roles: ['admin', 'curator'],
         },
     ];
     const axiosResponse = {
@@ -103,7 +104,7 @@ test('updates roles on selection', async () => {
         />,
     );
     expect(await findByText('Alice Smith')).toBeInTheDocument();
-    expect(await findByText(/admin, reader/)).toBeInTheDocument();
+    expect(await findByText(/admin, curator/)).toBeInTheDocument();
     expect(queryByText('curator')).not.toBeInTheDocument();
 
     // Select new role
@@ -112,7 +113,7 @@ test('updates roles on selection', async () => {
             _id: 'abc123',
             name: 'Alice Smith',
             email: 'foo@bar.com',
-            roles: ['admin', 'reader', 'curator'],
+            roles: ['admin'],
         },
     ];
     const axiosPutResponse = {
@@ -133,7 +134,7 @@ test('updates roles on selection', async () => {
     // Check roles are updated
     expect(mockedAxios.put).toHaveBeenCalledTimes(1);
     expect(mockedAxios.put).toHaveBeenCalledWith('/api/users/abc123', {
-        roles: ['admin', 'reader', 'curator'],
+        roles: ['admin'],
     });
 });
 
@@ -142,7 +143,7 @@ test('calls callback when user is changed', async () => {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
-        roles: ['admin', 'reader'],
+        roles: ['admin'],
     };
     const axiosResponse = {
         data: {
@@ -166,7 +167,7 @@ test('calls callback when user is changed', async () => {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
-        roles: ['admin', 'reader', 'curator'],
+        roles: ['admin', 'curator'],
     };
     const axiosPutResponse = {
         data: {
@@ -198,7 +199,7 @@ test('callback not called when other users are changed', async () => {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
-        roles: ['admin', 'reader'],
+        roles: ['admin'],
     };
     const axiosResponse = {
         data: {
@@ -226,7 +227,7 @@ test('callback not called when other users are changed', async () => {
         _id: 'abc123',
         name: 'Alice Smith',
         email: 'foo@bar.com',
-        roles: ['admin', 'reader', 'curator'],
+        roles: ['admin', 'curator'],
     };
     const axiosPutResponse = {
         data: {

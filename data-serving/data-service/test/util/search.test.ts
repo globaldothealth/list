@@ -20,9 +20,28 @@ describe('search query', () => {
         expect(() => parseSearchQuery('country:')).toThrow(/country/);
     });
 
+    it('consolidates keywords in query', () => {
+        const res = parseSearchQuery('country: other gender:   Female');
+        expect(res).toEqual({
+            filters: [
+                {
+                    path: 'demographics.gender',
+                    values: ['Female'],
+                },
+                {
+                    path: 'location.country',
+                    values: ['other'],
+                },
+            ],
+        });
+    });
+
     it('is parses tokens', () => {
         const res = parseSearchQuery(
-            'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss occupation:"clock maker" country:switzerland outcome:recovered caseid:abc123 uploadid:def456 source:wsj.com admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
+            'curator:foo@bar.com,baz@meh.com gender:male nationality:swiss ' +
+                'occupation:"clock maker" country:switzerland outcome:recovered ' +
+                'caseid:abc123 uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
+                'admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
         );
         expect(res).toEqual({
             filters: [
@@ -35,7 +54,7 @@ describe('search query', () => {
                     values: ['male'],
                 },
                 {
-                    path: 'demographics.nationality',
+                    path: 'demographics.nationalities',
                     values: ['swiss'],
                 },
                 {
@@ -61,6 +80,10 @@ describe('search query', () => {
                 {
                     path: 'caseReference.sourceUrl',
                     values: ['wsj.com'],
+                },
+                {
+                    path: 'caseReference.verificationStatus',
+                    values: ['verified'],
                 },
                 {
                     path: 'location.administrativeAreaLevel1',

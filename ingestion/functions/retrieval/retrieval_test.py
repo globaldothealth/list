@@ -3,7 +3,9 @@ import datetime
 import json
 import os
 import pytest
+import tempfile
 import sys
+import zipfile
 
 from moto import mock_s3
 from unittest.mock import MagicMock, patch
@@ -118,7 +120,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
         valid_event["env"],
         lambda_arn, source_id, upload_id, {}, None,
         response["key"],
-        origin_url, date_filter)
+        origin_url, date_filter, valid_event["parsingDateRange"])
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == full_source_url
     assert requests_mock.request_history[2].url == origin_url
@@ -127,11 +129,12 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     assert response["upload_id"] == upload_id
 
 
-def test_extract_event_fields_returns_env_and_source_id(valid_event):
+def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
     from retrieval import retrieval
-    env, source_id, auth = retrieval.extract_event_fields(valid_event)
+    env, source_id, date_range, _ = retrieval.extract_event_fields(valid_event)
     assert env == valid_event["env"]
     assert source_id == valid_event["sourceId"]
+    assert date_range == valid_event["parsingDateRange"]
 
 
 def test_extract_event_fields_raises_error_if_event_lacks_env():
@@ -154,7 +157,8 @@ def test_get_source_details_returns_url_and_format(
     requests_mock.get(f"{_SOURCE_API_URL}/sources/{source_id}",
                       json={"format": "CSV",
                             "origin": {"url": content_url, "license": "MIT"}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
+    result = retrieval.get_source_details(
+        "env", source_id, "upload_id", {}, {})
     assert result[0] == content_url
     assert result[1] == "CSV"
     assert result[2] == ""
@@ -171,7 +175,8 @@ def test_get_source_details_returns_parser_arn_if_present(
         json={"origin": {"url": content_url, "license": "MIT"},
               "format": "JSON",
               "automation": {"parser": {"awsLambdaArn": lambda_arn}}})
-    result = retrieval.get_source_details("env", source_id, "upload_id", {}, {})
+    result = retrieval.get_source_details(
+        "env", source_id, "upload_id", {}, {})
     assert result[2] == lambda_arn
 
 
@@ -197,7 +202,7 @@ def test_get_source_details_raises_error_if_source_not_found(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_get_source_details_raises_error_if_other_errors_getting_source(
@@ -222,7 +227,7 @@ def test_get_source_details_raises_error_if_other_errors_getting_source(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
@@ -284,7 +289,7 @@ def test_retrieve_content_raises_error_for_non_supported_format(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_raises_error_for_source_content_not_found(
@@ -308,7 +313,7 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
@@ -332,7 +337,7 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
 
 
 def test_upload_to_s3_writes_indicated_file_to_key(s3):
@@ -370,4 +375,27 @@ def test_upload_to_s3_raises_error_on_s3_error(
         return
 
     # We got the wrong exception or no exception, fail the test.
-    assert "Should have raised an exception." == False
+    assert not "Should have raised an exception."
+
+
+def test_raw_content_unzips():
+    from retrieval import retrieval
+    # Creating a fake zip file with one file in it.
+    name = None
+    with tempfile.NamedTemporaryFile('w', delete=False) as temp:
+        name = temp.name
+    with zipfile.ZipFile(name, 'w') as zf:
+        zf.writestr('somefile', 'foo')
+
+    url = 'http://mock/url.zip'
+    with open(name, "rb") as f:
+        wrappedBytes = retrieval.raw_content(url, f.read())
+        # Content should be the content of the first file in the zip.
+        assert wrappedBytes.read() == b'foo'
+
+
+def test_raw_content_ignores_unknown_mimetypes():
+    from retrieval import retrieval
+    url = 'http://mock/url'
+    wrappedBytes = retrieval.raw_content(url, b'foo')
+    assert wrappedBytes.read() == b'foo'

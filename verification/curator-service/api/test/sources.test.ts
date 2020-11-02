@@ -5,6 +5,8 @@ const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
+const mockSend = jest.fn().mockResolvedValue({});
+const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
 
@@ -25,6 +27,12 @@ jest.mock('../src/clients/aws-lambda-client', () => {
         return { invokeRetrieval: mockInvoke };
     });
 });
+jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { send: mockSend, initialize: mockInitialize };
+    });
+});
+
 let mongoServer: MongoMemoryServer;
 
 beforeAll(() => {
@@ -65,8 +73,13 @@ describe('unauthenticated access', () => {
 
 describe('GET', () => {
     it('list should return 200', async () => {
-        const source = await new Source({
+        const source1 = await new Source({
             name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        const source2 = await new Source({
+            name: 'another-source',
             origin: { url: 'http://foo.bar', license: 'MIT' },
             format: 'JSON',
         }).save();
@@ -74,8 +87,10 @@ describe('GET', () => {
             .get('/api/sources')
             .expect(200)
             .expect('Content-Type', /json/);
-        expect(res.body.sources).toHaveLength(1);
-        expect(res.body.sources[0]._id).toEqual(source.id);
+        expect(res.body.sources).toHaveLength(2);
+        // Ordered by name.
+        expect(res.body.sources[0]._id).toEqual(source2.id);
+        expect(res.body.sources[1]._id).toEqual(source1.id);
         // No continuation expected.
         expect(res.body.nextPage).toBeUndefined();
     });
@@ -175,6 +190,40 @@ describe('PUT', () => {
         expect(res.body.origin.url).toEqual('http://foo.bar');
         expect(mockPutRule).not.toHaveBeenCalled();
     });
+    it('should update date filtering of a source', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+        }).save();
+        let res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {
+                    numDaysBeforeToday: '3',
+                    op: 'EQ',
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toEqual({
+            numDaysBeforeToday: 3,
+            op: 'EQ',
+        });
+        // Now clear the date filter.
+        res = await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                dateFilter: {},
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        // Check what changed.
+        expect(res.body.dateFilter).toBeUndefined();
+
+        expect(mockPutRule).not.toHaveBeenCalledTimes(2);
+    });
     it('should create an AWS rule with target if provided schedule expression', async () => {
         const source = await new Source({
             name: 'test-source',
@@ -201,6 +250,68 @@ describe('PUT', () => {
             source._id.toString(),
             source.toAwsStatementId(),
         );
+    });
+    it('should send a notification email if automation added and recipients defined', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: recipients,
+        }).save();
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                automation: {
+                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
+                },
+            })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should send a notification email if automation removed', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: ['foo@bar.com'],
+        }).save();
+        const recipients = ['foo@bar.com'];
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({ automation: { schedule: undefined } })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if automation unchanged', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: ['foo@bar.com'],
+        }).save();
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({ format: 'CSV' })
+            .expect(200)
+            .expect('Content-Type', /json/);
+        expect(mockSend).not.toHaveBeenCalled();
     });
     it('should update AWS rule description on source rename', async () => {
         const source = await new Source({
@@ -309,6 +420,42 @@ describe('POST', () => {
             createdSource.toAwsStatementId(),
         );
     });
+    it('should send a notification email if automation and recipients defined', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: { awsScheduleExpression: 'rate(1 hour)' },
+            },
+            notificationRecipients: recipients,
+        };
+        await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if automation not defined', async () => {
+        const source = {
+            name: 'some_name',
+            origin: { url: 'http://what.ever', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+        };
+        await curatorRequest
+            .post('/api/sources')
+            .send(source)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
     it('should not create an incomplete source', async () => {
         await curatorRequest.post('/api/sources').send({}).expect(400);
     });
@@ -350,17 +497,62 @@ describe('DELETE', () => {
             source.toAwsStatementId(),
         );
     });
+    it('should send a notification email if source contains ruleArn and recipients', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            automation: {
+                schedule: {
+                    awsRuleArn: 'arn:aws:events:a:b:rule/c',
+                    awsScheduleExpression: 'rate(1 hour)',
+                },
+            },
+            notificationRecipients: recipients,
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
+        expect(mockSend).toHaveBeenCalledWith(
+            expect.arrayContaining(recipients),
+            expect.anything(),
+            expect.anything(),
+        );
+    });
+    it('should not send a notification email if source did not have automation rule', async () => {
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: ['foo@bar.com'],
+        }).save();
+        await curatorRequest.delete(`/api/sources/${source.id}`).expect(204);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
     it('should not be able to delete a non existent source', (done) => {
         curatorRequest
             .delete('/api/sources/424242424242424242424242')
             .expect(404, done);
     });
+});
 
-    describe('retrieval', () => {
-        it('can be invoked', (done) => {
-            curatorRequest
-                .post('/api/sources/424242424242424242424242/retrieve')
-                .expect(200, done);
-        });
+describe('retrieval', () => {
+    it('can be invoked', async () => {
+        const sourceId = '424242424242424242424242';
+        await curatorRequest
+            .post(`/api/sources/${sourceId}/retrieve`)
+            .expect(200);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, undefined);
+    });
+    it('forwards optional date params', async () => {
+        const sourceId = '424242424242424242424242';
+        const startDate = '2020-09-01';
+        const endDate = '2020-09-12';
+        const parseRange = { start: startDate, end: endDate };
+        await curatorRequest
+            .post(
+                `/api/sources/${sourceId}/retrieve?parse_start_date=${startDate}&parse_end_date=${endDate}`,
+            )
+            .expect(200);
+        expect(mockInvoke).toHaveBeenCalledWith(sourceId, parseRange);
     });
 });

@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/argentina/content.csv",
+    "sourceUrl": "s3://epid-sources-raw/test/argentina/content.csv",
+    "sourceId": "5f36f28820a86b00357e2df5"
+}

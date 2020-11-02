@@ -3,11 +3,11 @@ import {
     automationParsingValidator,
     automationSchema,
 } from './automation';
+import { DateFilterDocument, dateFilterSchema } from './date-filter';
 import { OriginDocument, originSchema } from './origin';
+import { UploadDocument, uploadSchema } from './upload';
 
 import mongoose from 'mongoose';
-import { uploadSchema, UploadDocument } from './upload';
-import { dateFilterSchema, DateFilterDocument } from './date-filter';
 
 const sourceSchema = new mongoose.Schema({
     name: {
@@ -25,6 +25,7 @@ const sourceSchema = new mongoose.Schema({
     },
     uploads: [uploadSchema],
     dateFilter: dateFilterSchema,
+    notificationRecipients: [String],
 });
 
 sourceSchema.methods.toAwsStatementId = function (): string {
@@ -48,8 +49,9 @@ export type SourceDocument = mongoose.Document & {
     origin: OriginDocument;
     format: string;
     automation: AutomationDocument;
-    uploads: [UploadDocument];
+    uploads: UploadDocument[];
     dateFilter: DateFilterDocument;
+    notificationRecipients: string[];
 
     toAwsStatementId(): string;
     toAwsRuleDescription(): string;

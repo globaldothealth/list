@@ -17,9 +17,8 @@ import Paper from '@material-ui/core/Paper';
 import ParsersAutocomplete from './ParsersAutocomplete';
 import SourceRetrievalButton from './SourceRetrievalButton';
 import TextField from '@material-ui/core/TextField';
-import User from './User';
 import axios from 'axios';
-import { isUndefined } from 'util';
+import ChipInput from 'material-ui-chip-input';
 
 interface ListResponse {
     sources: Source[];
@@ -68,6 +67,7 @@ interface Source {
     origin: Origin;
     automation?: Automation;
     dateFilter?: DateFilter;
+    notificationRecipients?: string[];
 }
 
 interface SourceTableState {
@@ -91,8 +91,8 @@ interface TableRow {
     // automation.schedule
     awsRuleArn?: string;
     awsScheduleExpression?: string;
-    // dateFilter
     dateFilter?: DateFilter;
+    notificationRecipients?: string[];
 }
 
 // Return type isn't meaningful.
@@ -112,19 +112,19 @@ const styles = (theme: Theme) =>
             marginBottom: theme.spacing(1),
         },
         spacer: { flex: 1 },
-        paginationRoot: { border: 'unset' },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: '#ECF3F0',
             display: 'flex',
             height: '64px',
         },
+        tableTitle: {
+            width: '100%',
+        },
     });
 
 // Cf. https://material-ui.com/guides/typescript/#augmenting-your-props-using-withstyles
-interface Props extends WithStyles<typeof styles> {
-    user: User;
-}
+type Props = WithStyles<typeof styles>;
 
 class SourceTable extends React.Component<Props, SourceTableState> {
     tableRef: RefObject<any> = React.createRef();
@@ -157,7 +157,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
         oldRowData: TableRow | undefined,
     ): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            if (isUndefined(oldRowData)) {
+            if (oldRowData === undefined) {
                 return reject();
             }
             if (
@@ -171,17 +171,21 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                 return reject();
             }
             const newSource = this.updateSourceFromRowData(newRowData);
-            this.setState({ error: '' });
             const response = axios.put(
                 this.state.url + oldRowData._id,
                 newSource,
             );
-            response.then(resolve).catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
+            response
+                .then(() => {
+                    this.setState({ error: '' });
+                    resolve();
+                })
+                .catch((e) => {
+                    this.setState({
+                        error: e.response?.data?.message || e.toString(),
+                    });
+                    reject(e);
                 });
-                reject(e);
-            });
         });
     }
 
@@ -220,7 +224,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             dateFilter:
                 rowData.dateFilter?.numDaysBeforeToday || rowData.dateFilter?.op
                     ? rowData.dateFilter
-                    : undefined,
+                    : {},
+            notificationRecipients: rowData.notificationRecipients,
         };
     }
 
@@ -323,7 +328,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV'].map((value) => (
+                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
                                             <MenuItem
                                                 key={`format-${value}`}
                                                 value={value || ''}
@@ -360,6 +365,27 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                             },
                             {
+                                title: 'Notification recipients',
+                                field: 'notificationRecipients',
+                                tooltip:
+                                    'Email addresses of parties to be notified of critical changes',
+                                render: (rowData): string =>
+                                    rowData.notificationRecipients
+                                        ? rowData.notificationRecipients?.join(
+                                              '\n',
+                                          )
+                                        : '',
+                                editComponent: (props): JSX.Element => (
+                                    <ChipInput
+                                        defaultValue={props.value || []}
+                                        onChange={(value: string[]): void =>
+                                            props.onChange(value)
+                                        }
+                                        placeholder="Email address(es)"
+                                    />
+                                ),
+                            },
+                            {
                                 title: 'AWS Schedule Expression',
                                 field: 'awsScheduleExpression',
                             },
@@ -389,7 +415,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 rowData.dateFilter
                                                     ?.numDaysBeforeToday
                                             }{' '}
-                                            days ago
+                                            day(s) ago
                                         </div>
                                     ) : rowData.dateFilter?.op === 'LT' ? (
                                         <div>
@@ -398,7 +424,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 rowData.dateFilter
                                                     ?.numDaysBeforeToday
                                             }{' '}
-                                            ago
+                                            day(s) ago
+                                        </div>
+                                    ) : rowData.dateFilter?.op === 'GT' ? (
+                                        <div>
+                                            Parse all data after{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            day(s) ago
                                         </div>
                                     ) : (
                                         <div>None</div>
@@ -429,6 +464,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                     value: 'EQ',
                                                 },
                                                 { text: 'up to', value: 'LT' },
+                                                { text: 'after', value: 'GT' },
                                             ].map((pair) => (
                                                 <MenuItem
                                                     key={`op-${pair.value}`}
@@ -510,6 +546,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                     s.automation?.schedule
                                                         ?.awsScheduleExpression,
                                                 dateFilter: s.dateFilter,
+                                                notificationRecipients:
+                                                    s.notificationRecipients,
                                             });
                                         }
                                         resolve({
@@ -535,21 +573,22 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             Pagination: (props): JSX.Element => {
                                 return (
                                     <div className={classes.tablePaginationBar}>
-                                        <Typography>
+                                        <Typography
+                                            classes={{
+                                                root: classes.tableTitle,
+                                            }}
+                                        >
                                             Ingestion sources
                                         </Typography>
                                         <span className={classes.spacer}></span>
                                         <TablePagination
                                             {...props}
-                                            classes={{
-                                                ...props.classes,
-                                                root: classes.paginationRoot,
-                                            }}
                                         ></TablePagination>
                                     </div>
                                 );
                             },
                         }}
+                        style={{ fontFamily: 'Inter' }}
                         options={{
                             // TODO: Create text indexes and support search queries.
                             // https://docs.mongodb.com/manual/text-search/

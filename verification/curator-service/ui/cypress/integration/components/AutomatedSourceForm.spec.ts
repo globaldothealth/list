@@ -13,6 +13,7 @@ describe('Automated source form', function () {
         const name = 'New source name';
         const format = 'JSON';
         const license = 'WTFPL';
+        const otherEmail = 'other.curator9001@gmail.com';
 
         cy.visit('/');
         cy.get('button[data-testid="create-new-button"]').click();
@@ -20,6 +21,7 @@ describe('Automated source form', function () {
         cy.get('div[data-testid="url"]').type(url);
         cy.get('div[data-testid="name"]').type(name);
         cy.get('div[data-testid="license"]').type(license);
+        cy.get('div[data-testid="recipients"]').type(otherEmail);
         cy.get('div[data-testid="format"]').click();
         cy.get(`li[data-value=${format}`).click();
         cy.server();
@@ -34,6 +36,8 @@ describe('Automated source form', function () {
         cy.contains(name);
         cy.contains(format);
         cy.contains(license);
+        cy.contains('superuser@test.com');
+        cy.contains(otherEmail);
     });
 
     it('Does not add source on submission error', function () {
