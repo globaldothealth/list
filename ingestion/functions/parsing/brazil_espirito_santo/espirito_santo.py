@@ -229,10 +229,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proff
         else:
             # Age in format '20 a 29 anos', except for '05 a 9 anos' which has a leading 0
             age_range = age.partition(" a ")
-            if age_range[0] == "05":
-                demo["ageRange"] = {"start": float(age_range[0][1]), "end": float(age_range[2][:2])}
-            else:
-                demo["ageRange"] = {"start": float(age_range[0]), "end": float(age_range[2][:2])}
+            demo["ageRange"] = {"start": float(age_range[0]), "end": float(age_range[2][:2])}
     if ethnicity:
         demo["ethnicity"] = convert_ethnicity(ethnicity)
     if healthcare_proffesional not in _NONE_TYPES:
