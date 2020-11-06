@@ -23,14 +23,20 @@ class EspiritoSantoTest(unittest.TestCase):
                 "location": {
                     "query": "SERRA, Espirito Santo, Brazil"
                 },
-                "events": [{
-                    "name": "confirmed",
-                    "dateRange": {
-                        "start": "10/27/2020Z",
-                        "end": "10/27/2020Z"
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange": {
+                            "start": "10/27/2020Z",
+                            "end": "10/27/2020Z"
+                        },
+                        "value": "Serological test"
                     },
-                    "value": "Serological test"
-                }],
+                    {
+                        "name": "outcome",
+                        "value": "Recovered"
+                    }
+                ],
                 "symptoms": {
                     "status": "Symptomatic",
                     "values": [
