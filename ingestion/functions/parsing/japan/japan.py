@@ -37,13 +37,16 @@ def convert_age(raw_age):
 
 
 def convert_location(raw_entry):
-    query_terms = [
-        term for term in [
-            raw_entry.get("detectedCityTown", ""),
-            raw_entry.get("detectedPrefecture", ""),
-            "Japan"]
-        if term and term != "Unspecified"]
-    return {"query": ", ".join(query_terms)}
+    if raw_entry["detectedPrefecture"] == "Port Quarantine":
+        return {"query": "Japan"}
+    else:
+        query_terms = [
+            term for term in [
+                raw_entry.get("detectedCityTown", ""),
+                raw_entry.get("detectedPrefecture", ""),
+                "Japan"]
+            if term and term != "Unspecified"]
+        return {"query": ", ".join(query_terms)}
 
 
 def detect_notes(raw_notes):
