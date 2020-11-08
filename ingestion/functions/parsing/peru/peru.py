@@ -37,13 +37,13 @@ def convert_gender(raw_gender):
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
-            raw_entry.get("DISTRITO", ""),
-            raw_entry.get("PROVINCIA", ""),
             raw_entry.get("DEPARTAMENTO", ""),
+            raw_entry.get("PROVINCIA", ""),
+            raw_entry.get("DISTRITO", ""),
             "Peru"]
         if term != "EN INVESTIGACIÓN"]
 
-    return {"query":  ", ".join(query_terms)}
+    return {"query": ", ".join(query_terms)}
 
 
 def convert_demographics(age: str, sex: str):

@@ -35,7 +35,6 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import fileDownload from 'js-file-download';
 import renderDate from './util/date';
 
 interface ListResponse {
@@ -56,7 +55,6 @@ interface LinelistTableState {
     totalNumRows: number;
     deleteDialogOpen: boolean;
     isLoading: boolean;
-    isDownloading: boolean;
     isDeleting: boolean;
 }
 
@@ -86,6 +84,7 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
+    setSearchLoading: (a: boolean) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -244,36 +243,34 @@ function RowMenu(props: {
 }
 
 export function DownloadButton(props: { search: string }): JSX.Element {
-    const [downloading, setDownloading] = React.useState(false);
-
-    const downloadCases = (): void => {
-        const requestBody = props.search.trim() ? { query: props.search } : {};
-        setDownloading(true);
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, 'cases.csv'))
-            .catch((e) => console.error(e))
-            .finally(() => setDownloading(false));
-    };
+    const formRef: RefObject<any> = React.createRef();
 
     return (
-        <Button
-            variant="outlined"
-            color="primary"
-            onClick={downloadCases}
-            disabled={downloading}
-            startIcon={
-                downloading ? <CircularProgress size={20} /> : <SaveAltIcon />
-            }
-        >
-            Download
-        </Button>
+        <>
+            <form
+                hidden
+                ref={formRef}
+                method="POST"
+                action="/api/cases/download"
+            >
+                <input name="query" value={props.search.trim()} />
+            </form>
+            <Button
+                variant="outlined"
+                color="primary"
+                onClick={(): void => formRef.current.submit()}
+                startIcon={<SaveAltIcon />}
+            >
+                Download
+            </Button>
+        </>
     );
 }
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
+    formRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
 
@@ -288,16 +285,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             totalNumRows: 0,
             deleteDialogOpen: false,
             isLoading: false,
-            isDownloading: false,
             isDeleting: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
             this,
         );
-        this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
+        this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
+            this,
+        );
     }
 
     componentDidMount(): void {
@@ -400,34 +398,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         });
     }
 
-    downloadSelectedCases(): void {
-        this.setState({ error: '', isDownloading: true });
-        let requestBody = {};
-        if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.props.location.state.search };
-        } else {
-            requestBody = {
-                caseIds: this.state.selectedRowsCurrentPage.map(
-                    (row: TableRow) => row.id,
-                ),
-            };
-        }
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => {
-                fileDownload(response.data, 'cases.csv');
-                this.setState({ isDownloading: false });
-            })
-            .catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
-                    isDownloading: false,
-                });
-            });
-    }
-
     confirmationDialogTitle(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return 'Error';
         }
         return (
@@ -440,10 +412,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogBody(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return (
                 `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
-                ' An admin can preform the deletion if it is valid.'
+                ' An admin can perform the deletion if it is valid.'
             );
         }
         return (
@@ -451,6 +423,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 ? '1 case'
                 : `${this.state.numSelectedRows} cases`) +
             ' will be permanently deleted.'
+        );
+    }
+
+    showConfirmationDialogError(): boolean {
+        return (
+            !this.props.user.roles.includes('admin') &&
+            this.state.numSelectedRows > this.maxDeletionThreshold
         );
     }
 
@@ -560,8 +539,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 >
                                     Cancel
                                 </Button>
-                                {this.state.numSelectedRows <=
-                                    this.maxDeletionThreshold && (
+                                {!this.showConfirmationDialogError() && (
                                     <Button
                                         onClick={this.deleteCases}
                                         color="primary"
@@ -637,18 +615,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
+                            headerStyle: { whiteSpace: 'nowrap' },
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
@@ -661,6 +644,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 rowData.age[0] === rowData.age[1]
                                     ? rowData.age[0]
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Gender',
@@ -673,6 +657,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -685,7 +670,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
-                            this.setState({ error: '' });
+                            this.setState({ isLoading: true, error: '' });
+                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
                             response
                                 .then((result) => {
@@ -748,6 +734,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             e.toString(),
                                     });
                                     reject(e);
+                                })
+                                .finally(() => {
+                                    this.setState({ isLoading: false });
+                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
@@ -952,31 +942,34 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="download selected rows">
-                                              {this.state.isDownloading ? (
-                                                  <CircularProgress
-                                                      size={24}
-                                                      classes={{
-                                                          root:
-                                                              classes.toolbarItems,
-                                                      }}
-                                                  />
-                                              ) : (
-                                                  <SaveAltIcon
-                                                      classes={{
-                                                          root:
-                                                              classes.toolbarItems,
-                                                      }}
-                                                  />
-                                              )}
+                                              <form
+                                                  hidden
+                                                  ref={this.formRef}
+                                                  method="POST"
+                                                  action="/api/cases/download"
+                                              >
+                                                  {this.state.selectedRowsCurrentPage.map(
+                                                      (row: TableRow) => (
+                                                          <input
+                                                              name="caseIds[]"
+                                                              key={row.id}
+                                                              value={row.id}
+                                                          />
+                                                      ),
+                                                  )}
+                                              </form>
+                                              <SaveAltIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
                                           </span>
                                       ),
-                                      tooltip: this.state.isDownloading
-                                          ? 'Downloading...'
-                                          : 'Download selected rows',
+                                      tooltip: 'Download selected rows',
                                       onClick: (): void => {
-                                          this.downloadSelectedCases();
+                                          this.formRef.current.submit();
                                       },
-                                      disabled: this.state.isDownloading,
                                   },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the

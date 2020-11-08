@@ -45,11 +45,11 @@ describe('Linelist table', function () {
         });
         cy.visit('/cases');
         cy.contains('France');
-        cy.contains('View case').should('not.exist');
+        cy.contains(/View case\b/).should('not.exist');
         cy.contains('td', 'France').click({ force: true });
-        cy.contains('View case');
+        cy.contains(/View case\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains('View case').should('not.exist');
+        cy.contains(/View case\b/).should('not.exist');
     });
 
     it('Can delete a case', function () {
@@ -211,17 +211,24 @@ describe('Linelist table', function () {
     it('Can search', function () {
         cy.addCase({
             country: 'France',
-            notes: 'some notes',
-            sourceUrl: 'foo.bar',
+        });
+        cy.addCase({
+            country: 'Germany',
         });
         cy.visit('/cases');
         cy.contains('France');
+        cy.contains('Germany');
         cy.contains('Filter').click();
         cy.get('li').contains('country').click();
         cy.get('input[id="search-field"]').type('uruguay{enter}');
         cy.contains('France').should('not.exist');
+        cy.contains('Germany').should('not.exist');
         cy.get('input[id="search-field"]').clear().type('France{enter}');
         cy.get('td[value="France"]');
+        cy.contains('Germany').should('not.exist');
+        cy.get('button[aria-label="clear search"]').click();
+        cy.contains('France');
+        cy.contains('Germany');
     });
 
     it('Search query is saved in browser history', function () {
@@ -241,9 +248,9 @@ describe('Linelist table', function () {
 
         // Navigate to case details and back
         cy.get('td[value="France"]').click();
-        cy.contains('View case');
+        cy.contains(/View case\b/);
         cy.get('button[aria-label="close overlay"').click();
-        cy.contains('View case').should('not.exist');
+        cy.contains(/View case\b/).should('not.exist');
 
         // Search is maintained
         cy.get('input[id="search-field"]').should(
@@ -291,86 +298,6 @@ describe('Linelist table', function () {
 
         cy.contains('Unselect all 7 rows').click();
         cy.contains('7 rows selected').should('not.exist');
-    });
-
-    it('Can download all cases', function () {
-        cy.addCase({
-            country: 'France',
-        });
-        cy.addCase({
-            country: 'Germany',
-        });
-        cy.addCase({
-            country: 'United Kingdom',
-        });
-        cy.visit('/cases');
-        cy.server();
-        cy.route('POST', '/api/cases/download').as('downloadCases');
-        cy.contains('Download').click();
-        cy.wait('@downloadCases').then((xhr) => {
-            const csv = xhr.response.body;
-            assert.include(csv, 'location.country');
-            assert.include(csv, 'France');
-            assert.include(csv, 'Germany');
-            assert.include(csv, 'United Kingdom');
-        });
-    });
-
-    it('Can download searched cases', function () {
-        cy.addCase({
-            country: 'France',
-        });
-        cy.addCase({
-            country: 'Germany',
-        });
-        cy.addCase({
-            country: 'United Kingdom',
-        });
-        cy.visit('/cases');
-
-        cy.contains('Filter').click();
-        cy.get('li').contains('country').click();
-        cy.get('input[id="search-field"]').type('France{enter}');
-
-        cy.server();
-        cy.route('POST', '/api/cases/download').as('downloadCases');
-        cy.contains('Download').click();
-        cy.wait('@downloadCases').then((xhr) => {
-            const csv = xhr.response.body;
-            assert.include(csv, 'location.country');
-            assert.include(csv, 'France');
-            assert.notInclude(csv, 'Germany');
-            assert.notInclude(csv, 'United Kingdom');
-        });
-    });
-
-    it('Can download selected cases', function () {
-        cy.addCase({
-            country: 'France',
-        });
-        cy.addCase({
-            country: 'Germany',
-        });
-        cy.addCase({
-            country: 'United Kingdom',
-        });
-        cy.server();
-        cy.route('GET', '/api/cases/*').as('getCases');
-        cy.visit('/cases');
-        cy.wait('@getCases');
-
-        cy.get('input[type="checkbox"]').eq(1).click();
-        cy.get('input[type="checkbox"]').eq(2).click();
-
-        cy.route('POST', '/api/cases/download').as('downloadCases');
-        cy.get('button[title="Download selected rows"]').click();
-        cy.wait('@downloadCases').then((xhr) => {
-            const csv = xhr.response.body;
-            assert.include(csv, 'location.country');
-            assert.notInclude(csv, 'France');
-            assert.include(csv, 'Germany');
-            assert.include(csv, 'United Kingdom');
-        });
     });
 
     it('Can delete all cases across rows for a search result', function () {
