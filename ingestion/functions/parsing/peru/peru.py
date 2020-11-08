@@ -79,7 +79,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "sourceEntryId": entry["UUID"],
                         "sourceUrl": source_url
                     },
-                    "location": convert_location(entry),
+                    "location": convert_location(entry),    
                     "events": [
                         {
                             "name": "confirmed",
