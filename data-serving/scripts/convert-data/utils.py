@@ -12,7 +12,7 @@ def is_url(value: str) -> bool:
     try:
         parts = urlparse(value)
         return parts.scheme and parts.netloc
-    except:
+    except Exception:
         return False
 
 

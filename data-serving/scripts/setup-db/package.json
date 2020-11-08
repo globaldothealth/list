@@ -7,7 +7,8 @@
     "build": "tsc",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "setup": "npm install && tsc && mongo $CONN --eval \"let args={connectionString: '$CONN', databaseName: '$DB', collectionName: '$COLL', schemaPath: '$SCHEMA', indexesPath: '$INDEXES', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js",
-    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json', indexesPath: './../../data-service/schemas/cases.indexes.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js"
+    "setup-cases": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'cases', schemaPath: './../../data-service/schemas/cases.schema.json', indexesPath: './../../data-service/schemas/cases.indexes.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js",
+    "setup-sources": "npm install && tsc && mongo --eval \"let args={databaseName: 'covid19', collectionName: 'sources', schemaPath: './../../../verification/curator-service/api/src/schemas/sources.schema.json', indexesPath: './../../../verification/curator-service/api/src/schemas/sources.schema.json', deleteAllDocuments: '$DELETE_ALL_DOCUMENTS'}\" dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -22,14 +23,14 @@
   "homepage": "https://github.com/globaldothealth/list#readme",
   "node_modules": [],
   "dependencies": {
-    "@types/node": "^13.13.15",
+    "@types/node": "^13.13.21",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.0.4",
+    "prettier": "^2.1.2",
     "typescript": "^3.9.7"
   }
 }

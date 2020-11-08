@@ -9,7 +9,7 @@ Converters log errors thrown by the parsers, since they have the context on
 which row failed to convert.
 '''
 
-from parsers import (parse_age, parse_bool, parse_date, parse_geo_resolution,
+from parsers import (parse_age, parse_date, parse_geo_resolution,
                      parse_latitude, parse_list, parse_location_list,
                      parse_longitude, parse_range, parse_sex, parse_string_list,
                      parse_url)
@@ -62,8 +62,8 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
         - "x months": Single age in months.
         - "x weeks": Single age in weeks.
         - "x - y": Age range.
-        - "x -": Age range start.
-        - "- y": Age range end.
+        - "x - 120": Age range start.
+        - "0 - y": Age range end.
 
     Raises:
       ValueError if the value can't be successfully parsed into an age.
@@ -77,7 +77,15 @@ def convert_age_range(ages: Any) -> Dict[str, float]:
         }
         where start == end if value represents a single age.
     '''
-    return convert_range(ages, parse_age, lambda x: x)
+    age_range = convert_range(ages, parse_age, lambda x: x)
+    if age_range is not None:
+      has_start = 'start' in age_range.keys()
+      has_end = 'end' in age_range.keys()
+      if not has_start and has_end:
+        age_range['start'] = 0
+      elif has_start and not has_end:
+        age_range['end'] = 120
+    return age_range
 
 
 def convert_date_range(dates: str) -> Dict[str, Dict[str, str]]:
@@ -154,7 +162,7 @@ def convert_event(id: str, dates: Any, value: str, field_name: str, event_name: 
         }
 
         if value:
-          event['value'] = value
+            event['value'] = value
 
         return event
     except ValueError as e:
@@ -296,9 +304,9 @@ def convert_location(id: str, location: str, admin3: str, admin2: str,
         location['geometry'] = geometry
 
     # Produce a reasonable human readable name based on admin hierarchy.
-    location['name'] = ', '.join([part for part in 
-      [admin1, admin2, admin3]
-    if part])
+    location['name'] = ', '.join([part for part in
+                                  [admin3, admin2, admin1, country]
+                                  if part])
 
     try:
         parsed_geo_resolution = parse_geo_resolution(geo_resolution)
@@ -337,31 +345,6 @@ def convert_dictionary_field(id: str, field_name: str, value: str) -> Dict[
         log_error(id, field_name, f'{field_name}.values', value, e)
 
 
-def convert_revision_metadata_field(data_moderator_initials: str) -> Dict[
-        str, str]:
-    '''
-    Populates a revisionMetadata field with an initial revision number of 0 and
-    the data moderator's initials where available.
-
-    Returns:
-      Dict[str, str]: Always. The dictionary is in the format:
-        {
-          'id': int,
-          'moderator': str
-        }
-    '''
-    revision_metadata = {
-        'revisionNumber': 0
-    }
-
-    if data_moderator_initials:
-        revision_metadata['creationMetadata'] = {
-            'curator': str(data_moderator_initials)
-        }
-
-    return revision_metadata
-
-
 def convert_notes_field(notes_fields: [str]) -> str:
     '''
     Creates a notes field from a list of original notes fields.
@@ -373,16 +356,17 @@ def convert_notes_field(notes_fields: [str]) -> str:
     return notes or None
 
 
-def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
+def convert_case_reference_field(id: str, source: str, sourceId: str) -> Dict[str, str]:
     '''
     Converts the case reference field from the source field.
 
     Returns:
-      None: When the input is empty.
       Dict[str, str]: When the input is nonempty. The dictionary is in the
         format:
         {
+          'sourceId': str,
           'sourceUrl': str,
+          'verificationStatus': 'VERIFIED',
           'additionalSources': [
            {
              'sourceUrl': str
@@ -390,27 +374,24 @@ def convert_case_reference_field(id: str, source: str) -> Dict[str, str]:
           ]
         }
     '''
-    if not source:
-        return None
+    caseReference = {
+        'verificationStatus': 'VERIFIED',
+    }
 
     sources = parse_list(source, ', ')
 
     try:
-      sourceUrls = [ parse_url(source) for source in sources ]
+        sourceUrls = [parse_url(source) for source in sources]
 
-      if not sourceUrls:
-        return None
-      
-      caseReference = { 'sourceUrl': sourceUrls[0] }
-
-      if len(sourceUrls) > 1:
+        caseReference['sourceId'] = sourceId
+        caseReference['sourceUrl'] = 'https://github.com/globaldothealth/list#data'
         caseReference['additionalSources'] = [{
             'sourceUrl': sourceUrl
-        } for sourceUrl in sourceUrls[1:]]
+        } for sourceUrl in sourceUrls]
 
-      return caseReference
+        return caseReference
     except ValueError as e:
-       log_error(id, 'source', 'caseReference.sourceUrl', source, e)
+        log_error(id, 'source', 'caseReference.sourceUrl', source, e)
 
 
 def convert_travel_history(geocoder: Any, id: str, dates: str,
@@ -450,16 +431,17 @@ def convert_travel_history(geocoder: Any, id: str, dates: str,
     if not location_list and not date_range:
         return None
     if not location_list:
-        return { 'travel': [{'dateRange': date_range}] }
+        return {'travel': [{'dateRange': date_range}]}
     if not date_range:
-        return { 'travel': [{'location': l} for l in location_list if l] }
+        return {'travel': [{'location': loc} for loc in location_list if loc]}
 
     # We believe it will be useful to have dates associated with each travel
     # location, but in the existing data, travel history only has one (or no)
     # date associated with the entire field.
-    return { 'travel':
-      [{'dateRange': date_range, 'location': l} for l in location_list if l]
-    }
+    return {'travel':
+            [{'dateRange': date_range, 'location': loc}
+                for loc in location_list if loc]
+            }
 
 
 def convert_imported_case(values_to_archive: Dict[str, Any]) -> Dict[str, Any]:

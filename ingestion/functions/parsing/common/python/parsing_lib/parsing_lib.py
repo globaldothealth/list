@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 import collections
+import time
 from typing import Callable, Dict, Generator, Any, List
 
 import boto3
@@ -13,12 +14,13 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
-UPLOAD_IDS_FIELD = "uploadIds"
+UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
+DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
 # Expected date fields format.
-DATE_FORMAT = "%m/%d/%YZ"
+DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
@@ -57,8 +59,8 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
+        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
@@ -102,20 +104,29 @@ def batch_of(cases: Generator[Dict, None, None], max_items: int) -> List[Dict]:
 
 def write_to_server(
         cases: Generator[Dict, None, None],
-        env: str, source_id: str, upload_id: str, headers, cookies):
+        env: str, source_id: str, upload_id: str, headers, cookies,
+        cases_batch_size: int, remaining_time_func: Callable[[], float]):
     """Upserts the provided cases via the G.h Case API."""
     put_api_url = f"{common_lib.get_source_api_url(env)}/cases/batchUpsert"
     counter = collections.Counter()
+    start_time = time.time()
     while True:
-        batch = batch_of(cases, CASES_BATCH_SIZE)
+        batch = batch_of(cases, cases_batch_size)
         # End of batch.
         if not batch:
             break
-        print(f"Sending {len(batch)} cases to {put_api_url}")
-        counter['total'] += len(batch)
+        print(f"Sending {len(batch)} cases, total so far: {counter['total']}")
         res = requests.post(put_api_url, json={"cases": batch},
                             headers=headers, cookies=cookies)
         if res and res.status_code == 200:
+            counter['total'] += len(batch)
+            now = time.time()
+            cps = int(counter['total'] / (now - start_time))
+            print(f'\tCurrent speed: {cps} cases/sec')
+            remaining_sec = int(remaining_time_func() / 1000)
+            max_estimate = int(counter['total'] + remaining_sec * cps)
+            print(
+                f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
             res_json = res.json()
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
@@ -130,10 +141,14 @@ def write_to_server(
         upload_error = (common_lib.UploadError.VALIDATION_ERROR
                         if res.status_code == 207 else
                         common_lib.UploadError.DATA_UPLOAD_ERROR)
-        common_lib.complete_with_error(e, env, upload_error,
-                                       source_id, upload_id, headers, cookies)
+        common_lib.complete_with_error(
+            e, env, upload_error,
+            source_id, upload_id, headers, cookies,
+            count_created=counter['numCreated'],
+            count_updated=counter['numUpdated'])
         return
-    print(f'sent {counter["total"]} cases')
+    print(
+        f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
     return counter['numCreated'], counter['numUpdated']
 
 
@@ -142,40 +157,77 @@ def get_today() -> datetime.datetime:
     return datetime.datetime.today()
 
 
+def get_case_date(date_string) -> datetime.datetime:
+    """Return a datetime parsed from a case."""
+    case_date = ""
+    for fmt in (DATE_FORMATS):
+        try:
+            return datetime.datetime.strptime(
+                date_string,
+                fmt)
+        except ValueError:
+            pass
+    if not case_date:
+        raise ValueError(f"Date {date_string} from case could not be parsed.")
+
+    return case_date
+
+
 def filter_cases_by_date(
         case_data: Generator[Dict, None, None],
-        date_filter: Dict, env: str, source_id: str, upload_id: str, api_creds,
-        cookies):
-    """Filter cases according ot the date_filter provided.
-
-    Returns the cases that matched the date filter or all cases if
-    no filter was requested.
+        date_filter: Dict, date_range: Dict, env: str,
+        source_id: str, upload_id: str, api_creds, cookies):
     """
-    if not date_filter:
+    Filter cases according to the date_range or date_filter provided.
+
+    If a date_range is provided, returns only cases within the specified start
+    and end bounds (inclusive). Else if date_filter is provided, returns the
+    cases within that specification. Else, returns all cases.
+
+    Notice that if _both_ date_range and date_filter are provided, then date_range is used
+    and date_filter is ignored.
+    """
+    if date_range:
+        print(f'Filtering cases using date range {date_range}')
+
+        def case_is_within_range(case, start, end):
+            confirmed_event = [e for e in case["events"]
+                               if e["name"] == "confirmed"][0]
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
+            return start <= case_date <= end
+
+        start = datetime.datetime.strptime(date_range["start"], "%Y-%m-%d")
+        end = datetime.datetime.strptime(date_range["end"], "%Y-%m-%d")
+        return (case for case in case_data if case_is_within_range(case, start, end))
+
+    elif date_filter:
+        print(f'Filtering cases using date filter {date_filter}')
+        now = get_today()
+        delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
+        cutoff_date = now - delta
+        op = date_filter["op"]
+
+        def case_is_within_range(case, cutoff_date, op):
+            confirmed_event = [e for e in case["events"]
+                               if e["name"] == "confirmed"][0]
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
+            delta_days = (case_date - cutoff_date).days
+            if op == "EQ":
+                return delta_days == 0
+            elif op == "LT":
+                return delta_days < 0
+            elif op == "GT":
+                return delta_days > 0
+            else:
+                e = ValueError(f'Unsupported date filter operand: {op}')
+                common_lib.complete_with_error(
+                    e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
+                    source_id, upload_id, api_creds, cookies)
+
+        return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
+
+    else:
         return case_data
-    print(f'Filtering cases using date filter {date_filter}')
-    now = get_today()
-    delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
-    cutoff_date = now - delta
-    op = date_filter["op"]
-
-    def case_is_within_range(case, cutoff_date, op):
-        confirmed_event = [e for e in case["events"]
-                           if e["name"] == "confirmed"][0]
-        case_date = datetime.datetime.strptime(
-            confirmed_event["dateRange"]["start"], DATE_FORMAT)
-        delta_days = (case_date - cutoff_date).days
-        if op == "EQ":
-            return delta_days == 0
-        elif op == "LT":
-            return delta_days < 0
-        else:
-            e = ValueError(f'Unsupported date filter operand: {op}')
-            common_lib.complete_with_error(
-                e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
-                source_id, upload_id, api_creds, cookies)
-
-    return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
 
 
 def run_lambda(
@@ -215,7 +267,7 @@ def run_lambda(
         https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, local_auth = extract_event_fields(
+    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth = extract_event_fields(
         event)
     api_creds = None
     cookies = None
@@ -238,10 +290,12 @@ def run_lambda(
             filter_cases_by_date(
                 final_cases,
                 date_filter,
+                date_range,
                 env, source_id, upload_id,
                 api_creds, cookies),
             env, source_id, upload_id,
-            api_creds, cookies)
+            api_creds, cookies,
+            CASES_BATCH_SIZE, context.get_remaining_time_in_millis)
         common_lib.finalize_upload(
             env, source_id, upload_id, api_creds, cookies, count_created,
             count_updated)

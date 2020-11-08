@@ -12,192 +12,222 @@ except ImportError:
     sys.path.append(
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            'common/python'))
+            "common/python"))
     import parsing_lib
 
-_DATE_DEATH_INDEX = 6
-_GENDER_INDEX = 3
-_AGE_INDEX = 5
-_METHOD_CONFIRMATION_INDEX = 0
-_DATE_SYMPTOMS_INDEX = 2
-_MUNICIPALITY_INDEX = 1
-_PREEXISTING_CONDITIONS_INDEX = 4
+_UUID = "ÿid"
+_AGE = "idade"
+_GENDER = "sexo"
+_MUNICIPALITY = "municipio"
+_STATE = "estado"
+_DATE_CONFIRMED = "dataNotificacao"
+_DATE_SYMPTOMS = "dataInicioSintomas"
+_SYMPTOMS = "sintomas"
+_HEALTHCARE_PROFESSIONAL = "profissionalSaude"
+_COMORBIDITIES = "condicoes"
+_TEST_TYPE = "tipoTeste"
+_TEST_RESULT = "resultadoTeste"
+_OUTCOME = "evolucaoCaso"
 
-commorbidities = {
-    "Diabetes Mellitus": "diabetes mellitus",
-    "Cardiopatia": "heart disease",
-    "Doença de Aparelho Digestivo": "gastrointestinal system disease",
-    "Doença Hepática": "liver disease",
-    "Doença Neurológica": "nervous system disease",
-    "Doença Renal": "kidney disease",
-    "Doença Respiratória": "respiratory system disease",
-    "Neoplasia": "neoplasm",
-    "Etilismo": "alcohol use disorder",
+_COMORBIDITIES_MAP = {
+    "Diabetes": "diabetes mellitus",
+    "Gestante": "pregnancy",
+    "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
+    "Doenças renais crônicas em estágio avançado (graus 3, 4 e 5)": "chronic kidney disease",
+    "Doenças cardíacas crônicas": "heart disease",
     "Obesidade": "obesity",
-    "Transtorno mental": "mental or behavioural disorder",
-    "Hipertensão": "hypertension"
+}
+
+_NONE_TYPES = set(["Não", "null", "undefined"])
+
+_SYMPTOMS_MAP = {
+    "Dor de Cabeça": "headache",
+    "Distúrbios Gustativos": "taste alteration",
+    # Symptom ontology does not have a specific term for smell alterations
+    "Distúrbios Olfativos": "disturbances of sensation of smell and taste",
+    "Dor de garganta": "throat pain",
+    "Dispneia": "dyspnea",
+    "Febre": "fever",
+    "Tosse": "cough"
 }
 
 
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
-
-    The date is listed in YYYY-mm-dd format, but the date filtering API
-    expects mm/dd/YYYYZ format.
     """
-    date = datetime.strptime(raw_date, "%Y-%m-%d")
-    return date.strftime("%m/%d/%YZ")
+    try:
+        date = datetime.strptime(raw_date.split("T")[0], "%Y-%m-%d")
+        return date.strftime("%m/%d/%YZ")
+    except:
+        return None
 
 
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
         return "Male"
-    elif raw_gender == "Feminino":
+    if raw_gender == "Feminino":
         return "Female"
-    return None
 
 
-def convert_age(age: str):
-    if age.isdecimal():
-        # Ages are mostly reported in decimal years, but there are entries like '1 ano' ['1 year']
-        # and '1 m' ['1 month'] which need to be dealt with separately.
+def convert_test(test_type: str):
+    if test_type not in _NONE_TYPES:
+        if test_type == "RT-PCR":
+            return "PCR test"
+        for i in ["TESTE", "ELISA", "CLIA"]:
+            if i in test_type:
+                return "Serological test"
+
+
+def convert_outcome(outcome: str):
+    if outcome == "Óbito":
         return {
-            "start": float(age),
-            "end": float(age)
+            "name": "outcome",
+            "value": "Death"
         }
-    else:
-        only_age = float("".join([i for i in age if not i.isalpha()]))
-        if "dia" in age:
-            return {
-                # Average number of days a year
-                "start": round(only_age/365.25, 3),
-                "end": round(only_age/365.25, 3)
+    elif outcome == "Cura":
+        return {
+            "name": "outcome",
+            "value": "Recovered"
+        }
+    elif outcome == "Internado em UTI":
+        return {
+            "name": "icuAdmission",
+            "value": "Yes"
+        }
+    elif outcome == "Internado":
+        return {
+            "name": "hospitalAdmission",
+            "value": "Yes"
+        }
+
+
+def convert_events(date_confirmed, date_symptoms, test_type, outcome):
+    events = [
+        {
+            "name": "confirmed",
+            "dateRange": {
+                "start": convert_date(date_confirmed),
+                "end": convert_date(date_confirmed)
+            },
+            "value": convert_test(test_type)
+        }
+    ]
+    if date_symptoms not in _NONE_TYPES:
+        events.append(
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": convert_date(date_symptoms),
+                    "end": convert_date(date_symptoms)
+                },
             }
-        elif "m" in age:
-            # There is one case which is reported as 1 m; I am assuming here that this also means 'mes' (month)
-            return {
-                "start": round(only_age/12, 3),
-                "end": round(only_age/12, 3)
-            }
-        elif "ano" in age:
-            return {
-                "start": only_age,
-                "end": only_age
-            }
+        )
+    if outcome not in _NONE_TYPES:
+        events.append(
+            convert_outcome(outcome)
+        )
+    return events
 
 
-def convert_confirmation_method(raw_test: str):
-    if "Clínico" in raw_test or "Clinico" in raw_test:  # written both ways in dataset
-        return "Clinical diagnosis"
-    elif "C. Epid" in raw_test:
-        return "Other"
-    elif "Laboratorial" in raw_test:
-        return "Other"
-    elif "swab" in raw_test.lower():
-        # swabs are reported both as Swab and SWAB
-        return "PCR test"
-    elif "teste" in raw_test.lower():
-        # this is reported as both Teste Rapido and teste rapido
-        return "Serological test"
-    else:
-        print(f'unknown confirmation method: {raw_test}')
-        return "Unknown"
+def convert_symptoms(raw_symptoms: str):
+    values = []
+    if raw_symptoms not in _NONE_TYPES:
+        if "Assintomático" in raw_symptoms:
+            return {"status": "Asymptomatic"}
+        else:
+            for key in _SYMPTOMS_MAP:
+                if key in raw_symptoms:
+                    values.append(_SYMPTOMS_MAP[key])
+            return {"status": "Symptomatic",
+                    "values": values}
 
 
-def convert_preexisting_conditions(raw_commorbidities: str):
+def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_commorbidities not in [
-        "Sem comorbidades", "Doença Hematológica", "Tabagismo",
-            "Imunossupressão"]:
+    if raw_comorbidities not in ["null", "Puérpera (até 45 dias do parto)", "Portador  de  doenças cromossômicas ou estado de fragilidade imunológica", "Imunossupressão"]:
         preexistingConditions["hasPreexistingConditions"] = True
 
-        commorbidities_list = []
+        comorbidities = []
 
-        for key in commorbidities:
-            if key in raw_commorbidities:
-                commorbidities_list.append(commorbidities[key])
-
-        preexistingConditions["values"] = commorbidities_list
+        for key in _COMORBIDITIES_MAP:
+            if key in raw_comorbidities:
+                comorbidities.append(_COMORBIDITIES_MAP[key])
+        if comorbidities:
+            preexistingConditions["values"] = comorbidities
         return preexistingConditions
     else:
         return None
 
 
-def convert_location(raw_entry: str):
-    query = ", ".join(word for word in [
-                      raw_entry, "Paraíba", "Brazil"] if word)
-    return {"query": query}
+def convert_demographics(gender: str, age: str, occupation: str):
+    if gender in _NONE_TYPES and age in _NONE_TYPES and occupation in _NONE_TYPES:
+        return None
+    demo = {}
+    if gender not in _NONE_TYPES:
+        demo["gender"] = convert_gender(gender)
+    if age not in _NONE_TYPES and float(age) <= 120.0:
+        demo["ageRange"] = {"start": float(age), "end": float(age)}
+    if occupation not in _NONE_TYPES:
+        demo["occupation"] = "Healthcare worker"
+    return demo
 
 
-def convert_notes(raw_commorbidities: str):
+def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     raw_notes = []
-    if "Imunossupressão" in raw_commorbidities:
-        raw_notes.append("Patient with immunosupression")
-    if "Tabagismo" in raw_commorbidities:
-        raw_notes.append("Smoker")
-    if "Doença Hematológica" in raw_commorbidities:
-        raw_notes.append("Hematologic disease")
-    if "Outros" in raw_commorbidities:
-        raw_notes.append("Unspecified pre-existing condition")
+    if "Imunossupressão" in raw_comorbidities:
+        raw_notes.append("Patient with immunosuppression")
+    if "Portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
+        raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
+    if "Puérpera" in raw_comorbidities:
+        raw_notes.append("Recently gave birth")
+    if "Coriza" in raw_symptoms:
+        raw_notes.append("Patient with coryza")
+    if "Outros" in raw_symptoms:
+        raw_notes.append("Other symptoms reported")
     notes = (', ').join(raw_notes)
     return notes
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
-    """Parses G.h-format case data from raw API data.
-        Caveats:
-        1. There are no patient ID/case ID in the raw API so we aren't able
-           to dedupe.
-        2. This data only includes deaths from Covid-19 so the outcome of all cases will be death.
-        3. There is no date of confirmation.
+    """
+    Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header.
+        reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            if datetime.strptime(row[_DATE_SYMPTOMS_INDEX],
-                                 "%Y-%m-%d") < datetime.strptime("2019-11-01",
-                                                                 "%Y-%m-%d"):  # One date is recorded as year 2000
-                print("date out of range:" + row[_DATE_SYMPTOMS_INDEX])
-                continue
-            case = {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceUrl": source_url
-                },
-                "location": convert_location(row[_MUNICIPALITY_INDEX]),
-                "demographics": {
-                    "gender": convert_gender(row[_GENDER_INDEX]),
-                    "ageRange": convert_age(row[_AGE_INDEX]),
-                },
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "value": convert_confirmation_method(row[_METHOD_CONFIRMATION_INDEX])
-                    },
-                    {
-                        "name": "onsetSymptoms",
-                        "dateRange":
-                        {
-                            "start": convert_date(row[_DATE_SYMPTOMS_INDEX]),
-                            "end": convert_date(row[_DATE_SYMPTOMS_INDEX])
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "PARAÍBA" and confirmation_date is not None:
+                try:
+                    case = {
+                        "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
+                        "location": {
+                            "query": ", ".join(
+                                [row[_MUNICIPALITY], "Paraíba", "Brazil"]
+                            )
                         },
-                    },
-                    {
-                        "name": "outcome",
-                        "dateRange":
-                        {
-                            "start": convert_date(row[_DATE_DEATH_INDEX]),
-                            "end": convert_date(row[_DATE_DEATH_INDEX])
-                        },
-                        "value": "Death"
+                        "events": convert_events(
+                            row[_DATE_CONFIRMED],
+                            row[_DATE_SYMPTOMS],
+                            row[_TEST_TYPE],
+                            row[_OUTCOME]
+                        ),
+                        "symptoms": convert_symptoms(row[_SYMPTOMS]),
+                        "demographics": convert_demographics(
+                            row[_GENDER], row[_AGE], row[_HEALTHCARE_PROFESSIONAL]
+                        ),
+                        "preexistingConditions": convert_preexisting_conditions(
+                            row[_COMORBIDITIES]
+                        )
                     }
-                ],
-                "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
-                "notes": convert_notes(row[_PREEXISTING_CONDITIONS_INDEX])
-            }
-            yield case
+                    notes = convert_notes(
+                        row[_COMORBIDITIES], row[_SYMPTOMS]
+                    )
+                    if notes:
+                        case["notes"] = notes
+                    yield case
+                except ValueError as ve:
+                    raise ValueError(f"error converting case: {ve}")
 
 
 def lambda_handler(event, context):

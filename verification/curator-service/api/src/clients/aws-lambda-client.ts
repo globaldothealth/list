@@ -5,6 +5,7 @@ import {
 
 import AWS from 'aws-sdk';
 import assertString from '../util/assert-string';
+import { logger } from '../util/logger';
 
 export interface RetrievalPayload {
     bucket: string;
@@ -14,6 +15,16 @@ export interface RetrievalPayload {
 
 export interface LambdaFunction {
     name: string;
+}
+
+/**
+ * Defines the time period over which Lambda functions should parse/ingest data.
+ *
+ * Note that start and end are YYYY-MM-DD format strings.
+ */
+export interface ParseDateRange {
+    start: string;
+    end: string;
 }
 
 /**
@@ -82,8 +93,14 @@ export default class AwsLambdaClient {
 
     /**
      * Invoke retrieval function lambda synchronously, returning its output.
+     *
+     * @param sourceId - ID of the source to be retrieved.
+     * @param parseDateRange - Range over which to perform parsing (inclusive).
      */
-    invokeRetrieval = async (sourceId: string): Promise<RetrievalPayload> => {
+    invokeRetrieval = async (
+        sourceId: string,
+        parseDateRange?: ParseDateRange,
+    ): Promise<RetrievalPayload> => {
         try {
             const res = await this.lambdaClient
                 .invoke({
@@ -91,11 +108,17 @@ export default class AwsLambdaClient {
                     Payload: JSON.stringify({
                         env: this.serviceEnv,
                         sourceId: sourceId,
+                        parsingDateRange: parseDateRange
+                            ? {
+                                  start: parseDateRange.start,
+                                  end: parseDateRange.end,
+                              }
+                            : undefined,
                     }),
                 })
                 .promise();
             if (res.FunctionError) {
-                console.error(res);
+                logger.error(res);
                 throw Error(
                     `Retrieving source "${sourceId}" content: ${res.FunctionError}`,
                 );
@@ -105,7 +128,7 @@ export default class AwsLambdaClient {
                 res.Payload?.toString() || '',
             ) as RetrievalPayload;
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             throw e;
         }
     };
@@ -124,7 +147,7 @@ export default class AwsLambdaClient {
                 }) || []
             );
         } catch (e) {
-            console.error(e);
+            logger.error(e);
             throw e;
         }
     };

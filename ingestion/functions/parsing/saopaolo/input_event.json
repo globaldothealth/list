@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f7337434ae4d50028bb34e0/2020/09/29/1353/content.csv",
+    "sourceUrl": "https://raw.githubusercontent.com/seade-R/dados-covid-sp/master/data/dados_covid_sp.csv",
+    "sourceId": "5f7337434ae4d50028bb34e0"
+}

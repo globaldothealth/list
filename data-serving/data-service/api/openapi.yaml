@@ -16,6 +16,8 @@ tags:
     description: Case related operations
   - name: Suggest
     description: Suggestion for input of cases
+  - name: Geocode
+    description: Geolocation of a case
 paths:
   /cases:
     get:
@@ -59,7 +61,8 @@ paths:
                 Keyword values can be quoted for multi-words matches and concatenated
                 with a comma to union them. Only equality operator is supported.
                 Supported keywords are: curator, gender, nationality, occupation,
-                country, outcome, caseid, uploadid, sourceurl, admin1, admin2, admin3
+                country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
+                admin1, admin2, admin3
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
@@ -222,30 +225,12 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchValidate:
-    post:
-      summary: Batch validates cases
-      tags: [Case]
-      operationId: batchValidateCases
-      requestBody:
-        description: Cases to validate
-        required: true
-        content:
-          application/json:
-            schema:
-                $ref: "#/components/schemas/CaseArray"
-      responses:
-        "207":
-          $ref: "#/components/responses/207BatchValidateCaseResponse"
         "500":
           $ref: "#/components/responses/500"
   /cases/batchUpsert:
@@ -267,6 +252,8 @@ paths:
               required:
                 - curator
       responses:
+        "200":
+          $ref: "#/components/responses/200BatchCaseUpsert"
         "207":
           $ref: "#/components/responses/207BatchUpsertCaseResponse"
         "422":
@@ -483,6 +470,57 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /geocode/seed:
+    post:
+      tags: [Geocode]
+      summary: Adds geocodes to the geocoding database
+      operationId: seedGeocodes
+      requestBody:
+        description: A single geocode record
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+  /geocode/clear:
+    post:
+      tags: [Geocode]
+      summary: Clears geocodes from the geocoding database
+      operationId: clearGeocodes
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+  /geocode/suggest:
+    get:
+      tags: [Suggest, Geocode]
+      summary: Suggests geocodes for a given query string
+      operationId: suggestGeocodes
+      parameters:
+        - name: q
+          in: query
+          description: The location string for which to find geocodes
+          required: true
+          allowReserved: true
+          schema:
+            type: string
+        - name: limitToResolution
+          in: query
+          allowReserved: true
+          schema:
+            type: string
+          description: >
+            Comma-separated list of resolutions to restrict geocoding to.
+            Allowed values are: Point, Admin3, Admin2, Admin1, Country.
+      responses:
+        "200":
+          $ref: "#/components/responses/200LocationArray"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     BatchUpdateResponse:
@@ -492,26 +530,16 @@ components:
           type: number
       required:
         - numModified
-    BatchValidateCaseResponse:
-      description: Response to batch validate case API requests
-      properties:
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              index:
-                type: integer
-              message:
-                type: string
-            required:
-              - index
-              - message
-      required:
-        - errors
     BatchUpsertCaseResponse:
       description: Response to batch upsert case API requests
       properties:
+        phase:
+          type: string
+          description: The last operation completed by the server
+          enum:
+            - GEOCODE
+            - VALIDATE
+            - UPSERT
         numCreated:
           type: number
           description: The number of cases created by the request.
@@ -522,9 +550,26 @@ components:
             includes cases that are actually modified by the batch upsert. If a
             case is included in the batch upsert request, but contains no
             changes compared to the currently stored case, it won't be counted.
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                description: 0-based index of the case which triggered an error
+                type: integer
+              message:
+                type: string
+                description: what went wrong
+                example: Cannot parse age
+            required:
+              - index
+              - message
       required:
+        - phase
         - numCreated
         - numUpdated
+        - errors
     Case:
       description: A single line-list case.
       properties:
@@ -750,6 +795,8 @@ components:
     Location:
       type: object
       properties:
+        query:
+          type: string
         country:
           type: string
         administrativeAreaLevel1:
@@ -796,12 +843,6 @@ components:
           required:
             - sourceId
             - sourceUrl
-        location:
-          required:
-            - country
-            - geoResolution
-            - geometry
-            - name
         curator:
           $ref: "#/components/schemas/Curator"
       required:
@@ -809,6 +850,11 @@ components:
         - location
         - events
         - curator
+    LocationArray:
+      description: A list of geo locations
+      type: array
+      items:
+        $ref: "#/components/schemas/Location"
   responses:
     "200Case":
       description: OK
@@ -852,6 +898,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OccupationArray"
+    "200LocationArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationArray"
     "201Case":
       description: Created
       content:
@@ -866,18 +918,20 @@ components:
             anyOf:
               - $ref: "#/components/schemas/Case"
               - $ref: "#/components/schemas/CaseArray"
-    "207BatchValidateCaseResponse":
-      description: Multi-status
+    "200BatchCaseUpsert":
+      description: OK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BatchValidateCaseResponse'
+            $ref: "#/components/schemas/BatchUpsertCaseResponse"
     "207BatchUpsertCaseResponse":
       description: Multi-status
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/BatchUpsertCaseResponse'
+    "200":
+      description: OK
     "400":
       description: Malformed request
     "403":
