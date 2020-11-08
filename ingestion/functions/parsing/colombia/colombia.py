@@ -16,18 +16,20 @@ except ImportError:
     import parsing_lib
 
 
-def convert_date(raw_date):
+def convert_date(raw_date, dataserver=True):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
     The date is listed in YYYYmmdd format, but the data server API will
     assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
 
-    Adding line to ensure date has type str
+    Set dataserver to False in order to return version appropriate for notes.
     """
     raw_date = str(raw_date)
     date = datetime.strptime(raw_date.split('T')[0], "%Y-%m-%d")
-    return date.strftime("%m/%d/%Y")
+    if not dataserver:
+        return date.strftime("%m/%d/%Y")
+    return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender):
@@ -199,7 +201,7 @@ def parse_cases(raw_data_file, source_id, source_url):
             # Add notes for each case, including date reported online and how
             # recovery was confirmed
             notes.append(
-                f"Date reported online was {convert_date(entry['fecha reporte web'])}.")
+                f"Date reported online was {convert_date(entry['fecha reporte web'], dataserver=False)}.")
 
             if entry['Tipo recuperación'] == 'PCR':
                 notes.append(
