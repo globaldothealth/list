@@ -102,12 +102,14 @@ def parse_cases(raw_data_file, source_id, source_url):
     - Assuming the date confirmed is the date of diagnosis (Fecha diagnostico) rather than
     Fecha de notificación (generally several days earlier). When date of diagnosis, using date reported online as proxy.
 
+    - Case can have date of death, but 'Recuperado' column says recovered. This corresponds to patients who died but
+    not from Covid-19.
+
     - Notes added include date reported online and date that SIVIGILA (national health alert system) was notiifed.
     Also whether case was imported, and how patient recovery was confirmed.
 
     - Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since
     symptoms, or a negative PCR/antigen test
-
 
     - No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'
 
@@ -131,7 +133,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "demographics": convert_demographics(entry)
             }
 
-            if entry["Fecha de diagnóstico"] != '':
+            if entry["Fecha de diagnóstico"]:
                 case["events"] = [
                     {
                         "name": "confirmed",
@@ -183,7 +185,7 @@ def parse_cases(raw_data_file, source_id, source_url):
 
             # Patient Outcome
             # If patient died, mark date
-            if entry["Fecha de muerte"] != '':
+            if entry["Fecha de muerte"]:
                 case["events"].append({
                     "name": "outcome",
                     "value": "Death",
@@ -192,10 +194,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "end": convert_date(entry['Fecha de muerte']),
                     }
                 })
-                if entry["Estado"] != "Fallecido":
-                    notes.append("Did not die from Covid-19.")
+                if entry["Recuperado"].lower() != "fallecido":
+                    notes.append("Died from something other than Covid-19.")
 
-            if entry["Recuperado"].lower() == "recuperado":
+            elif entry["Recuperado"].lower() == "recuperado":
                 case["events"].append({
                     "name": "outcome",
                     "value": "Recovered",
@@ -204,6 +206,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "end": convert_date(entry['Fecha de recuperación']),
                     }
                 })
+
+            elif entry['Recuperado'].lower() == 'activo':
+                notes.append('Case still active')
+
             if entry["Ubicación del caso"].lower() == "hospital":
                 case["events"].append({
                     "name": "hospitalAdmission",
