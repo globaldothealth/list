@@ -1,7 +1,11 @@
-ID de caso,Fecha de notificación,Código DIVIPOLA,Ciudad de ubicación,Departamento o Distrito ,atención,Edad,Sexo,Tipo,Estado,País de procedencia,FIS,Fecha de muerte,Fecha diagnostico,Fecha recuperado,fecha reporte web,Tipo recuperación,Codigo departamento,Codigo pais,Pertenencia etnica,Nombre grupo etnico
-1,2020-03-02T00:00:00.000,11001,Bogotá D.C.,Bogotá D.C.,Recuperado,19,F,Importado,Leve,ITALIA,2020-02-27T00:00:00.000,,2020-03-06T00:00:00.000,2020-03-13T00:00:00.000,2020-03-06T00:00:00.000,PCR,11,380.0,Otro,
-2,2020-03-06T00:00:00.000,76111,Guadalajara de Buga,Valle del Cauca,Recuperado,34,M,Importado,Leve,ESPAÑA,2020-03-04T00:00:00.000,,2020-03-09T00:00:00.000,2020-03-19T00:00:00.000,2020-03-09T00:00:00.000,PCR,76,724.0,Otro,
-3,2020-03-07T00:00:00.000,5001,Medellín,Antioquia,Recuperado,50,F,Importado,Leve,ESPAÑA,2020-02-29T00:00:00.000,,2020-03-09T00:00:00.000,2020-03-15T00:00:00.000,2020-03-09T00:00:00.000,PCR,5,724.0,Otro,
-4,2020-03-09T00:00:00.000,5001,Medellín,Antioquia,Recuperado,55,M,Relacionado,Leve,,2020-03-06T00:00:00.000,,2020-03-11T00:00:00.000,2020-03-26T00:00:00.000,2020-03-11T00:00:00.000,PCR,5,,Otro,
-5,2020-03-09T00:00:00.000,5001,Medellín,Antioquia,Recuperado,25,M,Relacionado,Leve,,2020-03-08T00:00:00.000,,2020-03-11T00:00:00.000,2020-03-23T00:00:00.000,2020-03-11T00:00:00.000,PCR,5,,Otro,
-6,2020-03-10T00:00:00.000,5360,Itagüí,Antioquia,Recuperado,27,F,Relacionado,Leve,,2020-03-06T00:00:00.000,,2020-03-11T00:00:00.000,2020-03-26T00:00:00.000,2020-03-11T00:00:00.000,PCR,5,,Otro,
+fecha reporte web,ID de caso,Fecha de notificación,Código DIVIPOLA departamento,Nombre departamento,Código DIVIPOLA municipio,Nombre municipio,Edad,Unidad de medida de edad,Sexo,Tipo de contagio,Ubicación del caso,Estado,Código ISO del país,Nombre del país,Recuperado,Fecha de inicio de síntomas,Fecha de muerte,Fecha de diagnóstico,Fecha de recuperación,Tipo de recuperación,Pertenencia étnica,Nombre del grupo étnico
+6/3/2020 0:00:00,1,2/3/2020 0:00:00,11,BOGOTA,11001,BOGOTA,19,1,F,Importado,Casa,Leve,380,ITALIA,Recuperado,27/2/2020 0:00:00,,6/3/2020 0:00:00,13/3/2020 0:00:00,PCR,6,
+9/3/2020 0:00:00,2,6/3/2020 0:00:00,76,VALLE,76111,BUGA,34,1,M,Importado,Casa,Leve,724,ESPAÑA,Recuperado,4/3/2020 0:00:00,,9/3/2020 0:00:00,19/3/2020 0:00:00,PCR,5,
+9/3/2020 0:00:00,3,7/3/2020 0:00:00,5,ANTIOQUIA,5001,MEDELLIN,50,1,F,Importado,Casa,Leve,724,ESPAÑA,Recuperado,29/2/2020 0:00:00,,9/3/2020 0:00:00,15/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,4,9/3/2020 0:00:00,5,ANTIOQUIA,5001,MEDELLIN,55,1,M,Relacionado,Casa,Leve,,,Recuperado,6/3/2020 0:00:00,,11/3/2020 0:00:00,26/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,5,9/3/2020 0:00:00,5,ANTIOQUIA,5001,MEDELLIN,25,1,M,Relacionado,Casa,Leve,,,Recuperado,8/3/2020 0:00:00,,11/3/2020 0:00:00,23/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,6,10/3/2020 0:00:00,5,ANTIOQUIA,5360,ITAGUI,27,1,F,Relacionado,Casa,Leve,,,Recuperado,6/3/2020 0:00:00,,11/3/2020 0:00:00,26/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,7,8/3/2020 0:00:00,13001,CARTAGENA,13001,CARTAGENA,85,1,F,Importado,Casa,Leve,840,ESTADOS UNIDOS,Recuperado,2/3/2020 0:00:00,,11/3/2020 0:00:00,17/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,8,9/3/2020 0:00:00,11,BOGOTA,11001,BOGOTA,22,1,F,Importado,Casa,Leve,724,ESPAÑA,Recuperado,6/3/2020 0:00:00,,11/3/2020 0:00:00,21/3/2020 0:00:00,PCR,6,
+11/3/2020 0:00:00,9,8/3/2020 0:00:00,11,BOGOTA,11001,BOGOTA,28,1,F,Importado,Casa,Leve,724,ESPAÑA,Recuperado,7/3/2020 0:00:00,,11/3/2020 0:00:00,23/3/2020 0:00:00,PCR,6,
+12/3/2020 0:00:00,10,12/3/2020 0:00:00,11,BOGOTA,11001,BOGOTA,36,1,F,Importado,Casa,Leve,724,ESPAÑA,Recuperado,6/3/2020 0:00:00,,12/3/2020 0:00:00,21/3/2020 0:00:00,PCR,6,
