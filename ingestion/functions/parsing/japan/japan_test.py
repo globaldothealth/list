@@ -97,6 +97,47 @@ _PARSED_CASES = [
             "gender": "Male"
         },
         "notes": None
+    },
+    # Add a case from port quarantine
+    {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceEntryId": "468",
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [
+                {
+                    "sourceUrl": "https://www.pref.kanagawa.jp/osirase/1369/"
+                },
+                {
+                    "sourceUrl": "https://www.pref.kanagawa.jp/docs/ga4/bukanshi/occurrence.html"
+                }
+            ]
+        },
+        "location": {
+            "query": "Japan"
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "02/11/2020Z",
+                            "end": "02/11/2020Z"
+                        }
+            },
+            {
+                "name": "outcome",
+                "value": "Unknown"
+            }
+        ],
+        "demographics": {
+            "ageRange": {
+                "start": 50,
+                "end": 59
+            },
+            "gender": "Male"
+        },
+        "notes": "Quarantine officer on Cruise ship (Kanagawa patient #2)"
     }
 ]
 
