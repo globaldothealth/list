@@ -96,7 +96,8 @@ def convert_events(date_confirmed, date_symptoms, death):
 def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
                                    cardiovascular: str, obesity: str):
     preexistingConditions = {}
-    if all((lung, kidney, metabolic, cardiovascular, obesity)) == "Sim":
+    items = (lung, kidney, metabolic, cardiovascular, obesity)
+    if all(item == "Não" for item in items):
         return None
 
     preexistingConditions["hasPreexistingConditions"] = True

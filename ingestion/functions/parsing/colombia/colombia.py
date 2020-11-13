@@ -16,18 +16,18 @@ except ImportError:
     import parsing_lib
 
 
-def convert_date(raw_date):
+def convert_date(raw_date: str, dataserver=True):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    The date is listed in YYYYmmdd format, but the data server API will
-    assume that ambiguous cases (e.g. "05/06/2020") are in mm/dd/YYYY format.
+    Removing timestamp as always midnight.
 
-    Adding line to ensure date has type str
+    Set dataserver to False in order to return version appropriate for notes.
     """
-    raw_date = str(raw_date)
-    date = datetime.strptime(raw_date.split('T')[0], "%Y-%m-%d")
-    return date.strftime("%m/%d/%Y")
+    date = datetime.strptime(raw_date.split(' ')[0], "%d/%m/%Y")
+    if not dataserver:
+        return date.strftime("%m/%d/%Y")
+    return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender):
@@ -41,36 +41,56 @@ def convert_gender(raw_gender):
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
-            raw_entry.get("Ciudad de ubicación", ""),
-            raw_entry.get("Departamento o Distrito ", ""),
+            raw_entry.get("Nombre municipio", ""),
+            raw_entry.get("Nombre departamento", ""),
             "Colombia"]
-        if term]
+        if term != '']
 
     return {"query": ", ".join(query_terms)}
 
 
-def get_ethnicity(raw_entry):
-    ethnicity_map = {'Otro': 'Other',
-                     'Negro': 'Black',
-                     'Indigeno': 'Indigenous'}
-    if ethnicity_map.get(raw_entry['Pertenencia etnica'], None):
-        if raw_entry['Pertenencia etnica'] == 'Indígena':
-            if raw_entry['Nombre grupo etnico'] != '' and raw_entry['Nombre grupo etnico'] != 'Sin Comunidad' and raw_entry['Nombre grupo etnico'] != 'Sin definir':
-                return f"Indigenous, {raw_entry['Nombre grupo etnico']}"
-            return "Indigenous"
-        return ethnicity_map.get(raw_entry['Pertenencia etnica'], None)
-    return None
+def convert_demographics(entry):
+    '''
+    This takes a whole row, and returns Age, Gender and Ethnicity in a dictionary.
+    Age is given as an int, but the adjacent field, 'Age Measurement Unit', determines what this int represents.
+    1 = Years; 2 = Months; 3 = Days
+    '''
 
+    ethnicity_map = {'1': 'Indigenous',
+                     '2': 'ROM',
+                     '3': 'Raizal',
+                     '4': 'Palenquero',
+                     '5': 'Black',
+                     '6': 'Other'}
 
-def convert_demographics(age: str, sex: str):
     demo = {}
-    if age:
-        demo["ageRange"] = {
-            "start": float(age),
-            "end": float(age)
-        }
-    if sex:
-        demo["gender"] = convert_gender(sex)
+    if entry['Edad']:
+        if str(entry['Unidad de medida de edad']) == '1':
+            demo["ageRange"] = {
+                "start": float(entry['Edad']),
+                "end": float(entry['Edad'])
+            }
+        elif str(entry['Unidad de medida de edad']) == '2':
+            demo["ageRange"] = {
+                "start": float(entry['Edad']) / 12,
+                "end": float(entry['Edad']) / 12
+            }
+        elif str(entry['Unidad de medida de edad']) == '3':
+            demo["ageRange"] = {
+                "start": float(entry['Edad']) / 365,
+                "end": float(entry['Edad']) / 365
+            }
+    if entry['Sexo']:
+        demo["gender"] = convert_gender(entry['Sexo'])
+
+    if entry['Pertenencia étnica']:
+        ethnicity = ethnicity_map.get(str(entry['Pertenencia étnica']), "")
+        if entry['Nombre del grupo étnico']:
+            ethnicity += f", {entry['Nombre del grupo étnico']}"
+    else:
+        ethnicity = 'Unknown'
+    demo["ethnicity"] = ethnicity
+
     return demo or None
 
 
@@ -82,15 +102,22 @@ def parse_cases(raw_data_file, source_id, source_url):
     - Assuming the date confirmed is the date of diagnosis (Fecha diagnostico) rather than
     Fecha de notificación (generally several days earlier). When date of diagnosis, using date reported online as proxy.
 
+    - Case can have date of death, but 'Recuperado' column says recovered. This corresponds to patients who died but
+    not from Covid-19.
+
+    - Notes added include date reported online and date that SIVIGILA (national health alert system) was notiifed.
+    Also whether case was imported, and how patient recovery was confirmed.
+
     - Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since
     symptoms, or a negative PCR/antigen test
 
     - No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'
+
     """
 
-    symptom_map = {'Leve': 'Mild',
-                   'Moderado': 'Moderate',
-                   'Grave': 'Serious'}
+    symptom_map = {'leve': 'Mild',
+                   'moderado': 'Moderate',
+                   'grave': 'Serious'}
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
@@ -100,23 +127,24 @@ def parse_cases(raw_data_file, source_id, source_url):
                 "caseReference": {
                     "sourceId": source_id,
                     "sourceEntryId": entry["ID de caso"],
-                    "sourceUrl": source_url},
+                    "sourceUrl": source_url
+                },
                 "location": convert_location(entry),
-                "demographics": convert_demographics(
-                    entry["Edad"],
-                    entry["Sexo"])}
-            if entry["Fecha diagnostico"] != '':
+                "demographics": convert_demographics(entry)
+            }
+
+            if entry["Fecha de diagnóstico"]:
                 case["events"] = [
                     {
                         "name": "confirmed",
                         "dateRange":
                         {
-                            "start": convert_date(entry["Fecha diagnostico"]),
-                            "end": convert_date(entry["Fecha diagnostico"])
+                            "start": convert_date(entry["Fecha de diagnóstico"]),
+                            "end": convert_date(entry["Fecha de diagnóstico"])
                         }
                     },
                 ]
-            elif entry["Fecha diagnostico"] == '':
+            else:
                 case["events"] = [
                     {
                         "name": "confirmed",
@@ -132,29 +160,32 @@ def parse_cases(raw_data_file, source_id, source_url):
 
             # If patient was symptomatic, mark date of onsetSymptoms, otherwise
             # asymptomatic
-            if entry["Estado"] == "Asintomático":
-                case["symptoms"] = {
-                    "status": "Asymptomatic",
-                }
-            elif entry["FIS"]:  # maybe change to elif clause and check if can parse field as date
+            # maybe change to elif clause and check if can parse field as date
+            if entry["Fecha de inicio de síntomas"]:
                 case["symptoms"] = {
                     "status": "Symptomatic",
                 }
                 case["events"].append({
                     "name": "onsetSymptoms",
                     "dateRange": {
-                        "start": convert_date(entry['FIS']),
-                        "end": convert_date(entry['FIS']),
+                        "start": convert_date(entry['Fecha de inicio de síntomas']),
+                        "end": convert_date(entry['Fecha de inicio de síntomas']),
                     }
                 })
 
+            else:
+                case["symptoms"] = {
+                    "status": "Asymptomatic",
+                }
+
             # Include severity of symptoms
-            if entry["Estado"] in ['Leve', 'Moderado', 'Grave']:
-                case["symptoms"]["values"] = [symptom_map.get(entry['Estado'])]
+            if entry["Estado"].lower() in symptom_map.keys():
+                case["symptoms"]["values"] = [
+                    symptom_map.get(entry['Estado'].lower())]
 
             # Patient Outcome
             # If patient died, mark date
-            if entry["Fecha de muerte"] != '':
+            if entry["Fecha de muerte"]:
                 case["events"].append({
                     "name": "outcome",
                     "value": "Death",
@@ -163,52 +194,65 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "end": convert_date(entry['Fecha de muerte']),
                     }
                 })
-                if entry["Estado"] != "Fallecido":
-                    notes.append("Patient died from something other than Covid-19.")
+                if entry["Recuperado"].lower() != "fallecido":
+                    notes.append("Died from something other than Covid-19.")
 
-            if entry["atención"] == "Recuperado":
+            elif entry["Recuperado"].lower() == "recuperado":
                 case["events"].append({
                     "name": "outcome",
                     "value": "Recovered",
                     "dateRange": {
-                        "start": convert_date(entry['Fecha recuperado']),
-                        "end": convert_date(entry['Fecha recuperado']),
+                        "start": convert_date(entry['Fecha de recuperación']),
+                        "end": convert_date(entry['Fecha de recuperación']),
                     }
                 })
-            elif entry["atención"] == "Hospital":
+
+            elif entry['Recuperado'].lower() == 'activo':
+                notes.append('Case still active')
+
+            if entry["Ubicación del caso"].lower() == "hospital":
                 case["events"].append({
                     "name": "hospitalAdmission",
                     "value": "Yes"
                 })
-            elif entry["atención"] == 'Hospital UCI':
+            if entry["Ubicación del caso"].lower() == 'hospital uci':
                 case["events"].append({
                     "name": "icuAdmission",
                     "value": "Yes"
                 })
+
+            if entry["Ubicación del caso"].lower() == 'casa':
+                notes.append("Patient self-isolated and recovered at home.")
+
+            # Add notes for each case
             # Travel History - we currently do not have any travel dates, so
-            # unknown whether in last 30 days (awaiting response)
-            if entry["Tipo"].lower() == "importado":
+            # unknown whether in last 30 days
+            if entry["Tipo de contagio"].lower() == "importado":
                 notes.append(
-                    f"Case is reported as importing the disease into Colombia, and country of origin is {entry['País de procedencia']}.")
-            elif entry['Tipo'].lower() == 'relacionado':
+                    f"Case is reported as importing the disease into Colombia, and country of origin is {entry['Nombre del país']}.")
+            elif entry["Tipo de contagio"].lower() == 'relacionado':
                 notes.append("Case was transmitted within Colombia.")
-            elif entry['Tipo'].lower() == 'en estudio':
+            elif entry["Tipo de contagio"].lower() == 'en estudio':
                 notes.append(
                     "Case transmission under investigation (currently unknown).")
 
-            # Add notes for each case, including date reported online and how
-            # recovery was confirmed
-            notes.append(
-                f"Date reported online was {convert_date(entry['fecha reporte web'])}.")
+            if entry['fecha reporte web']:
+                notes.append(
+                    f"Date reported online was {convert_date(entry['fecha reporte web'],dataserver=False)}.")
+            if entry['Fecha de notificación']:
+                notes.append(
+                    f"Date reported to SIVIGILA was {convert_date(entry['Fecha de notificación'],dataserver=False)}.")
 
-            if entry['Tipo recuperación'] == 'PCR':
+            if entry['Tipo de recuperación'] == 'PCR':
                 notes.append(
-                    "Patient recovery was confirmed by a negative PCR test.")
-            elif entry['Tipo recuperación'] == 'Tiempo':
+                    f"Patient recovery was confirmed by a negative PCR test.")
+            elif entry['Tipo de recuperación'] == 'Tiempo':
                 notes.append(
-                    "Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+                    f"Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+
             if notes:
-                case["notes"] = "\n".join(notes)
+                case["notes"] = " \n".join(notes)
+
             yield case
 
 
