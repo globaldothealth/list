@@ -15,7 +15,6 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
