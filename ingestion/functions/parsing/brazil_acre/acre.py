@@ -15,7 +15,7 @@ except ImportError:
             "common/python"))
     import parsing_lib
 
-_UUID = "identificador"
+
 _AGE = "idade"
 _GENDER = "sexo"
 _MUNICIPALITY = "municipio"
@@ -30,6 +30,8 @@ _TEST_RESULT = "resultadoTeste"
 _OUTCOME = "evolucaoCaso"
 _ETHNICITY = "racaCor"
 _SECURITY_PROFESSIONAL = "profissionalSeguranca"
+_INDIGENOUS_GROUP = "etnia"
+_FINAL_CLASSIFICATION = "classificacaoFinal"
 
 
 # Symptoms and comorbidities written with variation in capitalization, so all forced to lowercase
@@ -39,8 +41,10 @@ _COMORBIDITIES_MAP = {
     "gestante de alto risco": "high risk pregnancy",
     "doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "doenças renais crônicas em estágio avançado (graus 3, 4 e 5)": "chronic kidney disease",
-    "doenças cardíacas crônicas": "heart disease"
+    "doenças cardíacas crônicas": "heart disease",
+    "obesidade": "obesity"
 }
+
 
 _SYMPTOMS_MAP = {
     "dor de garganta": "throat pain",
@@ -48,7 +52,11 @@ _SYMPTOMS_MAP = {
     "febre": "fever",
     "tosse": "cough",
     # According to symptom ontology, breathing difficulty is exact synonym of dyspnea
-    "dificuldade de respirar": "dyspnea"
+    "dificuldade de respirar": "dyspnea",
+    "dor de cabeça": "headache",
+    "distúrbios gustativos": "taste alteration", 
+    # Symptom ontology does not have a specific term for smell alterations
+    "distúrbios olfativos": "disturbances of sensation of smell and taste"
 }
 
 
@@ -56,7 +64,8 @@ unrecognizedComorbidities = [
     "portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
     "imunossupressão",
     "portador  de  doenças cromossômicas ou estado de fragilidade imunológica, imunossupressão",
-    "imunossupressão, portador  de  doenças cromossômicas ou estado de fragilidade imunológica"
+    "imunossupressão, portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
+    "puérpera (até 45 dias do parto)"
 ]
 
 
@@ -141,7 +150,8 @@ def convert_events(date_confirmed, date_symptoms, test_type, outcome):
 def convert_symptoms(raw_symptoms: str):
     values = []
     if raw_symptoms:
-        if "assintomático" in raw_symptoms.lower():
+        # Some entries have 'assintomático' listed with other symptoms e.g. "Assintomático, Coriza, Tosse". These cases can't be considered as asymptomatic
+        if raw_symptoms.lower() == "assintomático":
             return {"status": "Asymptomatic"}
         else:
             for key in _SYMPTOMS_MAP:
@@ -197,14 +207,21 @@ def convert_demographics(gender: str, age: str, healthcare_professional: str, se
     return demo
 
 
-def convert_notes(raw_comorbidities: str, raw_symptoms: str):
+def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: str):
     raw_notes = []
     if "imunossupressão" in raw_comorbidities.lower():
         raw_notes.append("Patient with immunosuppression")
     if "portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
         raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
+    if "puérpera (até 45 dias do parto)" in raw_comorbidities.lower():
+        raw_notes.append("Patient given birth in the last 45 days")
+    if "coriza" in raw_symptoms.lower():
+        raw_notes.append("Patient with coryza")
     if "outros" in raw_symptoms.lower():
         raw_notes.append("Other symptoms reported")
+
+    if indigenous_group:
+        raw_notes.append("Patient from the following indigenous group: " + indigenous_group)
 
     if raw_notes:
         return (", ").join(raw_notes)
@@ -217,10 +234,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "ACRE":
+            if row[_TEST_RESULT] == "Positivo" and row[_FINAL_CLASSIFICATION] != "Descartado" and row[_STATE] == "ACRE":
                 try:
                     case = {
-                        "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
+                        "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                         "location": {
                             "query": ", ".join(
                                 [row[_MUNICIPALITY], "Acre", "Brazil"]
@@ -241,7 +258,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         )
                     }
                     notes = convert_notes(
-                        row[_COMORBIDITIES], row[_SYMPTOMS]
+                        row[_COMORBIDITIES], row[_SYMPTOMS], row[_INDIGENOUS_GROUP]
                     )
                     if notes:
                         case["notes"] = notes

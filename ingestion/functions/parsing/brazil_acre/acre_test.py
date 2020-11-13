@@ -19,7 +19,7 @@ class AcreTest(unittest.TestCase):
         result = acre.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
         self.assertCountEqual(list(result), [
             {
-                "caseReference": {"sourceId": _SOURCE_ID, "sourceEntryId": "3691", "sourceUrl": _SOURCE_URL},
+                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
                 "location": {
                     "query": "Rio Branco, Acre, Brazil"
                 },
@@ -51,8 +51,8 @@ class AcreTest(unittest.TestCase):
                 "demographics": {
                     "gender": "Female",
                     "ageRange": {
-                        "start": 31.0,
-                        "end": 31.0
+                        "start": 32.0,
+                        "end": 32.0
                     },
                     "ethnicity": "Asian",
                     "occupation": "Healthcare worker"
@@ -60,7 +60,7 @@ class AcreTest(unittest.TestCase):
                 "preexistingConditions": {
                     "hasPreexistingConditions": True,
                     "values": [
-                        "respiratory system disease", "heart disease"
+                        "diabetes mellitus", "obesity"
                     ]
                 },
                 "notes": "Other symptoms reported"
