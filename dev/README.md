@@ -28,14 +28,27 @@ the curator UI to manage case report data sources and view or update case data, 
 **Important:** running the full stack correctly requires having access to a few secrets: you should create a `.env` file
 in `${REPOSITORY_ROOT}/dev` that looks like this:
 
-```shell
+```text
 AWS_ACCESS_KEY_ID=<AWS access key ID>
 AWS_SECRET_ACCESS_KEY=<AWS secret access key to authenticate AWS API calls>
+EMAIL_USER_ADDRESS=<Email address of the account used to send notification emails>
+EMAIL_USER_PASSWORD=<Password for the above email address>
 GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 MAPBOX_TOKEN=<Mapbox API token>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
 ```
+
+These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
+other secret values, contact one of:
+
+- Christopher.Remmel@childrens.harvard.edu
+- Gaurav.Tuli@childrens.harvard.edu
+- Spencer.Marks@childrens.harvard.edu
+
+Note that for local development, it's fine to use your own values for these
+secrets if you have them. For instance, if you have a developer Mapbox API
+token, or if you'd like to use a different GMail account for mailing notifications, or different OAuth client values.
 
 #### Permissions
 
@@ -45,13 +58,45 @@ Give your user all the permissions to access the portal and make CRUD updates.
 ./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL
 ```
 
-Note that the user must be logged-in into the portal before you can issue this command.
+Note that **the user must be logged-in into the portal before you can issue this command**.
 
-If for some obscure reason the command above do not work, here is how to update a user in mongo directly:
+**Windows users**
+
+If you're running the dev stack in [MinGW](http://mingw.org) you will get errors from mongo about "not a tty". Prefix your commands with `winpty` (except shell scripts, which must be prefixed with `winpty bash`, like `winpty bash ./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL`), or run the commands from Windows `cmd.exe`.
+
+If you get this error:
+
+```shell
+$ ./dev/make_superuser.sh $YOUR_GOOGLE_EMAIL
+~/Projects/globaldothealth/list ~/Projects/globaldothealth/list
+MongoDB shell version v4.4.0
+connecting to: mongodb://127.0.0.1:27017/covid19?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("cdafb190-2d3f-4d80-a862-7cd4d7a0c0be") }
+MongoDB server version: 4.4.0
+{"t":{"$date":"2020-10-07T08:43:26.202Z"},"s":"E",  "c":"-",        "id":22779,   "ctx":"main","msg":"file [{filename}] doesn't exist","attr":{"filename":"/verification/scripts/roles.js"}}
+failed to load: /verification/scripts/roles.js
+exiting with code -3
+```
+
+here is how to update a user in mongo directly:
 
 ```mongo
 db.users.updateOne({email: "your-google-email"}, {$set: {roles: ['admin', 'curator']}})
 ```
+
+If _that_ shows you this response:
+
+```mongo
+{ "acknowledged" : true, "matchedCount" : 0, "modifiedCount" : 0 }
+```
+
+or the script shows you this error:
+
+```shell
+$YOUR_GOOGLE_EMAIL is not in the DB
+```
+
+it's because you didn't log in to the portal _before_ running `make_superuser.sh`.
 
 ### Let's run this thing!
 

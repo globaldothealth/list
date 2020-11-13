@@ -63,12 +63,27 @@ def convert_demographics(row):
 
     if row["Age Bracket"]:
         raw = row["Age Bracket"]
-        age = float(raw.split(" ", 1)[
-                    0]) / 12 if " months" in raw.lower() else float(row["Age Bracket"])
-        demo["ageRange"] = {
-            "start": age,
-            "end": age
-        }
+        # Handle ranges, e.g. "28-35"
+        if "-" in raw:
+            parts = raw.split("-", 1)
+            demo["ageRange"] = {
+                "start": float(parts[0]),
+                "end": float(parts[1])
+            }
+        # Handle months, e.g. "6 months"
+        elif " months" in raw.lower():
+            age = float(raw.split(" ", 1)[0]) / 12
+            demo["ageRange"] = {
+                "start": age,
+                "end": age
+            }
+        # Handle standard ages
+        else:
+            age = float(raw)
+            demo["ageRange"] = {
+                "start": age,
+                "end": age
+            }
     if row["Gender"]:
         demo["gender"] = convert_gender(row["Gender"])
     if row["Nationality"]:
@@ -78,26 +93,45 @@ def convert_demographics(row):
 
 
 def convert_sources(row):
+    # Sources must be unique, per our case schema.
+    included = set()
     additionalSources = [{"sourceUrl": row[col]}
                          for col in ["Source_1", "Source_2", "Source_3"]
-                         if row[col]]
+                         if row[col] and
+                         row[col] not in included and not included.add(
+                             row[col])]
     return additionalSources or None
 
 
-def update_for_status(row, case):
+def update_for_outcome(row, case):
     if row["Current Status"] == "Hospitalized":
         case["events"].append({
             "name": "hospitalAdmission",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
             "value": "Yes"
         })
     elif row["Current Status"] == "Recovered":
         case["events"].append({
             "name": "outcome",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
             "value": "Recovered"
         })
     elif row["Current Status"] == "Deceased":
         case["events"].append({
             "name": "outcome",
+            "dateRange":
+            {
+                "start": convert_date(row["Date Announced"]),
+                "end": convert_date(row["Date Announced"])
+            },
             "value": "Death"
         })
 
@@ -106,18 +140,30 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        uuid_column = ""
-        uuid_prefix = ""
         for row in reader:
+            # Rows with a status of Hospitalized are new, confirmed cases.
+            # Other statuses represent further developments in a case; we can
+            # use and properly attribute those for cases that have a State
+            # Patient Number, but not others.
+            if not row["State Patient Number"] and row["Current Status"] != "Hospitalized":
+                continue
+
+            # Some states publish updates on patients. In these cases, the
+            # values are keyed on a special state-specific ID. If that's
+            # available, we should use that to dedupe.
+            if row["State Patient Number"]:
+                uuid_column = "State Patient Number"
+                uuid_prefix = ""
             # The column used to denote case UUID changes in April.
             # It resets back to 1 when this happens.
             # Prefix old values ("Patient Number") to distinguish.
-            if not uuid_column:
-                if "Entry_ID" in row:
-                    uuid_column = "Entry_ID"
-                else:
-                    uuid_column = "Patient Number"
-                    uuid_prefix = "P"
+            elif "Entry_ID" in row:
+                uuid_column = "Entry_ID"
+                uuid_prefix = "Entry-"
+            else:
+                uuid_column = "Patient Number"
+                uuid_prefix = "Patient-"
+
             case = {
                 "caseReference": {
                     "sourceId": source_id,
@@ -138,7 +184,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
-            update_for_status(row, case)
+            update_for_outcome(row, case)
             for i in range(int(row["Num Cases"])):
                 c = copy.deepcopy(case)
                 c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
