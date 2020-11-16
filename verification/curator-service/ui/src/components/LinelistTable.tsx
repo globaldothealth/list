@@ -79,6 +79,7 @@ interface LocationState {
     bulkMessage: string;
     search: string;
     page: number;
+    pageSize: number;
 }
 
 interface Props
@@ -280,7 +281,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.state = {
             url: '/api/cases/',
             error: '',
-            pageSize: 50,
+            pageSize: this.props.location.state?.pageSize ?? 50,
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
@@ -302,8 +303,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     componentDidMount(): void {
         // history.location.state can be updated with new values on which we
         // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) => {
-            this.tableRef.current?.onQueryChange();
+        this.unlisten = this.props.history.listen(({ state }, _) => {
+            // To avoid request duplication, we need to listen only on search changes
+            if (state?.search !== this.props.location.state?.search) {
+                this.tableRef.current?.onQueryChange();
+            }
         });
     }
 
@@ -664,15 +668,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
-                            // When it comes to fetching remote data, material-table is not considering
-                            // the initialPage property at all. Therefore, a "query.page" variable has to be
-                            // manually introduced.
+                            // When it comes to fetching remote data, material-table
+                            // is ignoring the initialPage property.
                             // https://github.com/mbrn/material-table/issues/964
                             const page =
                                 this.props.location.state?.page ?? query.page;
 
                             let listUrl = this.state.url;
-                            listUrl += '?limit=' + this.state.pageSize;
+                            listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (page + 1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
@@ -823,12 +826,21 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     }}
                     onChangeRowsPerPage={(newPageSize: number): void => {
                         this.setState({ pageSize: newPageSize });
-                        this.tableRef.current.onQueryChange();
-                    }}
-                    onChangePage={(page: number): void => {
+
+                        // To avoid reseting the pagination, page size
+                        // should be persisted in location state object
                         history.push('/cases', {
                             ...this.props.location.state,
-                            page: page,
+                            page: 0,
+                            pageSize: newPageSize,
+                        });
+                    }}
+                    onChangePage={(newPage: number): void => {
+                        // To avoid reseting the pagination, page number
+                        // should be persisted in location state object
+                        history.push('/cases', {
+                            ...this.props.location.state,
+                            page: newPage,
                         });
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {

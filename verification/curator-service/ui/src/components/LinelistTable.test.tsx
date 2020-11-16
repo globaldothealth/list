@@ -392,7 +392,7 @@ it('cannot edit data if not curator', async () => {
     expect(queryByTestId(/row menu/)).not.toBeInTheDocument();
 });
 
-it('renders correct page number according to persisted data in location.state', async () => {
+it('initializes with correct pagination settings according to persisted data', async () => {
     const sampleCase = {
         _id: 'abc123',
         caseReference: {
@@ -417,8 +417,8 @@ it('renders correct page number according to persisted data in location.state', 
         notes: 'some notes',
     };
 
-    // generate 100 cases for pagination purposes
-    const cases = range(100).map(() => sampleCase);
+    // generate 30 cases for pagination purposes
+    const cases = range(20).map(() => sampleCase);
 
     const axiosResponse = {
         data: {
@@ -433,10 +433,10 @@ it('renders correct page number according to persisted data in location.state', 
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
     const history = createMemoryHistory();
-    const state = { page: 1 };
+    const state = { page: 1, pageSize: 10 };
     history.push('/', state);
 
-    const { findAllByText } = render(
+    const { findByText, findAllByText } = render(
         <Router history={history}>
             <LinelistTable
                 user={curator}
@@ -446,7 +446,9 @@ it('renders correct page number according to persisted data in location.state', 
         </Router>,
     );
 
-    const pagination = await findAllByText('51-100 of 100');
+    const rowsCounter = await findAllByText('11-20 of 20');
+    const pageSizeCounter = await findByText('10 rows');
     // there are two DOM elements showing number of elements
-    expect(pagination).toHaveLength(2);
+    expect(rowsCounter).toHaveLength(2);
+    expect(pageSizeCounter).toBeInTheDocument();
 });
