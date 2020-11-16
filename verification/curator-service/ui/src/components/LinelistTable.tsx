@@ -78,6 +78,7 @@ interface LocationState {
     editedCaseIds: string[];
     bulkMessage: string;
     search: string;
+    page: number;
 }
 
 interface Props
@@ -663,9 +664,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
+                            // When it comes to fetching remote data, material-table is not considering
+                            // the initialPage property at all. Therefore, a "query.page" variable has to be
+                            // manually introduced.
+                            // https://github.com/mbrn/material-table/issues/964
+                            const page =
+                                this.props.location.state?.page ?? query.page;
+
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + this.state.pageSize;
-                            listUrl += '&page=' + (query.page + 1);
+                            listUrl += '&page=' + (page + 1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
@@ -723,7 +731,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                     resolve({
                                         data: flattenedCases,
-                                        page: query.page,
+                                        page: page,
                                         totalCount: result.data.total,
                                     });
                                 })
@@ -813,9 +821,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 ? { backgroundColor: '#F0FBF9' }
                                 : {},
                     }}
-                    onChangeRowsPerPage={(newPageSize: number) => {
+                    onChangeRowsPerPage={(newPageSize: number): void => {
                         this.setState({ pageSize: newPageSize });
                         this.tableRef.current.onQueryChange();
+                    }}
+                    onChangePage={(page: number): void => {
+                        history.push('/cases', {
+                            ...this.props.location.state,
+                            page: page,
+                        });
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
                         if (rowData) {

@@ -3,9 +3,11 @@ import '@testing-library/jest-dom/extend-expect';
 import { fireEvent, render } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 import React from 'react';
 import axios from 'axios';
+import range from 'lodash/range';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -388,4 +390,63 @@ it('cannot edit data if not curator', async () => {
     expect(row).toBeInTheDocument();
 
     expect(queryByTestId(/row menu/)).not.toBeInTheDocument();
+});
+
+it('renders correct page number according to persisted data in location.state', async () => {
+    const sampleCase = {
+        _id: 'abc123',
+        caseReference: {
+            sourceId: 'CDC',
+            sourceUrl: 'www.example.com',
+        },
+        importedCase: {
+            outcome: 'Recovered',
+        },
+        location: {
+            country: 'France',
+            geoResolution: 'Country',
+        },
+        events: [
+            {
+                name: 'confirmed',
+                dateRange: {
+                    start: new Date().toJSON(),
+                },
+            },
+        ],
+        notes: 'some notes',
+    };
+
+    // generate 100 cases for pagination purposes
+    const cases = range(100).map(() => sampleCase);
+
+    const axiosResponse = {
+        data: {
+            cases: cases,
+            total: cases.length,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const history = createMemoryHistory();
+    const state = { page: 1 };
+    history.push('/', state);
+
+    const { findAllByText } = render(
+        <Router history={history}>
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+            />
+        </Router>,
+    );
+
+    const pagination = await findAllByText('51-100 of 100');
+    // there are two DOM elements showing number of elements
+    expect(pagination).toHaveLength(2);
 });
