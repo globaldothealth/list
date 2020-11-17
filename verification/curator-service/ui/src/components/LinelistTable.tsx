@@ -763,6 +763,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
+                                        onChangePage={(
+                                            event,
+                                            newPage: number,
+                                        ): void => {
+                                            history.push('/cases', {
+                                                ...this.props.location.state,
+                                                page: newPage,
+                                            });
+
+                                            props.onChangePage(event, newPage);
+                                        }}
                                     ></TablePagination>
                                 </div>
                             ) : (
@@ -833,14 +844,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ...this.props.location.state,
                             page: 0,
                             pageSize: newPageSize,
-                        });
-                    }}
-                    onChangePage={(newPage: number): void => {
-                        // To avoid reseting the pagination, page number
-                        // should be persisted in location state object
-                        history.push('/cases', {
-                            ...this.props.location.state,
-                            page: newPage,
                         });
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
