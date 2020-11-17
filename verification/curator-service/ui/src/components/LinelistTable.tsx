@@ -66,6 +66,8 @@ interface TableRow {
     adminArea2: string;
     adminArea1: string;
     country: string;
+    latitude: number;
+    longitude: number;
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
@@ -638,6 +640,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'country',
                         },
                         {
+                            title: 'Latitude',
+                            field: 'latitude',
+                        },
+                        {
+                            title: 'Longitude',
+                            field: 'longitude',
+                        },
+                        {
                             title: 'Age',
                             field: 'age',
                             render: (rowData) =>
@@ -700,6 +710,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.location
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
+                                            latitude:
+                                                c.location.geometry.latitude,
+                                            longitude:
+                                                c.location.geometry.longitude,
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
