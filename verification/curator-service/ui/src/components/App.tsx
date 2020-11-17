@@ -444,7 +444,9 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <GHListLogo />
+                        <Link to="/" data-testid="home-button">
+                            <GHListLogo />
+                        </Link>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
