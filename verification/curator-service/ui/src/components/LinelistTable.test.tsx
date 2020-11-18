@@ -1,10 +1,9 @@
 import '@testing-library/jest-dom/extend-expect';
 
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, wait } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
 import { MemoryRouter, Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
 import React from 'react';
 import axios from 'axios';
 import range from 'lodash/range';
@@ -96,6 +95,10 @@ it('loads and displays cases', async () => {
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={50}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -157,6 +160,10 @@ it('API errors are displayed', async () => {
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={50}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -221,6 +228,10 @@ it('can delete a row', async () => {
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={50}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -311,6 +322,10 @@ it('can cancel delete action', async () => {
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={50}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -381,6 +396,10 @@ it('cannot edit data if not curator', async () => {
                 }}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={50}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -392,7 +411,7 @@ it('cannot edit data if not curator', async () => {
     expect(queryByTestId(/row menu/)).not.toBeInTheDocument();
 });
 
-it('initializes with correct pagination settings according to persisted data', async () => {
+it('initializes with correct page and page size values', async () => {
     const sampleCase = {
         _id: 'abc123',
         caseReference: {
@@ -417,7 +436,7 @@ it('initializes with correct pagination settings according to persisted data', a
         notes: 'some notes',
     };
 
-    // generate 30 cases for pagination purposes
+    // generate 20 cases for pagination purposes
     const cases = range(20).map(() => sampleCase);
 
     const axiosResponse = {
@@ -432,18 +451,18 @@ it('initializes with correct pagination settings according to persisted data', a
     };
     mockedAxios.get.mockResolvedValueOnce(axiosResponse);
 
-    const history = createMemoryHistory();
-    const state = { page: 1, pageSize: 10 };
-    history.push('/', state);
-
     const { findByText, findAllByText } = render(
-        <Router history={history}>
+        <MemoryRouter>
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 setSearchLoading={(x: boolean): void => {}}
+                page={1}
+                pageSize={10}
+                onChangePage={jest.fn()}
+                onChangePageSize={jest.fn()}
             />
-        </Router>,
+        </MemoryRouter>,
     );
 
     const rowsCounter = await findAllByText('11-20 of 20');
@@ -451,4 +470,86 @@ it('initializes with correct pagination settings according to persisted data', a
     // there are two DOM elements showing number of elements
     expect(rowsCounter).toHaveLength(2);
     expect(pageSizeCounter).toBeInTheDocument();
+});
+
+it('paginates through data', async () => {
+    const sampleCase = {
+        _id: 'abc123',
+        caseReference: {
+            sourceId: 'CDC',
+            sourceUrl: 'www.example.com',
+        },
+        importedCase: {
+            outcome: 'Recovered',
+        },
+        location: {
+            country: 'France',
+            geoResolution: 'Country',
+        },
+        events: [
+            {
+                name: 'confirmed',
+                dateRange: {
+                    start: new Date().toJSON(),
+                },
+            },
+        ],
+        notes: 'some notes',
+    };
+
+    // generate 20 cases for pagination purposes
+    const cases = range(20).map(() => sampleCase);
+
+    const axiosResponse = {
+        data: {
+            cases: cases,
+            total: cases.length,
+        },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {},
+    };
+    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+
+    const changePage = jest.fn();
+    const changePageSize = jest.fn();
+
+    const { getByText, getAllByText, findAllByText } = render(
+        <MemoryRouter>
+            <LinelistTable
+                user={curator}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setSearchLoading={(x: boolean): void => {}}
+                page={0}
+                pageSize={10}
+                onChangePage={changePage}
+                onChangePageSize={changePageSize}
+            />
+        </MemoryRouter>,
+    );
+
+    expect(await findAllByText('1-10 of 20')).toHaveLength(2);
+
+    fireEvent.click(getByText('chevron_right'));
+
+    expect(changePage).toHaveBeenCalledTimes(1);
+    expect(changePage).toHaveBeenCalledWith(1);
+
+    wait(() => {
+        expect(getAllByText('11-20 of 20')).toHaveLength(2);
+        expect(getAllByText('France')).toHaveLength(10);
+    });
+
+    fireEvent.click(getByText('10 rows'));
+
+    wait(() => {
+        fireEvent.click(getByText('5'));
+        expect(changePageSize).toHaveBeenCalledTimes(1);
+
+        expect(getAllByText('5 rows')).toBeInTheDocument();
+        expect(getAllByText('1-5 of 20')).toHaveLength(2);
+
+        expect(getAllByText('France')).toHaveLength(5);
+    });
 });

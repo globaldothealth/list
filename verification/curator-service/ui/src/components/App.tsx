@@ -317,6 +317,8 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [listPage, setListPage] = React.useState<number>(0);
+    const [listPageSize, setListPageSize] = React.useState<number>(50);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
@@ -615,6 +617,10 @@ export default function App(): JSX.Element {
                                 <LinelistTable
                                     user={user}
                                     setSearchLoading={setSearchLoading}
+                                    page={listPage}
+                                    pageSize={listPageSize}
+                                    onChangePage={setListPage}
+                                    onChangePageSize={setListPageSize}
                                 />
                             </Route>
                         )}

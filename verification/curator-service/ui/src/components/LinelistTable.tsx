@@ -46,6 +46,7 @@ interface ListResponse {
 interface LinelistTableState {
     url: string;
     error: string;
+    page: number;
     pageSize: number;
     // The rows which are selected on the current page.
     selectedRowsCurrentPage: TableRow[];
@@ -87,6 +88,12 @@ interface Props
         WithStyles<typeof styles> {
     user: User;
     setSearchLoading: (a: boolean) => void;
+    page: number;
+    pageSize: number;
+
+    onChangePage: (page: number) => void;
+
+    onChangePageSize: (pageSize: number) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -281,7 +288,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.state = {
             url: '/api/cases/',
             error: '',
-            pageSize: this.props.location.state?.pageSize ?? 50,
+            page: this.props.page ?? 0,
+            pageSize: this.props.pageSize ?? 50,
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
@@ -304,10 +312,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         // history.location.state can be updated with new values on which we
         // must refresh the table
         this.unlisten = this.props.history.listen(({ state }, _) => {
-            // To avoid request duplication, we need to listen only on search changes
-            if (state?.search !== this.props.location.state?.search) {
-                this.tableRef.current?.onQueryChange();
-            }
+            this.tableRef.current?.onQueryChange();
         });
     }
 
@@ -668,15 +673,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
-                            // When it comes to fetching remote data, material-table
-                            // is ignoring the initialPage property.
-                            // https://github.com/mbrn/material-table/issues/964
-                            const page =
-                                this.props.location.state?.page ?? query.page;
-
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
-                            listUrl += '&page=' + (page + 1);
+                            listUrl += '&page=' + (this.state.page + 1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
@@ -734,7 +733,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                     resolve({
                                         data: flattenedCases,
-                                        page: page,
+                                        page: this.state.page,
                                         totalCount: result.data.total,
                                     });
                                 })
@@ -763,15 +762,31 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
+                                        onChangeRowsPerPage={(event): void => {
+                                            const newPage = 0;
+                                            const newPageSize = Number(
+                                                event.target.value,
+                                            );
+
+                                            this.setState({
+                                                page: newPage,
+                                                pageSize: newPageSize,
+                                            });
+
+                                            props.onChangeRowsPerPage(event);
+
+                                            this.props.onChangePage(newPage);
+                                            this.props.onChangePageSize(
+                                                newPageSize,
+                                            );
+                                        }}
                                         onChangePage={(
                                             event,
                                             newPage: number,
                                         ): void => {
-                                            history.push('/cases', {
-                                                ...this.props.location.state,
-                                                page: newPage,
-                                            });
+                                            this.setState({ page: newPage });
 
+                                            this.props.onChangePage(newPage);
                                             props.onChangePage(event, newPage);
                                         }}
                                     ></TablePagination>
@@ -834,17 +849,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ).includes(rowData.id)
                                 ? { backgroundColor: '#F0FBF9' }
                                 : {},
-                    }}
-                    onChangeRowsPerPage={(newPageSize: number): void => {
-                        this.setState({ pageSize: newPageSize });
-
-                        // To avoid reseting the pagination, page size
-                        // should be persisted in location state object
-                        history.push('/cases', {
-                            ...this.props.location.state,
-                            page: 0,
-                            pageSize: newPageSize,
-                        });
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
                         if (rowData) {
