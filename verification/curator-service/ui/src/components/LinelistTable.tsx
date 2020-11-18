@@ -36,6 +36,7 @@ import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
 import renderDate, { renderDateRange } from './util/date';
+import { round } from 'lodash';
 
 interface ListResponse {
     cases: Case[];
@@ -720,10 +721,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.location
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
-                                            latitude:
+                                            latitude: round(
                                                 c.location.geometry.latitude,
-                                            longitude:
+                                                4,
+                                            ),
+                                            longitude: round(
                                                 c.location.geometry.longitude,
+                                                4,
+                                            ),
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
