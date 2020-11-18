@@ -71,6 +71,8 @@ interface TableRow {
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
+    hospitalizationDate?: string;
+    symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
 }
@@ -435,6 +437,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
     }
 
+    dateRange(range?: { start?: string; end?: string }): string {
+        if (!range || !range.start || !range.end) {
+            return '';
+        }
+        return range.start === range.end
+            ? renderDate(range.start)
+            : `${renderDate(range.start)} - ${renderDate(range.end)}`;
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -665,6 +676,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'outcome',
                         },
                         {
+                            title: 'Hospitalization date',
+                            field: 'hospitalizationDate',
+                        },
+                        {
+                            title: 'Symptoms onset date',
+                            field: 'symptomsOnsetDate',
+                        },
+                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
                             headerStyle: { whiteSpace: 'nowrap' },
@@ -723,6 +742,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
+                                            hospitalizationDate: this.dateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'hospitalAdmission',
+                                                )?.dateRange,
+                                            ),
+                                            symptomsOnsetDate: this.dateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'onsetSymptoms',
+                                                )?.dateRange,
+                                            ),
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
                                             verificationStatus:
