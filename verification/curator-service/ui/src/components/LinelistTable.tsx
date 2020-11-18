@@ -71,7 +71,7 @@ interface TableRow {
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
-    hospitalizationDate?: string;
+    hospitalizationDateRange?: string;
     symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
@@ -667,8 +667,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'outcome',
                         },
                         {
-                            title: 'Hospitalization date',
-                            field: 'hospitalizationDate',
+                            title: 'Hospitalization date/period',
+                            field: 'hospitalizationDateRange',
                         },
                         {
                             title: 'Symptoms onset date',
@@ -733,7 +733,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
-                                            hospitalizationDate: renderDateRange(
+                                            hospitalizationDateRange: renderDateRange(
                                                 c.events.find(
                                                     (event) =>
                                                         event.name ===
