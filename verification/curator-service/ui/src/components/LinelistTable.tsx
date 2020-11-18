@@ -722,11 +722,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
                                             latitude: round(
-                                                c.location.geometry.latitude,
+                                                c.location?.geometry?.latitude,
                                                 4,
                                             ),
                                             longitude: round(
-                                                c.location.geometry.longitude,
+                                                c.location?.geometry?.longitude,
                                                 4,
                                             ),
                                             age: [
