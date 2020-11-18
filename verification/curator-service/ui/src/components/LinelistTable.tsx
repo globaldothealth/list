@@ -35,7 +35,7 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import renderDate from './util/date';
+import renderDate, { renderDateRange } from './util/date';
 
 interface ListResponse {
     cases: Case[];
@@ -437,15 +437,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
     }
 
-    dateRange(range?: { start?: string; end?: string }): string {
-        if (!range || !range.start || !range.end) {
-            return '';
-        }
-        return range.start === range.end
-            ? renderDate(range.start)
-            : `${renderDate(range.start)} - ${renderDate(range.end)}`;
-    }
-
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -742,14 +733,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
-                                            hospitalizationDate: this.dateRange(
+                                            hospitalizationDate: renderDateRange(
                                                 c.events.find(
                                                     (event) =>
                                                         event.name ===
                                                         'hospitalAdmission',
                                                 )?.dateRange,
                                             ),
-                                            symptomsOnsetDate: this.dateRange(
+                                            symptomsOnsetDate: renderDateRange(
                                                 c.events.find(
                                                     (event) =>
                                                         event.name ===
