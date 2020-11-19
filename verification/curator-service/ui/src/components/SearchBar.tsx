@@ -56,28 +56,38 @@ const StyledSearchTextField = withStyles({
     },
 })(TextField);
 
+const StyledInputAdornment = withStyles({
+    positionStart: {
+        marginRight: 0,
+    },
+})(InputAdornment);
+
 export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
     loading: boolean;
+    onSearchGuideToggle: () => void;
 }): JSX.Element {
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    const handleFilterClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+    ): void => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = (): void => {
+    const handleFilterClose = (): void => {
         setAnchorEl(null);
     };
 
     const clickItem = (text: string): void => {
         setSearch(search + (search ? ` ${text}:` : `${text}:`));
-        handleClose();
+        handleFilterClose();
     };
 
     const classes = searchBarStyles();
@@ -102,17 +112,29 @@ export default function SearchBar(props: {
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
-                        <InputAdornment position="start">
-                            <Button
-                                color="primary"
-                                startIcon={<FilterListIcon />}
-                                onClick={handleClick}
-                            >
-                                Filter
-                            </Button>
-                            <div className={classes.divider}></div>
-                            <SearchIcon color="primary" />
-                        </InputAdornment>
+                        <>
+                            <StyledInputAdornment position="start">
+                                <Button
+                                    color="primary"
+                                    startIcon={<FilterListIcon />}
+                                    onClick={handleFilterClick}
+                                >
+                                    Filter
+                                </Button>
+                                <div className={classes.divider}></div>
+                            </StyledInputAdornment>
+                            <InputAdornment position="start">
+                                <Button
+                                    color="primary"
+                                    startIcon={<HelpIcon />}
+                                    onClick={props.onSearchGuideToggle}
+                                >
+                                    Search guide
+                                </Button>
+                                <div className={classes.divider}></div>
+                                <SearchIcon color="primary" />
+                            </InputAdornment>
+                        </>
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
@@ -193,7 +215,7 @@ export default function SearchBar(props: {
                     horizontal: 'left',
                 }}
                 open={Boolean(anchorEl)}
-                onClose={handleClose}
+                onClose={handleFilterClose}
             >
                 {[
                     { desc: 'curator email', value: 'curator' },

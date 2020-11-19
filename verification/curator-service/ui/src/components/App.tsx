@@ -56,6 +56,7 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
+import SearchGuideDialog from './SearchGuideDialog';
 
 const theme = createMuiTheme({
     palette: {
@@ -317,9 +318,18 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [listPage, setListPage] = React.useState<number>(0);
+    const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const [searchLoading, setSearchLoading] = React.useState(false);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
+        false,
+    );
+
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const classes = useStyles();
+
     const menuList = user
         ? [
               {
@@ -416,13 +426,14 @@ export default function App(): JSX.Element {
         }
     };
 
+    const toggleSearchGuide = (): void => {
+        setIsSearchGuideOpen((isOpen) => !isOpen);
+    };
+
     useEffect(() => {
         getUser();
     }, []);
 
-    const [searchLoading, setSearchLoading] = React.useState(false);
-
-    const classes = useStyles();
     return (
         <div className={classes.root}>
             <ThemeProvider theme={theme}>
@@ -458,6 +469,7 @@ export default function App(): JSX.Element {
                                             });
                                         }}
                                         loading={searchLoading}
+                                        onSearchGuideToggle={toggleSearchGuide}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
@@ -720,6 +732,10 @@ export default function App(): JSX.Element {
                         )}
                     </Switch>
                 </main>
+                <SearchGuideDialog
+                    isOpen={isSearchGuideOpen}
+                    onClose={toggleSearchGuide}
+                />
             </ThemeProvider>
         </div>
     );
