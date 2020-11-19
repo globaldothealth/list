@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import {
     Box,
     createStyles,
+    Portal,
     Theme,
     Typography,
     withStyles,
@@ -11,7 +12,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import Draggable, { ControlPosition } from 'react-draggable';
 
 type Props = WithStyles<typeof styles> & {
-    triggerRef: React.RefObject<HTMLDivElement>;
+    rootComponentRef: React.RefObject<HTMLDivElement>;
+    triggerComponentRef: React.RefObject<HTMLButtonElement>;
     onToggle: () => void;
 };
 
@@ -56,11 +58,13 @@ const styles = (theme: Theme) =>
         },
     });
 
-// additional offset to place dialog just below search guide button
-const LEFT_OFFSET = 116;
+// additional offsets to keep the position ideally below the search guide button
+const LEFT_OFFSET = -16;
+const TOP_OFFSET = 6;
 
 const SearchGuideDialog = ({
-    triggerRef,
+    rootComponentRef,
+    triggerComponentRef,
     onToggle,
     classes,
 }: Props): JSX.Element | null => {
@@ -68,80 +72,89 @@ const SearchGuideDialog = ({
         positionOffset,
         setPositionOffset,
     ] = React.useState<ControlPosition | null>(null);
+    const nodeRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const container = triggerRef.current;
+        const container = triggerComponentRef.current;
 
         if (container) {
+            const { left, bottom } = container.getBoundingClientRect();
             setPositionOffset({
-                x: container.offsetLeft + LEFT_OFFSET,
-                y: container.offsetTop + container.offsetHeight,
+                x: left + LEFT_OFFSET,
+                y: bottom + TOP_OFFSET,
             });
         }
-    }, [triggerRef]);
+    }, [triggerComponentRef]);
 
     return (
         positionOffset && (
-            <Draggable
-                handle="#draggable-search-guide"
-                bounds="body"
-                defaultPosition={positionOffset}
-            >
-                <Box className={classes.root} id="draggable-search-guide">
-                    <Box position="relative">
-                        <Box position="absolute" top={0} right={0}>
-                            <CloseIcon
-                                className={classes.closeIcon}
-                                onClick={onToggle}
-                            />
-                        </Box>
-                        <Box mb={1}>
-                            <Typography className={classes.title}>
-                                Search syntax
+            <Portal container={rootComponentRef.current}>
+                <Draggable
+                    handle="#draggable-search-guide"
+                    bounds="body"
+                    defaultPosition={positionOffset}
+                    nodeRef={nodeRef}
+                >
+                    <div
+                        ref={nodeRef}
+                        className={classes.root}
+                        id="draggable-search-guide"
+                    >
+                        <Box position="relative">
+                            <Box position="absolute" top={0} right={0}>
+                                <CloseIcon
+                                    className={classes.closeIcon}
+                                    onClick={onToggle}
+                                />
+                            </Box>
+                            <Box mb={1}>
+                                <Typography className={classes.title}>
+                                    Search syntax
+                                </Typography>
+                            </Box>
+                            <Box mt={3} mb={1}>
+                                <Typography className={classes.subtitle}>
+                                    Full text search
+                                </Typography>
+                            </Box>
+                            <Typography>
+                                Example: <i>"got infected at work" - India</i>
+                                <br />
+                                You can use arbitrary strings to search over
+                                those text fields:
+                            </Typography>
+                            <ul className={classes.list}>
+                                <li>notes</li>
+                                <li>country</li>
+                                <li>pathogen</li>
+                                <li>curator</li>
+                                <li>admin1</li>
+                                <li>name</li>
+                                <li>occupation</li>
+                                <li>admin2</li>
+                                <li>source URL</li>
+                                <li>nationalities</li>
+                                <li>place</li>
+                                <li>upload ID</li>
+                                <li>ethnicity</li>
+                                <li>location name</li>
+                                <li>verification status</li>
+                            </ul>
+                            <Box mt={3} mb={1}>
+                                <Typography className={classes.subtitle}>
+                                    Keyboard text search
+                                </Typography>
+                            </Box>
+                            <Typography>
+                                Example: lorem ipsum
+                                <br />
+                                Supported keywords are shown when the filter
+                                button is clicked.
                             </Typography>
                         </Box>
-                        <Box mt={3} mb={1}>
-                            <Typography className={classes.subtitle}>
-                                Full text search
-                            </Typography>
-                        </Box>
-                        <Typography>
-                            Example: <i>"got infected at work" - India</i>
-                            <br />
-                            You can use arbitrary strings to search over those
-                            text fields:
-                        </Typography>
-                        <ul className={classes.list}>
-                            <li>notes</li>
-                            <li>country</li>
-                            <li>pathogen</li>
-                            <li>curator</li>
-                            <li>admin1</li>
-                            <li>name</li>
-                            <li>occupation</li>
-                            <li>admin2</li>
-                            <li>source URL</li>
-                            <li>nationalities</li>
-                            <li>place</li>
-                            <li>upload ID</li>
-                            <li>ethnicity</li>
-                            <li>location name</li>
-                            <li>verification status</li>
-                        </ul>
-                        <Box mt={3} mb={1}>
-                            <Typography className={classes.subtitle}>
-                                Keyboard text search
-                            </Typography>
-                        </Box>
-                        <Typography>
-                            Example: lorem ipsum
-                            <br />
-                            Supported keywords are shown when the filter button
-                            is clicked.
-                        </Typography>
-                    </Box>
-                </Box>
-            </Draggable>
+                    </div>
+                </Draggable>
+            </Portal>
         )
     );
 };
