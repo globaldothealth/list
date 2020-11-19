@@ -23,6 +23,7 @@ _STATE = "estado"
 _DATE_CONFIRMED = "dataNotificacao"
 _DATE_SYMPTOMS = "dataInicioSintomas"
 _SYMPTOMS = "sintomas"
+_OTHER_SYMPTOMS = "outrosSintomas"
 _HEALTHCARE_PROFESSIONAL = "profissionalSaude"
 _COMORBIDITIES = "condicoes"
 _TEST_TYPE = "tipoTeste"
@@ -207,7 +208,7 @@ def convert_demographics(gender: str, age: str, healthcare_professional: str, se
     return demo
 
 
-def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: str):
+def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: str, other_symptoms: str):
     raw_notes = []
     if "imunossupressão" in raw_comorbidities.lower():
         raw_notes.append("Patient with immunosuppression")
@@ -219,7 +220,8 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: s
         raw_notes.append("Patient with coryza")
     if "outros" in raw_symptoms.lower():
         raw_notes.append("Other symptoms reported")
-
+    if other_symptoms:
+        raw_notes.append("Non-standard symptoms listed but not parsed (please see raw data for further information)")
     if indigenous_group:
         raw_notes.append("Patient from the following indigenous group: " + indigenous_group)
 
@@ -258,7 +260,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         )
                     }
                     notes = convert_notes(
-                        row[_COMORBIDITIES], row[_SYMPTOMS], row[_INDIGENOUS_GROUP]
+                        row[_COMORBIDITIES], row[_SYMPTOMS], row[_INDIGENOUS_GROUP], row[_OTHER_SYMPTOMS]
                     )
                     if notes:
                         case["notes"] = notes

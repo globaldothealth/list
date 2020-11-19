@@ -63,6 +63,6 @@ class AcreTest(unittest.TestCase):
                         "diabetes mellitus", "obesity"
                     ]
                 },
-                "notes": "Other symptoms reported"
+                "notes": "Other symptoms reported, Non-standard symptoms listed but not parsed (please see raw data for further information)"
             }
         ])
