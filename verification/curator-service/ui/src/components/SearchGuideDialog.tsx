@@ -21,11 +21,7 @@ const styles = (theme: Theme) =>
         },
     });
 
-const SearchGuideDialog = ({
-    isOpen,
-    onClose,
-    classes,
-}: Props): JSX.Element | null => {
+const SearchGuideDialog = ({ isOpen, classes }: Props): JSX.Element | null => {
     if (!isOpen) return null;
 
     return (
