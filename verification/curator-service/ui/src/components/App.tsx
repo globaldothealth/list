@@ -56,7 +56,6 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
-import SearchGuideDialog from './SearchGuideDialog';
 
 const theme = createMuiTheme({
     palette: {
@@ -319,10 +318,7 @@ export default function App(): JSX.Element {
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
-    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
-        false,
-    );
-    const searchBarRef = React.useRef<HTMLDivElement>(null);
+    const rootRef = React.useRef<HTMLDivElement>(null);
 
     const lastLocation = useLastLocation();
     const history = useHistory();
@@ -425,16 +421,12 @@ export default function App(): JSX.Element {
         }
     };
 
-    const toggleSearchGuide = (): void => {
-        setIsSearchGuideOpen((isOpen) => !isOpen);
-    };
-
     useEffect(() => {
         getUser();
     }, []);
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
@@ -457,10 +449,7 @@ export default function App(): JSX.Element {
                         <GHListLogo />
                         {location.pathname === '/cases' && user ? (
                             <>
-                                <div
-                                    className={classes.searchBar}
-                                    ref={searchBarRef}
-                                >
+                                <div className={classes.searchBar}>
                                     <SearchBar
                                         searchQuery={
                                             location.state?.search ?? ''
@@ -471,8 +460,7 @@ export default function App(): JSX.Element {
                                             });
                                         }}
                                         loading={searchLoading}
-                                        searchGuideOpen={isSearchGuideOpen}
-                                        onSearchGuideToggle={toggleSearchGuide}
+                                        rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
@@ -735,12 +723,6 @@ export default function App(): JSX.Element {
                         )}
                     </Switch>
                 </main>
-                {isSearchGuideOpen && (
-                    <SearchGuideDialog
-                        onToggle={toggleSearchGuide}
-                        triggerRef={searchBarRef}
-                    />
-                )}
             </ThemeProvider>
         </div>
     );

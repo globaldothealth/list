@@ -16,6 +16,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
+import SearchGuideDialog from './SearchGuideDialog';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -69,13 +70,16 @@ export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
     loading: boolean;
-    searchGuideOpen: boolean;
-    onSearchGuideToggle: () => void;
+    rootComponentRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element {
     const classes = searchBarStyles();
 
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
+        false,
+    );
+    const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
@@ -94,6 +98,10 @@ export default function SearchBar(props: {
     const clickItem = (text: string): void => {
         setSearch(search + (search ? ` ${text}:` : `${text}:`));
         handleFilterClose();
+    };
+
+    const toggleSearchGuide = (): void => {
+        setIsSearchGuideOpen((isOpen) => !isOpen);
     };
 
     return (
@@ -132,14 +140,23 @@ export default function SearchBar(props: {
                                 <Button
                                     color="primary"
                                     startIcon={<HelpIcon />}
-                                    onClick={props.onSearchGuideToggle}
+                                    onClick={toggleSearchGuide}
                                     className={clsx({
-                                        [classes.activeButton]:
-                                            props.searchGuideOpen,
+                                        [classes.activeButton]: isSearchGuideOpen,
                                     })}
+                                    ref={guideButtonRef}
                                 >
                                     Search guide
                                 </Button>
+                                {isSearchGuideOpen && (
+                                    <SearchGuideDialog
+                                        onToggle={toggleSearchGuide}
+                                        rootComponentRef={
+                                            props.rootComponentRef
+                                        }
+                                        triggerComponentRef={guideButtonRef}
+                                    />
+                                )}
                                 <div className={classes.divider}></div>
                                 <SearchIcon color="primary" />
                             </InputAdornment>
