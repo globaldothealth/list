@@ -471,6 +471,7 @@ export default function App(): JSX.Element {
                                             });
                                         }}
                                         loading={searchLoading}
+                                        searchGuideOpen={isSearchGuideOpen}
                                         onSearchGuideToggle={toggleSearchGuide}
                                     ></SearchBar>
                                 </div>

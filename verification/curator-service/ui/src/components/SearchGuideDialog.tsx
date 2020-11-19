@@ -26,6 +26,7 @@ const styles = (theme: Theme) =>
             cursor: 'move',
             position: 'absolute',
             zIndex: 1500,
+            borderRadius: 5,
             padding: theme.spacing(4),
         },
         closeIcon: {
