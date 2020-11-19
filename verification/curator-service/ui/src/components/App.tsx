@@ -318,8 +318,6 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [listPage, setListPage] = React.useState<number>(0);
-    const [listPageSize, setListPageSize] = React.useState<number>(50);
     const [searchLoading, setSearchLoading] = React.useState(false);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
         false,
@@ -732,10 +730,7 @@ export default function App(): JSX.Element {
                         )}
                     </Switch>
                 </main>
-                <SearchGuideDialog
-                    isOpen={isSearchGuideOpen}
-                    onClose={toggleSearchGuide}
-                />
+                {isSearchGuideOpen && <SearchGuideDialog />}
             </ThemeProvider>
         </div>
     );
