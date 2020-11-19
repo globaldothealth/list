@@ -1,2 +1,2 @@
-dataNotificacao,profissionalSaude,comorbidades,tipoTeste,resultadoTeste,sexo,bairro,municipio,idade,racaCor,etniaIndigena
-None 12:30:00,N√£o,"Doen√ßas card√≠acas cr√¥nicas, Diabetes",TESTE R√ÅPIDO - ANTICORPO,Positivo,Feminino,AGRESTE,Laranjal do Jari,54,Parda,
+Data de NotificaÁ„o,MunicÌpio,Bairro,Tipo de Teste,Profissional de Sa˙de,Sexo,Idade,RaÁa/Cor,Comorbidades,EvoluÁ„o do Caso
+None 12:30:00,Ferreira Gomes,FERREIRA GOMES,TESTE R¡PIDO - ANTICORPO,N„o,Masculino,52,PARDA,"Diabetes, Imunossupress„o",Cura
