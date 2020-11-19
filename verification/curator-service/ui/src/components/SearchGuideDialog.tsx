@@ -1,11 +1,17 @@
 import React from 'react';
-import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core';
+import {
+    Box,
+    Button,
+    createStyles,
+    Theme,
+    Typography,
+    withStyles,
+    WithStyles,
+} from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import Draggable from 'react-draggable';
 
-type Props = WithStyles<typeof styles> & {
-    isOpen: boolean;
-    onClose: () => void;
-};
+type Props = WithStyles<typeof styles>;
 
 // Return type isn't meaningful.
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -19,16 +25,23 @@ const styles = (theme: Theme) =>
             zIndex: 1500,
             padding: theme.spacing(2),
         },
+        closeIcon: {
+            cursor: 'pointer',
+        },
     });
 
-const SearchGuideDialog = ({ isOpen, classes }: Props): JSX.Element | null => {
-    if (!isOpen) return null;
-
+const SearchGuideDialog = ({ classes }: Props): JSX.Element | null => {
     return (
         <Draggable handle="#draggable-search-guide" bounds="body">
-            <div className={classes.root} id="draggable-search-guide">
-                <p>Search syntax</p>
-            </div>
+            <Box className={classes.root} id="draggable-search-guide">
+                <Box position="relative">
+                    <Box position="absolute" top={0} right={0}>
+                        <CloseIcon className={classes.closeIcon} />
+                    </Box>
+                    <Typography>Search syntax</Typography>
+                    <Typography>Lorem ipsum dolor sit amet</Typography>
+                </Box>
+            </Box>
         </Draggable>
     );
 };
