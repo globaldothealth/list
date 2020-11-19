@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     Button,
     IconButton,
@@ -10,12 +11,11 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
-import React from 'react';
 import SearchIcon from '@material-ui/icons/Search';
+import clsx from 'clsx';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -31,6 +31,9 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         width: '1px',
+    },
+    activeButton: {
+        fontWeight: 'bold',
     },
 }));
 
@@ -66,8 +69,11 @@ export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
     loading: boolean;
+    searchGuideOpen: boolean;
     onSearchGuideToggle: () => void;
 }): JSX.Element {
+    const classes = searchBarStyles();
+
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -90,7 +96,6 @@ export default function SearchBar(props: {
         handleFilterClose();
     };
 
-    const classes = searchBarStyles();
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
@@ -128,6 +133,10 @@ export default function SearchBar(props: {
                                     color="primary"
                                     startIcon={<HelpIcon />}
                                     onClick={props.onSearchGuideToggle}
+                                    className={clsx({
+                                        [classes.activeButton]:
+                                            props.searchGuideOpen,
+                                    })}
                                 >
                                     Search guide
                                 </Button>
