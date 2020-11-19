@@ -318,10 +318,11 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [searchLoading, setSearchLoading] = React.useState(false);
+    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
         false,
     );
+    const searchBarRef = React.useRef<HTMLDivElement>(null);
 
     const lastLocation = useLastLocation();
     const history = useHistory();
@@ -456,7 +457,10 @@ export default function App(): JSX.Element {
                         <GHListLogo />
                         {location.pathname === '/cases' && user ? (
                             <>
-                                <div className={classes.searchBar}>
+                                <div
+                                    className={classes.searchBar}
+                                    ref={searchBarRef}
+                                >
                                     <SearchBar
                                         searchQuery={
                                             location.state?.search ?? ''
@@ -730,7 +734,12 @@ export default function App(): JSX.Element {
                         )}
                     </Switch>
                 </main>
-                {isSearchGuideOpen && <SearchGuideDialog />}
+                {isSearchGuideOpen && (
+                    <SearchGuideDialog
+                        onToggle={toggleSearchGuide}
+                        triggerRef={searchBarRef}
+                    />
+                )}
             </ThemeProvider>
         </div>
     );
