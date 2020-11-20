@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5f9c06e8c83590004ccd9c43/2020/10/30/1311/content.csv",
+    "sourceUrl": "https://bi.static.es.gov.br/covid19/MICRODADOS.csv",
+    "sourceId": "5f9c06e8c83590004ccd9c43"
+}
