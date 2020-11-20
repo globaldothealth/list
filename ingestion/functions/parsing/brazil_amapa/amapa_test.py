@@ -22,14 +22,14 @@ class AmapaTest(unittest.TestCase):
                 "sourceUrl": _SOURCE_URL
             },
             "location": {
-                "query": "Laranjal do Jari, Amapá, Brazil"
+                "query": "Ferreira Gomes, Amapá, Brazil"
             },
             "demographics": {
-                "gender": "Female",
+                "gender": "Male",
                 "ageRange":
                 {
-                    "start": float(54),
-                    "end": float(54)
+                    "start": float(52),
+                    "end": float(52)
                 },
                 "ethnicity": "Mixed",
                 "occupation": None
@@ -39,17 +39,21 @@ class AmapaTest(unittest.TestCase):
                     "name": "confirmed",
                     "dateRange":
                     {
-                        "start": "04/22/2020Z",
-                        "end": "04/22/2020Z"
+                        "start": "06/04/2020Z",
+                        "end": "06/04/2020Z"
                     },
                     "value": "Serological test"
                 },
+                {
+                    "name": "outcome",
+                    "value": "Recovered"
+                }
             ],
             "preexistingConditions": {
                 "hasPreexistingConditions": True,
-                "values": ["diabetes mellitus", "heart disease"]
+                "values": ["diabetes mellitus"]
             },
-            "notes": "Neighbourhood: AGRESTE"
+            "notes": "Patient with immunosupression, Neighbourhood: FERREIRA GOMES"
         }
 
         result = amapa.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
@@ -64,4 +68,3 @@ class AmapaTest(unittest.TestCase):
 
         result = amapa.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
         self.assertCountEqual(list(result), [])
-
