@@ -45,12 +45,19 @@ it('loads and displays cases', async () => {
                 administrativeAreaLevel3: 'some admin 3',
                 name: 'some place name',
                 geometry: {
-                    latitude: 42,
-                    longitude: 12,
+                    latitude: 42.123421,
+                    longitude: 12.376867,
                 },
                 geoResolution: 'Admin3',
             },
             events: [
+                {
+                    name: 'onsetSymptoms',
+                    dateRange: {
+                        start: new Date(Date.UTC(2020, 10, 28)).toJSON(),
+                        end: new Date(Date.UTC(2020, 10, 28)).toJSON(),
+                    },
+                },
                 {
                     name: 'confirmed',
                     dateRange: {
@@ -61,6 +68,10 @@ it('loads and displays cases', async () => {
                 {
                     name: 'hospitalAdmission',
                     value: 'Yes',
+                    dateRange: {
+                        start: new Date(Date.UTC(2020, 11, 1)).toJSON(),
+                        end: new Date(Date.UTC(2020, 11, 6)).toJSON(),
+                    },
                 },
                 {
                     name: 'outcome',
@@ -105,9 +116,13 @@ it('loads and displays cases', async () => {
     expect(await findByText('some admin 2')).toBeInTheDocument();
     expect(await findByText('some admin 3')).toBeInTheDocument();
     expect(await findByText('France')).toBeInTheDocument();
+    expect(await findByText('42.1234')).toBeInTheDocument();
+    expect(await findByText('12.3769')).toBeInTheDocument();
     expect(await findByText('1-3')).toBeInTheDocument();
     expect(await findByText('Female')).toBeInTheDocument();
     expect(await findByText('Recovered')).toBeInTheDocument();
+    expect(await findByText('2020-11-28')).toBeInTheDocument();
+    expect(await findByText('2020-12-01 - 2020-12-06')).toBeInTheDocument();
     expect(await findByTestId('verified-svg')).toBeInTheDocument();
 });
 
