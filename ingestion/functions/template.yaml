@@ -56,11 +56,11 @@ Resources:
       RetentionPolicy: Retain
     Metadata:
       BuildMethod: python3.8
-  ThaiParsingFunction:
+  ThailandParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: parsing/thai/
-      Handler: thai.lambda_handler
+      CodeUri: parsing/thailand/
+      Handler: thailand.lambda_handler
       Description: Parse case data for Thailand
       # Function's execution role
       Policies:
