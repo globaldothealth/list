@@ -35,7 +35,8 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import renderDate from './util/date';
+import renderDate, { renderDateRange } from './util/date';
+import { round } from 'lodash';
 
 interface ListResponse {
     cases: Case[];
@@ -46,6 +47,7 @@ interface ListResponse {
 interface LinelistTableState {
     url: string;
     error: string;
+    page: number;
     pageSize: number;
     // The rows which are selected on the current page.
     selectedRowsCurrentPage: TableRow[];
@@ -66,9 +68,13 @@ interface TableRow {
     adminArea2: string;
     adminArea1: string;
     country: string;
+    latitude: number;
+    longitude: number;
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
+    hospitalizationDateRange?: string;
+    symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
 }
@@ -78,6 +84,8 @@ interface LocationState {
     editedCaseIds: string[];
     bulkMessage: string;
     search: string;
+    page: number;
+    pageSize: number;
 }
 
 interface Props
@@ -85,6 +93,12 @@ interface Props
         WithStyles<typeof styles> {
     user: User;
     setSearchLoading: (a: boolean) => void;
+    page: number;
+    pageSize: number;
+
+    onChangePage: (page: number) => void;
+
+    onChangePageSize: (pageSize: number) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -279,7 +293,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.state = {
             url: '/api/cases/',
             error: '',
-            pageSize: 50,
+            page: this.props.page ?? 0,
+            pageSize: this.props.pageSize ?? 50,
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
@@ -301,7 +316,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     componentDidMount(): void {
         // history.location.state can be updated with new values on which we
         // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) => {
+        this.unlisten = this.props.history.listen(({ state }, _) => {
             this.tableRef.current?.onQueryChange();
         });
     }
@@ -638,6 +653,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'country',
                         },
                         {
+                            title: 'Latitude',
+                            field: 'latitude',
+                        },
+                        {
+                            title: 'Longitude',
+                            field: 'longitude',
+                        },
+                        {
                             title: 'Age',
                             field: 'age',
                             render: (rowData) =>
@@ -655,6 +678,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'outcome',
                         },
                         {
+                            title: 'Hospitalization date/period',
+                            field: 'hospitalizationDateRange',
+                        },
+                        {
+                            title: 'Symptoms onset date',
+                            field: 'symptomsOnsetDate',
+                        },
+                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
                             headerStyle: { whiteSpace: 'nowrap' },
@@ -664,8 +695,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
-                            listUrl += '?limit=' + this.state.pageSize;
-                            listUrl += '&page=' + (query.page + 1);
+                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '&page=' + (this.state.page + 1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
@@ -700,6 +731,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.location
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
+                                            latitude: round(
+                                                c.location?.geometry?.latitude,
+                                                4,
+                                            ),
+                                            longitude: round(
+                                                c.location?.geometry?.longitude,
+                                                4,
+                                            ),
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
@@ -709,6 +748,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
+                                            hospitalizationDateRange: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'hospitalAdmission',
+                                                )?.dateRange,
+                                            ),
+                                            symptomsOnsetDate: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'onsetSymptoms',
+                                                )?.dateRange,
+                                            ),
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
                                             verificationStatus:
@@ -723,7 +776,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                     resolve({
                                         data: flattenedCases,
-                                        page: query.page,
+                                        page: this.state.page,
                                         totalCount: result.data.total,
                                     });
                                 })
@@ -752,6 +805,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
+                                        onChangeRowsPerPage={(event): void => {
+                                            const newPage = 0;
+                                            const newPageSize = Number(
+                                                event.target.value,
+                                            );
+
+                                            this.setState({
+                                                page: newPage,
+                                                pageSize: newPageSize,
+                                            });
+
+                                            props.onChangeRowsPerPage(event);
+
+                                            this.props.onChangePage(newPage);
+                                            this.props.onChangePageSize(
+                                                newPageSize,
+                                            );
+                                        }}
+                                        onChangePage={(
+                                            event,
+                                            newPage: number,
+                                        ): void => {
+                                            this.setState({ page: newPage });
+
+                                            this.props.onChangePage(newPage);
+                                            props.onChangePage(event, newPage);
+                                        }}
                                     ></TablePagination>
                                 </div>
                             ) : (
@@ -812,10 +892,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ).includes(rowData.id)
                                 ? { backgroundColor: '#F0FBF9' }
                                 : {},
-                    }}
-                    onChangeRowsPerPage={(newPageSize: number) => {
-                        this.setState({ pageSize: newPageSize });
-                        this.tableRef.current.onQueryChange();
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
                         if (rowData) {

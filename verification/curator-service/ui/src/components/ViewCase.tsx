@@ -17,7 +17,7 @@ import StaticMap from './StaticMap';
 import axios from 'axios';
 import createHref from './util/links';
 import { makeStyles } from '@material-ui/core';
-import renderDate from './util/date';
+import renderDate, { renderDateRange } from './util/date';
 import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
@@ -121,15 +121,6 @@ function ageRange(range?: { start: number; end: number }): string {
     return range.start === range.end
         ? `${range.start}`
         : `${range.start}-${range.end}`;
-}
-
-function dateRange(range?: { start?: string; end?: string }): string {
-    if (!range || !range.start || !range.end) {
-        return '';
-    }
-    return range.start === range.end
-        ? renderDate(range.start)
-        : `${renderDate(range.start)} - ${renderDate(range.end)}`;
 }
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
@@ -394,7 +385,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         <Grid container className={classes.grid}>
                             <RowHeader title="Confirmed case date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'confirmed',
                                     )?.dateRange,
@@ -412,7 +403,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Symptom onset date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'onsetSymptoms',
                                     )?.dateRange,
@@ -421,7 +412,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="First clinical consultation" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) =>
                                             e.name ===
@@ -432,7 +423,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Date of self isolation" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'selfIsolation',
                                     )?.dateRange,
@@ -450,7 +441,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Hospital admission date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'hospitalAdmission',
                                     )?.dateRange,
@@ -459,7 +450,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Date admitted to isolation unit" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'icuAdmission',
                                     )?.dateRange,
@@ -477,7 +468,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Outcome date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'outcome',
                                     )?.dateRange,
@@ -725,7 +716,7 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
             <RowContent content={props.travel.methods?.join(', ') || ''} />
 
             <RowHeader title="Travel dates" />
-            <RowContent content={dateRange(props.travel.dateRange)} />
+            <RowContent content={renderDateRange(props.travel.dateRange)} />
 
             <RowHeader title="Primary reason of travel" />
             <RowContent content={props.travel.purpose || ''} />
