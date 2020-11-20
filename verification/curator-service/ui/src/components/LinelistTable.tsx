@@ -35,7 +35,8 @@ import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from 'axios';
 import { createStyles } from '@material-ui/core/styles';
-import renderDate from './util/date';
+import renderDate, { renderDateRange } from './util/date';
+import { round } from 'lodash';
 
 interface ListResponse {
     cases: Case[];
@@ -66,9 +67,13 @@ interface TableRow {
     adminArea2: string;
     adminArea1: string;
     country: string;
+    latitude: number;
+    longitude: number;
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
+    hospitalizationDateRange?: string;
+    symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
 }
@@ -638,6 +643,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'country',
                         },
                         {
+                            title: 'Latitude',
+                            field: 'latitude',
+                        },
+                        {
+                            title: 'Longitude',
+                            field: 'longitude',
+                        },
+                        {
                             title: 'Age',
                             field: 'age',
                             render: (rowData) =>
@@ -653,6 +666,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Outcome',
                             field: 'outcome',
+                        },
+                        {
+                            title: 'Hospitalization date/period',
+                            field: 'hospitalizationDateRange',
+                        },
+                        {
+                            title: 'Symptoms onset date',
+                            field: 'symptomsOnsetDate',
                         },
                         {
                             title: 'Source URL',
@@ -700,6 +721,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.location
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
+                                            latitude: round(
+                                                c.location?.geometry?.latitude,
+                                                4,
+                                            ),
+                                            longitude: round(
+                                                c.location?.geometry?.longitude,
+                                                4,
+                                            ),
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
@@ -709,6 +738,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
+                                            hospitalizationDateRange: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'hospitalAdmission',
+                                                )?.dateRange,
+                                            ),
+                                            symptomsOnsetDate: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'onsetSymptoms',
+                                                )?.dateRange,
+                                            ),
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
                                             verificationStatus:
