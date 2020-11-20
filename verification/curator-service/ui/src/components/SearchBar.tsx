@@ -148,15 +148,12 @@ export default function SearchBar(props: {
                                 >
                                     Search guide
                                 </Button>
-                                {isSearchGuideOpen && (
-                                    <SearchGuideDialog
-                                        onToggle={toggleSearchGuide}
-                                        rootComponentRef={
-                                            props.rootComponentRef
-                                        }
-                                        triggerComponentRef={guideButtonRef}
-                                    />
-                                )}
+                                <SearchGuideDialog
+                                    isOpen={isSearchGuideOpen}
+                                    onToggle={toggleSearchGuide}
+                                    rootComponentRef={props.rootComponentRef}
+                                    triggerComponentRef={guideButtonRef}
+                                />
                                 <div className={classes.divider}></div>
                                 <SearchIcon color="primary" />
                             </InputAdornment>
