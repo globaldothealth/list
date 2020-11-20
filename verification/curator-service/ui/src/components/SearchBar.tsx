@@ -7,7 +7,6 @@ import {
     MenuItem,
     TextField,
     Theme,
-    Tooltip,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
@@ -37,12 +36,6 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         fontWeight: 'bold',
     },
 }));
-
-const HtmlTooltip = withStyles((theme: Theme) => ({
-    tooltip: {
-        maxWidth: '500px',
-    },
-}))(Tooltip);
 
 const StyledSearchTextField = withStyles({
     root: {
@@ -173,59 +166,6 @@ export default function SearchBar(props: {
                                     <CloseIcon />
                                 </IconButton>
                             )}
-                            <HtmlTooltip
-                                color="primary"
-                                title={
-                                    <React.Fragment>
-                                        <h4>Search syntax</h4>
-                                        <h5>Full text search</h5>
-                                        Example:{' '}
-                                        <i>"got infected at work" -India</i>
-                                        <br />
-                                        You can use arbitrary strings to search
-                                        over those text fields:
-                                        {[
-                                            'notes',
-                                            'curator',
-                                            'occupation',
-                                            'nationalities',
-                                            'ethnicity',
-                                            'country',
-                                            'admin1',
-                                            'admin2',
-                                            'admin3',
-                                            'place',
-                                            'location name',
-                                            'pathogen name',
-                                            'source url',
-                                            'upload ID',
-                                            'verification status',
-                                        ].join(', ')}
-                                        <h5>Keywords search</h5>
-                                        Example:{' '}
-                                        <i>
-                                            curator:foo@bar.com,fez@meh.org
-                                            country:Japan gender:female
-                                            occupation:"healthcare worker"
-                                        </i>
-                                        <br />
-                                        Values are OR'ed for the same keyword
-                                        and all keywords are AND'ed.
-                                        <br />
-                                        Keyword values can be quoted for
-                                        multi-words matches and concatenated
-                                        with a comma to union them.
-                                        <br />
-                                        Only equality operator is supported.
-                                        <br />
-                                        Supported keywords are shown when the
-                                        filter button is clicked.
-                                    </React.Fragment>
-                                }
-                                placement="left"
-                            >
-                                <HelpIcon />
-                            </HtmlTooltip>
                         </InputAdornment>
                     ),
                 }}
