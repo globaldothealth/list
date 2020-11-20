@@ -15,24 +15,25 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-_DATE_CONFIRMED = "dataNotificacao"
-_HEALTHCARE_WORKER = "profissionalSaude"
-_PREEXISTING_CONDITIONS = "comorbidades"
-_METHOD_CONFIRMATION = "tipoTeste"
-_CONFIRMATION = "resultadoTeste"
-_GENDER = "sexo"
-_NOTES_BAIRRO = "bairro"
-_MUNICIPALITY = "municipio"
-_AGE = "idade"
-_ETHNICITY = "racaCor"
-_NOTES_INDIGENOUS_GROUP = "etniaIndigena"
+_DATE_CONFIRMED = "Data de Notificação"
+_HEALTHCARE_WORKER = "Profissional de Saúde"
+_PREEXISTING_CONDITIONS = "Comorbidades"
+_METHOD_CONFIRMATION = "Tipo de Teste"
+_GENDER = "Sexo"
+_NOTES_BAIRRO = "Bairro"
+_MUNICIPALITY = "Município"
+_AGE = "Idade"
+_ETHNICITY = "Raça/Cor"
+_OUTCOME = "Evolução do Caso"
 
 _COMORBIDITIES_MAP = {
     "Diabetes": "diabetes mellitus",
     "Gestante": "pregnancy",
+    "Gestante de alto risco": "high risk pregnancy",
     "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
-    "Doenças cardíacas crônicas": "heart disease"
+    "Doenças cardíacas crônicas": "heart disease",
+    "Obesidade": "obesity"
 }
 
 
@@ -44,10 +45,14 @@ def convert_gender(raw_gender: str):
 
 
 def convert_age(age: str):
-    return {
-        "start": float(age),
-        "end": float(age)
-    }
+    # It seems for some cases the wrong information has been entered into the wrong columns, and so we get instances of Masculino and Feminino in the age column
+    try:
+        return {
+            "start": float(age),
+            "end": float(age)
+        }
+    except:
+        return None
 
 
 def convert_confirmation_method(raw_test: str):
@@ -66,36 +71,32 @@ def convert_profession(raw_profession: str):
 
 
 def convert_ethnicity(raw_ethnicity: str):
-    # I have checked these against the UK government list of ethnicities, with the exception of
-    # indigenous which I have added as it is not on the list
-    if raw_ethnicity == "Preta":
+    if raw_ethnicity == "PRETA":
         return "Black"
-    elif raw_ethnicity == "Parda":
+    elif raw_ethnicity == "PARDA":
         return "Mixed"
-    elif raw_ethnicity == "Amarela":
+    elif raw_ethnicity == "AMARELA":
         return "Asian"
-    elif raw_ethnicity == "Branca":
+    elif raw_ethnicity == "BRANCA":
         return "White"
-    elif raw_ethnicity == "Indigena":
+    elif raw_ethnicity == "INDIGENA":
         return "Indigenous"
 
 
 def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_comorbidities:
+    comorbidities = []
+
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_comorbidities:
+            comorbidities.append(_COMORBIDITIES_MAP[key])
+    
+    if comorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-
-        comorbidities = []
-
-        for key in _COMORBIDITIES_MAP:
-            if key in raw_comorbidities:
-                comorbidities.append(_COMORBIDITIES_MAP[key])
-
-        if comorbidities:
-            preexistingConditions["values"] = comorbidities
-
+        preexistingConditions["values"] = comorbidities
         return preexistingConditions
-
+    else:
+        return None
 
 def convert_location(raw_entry: str):
     query = ", ".join(word for word in [raw_entry, "Amapá", "Brazil"] if word)
@@ -103,18 +104,16 @@ def convert_location(raw_entry: str):
 
 
 def convert_notes(
-        raw_comorbidities: str, raw_notes_neighbourhood: str,
-        raw_notes_indigenousEthnicity: str):
+        raw_comorbidities: str, raw_notes_neighbourhood: str):
     raw_notes = []
     if "Imunossupressão" in raw_comorbidities:
         raw_notes.append("Patient with immunosupression")
     if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
-        raw_notes.append(
-            "primary immunodeficiency disease or chromosomal disease")
+        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
+    if "Puérpera (até 45 dias do parto)" in raw_comorbidities:
+        raw_notes.append("Patient given birth in the last 45 days")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
-    if raw_notes_indigenousEthnicity:
-        raw_notes.append("Indigenous ethnicity: " + raw_notes_indigenousEthnicity)
 
     notes = (', ').join(raw_notes)
     return notes
@@ -138,6 +137,25 @@ def convert_date(raw_date: str):
         except:
             return None
 
+
+def convert_outcome(outcome: str):
+    if outcome == "Óbito":
+        return {
+            "name": "outcome",
+            "value": "Death"
+        }
+    elif outcome == "Cura":
+        return {
+            "name": "outcome",
+            "value": "Recovered"
+        }
+    elif outcome == "Internado":
+        return {
+            "name": "hospitalAdmission",
+            "value": "Yes"
+        }
+
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data.
         Caveats:
@@ -151,7 +169,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         for row in reader:
             # We have entries as high as 351 - unclear if this is days.
             confirmation_date = convert_date(row[_DATE_CONFIRMED])
-            if float(row[_AGE]) <= 110 and confirmation_date is not None:
+            age = convert_age(row[_AGE])
+            if age is not None and float(row[_AGE]) <= 110 and confirmation_date is not None:
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
@@ -174,12 +193,12 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             },
                             "value": convert_confirmation_method(row[_METHOD_CONFIRMATION])
                         },
+                        convert_outcome(row[_OUTCOME])
                     ],
                     "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS]),
                     "notes": convert_notes(
                         row[_PREEXISTING_CONDITIONS],
-                        row[_NOTES_BAIRRO],
-                        row[_NOTES_INDIGENOUS_GROUP])
+                        row[_NOTES_BAIRRO])
                 }
                 yield case
 
