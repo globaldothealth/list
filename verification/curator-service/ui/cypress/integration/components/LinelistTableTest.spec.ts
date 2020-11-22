@@ -361,4 +361,28 @@ describe('Linelist table', function () {
         cy.contains('6-7 of 7').should('exist');
         cy.contains('5 rows').should('exist');
     });
+
+    it('Searching from a different page than first flips back to page one', function () {
+        for (let i = 0; i < 7; i++) {
+            cy.addCase({
+                country: 'France',
+                notes: 'some notes',
+                sourceUrl: 'foo.bar',
+            });
+        }
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+        cy.contains('rows').click();
+        cy.route('GET', '/api/cases/?limit=5&page=1').as('getFirstPage');
+        cy.get('li').contains('5').click();
+        cy.wait('@getFirstPage');
+
+        cy.contains('chevron_right').click();
+
+        cy.get('input[id="search-field"]').type('France{enter}');
+
+        cy.contains('1-5 of 7').should('exist');
+    });
 });
