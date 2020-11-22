@@ -313,14 +313,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
     }
 
-    componentDidMount(): void {
-        // history.location.state can be updated with new values on which we
-        // must refresh the table
-        this.unlisten = this.props.history.listen(({ state }, _) => {
-            this.tableRef.current?.onQueryChange();
-        });
+    componentDidUpdate(
+        prevProps: Readonly<Props>,
+        prevState: Readonly<LinelistTableState>,
+    ): void {
+        if (
+            this.props.location.state?.search !==
+            prevProps.location.state?.search
+        ) {
+            this.setState({ page: 0 }, this.tableRef.current?.onQueryChange);
+        }
     }
-
     componentWillUnmount(): void {
         this.unlisten();
     }
