@@ -8,6 +8,7 @@ import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
+import { parseDownloadedCase } from '../util/case';
 
 class GeocodeNotFoundError extends Error {}
 
@@ -76,6 +77,7 @@ export class CasesController {
                     }>).map((datum) => datum.name);
                     casesQuery
                         .cursor()
+                        .map(parseDownloadedCase)
                         .pipe(
                             stringify({
                                 header: true,
