@@ -2,8 +2,6 @@ import { CaseDocument } from '../../src/model/case';
 import { EventDocument } from '../../src/model/event';
 import { parseCaseEvents, parseDownloadedCase } from '../../src/util/case';
 import events from '../model/data/case.events.json';
-import demographics from '../model/data/demographics.full.json';
-import symptoms from '../model/data/symptoms.full.json';
 
 describe('Case', () => {
     it('is parsed properly for download', () => {
@@ -11,8 +9,12 @@ describe('Case', () => {
         // @ts-ignore Not necessary to mock full Mongoose type in JSON file
         const res = parseDownloadedCase({
             events,
-            demographics,
-            symptoms,
+            symptoms: {
+                values: ['Cough', 'Pneumonia'],
+            },
+            demographics: {
+                nationalities: [],
+            },
         } as CaseDocument);
 
         expect(res.events).toEqual({
@@ -34,8 +36,8 @@ describe('Case', () => {
             },
         });
 
-        expect(res.demographics.nationalities).toEqual('American,Swedish');
         expect(res.symptoms.values).toEqual('Cough,Pneumonia');
+        expect(res.demographics.nationalities).toEqual('');
     });
     it('events are parsed properly for download', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

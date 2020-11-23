@@ -29,15 +29,35 @@ export const parseCaseEvents = (
 /**
  * Converts case to fulfill CSV file structure requirements.
  */
-export const parseDownloadedCase = (caseDocument: CaseDocument) => ({
-    ...caseDocument,
-    events: parseCaseEvents(caseDocument.events),
-    demographics: {
-        ...caseDocument.demographics,
-        nationalities: caseDocument.demographics.nationalities.join(','),
-    },
-    symptoms: {
-        ...caseDocument.symptoms,
-        values: caseDocument.symptoms.values.join(','),
-    },
-});
+export const parseDownloadedCase = (caseDocument: CaseDocument) => {
+    const { demographics, symptoms } = caseDocument;
+
+    const parsedDemographics = demographics?.nationalities
+        ? {
+              demographics: {
+                  ...demographics,
+                  nationalities: demographics.nationalities?.length
+                      ? demographics.nationalities.join(',')
+                      : '',
+              },
+          }
+        : {};
+
+    const parsedSymptoms = symptoms?.values
+        ? {
+              symptoms: {
+                  ...symptoms,
+                  values: symptoms.values?.length
+                      ? symptoms.values.join(',')
+                      : '',
+              },
+          }
+        : {};
+
+    return {
+        ...caseDocument,
+        ...parsedDemographics,
+        ...parsedSymptoms,
+        events: parseCaseEvents(caseDocument.events),
+    };
+};
