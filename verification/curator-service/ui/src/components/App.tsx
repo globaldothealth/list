@@ -607,7 +607,6 @@ export default function App(): JSX.Element {
                                 Terms of use
                             </Link>
                             <IubendaElement
-                                id="test"
                                 type="privacy-policy"
                                 classes={{
                                     root: classes.link,
@@ -616,7 +615,6 @@ export default function App(): JSX.Element {
                                 Privacy policy
                             </IubendaElement>
                             <IubendaElement
-                                id="test"
                                 type="cookie-policy"
                                 classes={{
                                     root: classes.link,
@@ -625,7 +623,6 @@ export default function App(): JSX.Element {
                                 Cookie policy
                             </IubendaElement>
                             <IubendaElement
-                                id="test"
                                 type="terms-and-conditions"
                                 classes={{
                                     root: clsx([

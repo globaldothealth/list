@@ -37,6 +37,7 @@ GOOGLE_OAUTH_CLIENT_ID=<oauth client id to enable OAuth>
 GOOGLE_OAUTH_CLIENT_SECRET=<oauth client secret>
 MAPBOX_TOKEN=<Mapbox API token>
 REACT_APP_PUBLIC_MAPBOX_TOKEN=<Different Mapbox API token>
+REACT_APP_IUBENDA_PUBLIC_ID=<Public id for Iubenda service that provides legal policies>
 ```
 
 These values are stored in a dedicated secret manager. To request AWS credentials, or for access to
