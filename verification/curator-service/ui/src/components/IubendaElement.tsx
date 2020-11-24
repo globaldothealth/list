@@ -4,7 +4,6 @@ import clsx from 'clsx';
 type LegalType = 'privacy-policy' | 'cookie-policy' | 'terms-and-conditions';
 
 interface Props {
-    id: string;
     children: string;
     type: LegalType;
     classes?: {
@@ -14,9 +13,9 @@ interface Props {
 
 const IUBENDA_URL = 'https://www.iubenda.com';
 const IUBENDA_SRC = 'https://cdn.iubenda.com/iubenda.js';
+const IUBENDA_ID = process.env.REACT_APP_IUBENDA_PUBLIC_ID;
 export default function IubendaElement({
     children,
-    id,
     type,
     classes,
 }: Props): JSX.Element {
@@ -31,20 +30,20 @@ export default function IubendaElement({
         }
     }, []);
 
-    const createURL = (id: string, type: LegalType): string => {
+    const createURL = (type: LegalType): string => {
         switch (type) {
             case 'cookie-policy':
-                return `${IUBENDA_URL}/privacy-policy/${id}/cookie-policy`;
+                return `${IUBENDA_URL}/privacy-policy/${IUBENDA_ID}/cookie-policy`;
             case 'privacy-policy':
-                return `${IUBENDA_URL}/privacy-policy/${id}`;
+                return `${IUBENDA_URL}/privacy-policy/${IUBENDA_ID}`;
             default:
-                return `${IUBENDA_URL}/${type}/${id}`;
+                return `${IUBENDA_URL}/${type}/${IUBENDA_ID}`;
         }
     };
 
     return (
         <a
-            href={createURL(id, type)}
+            href={createURL(type)}
             className={clsx([
                 'iubenda-nostyle',
                 'iubenda-embed',
