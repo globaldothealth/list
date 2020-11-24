@@ -3,6 +3,7 @@ import { DocumentQuery, Query } from 'mongoose';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
@@ -76,6 +77,7 @@ export class CasesController {
                     }>).map((datum) => datum.name);
                     casesQuery
                         .cursor()
+                        .map(parseDownloadedCase)
                         .pipe(
                             stringify({
                                 header: true,
