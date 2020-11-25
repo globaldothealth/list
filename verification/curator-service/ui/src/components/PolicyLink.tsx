@@ -11,33 +11,29 @@ interface Props {
     };
 }
 
-const IUBENDA_URL = 'https://www.iubenda.com';
-const IUBENDA_SRC = 'https://cdn.iubenda.com/iubenda.js';
-const IUBENDA_ID = process.env.REACT_APP_IUBENDA_PUBLIC_ID;
-export default function IubendaElement({
+const POLICY_URL = 'https://www.iubenda.com';
+const POLICY_ID = process.env.REACT_APP_POLICY_PUBLIC_ID;
+export default function PolicyLink({
     children,
     type,
     classes,
 }: Props): JSX.Element {
     useEffect(() => {
         const script = document.createElement('script');
-        const tag = document.getElementsByTagName('script')[0];
 
-        script.src = IUBENDA_SRC;
+        script.src = 'https://cdn.iubenda.com/iubenda.js';
 
-        if (tag?.parentNode) {
-            tag.parentNode.insertBefore(script, tag);
-        }
+        document.body.appendChild(script);
     }, []);
 
     const createURL = (type: LegalType): string => {
         switch (type) {
             case 'cookie-policy':
-                return `${IUBENDA_URL}/privacy-policy/${IUBENDA_ID}/cookie-policy`;
+                return `${POLICY_URL}/privacy-policy/${POLICY_ID}/cookie-policy`;
             case 'privacy-policy':
-                return `${IUBENDA_URL}/privacy-policy/${IUBENDA_ID}`;
+                return `${POLICY_URL}/privacy-policy/${POLICY_ID}`;
             default:
-                return `${IUBENDA_URL}/${type}/${IUBENDA_ID}`;
+                return `${POLICY_URL}/${type}/${POLICY_ID}`;
         }
     };
 
