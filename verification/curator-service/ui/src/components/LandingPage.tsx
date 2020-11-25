@@ -4,6 +4,7 @@ import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insigni
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import PolicyLink from './PolicyLink';
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles(() => ({
         width: '60%',
     },
     link: {
+        display: 'block',
         margin: '4px 0',
     },
     loginButton: {
@@ -82,6 +84,22 @@ export default function LandingPage(): JSX.Element {
                     <div className={classes.link}>
                         <Link to="/terms">Terms of use</Link>
                     </div>
+                    <PolicyLink
+                        type="privacy-policy"
+                        classes={{
+                            root: classes.link,
+                        }}
+                    >
+                        Privacy policy
+                    </PolicyLink>
+                    <PolicyLink
+                        type="cookie-policy"
+                        classes={{
+                            root: classes.link,
+                        }}
+                    >
+                        Cookie policy
+                    </PolicyLink>
                 </div>
             </div>
             <Button
