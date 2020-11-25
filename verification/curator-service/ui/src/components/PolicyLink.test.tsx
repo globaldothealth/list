@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import IubendaElement from './IubendaElement';
+import PolicyLink from './PolicyLink';
 
 test('renders privacy policy link', async () => {
     const { getByText } = render(
-        <IubendaElement type="privacy-policy">Privacy policy</IubendaElement>,
+        <PolicyLink type="privacy-policy">Privacy policy</PolicyLink>,
     );
 
     const button = getByText('Privacy policy') as HTMLAnchorElement;
@@ -15,7 +15,7 @@ test('renders privacy policy link', async () => {
 
 test('renders cookie policy link', async () => {
     const { getByText } = render(
-        <IubendaElement type="cookie-policy">Cookie policy</IubendaElement>,
+        <PolicyLink type="cookie-policy">Cookie policy</PolicyLink>,
     );
 
     const button = getByText('Cookie policy') as HTMLAnchorElement;
