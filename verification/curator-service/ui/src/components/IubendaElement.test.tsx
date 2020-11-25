@@ -23,17 +23,3 @@ test('renders cookie policy link', async () => {
     expect(button.href).toContain('https://www.iubenda.com/privacy-policy');
     expect(button.href).toContain('cookie-policy');
 });
-
-test('renders terms and conditions link', async () => {
-    const { getByText } = render(
-        <IubendaElement type="terms-and-conditions">
-            Terms and conditions
-        </IubendaElement>,
-    );
-
-    const button = getByText('Terms and conditions') as HTMLAnchorElement;
-
-    expect(button.href).toContain(
-        'https://www.iubenda.com/terms-and-conditions',
-    );
-});

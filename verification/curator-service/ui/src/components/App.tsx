@@ -617,21 +617,13 @@ export default function App(): JSX.Element {
                             <IubendaElement
                                 type="cookie-policy"
                                 classes={{
-                                    root: classes.link,
-                                }}
-                            >
-                                Cookie policy
-                            </IubendaElement>
-                            <IubendaElement
-                                type="terms-and-conditions"
-                                classes={{
                                     root: clsx([
                                         classes.link,
                                         classes.lastLink,
                                     ]),
                                 }}
                             >
-                                Terms and conditions
+                                Cookie policy
                             </IubendaElement>
                         </div>
                     </Drawer>
