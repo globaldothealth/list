@@ -38,6 +38,10 @@ class ParaTest(unittest.TestCase):
                             "start": "04/16/2020Z",
                             "end": "04/16/2020Z"
                         }
+                    },
+                    {
+                        "name": "outcome",
+                        "value": "Recovered"
                     }
                 ],
                 "symptoms": {
