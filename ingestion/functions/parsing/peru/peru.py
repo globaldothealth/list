@@ -72,7 +72,7 @@ def parse_cases(raw_data_file, source_id, source_url):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=';')
         for entry in reader:
-            if entry["UUID"]:
+            if entry["UUID"] and entry['FECHA_RESULTADO']:
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
