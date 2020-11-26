@@ -3,8 +3,6 @@ import { useEffect } from 'react';
 const POLICY_ID = process.env.REACT_APP_POLICY_PUBLIC_ID;
 const SITE_ID = process.env.REACT_APP_COOKIE_CONSENT_PUBLIC_ID;
 
-console.log(SITE_ID, POLICY_ID);
-
 const configuration = {
     whitelabel: false,
     lang: 'en',
@@ -13,7 +11,7 @@ const configuration = {
     banner: {
         rejectButtonColor: '#ECF3F0',
         rejectButtonCaptionColor: '#0E7569',
-        position: 'float-top-center',
+        position: 'float-bottom-center',
         textColor: 'white',
         backgroundColor: '#0E7569',
         acceptButtonDisplay: true,
