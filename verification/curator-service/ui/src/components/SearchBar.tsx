@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     Button,
     IconButton,
@@ -6,16 +7,15 @@ import {
     MenuItem,
     TextField,
     Theme,
-    Tooltip,
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-
 import CloseIcon from '@material-ui/icons/Close';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import HelpIcon from '@material-ui/icons/HelpOutline';
-import React from 'react';
 import SearchIcon from '@material-ui/icons/Search';
+import clsx from 'clsx';
+import SearchGuideDialog from './SearchGuideDialog';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -32,13 +32,10 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         marginRight: theme.spacing(2),
         width: '1px',
     },
-}));
-
-const HtmlTooltip = withStyles((theme: Theme) => ({
-    tooltip: {
-        maxWidth: '500px',
+    activeButton: {
+        fontWeight: 'bold',
     },
-}))(Tooltip);
+}));
 
 const StyledSearchTextField = withStyles({
     root: {
@@ -56,31 +53,50 @@ const StyledSearchTextField = withStyles({
     },
 })(TextField);
 
+const StyledInputAdornment = withStyles({
+    positionStart: {
+        marginRight: 0,
+    },
+})(InputAdornment);
+
 export default function SearchBar(props: {
     searchQuery: string;
     onSearchChange: (search: string) => void;
     loading: boolean;
+    rootComponentRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element {
+    const classes = searchBarStyles();
+
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
+        false,
+    );
+    const guideButtonRef = React.useRef<HTMLButtonElement>(null);
+
     React.useEffect(() => {
         setSearch(props.searchQuery ?? '');
     }, [props.searchQuery]);
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    const handleFilterClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+    ): void => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = (): void => {
+    const handleFilterClose = (): void => {
         setAnchorEl(null);
     };
 
     const clickItem = (text: string): void => {
         setSearch(search + (search ? ` ${text}:` : `${text}:`));
-        handleClose();
+        handleFilterClose();
     };
 
-    const classes = searchBarStyles();
+    const toggleSearchGuide = (): void => {
+        setIsSearchGuideOpen((isOpen) => !isOpen);
+    };
+
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
@@ -102,17 +118,39 @@ export default function SearchBar(props: {
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
-                        <InputAdornment position="start">
-                            <Button
-                                color="primary"
-                                startIcon={<FilterListIcon />}
-                                onClick={handleClick}
-                            >
-                                Filter
-                            </Button>
-                            <div className={classes.divider}></div>
-                            <SearchIcon color="primary" />
-                        </InputAdornment>
+                        <>
+                            <StyledInputAdornment position="start">
+                                <Button
+                                    color="primary"
+                                    startIcon={<FilterListIcon />}
+                                    onClick={handleFilterClick}
+                                >
+                                    Filter
+                                </Button>
+                                <div className={classes.divider}></div>
+                            </StyledInputAdornment>
+                            <InputAdornment position="start">
+                                <Button
+                                    color="primary"
+                                    startIcon={<HelpIcon />}
+                                    onClick={toggleSearchGuide}
+                                    className={clsx({
+                                        [classes.activeButton]: isSearchGuideOpen,
+                                    })}
+                                    ref={guideButtonRef}
+                                >
+                                    Search guide
+                                </Button>
+                                <SearchGuideDialog
+                                    isOpen={isSearchGuideOpen}
+                                    onToggle={toggleSearchGuide}
+                                    rootComponentRef={props.rootComponentRef}
+                                    triggerComponentRef={guideButtonRef}
+                                />
+                                <div className={classes.divider}></div>
+                                <SearchIcon color="primary" />
+                            </InputAdornment>
+                        </>
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
@@ -128,59 +166,6 @@ export default function SearchBar(props: {
                                     <CloseIcon />
                                 </IconButton>
                             )}
-                            <HtmlTooltip
-                                color="primary"
-                                title={
-                                    <React.Fragment>
-                                        <h4>Search syntax</h4>
-                                        <h5>Full text search</h5>
-                                        Example:{' '}
-                                        <i>"got infected at work" -India</i>
-                                        <br />
-                                        You can use arbitrary strings to search
-                                        over those text fields:
-                                        {[
-                                            'notes',
-                                            'curator',
-                                            'occupation',
-                                            'nationalities',
-                                            'ethnicity',
-                                            'country',
-                                            'admin1',
-                                            'admin2',
-                                            'admin3',
-                                            'place',
-                                            'location name',
-                                            'pathogen name',
-                                            'source url',
-                                            'upload ID',
-                                            'verification status',
-                                        ].join(', ')}
-                                        <h5>Keywords search</h5>
-                                        Example:{' '}
-                                        <i>
-                                            curator:foo@bar.com,fez@meh.org
-                                            country:Japan gender:female
-                                            occupation:"healthcare worker"
-                                        </i>
-                                        <br />
-                                        Values are OR'ed for the same keyword
-                                        and all keywords are AND'ed.
-                                        <br />
-                                        Keyword values can be quoted for
-                                        multi-words matches and concatenated
-                                        with a comma to union them.
-                                        <br />
-                                        Only equality operator is supported.
-                                        <br />
-                                        Supported keywords are shown when the
-                                        filter button is clicked.
-                                    </React.Fragment>
-                                }
-                                placement="left"
-                            >
-                                <HelpIcon />
-                            </HtmlTooltip>
                         </InputAdornment>
                     ),
                 }}
@@ -193,7 +178,7 @@ export default function SearchBar(props: {
                     horizontal: 'left',
                 }}
                 open={Boolean(anchorEl)}
-                onClose={handleClose}
+                onClose={handleFilterClose}
             >
                 {[
                     { desc: 'curator email', value: 'curator' },
