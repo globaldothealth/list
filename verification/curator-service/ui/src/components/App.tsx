@@ -317,11 +317,15 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const classes = useStyles();
+
     const menuList = user
         ? [
               {
@@ -422,11 +426,8 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
-    const [searchLoading, setSearchLoading] = React.useState(false);
-
-    const classes = useStyles();
     return (
-        <div className={classes.root}>
+        <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
@@ -460,6 +461,7 @@ export default function App(): JSX.Element {
                                             });
                                         }}
                                         loading={searchLoading}
+                                        rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
