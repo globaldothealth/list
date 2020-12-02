@@ -1,3 +1,7 @@
+import React, { RefObject } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import axios from 'axios';
+import { round } from 'lodash';
 import {
     Button,
     Dialog,
@@ -15,14 +19,15 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-import { Case, VerificationStatus } from './Case';
+import { createStyles } from '@material-ui/core/styles';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
-import React, { RefObject } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import { Case, VerificationStatus } from './Case';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -31,12 +36,9 @@ import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
+import CaseExclusionDialog from './CaseExclusionDialog';
 import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
-import { createStyles } from '@material-ui/core/styles';
 import renderDate, { renderDateRange } from './util/date';
-import { round } from 'lodash';
 
 interface ListResponse {
     cases: Case[];
@@ -150,6 +152,9 @@ function RowMenu(props: {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
         false,
     );
+    const [exclusionDialogOpen, setExclusionDialogOpen] = React.useState<
+        boolean
+    >(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
@@ -168,6 +173,11 @@ function RowMenu(props: {
         setDeleteDialogOpen(true);
     };
 
+    const openExclusionDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setExclusionDialogOpen(true);
+    };
+
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
@@ -181,6 +191,22 @@ function RowMenu(props: {
         } finally {
             setDeleteDialogOpen(false);
             setIsDeleting(false);
+            handleClose();
+        }
+    };
+
+    const handleExclude = async (note: string): Promise<void> => {
+        try {
+            props.setError('');
+            await axios.post(`/api/excludedCaseIds`, {
+                cases: [props.rowId],
+                note,
+            });
+            props.refreshData();
+        } catch (e) {
+            props.setError(e.toString());
+        } finally {
+            setExclusionDialogOpen(false);
             handleClose();
         }
     };
@@ -212,6 +238,10 @@ function RowMenu(props: {
                 <MenuItem onClick={openDeleteDialog}>
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
+                </MenuItem>
+                <MenuItem onClick={openExclusionDialog}>
+                    <NotInterestedIcon />
+                    <span className={classes.menuItemTitle}>Exclude</span>
                 </MenuItem>
             </Menu>
             <Dialog
@@ -252,6 +282,11 @@ function RowMenu(props: {
                     )}
                 </DialogActions>
             </Dialog>
+            <CaseExclusionDialog
+                isOpen={exclusionDialogOpen}
+                onClose={(): void => setExclusionDialogOpen(false)}
+                onSubmit={handleExclude}
+            />
         </>
     );
 }
