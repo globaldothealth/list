@@ -223,7 +223,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proff
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
-    if age:
+    if age is not None and age != "-":
         if age == "90 anos ou mais":
             demo["ageRange"] = {"start": 90, "end": 120}
         else:
