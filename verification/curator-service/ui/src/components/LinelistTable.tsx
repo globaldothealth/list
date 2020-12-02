@@ -33,6 +33,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
+import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
@@ -58,6 +59,7 @@ interface LinelistTableState {
     numSelectedRows: number;
     totalNumRows: number;
     deleteDialogOpen: boolean;
+    excludeDialogOpen: boolean;
     isLoading: boolean;
     isDeleting: boolean;
 }
@@ -199,7 +201,7 @@ function RowMenu(props: {
         try {
             props.setError('');
             await axios.post(`/api/excludedCaseIds`, {
-                cases: [props.rowId],
+                caseIds: [props.rowId],
                 note,
             });
             props.refreshData();
@@ -334,10 +336,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             numSelectedRows: 0,
             totalNumRows: 0,
             deleteDialogOpen: false,
+            excludeDialogOpen: false,
             isLoading: false,
             isDeleting: false,
         };
         this.deleteCases = this.deleteCases.bind(this);
+        this.excludeCases = this.excludeCases.bind(this);
         this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
             this,
         );
@@ -384,6 +388,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this.setState({ error: e.toString() });
         } finally {
             this.setState({ deleteDialogOpen: false, isDeleting: false });
+        }
+    }
+
+    async excludeCases(note: string): Promise<void> {
+        this.setState({ error: '' });
+
+        try {
+            await axios.post(`/api/excludedCaseIds`, {
+                caseIds: this.state.selectedRowsCurrentPage.map(
+                    (row: TableRow) => row.id,
+                ),
+                note,
+            });
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString() });
+        } finally {
+            this.setState({ excludeDialogOpen: false });
         }
     }
 
@@ -485,7 +507,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this.state.numSelectedRows > this.maxDeletionThreshold
         );
     }
-
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -559,6 +580,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
+                <CaseExclusionDialog
+                    isOpen={this.state.excludeDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ excludeDialogOpen: false })
+                    }
+                    onSubmit={this.excludeCases}
+                />
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
@@ -1051,6 +1079,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                               );
                                           }
                                           this.tableRef.current.onQueryChange();
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <ExcludedIcon data-testid="exclude-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
+                                      tooltip: 'Exclude selected rows',
+                                      onClick: async (): Promise<void> => {
+                                          this.setState({
+                                              excludeDialogOpen: true,
+                                          });
                                       },
                                   },
                                   {
