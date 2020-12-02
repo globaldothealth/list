@@ -2,6 +2,7 @@
 export enum VerificationStatus {
     Unverified = 'UNVERIFIED',
     Verified = 'VERIFIED',
+    Excluded = 'EXCLUDED',
 }
 
 export interface CaseReference {
