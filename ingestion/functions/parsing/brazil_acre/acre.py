@@ -61,15 +61,6 @@ _SYMPTOMS_MAP = {
 }
 
 
-unrecognizedComorbidities = [
-    "portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
-    "imunossupressão",
-    "portador  de  doenças cromossômicas ou estado de fragilidade imunológica, imunossupressão",
-    "imunossupressão, portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
-    "puérpera (até 45 dias do parto)"
-]
-
-
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -165,18 +156,16 @@ def convert_symptoms(raw_symptoms: str):
 
 def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_comorbidities:
-        if raw_comorbidities.lower() not in unrecognizedComorbidities:
-            preexistingConditions["hasPreexistingConditions"] = True
+    comorbidities = []
 
-            comorbidities = []
-
-            for key in _COMORBIDITIES_MAP:
-                if key in raw_comorbidities.lower():
-                    comorbidities.append(_COMORBIDITIES_MAP[key])
-            if comorbidities:
-                preexistingConditions["values"] = comorbidities
-            return preexistingConditions
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_comorbidities.lower():
+            comorbidities.append(_COMORBIDITIES_MAP[key])
+    
+    if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
+        preexistingConditions["values"] = comorbidities
+        return preexistingConditions
 
 
 def convert_ethnicity(raw_ethnicity: str):
