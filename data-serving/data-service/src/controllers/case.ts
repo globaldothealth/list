@@ -521,6 +521,40 @@ export class CasesController {
     };
 
     /**
+     * Excludes multiple cases.
+     *
+     * Handles HTTP POST /api/excludedCaseIds.
+     */
+    exclude = async (req: Request, res: Response): Promise<void> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // if (!req.body.cases.every((c: any) => c._id)) {
+        res.status(422).json(req.body.cases);
+        return;
+        // }
+        try {
+            const bulkWriteResult = await Case.bulkWrite(
+                // Consider defining a type for the request-format cases.
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                req.body.cases.map((c: any) => {
+                    return {
+                        updateOne: {
+                            filter: {
+                                _id: c._id,
+                            },
+                            update: c,
+                        },
+                    };
+                }),
+                { ordered: false },
+            );
+            res.json({ numModified: bulkWriteResult.modifiedCount });
+        } catch (err) {
+            res.status(500).json(err);
+            return;
+        }
+    };
+
+    /**
      * Geocodes a single location.
      * @returns The geocoded location.
      * @throws GeocodeNotFoundError if no geocode could be found.

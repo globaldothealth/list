@@ -470,6 +470,41 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /excludedCaseIds:
+    post:
+      summary: Exclude cases using their Mongo IDs
+      tags: [Case]
+      operationId: excludeCases
+      requestBody:
+        description: Cases to exclude along with note with reasoning
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                cases:
+                  description: >
+                    Cases having IDs provided here will be excluded
+                    from future source fetches.
+                  type: array
+                  items:
+                    type: string
+                note:
+                  description: >
+                    The reason behind exclusion (or other important info).
+                  type: string
+              required:
+                - cases
+                - note
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /geocode/seed:
     post:
       tags: [Geocode]
