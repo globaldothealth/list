@@ -280,6 +280,11 @@ new OpenApiValidator({
             mustHaveAnyRole(['curator']),
             casesController.del,
         );
+        apiRouter.post(
+            '/excludedCaseIds',
+            mustHaveAnyRole(['curator']),
+            casesController.exclude,
+        );
 
         // Configure users controller.
         apiRouter.get(
