@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5fc25486c26f2600385e210e/2020/11/28/1354/content.csv",
+    "sourceUrl": "https://data.cdc.gov/api/views/vbim-akqf/rows.csv?accessType=DOWNLOAD",
+    "sourceId": "5fc25486c26f2600385e210e"
+}
