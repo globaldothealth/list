@@ -113,7 +113,7 @@ def convert_events(date_confirmed, pcr, serological_method1, serological_method2
             "value": convert_test(pcr, serological_method1, serological_method2, serological_method3, test_class)
         }
     ]
-    if hospitalized not in _NONE_TYPES:
+    if hospitalized == "Sim":
         events.append(
             {
                 "name": "hospitalAdmission",
@@ -154,11 +154,6 @@ def convert_test(pcr: str, serological_method1: str, serological_method2: str, s
 def convert_preexisting_conditions(lung: str, kidney: str, diabetes: str,
                                    cardiovascular: str, obesity: str):
     preexistingConditions = {}
-    items = (lung, kidney, diabetes, cardiovascular, obesity)
-    if all(item in _NONE_TYPES for item in items):
-        return None
-
-    preexistingConditions["hasPreexistingConditions"] = True
     comorbidities = []
 
     if lung == "Sim":
@@ -173,9 +168,11 @@ def convert_preexisting_conditions(lung: str, kidney: str, diabetes: str,
         comorbidities.append(_COMORBIDITIES_MAP["ComorbidadeObesidade"])
 
     if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
         preexistingConditions["values"] = comorbidities
-
-    return preexistingConditions
+        return preexistingConditions
+    else:
+        return None
 
 
 def convert_symptoms(headache: str, throat: str, fever: str, cough: str, diarrhoea: str, dyspnea: str):
@@ -223,7 +220,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proff
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
-    if age is not None and age != "-":
+    if age not in _NONE_TYPES:
         if age == "90 anos ou mais":
             demo["ageRange"] = {"start": 90, "end": 120}
         else:
@@ -232,7 +229,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proff
             demo["ageRange"] = {"start": float(age_range[0]), "end": float(age_range[2][:2])}
     if ethnicity:
         demo["ethnicity"] = convert_ethnicity(ethnicity)
-    if healthcare_proffesional not in _NONE_TYPES:
+    if healthcare_proffesional == "Sim":
         demo["occupation"] = "Healthcare worker"
     return demo
 
