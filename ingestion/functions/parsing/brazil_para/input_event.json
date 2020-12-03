@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5fbfbac62fd76800392dd1a7/2020/11/26/1428/content.csv",
+    "sourceUrl": "https://s3-sa-east-1.amazonaws.com/ckan.saude.gov.br/dados-pa.csv",
+    "sourceId": "5fbfbac62fd76800392dd1a7"
+}
