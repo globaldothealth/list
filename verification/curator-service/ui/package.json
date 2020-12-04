@@ -33,6 +33,7 @@
     "formik": "^2.1.5",
     "formik-material-ui": "^2.0.1",
     "formik-material-ui-pickers": "0.0.8",
+    "history": "^4.10.1",
     "http-proxy-middleware": "^1.0.5",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
