@@ -115,7 +115,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      MemorySize: 512
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   EstoniaParsingFunction:
@@ -168,6 +168,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
   PeruParsingFunction:
@@ -292,6 +293,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
   BrazilDistritoFederalParsingFunction:
