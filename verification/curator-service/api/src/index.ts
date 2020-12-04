@@ -265,6 +265,11 @@ new OpenApiValidator({
             mustHaveAnyRole(['curator']),
             casesController.batchUpdateQuery,
         );
+        apiRouter.post(
+            '/cases/batchStatusChange',
+            mustHaveAnyRole(['curator']),
+            casesController.batchStatusChange,
+        );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
@@ -279,11 +284,6 @@ new OpenApiValidator({
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),
             casesController.del,
-        );
-        apiRouter.post(
-            '/excludedCaseIds',
-            mustHaveAnyRole(['curator']),
-            casesController.exclude,
         );
 
         // Configure users controller.
