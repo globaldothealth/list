@@ -61,23 +61,15 @@ _SYMPTOMS_MAP = {
 }
 
 
-unrecognizedComorbidities = [
-    "portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
-    "imunossupressão",
-    "portador  de  doenças cromossômicas ou estado de fragilidade imunológica, imunossupressão",
-    "imunossupressão, portador  de  doenças cromossômicas ou estado de fragilidade imunológica",
-    "puérpera (até 45 dias do parto)"
-]
-
-
 def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
-    if raw_date:
+    try:
         date = datetime.strptime(raw_date.split("T")[0], "%Y-%m-%d")
         return date.strftime("%m/%d/%YZ")
-
+    except:
+        return None
 
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
@@ -164,18 +156,16 @@ def convert_symptoms(raw_symptoms: str):
 
 def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_comorbidities:
-        if raw_comorbidities.lower() not in unrecognizedComorbidities:
-            preexistingConditions["hasPreexistingConditions"] = True
+    comorbidities = []
 
-            comorbidities = []
-
-            for key in _COMORBIDITIES_MAP:
-                if key in raw_comorbidities.lower():
-                    comorbidities.append(_COMORBIDITIES_MAP[key])
-            if comorbidities:
-                preexistingConditions["values"] = comorbidities
-            return preexistingConditions
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_comorbidities.lower():
+            comorbidities.append(_COMORBIDITIES_MAP[key])
+    
+    if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
+        preexistingConditions["values"] = comorbidities
+        return preexistingConditions
 
 
 def convert_ethnicity(raw_ethnicity: str):
@@ -236,7 +226,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            if row[_TEST_RESULT] == "Positivo" and row[_FINAL_CLASSIFICATION] != "Descartado" and row[_STATE] == "ACRE":
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if row[_TEST_RESULT] == "Positivo" and row[_FINAL_CLASSIFICATION] != "Descartado" and row[_STATE] == "ACRE" and confirmation_date is not None:
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
