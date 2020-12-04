@@ -308,8 +308,6 @@ paths:
                   type: string
                   pattern: \S+
                 case:
-                  description: >
-                    The case fields that all matching cases will be updated to.
                   $ref: "#/components/schemas/Case"
               required:
                 - curator
@@ -470,32 +468,37 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
-  /excludedCaseIds:
+  /cases/batchStatusChange:
     post:
-      summary: Exclude cases using their Mongo IDs
+      summary: Changes status for a list of cases
       tags: [Case]
-      operationId: excludeCases
+      operationId: batchStatusChange
       requestBody:
-        description: Cases to exclude along with note with reasoning
+        description: Case IDs are passed through an array of strings, note may be provided as well.
         required: true
         content:
           application/json:
             schema:
               properties:
-                cases:
+                caseIds:
                   description: >
-                    Cases having IDs provided here will be excluded
-                    from future source fetches.
+                    Cases having IDs provided here will have their
+                    status changed to one specified in status field.
                   type: array
                   items:
                     type: string
+                status:
+                  $ref: "#/components/schemas/CaseStatus"
                 note:
                   description: >
                     The reason behind exclusion (or other important info).
+                    This field is ignored if a status is not "Excluded".
                   type: string
+                curator:
+                  $ref: "#/components/schemas/Curator"
               required:
-                - cases
-                - note
+                - caseIds
+                - status
       responses:
         "200":
           $ref: "#/components/responses/200"
@@ -785,6 +788,9 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    CaseStatus:
+      type: string
+      enum: [Unverified, Verified, Excluded]
     SymptomArray:
       type: object
       properties:

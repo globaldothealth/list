@@ -176,9 +176,8 @@ new OpenApiValidator({
             caseController.del,
         );
         apiRouter.post(
-            '/excludedCaseIds',
-            setRevisionMetadata,
-            caseController.exclude,
+            '/cases/batchStatusChange',
+            caseController.batchStatusChange,
         );
 
         // Suggest locations based on the request's "q" query param.

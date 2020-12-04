@@ -523,11 +523,14 @@ export class CasesController {
     /**
      * Excludes multiple cases.
      *
-     * Handles HTTP POST /api/excludedCaseIds.
+     * Handles HTTP POST /api/batchStatusChange.
+     * Receives an array of MongoDB IDs, status to be set for them and optional note.
+     * Note is used only when excluding cases (status set to "Excluded").
      */
-    exclude = async (req: Request, res: Response): Promise<void> => {
+    batchStatusChange = async (req: Request, res: Response): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         // if (!req.body.cases.every((c: any) => c._id)) {
+        console.log('Got batch status change req!');
         res.status(422).json(req.body.cases);
         return;
         // }

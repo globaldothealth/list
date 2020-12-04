@@ -307,14 +307,15 @@ export default class CasesController {
     };
 
     /**
-     * create forwards the query to the data service.
+     * batchStatusChange forwards the query to the data service.
      * It does set the curator in the request to the data service based on the
      * currently logged-in user.
      */
-    create = async (req: Request, res: Response): Promise<void> => {
+    batchStatusChange = async (req: Request, res: Response): Promise<void> => {
         try {
+            console.log('Passing on batch status change');
             const response = await axios.post(
-                this.dataServerURL + '/api' + req.url,
+                this.dataServerURL + '/api/cases/batchStatusChange',
                 {
                     ...req.body,
                     curator: { email: (req.user as UserDocument).email },
@@ -331,15 +332,14 @@ export default class CasesController {
     };
 
     /**
-     * exclude forwards the query to the data service.
+     * create forwards the query to the data service.
      * It does set the curator in the request to the data service based on the
      * currently logged-in user.
      */
-    exclude = async (req: Request, res: Response): Promise<void> => {
+    create = async (req: Request, res: Response): Promise<void> => {
         try {
-            console.log("EXCLUDE")
             const response = await axios.post(
-                this.dataServerURL + '/api/excludedCaseIds',
+                this.dataServerURL + '/api' + req.url,
                 {
                     ...req.body,
                     curator: { email: (req.user as UserDocument).email },
