@@ -1,6 +1,6 @@
 import os
 import unittest
-import rio_de_janeiro
+from brazil_rio_de_janeiro import rio_de_janeiro
 
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
