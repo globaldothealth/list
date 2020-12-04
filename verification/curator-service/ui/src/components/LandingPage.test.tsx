@@ -22,4 +22,16 @@ test('shows all content', async () => {
         'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
     );
     expect(getByText('Terms of use')).toHaveAttribute('href', '/terms');
+
+    const privacyPolicyBtn = getByText('Privacy policy') as HTMLAnchorElement;
+    const cookiePolicyBtn = getByText('Cookie policy') as HTMLAnchorElement;
+
+    expect(privacyPolicyBtn.href).toContain(
+        'https://www.iubenda.com/privacy-policy',
+    );
+
+    expect(cookiePolicyBtn.href).toContain(
+        'https://www.iubenda.com/privacy-policy',
+    );
+    expect(cookiePolicyBtn.href).toContain('cookie-policy');
 });
