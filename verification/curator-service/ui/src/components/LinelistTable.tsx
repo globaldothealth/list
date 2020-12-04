@@ -32,13 +32,14 @@ import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
-import CaseExclusionDialog from './CaseExclusionDialog';
-import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
+import CaseExcludeDialog from './CaseExcludeDialog';
+import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 
 interface ListResponse {
@@ -60,8 +61,11 @@ interface LinelistTableState {
     totalNumRows: number;
     deleteDialogOpen: boolean;
     excludeDialogOpen: boolean;
+    includeDialogOpen: boolean;
     isLoading: boolean;
     isDeleting: boolean;
+
+    selectedVerificationStatus: VerificationStatus;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -147,6 +151,7 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
 
 function RowMenu(props: {
     rowId: string;
+    rowData: TableRow;
     setError: (error: string) => void;
     refreshData: () => void;
 }): JSX.Element {
@@ -154,9 +159,12 @@ function RowMenu(props: {
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
         false,
     );
-    const [exclusionDialogOpen, setExclusionDialogOpen] = React.useState<
-        boolean
-    >(false);
+    const [excludeDialogOpen, setExcludeDialogOpen] = React.useState<boolean>(
+        false,
+    );
+    const [includeDialogOpen, setIncludeDialogOpen] = React.useState<boolean>(
+        false,
+    );
     const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
@@ -175,9 +183,14 @@ function RowMenu(props: {
         setDeleteDialogOpen(true);
     };
 
-    const openExclusionDialog = async (event?: any): Promise<void> => {
+    const openExcludeDialog = async (event?: any): Promise<void> => {
         event?.stopPropagation();
-        setExclusionDialogOpen(true);
+        setExcludeDialogOpen(true);
+    };
+
+    const openIncludeDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setIncludeDialogOpen(true);
     };
 
     const handleDelete = async (event?: any): Promise<void> => {
@@ -197,21 +210,30 @@ function RowMenu(props: {
         }
     };
 
-    const handleExclude = async (note: string): Promise<void> => {
+    const handleStatusChange = async (
+        status: VerificationStatus,
+        note?: string,
+    ): Promise<void> => {
         try {
             props.setError('');
-            await axios.post(`/api/excludedCaseIds`, {
+            await axios.post(`/api/batchStatusChange`, {
+                status,
                 caseIds: [props.rowId],
-                note,
+                ...(note ? { note } : {}),
             });
             props.refreshData();
         } catch (e) {
             props.setError(e.toString());
         } finally {
-            setExclusionDialogOpen(false);
+            status === VerificationStatus.Excluded
+                ? setIncludeDialogOpen(false)
+                : setExcludeDialogOpen(false);
             handleClose();
         }
     };
+
+    const isCaseExcluded =
+        props.rowData.verificationStatus === VerificationStatus.Excluded;
 
     return (
         <>
@@ -241,10 +263,17 @@ function RowMenu(props: {
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
                 </MenuItem>
-                <MenuItem onClick={openExclusionDialog}>
-                    <NotInterestedIcon />
-                    <span className={classes.menuItemTitle}>Exclude</span>
-                </MenuItem>
+                {isCaseExcluded ? (
+                    <MenuItem onClick={openIncludeDialog}>
+                        <NotInterestedIcon />
+                        <span className={classes.menuItemTitle}>Include</span>
+                    </MenuItem>
+                ) : (
+                    <MenuItem onClick={openExcludeDialog}>
+                        <NotInterestedIcon />
+                        <span className={classes.menuItemTitle}>Exclude</span>
+                    </MenuItem>
+                )}
             </Menu>
             <Dialog
                 open={deleteDialogOpen}
@@ -284,10 +313,21 @@ function RowMenu(props: {
                     )}
                 </DialogActions>
             </Dialog>
-            <CaseExclusionDialog
-                isOpen={exclusionDialogOpen}
-                onClose={(): void => setExclusionDialogOpen(false)}
-                onSubmit={handleExclude}
+            <CaseExcludeDialog
+                isOpen={excludeDialogOpen}
+                onClose={(): void => setExcludeDialogOpen(false)}
+                onSubmit={(values: { note: string }): Promise<void> =>
+                    handleStatusChange(VerificationStatus.Excluded, values.note)
+                }
+                caseIds={[props.rowId]}
+            />
+            <CaseIncludeDialog
+                isOpen={includeDialogOpen}
+                onClose={(): void => setIncludeDialogOpen(false)}
+                onSubmit={(): Promise<void> =>
+                    handleStatusChange(VerificationStatus.Unverified)
+                }
+                caseIds={[props.rowId]}
             />
         </>
     );
@@ -337,19 +377,22 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             totalNumRows: 0,
             deleteDialogOpen: false,
             excludeDialogOpen: false,
+            includeDialogOpen: false,
             isLoading: false,
             isDeleting: false,
+            selectedVerificationStatus: VerificationStatus.Unverified,
         };
         this.deleteCases = this.deleteCases.bind(this);
-        this.excludeCases = this.excludeCases.bind(this);
-        this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
-            this,
-        );
+        this.setCaseVerification = this.setCaseVerification.bind(this);
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
         this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
             this,
         );
+        this.changeVerificationStatus = this.changeVerificationStatus.bind(
+            this,
+        );
+        this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
     }
 
     componentDidUpdate(
@@ -390,87 +433,44 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this.setState({ deleteDialogOpen: false, isDeleting: false });
         }
     }
-
-    async excludeCases(note: string): Promise<void> {
-        this.setState({ error: '' });
-
-        try {
-            await axios.post(`/api/excludedCaseIds`, {
-                caseIds: this.state.selectedRowsCurrentPage.map(
-                    (row: TableRow) => row.id,
-                ),
-                note,
-            });
-            this.tableRef.current.onQueryChange();
-        } catch (e) {
-            this.setState({ error: e.toString() });
-        } finally {
-            this.setState({ excludeDialogOpen: false });
-        }
-    }
-
     hasSelectedRowsAcrossPages(): boolean {
         return (
             this.state.totalNumRows === this.state.numSelectedRows &&
             this.state.numSelectedRows > this.state.pageSize
         );
     }
-
-    setCaseVerification(
+    async setCaseVerification(
         rowData: TableRow[],
         verificationStatus: VerificationStatus,
-    ): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + 'batchUpdate';
-            this.setState({ error: '', isLoading: true });
-            const response = axios.post(updateUrl, {
-                cases: rowData.map((row) => {
-                    return {
-                        _id: row.id,
-                        'caseReference.verificationStatus': verificationStatus,
-                    };
-                }),
-            });
-            response
-                .then(() => {
-                    this.setState({ isLoading: false });
-                    resolve();
-                })
-                .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                        isLoading: false,
-                    });
-                    reject(e);
-                });
-        });
-    }
+        note?: string,
+    ): Promise<void> {
+        this.setState({ error: '', isLoading: true });
+        const payload = {
+            status: verificationStatus,
+            ...(note ? { note } : {}),
+        };
 
-    setCaseVerificationWithQuery(
-        verificationStatus: VerificationStatus,
-    ): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + 'batchUpdateQuery';
-            this.setState({ error: '', isLoading: true });
-            const response = axios.post(updateUrl, {
-                query: this.props.location.state.search,
-                case: {
-                    'caseReference.verificationStatus': verificationStatus,
-                },
-            });
-            response
-                .then(() => {
-                    this.setState({ isLoading: false });
-                    resolve();
-                })
-                .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                        isLoading: false,
-                    });
-                    reject(e);
+        try {
+            if (this.hasSelectedRowsAcrossPages()) {
+                await axios.post(`/api/batchStatusChangeQuery`, {
+                    query: this.props.location.state.search,
+                    ...payload,
                 });
-        });
+            } else {
+                await axios.post(`/api/batchStatusChange`, {
+                    caseIds: rowData.map((row: TableRow) => row.id),
+                    ...payload,
+                });
+            }
+
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString(), isLoading: false });
+        } finally {
+            verificationStatus === VerificationStatus.Excluded
+                ? this.setState({ excludeDialogOpen: false, isLoading: false })
+                : this.setState({ includeDialogOpen: false, isLoading: false });
+        }
     }
 
     confirmationDialogTitle(): string {
@@ -507,6 +507,36 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this.state.numSelectedRows > this.maxDeletionThreshold
         );
     }
+
+    async changeVerificationStatus(
+        rows: TableRow[],
+        status: VerificationStatus,
+    ): Promise<void> {
+        const excludedCases = this.getExcludedCaseIds(rows);
+
+        if (excludedCases.length) {
+            this.setState({
+                selectedVerificationStatus: status,
+                includeDialogOpen: true,
+            });
+
+            return;
+        }
+
+        await this.setCaseVerification(rows, status);
+
+        this.tableRef.current.onQueryChange();
+    }
+
+    getExcludedCaseIds(rows: TableRow[]): string[] {
+        return rows
+            .filter(
+                ({ verificationStatus }) =>
+                    verificationStatus === VerificationStatus.Excluded,
+            )
+            .map(({ id }) => id);
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
         return (
@@ -580,12 +610,36 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
-                <CaseExclusionDialog
+                <CaseExcludeDialog
                     isOpen={this.state.excludeDialogOpen}
                     onClose={(): void =>
                         this.setState({ excludeDialogOpen: false })
                     }
-                    onSubmit={this.excludeCases}
+                    onSubmit={(values: { note: string }): Promise<void> =>
+                        this.setCaseVerification(
+                            this.state.selectedRowsCurrentPage,
+                            VerificationStatus.Excluded,
+                            values.note,
+                        )
+                    }
+                    caseIds={this.state.selectedRowsCurrentPage.map(
+                        ({ id }) => id,
+                    )}
+                />
+                <CaseIncludeDialog
+                    isOpen={this.state.includeDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ includeDialogOpen: false })
+                    }
+                    onSubmit={(): Promise<void> =>
+                        this.setCaseVerification(
+                            this.state.selectedRowsCurrentPage,
+                            this.state.selectedVerificationStatus,
+                        )
+                    }
+                    caseIds={this.getExcludedCaseIds(
+                        this.state.selectedRowsCurrentPage,
+                    )}
                 />
                 <Dialog
                     open={this.state.deleteDialogOpen}
@@ -648,6 +702,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ): JSX.Element => (
                                           <RowMenu
                                               rowId={rowData.id}
+                                              rowData={rowData}
                                               refreshData={(): void =>
                                                   this.tableRef.current.onQueryChange()
                                               }
@@ -770,6 +825,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             this.setState({ isLoading: true, error: '' });
                             this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
+
                             response
                                 .then((result) => {
                                     const flattenedCases: TableRow[] = [];
@@ -949,15 +1005,27 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             zIndex: 1,
                         },
                         // TODO: style highlighted rows to spec
-                        rowStyle: (rowData) =>
-                            (
-                                this.props.location.state?.newCaseIds ?? []
-                            ).includes(rowData.id) ||
-                            (
-                                this.props.location.state?.editedCaseIds ?? []
-                            ).includes(rowData.id)
-                                ? { backgroundColor: '#F0FBF9' }
-                                : {},
+                        rowStyle: (rowData) => {
+                            const isHighlighted =
+                                (
+                                    this.props.location.state?.newCaseIds ?? []
+                                ).includes(rowData.id) ||
+                                (
+                                    this.props.location.state?.editedCaseIds ??
+                                    []
+                                ).includes(rowData.id);
+
+                            const isExcluded =
+                                rowData.verificationStatus ===
+                                VerificationStatus.Excluded;
+
+                            return {
+                                ...(isHighlighted
+                                    ? { backgroundColor: '#F0FBF9' }
+                                    : {}),
+                                opacity: isExcluded ? 0.6 : 1,
+                            };
+                        },
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
                         if (rowData) {
@@ -1038,19 +1106,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
-                                          if (
-                                              this.hasSelectedRowsAcrossPages()
-                                          ) {
-                                              await this.setCaseVerificationWithQuery(
-                                                  VerificationStatus.Verified,
-                                              );
-                                          } else {
-                                              await this.setCaseVerification(
-                                                  rows,
-                                                  VerificationStatus.Verified,
-                                              );
-                                          }
-                                          this.tableRef.current.onQueryChange();
+                                          this.changeVerificationStatus(
+                                              rows,
+                                              VerificationStatus.Verified,
+                                          );
                                       },
                                   },
                                   {
@@ -1066,19 +1125,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
-                                          if (
-                                              this.hasSelectedRowsAcrossPages()
-                                          ) {
-                                              await this.setCaseVerificationWithQuery(
-                                                  VerificationStatus.Unverified,
-                                              );
-                                          } else {
-                                              await this.setCaseVerification(
-                                                  rows,
-                                                  VerificationStatus.Unverified,
-                                              );
-                                          }
-                                          this.tableRef.current.onQueryChange();
+                                          this.changeVerificationStatus(
+                                              rows,
+                                              VerificationStatus.Unverified,
+                                          );
                                       },
                                   },
                                   {
