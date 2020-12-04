@@ -73,10 +73,9 @@ def convert_demographics(gender: str, age: str):
     return demo or None
 
 
-def convert_notes(immigration_status: str):
-    return (
-        "Case is an immigrant" if immigration_status == "是"
-        else "Case is from Taiwan")
+def convert_immigration(immigration_status: str):
+    return ({"traveledPrior30Days": True} if immigration_status == "是"
+        else None)
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -110,8 +109,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     row['性別'],
                     # Age range.
                     row['年齡層']),
-                # Immigration status.
-                "notes": convert_notes(row["是否為境外移入"]),
+                "travelHistory": convert_immigration(row["是否為境外移入"]),
             }
             # Number of cases that this row represents.
             for _ in range(int(row["確定病例數"])):
