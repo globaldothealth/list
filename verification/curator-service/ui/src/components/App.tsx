@@ -56,6 +56,8 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
+import PolicyLink from './PolicyLink';
+import useCookieBanner from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
@@ -187,8 +189,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '12px',
         width: '100%',
     },
-    termsLink: {
-        margin: '12px 0 24px',
+    link: {
+        marginTop: 12,
+    },
+    lastLink: {
+        marginBottom: 24,
     },
     content: {
         flexGrow: 1,
@@ -308,6 +313,8 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
+    useCookieBanner();
+
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
@@ -599,11 +606,30 @@ export default function App(): JSX.Element {
                             </a>
                             <Link
                                 to="/terms"
-                                className={classes.termsLink}
+                                className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
                             </Link>
+                            <PolicyLink
+                                type="privacy-policy"
+                                classes={{
+                                    root: classes.link,
+                                }}
+                            >
+                                Privacy policy
+                            </PolicyLink>
+                            <PolicyLink
+                                type="cookie-policy"
+                                classes={{
+                                    root: clsx([
+                                        classes.link,
+                                        classes.lastLink,
+                                    ]),
+                                }}
+                            >
+                                Cookie policy
+                            </PolicyLink>
                         </div>
                     </Drawer>
                 )}
