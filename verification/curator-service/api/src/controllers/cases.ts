@@ -321,7 +321,7 @@ export default class CasesController {
                     curator: { email: (req.user as UserDocument).email },
                 },
             );
-            res.status(response.status).json(response.data);
+            res.status(response.status).end();
         } catch (err) {
             if (err.response?.status && err.response?.data) {
                 res.status(err.response.status).send(err.response.data);
