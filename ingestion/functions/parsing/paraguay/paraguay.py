@@ -84,8 +84,9 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
             age = int(row[_AGE])
+            date_confirmed = convert_date(row[_DATE_CONFIRMED])
             # Cases with age 999 are in the process of being confirmed
-            if age != 999:
+            if age != 999 and date_confirmed is not None:
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
