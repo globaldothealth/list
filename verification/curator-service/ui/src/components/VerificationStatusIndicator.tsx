@@ -5,9 +5,14 @@ import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import { VerificationStatus } from './Case';
+import renderDate from './util/date';
 
 interface Props {
     status?: VerificationStatus;
+    exclusionData?: {
+        date: string;
+        note: string;
+    };
 }
 
 export default function VerificationStatusIndicator(props: Props): JSX.Element {
@@ -20,9 +25,16 @@ export default function VerificationStatusIndicator(props: Props): JSX.Element {
         helpText = 'Unverified';
         iconElement = <UnverifiedIcon data-testid="unverified-svg" />;
     } else {
-        helpText = 'Excluded';
+        if (props.exclusionData) {
+            const { date, note } = props.exclusionData;
+            helpText = `Excluded. Date: ${renderDate(date)}, Note: ${note}`;
+        } else {
+            helpText = 'Excluded';
+        }
+
         iconElement = <ExcludedIcon data-testid="excluded-svg" />;
     }
+
     return (
         <Tooltip title={helpText} placement="right">
             {iconElement}

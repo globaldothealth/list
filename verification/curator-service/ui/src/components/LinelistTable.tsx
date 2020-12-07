@@ -85,6 +85,10 @@ interface TableRow {
     symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
+    exclusionData?: {
+        date: string;
+        note: string;
+    };
 }
 
 interface LocationState {
@@ -736,6 +740,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <div className={classes.centeredContent}>
                                         <VerificationStatusIndicator
                                             status={rowData.verificationStatus}
+                                            exclusionData={
+                                                rowData.exclusionData
+                                            }
                                         />
                                     </div>
                                 );
