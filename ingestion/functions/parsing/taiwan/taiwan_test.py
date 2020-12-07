@@ -22,7 +22,9 @@ _PARSED_CASES = [
             'gender': 'Female',
             'ageRange': {'start': 55.0, 'end': 59.0},
         },
-        'notes': 'Case is an immigrant'
+        "travelHistory": {
+            "traveledPrior30Days": True
+        },
     }, {
         "caseReference": {
             "sourceId": _SOURCE_ID,
@@ -39,7 +41,9 @@ _PARSED_CASES = [
             'gender': 'Female',
             'ageRange': {'start': 55.0, 'end': 59.0},
         },
-        'notes': 'Case is an immigrant'
+        "travelHistory": {
+            "traveledPrior30Days": True
+        },
     }, {
         "caseReference": {
             "sourceId": _SOURCE_ID,
@@ -56,7 +60,7 @@ _PARSED_CASES = [
             'gender': 'Male',
             'ageRange': {'start': 55.0, 'end': 55.0},
         },
-        'notes': 'Case is from Taiwan'
+        "travelHistory": None
     }, {
         "caseReference": {
             "sourceId": _SOURCE_ID,
@@ -73,7 +77,7 @@ _PARSED_CASES = [
             'gender': 'Male',
             'ageRange': {'start': 70.0, 'end': 120.0},
         },
-        'notes': 'Case is from Taiwan'
+        "travelHistory": None
     },
 ]
 

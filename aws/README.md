@@ -125,6 +125,8 @@ Here is the list of environment variables that should be filled with secrets and
 - `MAPBOX_TOKEN`: _(optional)_ Mapbox private token used to perform geocoding of new cases. It must have Configure this token from the [Mapbox console](https://account.mapbox.com/auth/signin/). The mapbox account should have the [Boudaries API](https://www.mapbox.com/boundaries/) enabled to properly geocode all administrative areas.
 - `REACT_APP_PUBLIC_MAPBOX_TOKEN`: This is not really a secret as it is a public mapbox token but still it is nice to have it documented here close to its private counterpart (`MAPBOX_TOKEN`) used for geocoding. As it is a public token, make sure it is restricted only to the origins where the curator portal UI is running.
 - `SESSION_COOKIE_KEY`: _(optional)_ Session cookies contain IDs that are encrypted using this key.
+- `REACT_APP_POLICY_PUBLIC_ID`: This is a public ID for Iubenda service that provides legal policies.
+- `REACT_APP_COOKIE_CONSENT_PUBLIC_ID`: This is a public ID for Iubenda service that provides cookie consent banner.
 
 #### Secrets in production
 
