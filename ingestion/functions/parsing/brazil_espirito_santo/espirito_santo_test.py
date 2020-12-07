@@ -58,5 +58,33 @@ class EspiritoSantoTest(unittest.TestCase):
                     ]
                 },
                 "notes": "Neighbourhood: JARDIM CARAPINA, First four years of elementary school not completed"
+            },
+            {
+                "caseReference": {"sourceId": _SOURCE_ID, "sourceUrl": _SOURCE_URL},
+                "location": {
+                    "query": "RIO NOVO DO SUL, Espirito Santo, Brazil"
+                },
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange": {
+                            "start": "10/29/2020Z",
+                            "end": "10/29/2020Z"
+                        },
+                        "value": "Serological test"
+                    }
+                ],
+                "symptoms": {
+                    "status": "Symptomatic",
+                    "values": [
+                        "headache", "diarrhoea"
+                    ]
+                },
+                "demographics": {
+                    "gender": "Female",
+                    "ethnicity": "White"
+                },
+                "preexistingConditions": None,
+                "notes": "Neighbourhood: CENTRO, Elementary school completed"
             }
         ])

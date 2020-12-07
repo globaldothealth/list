@@ -15,7 +15,7 @@ except ImportError:
             "common/python"))
     import parsing_lib
 
-
+_UUID = "ÿid"
 _AGE = "idade"
 _GENDER = "sexo"
 _MUNICIPALITY = "municipio"
@@ -23,19 +23,12 @@ _STATE = "estado"
 _DATE_CONFIRMED = "dataNotificacao"
 _DATE_SYMPTOMS = "dataInicioSintomas"
 _SYMPTOMS = "sintomas"
-_OTHER_SYMPTOMS = "outrosSintomas"
 _HEALTHCARE_PROFESSIONAL = "profissionalSaude"
 _COMORBIDITIES = "condicoes"
 _TEST_TYPE = "tipoTeste"
 _TEST_RESULT = "resultadoTeste"
 _OUTCOME = "evolucaoCaso"
-_ETHNICITY = "racaCor"
-_SECURITY_PROFESSIONAL = "profissionalSeguranca"
-_INDIGENOUS_GROUP = "etnia"
-_FINAL_CLASSIFICATION = "classificacaoFinal"
 
-
-# Symptoms and comorbidities written with variation in capitalization, so all forced to lowercase
 _COMORBIDITIES_MAP = {
     "diabetes": "diabetes mellitus",
     "gestante": "pregnancy",
@@ -43,21 +36,26 @@ _COMORBIDITIES_MAP = {
     "doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "doenças renais crônicas em estágio avançado (graus 3, 4 e 5)": "chronic kidney disease",
     "doenças cardíacas crônicas": "heart disease",
-    "obesidade": "obesity"
+    "obesidade": "obesity",
+    "pressão alta": "high blood pressure",
+    "pneumopatia": "respiratory system disease",
+    "cardiopatia": "heart disease",
+    "doenca cardiaca": "heart disease",
+    "doenca renal": "kidney disease",
+    "imunodeficiencia": "primary immunodeficency disease",
+    "doenças autoimunes": "autoimmune disease"
 }
 
+_NONE_TYPES = set(["Não", "null", "undefined", None])
 
 _SYMPTOMS_MAP = {
-    "dor de garganta": "throat pain",
-    "dispneia": "dyspnea",
-    "febre": "fever",
-    "tosse": "cough",
-    # According to symptom ontology, breathing difficulty is exact synonym of dyspnea
-    "dificuldade de respirar": "dyspnea",
-    "dor de cabeça": "headache",
-    "distúrbios gustativos": "taste alteration", 
-    # Symptom ontology does not have a specific term for smell alterations
-    "distúrbios olfativos": "disturbances of sensation of smell and taste"
+    "Dor de Cabeça": "headache",
+    "Distúrbios Gustativos": "taste alteration",
+    "Distúrbios Olfativos": "smell alteration",
+    "Dor de Garganta": "throat pain",
+    "Dispneia": "dyspnea",
+    "Febre": "fever",
+    "Tosse": "cough"
 }
 
 
@@ -71,6 +69,7 @@ def convert_date(raw_date):
     except:
         return None
 
+
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
         return "Male"
@@ -79,10 +78,10 @@ def convert_gender(raw_gender: str):
 
 
 def convert_test(test_type: str):
-    if test_type:
+    if test_type not in _NONE_TYPES:
         if test_type == "RT-PCR":
             return "PCR test"
-        for i in ["TESTE", "ELISA", "CLIA"]:
+        for i in ["TESTE", "ELISA", "CLIA", "ECLIA"]:
             if i in test_type:
                 return "Serological test"
 
@@ -121,19 +120,17 @@ def convert_events(date_confirmed, date_symptoms, test_type, outcome):
             "value": convert_test(test_type)
         }
     ]
-    # One case dated July 2019
-    if date_symptoms:
-        if datetime.strptime(date_symptoms.split("T")[0], "%Y-%m-%d") > datetime.strptime("2019-11-01", "%Y-%m-%d"):
-            events.append(
-                {
-                    "name": "onsetSymptoms",
-                    "dateRange": {
-                        "start": convert_date(date_symptoms),
-                        "end": convert_date(date_symptoms)
-                    }
-                }
-            )
-    if outcome:
+    if date_symptoms not in _NONE_TYPES:
+        events.append(
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": convert_date(date_symptoms),
+                    "end": convert_date(date_symptoms)
+                },
+            }
+        )
+    if outcome not in _NONE_TYPES:
         events.append(
             convert_outcome(outcome)
         )
@@ -142,13 +139,13 @@ def convert_events(date_confirmed, date_symptoms, test_type, outcome):
 
 def convert_symptoms(raw_symptoms: str):
     values = []
-    if raw_symptoms:
-        # Some entries have 'assintomático' listed with other symptoms e.g. "Assintomático, Coriza, Tosse". These cases can't be considered as asymptomatic
-        if raw_symptoms.lower() == "assintomático":
+    if raw_symptoms not in _NONE_TYPES:
+        # Some cases list "Assintomático" with other symptoms e.g. "Assintomático, Tosse, Febre", but these cannot be treated as asymptomatic
+        if raw_symptoms == "Assintomático":
             return {"status": "Asymptomatic"}
         else:
             for key in _SYMPTOMS_MAP:
-                if key in raw_symptoms.lower():
+                if key in raw_symptoms:
                     values.append(_SYMPTOMS_MAP[key])
             return {"status": "Symptomatic",
                     "values": values}
@@ -157,66 +154,45 @@ def convert_symptoms(raw_symptoms: str):
 def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
     comorbidities = []
-
+    # Inconsistent use of capitalization means all entries forced to lower case
     for key in _COMORBIDITIES_MAP:
         if key in raw_comorbidities.lower():
             comorbidities.append(_COMORBIDITIES_MAP[key])
-    
     if comorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
         preexistingConditions["values"] = comorbidities
         return preexistingConditions
+    else:
+        return None
 
 
-def convert_ethnicity(raw_ethnicity: str):
-    if raw_ethnicity == "Preta":
-        return "Black"
-    elif raw_ethnicity == "Parda":
-        return "Mixed"
-    elif raw_ethnicity == "Amarela":
-        return "Asian"
-    elif raw_ethnicity == "Branca":
-        return "White"
-    elif raw_ethnicity == "Indigena":
-        return "Indigenous"
-
-
-def convert_demographics(gender: str, age: str, healthcare_professional: str, security_professional: str, raw_ethnicity: str):
-    if not any((gender, age, raw_ethnicity, healthcare_professional, security_professional)):
+def convert_demographics(gender: str, age: str, occupation: str):
+    if gender in _NONE_TYPES and age in _NONE_TYPES and occupation in _NONE_TYPES:
         return None
     demo = {}
-    if gender:
+    if gender not in _NONE_TYPES:
         demo["gender"] = convert_gender(gender)
-    if age and float(age) <= 120.0:
+    if age not in _NONE_TYPES and float(age) <= 120.0:
         demo["ageRange"] = {"start": float(age), "end": float(age)}
-    if raw_ethnicity:
-        demo["ethnicity"] = convert_ethnicity(raw_ethnicity)
-    if healthcare_professional == "Sim":
+    if occupation == "Sim":
         demo["occupation"] = "Healthcare worker"
-    if security_professional == "Sim":
-        demo["occupation"] = "Security guard"
     return demo
 
 
-def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: str, other_symptoms: str):
+def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     raw_notes = []
     if "imunossupressão" in raw_comorbidities.lower():
         raw_notes.append("Patient with immunosuppression")
     if "portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
         raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
-    if "puérpera (até 45 dias do parto)" in raw_comorbidities.lower():
-        raw_notes.append("Patient given birth in the last 45 days")
-    if "coriza" in raw_symptoms.lower():
+    if "puérpera" in raw_comorbidities.lower():
+        raw_notes.append("Recently gave birth")
+    if "Coriza" in raw_symptoms:
         raw_notes.append("Patient with coryza")
-    if "outros" in raw_symptoms.lower():
+    if "Outros" in raw_symptoms:
         raw_notes.append("Other symptoms reported")
-    if other_symptoms:
-        raw_notes.append("Non-standard symptoms listed but not parsed (please see raw data for further information)")
-    if indigenous_group:
-        raw_notes.append("Patient from the following indigenous group: " + indigenous_group)
-
-    if raw_notes:
-        return (", ").join(raw_notes)
+    notes = (', ').join(raw_notes)
+    return notes
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -224,16 +200,16 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.DictReader(f, delimiter=",")
+        reader = csv.DictReader(f, delimiter=";")
         for row in reader:
             confirmation_date = convert_date(row[_DATE_CONFIRMED])
-            if row[_TEST_RESULT] == "Positivo" and row[_FINAL_CLASSIFICATION] != "Descartado" and row[_STATE] == "ACRE" and confirmation_date is not None:
+            if row[_TEST_RESULT] == "Positivo" and row[_OUTCOME] != "Cancelado" and row[_STATE] == "PARÁ" and confirmation_date is not None:
                 try:
                     case = {
-                        "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
+                        "caseReference": {"sourceId": source_id, "sourceEntryId": row[_UUID], "sourceUrl": source_url},
                         "location": {
                             "query": ", ".join(
-                                [row[_MUNICIPALITY], "Acre", "Brazil"]
+                                [row[_MUNICIPALITY], "Pará", "Brazil"]
                             )
                         },
                         "events": convert_events(
@@ -244,14 +220,14 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                         ),
                         "symptoms": convert_symptoms(row[_SYMPTOMS]),
                         "demographics": convert_demographics(
-                            row[_GENDER], row[_AGE], row[_HEALTHCARE_PROFESSIONAL], row[_SECURITY_PROFESSIONAL], row[_ETHNICITY]
+                            row[_GENDER], row[_AGE], row[_HEALTHCARE_PROFESSIONAL]
                         ),
                         "preexistingConditions": convert_preexisting_conditions(
                             row[_COMORBIDITIES]
                         )
                     }
                     notes = convert_notes(
-                        row[_COMORBIDITIES], row[_SYMPTOMS], row[_INDIGENOUS_GROUP], row[_OTHER_SYMPTOMS]
+                        row[_COMORBIDITIES], row[_SYMPTOMS]
                     )
                     if notes:
                         case["notes"] = notes
