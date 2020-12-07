@@ -368,6 +368,18 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+  ParaguayParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/paraguay/
+      Handler: paraguay.lambda_handler
+      Description: Parse case data for Paraguay
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
 
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
