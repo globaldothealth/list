@@ -216,7 +216,7 @@ function RowMenu(props: {
     ): Promise<void> => {
         try {
             props.setError('');
-            await axios.post(`/api/batchStatusChange`, {
+            await axios.post(`/api/cases/batchStatusChange`, {
                 status,
                 caseIds: [props.rowId],
                 ...(note ? { note } : {}),
@@ -452,12 +452,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
         try {
             if (this.hasSelectedRowsAcrossPages()) {
-                await axios.post(`/api/batchStatusChangeQuery`, {
+                await axios.post(`/api/cases/batchStatusChangeQuery`, {
                     query: this.props.location.state.search,
                     ...payload,
                 });
             } else {
-                await axios.post(`/api/batchStatusChange`, {
+                await axios.post(`/api/cases/batchStatusChange`, {
                     caseIds: rowData.map((row: TableRow) => row.id),
                     ...payload,
                 });
