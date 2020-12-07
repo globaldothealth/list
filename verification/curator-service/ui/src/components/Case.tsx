@@ -114,6 +114,11 @@ interface RevisionMetadata {
     updateMetadata?: Revision;
 }
 
+interface ExclusionData {
+    date: string;
+    note: string;
+}
+
 export interface Case {
     _id: string;
     caseReference: CaseReference;
@@ -131,4 +136,5 @@ export interface Case {
     pathogens: Pathogen[];
     notes: string;
     revisionMetadata: RevisionMetadata;
+    exclusionData?: ExclusionData;
 }
