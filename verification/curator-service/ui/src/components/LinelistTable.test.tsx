@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { fireEvent, render, wait } from '@testing-library/react';
 
 import LinelistTable from './LinelistTable';
-import { MemoryRouter, Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 import range from 'lodash/range';
