@@ -1,5 +1,5 @@
 import { Case, CaseDocument } from '../model/case';
-import { DocumentQuery, Query } from 'mongoose';
+import { CastError, DocumentQuery, Error, Query } from 'mongoose';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
@@ -529,13 +529,50 @@ export class CasesController {
      */
     batchStatusChange = async (req: Request, res: Response): Promise<void> => {
         const newStatus = req.body.status.toUpperCase();
+        const caseIds = req.body.caseIds;
+
+        if (newStatus === 'EXCLUDED' && !req.body.note) {
+            res.status(422)
+                .send({
+                    message: 'Note is required when excluding cases.',
+                })
+                .end();
+            return;
+        }
+
+        try {
+            const validIdsCount = await Case.countDocuments({
+                _id: { $in: caseIds },
+            });
+            if (validIdsCount != caseIds.length) {
+                res.status(422)
+                    .send({
+                        message:
+                            'At least one of provided case IDs was not found. No records changed.',
+                    })
+                    .end();
+                return;
+            }
+        } catch (err) {
+            if (err.name === 'CastError') {
+                res.status(422)
+                    .send({
+                        message: `Provided ID (${err.value}) is not valid. More IDs may be invalid. No records changed.`,
+                    })
+                    .end();
+                return;
+            }
+            res.status(500).json(err).end();
+            return;
+        }
+
         try {
             let updateDocument = {};
             if (newStatus === 'EXCLUDED') {
                 updateDocument = {
                     $set: {
                         'caseReference.verificationStatus': newStatus,
-                        'exclusionData.date': new Date(),
+                        'exclusionData.date': Date.now(),
                         'exclusionData.note': req.body.note,
                     },
                 };
@@ -555,12 +592,10 @@ export class CasesController {
             );
 
             res.status(200).end();
-            return;
         } catch (err) {
-            console.error('ERROR', err);
-            res.status(500).json(err);
-            return;
+            res.status(500).json(err).end();
         }
+        return;
     };
 
     /**
