@@ -528,20 +528,32 @@ export class CasesController {
      * Note is used only when excluding cases (status set to "Excluded").
      */
     batchStatusChange = async (req: Request, res: Response): Promise<void> => {
+        const newStatus = req.body.status.toUpperCase();
         try {
-            const updateManyResult = await Case.updateMany(
-                { _id: { $in: req.body.caseIds } },
-                {
+            let updateDocument = {};
+            if (newStatus === 'EXCLUDED') {
+                updateDocument = {
                     $set: {
-                        'caseReference.verificationStatus': req.body.status.toUpperCase(),
+                        'caseReference.verificationStatus': newStatus,
+                        'exclusionData.date': new Date(),
+                        'exclusionData.note': req.body.note,
                     },
-                },
+                };
+            } else {
+                updateDocument = {
+                    $set: {
+                        'caseReference.verificationStatus': newStatus,
+                    },
+                    $unset: {
+                        exclusionData: '',
+                    },
+                };
+            }
+            await Case.updateMany(
+                { _id: { $in: req.body.caseIds } },
+                updateDocument,
             );
-            console.log(
-                `${
-                    updateManyResult.modifiedCount
-                } rows updated to ${req.body.status.toUpperCase()}`,
-            );
+
             res.status(200).end();
             return;
         } catch (err) {
