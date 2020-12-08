@@ -47,6 +47,18 @@
           }
         }
       },
+      "exclusionData": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourceEntryId": {
+            "bsonType": "string"
+          },
+          "sourceUrl": {
+            "bsonType": "string"
+          }
+        }
+      },
       "demographics": {
         "bsonType": "object",
         "additionalProperties": false,

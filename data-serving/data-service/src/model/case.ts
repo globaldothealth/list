@@ -22,6 +22,7 @@ import { TravelHistoryDocument, travelHistorySchema } from './travel-history';
 import { ObjectId } from 'mongodb';
 import _ from 'lodash';
 import mongoose from 'mongoose';
+import { ExclusionDataDocument, exclusionDataSchema } from './exclusion-data';
 
 export const caseSchema = new mongoose.Schema(
     {
@@ -39,6 +40,7 @@ export const caseSchema = new mongoose.Schema(
                 message: 'Must include an event with name "confirmed"',
             },
         },
+        exclusionData: exclusionDataSchema,
         genomeSequences: [genomeSequenceSchema],
         importedCase: {
             _id: false,
@@ -88,6 +90,7 @@ caseSchema.methods.equalsJSON = function (jsonCase: any): boolean {
     return (
         _.isEqual(thisJson.demographics, other.demographics) &&
         _.isEqual(thisJson.events, other.events) &&
+        _.isEqual(thisJson.exclusionData, other.exclusionData) &&
         _.isEqual(thisJson.genomeSequences, other.genomeSequences) &&
         _.isEqual(thisJson.location, other.location) &&
         _.isEqual(thisJson.notes, other.notes) &&
@@ -107,6 +110,7 @@ export type CaseDocument = mongoose.Document & {
     caseReference: CaseReferenceDocument;
     demographics: DemographicsDocument;
     events: [EventDocument];
+    exclusionData: ExclusionDataDocument;
     genomeSequences: [GenomeSequenceDocument];
     importedCase: unknown;
     location: LocationDocument;
