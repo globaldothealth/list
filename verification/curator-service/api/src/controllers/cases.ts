@@ -313,7 +313,6 @@ export default class CasesController {
      */
     batchStatusChange = async (req: Request, res: Response): Promise<void> => {
         try {
-            console.log('Passing on batch status change');
             const response = await axios.post(
                 this.dataServerURL + '/api/cases/batchStatusChange',
                 {
