@@ -1141,6 +1141,7 @@ components:
               enum:
                 - UNVERIFIED
                 - VERIFIED
+                - EXCLUDED
             additionalSources:
               type: array
               description: List of additional URLs that described a case

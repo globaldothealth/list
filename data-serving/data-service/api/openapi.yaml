@@ -636,6 +636,7 @@ components:
               enum:
                 - UNVERIFIED
                 - VERIFIED
+                - EXCLUDED
             additionalSources:
               type: array
               items:
