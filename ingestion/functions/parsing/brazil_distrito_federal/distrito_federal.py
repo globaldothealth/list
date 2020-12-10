@@ -15,19 +15,19 @@ except ImportError:
             "common/python"))
     import parsing_lib
 
-_AGE = "Faixa EtÃ¡ria"
+_AGE = "Faixa Etária"
 _GENDER = "Sexo"
 _MUNICIPALITY = "RA"
 # UF stands for Unidade Federada which is the same as State
 _STATE = "UF"
 _DATE_CONFIRMED = "Data Cadastro"
 _DATE_SYMPTOMS = "dataPrimeirosintomas"
-_DEATH = "Ã“bito"
+_DEATH = "Óbito"
 _LUNG = "Pneumopatia"
 _KIDNEY = "Nefropatia"
-_HEMATOLOGIC = "DoenÃ§a HematolÃ³gica"
-_METABOLIC = "DistÃºrbios MetabÃ³licos"
-_IMMUNOSUPPRESSED = "ImunopressÃ£o"
+_HEMATOLOGIC = "Doença Hematológica"
+_METABOLIC = "Distúrbios Metabólicos"
+_IMMUNOSUPPRESSED = "Imunopressão"
 _OBESITY = "Obesidade"
 _OTHERS = "Outros"
 _CARDIOVASCULAR = "Cardiovasculopatia"
@@ -35,7 +35,7 @@ _CARDIOVASCULAR = "Cardiovasculopatia"
 _COMORBIDITIES_MAP = {
     "Pneumopatia": "lung disease",
     "Nefropatia": "kidney disease",
-    "DistÃºrbios MetabÃ³licos": "disease of metabolism",
+    "Distúrbios Metabólicos": "disease of metabolism",
     "Obesidade": "obesity",
     "Cardiovasculopatia": "cardiovascular system disease"
 }
@@ -105,7 +105,7 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
     if kidney == "Sim":
         comorbidities.append(_COMORBIDITIES_MAP["Nefropatia"])
     if metabolic == "Sim":
-        comorbidities.append(_COMORBIDITIES_MAP["DistÃºrbios MetabÃ³licos"])
+        comorbidities.append(_COMORBIDITIES_MAP["Distúrbios Metabólicos"])
     if cardiovascular == "Sim":
         comorbidities.append(_COMORBIDITIES_MAP["Cardiovasculopatia"])
     if obesity == "Sim":
@@ -117,6 +117,7 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
         return preexistingConditions
     else:
         return None
+
 
 def convert_demographics(gender: str, age: str):
     if not any((gender, age)):
