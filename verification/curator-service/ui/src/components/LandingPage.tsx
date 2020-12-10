@@ -4,7 +4,6 @@ import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insigni
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import PolicyLink from './PolicyLink';
 
 const useStyles = makeStyles(() => ({
     paper: {
