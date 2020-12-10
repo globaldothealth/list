@@ -313,8 +313,6 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
-    // useCookieBanner();
-
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
