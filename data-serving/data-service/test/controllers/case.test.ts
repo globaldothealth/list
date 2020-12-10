@@ -761,7 +761,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [''],
-                    status: 'Excluded',
+                    status: 'EXCLUDED',
                     ...curatorMetadata,
                 })
                 .expect(422);
@@ -775,7 +775,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [existingCase._id],
-                    status: 'Excluded',
+                    status: 'EXCLUDED',
                     note: 'Duplicate',
                     ...curatorMetadata,
                 })
@@ -792,7 +792,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [firstExistingCase._id, secondExistingCase._id],
-                    status: 'Excluded',
+                    status: 'EXCLUDED',
                     note: 'Duplicate',
                     ...curatorMetadata,
                 })
@@ -820,7 +820,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [firstExistingCase._id, secondExistingCase._id],
-                    status: 'Excluded',
+                    status: 'EXCLUDED',
                     note: 'Duplicate',
                     ...curatorMetadata,
                 })
@@ -846,7 +846,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [firstExistingCase._id, secondExistingCase._id],
-                    status: 'Excluded',
+                    status: 'EXCLUDED',
                     note: 'Duplicate',
                     ...curatorMetadata,
                 })
@@ -856,7 +856,7 @@ describe('POST', () => {
                 .post('/api/cases/batchStatusChange')
                 .send({
                     caseIds: [firstExistingCase._id, secondExistingCase._id],
-                    status: 'Unverified',
+                    status: 'UNVERIFIED',
                     ...curatorMetadata,
                 })
                 .expect(200);
@@ -871,6 +871,32 @@ describe('POST', () => {
             );
             expect(firstCaseInDb?.exclusionData).not.toBeDefined();
             expect(secondCaseInDb?.exclusionData).not.toBeDefined();
+        });
+
+        it('should allow query instead of list of case IDs', async () => {
+            const firstExistingCase = new Case(fullCase);
+            await firstExistingCase.save();
+            const secondExistingCase = new Case(fullCase);
+            await secondExistingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    query: 'country:France',
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            const firstCaseInDb = await Case.findById(firstExistingCase._id);
+            const secondCaseInDb = await Case.findById(secondExistingCase._id);
+            expect(firstCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
+            expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
         });
     });
 });
