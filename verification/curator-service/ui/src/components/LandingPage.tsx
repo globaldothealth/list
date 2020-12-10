@@ -4,6 +4,7 @@ import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insigni
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import PolicyLink from './PolicyLink';
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -83,7 +84,7 @@ export default function LandingPage(): JSX.Element {
                     <div className={classes.link}>
                         <Link to="/terms">Terms of use</Link>
                     </div>
-                    {/* <PolicyLink
+                    <PolicyLink
                         type="privacy-policy"
                         classes={{
                             root: classes.link,
@@ -98,7 +99,7 @@ export default function LandingPage(): JSX.Element {
                         }}
                     >
                         Cookie policy
-                    </PolicyLink> */}
+                    </PolicyLink>
                 </div>
             </div>
             <Button
