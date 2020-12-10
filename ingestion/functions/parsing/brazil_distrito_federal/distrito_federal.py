@@ -15,19 +15,19 @@ except ImportError:
             "common/python"))
     import parsing_lib
 
-_AGE = "Faixa Etária"
+_AGE = "Faixa EtÃ¡ria"
 _GENDER = "Sexo"
 _MUNICIPALITY = "RA"
 # UF stands for Unidade Federada which is the same as State
 _STATE = "UF"
 _DATE_CONFIRMED = "Data Cadastro"
 _DATE_SYMPTOMS = "dataPrimeirosintomas"
-_DEATH = "Óbito"
+_DEATH = "Ã“bito"
 _LUNG = "Pneumopatia"
 _KIDNEY = "Nefropatia"
-_HEMATOLOGIC = "Doença Hematológica"
-_METABOLIC = "Distúrbios Metabólicos"
-_IMMUNOSUPPRESSED = "Imunopressão"
+_HEMATOLOGIC = "DoenÃ§a HematolÃ³gica"
+_METABOLIC = "DistÃºrbios MetabÃ³licos"
+_IMMUNOSUPPRESSED = "ImunopressÃ£o"
 _OBESITY = "Obesidade"
 _OTHERS = "Outros"
 _CARDIOVASCULAR = "Cardiovasculopatia"
@@ -35,7 +35,7 @@ _CARDIOVASCULAR = "Cardiovasculopatia"
 _COMORBIDITIES_MAP = {
     "Pneumopatia": "lung disease",
     "Nefropatia": "kidney disease",
-    "Distúrbios Metabólicos": "disease of metabolism",
+    "DistÃºrbios MetabÃ³licos": "disease of metabolism",
     "Obesidade": "obesity",
     "Cardiovasculopatia": "cardiovascular system disease"
 }
@@ -98,11 +98,6 @@ def convert_events(date_confirmed, date_symptoms, death):
 def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
                                    cardiovascular: str, obesity: str):
     preexistingConditions = {}
-    items = (lung, kidney, metabolic, cardiovascular, obesity)
-    if all(item == "Não" for item in items):
-        return None
-
-    preexistingConditions["hasPreexistingConditions"] = True
     comorbidities = []
 
     if lung == "Sim":
@@ -110,17 +105,18 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
     if kidney == "Sim":
         comorbidities.append(_COMORBIDITIES_MAP["Nefropatia"])
     if metabolic == "Sim":
-        comorbidities.append(_COMORBIDITIES_MAP["Distúrbios Metabólicos"])
+        comorbidities.append(_COMORBIDITIES_MAP["DistÃºrbios MetabÃ³licos"])
     if cardiovascular == "Sim":
         comorbidities.append(_COMORBIDITIES_MAP["Cardiovasculopatia"])
     if obesity == "Sim":
         comorbidities.append(_COMORBIDITIES_MAP["Obesidade"])
 
     if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
         preexistingConditions["values"] = comorbidities
-
-    return preexistingConditions
-
+        return preexistingConditions
+    else:
+        return None
 
 def convert_demographics(gender: str, age: str):
     if not any((gender, age)):
