@@ -110,3 +110,7 @@
   description: Date an update was made to the case
 - name: revisionMetadata.updateMetadata.notes
   description: Update notes from curator
+- name: exclusionData.note
+  description: Note that was entered by curator when marking the case as excluded
+- name: exclusionData.date
+  description: Date this case was marked as excluded
