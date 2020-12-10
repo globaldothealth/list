@@ -56,8 +56,8 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
-import PolicyLink from './PolicyLink';
-import useCookieBanner from '../hooks/useCookieBanner';
+// import PolicyLink from './PolicyLink';
+// import useCookieBanner from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
@@ -313,8 +313,6 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
-    useCookieBanner();
-
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
@@ -613,7 +611,7 @@ export default function App(): JSX.Element {
                             >
                                 Terms of use
                             </Link>
-                            <PolicyLink
+                            {/* <PolicyLink
                                 type="privacy-policy"
                                 classes={{
                                     root: classes.link,
@@ -631,7 +629,7 @@ export default function App(): JSX.Element {
                                 }}
                             >
                                 Cookie policy
-                            </PolicyLink>
+                            </PolicyLink> */}
                         </div>
                     </Drawer>
                 )}
