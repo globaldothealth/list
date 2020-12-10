@@ -84,7 +84,7 @@ export default function LandingPage(): JSX.Element {
                     <div className={classes.link}>
                         <Link to="/terms">Terms of use</Link>
                     </div>
-                    <PolicyLink
+                    {/* <PolicyLink
                         type="privacy-policy"
                         classes={{
                             root: classes.link,
@@ -99,7 +99,7 @@ export default function LandingPage(): JSX.Element {
                         }}
                     >
                         Cookie policy
-                    </PolicyLink>
+                    </PolicyLink> */}
                 </div>
             </div>
             <Button
