@@ -56,7 +56,7 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
-import PolicyLink from './PolicyLink';
+// import PolicyLink from './PolicyLink';
 // import useCookieBanner from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
