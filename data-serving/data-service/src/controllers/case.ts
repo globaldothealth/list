@@ -540,18 +540,28 @@ export class CasesController {
             return;
         }
 
+        let updateQuery = {};
+
         try {
-            const validIdsCount = await Case.countDocuments({
-                _id: { $in: caseIds },
-            });
-            if (validIdsCount != caseIds.length) {
-                res.status(422)
-                    .send({
-                        message:
-                            'At least one of provided case IDs was not found. No records changed.',
-                    })
-                    .end();
-                return;
+            if (!caseIds) {
+                updateQuery = casesMatchingSearchQuery({
+                    searchQuery: req.body.query,
+                    count: false,
+                });
+            } else {
+                updateQuery = {
+                    _id: { $in: caseIds },
+                };
+                const validIdsCount = await Case.countDocuments(updateQuery);
+                if (validIdsCount != caseIds.length) {
+                    res.status(422)
+                        .send({
+                            message:
+                                'At least one of provided case IDs was not found. No records changed.',
+                        })
+                        .end();
+                    return;
+                }
             }
         } catch (err) {
             if (err.name === 'CastError') {
@@ -562,6 +572,7 @@ export class CasesController {
                     .end();
                 return;
             }
+            logger.error(err);
             res.status(500).json(err).end();
             return;
         }
@@ -586,13 +597,11 @@ export class CasesController {
                     },
                 };
             }
-            await Case.updateMany(
-                { _id: { $in: req.body.caseIds } },
-                updateDocument,
-            );
+            await Case.updateMany(updateQuery, updateDocument);
 
             res.status(200).end();
         } catch (err) {
+            logger.error(err);
             res.status(500).json(err).end();
         }
         return;
