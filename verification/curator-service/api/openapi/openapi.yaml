@@ -632,7 +632,10 @@ paths:
       tags: [Case]
       operationId: batchStatusChange
       requestBody:
-        description: Case IDs are passed through an array of strings, note may be provided as well.
+        description: >
+          Case IDs are passed through an array of strings, note may be provided as well.
+          A query may be provided instead of list of IDs, this will change status for all
+          cases matching the query.
         required: true
         content:
           application/json:
@@ -647,13 +650,21 @@ paths:
                     type: string
                 status:
                   $ref: "#/components/schemas/CaseStatus"
+                query:
+                  description: >
+                    Cases matching this query will have their status
+                    changed. Must contain non-whitespace characters.
+                  type: string
+                  pattern: \S+
                 note:
                   description: >
                     The reason behind exclusion (or other important info).
                     This field is ignored if a status is not "Excluded".
                   type: string
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
               required:
-                - caseIds
                 - status
       responses:
         "200":
@@ -1369,7 +1380,7 @@ components:
               $ref: "#/components/schemas/EditMetadata"
     CaseStatus:
       type: string
-      enum: [Unverified, Verified, Excluded]
+      enum: [UNVERIFIED, VERIFIED, EXCLUDED]
     CaseArray:
       type: object
       properties:
