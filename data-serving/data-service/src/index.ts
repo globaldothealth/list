@@ -175,6 +175,10 @@ new OpenApiValidator({
             createCaseRevision,
             caseController.del,
         );
+        apiRouter.post(
+            '/cases/batchStatusChange',
+            caseController.batchStatusChange,
+        );
 
         // Suggest locations based on the request's "q" query param.
         const geocodeSuggester = new GeocodeSuggester(geocoders);
