@@ -463,7 +463,7 @@ describe('POST', () => {
         await curatorRequest
             .post('/api/sources')
             .send({ origin: { url: 2 } })
-            .expect(422);
+            .expect(400);
     });
 });
 
