@@ -13,7 +13,7 @@ import AwsLambdaClient from './clients/aws-lambda-client';
 import CasesController from './controllers/cases';
 import EmailClient from './clients/email-client';
 import GeocodeProxy from './controllers/geocode';
-import { OpenApiValidator } from 'express-openapi-validator';
+import { middleware as OpenApiValidatorMiddleware } from 'express-openapi-validator';
 import SourcesController from './controllers/sources';
 import UploadsController from './controllers/uploads';
 import { ValidationError } from 'express-openapi-validator/dist/framework/types';
@@ -132,17 +132,15 @@ const awsEventsClient = new AwsEventsClient(
 );
 
 // API validation.
-new OpenApiValidator({
-    apiSpec: './openapi/openapi.yaml',
-    validateResponses: true,
-})
-    .install(app)
-    .then(() => {
-        return new EmailClient(
-            env.EMAIL_USER_ADDRESS,
-            env.EMAIL_USER_PASSWORD,
-        ).initialize();
-    })
+app.use(
+    OpenApiValidatorMiddleware({
+        apiSpec: './openapi/openapi.yaml',
+        validateResponses: true,
+    }),
+);
+
+new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
+    .initialize()
     .catch((e) => {
         logger.error('Failed to instantiate email client:', e);
         process.exit(1);
@@ -367,10 +365,6 @@ new OpenApiValidator({
                 res.sendFile(path.join(env.STATIC_DIR, 'index.html'));
             });
         }
-    })
-    .catch((e) => {
-        logger.error('Failed to install OpenAPI validator:', e);
-        process.exit(1);
     });
 
 export default app;
