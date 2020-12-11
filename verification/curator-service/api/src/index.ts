@@ -263,6 +263,11 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             mustHaveAnyRole(['curator']),
             casesController.batchUpdateQuery,
         );
+        apiRouter.post(
+            '/cases/batchStatusChange',
+            mustHaveAnyRole(['curator']),
+            casesController.batchStatusChange,
+        );
         apiRouter.put(
             '/cases/:id([a-z0-9]{24})',
             mustHaveAnyRole(['curator']),

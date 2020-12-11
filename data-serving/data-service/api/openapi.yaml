@@ -308,8 +308,6 @@ paths:
                   type: string
                   pattern: \S+
                 case:
-                  description: >
-                    The case fields that all matching cases will be updated to.
                   $ref: "#/components/schemas/Case"
               required:
                 - curator
@@ -470,6 +468,57 @@ paths:
           $ref: "#/components/responses/404"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchStatusChange:
+    post:
+      summary: Changes status for a list of cases
+      tags: [Case]
+      operationId: batchStatusChange
+      requestBody:
+        description: >
+          Case IDs are passed through an array of strings, note may be provided as well.
+          A query may be provided instead of list of IDs, this will change status for all
+          cases matching the query.
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  description: >
+                    Cases having IDs provided here will have their
+                    status changed to one specified in status field.
+                  type: array
+                  items:
+                    type: string
+                status:
+                  $ref: "#/components/schemas/CaseStatus"
+                query:
+                  description: >
+                    Cases matching this query will have their status
+                    changed. Must contain non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                note:
+                  description: >
+                    The reason behind exclusion (or other important info).
+                    This field is ignored if a status is not "Excluded".
+                  type: string
+                curator:
+                  $ref: "#/components/schemas/Curator"
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
+              required:
+                - status
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /geocode/seed:
     post:
       tags: [Geocode]
@@ -598,6 +647,7 @@ components:
               enum:
                 - UNVERIFIED
                 - VERIFIED
+                - EXCLUDED
             additionalSources:
               type: array
               items:
@@ -750,6 +800,9 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    CaseStatus:
+      type: string
+      enum: [UNVERIFIED, VERIFIED, EXCLUDED]
     SymptomArray:
       type: object
       properties:
