@@ -481,8 +481,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             placeholder="days"
                                             onChange={(event): void =>
                                                 props.onChange({
-                                                    numDaysBeforeToday:
+                                                    numDaysBeforeToday: Number(
                                                         event.target.value,
+                                                    ),
                                                     op: props.value?.op,
                                                 })
                                             }
