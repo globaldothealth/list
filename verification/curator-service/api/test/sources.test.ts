@@ -200,7 +200,7 @@ describe('PUT', () => {
             .put(`/api/sources/${source.id}`)
             .send({
                 dateFilter: {
-                    numDaysBeforeToday: '3',
+                    numDaysBeforeToday: 3,
                     op: 'EQ',
                 },
             })

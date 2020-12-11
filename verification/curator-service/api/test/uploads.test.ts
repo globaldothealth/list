@@ -13,11 +13,13 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
-const mockSend = jest.fn().mockResolvedValue({});
-const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 jest.mock('../src/clients/email-client', () => {
+    const mockSend = jest.fn().mockResolvedValue({});
     return jest.fn().mockImplementation(() => {
-        return { send: mockSend, initialize: mockInitialize };
+        return {
+            send: mockSend,
+            initialize: jest.fn().mockResolvedValue({ send: mockSend }),
+        };
     });
 });
 
