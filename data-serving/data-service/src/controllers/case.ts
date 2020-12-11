@@ -3,6 +3,7 @@ import { DocumentQuery, Query } from 'mongoose';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
@@ -76,6 +77,7 @@ export class CasesController {
                     }>).map((datum) => datum.name);
                     casesQuery
                         .cursor()
+                        .map(parseDownloadedCase)
                         .pipe(
                             stringify({
                                 header: true,
@@ -301,11 +303,7 @@ export class CasesController {
                 });
                 return;
             }
-            let bulkWriteResult;
-            if (req.body.cases.length > 0) {
-                // Use this method rather than Case.bulkWrite() as that method
-                // causes an out of memory error for a large number of cases.
-                const bulk = Case.collection.initializeUnorderedBulkOp();
+            const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
                     delete c.caseCount;
@@ -313,26 +311,34 @@ export class CasesController {
                         c.caseReference?.sourceId &&
                         c.caseReference?.sourceEntryId
                     ) {
-                        delete c._id;
-                        bulk.find({
-                            'caseReference.sourceId': c.caseReference.sourceId,
-                            'caseReference.sourceEntryId':
-                                c.caseReference.sourceEntryId,
-                        })
-                            .upsert()
-                            .updateOne({ $set: c });
+                        return {
+                            updateOne: {
+                                filter: {
+                                    'caseReference.sourceId':
+                                        c.caseReference.sourceId,
+                                    'caseReference.sourceEntryId':
+                                        c.caseReference.sourceEntryId,
+                                },
+                                update: c,
+                                upsert: true,
+                            },
+                        };
                     } else {
-                        bulk.insert(c);
+                        return {
+                            insertOne: {
+                                document: c,
+                            },
+                        };
                     }
-                });
-                bulkWriteResult = await bulk.execute();
-            }
+                }),
+                { ordered: false },
+            );
             res.status(200).json({
                 phase: 'UPSERT',
                 numCreated:
-                    (bulkWriteResult?.nInserted || 0) +
-                    (bulkWriteResult?.nUpserted || 0),
-                numUpdated: bulkWriteResult?.nModified || 0,
+                    (bulkWriteResult.insertedCount || 0) +
+                    (bulkWriteResult.upsertedCount || 0),
+                numUpdated: bulkWriteResult.modifiedCount,
                 errors: [],
             });
             return;

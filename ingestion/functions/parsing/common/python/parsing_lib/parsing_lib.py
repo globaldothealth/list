@@ -20,7 +20,7 @@ DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
 # Expected date fields format.
-DATE_FORMAT = "%m/%d/%YZ"
+DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
@@ -59,14 +59,8 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    if event.get(DATE_FILTER_FIELD) and event.get(DATE_RANGE_FIELD):
-        error_message = (
-            f"At most one of fields {DATE_FILTER_FIELD} and {DATE_RANGE_FIELD} can be provided."
-        )
-        e = ValueError(error_message)
-        common_lib.complete_with_error(e)
     return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(DATE_RANGE_FIELD, {}), event.get(AUTH_FIELD, None)
+        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
@@ -163,6 +157,22 @@ def get_today() -> datetime.datetime:
     return datetime.datetime.today()
 
 
+def get_case_date(date_string) -> datetime.datetime:
+    """Return a datetime parsed from a case."""
+    case_date = ""
+    for fmt in (DATE_FORMATS):
+        try:
+            return datetime.datetime.strptime(
+                date_string,
+                fmt)
+        except ValueError:
+            pass
+    if not case_date:
+        raise ValueError(f"Date {date_string} from case could not be parsed.")
+
+    return case_date
+
+
 def filter_cases_by_date(
         case_data: Generator[Dict, None, None],
         date_filter: Dict, date_range: Dict, env: str,
@@ -173,6 +183,9 @@ def filter_cases_by_date(
     If a date_range is provided, returns only cases within the specified start
     and end bounds (inclusive). Else if date_filter is provided, returns the
     cases within that specification. Else, returns all cases.
+
+    Notice that if _both_ date_range and date_filter are provided, then date_range is used
+    and date_filter is ignored.
     """
     if date_range:
         print(f'Filtering cases using date range {date_range}')
@@ -180,8 +193,7 @@ def filter_cases_by_date(
         def case_is_within_range(case, start, end):
             confirmed_event = [e for e in case["events"]
                                if e["name"] == "confirmed"][0]
-            case_date = datetime.datetime.strptime(
-                confirmed_event["dateRange"]["start"], DATE_FORMAT)
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
             return start <= case_date <= end
 
         start = datetime.datetime.strptime(date_range["start"], "%Y-%m-%d")
@@ -198,13 +210,14 @@ def filter_cases_by_date(
         def case_is_within_range(case, cutoff_date, op):
             confirmed_event = [e for e in case["events"]
                                if e["name"] == "confirmed"][0]
-            case_date = datetime.datetime.strptime(
-                confirmed_event["dateRange"]["start"], DATE_FORMAT)
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
             delta_days = (case_date - cutoff_date).days
             if op == "EQ":
                 return delta_days == 0
             elif op == "LT":
                 return delta_days < 0
+            elif op == "GT":
+                return delta_days > 0
             else:
                 e = ValueError(f'Unsupported date filter operand: {op}')
                 common_lib.complete_with_error(

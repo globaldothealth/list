@@ -15,7 +15,6 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -37,9 +36,9 @@ def convert_gender(raw_gender):
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
-            raw_entry.get("DISTRITO", ""),
-            raw_entry.get("PROVINCIA", ""),
             raw_entry.get("DEPARTAMENTO", ""),
+            raw_entry.get("PROVINCIA", ""),
+            raw_entry.get("DISTRITO", ""),
             "Peru"]
         if term != "EN INVESTIGACIÓN"]
 
@@ -71,29 +70,30 @@ def parse_cases(raw_data_file, source_id, source_url):
     }
 
     with open(raw_data_file, "r") as f:
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, delimiter=';')
         for entry in reader:
-            case = {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceEntryId": entry["UUID"],
-                    "sourceUrl": source_url
-                },
-                "location": convert_location(entry),
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "value": conf_methods.get(entry['METODODX']),
-                        "dateRange":
-                            {
-                                "start": convert_date(entry["FECHA_RESULTADO"]),
-                                "end": convert_date(entry["FECHA_RESULTADO"])
-                        }
-                    }
-                ],
-                "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
-            }
-            yield case
+            if entry["UUID"] and entry['FECHA_RESULTADO']:
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceEntryId": entry["UUID"],
+                        "sourceUrl": source_url},
+                    "location": convert_location(entry),
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "value": conf_methods.get(
+                                entry['METODODX']),
+                            "dateRange": {
+                                "start": convert_date(
+                                    entry["FECHA_RESULTADO"]),
+                                "end": convert_date(
+                                    entry["FECHA_RESULTADO"])}}],
+                    "demographics": convert_demographics(
+                        entry["EDAD"],
+                        entry["SEXO"]),
+                }
+                yield case
 
 
 def lambda_handler(event, context):

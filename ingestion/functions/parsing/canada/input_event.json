@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "sourceUrl": "https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/cases.csv",
+    "s3Key": "5f596b7cb48729003fb4aca6/2020/09/10/0248/content.csv",
+    "sourceId": "5f596b7cb48729003fb4aca6"
+}

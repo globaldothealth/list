@@ -26,8 +26,19 @@ export const mustBeAuthenticated = (
 ): void => {
     if (req.isAuthenticated()) {
         return next();
+    } else {
+        passport.authenticate('bearer', (err, user) => {
+            if (err) {
+                return next(err);
+            }
+            if (user) {
+                req.user = user;
+                return next();
+            } else {
+                res.sendStatus(403);
+            }
+        })(req, res, next);
     }
-    res.sendStatus(403);
 };
 
 /**

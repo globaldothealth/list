@@ -113,8 +113,8 @@ new OpenApiValidator({
                         ? 'mapbox.places-permanent'
                         : 'mapbox.places',
                     new RateLimiter(
-                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_SEC,
-                        'second',
+                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN,
+                        'minute',
                     ),
                 ),
             );

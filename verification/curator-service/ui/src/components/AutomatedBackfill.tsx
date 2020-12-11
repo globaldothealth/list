@@ -14,6 +14,17 @@ import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { useInterval } from '../hooks/useInterval';
 
+/**
+ * The amount of time allowed before timing out a backfill.
+ *
+ * Parsing functions, on AWS Lambda, have a 15 minute limit. It's possible for
+ * retrieval to take a few minutes as well, so we allot five additional minutes
+ * for that, too.
+ *
+ * This is 20 minutes, times 60 seconds per minute, to milliseconds.
+ */
+const _BACKFILL_TIME_LIMIT_MS = 20 * 60 * 1000;
+
 interface RetrievalResult {
     bucket: string;
     key: string;
@@ -52,6 +63,7 @@ const useStyles = makeStyles(() => ({
     statusMessage: {
         marginTop: '2em',
         maxWidth: '60%',
+        whiteSpace: 'pre-line',
     },
     buttonBar: {
         alignItems: 'center',
@@ -116,6 +128,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
     const [successMessage, setSuccessMessage] = React.useState('');
     const [sourceId, setSourceId] = React.useState('');
     const [uploadId, setUploadId] = React.useState('');
+    const [uploadStart, setUploadStart] = React.useState(0);
     const [uploadStatus, setUploadStatus] = React.useState('');
 
     useInterval(async () => {
@@ -134,7 +147,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
             } else if (upload.status === 'ERROR') {
                 setUploadStatus(upload.status);
                 setErrorMessage(
-                    `Upload ${upload._id} failed with error: ${upload.summary.error}`,
+                    `Upload ${uploadId} failed with error: ${upload.summary.error}`,
                 );
             } else if (upload.status === 'SUCCESS') {
                 setUploadStatus(upload.status);
@@ -148,9 +161,35 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
                 setSuccessMessage(
                     baseMessage.concat(createMessage, updateMessage),
                 );
+            } else if (uploadStart && outOfTime(uploadStart)) {
+                setUploadStatus('ERROR');
+                setErrorMessage(
+                    `Upload ${uploadId} failed with timeout.
+                     This typically means that the parsing function wasn't able to ingest all cases in the provided range within the function time limit.
+                     Please search the line list by the above upload ID to find what dates were covered, and for subsequent backfills, try running over a date range with fewer cases.`,
+                );
+                await axios.put(
+                    `/api/sources/${sourceId}/uploads/${uploadId}`,
+                    {
+                        status: 'ERROR',
+                        summary: {
+                            error: 'TIMEOUT',
+                        },
+                    },
+                );
             }
         }
     }, 10000);
+
+    /**
+     * Determines whether or not backfill has exceeded the configured time
+     * limit.
+     *
+     * @param startTime - Time at which backfill began.
+     */
+    const outOfTime = (startTime: number): boolean => {
+        return Date.now() - startTime > _BACKFILL_TIME_LIMIT_MS;
+    };
 
     /**
      * Convert the supplied date to a local YYYY-MM-DD format.
@@ -193,6 +232,7 @@ export default function AutomatedBackfill(props: Props): JSX.Element {
             const response = await axios.post<RetrievalResult>(
                 encodeURI(fullUri),
             );
+            setUploadStart(Date.now());
             setUploadStatus('IN_PROGRESS');
             setUploadId(response.data.upload_id);
         } catch (e) {

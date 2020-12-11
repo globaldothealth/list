@@ -19,49 +19,48 @@ class ParaibaTest(unittest.TestCase):
         result = paraiba.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
         self.assertCountEqual(list(result), [
             {
-                "caseReference": {
-                    "sourceId": _SOURCE_ID,
-                    "sourceUrl": _SOURCE_URL
-                },
+                "caseReference": {"sourceId": _SOURCE_ID, "sourceEntryId": "ymF8MCjS33", "sourceUrl": _SOURCE_URL},
                 "location": {
-                    "query": "Santa Rita, Paraíba, Brazil"
-                },
-                "demographics": {
-                    "gender": "Male",
-                    "ageRange": {
-                        "start": 80.0,
-                        "end": 80.0
-                    },
+                    "query": "João Pessoa, Paraíba, Brazil"
                 },
                 "events": [
                     {
                         "name": "confirmed",
-                        "value": "PCR test"
+                        "dateRange": {
+                            "start": "04/26/2020Z",
+                            "end": "04/26/2020Z"
+                        },
+                        "value": "Serological test"
                     },
                     {
                         "name": "onsetSymptoms",
-                        "dateRange":
-                        {
-                            "start": "04/27/2020Z",
-                            "end": "04/27/2020Z"
-                        },
+                        "dateRange": {
+                            "start": "04/16/2020Z",
+                            "end": "04/16/2020Z"
+                        }
                     },
                     {
-                        "name": "outcome",
-                        "dateRange":
-                        {
-                            "start": "05/10/2020Z",
-                            "end": "05/10/2020Z"
-                        },
-                        "value": "Death"
+                        "name": "icuAdmission",
+                        "value": "Yes"
                     }
                 ],
+                "symptoms": {
+                    "status": "Symptomatic",
+                    "values": ["cough"]
+                },
+                "demographics": {
+                    "gender": "Female",
+                    "ageRange": {
+                        "start": 47.0,
+                        "end": 47.0
+                    }
+                },
                 "preexistingConditions": {
                     "hasPreexistingConditions": True,
-                    "values":
-                    ["diabetes mellitus", "heart disease",
-                     "respiratory system disease"]
+                    "values": [
+                        "diabetes mellitus"
+                    ]
                 },
-                "notes": ''
+                "notes": "Other symptoms reported"
             }
         ])

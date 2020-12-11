@@ -25,7 +25,7 @@
 - name: demographics.occupation
   description: Primary occupation of the case if any
 - name: demographics.nationalities
-  descriptionn: Nationalities of the case in English.
+  description: Nationalities of the case in English.
 - name: demographics.ethnicity
   description: >
     Ethnicity of the case, Asian, Caucasian, etc. Social group that has a common
@@ -49,12 +49,28 @@
   description: Latitude of the centroid of the location
 - name: location.geometry.longitude
   description: Longitude of the centroid of the location
-- name: events
-  description: >
-    Series of events known about this case. At least an event with the name
-    "confirmed" will always be present, other event names can include
-    confirmed, firstClinicalConsultation, hospitalAdmission, icuAdmission,
-    onsetSymptoms, outcome, selfIsolation
+- name: events.confirmed.value
+  description: Confirmation method
+- name: events.confirmed.date
+  description: Confirmed case date
+- name: events.onsetSymptoms.date
+  description: Symptom onset date
+- name: events.firstClinicalConsultation.date
+  description: First clinical consultation
+- name: events.selfIsolation.date
+  description: Date of self isolation
+- name: events.hospitalAdmission.value
+  description: Hospital admission
+- name: events.hospitalAdmission.date
+  description: Hospital admission date
+- name: events.icuAdmission.value
+  description: Admission to isolation unit
+- name: events.icuAdmission.date
+  description: Date admitted to isolation unit
+- name: events.outcome.value
+  description: Outcome
+- name: events.outcome.date
+  description: Outcome date
 - name: symptoms.status
   description: >
     Symptom status if known: Asymptomatic, Symptomatic or Presymptomatic

@@ -328,7 +328,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV'].map((value) => (
+                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
                                             <MenuItem
                                                 key={`format-${value}`}
                                                 value={value || ''}
@@ -426,6 +426,15 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                             }{' '}
                                             day(s) ago
                                         </div>
+                                    ) : rowData.dateFilter?.op === 'GT' ? (
+                                        <div>
+                                            Parse all data after{' '}
+                                            {
+                                                rowData.dateFilter
+                                                    ?.numDaysBeforeToday
+                                            }{' '}
+                                            day(s) ago
+                                        </div>
                                     ) : (
                                         <div>None</div>
                                     ),
@@ -455,6 +464,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                     value: 'EQ',
                                                 },
                                                 { text: 'up to', value: 'LT' },
+                                                { text: 'after', value: 'GT' },
                                             ].map((pair) => (
                                                 <MenuItem
                                                     key={`op-${pair.value}`}

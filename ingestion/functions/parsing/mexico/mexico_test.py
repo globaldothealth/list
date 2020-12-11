@@ -7,7 +7,7 @@ _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://mex.ico"
 _PARSED_CASE = {
     "caseReference": {"sourceId": "abc123", "sourceUrl": "https://mex.ico"},
-    "location": {"query": "MÉXICO, ATIZAPÁN DE ZARAGOZA, MEXICO"},
+    "location": {'query': 'ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO'},
     "events": [
         {
             "name": "confirmed",
@@ -27,7 +27,7 @@ _PARSED_CASE = {
     "demographics": {
         "gender": "Male",
         "ageRange": {"start": 56.0, "end": 56.0},
-        "nationalities": "Mexican",
+        "nationalities": ["Mexican"],
     },
     "preexistingConditions": {"values": ["obesity"]},
     "notes": "Smoker",

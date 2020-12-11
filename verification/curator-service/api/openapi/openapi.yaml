@@ -940,6 +940,7 @@ components:
                 - PARSING_ERROR
                 - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
+                - TIMEOUT
         created:
           $ref: "#/components/schemas/Date"
     UploadsArray:
@@ -1000,6 +1001,7 @@ components:
             - null
             - CSV
             - JSON
+            - XLSX
         dateFilter:
           type: object
           properties:
@@ -1011,6 +1013,7 @@ components:
               type: string
               enum:
                 - EQ
+                - GT
                 - LT
         notificationRecipients:
           description: >

@@ -56,6 +56,8 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
+import PolicyLink from './PolicyLink';
+import useCookieBanner from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
@@ -187,8 +189,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '12px',
         width: '100%',
     },
-    termsLink: {
-        margin: '12px 0 24px',
+    link: {
+        marginTop: 12,
+    },
+    lastLink: {
+        marginBottom: 24,
     },
     content: {
         flexGrow: 1,
@@ -290,6 +295,14 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 >
                     <MenuItem>Report an issue</MenuItem>
                 </a>
+                <a
+                    href="https://github.com/globaldothealth/list#globalhealth-list"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    onClick={handleClose}
+                >
+                    <MenuItem>View source on Github</MenuItem>
+                </a>
             </Menu>
         </div>
     );
@@ -300,6 +313,8 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
+    useCookieBanner();
+
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
     const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
@@ -309,9 +324,15 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
+    const [listPage, setListPage] = React.useState<number>(0);
+    const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const classes = useStyles();
+
     const menuList = user
         ? [
               {
@@ -412,11 +433,8 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
-    const [searchLoading, setSearchLoading] = React.useState(false);
-
-    const classes = useStyles();
     return (
-        <div className={classes.root}>
+        <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
@@ -436,7 +454,9 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <GHListLogo />
+                        <Link to="/" data-testid="home-button">
+                            <GHListLogo />
+                        </Link>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
@@ -450,6 +470,7 @@ export default function App(): JSX.Element {
                                             });
                                         }}
                                         loading={searchLoading}
+                                        rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
@@ -587,11 +608,30 @@ export default function App(): JSX.Element {
                             </a>
                             <Link
                                 to="/terms"
-                                className={classes.termsLink}
+                                className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
                             </Link>
+                            <PolicyLink
+                                type="privacy-policy"
+                                classes={{
+                                    root: classes.link,
+                                }}
+                            >
+                                Privacy policy
+                            </PolicyLink>
+                            <PolicyLink
+                                type="cookie-policy"
+                                classes={{
+                                    root: clsx([
+                                        classes.link,
+                                        classes.lastLink,
+                                    ]),
+                                }}
+                            >
+                                Cookie policy
+                            </PolicyLink>
                         </div>
                     </Drawer>
                 )}
@@ -607,6 +647,10 @@ export default function App(): JSX.Element {
                                 <LinelistTable
                                     user={user}
                                     setSearchLoading={setSearchLoading}
+                                    page={listPage}
+                                    pageSize={listPageSize}
+                                    onChangePage={setListPage}
+                                    onChangePageSize={setListPageSize}
                                 />
                             </Route>
                         )}

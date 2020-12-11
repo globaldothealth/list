@@ -119,6 +119,114 @@ execution of code.
 You are free to write the parsers however you like.
 It's best to get inspiration from existing functions though and the only prerequisite for it showing up in the UI once your PR is merged in is that its name must include _"ParsingFunction"_.
 
+### Writing a parser
+
+You can find an example minimal parser in the [parsing/example](/ingestion/functions/parsing/example/README.md) directory, let's look at its structure:
+
+```shell
+$ tree parsing/example
+parsing/example
+├── README.md        # You can document your parser if you want.
+├── __init__.py      # Required to make this a proper python package, usually empty.
+├── example.py       # Write your parsing code here.
+├── example_test.py  # Always add unit tests.
+├── input_event.json # AWS Cloudwatch event used when testing locally, will be described below.
+├── requirements.txt # Any special third-party dependency that your parser requires, this file is required even if it's empty.
+└── sample_data.csv  # Some sample data used in unit tests, usually copied verbatim from a real source.
+```
+
+At minima, a parser must generate a list of cases that conform to the openAPI
+specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
+
+A minimal case looks like this:
+
+```text
+{
+    "caseReference": {
+        "sourceId": "5ea86423bae6982635d2e1f8",
+        "sourceUrl": "cdc.gov"
+    },
+    "events": [
+        {
+            "name": "confirmed",
+            "dateRange": {
+                "start": "04/27/2020Z",
+                "end": "04/27/2020Z"
+            }
+        }
+    ],
+    "location": {
+        "query": "Canada",
+    },
+}
+```
+
+Its main function (usually called `parse_cases`) must yield cases one by one using [python generators](https://wiki.python.org/moin/Generators). A common library will take care of sending those cases to the server for you in batches.
+
+For geocoding, the parser can either hardcode a location with a `name`, `geoResolution` and `geometry.latitude`, `geometry.longitude` included, in which case no geocoding will be attempted on the server.
+If it doesn't have that information it can simply output a `location.query` which will get geocoded by the server. If geocodes are to be restricted to a certain administrative area level, one can pass the `location.limitToResolution`. Details about those parameters are in the OpenAPI spec for the `NewCase` schema definition.
+
+Example of a location which will not trigger geocoding on the server:
+
+```json
+{
+   "country": "Switzerland",
+   "administrativeAreaLevel1": "Zurich",
+   "geoResolution": "Admin1",
+   "name": "Zurich canton",
+   "geometry": {
+         "longitude": "8.651071",
+         "latitude": "47.42568",
+   }
+}
+```
+
+Example if a minimal location which will trigger geocoding:
+
+```json
+{
+   "query": "Quebec, Canada"
+}
+```
+
+Example of a location which will trigger geocoding with restricted results:
+
+```json
+{
+   "query": "Quebec, Canada",
+   "limitToResolution": "Admin1,Country"
+}
+```
+
+Travel history locations can be geocoded in the same way, travel history should only contain travels prior to the case's location.
+
+Prefer sending queries that go from smallest to biggest regions as mapbox can get confused by the former and geocode to a totally different country that the one you were expecting.
+
+Fields and nested structs should be preferably not set (or set to `None`) rather than set to an empty value (for example unknown age shouldn't be set to `''` and unknown demographics altogether shouldn't be set to `{}`).
+
+Once you are done writing the parser, it needs to be included in the [SAM template](/ingestion/functions/template.yaml) to be made available in production, you can refer to how other functions were added there for example:
+
+```yaml
+# This name must contain "ParsingFunction" in it as a convention.
+ExampleParsingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+        # This is the package in which you wrote your parsing code.
+        CodeUri: parsing/example/
+        # This is the handler in your package in format: file_name.function_name
+        Handler: example.lambda_handler
+        Description: Example parser
+        # This is required for running in AWS.
+        Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+        # Adjust this based on your memory requirements (local runs prints the max memory usage at the end of the run, it's usually good to check if the allocated memory is enough especially for parsers that cannot parse cases one by one (like some JSON parsers which hold the whole data set in memory).
+        MemorySize: 512
+        # This is required to access the common code layer for parsers.
+        Layers:
+        - !Ref ParsingLibLayer
+```
+
 #### Unit tests
 
 Unit testing is mostly standard `pytest`, with a caveat to be sure that tests
@@ -136,18 +244,35 @@ You need AWS sam CLi installed on your system, [follow the instructions](https:/
 
 Run the stack locally using `/dev/run_stack.sh` and follow the [instructions](https://github.com/globaldothealth/list/blob/main/dev/README.md#permissions) to make sure you're an `admin` to be able to give the role account doing the fetch/parsing the right to call your local stack. This step is described below.
 
-Go to the [UI](http://localhost:3002/sources) and add a new source for your parser, once you give it a name, a URL and save it, it will be given an ID.
+Go to the [UI](http://localhost:3002/sources) and add a new source for your parser by clicking on `CREATE NEW` -> `New automated source`.
 
-Put that ID in the `retrieval/valid_scheduled_event.json` file.
+![new automated source](assets/new-automated-source.png).
+
+Once you give it a name, a URL and save it, it will be given an ID.
+
+![new source](assets/new-source-id.png)
+
+Put that ID in the [retrieval/valid_scheduled_event.json](/ingestion/functions/retrieval/valid_scheduled_event.json) file, it should now look something like:
+
+```json
+{
+    "env": "local",
+    "sourceId": "<paste the source ID here>",
+    "auth": {
+      "email": "local@ingestion.function"
+    }
+}
+```
 
 Next invoke the `RetrievalFunction` like this:
 
 ```shell
+cd ingestion/functions
 sam build
 sam local invoke "RetrievalFunction" -e retrieval/valid_scheduled_event.json --docker-network=host
 ```
 
-If you get a 403 error, go to the [user administration page](http://localhost:3002/users) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there.
+If you get a 403 error, go to the [user administration page](http://localhost:3002/users) and assign the `curator` role to the `ingestion@covid-19-map-277002.iam.gserviceaccount.com` service account there or just make sure you added the "auth" property to the event as described in the [auth section](#setup-for-folks-without-aws-access)
 
 Upon success you'll see in the output something like
 `{"bucket":"epid-sources-raw","key":"5f311a9795e338003016593a/2020/08/10/1009/content.csv"}`
@@ -167,28 +292,28 @@ for more information on the template, read
 
 If all goes well you should see the number of cases created/updated (i.e. `{"count_created":4079,"count_updated":0}`).
 
-Test via unit tests and manual testing prior to sending changes. A GitHub
+Test via [unit tests](#Unit-tests) prior to sending PRs. A GitHub
 action
 [verifying the SAM build](../../.github/workflows/ingestion-aws-sam-build.yml)
 is run on pull requests.
-
-### Writing a parser
-
-At minima, a parser must generate a list of cases that conform to the openAPI
-specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
-
-Its main function must yield cases one by one using [python generators](https://wiki.python.org/moin/Generators). A common library will take care of sending those cases to the server for you.
-
-For geocoding, the parser can either hardcode a location with a name, geoResolution and latitude/longitude included, in which case no geocoding will be attempted on the server.
-If it doesn't have that information it can output a `location.query` which will get geocoded by the server. If geocodes are to be restricted to a certain administrative area level, one can pass the `location.limitToResolution`. Details about those parameters are in the OpenAPI spec for the `NewCase` schema definition.
-
-Fields and nested structs should be referably not set rather than set to an empty value (for example unknown age shouldn't be set to '' and unknown demographics altogether shouldn't be set to {}).
 
 #### Debugging of parsers
 
 When a parser is running locally via `sam local invoke`, you can access its container by listing the current docker containers with `docker container ps` and then you can inspect the container you want using its ID. This allows you to see which environment variables are set and is useful to debug potential memory exceeded errors or dangling parsers that are waiting to timeout for some obscure reason. Some useful debugging commands include `docker logs <container id>`, `docker container inspect <container id>` and `docker container stats <container id>`.
 
 For live parsers, you can look in the [AWS console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions) directly, all `print()` calls are logged to Cloudwatch which is useful for debugging.
+
+Example live debugging workflow:
+
+1. [Check the Curator portal for errors](https://curator.ghdsi.org/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
+2. Use the AWS console to find the logs. I'm doing this in the command line, so `aws logs describe-log-groups` shows the log groups. Only one of them has "Mexico" in the name, so that's the one I want.
+3. `aws logs describe-log-streams --log-group-name {GROUP_NAME}` shows me the log stream names, conveniently ordered by date as it's the latest (the last in the list) that I want. They also are named after the date, if you're searching for a particular run.
+4. `aws logs get-log-events --log-group-name {GROUP_NAME} --log-stream-name '{STREAM_NAME}'` shows the log events. Notice that the stream name is in single quotes to avoid shell expansion of its name.
+5. Read the logs, identify the error.
+6. Fix the error.
+7. Submit pull request.
+
+Steps 5-6 may take longer than indicated.
 
 ### Deployment
 
@@ -247,16 +372,27 @@ You can find a list of issues/FR for parsers using the [importer tag](https://gi
 
 Here is an overview of parsers written so far and some details about the data they collect.
 
-| Parser                      | Code                                                                                                 | Remarks                                                                                                                                                                                                                                                                                             | FR   |
-|-----------------------------|------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)          | We aren't converting all fields yet. We're restricting ourselves to data with an `agebracket` present. This data has an interesting format in which some rows represent aggregate data. We need to add handling logic; until we've done so, this filter is used to process strictly line list data. | #563 |
-| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich)      | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided). Granularity for cases is weekly, not daily so we use the first day of the given week arbitrarily. | #483                                                                                                 || Thailand                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/thai)           |                                                                                                                                                                                                                                                                                                     | #516 |
-| Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)       |                                                                                                                                                                                                                                                                                                     | #518 |
-| Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)          |                                                                                                                                                                                                                                                                                                     | #481 |
-| Estonia                     | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/estonia)        |                                                                                                                                                                                                                                                                                                     | #502 |
-| Amapa, Brazil               | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_amapa)   | There are no patient ID/case ID in the raw API so we aren't able to dedupe. There are two files in the source for Amapa, one for confirmed cases and one for confirmed deaths; some of these cases may also be deaths but without patient IDs we are unable to confirm.                             | #495 |
-| Paraiba, Brazil             | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_paraiba) | There are no patient ID/case ID in the raw API so we aren't able to dedupe. This data only includes deaths from Covid-19 so the outcome of all cases will be death. There is no date of confirmation.                                                                                               | #499 |
-| Peru                        | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/peru)           | Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test                                                                                                                                                                                                                             | #484 |
-| Taiwan                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/taiwan)         | No per-case ID so unable to dedupe.                                                                                                                                                                                                                                                                 | #517 |
-| Colombia                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/colombia)         | Assuming the date confirmed is the date of diagnosis (Fecha diagnostico) rather than Fecha de notificación (generally several days earlier). When date of diagnosis, using date reported online as proxy. Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since symptoms, or a negative PCR/antigen test. No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'. | #504 |
-| Germany                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/germany)         |  | #482 |
+_Please update this table with new parsers, or pertinent changes._
+
+| Parser                      | Code                                                                                                 | UUID/Deduping | Remarks                                                                                                                                                                                                                                                                                             | FR   |
+|-----------------------------|------------------------------------------------------------------------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| India                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/india)          |       Y       | Only processes line list style data from this source. There's bulk "state of the world" data published with current values (e.g. number currently hospitalized on a given date), but it's purely aggregate/can't be disaggregated to our format..                                                   | #563 |
+| Switzerland (Zurich canton) | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/ch_zurich)      |       N       | Only imports confirmed cases, not confirmed deaths as we can't link one to the other (no unique patient ID provided). Granularity for cases is weekly, not daily so we use the first day of the given week arbitrarily.                                                                             | #483 |
+| Thailand                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/thai)           |       Y       |                                                                                                                                                                                                                                                                                                     | #516 |
+| Hong Kong                   | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/hongkong)       |       Y       |                                                                                                                                                                                                                                                                                                     | #518 |
+| Japan                       | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/japan)          |       Y       |                                                                                                                                                                                                                                                                                                     | #481 |
+| Estonia                     | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/estonia)        |       Y       |                                                                                                                                                                                                                                                                                                     | #502 |
+| Amapa, Brazil               | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_amapa)   |       N       | There are two files in the source for Amapa, one for confirmed cases and one for confirmed deaths; some of these cases may also be deaths but without patient IDs we are unable to confirm.                                                                                                         | #495 |
+| Paraiba, Brazil             | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_paraiba) |       Y       |                                                                                                                                                                                                                                                                                                     | #499 |
+| Peru                        | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/peru)           |       Y       | Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test                                                                                                                                                                                                                             | #484 |
+| Taiwan                      | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/taiwan)         |       N       |                                                                                                                                                                                                                                                                                                     | #517 |
+| Colombia                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/colombia)       |       Y       | Assuming the date confirmed is the date of diagnosis (Fecha diagnostico) rather than Fecha de notificación (generally several days earlier). When date of diagnosis, using date reported online as proxy. Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since symptoms, or a negative PCR/antigen test. No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'. | #504 |
+| Germany                     | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/germany)        |       N       |                                                                                                                                                                                                                                                                                                     | #482 |
+| Distrito Federal, Brazil    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_distrito_federal) | N    |                                                                                                                                                                                                                                                                                                     | #498 |
+| Argentina                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/argentina)       |       Y       | We are currently only incorporating cases classified ('clasificacion_resumen') as 'Confirmed'. However, 970k out of 1.5M cases are listed as 'Discarded', even though many have data values resembling confirmed Covid-19 patients, eg date_of_diagnosis, ICU_admission, mechanical breathing assistance. Future versions may want to modify this behaviour. For cases classified as Confirmed but lacking a Date of Diagnosis, we use Date of Symptom onset where present, and Date of Case Opening where neither Date of Diagnosis or Date of Symptom Onset are present. For case location, we use 'Province of case loading' (carga_provincia_nombre). This is where the laboratory tests were carried out, so may not always correspond to the exact location of the case, but is best proxy we have. The other location date refers to the residential address of the patient.| #508 |
+| Goias, Brazil                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/brazil_goias)       |       N       |                                                                                                                                                                                                                                                                                                     | #489 |
+| Cuba                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/cuba)       |       Y       | Nationality of case is provided in two letter country codes, so using pycountry package to parse these. The field 'posible_procedencia_contagio' is generally populated by two letter country codes. Case is assumed to have travelled from one of these countries in last 30 days if populated. Diagnostic centre and treatment hospital are both included in notes for now, could be geocoded in future. Currently no parsing of symptoms, as field is always left empty - worth rechecking this in future in case this field becomes populated. No disease outcome data is provided either.| #513 |
+| Mexico                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/mexico)       |       N       | | #480 |
+| Rio Grande do Sul, Brazil                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/riograndedosul)       |       N       | | #490 |
+| Sao Paolo, Brazil                    | [code](https://github.com/globaldothealth/list/tree/main/ingestion/functions/parsing/saopaolo)       |       N       |Some caveats: 1. There are no patient ID/case ID in the raw API so we aren't able to dedupe. 2. We can't link confirmed cases and confirmed deaths because of (1) so we're only importing confirmed cases and ignoring deaths. | #497 |
+
