@@ -3,6 +3,7 @@
 # arrives by magic here, check out
 # https://requests-mock.readthedocs.io/en/latest/pytest.html?highlight=pytest#pytest
 import boto3
+import copy
 import json
 import os
 import pytest
@@ -233,20 +234,9 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
         input_event[parsing_lib.UPLOAD_ID_FIELD],
         input_event[parsing_lib.S3_BUCKET_FIELD],
         input_event[parsing_lib.S3_KEY_FIELD],
-        {},  # Date filter isn't provided, per the following test case.
+        None,
         input_event[parsing_lib.DATE_RANGE_FIELD],
         input_event[parsing_lib.AUTH_FIELD])
-
-
-def test_extract_event_fields_errors_if_date_filter_and_range_provided(
-        input_event):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    with pytest.raises(ValueError, match=parsing_lib.DATE_FILTER_FIELD):
-        input_event[parsing_lib.DATE_FILTER_FIELD] = {
-            "numDaysBeforeToday": 3,
-            "op": "LT"
-        }
-        parsing_lib.extract_event_fields(input_event)
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
@@ -378,7 +368,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_today(mock_today):
+def test_filter_cases_by_date_keeps_exact_with_EQ(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
@@ -390,7 +380,7 @@ def test_filter_cases_by_date_today(mock_today):
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_not_today(mock_today):
+def test_filter_cases_by_date_removes_nonexact_with_EQ(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 10, 10)
     cases = parsing_lib.filter_cases_by_date(
@@ -402,7 +392,7 @@ def test_filter_cases_by_date_not_today(mock_today):
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_exactly_before_today(mock_today):
+def test_filter_cases_by_date_removes_exact_with_LT(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
@@ -414,12 +404,36 @@ def test_filter_cases_by_date_exactly_before_today(mock_today):
 
 
 @patch('parsing_lib.parsing_lib.get_today')
-def test_filter_cases_by_date_before_today(mock_today):
+def test_filter_cases_by_date_keeps_before_LT(mock_today):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 10)
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
         {"numDaysBeforeToday": 3, "op": "LT"},
+        None,
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert next(cases) == CASE_JUNE_FIFTH
+
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_removes_exact_with_GT(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 8)
+    cases = parsing_lib.filter_cases_by_date(
+        [CASE_JUNE_FIFTH],
+        {"numDaysBeforeToday": 3, "op": "GT"},
+        None,
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+    assert not next(cases, None)
+
+
+@patch('parsing_lib.parsing_lib.get_today')
+def test_filter_cases_by_date_keeps_after_GT(mock_today):
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    mock_today.return_value = datetime.datetime(2020, 6, 7)
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH,),
+        {"numDaysBeforeToday": 3, "op": "GT"},
         None,
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert next(cases) == CASE_JUNE_FIFTH
@@ -478,6 +492,26 @@ def test_filter_cases_by_date_outside_range():
         {"start": "2020-06-03", "end": "2020-06-04"},
         "env", "source_id", "upload_id", {}, {})  # api_creds
     assert not next(cases, None)
+
+
+def test_filter_cases_by_date_handles_two_date_formats():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    # Date format is %m/%d/%YZ in CASE_JUNE_FIFTH.
+    # Date parsing also handles strings without the 'Z'.
+    other_date_format_case = copy.deepcopy(
+        CASE_JUNE_FIFTH)
+    other_date_format_case["events"][0]["dateRange"]["start"] = "06/05/2020"
+    other_date_format_case["events"][0]["dateRange"]["end"] = "06/05/2020"
+
+    cases = parsing_lib.filter_cases_by_date(
+        (CASE_JUNE_FIFTH, other_date_format_case),
+        None,
+        {"start": "2020-06-05", "end": "2020-06-05"},
+        "env", "source_id", "upload_id", {}, {})  # api_creds
+
+    assert next(cases) == CASE_JUNE_FIFTH
+    assert next(cases) == other_date_format_case
 
 
 def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():

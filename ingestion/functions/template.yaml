@@ -22,7 +22,7 @@ Resources:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
-      MemorySize: 512
+      MemorySize: 1024
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
@@ -56,11 +56,11 @@ Resources:
       RetentionPolicy: Retain
     Metadata:
       BuildMethod: python3.8
-  ThaiParsingFunction:
+  ThailandParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: parsing/thai/
-      Handler: thai.lambda_handler
+      CodeUri: parsing/thailand/
+      Handler: thailand.lambda_handler
       Description: Parse case data for Thailand
       # Function's execution role
       Policies:
@@ -92,6 +92,19 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+  ExampleParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/example/
+      Handler: example.lambda_handler
+      Description: Example parser
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      MemorySize: 512
+      Layers:
+        - !Ref ParsingLibLayer
   JapanParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -102,7 +115,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      MemorySize: 512
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   EstoniaParsingFunction:
@@ -111,6 +124,20 @@ Resources:
       CodeUri: parsing/estonia/
       Handler: estonia.lambda_handler
       Description: Parse case data for Estonia
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      MemorySize: 512
+      Layers:
+        - !Ref ParsingLibLayer
+  CanadaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/canada/
+      Handler: canada.lambda_handler
+      Runtime: python3.8
+      Description: Parse case data for Canada
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -140,6 +167,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
   PeruParsingFunction:
@@ -152,6 +180,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   BrazilAmapaParsingFunction:
@@ -200,6 +229,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   TaiwanParsingFunction:
@@ -224,6 +254,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   ArgentinaParsingFunction:
@@ -236,6 +267,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   CubaParsingFunction:
@@ -250,6 +282,119 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
+  SaoPaoloParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/saopaolo/
+      Handler: saopaolo.lambda_handler
+      Description: Parse case data for the Sao Paolo State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      MemorySize: 512
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilDistritoFederalParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_distrito_federal/
+      Handler: distrito_federal.lambda_handler
+      Description: Parse case data for the Distrito Federal State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilAcreParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_acre/
+      Handler: acre.lambda_handler
+      Description: Parse case data for the Acre State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilEspiritoSantoParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_espirito_santo/
+      Handler: espirito_santo.lambda_handler
+      Description: Parse case data for the Espirito Santo State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilGoiasParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_goias/
+      Handler: goias.lambda_handler
+      Description: Parse case data for the Goias State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  USAParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/USA/
+      Handler: USA.lambda_handler
+      Description: Parse case data for the United States of America
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilParaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_para/
+      Handler: para.lambda_handler
+      Description: Parse case data for the Para State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  ParaguayParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/paraguay/
+      Handler: paraguay.lambda_handler
+      Description: Parse case data for Paraguay
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+<<<<<<< HEAD
+  CubaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/cuba/
+      Handler: cuba.lambda_handler
+      Description: Parse case data for Cuba
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+=======
+
+>>>>>>> main
 # Declare values that can be imported to other CloudFormation stacks, or should
 # be made easily visible on the console.
 # For more information:
@@ -258,3 +403,4 @@ Outputs:
   RetrievalFunction:
     Description: "Retrieval Lambda function ARN"
     Value: !GetAtt RetrievalFunction.Arn
+

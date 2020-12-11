@@ -51,7 +51,7 @@ describe('App', function () {
         cy.contains('Uploads').should('not.exist');
         cy.contains('Manage users').should('not.exist');
 
-        cy.contains('Trustworthy line list data');
+        cy.contains('Detailed line list data');
         cy.contains('Terms of use');
         cy.contains('Login to get started');
     });
@@ -173,5 +173,19 @@ describe('App', function () {
         cy.contains('Terms of use').click();
         cy.url().should('eq', 'http://localhost:3002/terms');
         cy.contains('Global.health Terms of Use');
+    });
+
+    it('Can navigate to home screen by clicking on logo', function () {
+        cy.login();
+        cy.visit('/cases');
+        cy.contains('Line list');
+
+        cy.get('a[data-testid="home-button"').click();
+
+        cy.url().should('eq', 'http://localhost:3002/');
+
+        cy.contains('Completeness').should('exist');
+        cy.contains('Cumulative').should('exist');
+        cy.contains('Freshness').should('exist');
     });
 });

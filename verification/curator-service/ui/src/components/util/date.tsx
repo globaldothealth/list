@@ -21,3 +21,15 @@ export function toUTCDate(dateString: string): string {
     );
     return utcDate.toString();
 }
+
+export function renderDateRange(range?: {
+    start?: string;
+    end?: string;
+}): string {
+    if (!range || !range.start || !range.end) {
+        return '';
+    }
+    return range.start === range.end
+        ? renderDate(range.start)
+        : `${renderDate(range.start)} - ${renderDate(range.end)}`;
+}

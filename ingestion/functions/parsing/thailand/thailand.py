@@ -24,7 +24,13 @@ def convert_date(raw_date):
     expects mm/dd/YYYYZ format.
     """
     date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
-    return date.strftime("%m/%d/%YZ")
+    # Some cases are reported using the Buddhist calendar which is 543 years ahead of the Gregorian
+    year = date.year
+    if year > 2540:
+        corrected_year = year - 543
+        return date.strftime(f"%m/%d/{corrected_year}Z")
+    else:
+        return date.strftime("%m/%d/%YZ")
 
 
 def convert_gender(raw_gender):
