@@ -98,11 +98,6 @@ def convert_events(date_confirmed, date_symptoms, death):
 def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
                                    cardiovascular: str, obesity: str):
     preexistingConditions = {}
-    items = (lung, kidney, metabolic, cardiovascular, obesity)
-    if all(item == "Não" for item in items):
-        return None
-
-    preexistingConditions["hasPreexistingConditions"] = True
     comorbidities = []
 
     if lung == "Sim":
@@ -117,9 +112,11 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
         comorbidities.append(_COMORBIDITIES_MAP["Obesidade"])
 
     if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
         preexistingConditions["values"] = comorbidities
-
-    return preexistingConditions
+        return preexistingConditions
+    else:
+        return None
 
 
 def convert_demographics(gender: str, age: str):
