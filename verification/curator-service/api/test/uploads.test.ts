@@ -1,3 +1,5 @@
+const mockSend = jest.fn().mockResolvedValue({});
+
 import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
@@ -13,11 +15,12 @@ import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
-const mockSend = jest.fn().mockResolvedValue({});
-const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
-        return { send: mockSend, initialize: mockInitialize };
+        return {
+            send: mockSend,
+            initialize: jest.fn().mockResolvedValue({ send: mockSend }),
+        };
     });
 });
 
@@ -295,6 +298,7 @@ describe('POST', () => {
         expect(res.body._id).toEqual(upload._id.toString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
+
     it('should send a notification email if status is error and recipients defined', async () => {
         const source = await new Source(fullSource).save();
         const upload = new Upload(minimalUpload);

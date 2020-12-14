@@ -20,7 +20,7 @@ import FakeGeocoder from './geocoding/fake';
 import GeocodeSuggester from './geocoding/suggest';
 import { Geocoder } from './geocoding/geocoder';
 import MapboxGeocoder from './geocoding/mapbox';
-import { OpenApiValidator } from 'express-openapi-validator';
+import { middleware as OpenApiValidatorMiddleware } from 'express-openapi-validator';
 import YAML from 'yamljs';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
@@ -87,101 +87,96 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // API validation.
-new OpenApiValidator({
-    apiSpec: './api/openapi.yaml',
-    validateResponses: true,
-})
-    .install(app)
-    .then(() => {
-        const apiRouter = express.Router();
-        // Chain geocoders so that during dev/integration tests we can use the fake one.
-        // It might also just be useful to have various geocoders plugged-in at some point.
-        const geocoders = new Array<Geocoder>();
-        if (env.ENABLE_FAKE_GEOCODER) {
-            logger.info('Using fake geocoder');
-            const fakeGeocoder = new FakeGeocoder();
-            apiRouter.post('/geocode/seed', fakeGeocoder.seed);
-            apiRouter.post('/geocode/clear', fakeGeocoder.clear);
-            geocoders.push(fakeGeocoder);
-        }
-        if (env.MAPBOX_TOKEN !== '') {
-            logger.info('Using mapbox geocoder');
-            geocoders.push(
-                new MapboxGeocoder(
-                    env.MAPBOX_TOKEN,
-                    env.MAPBOX_PERMANENT_GEOCODE
-                        ? 'mapbox.places-permanent'
-                        : 'mapbox.places',
-                    new RateLimiter(
-                        env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN,
-                        'minute',
-                    ),
-                ),
-            );
-        }
-        const caseController = new cases.CasesController(geocoders);
+app.use(
+    OpenApiValidatorMiddleware({
+        apiSpec: './api/openapi.yaml',
+        validateResponses: true,
+    }),
+);
 
-        apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
-        apiRouter.get('/cases', caseController.list);
-        apiRouter.get('/cases/symptoms', cases.listSymptoms);
-        apiRouter.get(
-            '/cases/placesOfTransmission',
-            cases.listPlacesOfTransmission,
-        );
-        apiRouter.get('/cases/occupations', cases.listOccupations);
-        apiRouter.post('/cases', setRevisionMetadata, caseController.create);
-        apiRouter.post('/cases/download', caseController.download);
-        apiRouter.post(
-            '/cases/batchUpsert',
-            caseController.batchGeocode,
-            batchUpsertDropUnchangedCases,
-            setBatchUpsertFields,
-            createBatchUpsertCaseRevisions,
-            caseController.batchUpsert,
-        );
-        apiRouter.put(
-            '/cases',
-            setRevisionMetadata,
-            createCaseRevision,
-            caseController.upsert,
-        );
-        apiRouter.post(
-            '/cases/batchUpdate',
-            setBatchUpdateRevisionMetadata,
-            createBatchUpdateCaseRevisions,
-            caseController.batchUpdate,
-        );
-        apiRouter.post(
-            '/cases/batchUpdateQuery',
-            findCasesToUpdate,
-            setBatchUpdateRevisionMetadata,
-            createBatchUpdateCaseRevisions,
-            caseController.batchUpdate,
-        );
-        apiRouter.put(
-            '/cases/:id([a-z0-9]{24})',
-            setRevisionMetadata,
-            createCaseRevision,
-            caseController.update,
-        );
-        apiRouter.delete(
-            '/cases',
-            batchDeleteCheckThreshold,
-            createBatchDeleteCaseRevisions,
-            caseController.batchDel,
-        );
-        apiRouter.delete(
-            '/cases/:id([a-z0-9]{24})',
-            createCaseRevision,
-            caseController.del,
-        );
+const apiRouter = express.Router();
+// Chain geocoders so that during dev/integration tests we can use the fake one.
+// It might also just be useful to have various geocoders plugged-in at some point.
+const geocoders = new Array<Geocoder>();
+if (env.ENABLE_FAKE_GEOCODER) {
+    logger.info('Using fake geocoder');
+    const fakeGeocoder = new FakeGeocoder();
+    apiRouter.post('/geocode/seed', fakeGeocoder.seed);
+    apiRouter.post('/geocode/clear', fakeGeocoder.clear);
+    geocoders.push(fakeGeocoder);
+}
+if (env.MAPBOX_TOKEN !== '') {
+    logger.info('Using mapbox geocoder');
+    geocoders.push(
+        new MapboxGeocoder(
+            env.MAPBOX_TOKEN,
+            env.MAPBOX_PERMANENT_GEOCODE
+                ? 'mapbox.places-permanent'
+                : 'mapbox.places',
+            new RateLimiter(env.MAPBOX_GEOCODE_RATE_LIMIT_PER_MIN, 'minute'),
+        ),
+    );
+}
+const caseController = new cases.CasesController(geocoders);
 
-        // Suggest locations based on the request's "q" query param.
-        const geocodeSuggester = new GeocodeSuggester(geocoders);
-        apiRouter.get('/geocode/suggest', geocodeSuggester.suggest);
+apiRouter.get('/cases/:id([a-z0-9]{24})', caseController.get);
+apiRouter.get('/cases', caseController.list);
+apiRouter.get('/cases/symptoms', cases.listSymptoms);
+apiRouter.get('/cases/placesOfTransmission', cases.listPlacesOfTransmission);
+apiRouter.get('/cases/occupations', cases.listOccupations);
+apiRouter.post('/cases', setRevisionMetadata, caseController.create);
+apiRouter.post('/cases/download', caseController.download);
+apiRouter.post(
+    '/cases/batchUpsert',
+    caseController.batchGeocode,
+    batchUpsertDropUnchangedCases,
+    setBatchUpsertFields,
+    createBatchUpsertCaseRevisions,
+    caseController.batchUpsert,
+);
+apiRouter.put(
+    '/cases',
+    setRevisionMetadata,
+    createCaseRevision,
+    caseController.upsert,
+);
+apiRouter.post(
+    '/cases/batchUpdate',
+    setBatchUpdateRevisionMetadata,
+    createBatchUpdateCaseRevisions,
+    caseController.batchUpdate,
+);
+apiRouter.post(
+    '/cases/batchUpdateQuery',
+    findCasesToUpdate,
+    setBatchUpdateRevisionMetadata,
+    createBatchUpdateCaseRevisions,
+    caseController.batchUpdate,
+);
+apiRouter.put(
+    '/cases/:id([a-z0-9]{24})',
+    setRevisionMetadata,
+    createCaseRevision,
+    caseController.update,
+);
+apiRouter.delete(
+    '/cases',
+    batchDeleteCheckThreshold,
+    createBatchDeleteCaseRevisions,
+    caseController.batchDel,
+);
+apiRouter.delete(
+    '/cases/:id([a-z0-9]{24})',
+    createCaseRevision,
+    caseController.del,
+);
+apiRouter.post('/cases/batchStatusChange', caseController.batchStatusChange);
 
-        app.use('/api', apiRouter);
-    });
+// Suggest locations based on the request's "q" query param.
+const geocodeSuggester = new GeocodeSuggester(geocoders);
+apiRouter.get('/geocode/suggest', geocodeSuggester.suggest);
+
+app.use('/api', apiRouter);
 
 (async (): Promise<void> => {
     try {
