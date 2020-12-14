@@ -69,7 +69,7 @@ export default function LandingPage(): JSX.Element {
                             rel="noopener noreferrer"
                             target="_blank"
                         >
-                            Global.health map
+                            Global.health Map
                         </a>
                     </div>
                     <div className={classes.link}>
