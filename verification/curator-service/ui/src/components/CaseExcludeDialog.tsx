@@ -51,7 +51,7 @@ export const CaseExcludeDialog = ({
                             </ul>
                             <TextField
                                 name="note"
-                                placeholder="Please specify a reason of the exclusion"
+                                placeholder="Please specify reason for exclusion"
                                 multiline
                                 fullWidth
                                 value={values.note}
