@@ -1,6 +1,6 @@
 import { Button, Paper, Typography } from '@material-ui/core';
 
-import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.png';
+import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
