@@ -23,8 +23,11 @@ const invalidRequest = {
     demographics: { ageRange: { start: 400 } },
 };
 
+const realDate = Date.now;
+
 beforeAll(async () => {
     mongoServer = new MongoMemoryServer();
+    global.Date.now = jest.fn(() => new Date('2020-12-12T12:12:37Z').getTime());
 });
 
 beforeEach(async () => {
@@ -33,6 +36,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+    global.Date.now = realDate;
     return mongoServer.stop();
 });
 
@@ -738,6 +742,161 @@ describe('POST', () => {
             expect(res.text).toContain('Germany');
             expect(res.text).toContain(matchedCase._id);
             expect(res.text).not.toContain(unmatchedCase._id);
+        });
+    });
+    describe('batch status change', () => {
+        it('should not accept invalid statuses', async () => {
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [''],
+                    status: 'xxx',
+                    ...curatorMetadata,
+                })
+                .expect(400);
+        });
+
+        it('should require note when excluding cases', async () => {
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [''],
+                    status: 'EXCLUDED',
+                    ...curatorMetadata,
+                })
+                .expect(422);
+        });
+
+        it('should return 200 OK when excluding cases with note', async () => {
+            const existingCase = new Case(fullCase);
+            await existingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [existingCase._id],
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+        });
+
+        it('should save note when excluding cases with note', async () => {
+            const firstExistingCase = new Case(fullCase);
+            await firstExistingCase.save();
+            const secondExistingCase = new Case(fullCase);
+            await secondExistingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [firstExistingCase._id, secondExistingCase._id],
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            const firstCaseInDb = await Case.findById(firstExistingCase._id);
+            const secondCaseInDb = await Case.findById(secondExistingCase._id);
+            expect(firstCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
+            expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
+            expect(firstCaseInDb?.exclusionData.note).toEqual('Duplicate');
+            expect(secondCaseInDb?.exclusionData.note).toEqual('Duplicate');
+        });
+
+        it('should save current date when excluding cases', async () => {
+            const firstExistingCase = new Case(fullCase);
+            await firstExistingCase.save();
+            const secondExistingCase = new Case(fullCase);
+            await secondExistingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [firstExistingCase._id, secondExistingCase._id],
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            const firstCaseInDb = await Case.findById(firstExistingCase._id);
+            const secondCaseInDb = await Case.findById(secondExistingCase._id);
+            expect(firstCaseInDb?.exclusionData.date).toEqual(
+                new Date('2020-12-12T12:12:37.000Z'),
+            );
+            expect(secondCaseInDb?.exclusionData.date).toEqual(
+                new Date('2020-12-12T12:12:37.000Z'),
+            );
+        });
+
+        it('should remove exclusion data when unexcluding cases', async () => {
+            const firstExistingCase = new Case(fullCase);
+            await firstExistingCase.save();
+            const secondExistingCase = new Case(fullCase);
+            await secondExistingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [firstExistingCase._id, secondExistingCase._id],
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    caseIds: [firstExistingCase._id, secondExistingCase._id],
+                    status: 'UNVERIFIED',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            const firstCaseInDb = await Case.findById(firstExistingCase._id);
+            const secondCaseInDb = await Case.findById(secondExistingCase._id);
+            expect(firstCaseInDb?.caseReference.verificationStatus).toEqual(
+                'UNVERIFIED',
+            );
+            expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
+                'UNVERIFIED',
+            );
+            expect(firstCaseInDb?.exclusionData).not.toBeDefined();
+            expect(secondCaseInDb?.exclusionData).not.toBeDefined();
+        });
+
+        it('should allow query instead of list of case IDs', async () => {
+            const firstExistingCase = new Case(fullCase);
+            await firstExistingCase.save();
+            const secondExistingCase = new Case(fullCase);
+            await secondExistingCase.save();
+
+            await request(app)
+                .post('/api/cases/batchStatusChange')
+                .send({
+                    query: 'country:France',
+                    status: 'EXCLUDED',
+                    note: 'Duplicate',
+                    ...curatorMetadata,
+                })
+                .expect(200);
+
+            const firstCaseInDb = await Case.findById(firstExistingCase._id);
+            const secondCaseInDb = await Case.findById(secondExistingCase._id);
+            expect(firstCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
+            expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
+                'EXCLUDED',
+            );
         });
     });
 });

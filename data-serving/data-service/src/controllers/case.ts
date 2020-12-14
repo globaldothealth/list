@@ -1,5 +1,5 @@
 import { Case, CaseDocument } from '../model/case';
-import { DocumentQuery, Query } from 'mongoose';
+import { CastError, DocumentQuery, Error, Query } from 'mongoose';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
@@ -518,6 +518,93 @@ export class CasesController {
             return;
         }
         res.status(204).end();
+    };
+
+    /**
+     * Excludes multiple cases.
+     *
+     * Handles HTTP POST /api/batchStatusChange.
+     * Receives an array of MongoDB IDs, status to be set for them and optional note.
+     * Note is used only when excluding cases (status set to "Excluded").
+     */
+    batchStatusChange = async (req: Request, res: Response): Promise<void> => {
+        const newStatus = req.body.status.toUpperCase();
+        const caseIds = req.body.caseIds;
+
+        if (newStatus === 'EXCLUDED' && !req.body.note) {
+            res.status(422)
+                .send({
+                    message: 'Note is required when excluding cases.',
+                })
+                .end();
+            return;
+        }
+
+        let updateQuery = {};
+
+        try {
+            if (!caseIds) {
+                updateQuery = casesMatchingSearchQuery({
+                    searchQuery: req.body.query,
+                    count: false,
+                });
+            } else {
+                updateQuery = {
+                    _id: { $in: caseIds },
+                };
+                const validIdsCount = await Case.countDocuments(updateQuery);
+                if (validIdsCount != caseIds.length) {
+                    res.status(422)
+                        .send({
+                            message:
+                                'At least one of provided case IDs was not found. No records changed.',
+                        })
+                        .end();
+                    return;
+                }
+            }
+        } catch (err) {
+            if (err.name === 'CastError') {
+                res.status(422)
+                    .send({
+                        message: `Provided ID (${err.value}) is not valid. More IDs may be invalid. No records changed.`,
+                    })
+                    .end();
+                return;
+            }
+            logger.error(err);
+            res.status(500).json(err).end();
+            return;
+        }
+
+        try {
+            let updateDocument = {};
+            if (newStatus === 'EXCLUDED') {
+                updateDocument = {
+                    $set: {
+                        'caseReference.verificationStatus': newStatus,
+                        'exclusionData.date': Date.now(),
+                        'exclusionData.note': req.body.note,
+                    },
+                };
+            } else {
+                updateDocument = {
+                    $set: {
+                        'caseReference.verificationStatus': newStatus,
+                    },
+                    $unset: {
+                        exclusionData: '',
+                    },
+                };
+            }
+            await Case.updateMany(updateQuery, updateDocument);
+
+            res.status(200).end();
+        } catch (err) {
+            logger.error(err);
+            res.status(500).json(err).end();
+        }
+        return;
     };
 
     /**
