@@ -55,7 +55,6 @@ describe('Linelist table', function () {
     it('Can delete a case', function () {
         cy.addCase({
             country: 'France',
-            sourceUrl: 'www.example.com',
         });
         cy.visit('/cases');
         cy.contains('France');
@@ -66,6 +65,47 @@ describe('Linelist table', function () {
         cy.contains('Yes').click();
 
         cy.contains('France').should('not.exist');
+    });
+
+    it('Can exclude a case', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Exclude').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+
+        cy.get('svg[data-testid="excluded-svg"]').should('exist');
+    });
+
+    it('Can reinclude a case', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+
+        // Need to add and exclude the case first
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Exclude').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+
+        cy.get('svg[data-testid="excluded-svg"]').should('exist');
+
+        // Reinclude the case
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Include').click();
+        cy.contains('Are you sure you want to reinclude selected cases?');
+        cy.contains('Yes').click();
+
+        cy.get('svg[data-testid="unverified-svg"]').should('exist');
     });
 
     it('Can delete multiple cases', function () {
@@ -99,6 +139,88 @@ describe('Linelist table', function () {
         cy.contains('United Kingdom').should('not.exist');
     });
 
+    it('Can exclude multiple cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
+
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+        cy.get('button[title="Exclude selected rows"]').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+        cy.wait('@excludeCases');
+
+        cy.get('svg[data-testid="excluded-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
+    });
+
+    it('Can reinclude multiple cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
+
+        // Need to add and exclude the case first
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+        cy.get('button[title="Exclude selected rows"]').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+        cy.wait('@excludeCases');
+
+        cy.get('svg[data-testid="excluded-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
+
+        // Reinclude cases
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('includeCases');
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.contains('Are you sure you want to reinclude selected cases?');
+        cy.contains('Yes').click();
+        cy.wait('@includeCases');
+
+        cy.get('svg[data-testid="unverified-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
+    });
+
     it('Can toggle case verification status', function () {
         cy.addCase({
             country: 'France',
@@ -110,9 +232,9 @@ describe('Linelist table', function () {
             country: 'France',
         });
         cy.visit('/cases');
-        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 3);
         cy.server();
-        cy.route('POST', `/api/cases/batchUpdate`).as('updateCases');
+        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
 
         // Three row checkboxes and a header checkbox
         cy.get('input[type="checkbox"]').should('have.length', 4);
@@ -123,7 +245,7 @@ describe('Linelist table', function () {
         // Mark them verified.
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
-        cy.get('[data-testid="verified-svg"]').should('have.length', 3);
+        cy.get('svg[data-testid="verified-svg"]').should('have.length', 3);
 
         // Select all rows.
         cy.get('input[type="checkbox"]').eq(0).click();
@@ -150,7 +272,7 @@ describe('Linelist table', function () {
         cy.route('GET', '/api/cases/*').as('getCases');
         cy.visit('/cases');
         cy.wait('@getCases');
-        cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
         cy.wait('@getCases');
@@ -163,7 +285,7 @@ describe('Linelist table', function () {
         cy.contains('Select all 7 rows').click();
 
         // Mark them verified.
-        cy.route('POST', `/api/cases/batchUpdateQuery`).as('updateCases');
+        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
         cy.get('button[title="Verify selected rows"]').click();
         cy.wait('@updateCases');
         cy.wait('@getCases');
@@ -174,8 +296,8 @@ describe('Linelist table', function () {
         // Check only France rows are changed
         cy.get('li').contains('10').click();
         cy.wait('@getCases');
-        cy.get('[data-testid="verified-svg"]').should('have.length', 7);
-        cy.get('[data-testid="unverified-svg"]').should('have.length', 2);
+        cy.get('svg[data-testid="verified-svg"]').should('have.length', 7);
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 2);
 
         cy.contains('rows').click();
         cy.get('li').contains('5').click();
@@ -196,8 +318,8 @@ describe('Linelist table', function () {
         cy.contains('rows').click();
         cy.get('li').contains('10').click();
         cy.wait('@getCases');
-        cy.get('[data-testid="verified-svg"]').should('not.exist');
-        cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
+        cy.get('svg[data-testid="verified-svg"]').should('not.exist');
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
     });
 
     it('displays search errors', function () {
