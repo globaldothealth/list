@@ -1,6 +1,6 @@
 import { Button, Paper, Typography } from '@material-ui/core';
 
-import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
+import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.png';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -47,7 +47,7 @@ export default function LandingPage(): JSX.Element {
                     classes={{ root: classes.description }}
                     variant="h5"
                 >
-                    Welcome to G.h List. The first of its kind, easy to use
+                    Welcome to G.h Data. The first of its kind, easy to use
                     global data repository with open access to real-time
                     epidemiological anonymized line list data.
                 </Typography>
