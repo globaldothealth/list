@@ -608,6 +608,27 @@ export class CasesController {
     };
 
     /**
+     * Get a list of excluded cases IDs for a specific source ID.
+     *
+     * Handles HTTP GET /api/excludedCaseIds.
+     */
+    listExcludedCaseIds = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        console.log('got!', req.query.sourceId);
+        const searchQuery = {
+            'caseReference.verificationStatus': 'EXCLUDED',
+            'caseReference.sourceId': req.query.sourceId,
+        };
+
+        const cases = await Case.find(searchQuery).lean();
+        const caseIds = cases.map((c) => c.caseReference.sourceEntryId);
+
+        res.status(200).json({ cases: caseIds }).end();
+    };
+
+    /**
      * Geocodes a single location.
      * @returns The geocoded location.
      * @throws GeocodeNotFoundError if no geocode could be found.
