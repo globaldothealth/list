@@ -46,13 +46,15 @@ def convert_date(raw_date):
     Convert raw date field into a value interpretable by the dataserver.
     """
     # Some date fields are empty
-    if raw_date:
+    try:
         # There is variation in how dates are reported
         if "-" in raw_date:
             date = datetime.strptime(raw_date, "%Y-%m-%d")
         else:
             date = datetime.strptime(raw_date, "%d/%m/%Y")
         return date.strftime("%m/%d/%YZ")
+    except:
+        return None
 
 
 def convert_gender(raw_gender: str):
@@ -96,11 +98,6 @@ def convert_events(date_confirmed, date_symptoms, death):
 def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
                                    cardiovascular: str, obesity: str):
     preexistingConditions = {}
-    items = (lung, kidney, metabolic, cardiovascular, obesity)
-    if all(item == "Não" for item in items):
-        return None
-
-    preexistingConditions["hasPreexistingConditions"] = True
     comorbidities = []
 
     if lung == "Sim":
@@ -115,9 +112,11 @@ def convert_preexisting_conditions(lung: str, kidney: str, metabolic: str,
         comorbidities.append(_COMORBIDITIES_MAP["Obesidade"])
 
     if comorbidities:
+        preexistingConditions["hasPreexistingConditions"] = True
         preexistingConditions["values"] = comorbidities
-
-    return preexistingConditions
+        return preexistingConditions
+    else:
+        return None
 
 
 def convert_demographics(gender: str, age: str):
@@ -159,8 +158,9 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
+            confirmed_date = convert_date(row[_DATE_CONFIRMED])
             # There are a few entries for other states
-            if row[_STATE] == "DISTRITO FEDERAL":
+            if row[_STATE] == "DISTRITO FEDERAL" and confirmed_date is not None:
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},

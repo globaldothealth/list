@@ -626,6 +626,55 @@ paths:
           $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchStatusChange:
+    post:
+      summary: Changes status for a list of cases
+      tags: [Case]
+      operationId: batchStatusChange
+      requestBody:
+        description: >
+          Case IDs are passed through an array of strings, note may be provided as well.
+          A query may be provided instead of list of IDs, this will change status for all
+          cases matching the query.
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  description: >
+                    Cases having IDs provided here will have their
+                    status changed to one specified in status field.
+                  type: array
+                  items:
+                    type: string
+                status:
+                  $ref: "#/components/schemas/CaseStatus"
+                query:
+                  description: >
+                    Cases matching this query will have their status
+                    changed. Must contain non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                note:
+                  description: >
+                    The reason behind exclusion (or other important info).
+                    This field is ignored if a status is not "Excluded".
+                  type: string
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
+              required:
+                - status
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/batchUpsert:
     post:
       tags: [Case]
@@ -685,8 +734,6 @@ paths:
                   type: string
                   pattern: \S+
                 case:
-                  description: >
-                    The case fields that all matching cases will be updated to.
                   $ref: "#/components/schemas/Case"
               required:
                 - query
@@ -910,7 +957,6 @@ components:
     ParsersArray:
       type: array
       items:
-        description: An array of parsers
         $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
@@ -1106,6 +1152,7 @@ components:
               enum:
                 - UNVERIFIED
                 - VERIFIED
+                - EXCLUDED
             additionalSources:
               type: array
               description: List of additional URLs that described a case
@@ -1331,6 +1378,9 @@ components:
               $ref: "#/components/schemas/EditMetadata"
             editMetadata:
               $ref: "#/components/schemas/EditMetadata"
+    CaseStatus:
+      type: string
+      enum: [UNVERIFIED, VERIFIED, EXCLUDED]
     CaseArray:
       type: object
       properties:

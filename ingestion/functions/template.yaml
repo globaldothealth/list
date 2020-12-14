@@ -131,7 +131,6 @@ Resources:
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
-        - !Ref CommonLibLayer
   CanadaParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -374,6 +373,18 @@ Resources:
       CodeUri: parsing/paraguay/
       Handler: paraguay.lambda_handler
       Description: Parse case data for Paraguay
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  SouthAfricaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/south_africa/
+      Handler: south_africa.lambda_handler
+      Description: Parse case data for South Africa
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

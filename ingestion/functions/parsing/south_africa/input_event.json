@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5fd62b19c44be30056c7280b/2020/12/13/1531/content.csv",
+    "sourceUrl": "https://raw.githubusercontent.com/dsfsi/covid19africa/master/data/line_lists/line-list-south-africa.csv",
+    "sourceId": "5fd62b19c44be30056c7280b"
+}
