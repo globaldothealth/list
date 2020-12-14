@@ -103,61 +103,22 @@ def convert_sources(row):
     return additionalSources or None
 
 
-def update_for_outcome(row, case):
-    if row["Current Status"] == "Hospitalized":
-        case["events"].append({
-            "name": "hospitalAdmission",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Yes"
-        })
-    elif row["Current Status"] == "Recovered":
-        case["events"].append({
-            "name": "outcome",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Recovered"
-        })
-    elif row["Current Status"] == "Deceased":
-        case["events"].append({
-            "name": "outcome",
-            "dateRange":
-            {
-                "start": convert_date(row["Date Announced"]),
-                "end": convert_date(row["Date Announced"])
-            },
-            "value": "Death"
-        })
-
-
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """Parses G.h-format case data from raw API data."""
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             # Rows with a status of Hospitalized are new, confirmed cases.
-            # Other statuses represent further developments in a case; we can
-            # use and properly attribute those for cases that have a State
-            # Patient Number, but not others.
-            if not row["State Patient Number"] and row["Current Status"] != "Hospitalized":
+            # Unfortunately, while other statuses sometimes contain interesting
+            # information, we don't have a way to reliably collate these with
+            # their respective confirmations.
+            if row["Current Status"] != "Hospitalized":
                 continue
 
-            # Some states publish updates on patients. In these cases, the
-            # values are keyed on a special state-specific ID. If that's
-            # available, we should use that to dedupe.
-            if row["State Patient Number"]:
-                uuid_column = "State Patient Number"
-                uuid_prefix = ""
             # The column used to denote case UUID changes in April.
             # It resets back to 1 when this happens.
             # Prefix old values ("Patient Number") to distinguish.
-            elif "Entry_ID" in row:
+            if "Entry_ID" in row:
                 uuid_column = "Entry_ID"
                 uuid_prefix = "Entry-"
             else:
@@ -171,6 +132,11 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     "additionalSources": convert_sources(row)
                 },
                 "location": convert_location(row),
+                # While case confirmation is represented by "Hospitalized," it
+                # isn't clear that this is semantically accurate for new data.
+                # At the onset, cases were likely confirmed via
+                # hospitalization, but it's now likely inaccurate to claim as
+                # much for the entirety of confirmed cases.
                 "events": [
                     {
                         "name": "confirmed",
@@ -184,7 +150,6 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "demographics": convert_demographics(row),
                 "notes": row["Notes"] or None
             }
-            update_for_outcome(row, case)
             for i in range(int(row["Num Cases"])):
                 c = copy.deepcopy(case)
                 c["caseReference"]["sourceEntryId"] = f"{uuid_prefix}{row[uuid_column]}-{i + 1}"
