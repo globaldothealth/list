@@ -67,48 +67,46 @@ describe('Linelist table', function () {
         cy.contains('France').should('not.exist');
     });
 
-    // TODO: Uncomment after backend is done
-    // it('Can exclude a case', function () {
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.visit('/cases');
-    //     cy.contains('France');
+    it('Can exclude a case', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
 
-    //     cy.get('button[data-testid="row menu"]').click();
-    //     cy.contains('li', 'Exclude').click();
-    //     cy.contains('Are you sure you want to exclude selected cases?');
-    //     cy.get('textarea[name="note"]').type('test reason');
-    //     cy.contains('Yes').click();
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Exclude').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
 
-    //     cy.get('button[data-testid="excluded-svg"]').should('exist');
-    // });
+        cy.get('svg[data-testid="excluded-svg"]').should('exist');
+    });
 
-    // TODO: Uncomment after backend is done
-    // it('Can reinclude a case', function () {
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.visit('/cases');
-    //     cy.contains('France');
+    it('Can reinclude a case', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
 
-    //     // Need to add and exclude the case first
-    //     cy.get('button[data-testid="row menu"]').click();
-    //     cy.contains('li', 'Exclude').click();
-    //     cy.contains('Are you sure you want to exclude selected cases?');
-    //     cy.get('textarea[name="note"]').type('test reason');
-    //     cy.contains('Yes').click();
+        // Need to add and exclude the case first
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Exclude').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
 
-    //     cy.get('button[data-testid="excluded-svg"]').should('exist');
+        cy.get('svg[data-testid="excluded-svg"]').should('exist');
 
-    //     // Reinclude the case
-    //     cy.get('button[data-testid="row menu"]').click();
-    //     cy.contains('li', 'Include').click();
-    //     cy.contains('Are you sure you want to reinclude selected cases?');
-    //     cy.contains('Yes').click();
+        // Reinclude the case
+        cy.get('button[data-testid="row menu"]').click();
+        cy.contains('li', 'Include').click();
+        cy.contains('Are you sure you want to reinclude selected cases?');
+        cy.contains('Yes').click();
 
-    //     cy.get('button[data-testid="unverified-svg"]').should('exist');
-    // });
+        cy.get('svg[data-testid="unverified-svg"]').should('exist');
+    });
 
     it('Can delete multiple cases', function () {
         cy.addCase({
@@ -141,182 +139,188 @@ describe('Linelist table', function () {
         cy.contains('United Kingdom').should('not.exist');
     });
 
-    // TODO: Uncomment after backend is done
-    // it('Can exclude multiple cases', function () {
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.addCase({
-    //         country: 'Germany',
-    //     });
-    //     cy.addCase({
-    //         country: 'United Kingdom',
-    //     });
-    //     cy.visit('/cases');
-    //     cy.contains('France');
-    //     cy.contains('Germany');
-    //     cy.contains('United Kingdom');
+    it('Can exclude multiple cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
 
-    //     // Three row checkboxes and a header checkbox
-    //     cy.get('input[type="checkbox"]').should('have.length', 4);
-    //     cy.get('input[type="checkbox"]').eq(1).click();
-    //     cy.get('input[type="checkbox"]').eq(3).click();
-    //     cy.server();
-    //     cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
-    //     cy.get('button[title="Exclude selected rows"]').click();
-    //     cy.contains('Are you sure you want to exclude selected cases?');
-    //     cy.get('textarea[name="note"]').type('test reason');
-    //     cy.contains('Yes').click();
-    //     cy.wait('@excludeCases');
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+        cy.get('button[title="Exclude selected rows"]').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+        cy.wait('@excludeCases');
 
-    //     cy.get('button[data-testid="excluded-svg"]').eq(3).should('exist');
-    // });
+        cy.get('svg[data-testid="excluded-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
+    });
 
-    // TODO: Uncomment after backend is done
-    // it('Can reinclude multiple cases', function () {
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.addCase({
-    //         country: 'Germany',
-    //     });
-    //     cy.addCase({
-    //         country: 'United Kingdom',
-    //     });
-    //     cy.visit('/cases');
-    //     cy.contains('France');
-    //     cy.contains('Germany');
-    //     cy.contains('United Kingdom');
+    it('Can reinclude multiple cases', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.visit('/cases');
+        cy.contains('France');
+        cy.contains('Germany');
+        cy.contains('United Kingdom');
 
-    //     // Need to add and exclude the case first
-    //     cy.get('input[type="checkbox"]').should('have.length', 4);
-    //     cy.get('input[type="checkbox"]').eq(1).click();
-    //     cy.get('input[type="checkbox"]').eq(3).click();
-    //     cy.server();
-    //     cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
-    //     cy.get('button[title="Unverify selected rows"]').click();
-    //     cy.contains('Are you sure you want to exclude selected cases?');
-    //     cy.contains('Yes').click();
-    //     cy.wait('@excludeCases');
+        // Need to add and exclude the case first
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('excludeCases');
+        cy.get('button[title="Exclude selected rows"]').click();
+        cy.contains('Are you sure you want to exclude selected cases?');
+        cy.get('textarea[name="note"]').type('test reason');
+        cy.contains('Yes').click();
+        cy.wait('@excludeCases');
 
-    //     cy.get('button[data-testid="excluded-svg"]').eq(3).should('exist');
+        cy.get('svg[data-testid="excluded-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
 
-    //     // Reinclude cases
-    //     cy.get('input[type="checkbox"]').should('have.length', 4);
-    //     cy.get('input[type="checkbox"]').eq(1).click();
-    //     cy.get('input[type="checkbox"]').eq(3).click();
-    //     cy.server();
-    //     cy.route('POST', `/api/cases/batchStatusChange`).as('includeCases');
-    //     cy.get('button[title="Exclude selected rows"]').click();
-    //     cy.contains('Are you sure you want to reinclude selected cases?');
-    //     cy.contains('Yes').click();
-    //     cy.wait('@includeCases');
+        // Reinclude cases
+        cy.get('input[type="checkbox"]').should('have.length', 4);
+        cy.get('input[type="checkbox"]').eq(1).click();
+        cy.get('input[type="checkbox"]').eq(2).click();
+        cy.get('input[type="checkbox"]').eq(3).click();
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('includeCases');
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.contains('Are you sure you want to reinclude selected cases?');
+        cy.contains('Yes').click();
+        cy.wait('@includeCases');
 
-    //     cy.get('button[data-testid="unverified-svg"]').eq(3).should('exist');
-    // });
+        cy.get('svg[data-testid="unverified-svg"]').should((rows) => {
+            expect(rows).to.have.length(3);
+        });
+    });
 
-    // TODO: Uncomment after backend is done
-    // it('Can toggle case verification status', function () {
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.addCase({
-    //         country: 'France',
-    //     });
-    //     cy.visit('/cases');
-    //     cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
-    //     cy.server();
-    //     cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
+    it('Can toggle case verification status', function () {
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.addCase({
+            country: 'France',
+        });
+        cy.visit('/cases');
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 3);
+        cy.server();
+        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
 
-    //     // Three row checkboxes and a header checkbox
-    //     cy.get('input[type="checkbox"]').should('have.length', 4);
+        // Three row checkboxes and a header checkbox
+        cy.get('input[type="checkbox"]').should('have.length', 4);
 
-    //     // Select all rows.
-    //     cy.get('input[type="checkbox"]').eq(0).click();
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
 
-    //     // Mark them verified.
-    //     cy.get('button[title="Verify selected rows"]').click();
-    //     cy.wait('@updateCases');
-    //     cy.get('[data-testid="verified-svg"]').should('have.length', 3);
+        // Mark them verified.
+        cy.get('button[title="Verify selected rows"]').click();
+        cy.wait('@updateCases');
+        cy.get('svg[data-testid="verified-svg"]').should('have.length', 3);
 
-    //     // Select all rows.
-    //     cy.get('input[type="checkbox"]').eq(0).click();
+        // Select all rows.
+        cy.get('input[type="checkbox"]').eq(0).click();
 
-    //     // Mark them unverified.
-    //     cy.get('button[title="Unverify selected rows"]').click();
-    //     cy.wait('@updateCases');
-    //     cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
-    // });
+        // Mark them unverified.
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.wait('@updateCases');
+        cy.get('[data-testid="unverified-svg"]').should('have.length', 3);
+    });
 
-    // TODO: Uncomment after backend is done
-    // it('Can toggle case verification status for rows across pages', function () {
-    //     for (let i = 0; i < 7; i++) {
-    //         cy.addCase({
-    //             country: 'France',
-    //         });
-    //     }
-    //     cy.addCase({
-    //         country: 'Germany',
-    //     });
-    //     cy.addCase({
-    //         country: 'United Kingdom',
-    //     });
-    //     cy.server();
-    //     cy.route('GET', '/api/cases/*').as('getCases');
-    //     cy.visit('/cases');
-    //     cy.wait('@getCases');
-    //     cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
-    //     cy.contains('rows').click();
-    //     cy.get('li').contains('5').click();
-    //     cy.wait('@getCases');
-    //     cy.contains('Filter').click();
-    //     cy.get('li').contains('country').click();
-    //     cy.get('input[id="search-field"]').type('France{enter}');
-    //     cy.wait('@getCases');
+    it('Can toggle case verification status for rows across pages', function () {
+        for (let i = 0; i < 7; i++) {
+            cy.addCase({
+                country: 'France',
+            });
+        }
+        cy.addCase({
+            country: 'Germany',
+        });
+        cy.addCase({
+            country: 'United Kingdom',
+        });
+        cy.server();
+        cy.route('GET', '/api/cases/*').as('getCases');
+        cy.visit('/cases');
+        cy.wait('@getCases');
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
+        cy.contains('rows').click();
+        cy.get('li').contains('5').click();
+        cy.wait('@getCases');
+        cy.contains('Filter').click();
+        cy.get('li').contains('country').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
 
-    //     cy.get('input[type="checkbox"]').eq(0).click();
-    //     cy.contains('Select all 7 rows').click();
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.contains('Select all 7 rows').click();
 
-    //     // Mark them verified.
-    //     cy.route('POST', `/api/cases/batchStatusChangeQuery`).as('updateCases');
-    //     cy.get('button[title="Verify selected rows"]').click();
-    //     cy.wait('@updateCases');
-    //     cy.wait('@getCases');
-    //     cy.get('input[id="search-field"]').clear().type('{enter}');
-    //     cy.wait('@getCases');
-    //     cy.contains('rows').click();
+        // Mark them verified.
+        cy.route('POST', `/api/cases/batchStatusChange`).as('updateCases');
+        cy.get('button[title="Verify selected rows"]').click();
+        cy.wait('@updateCases');
+        cy.wait('@getCases');
+        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
+        cy.contains('rows').click();
 
-    //     // Check only France rows are changed
-    //     cy.get('li').contains('10').click();
-    //     cy.wait('@getCases');
-    //     cy.get('[data-testid="verified-svg"]').should('have.length', 7);
-    //     cy.get('[data-testid="unverified-svg"]').should('have.length', 2);
+        // Check only France rows are changed
+        cy.get('li').contains('10').click();
+        cy.wait('@getCases');
+        cy.get('svg[data-testid="verified-svg"]').should('have.length', 7);
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 2);
 
-    //     cy.contains('rows').click();
-    //     cy.get('li').contains('5').click();
-    //     cy.wait('@getCases');
-    //     cy.contains('Filter').click();
-    //     cy.get('li').contains('country').click();
-    //     cy.get('input[id="search-field"]').type('France{enter}');
-    //     cy.wait('@getCases');
-    //     cy.get('input[type="checkbox"]').eq(0).click();
-    //     cy.contains('Select all 7 rows').click();
+        cy.contains('rows').click();
+        cy.get('li').contains('5').click();
+        cy.wait('@getCases');
+        cy.contains('Filter').click();
+        cy.get('li').contains('country').click();
+        cy.get('input[id="search-field"]').type('France{enter}');
+        cy.wait('@getCases');
+        cy.get('input[type="checkbox"]').eq(0).click();
+        cy.contains('Select all 7 rows').click();
 
-    //     // Mark them unverified.
-    //     cy.get('button[title="Unverify selected rows"]').click();
-    //     cy.wait('@updateCases');
-    //     cy.wait('@getCases');
-    //     cy.get('input[id="search-field"]').clear().type('{enter}');
-    //     cy.wait('@getCases');
-    //     cy.contains('rows').click();
-    //     cy.get('li').contains('10').click();
-    //     cy.wait('@getCases');
-    //     cy.get('[data-testid="verified-svg"]').should('not.exist');
-    //     cy.get('[data-testid="unverified-svg"]').should('have.length', 9);
-    // });
+        // Mark them unverified.
+        cy.get('button[title="Unverify selected rows"]').click();
+        cy.wait('@updateCases');
+        cy.wait('@getCases');
+        cy.get('input[id="search-field"]').clear().type('{enter}');
+        cy.wait('@getCases');
+        cy.contains('rows').click();
+        cy.get('li').contains('10').click();
+        cy.wait('@getCases');
+        cy.get('svg[data-testid="verified-svg"]').should('not.exist');
+        cy.get('svg[data-testid="unverified-svg"]').should('have.length', 9);
+    });
 
     it('displays search errors', function () {
         cy.visit('/cases');
