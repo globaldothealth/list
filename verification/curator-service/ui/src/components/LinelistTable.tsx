@@ -452,20 +452,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         const payload = {
             status: verificationStatus,
             ...(note ? { note } : {}),
+            ...(this.hasSelectedRowsAcrossPages()
+                ? { query: this.props.location.state.search }
+                : { caseIds: rowData.map((row: TableRow) => row.id) }),
         };
 
         try {
-            if (this.hasSelectedRowsAcrossPages()) {
-                await axios.post(`/api/cases/batchStatusChangeQuery`, {
-                    query: this.props.location.state.search,
-                    ...payload,
-                });
-            } else {
-                await axios.post(`/api/cases/batchStatusChange`, {
-                    caseIds: rowData.map((row: TableRow) => row.id),
-                    ...payload,
-                });
-            }
+            await axios.post(`/api/cases/batchStatusChange`, payload);
 
             this.tableRef.current.onQueryChange();
         } catch (e) {
@@ -528,8 +521,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         }
 
         await this.setCaseVerification(rows, status);
-
-        this.tableRef.current.onQueryChange();
     }
 
     getExcludedCaseIds(rows: TableRow[]): string[] {
