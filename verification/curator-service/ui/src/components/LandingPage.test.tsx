@@ -11,7 +11,7 @@ test('shows all content', async () => {
     );
 
     expect(getByText(/Detailed line list data/)).toBeInTheDocument();
-    expect(getByText(/Welcome to G.h List/)).toBeInTheDocument();
+    expect(getByText(/Welcome to G.h Data/)).toBeInTheDocument();
     expect(getByText('Login to get started')).toBeInTheDocument();
     expect(getByText('Global.health map')).toHaveAttribute(
         'href',
