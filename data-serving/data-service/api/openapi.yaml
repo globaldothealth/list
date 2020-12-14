@@ -599,7 +599,7 @@ paths:
             format: date
       responses:
         "200":
-          $ref: "#/components/responses/200"
+          $ref: "#/components/responses/200CaseIdsArray"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -839,9 +839,14 @@ components:
       required:
         - cases
     CaseIdsArray:
-      type: array
-      items:
-        type: string
+      type: object
+      properties:
+        cases:
+          type: array
+          items:
+            type: string
+      required:
+        - cases
     CaseStatus:
       type: string
       enum: [UNVERIFIED, VERIFIED, EXCLUDED]
