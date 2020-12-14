@@ -91,6 +91,10 @@ def parse_cases(raw_data_file, source_id, source_url):
     Currently no parsing of symptoms, as field is always left empty - worth rechecking this in future in case this field
     becomes populated. No disease outcome data is provided either.
 
+    Also includes any case-specific notes made.
+
+    Including a note on JSON schema version (currently v7)
+
     """
     with open(raw_data_file, "r") as f:
         json_data = json.load(f)
