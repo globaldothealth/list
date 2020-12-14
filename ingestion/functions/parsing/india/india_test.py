@@ -9,52 +9,6 @@ _PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "OR-A-123-1",
-            "sourceUrl": _SOURCE_URL,
-            "additionalSources": [
-                {
-                    "sourceUrl": "https://twitter.com/HFWOdisha/status/1308286422281977856"
-                }
-            ]
-        },
-        "location": {
-            "limitToResolution": "Admin2,Admin1,Country",
-            "query": "Balasore, Odisha, India"
-        },
-        "events": [
-            {
-                "name": "confirmed",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        }
-            },
-            {
-                "name": "outcome",
-                "dateRange":
-                {
-                    "start": "09/22/2020Z",
-                    "end": "09/22/2020Z",
-                },
-                "value": "Death"
-            }
-        ],
-        "demographics": {
-            "ageRange": {
-                "start": 0.5,
-                "end": 0.5
-            },
-            "gender": "Male",
-            "nationalities": [
-                "Bengladeshi"
-            ]
-        },
-        "notes": "was also suffering from Diabetes, hypertension."
-    },
-    {
-        "caseReference": {
-            "sourceId": _SOURCE_ID,
             "sourceEntryId": "Entry-297649-1",
             "sourceUrl": _SOURCE_URL,
             "additionalSources": [
@@ -75,15 +29,6 @@ _PARSED_CASES = [
                             "start": "09/22/2020Z",
                             "end": "09/22/2020Z"
                         }
-            },
-            {
-                "name": "hospitalAdmission",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        },
-                "value": "Yes"
             }
         ],
         "demographics": {
@@ -117,15 +62,6 @@ _PARSED_CASES = [
                             "start": "09/22/2020Z",
                             "end": "09/22/2020Z"
                         }
-            },
-            {
-                "name": "hospitalAdmission",
-                "dateRange":
-                        {
-                            "start": "09/22/2020Z",
-                            "end": "09/22/2020Z"
-                        },
-                "value": "Yes"
             }
         ],
         "demographics": {
