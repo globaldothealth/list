@@ -200,7 +200,7 @@ describe('PUT', () => {
             .put(`/api/sources/${source.id}`)
             .send({
                 dateFilter: {
-                    numDaysBeforeToday: '3',
+                    numDaysBeforeToday: 3,
                     op: 'EQ',
                 },
             })
@@ -463,7 +463,7 @@ describe('POST', () => {
         await curatorRequest
             .post('/api/sources')
             .send({ origin: { url: 2 } })
-            .expect(422);
+            .expect(400);
     });
 });
 
