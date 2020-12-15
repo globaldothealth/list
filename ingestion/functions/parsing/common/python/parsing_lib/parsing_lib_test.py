@@ -524,3 +524,15 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
                 "multi": {"multikeep": "ok"},
                 "emptyobject": {}}
     assert parsing_lib.remove_nested_none_and_empty(data) == expected
+
+def test_excluded_case_are_removed_from_cases():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    valid_case = _PARSED_CASE
+    excluded_case = copy.deepcopy(_PARSED_CASE)
+    excluded_case["caseReference"]["sourceEntryId"] = "999"
+
+    cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0")
+
+    assert next(cases) == valid_case
+    assert next(cases) != excluded_case
