@@ -631,24 +631,27 @@ export class CasesController {
             'caseReference.sourceId': req.query.sourceId?.toString(),
         };
 
-        if (req.query.dateFrom) {
-            searchQuery['events'] = {
-                $elemMatch: {
-                    name: 'confirmed',
-                    'dateRange.start': {
-                        $gte: new Date(req.query.dateFrom.toString()),
-                    },
-                },
-            };
-        }
+        if (req.query.dateFrom || req.query.dateTo) {
+            let dateRangeFilter = {};
 
-        if (req.query.dateTo) {
+            if (req.query.dateFrom) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $gte: new Date(req.query.dateFrom.toString()),
+                };
+            }
+
+            if (req.query.dateTo) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $lte: new Date(req.query.dateTo.toString()),
+                };
+            }
+
             searchQuery['events'] = {
                 $elemMatch: {
                     name: 'confirmed',
-                    'dateRange.start': {
-                        $lte: new Date(req.query.dateTo.toString()),
-                    },
+                    'dateRange.start': dateRangeFilter,
                 },
             };
         }
