@@ -623,7 +623,10 @@ export class CasesController {
         };
 
         const cases = await Case.find(searchQuery).lean();
-        const caseIds = cases.map((c) => c.caseReference.sourceEntryId);
+
+        const caseIds = cases
+            .map((c) => c.caseReference.sourceEntryId)
+            .filter((id) => !!id);
 
         res.status(200).json({ cases: caseIds }).end();
     };
