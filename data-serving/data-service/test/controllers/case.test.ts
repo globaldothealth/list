@@ -744,6 +744,7 @@ describe('POST', () => {
             expect(res.text).not.toContain(unmatchedCase._id);
         });
     });
+
     describe('batch status change', () => {
         it('should not accept invalid statuses', async () => {
             await request(app)
@@ -897,6 +898,27 @@ describe('POST', () => {
             expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
                 'EXCLUDED',
             );
+        });
+    });
+
+    describe('excludedCaseIds', () => {
+        it('should require sourceId and return 400 if not present', async () => {
+            const res = await request(app)
+                .get('/api/excludedCaseIds')
+                .expect(400);
+        });
+
+        it('should return empty array when no cases match', async () => {
+            const existingCase = new Case(fullCase);
+            await existingCase.save();
+
+            const caseSourceId = existingCase.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(`/api/excludedCaseIds?sourceId=${caseSourceId}`)
+                .expect(200);
+
+            expect(res.body).toContain('[]');
         });
     });
 });
