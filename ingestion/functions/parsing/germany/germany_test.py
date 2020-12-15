@@ -31,6 +31,39 @@ _PARSED_CASE = [
                 "end": 14.0
             }
         }
+    },
+    {
+        "caseReference": {
+            "sourceId": "abc123",
+            "sourceUrl": "foo.bar"
+        },
+        "location": {
+            "query": "SK Kiel, Schleswig-Holstein, Germany",
+            "limitToResolution": "Country,Admin1,Admin2",
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": "03/23/2020Z",
+                    "end": "03/23/2020Z"
+                }
+            },
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": "03/20/2020Z",
+                    "end": "03/20/2020Z"
+                }
+            }            
+        ],
+        "demographics": {
+            "gender": "Male",
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            }
+        }
     }
 ]
 
