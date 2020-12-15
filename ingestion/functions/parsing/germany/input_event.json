@@ -1,5 +1,7 @@
 {
+    "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "germany-test-id/content.json",
-    "sourceUrl": "https://foo.bar"
+    "s3Key": "5fd8d2e8aaae7e00309ecd03/2020/12/15/1520/content.csv",
+    "sourceUrl": "https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data",
+    "sourceId": "5fd8d2e8aaae7e00309ecd03"
 }
