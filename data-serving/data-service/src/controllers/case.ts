@@ -622,6 +622,22 @@ export class CasesController {
             'caseReference.sourceId': req.query.sourceId,
         };
 
+        if (req.query.dateFrom) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            searchQuery['events.0.dateRange.start'] = {
+                $gte: new Date(req.query.dateFrom.toString()),
+            };
+        }
+
+        if (req.query.dateTo) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            searchQuery['events.0.dateRange.end'] = {
+                $lt: new Date(req.query.dateTo.toString()),
+            };
+        }
+
         const cases = await Case.find(searchQuery).lean();
 
         const caseIds = cases
