@@ -1,0 +1,5 @@
+datum,vek,pohlavi,kraj_nuts_kod,okres_lau_kod,nakaza_v_zahranici,nakaza_zeme_csu_kod
+2020-11-01,57,Z,CZ051,CZ0514,,
+2020-10-10,38,Z,CZ010,CZ0100,1,UA
+2020-11-23,23,Z,CZ052,CZ0521,1,XK
+2020-06-11,27,M,CZ080,CZ099Y,,
