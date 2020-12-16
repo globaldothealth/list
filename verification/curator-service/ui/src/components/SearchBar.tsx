@@ -16,7 +16,6 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
-import Axios from 'axios';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -70,7 +69,9 @@ export default function SearchBar(props: {
 
     const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [isSearchGuideOpen] = React.useState<boolean>(false);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
+        false,
+    );
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
@@ -93,12 +94,7 @@ export default function SearchBar(props: {
     };
 
     const toggleSearchGuide = async (): Promise<void> => {
-        // setIsSearchGuideOpen((isOpen) => !isOpen);
-        await Axios.post('/api/sources', {
-            origin: {
-                url: 2,
-            },
-        });
+        setIsSearchGuideOpen((isOpen) => !isOpen);
     };
 
     return (
