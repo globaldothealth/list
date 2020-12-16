@@ -71,7 +71,7 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
         common_lib.complete_with_error(e)
 
 
-def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
+def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
     Populates standard required fields for the G.h Case API.
 
@@ -79,7 +79,8 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        yield remove_nested_none_and_empty(case)
+        if not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+            yield remove_nested_none_and_empty(case)
 
 
 def remove_nested_none_and_empty(d):
@@ -285,7 +286,7 @@ def run_lambda(
         case_data = parsing_function(
             local_data_file.name, source_id,
             source_url)
-        final_cases = prepare_cases(case_data, upload_id)
+        final_cases = prepare_cases(case_data, upload_id, [])
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
                 final_cases,
