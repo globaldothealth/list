@@ -262,28 +262,34 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
 
 def test_prepare_cases_adds_upload_id():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    case = copy.deepcopy(_PARSED_CASE)
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        upload_id)
+        [case],
+        upload_id,
+        [])
     assert next(result)["caseReference"]["uploadIds"] == [upload_id]
 
 
 def test_prepare_cases_removes_nones():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    _PARSED_CASE["demographics"] = None
+    case = copy.deepcopy(_PARSED_CASE)
+    case["demographics"] = None
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        "123456789012345678901234")
+        [case],
+        "123456789012345678901234",
+        [])
     assert "demographics" not in next(result).keys()
 
 
 def test_prepare_cases_removes_empty_strings():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    _PARSED_CASE["notes"] = ""
+    case = copy.deepcopy(_PARSED_CASE)
+    case["notes"] = ""
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        "123456789012345678901234")
+        [case],
+        "123456789012345678901234",
+        [])
     assert "notes" not in next(result).keys()
 
 
@@ -528,11 +534,10 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
 def test_excluded_case_are_removed_from_cases():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
 
-    valid_case = _PARSED_CASE
+    valid_case = copy.deepcopy(_PARSED_CASE)
     excluded_case = copy.deepcopy(_PARSED_CASE)
     excluded_case["caseReference"]["sourceEntryId"] = "999"
 
-    cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0")
+    cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0", ["999"])
 
-    assert next(cases) == valid_case
-    assert next(cases) != excluded_case
+    assert next(cases)["caseReference"]["sourceEntryId"] == valid_case["caseReference"]["sourceEntryId"]
