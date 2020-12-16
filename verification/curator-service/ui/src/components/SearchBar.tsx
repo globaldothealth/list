@@ -16,7 +16,6 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
-import Axios from 'axios';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
