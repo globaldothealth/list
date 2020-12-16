@@ -5,7 +5,13 @@ import {
     Paper,
     Typography,
 } from '@material-ui/core';
-import { Case, GenomeSequence, Location, Travel } from './Case';
+import {
+    Case,
+    GenomeSequence,
+    Location,
+    Travel,
+    VerificationStatus,
+} from './Case';
 import React, { useEffect, useState } from 'react';
 
 import AppModal from './AppModal';
@@ -111,6 +117,11 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: '2em',
         width: '10em',
         textTransform: 'uppercase',
+    },
+    alert: {
+        backgroundColor: 'white',
+        borderRadius: theme.spacing(1),
+        marginTop: theme.spacing(1),
     },
 }));
 
@@ -226,6 +237,17 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Link>
                     )}
                 </Typography>
+                {props.c.caseReference.verificationStatus ===
+                    VerificationStatus.Excluded && (
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        variant="outlined"
+                        severity="error"
+                    >
+                        This case is excluded. That means it's ignored in the
+                        automated ingestion process
+                    </MuiAlert>
+                )}
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element name="case-data">
                         <Typography
