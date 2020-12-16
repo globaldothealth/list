@@ -55,9 +55,8 @@ _SYMPTOMS_MAP = {
     # According to symptom ontology, breathing difficulty is exact synonym of dyspnea
     "dificuldade de respirar": "dyspnea",
     "dor de cabeça": "headache",
-    "distúrbios gustativos": "taste alteration", 
-    # Symptom ontology does not have a specific term for smell alterations
-    "distúrbios olfativos": "disturbances of sensation of smell and taste"
+    "distúrbios gustativos": "taste alteration",
+    "distúrbios olfativos": "smell alteration"
 }
 
 
