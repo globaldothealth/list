@@ -45,7 +45,7 @@ _CORYZA = "Coriza"
 _HOSPITALIZED = "FicouInternado"
 _INTERNAL_TRAVEL = "ViagemBrasil"
 _INTERNATIONAL_TRAVEL = "ViagemInternacional"
-_HEALTHCARE_PROFFESIONAL = "ProfissionalSaude"
+_HEALTHCARE_PROFESSIONAL = "ProfissionalSaude"
 _HOMELESS = "MoradorDeRua"
 _DISABILITY = "PossuiDeficiencia"
 _SCHOOLING = "Escolaridade"
@@ -216,7 +216,7 @@ def convert_ethnicity(ethnicity: str):
         return "Indigenous"
 
 
-def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proffesional: str):
+def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_professional: str):
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
@@ -229,7 +229,7 @@ def convert_demographics(gender: str, age: str, ethnicity: str, healthcare_proff
             demo["ageRange"] = {"start": float(age_range[0]), "end": float(age_range[2][:2])}
     if ethnicity:
         demo["ethnicity"] = convert_ethnicity(ethnicity)
-    if healthcare_proffesional == "Sim":
+    if healthcare_professional == "Sim":
         demo["occupation"] = "Healthcare worker"
     return demo
 
@@ -293,7 +293,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             row[_DIFFICULTY_BREATHING]
                         ),
                         "demographics": convert_demographics(
-                            row[_GENDER], row[_AGE], row[_ETHNICITY], row[_HEALTHCARE_PROFFESIONAL]
+                            row[_GENDER], row[_AGE], row[_ETHNICITY], row[_HEALTHCARE_PROFESSIONAL]
                         ),
                     }
                     case["preexistingConditions"] = convert_preexisting_conditions(
