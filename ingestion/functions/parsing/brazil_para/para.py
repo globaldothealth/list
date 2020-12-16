@@ -120,7 +120,8 @@ def convert_events(date_confirmed, date_symptoms, test_type, outcome):
             "value": convert_test(test_type)
         }
     ]
-    if date_symptoms not in _NONE_TYPES:
+    # There are some date entries which are before the earliest allowed date
+    if date_symptoms not in _NONE_TYPES and datetime.strptime(date_symptoms.split("T")[0], "%Y-%m-%d") > datetime.strptime("2019-11-01", "%Y-%m-%d"):
         events.append(
             {
                 "name": "onsetSymptoms",
