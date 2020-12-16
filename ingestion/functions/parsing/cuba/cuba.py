@@ -17,13 +17,15 @@ except ImportError:
     import parsing_lib
 
 
-def convert_date(raw_date):
+def convert_date(raw_date, dataserver=True):
     """
     Convert raw date field into a value interpretable by the dataserver.
     Dates are listed in YYYY/mm/dd format
     """
     try:
         date = datetime.strptime(raw_date, "%Y/%m/%d")
+        if not dataserver:
+            return date.strftime("%m/%d/%Y")
         return date.strftime("%m/%d/%YZ")
     except BaseException:
         pass
@@ -58,6 +60,23 @@ def convert_nationality(two_letter_country_code):
             pass
 
 
+def convert_demographics(raw_entry):
+    demo = {}
+    if raw_entry['edad']:
+        demo["ageRange"] = {
+            "start": float(
+                raw_entry["edad"]),
+            "end": float(
+                raw_entry["edad"])}
+    if raw_entry['sexo']:
+        demo["gender"] = convert_gender(
+            raw_entry["sexo"])
+    if raw_entry['pais']:
+        demo["nationalities"] = [convert_nationality(raw_entry['pais'])]
+
+    return demo or None
+
+
 def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses G.h-format case data from raw API data.
@@ -71,6 +90,10 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     Currently no parsing of symptoms, as field is always left empty - worth rechecking this in future in case this field
     becomes populated. No disease outcome data is provided either.
+
+    Also includes any case-specific notes made.
+
+    Including a note on JSON schema version (currently v7)
 
     """
     with open(raw_data_file, "r") as f:
@@ -95,97 +118,91 @@ def parse_cases(raw_data_file, source_id, source_url):
             if 'diagnosticados' in json_data['casos']['dias'][day]:
                 fecha = json_data['casos']['dias'][day]['fecha']
                 for entry in json_data['casos']['dias'][day]['diagnosticados']:
-                    notes = []
-                    case = {
-                        "caseReference": {
-                            "sourceId": source_id,
-                            "sourceEntryId": entry["id"],
-                            "sourceUrl": source_url},
-                        "location": convert_location(entry),
-                        "events": [
-                            {
-                                "name": "confirmed",
+                    if entry['id']:
+                        notes = []
+                        case = {
+                            "caseReference": {
+                                "sourceId": source_id,
+                                "sourceEntryId": entry["id"],
+                                "sourceUrl": source_url},
+                            "location": convert_location(entry),
+                            "events": [
+                                {
+                                    "name": "confirmed",
+                                    "dateRange": {
+                                        "start": convert_date(fecha),
+                                        "end": convert_date(fecha)}}]}
+                        case["demographics"] = convert_demographics(entry)
+
+                        if entry.get("consulta_medico", ""):
+                            case["events"].append({
+                                "name": "firstClinicalConsultation",
                                 "dateRange": {
-                                    "start": convert_date(fecha),
-                                    "end": convert_date(fecha)}}],
-                        "demographics": {
-                            "ageRange": {
-                                "start": float(
-                                    entry["edad"]),
-                                "end": float(
-                                    entry["edad"])},
-                            "gender": convert_gender(
-                                entry["sexo"]),
-                            "nationalities": [
-                                convert_nationality(
-                                    entry['pais'])]}}
+                                    "start": convert_date(entry["consulta_medico"]),
+                                    "end": convert_date(entry["consulta_medico"])
+                                }}
+                            )
 
-                    if entry.get("consulta_medico", ""):
-                        case["events"].append({
-                            "name": "firstClinicalConsultation",
-                            "dateRange": {
-                                "start": convert_date(entry["consulta_medico"]),
-                                "end": convert_date(entry["consulta_medico"])
-                            }}
-                        )
+                        if entry.get('posible_procedencia_contagio', ""):
+                            if 'crucero' in entry['posible_procedencia_contagio']:
+                                case["transmission"] = {
+                                    "places": ["Cruise Ship"]}
 
-                    if entry.get('posible_procedencia_contagio', ""):
-                        if 'crucero' in entry['posible_procedencia_contagio']:
-                            case["transmission"] = {"places": "Cruise Ship"}
+                            elif len(entry['posible_procedencia_contagio'][0]) == 2:
+                                for two_letter_country_code in entry['posible_procedencia_contagio']:
+                                    if pycountry.countries.get(
+                                            alpha_2=two_letter_country_code):
+                                        country = pycountry.countries.get(
+                                            alpha_2=two_letter_country_code).name
+                                        if country:
+                                            case["travelHistory"] = {
+                                                "traveledPrior30Days": True,
+                                                "travel": [
+                                                    {
+                                                        "location": {
+                                                            "query": country
+                                                        }
+                                                    }]
+                                            }
 
-                        elif len(entry['posible_procedencia_contagio'][0]) == 2:
-                            for two_letter_country_code in entry['posible_procedencia_contagio']:
-                                if pycountry.countries.get(
-                                        alpha_2=two_letter_country_code):
-                                    country = pycountry.countries.get(
-                                        alpha_2=two_letter_country_code).name
-                                    if country:
-                                        case["travelHistory"] = {
-                                            "traveledPrior30Days": True,
-                                            "travel": [
-                                                {
-                                                    "location": {
-                                                        "query": country
-                                                    }
-                                                }]
-                                        }
+                                            if entry.get(
+                                                    'arribo_a_cuba_foco', ""):
+                                                notes.append(
+                                                    f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'],dataserver=False)}")
 
-                                        if entry.get('arribo_a_cuba_foco', ""):
-                                            notes.append(
-                                                f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'])}")
+                        if entry.get('contagio', "") == 'introducido':
+                            notes.append(
+                                "Case was transmitted from another confirmed case within Cuba.")
+                        elif entry.get('contagio', "") == 'importado':
+                            notes.append(
+                                "Case was contracted abroad and brought into Cuba.")
 
-                    if entry.get('contagio', "") == 'introducido':
-                        notes.append(
-                            "Case was transmitted from another confirmed case within Cuba.")
-                    elif entry.get('contagio', "") == 'importado':
-                        notes.append(
-                            "Case was contracted abroad and brought into Cuba.")
+                        if '-1' in entry['id']:
+                            notes.append(
+                                "First patient from this country in Cuba.")
 
-                    if '-1' in entry['id']:
-                        notes.append(
-                            "First patient from this country in Cuba.")
+                        if entry.get("centro_diagnostico", ""):
+                            notes.append(
+                                f"Case diagnostic test was performed at {hospital_map.get(entry['centro_diagnostico'],'Unknown Centre')}.")
+                        if entry.get("centro_aislamiento", ""):
+                            notes.append(
+                                f"Case was treated at {hospital_map.get(entry['centro_aislamiento'],'Unknown Hospital')}.")
 
-                    if entry.get("centro_diagnostico", ""):
-                        notes.append(
-                            f"Case diagnostic test was performed at {hospital_map.get(entry['centro_diagnostico'],'Unknown Centre')}.")
-                    if entry.get("centro_aislamiento", ""):
-                        notes.append(
-                            f"Case was treated at {hospital_map.get(entry['centro_aislamiento'],'Unknown Hospital')}.")
+                        if entry.get("contacto_focal", ""):
+                            notes.append(
+                                f"A further {entry['contacto_focal']} people who this case was in contact with are being monitored for symptoms")
 
-                    if entry.get("contacto_focal", ""):
-                        notes.append(
-                            f"A further {entry['contacto_focal']} people who this case was in contact with are being monitored for symptoms")
+                        if entry['info']:
+                            notes.append(
+                                f"Notes provided are as follows: \n {entry['info']}")
 
-                    if entry['info']:
-                        notes.append(
-                            f"Notes provided are as follows: \n {entry['info']}")
+                        if schema_version:
+                            notes.append(
+                                f'Using schema version {schema_version}')
 
-                    if schema_version:
-                        notes.append(f'Using schema version {schema_version}')
+                        case["notes"] = ", ".join(notes)
 
-                    case["notes"] = "\n".join(notes)
-
-                    yield case
+                        yield case
 
 
 def lambda_handler(event, context):

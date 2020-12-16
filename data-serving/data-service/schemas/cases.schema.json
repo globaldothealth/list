@@ -51,10 +51,10 @@
         "bsonType": "object",
         "additionalProperties": false,
         "properties": {
-          "sourceEntryId": {
-            "bsonType": "string"
+          "date": {
+            "bsonType": "date"
           },
-          "sourceUrl": {
+          "note": {
             "bsonType": "string"
           }
         }

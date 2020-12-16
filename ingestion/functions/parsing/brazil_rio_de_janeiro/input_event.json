@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5fc921cec89abf0050348be8/2020/12/03/1750/content.csv",
+    "sourceUrl": "http://painel.saude.rj.gov.br/arquivos/COVID.CSV",
+    "sourceId": "5fc921cec89abf0050348be8"
+}

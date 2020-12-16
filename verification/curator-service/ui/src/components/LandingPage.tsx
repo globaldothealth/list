@@ -47,7 +47,7 @@ export default function LandingPage(): JSX.Element {
                     classes={{ root: classes.description }}
                     variant="h5"
                 >
-                    Welcome to G.h List. The first of its kind, easy to use
+                    Welcome to G.h Data. The first of its kind, easy to use
                     global data repository with open access to real-time
                     epidemiological anonymized line list data.
                 </Typography>

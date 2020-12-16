@@ -15,14 +15,16 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-_DATE_INDEX = 8
-_AGE_INDEX = 4
-_GENDER_INDEX = 5
-_CASECOUNT = 6
-_DEATHCOUNT = 7
-_RECOVERYCOUNT = 15
-_ADMIN1 = 2
-_ADMIN2 = 3
+_DATE_INDEX = "Meldedatum"
+_AGE_INDEX = "Altersgruppe"
+_GENDER_INDEX = "Geschlecht"
+_CASECOUNT = "AnzahlFall"
+_DEATHCOUNT = "AnzahlTodesfall"
+_RECOVERYCOUNT = "NeuGenesen"
+_ADMIN1 = "Bundesland"
+_ADMIN2 = "Landkreis"
+_DATE_ONSET_SYMPTOMS = "Refdatum"
+_ONSET_DATE_PROVIDED = "IstErkrankungsbeginn"
 
 
 def convert_date(raw_date):
@@ -75,8 +77,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header.
+        reader = csv.DictReader(f, delimiter=",")
         for row in reader:
             num_confirmed_cases = int(row[_CASECOUNT])
             if num_confirmed_cases < 1:
@@ -111,6 +112,15 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 elif int(row[_RECOVERYCOUNT]) > 0:
                     case["events"].append(
                         {"name": "outcome", "value": "Recovered"})
+                if int(row[_ONSET_DATE_PROVIDED]) == 1:
+                    case["events"].append({
+                        "name": "onsetSymptoms",
+                        "dateRange":
+                        {
+                            "start": convert_date(row[_DATE_ONSET_SYMPTOMS]),
+                            "end": convert_date(row[_DATE_ONSET_SYMPTOMS])
+                        }
+                    })
                 for _ in range(num_confirmed_cases):
                     yield case
             except ValueError as ve:
