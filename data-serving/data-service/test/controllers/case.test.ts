@@ -744,6 +744,7 @@ describe('POST', () => {
             expect(res.text).not.toContain(unmatchedCase._id);
         });
     });
+
     describe('batch status change', () => {
         it('should not accept invalid statuses', async () => {
             await request(app)
@@ -897,6 +898,141 @@ describe('POST', () => {
             expect(secondCaseInDb?.caseReference.verificationStatus).toEqual(
                 'EXCLUDED',
             );
+        });
+    });
+
+    describe('excludedCaseIds', () => {
+        it('should require sourceId and return 400 if not present', async () => {
+            const res = await request(app)
+                .get('/api/excludedCaseIds')
+                .expect(400);
+        });
+
+        it('should return empty array when no cases match', async () => {
+            const existingCase = new Case(fullCase);
+            await existingCase.save();
+
+            const caseSourceId = existingCase.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(`/api/excludedCaseIds?sourceId=${caseSourceId}`)
+                .expect(200);
+
+            expect(res.text).toContain('[]');
+        });
+
+        it('should return array with correct results when some cases match', async () => {
+            const case1 = new Case(fullCase);
+            case1.caseReference.verificationStatus = 'EXCLUDED';
+            case1.caseReference.sourceEntryId = 'entry1';
+            await case1.save();
+
+            const case2 = new Case(fullCase);
+            case2.caseReference.verificationStatus = 'EXCLUDED';
+            case2.caseReference.sourceEntryId = 'entry2';
+            await case2.save();
+
+            const case3 = new Case(fullCase);
+            case3.caseReference.verificationStatus = 'EXCLUDED';
+            case3.caseReference.sourceId = 'invalid';
+            await case3.save();
+
+            const caseSourceId = case1.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(`/api/excludedCaseIds?sourceId=${caseSourceId}`)
+                .expect(200);
+
+            expect(res.text).toContain(case1.caseReference.sourceEntryId);
+            expect(res.text).toContain(case2.caseReference.sourceEntryId);
+            expect(res.text).not.toContain(case3.caseReference.sourceEntryId);
+        });
+
+        it('should allow filtering of results by start date', async () => {
+            const case1 = new Case(fullCase);
+            case1.caseReference.verificationStatus = 'EXCLUDED';
+            case1.caseReference.sourceEntryId = 'entry1';
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case1.events[1].dateRange.start = new Date('01-01-2020');
+            await case1.save();
+
+            const case2 = new Case(fullCase);
+            case2.caseReference.verificationStatus = 'EXCLUDED';
+            case2.caseReference.sourceEntryId = 'entry2';
+            await case2.save();
+
+            const caseSourceId = case1.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(
+                    `/api/excludedCaseIds?sourceId=${caseSourceId}&dateFrom=2020-01-11`,
+                )
+                .expect(200);
+
+            expect(res.text).not.toContain(case1.caseReference.sourceEntryId);
+            expect(res.text).toContain(case2.caseReference.sourceEntryId);
+        });
+
+        it('should allow filtering of results by end date', async () => {
+            const case1 = new Case(fullCase);
+            case1.caseReference.verificationStatus = 'EXCLUDED';
+            case1.caseReference.sourceEntryId = 'entry1';
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case1.events[1].dateRange.start = new Date('01-01-2020');
+            await case1.save();
+
+            const case2 = new Case(fullCase);
+            case2.caseReference.verificationStatus = 'EXCLUDED';
+            case2.caseReference.sourceEntryId = 'entry2';
+            await case2.save();
+
+            const caseSourceId = case1.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(
+                    `/api/excludedCaseIds?sourceId=${caseSourceId}&dateTo=2020-01-11`,
+                )
+                .expect(200);
+
+            expect(res.text).toContain(case1.caseReference.sourceEntryId);
+            expect(res.text).not.toContain(case2.caseReference.sourceEntryId);
+        });
+
+        it('should allow filtering of results by date range', async () => {
+            const case1 = new Case(fullCase);
+            case1.caseReference.verificationStatus = 'EXCLUDED';
+            case1.caseReference.sourceEntryId = 'entry1';
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case1.events[1].dateRange.start = new Date('01-01-2020');
+            await case1.save();
+
+            const case2 = new Case(fullCase);
+            case2.caseReference.verificationStatus = 'EXCLUDED';
+            case2.caseReference.sourceEntryId = 'entry2';
+            await case2.save();
+
+            const case3 = new Case(fullCase);
+            case3.caseReference.verificationStatus = 'EXCLUDED';
+            case3.caseReference.sourceEntryId = 'entry3';
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case3.events[1].dateRange.start = new Date('01-30-2020');
+            await case3.save();
+
+            const caseSourceId = case1.caseReference.sourceId;
+
+            const res = await request(app)
+                .get(
+                    `/api/excludedCaseIds?sourceId=${caseSourceId}&dateFrom=2020-01-03&dateTo=2020-01-15`,
+                )
+                .expect(200);
+
+            expect(res.text).not.toContain(case1.caseReference.sourceEntryId);
+            expect(res.text).toContain(case2.caseReference.sourceEntryId);
+            expect(res.text).not.toContain(case3.caseReference.sourceEntryId);
         });
     });
 });

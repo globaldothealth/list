@@ -1,5 +1,7 @@
 import { Case, CaseDocument } from '../model/case';
-import { CastError, DocumentQuery, Error, Query } from 'mongoose';
+import { EventDocument } from '../model/event';
+import { DocumentQuery, Error, Query } from 'mongoose';
+import { QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
@@ -605,6 +607,62 @@ export class CasesController {
             res.status(500).json(err).end();
         }
         return;
+    };
+
+    /**
+     * Get a list of excluded cases IDs for a specific source ID.
+     *
+     * Handles HTTP GET /api/excludedCaseIds.
+     */
+    listExcludedCaseIds = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        /*
+            We need to be able to include date filtering or
+            not - requiring events to be an optional property.
+         */
+        const searchQuery: {
+            'caseReference.verificationStatus': string;
+            'caseReference.sourceId': string | undefined;
+            events?: QuerySelector<EventDocument | [EventDocument]>;
+        } = {
+            'caseReference.verificationStatus': 'EXCLUDED',
+            'caseReference.sourceId': req.query.sourceId?.toString(),
+        };
+
+        if (req.query.dateFrom || req.query.dateTo) {
+            let dateRangeFilter = {};
+
+            if (req.query.dateFrom) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $gte: new Date(req.query.dateFrom.toString()),
+                };
+            }
+
+            if (req.query.dateTo) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $lte: new Date(req.query.dateTo.toString()),
+                };
+            }
+
+            searchQuery['events'] = {
+                $elemMatch: {
+                    name: 'confirmed',
+                    'dateRange.start': dateRangeFilter,
+                },
+            };
+        }
+
+        const cases = await Case.find(searchQuery).lean();
+
+        const caseIds = cases
+            .filter((c) => !!c.caseReference.sourceEntryId)
+            .map((c) => c.caseReference.sourceEntryId);
+
+        res.status(200).json({ cases: caseIds }).end();
     };
 
     /**
