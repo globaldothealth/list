@@ -43,8 +43,7 @@ _NONE_TYPES = set(["Não", "null", "undefined"])
 _SYMPTOMS_MAP = {
     "Dor de Cabeça": "headache",
     "Distúrbios Gustativos": "taste alteration",
-    # Symptom ontology does not have a specific term for smell alterations
-    "Distúrbios Olfativos": "disturbances of sensation of smell and taste",
+    "Distúrbios Olfativos": "smell alteration",
     "Dor de garganta": "throat pain",
     "Dispneia": "dyspnea",
     "Febre": "fever",
