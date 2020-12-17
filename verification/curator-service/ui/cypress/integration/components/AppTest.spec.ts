@@ -170,7 +170,7 @@ describe('App', function () {
         cy.contains('Line list');
 
         cy.contains('Global.health Terms of Use').should('not.exist');
-        cy.contains('Terms of use').click();
+        cy.contains('Terms of use').click({ force: true });
         cy.url().should('eq', 'http://localhost:3002/terms');
         cy.contains('Global.health Terms of Use');
     });
