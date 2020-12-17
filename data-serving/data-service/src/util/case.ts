@@ -20,7 +20,7 @@ export const parseCaseEvents = (
             ...agg,
             [name]: {
                 value: value ?? '',
-                date: new Date(dateRange.start).toISOString(), // dateRange.start and dateRange.end have always the same values
+                date: new Date(dateRange.start).toISOString().split('T')[0], // dateRange.start and dateRange.end have always the same values
             },
         }),
         {},
