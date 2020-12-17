@@ -47,19 +47,19 @@ describe('Case', () => {
         expect(res).toEqual({
             onsetSymptoms: {
                 value: '',
-                date: '2020-11-14T00:00:00.000Z',
+                date: '2020-11-14',
             },
             confirmed: {
                 value: 'PCR test',
-                date: '2020-11-19T00:00:00.000Z',
+                date: '2020-11-19',
             },
             hospitalAdmission: {
                 value: '',
-                date: '2020-11-20T00:00:00.000Z',
+                date: '2020-11-20',
             },
             outcome: {
                 value: 'Recovered',
-                date: '2020-12-01T00:00:00.000Z',
+                date: '2020-12-01',
             },
         });
     });
