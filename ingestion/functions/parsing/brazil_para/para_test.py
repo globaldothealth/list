@@ -62,5 +62,34 @@ class ParaTest(unittest.TestCase):
                     ]
                 },
                 "notes": "Other symptoms reported"
+            },
+            {
+                "caseReference": {"sourceId": _SOURCE_ID, "sourceEntryId": "1BbNtddcVG", "sourceUrl": _SOURCE_URL},
+                "location": {
+                    "query": "Santa Isabel do Pará, Pará, Brazil"
+                },
+                "events": [
+                    {
+                        "name": "confirmed",
+                        "dateRange": {
+                            "start": "06/16/2020Z",
+                            "end": "06/16/2020Z"
+                        },
+                        "value": "Serological test"
+                    },
+                    None
+                ],
+                "symptoms": {
+                    "status": "Symptomatic",
+                    "values": ["throat pain", "cough"]
+                },
+                "demographics": {
+                    "gender": "Female",
+                    "ageRange": {
+                        "start": 73.0,
+                        "end": 73.0
+                    }
+                },
+                "preexistingConditions": None
             }
         ])
