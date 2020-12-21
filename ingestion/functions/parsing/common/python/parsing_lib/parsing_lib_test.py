@@ -188,7 +188,9 @@ def test_run_lambda_e2e(
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
     # Mock the excluded case IDs endpoint call.
-    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}"
+    start_date = input_event[parsing_lib.DATE_RANGE_FIELD]["start"]
+    end_date = input_event[parsing_lib.DATE_RANGE_FIELD]["end"]
+    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}&dateFrom={start_date}&dateTo={end_date}"
     requests_mock.register_uri(
                 "GET", excluded_case_ids_url,
                 [{"json": {"cases": []},
@@ -539,20 +541,14 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
                 "emptyobject": {}}
     assert parsing_lib.remove_nested_none_and_empty(data) == expected
 
-def test_excluded_case_are_removed_from_cases(requests_mock):
+def test_excluded_case_are_removed_from_cases():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
 
     valid_case = copy.deepcopy(_PARSED_CASE)
     excluded_case = copy.deepcopy(_PARSED_CASE)
     excluded_case["caseReference"]["sourceEntryId"] = "999"
 
-    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?source_id={_SOURCE_ID}/"
-    requests_mock.register_uri(
-            "GET", excluded_case_ids_url,
-            [{"json": {"cases": [excluded_case["caseReference"]["sourceEntryId"]]},
-              "status_code": 200}])
-    requests_mock.get(excluded_case_ids_url)
-
     cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0", ["999"])
-
-    assert next(cases)["caseReference"]["sourceEntryId"] == valid_case["caseReference"]["sourceEntryId"]
+    cases_list = list(cases)
+    assert len(cases_list) == 1
+    assert cases_list[0]["caseReference"]["sourceEntryId"] == valid_case["caseReference"]["sourceEntryId"]
