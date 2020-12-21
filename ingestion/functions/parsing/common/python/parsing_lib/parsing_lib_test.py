@@ -28,7 +28,7 @@ except ImportError:
     import common_lib
 
 _SOURCE_API_URL = "http://bar.baz"
-_SOURCE_ID = "abc123"
+_SOURCE_ID = "5f0b9a7ead3a2b003edc0e7f"
 _SOURCE_URL = "https://foo.bar"
 _PARSED_CASE = (
     {
@@ -187,13 +187,21 @@ def test_run_lambda_e2e(
         json={"_id": upload_id, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
+    # Mock the excluded case IDs endpoint call.
+    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}"
+    requests_mock.register_uri(
+                "GET", excluded_case_ids_url,
+                [{"json": {"cases": []},
+                  "status_code": 200}])
+
     response = parsing_lib.run_lambda(
         input_event, FakeContext(),
         fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
-    assert requests_mock.request_history[1].url == full_source_url
-    assert requests_mock.request_history[2].url == update_upload_url
+    assert requests_mock.request_history[1].url == excluded_case_ids_url
+    assert requests_mock.request_history[2].url == full_source_url
+    assert requests_mock.request_history[3].url == update_upload_url
     assert response["count_created"] == num_created
     assert response["count_updated"] == num_updated
 
@@ -531,12 +539,19 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
                 "emptyobject": {}}
     assert parsing_lib.remove_nested_none_and_empty(data) == expected
 
-def test_excluded_case_are_removed_from_cases():
+def test_excluded_case_are_removed_from_cases(requests_mock):
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
 
     valid_case = copy.deepcopy(_PARSED_CASE)
     excluded_case = copy.deepcopy(_PARSED_CASE)
     excluded_case["caseReference"]["sourceEntryId"] = "999"
+
+    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?source_id={_SOURCE_ID}/"
+    requests_mock.register_uri(
+            "GET", excluded_case_ids_url,
+            [{"json": {"cases": [excluded_case["caseReference"]["sourceEntryId"]]},
+              "status_code": 200}])
+    requests_mock.get(excluded_case_ids_url)
 
     cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0", ["999"])
 
