@@ -70,6 +70,13 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     except Exception as e:
         common_lib.complete_with_error(e)
 
+def retrieve_excluded_case_ids(source_id: str, date_range: Dict, env: str):
+    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}"
+    res = requests.get(excluded_case_ids_endpoint_url)
+    if res and res.status_code == 200:
+        res_json = res.json()
+        print(res_json["cases"])
+        res_json["cases"]
 
 def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
@@ -79,7 +86,7 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_c
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        if not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+        if excluded_case_ids is None or not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
             yield remove_nested_none_and_empty(case)
 
 
@@ -286,7 +293,8 @@ def run_lambda(
         case_data = parsing_function(
             local_data_file.name, source_id,
             source_url)
-        final_cases = prepare_cases(case_data, upload_id, [])
+        excluded_case_ids = retrieve_excluded_case_ids(source_id, date_range, env)
+        final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
                 final_cases,
