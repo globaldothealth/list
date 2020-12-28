@@ -23,8 +23,8 @@ _LOCATION = {
     "geoResolution": "Admin1",
     "name": "Hong Kong",
     "geometry": {
-        "longitude": "114.15861",
-        "latitude": "22.27833",
+        "longitude": float("114.15861"),
+        "latitude": float("22.27833"),
     },
 }
 
