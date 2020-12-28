@@ -142,7 +142,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
-      MemorySize: 512
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   CHZurichParsingFunction:
@@ -353,6 +353,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSLambdaReadOnlyAccess
+      MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
   BrazilParaParsingFunction:
