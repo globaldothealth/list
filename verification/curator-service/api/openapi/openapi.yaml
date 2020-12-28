@@ -944,6 +944,44 @@ paths:
           $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
+  /excludedCaseIds:
+    get:
+      summary: Lists IDs of excluded cases for a specified source
+      tags: [Case]
+      operationId: listExcludedCaseIds
+      parameters:
+        - name: sourceId
+          in: query
+          description: ID of source to filter out only excluded cases from.
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-f\d]{24}$'
+        - name: dateFrom
+          in: query
+          description: Start date for excluded cases lookup
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          description: Start date for excluded cases lookup
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          $ref: "#/components/responses/200CaseIdsArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     Parser:
@@ -1390,6 +1428,15 @@ components:
             $ref: "#/components/schemas/Case"
       required:
         - cases
+    CaseIdsArray:
+      type: object
+      properties:
+        cases:
+          type: array
+          items:
+            type: string
+      required:
+        - cases
     SymptomArray:
       type: object
       properties:
@@ -1660,6 +1707,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CaseIdsArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseIdsArray"
     "200CasesDownload":
       description: OK
       content:

@@ -312,6 +312,9 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
         apiRouter.post('/geocode/seed', geocodeProxy.seed);
         apiRouter.post('/geocode/clear', geocodeProxy.clear);
 
+        // Forward excluded case IDs fetching to data service
+        apiRouter.get('/excludedCaseIds', casesController.listExcludedCaseIds);
+
         app.use('/api', apiRouter);
 
         // Basic health check handler.
