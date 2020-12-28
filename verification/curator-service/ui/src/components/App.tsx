@@ -317,7 +317,7 @@ export default function App(): JSX.Element {
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
