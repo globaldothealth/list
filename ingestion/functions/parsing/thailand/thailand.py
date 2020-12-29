@@ -38,6 +38,8 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "Female" or raw_gender == "หญิง":
         return "Female"
+    if raw_gender == "Unknown":
+        return "Unknown"
     raise ValueError(f'Unknown gender: {raw_gender}')
 
 
@@ -63,7 +65,8 @@ def notes(entry):
 def demographics(entry):
     demo = {}
     age = entry['Age']
-    if age:
+    # Some negative age entries
+    if age and float(age) >= 0.0:
         demo["ageRange"] = {
             "start": float(age),
             "end": float(age),
