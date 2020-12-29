@@ -184,7 +184,7 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     raw_notes = []
     if "imunossupressão" in raw_comorbidities.lower():
         raw_notes.append("Patient with immunosuppression")
-    if "portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
+    if "portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
         raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
     if "puérpera" in raw_comorbidities.lower():
         raw_notes.append("Recently gave birth")
