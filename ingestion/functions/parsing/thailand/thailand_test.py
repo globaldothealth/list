@@ -29,7 +29,10 @@ _PARSED_CASES = [
                 "start": 27.0,
                 "end": 27.0
             },
-            "gender": "Male"
+            "gender": "Male",
+            "nationalities": [
+                "Thai"
+            ]
         },
         "notes": 'Case was in quarantine',
     },
@@ -55,7 +58,10 @@ _PARSED_CASES = [
                 "start": 30.0,
                 "end": 30.0
             },
-            "gender": "Female"
+            "gender": "Female",
+            "nationalities":[
+                "Burmese"
+            ]
         },
         "notes": 'Case was not in quarantine',
     },
@@ -71,7 +77,12 @@ _PARSED_CASES = [
                 'start': '07/13/2020Z', 'end': '07/13/2020Z'}}
         ],
         'demographics': {
-            'ageRange': {'start': 43.0, 'end': 43.0}, 'gender': 'Male'
+            'ageRange': {'start': 43.0, 'end': 43.0},
+            'gender': 'Male',
+            "nationalities": [
+                "Thai",
+                "Indian"
+            ]
         },
         'notes': 'Case was in quarantine'
     },

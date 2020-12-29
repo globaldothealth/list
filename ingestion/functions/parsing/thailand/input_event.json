@@ -2,6 +2,6 @@
     "env": "local",
     "s3Bucket": "epid-sources-raw",
     "sourceUrl": "https://covid19.th-stat.com/api/open/cases",
-    "s3Key": "5f59f44e7ef66004bc9c91db/2020/09/10/0940/content.json",
-    "sourceId": "5f64c9e7f7add200286d9af5"
+    "s3Key": "5feb4be70af5b9003c10f916/2020/12/29/1536/content.json",
+    "sourceId": "5feb4be70af5b9003c10f916"
 }
