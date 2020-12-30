@@ -84,6 +84,12 @@ def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Di
         end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
         date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
+    else:
+        now = get_today()
+        start_date = '2019-12-01'
+        end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
+
     excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
     res = requests.get(excluded_case_ids_endpoint_url)
     if res and res.status_code == 200:
