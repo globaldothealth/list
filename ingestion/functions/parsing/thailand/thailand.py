@@ -15,6 +15,11 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "nationalities.json")) as json_file:
+    nationalities = json.load(json_file)
+
+_NATIONALITIES_MAP = nationalities["nationalities"]
+
 
 def convert_date(raw_date):
     """
@@ -38,6 +43,8 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "Female" or raw_gender == "หญิง":
         return "Female"
+    if raw_gender == "Unknown":
+        return None
     raise ValueError(f'Unknown gender: {raw_gender}')
 
 
@@ -60,10 +67,22 @@ def notes(entry):
         return 'Case was not in quarantine'
 
 
+def convert_nationality(entry):
+    nationalities = []
+    for key in _NATIONALITIES_MAP:
+        if key in entry:
+            nationalities.append(_NATIONALITIES_MAP[key])
+    if nationalities:
+        return nationalities
+    else:
+        return None
+
+
 def demographics(entry):
     demo = {}
     age = entry['Age']
-    if age:
+    # Some negative age entries
+    if age and float(age) >= 0.0:
         demo["ageRange"] = {
             "start": float(age),
             "end": float(age),
@@ -71,6 +90,9 @@ def demographics(entry):
     gender = entry['GenderEn'] or entry['Gender']
     if gender:
         demo['gender'] = convert_gender(gender)
+    nationalities = entry['Nation']
+    if nationalities:
+        demo['nationalities'] = convert_nationality(nationalities)
     return demo or None
 
 
