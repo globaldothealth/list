@@ -44,7 +44,7 @@ def convert_gender(raw_gender):
     if raw_gender == "Female" or raw_gender == "หญิง":
         return "Female"
     if raw_gender == "Unknown":
-        return "Unknown"
+        return None
     raise ValueError(f'Unknown gender: {raw_gender}')
 
 
