@@ -43,9 +43,8 @@ def convert_gender(raw_gender):
         return "Male"
     if raw_gender == "Female" or raw_gender == "หญิง":
         return "Female"
-    if raw_gender == "Unknown":
+    else:
         return None
-    raise ValueError(f'Unknown gender: {raw_gender}')
 
 
 def convert_location(entry):
