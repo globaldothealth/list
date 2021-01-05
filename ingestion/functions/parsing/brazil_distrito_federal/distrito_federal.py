@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -32,13 +33,13 @@ _OBESITY = "Obesidade"
 _OTHERS = "Outros"
 _CARDIOVASCULAR = "Cardiovasculopatia"
 
-_COMORBIDITIES_MAP = {
-    "Pneumopatia": "lung disease",
-    "Nefropatia": "kidney disease",
-    "Distúrbios Metabólicos": "disease of metabolism",
-    "Obesidade": "obesity",
-    "Cardiovasculopatia": "cardiovascular system disease"
-}
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")) as json_file:
+    dictionaries = json.load(json_file)
+
+_COMORBIDITIES_MAP = dictionaries["comorbidities"]
+
+_ADMINISTRATIVE_DISTRICTS_MAP = dictionaries["admin_districts"]
 
 
 def convert_date(raw_date):
@@ -132,7 +133,7 @@ def convert_demographics(gender: str, age: str):
         elif age == "<= 19 anos":
             demo["ageRange"] = {"start": 0, "end": 19}
         else:
-        # Age in format '20 a 29 anos'
+            # Age in format '20 a 29 anos'
             age_range = age.partition(" a ")
             demo["ageRange"] = {"start": float(age_range[0]), "end": float("".join([i for i in age_range[2] if not i.isalpha()]))}
     return demo
@@ -151,6 +152,29 @@ def convert_notes(hematologic: str, immunosuppressed: str, other: str):
         return (", ").join(raw_notes)
 
 
+def convert_location(municipality: str):
+    location = {}
+    geometry = {}
+    if municipality and municipality in _ADMINISTRATIVE_DISTRICTS_MAP.keys():
+        location["place"] = municipality
+        location["country"] = "Brazil"
+        location["administrativeAreaLevel1"] = "Distrito Federal"
+        location["geoResolution"] = "Point"
+        location["name"] = str(municipality + ", Distrito Federal, Brazil")
+        
+        geometry["latitude"] = _ADMINISTRATIVE_DISTRICTS_MAP[municipality]["latitude"]
+        geometry["longitude"] = _ADMINISTRATIVE_DISTRICTS_MAP[municipality]["longitude"]
+        location["geometry"] = geometry
+    else:
+        # In local testing the only unknown administrative districts were empty entries, 'Entorno DF' (== Surroundings of Distrito Federal), and 'Sistema Penitenciário' (== Penitenciary system)
+        print(f'Unknown administrative district: {municipality}')
+        location["query"] = "Distrito Federal, Brazil"
+    if location:
+        return location
+    else:
+        return None
+
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     Parses G.h-format case data from raw API data.
@@ -164,11 +188,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
-                        "location": {
-                            "query": ", ".join(
-                                [row[_MUNICIPALITY], "Distrito Federal", "Brazil"]
-                            )
-                        },
+                        "location": convert_location(row[_MUNICIPALITY]),
                         "events": convert_events(
                             row[_DATE_CONFIRMED],
                             row[_DATE_SYMPTOMS],
