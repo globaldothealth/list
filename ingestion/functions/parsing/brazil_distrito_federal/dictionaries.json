@@ -1,0 +1,143 @@
+{
+    "comorbidities": {
+        "Pneumopatia": "lung disease",
+        "Nefropatia": "kidney disease",
+        "Distúrbios Metabólicos": "disease of metabolism",
+        "Obesidade": "obesity",
+        "Cardiovasculopatia": "cardiovascular system disease"
+    },
+    "admin_districts": {
+        "Plano Piloto": {
+            "latitude": -15.7939,
+            "longitude": -47.8828
+        },
+        "Gama": {
+            "latitude": -16.0194,
+            "longitude": -48.0669
+        },
+        "Taguatinga": {
+            "latitude": -15.8333,
+            "longitude": -48.0564
+        },
+        "Brazlândia": {
+            "latitude": -15.675,
+            "longitude": -48.2008
+        },
+        "Sobradinho": {
+            "latitude": -15.6531,
+            "longitude": -47.7914
+        },
+        "Planaltina": {
+            "latitude": -15.6192,
+            "longitude": -47.6525
+        },
+        "Paranoá": {
+            "latitude": -15.7686,
+            "longitude": -47.7797
+        },
+        "Núcleo Bandeirante": {
+            "latitude": -15.87,
+            "longitude": -47.9678
+        },
+        "Ceilândia": {
+            "latitude": -15.8192,
+            "longitude": -48.1083
+        },
+        "Guará": {
+            "latitude": -15.8256,
+            "longitude": -47.98
+        },
+        "Cruzeiro": {
+            "latitude": -15.7908,
+            "longitude": -47.9372
+        },
+        "Samambaia": {
+            "latitude": -15.8761,
+            "longitude": -48.0886
+        },
+        "Santa Maria": {
+            "latitude": -16.0153,
+            "longitude": -48.0131
+        },
+        "São Sebastião": {
+            "latitude": -15.9006,
+            "longitude": -47.7794
+        },
+        "Recanto das Emas": {
+            "latitude": -15.9081,
+            "longitude": -48.0731
+        },
+        "Lago Sul": {
+            "latitude": -15.8428,
+            "longitude": -47.8778
+        },
+        "Riacho Fundo": {
+            "latitude": -15.8833,
+            "longitude": -48.0175
+        },
+        "Lago Norte": {
+            "latitude": -15.7386,
+            "longitude": -47.8594
+        },
+        "Candangolândia": {
+            "latitude": -15.8544,
+            "longitude": -47.95
+        },
+        "Águas Claras": {
+            "latitude": -15.8403,
+            "longitude": -48.0278
+        },
+        "Riacho Fundo II": {
+            "latitude": -15.8954,
+            "longitude": -48.0494
+        },
+        "Sudoeste/Octogonal": {
+            "latitude": -15.8055,
+            "longitude": -47.9429
+        },
+        "Varjão": {
+            "latitude": -15.7097,
+            "longitude": -47.8789
+        },
+        "Park Way": {
+            "latitude": -15.9070,
+            "longitude": -47.9647
+        },
+        "SCIA": {
+            "latitude": -15.7875,
+            "longitude": -47.9786
+        },
+        "Sobradinho II": {
+            "latitude": -15.6549,
+            "longitude": -47.7931
+        },
+        "Jardim Botânico": {
+            "latitude": -15.8667,
+            "longitude": -47.7892
+        },
+        "Itapoã": {
+            "latitude": -15.7483,
+            "longitude": -47.7689
+        },
+        "SIA": {
+            "latitude": -15.8011,
+            "longitude": -47.9506
+        },
+        "Vicente Pires": {
+            "latitude": -15.8033,
+            "longitude": -48.03
+        },
+        "Fercal": {
+            "latitude": -15.6028,
+            "longitude": -47.8708
+        },
+        "Pôr do Sol": {
+            "latitude": -15.8553,
+            "longitude": -48.1113
+        },
+        "Arniqueira": {
+            "latitude": -15.8579,
+            "longitude": -48.0046
+        }
+    }
+}
