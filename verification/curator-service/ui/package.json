@@ -24,7 +24,7 @@
     "@types/yup": "^0.29.7",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "clsx": "^1.1.1",
     "date-fns": "^2.16.1",
     "eslint-config-prettier": "^6.11.0",
