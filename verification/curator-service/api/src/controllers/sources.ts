@@ -5,9 +5,22 @@ import AwsEventsClient from '../clients/aws-events-client';
 import AwsLambdaClient from '../clients/aws-lambda-client';
 import EmailClient from '../clients/email-client';
 
+/**
+ * Email notification that should be sent on any update to a source.
+ */
 enum NotificationType {
+    /**
+     * Send the email that a schedule has been added.
+     */
     Add = 'Add',
+    /**
+     * Send the email that a schedule has been removed.
+     */
     Remove = 'Remove',
+    /**
+     * No change that requires email notification has been made.
+     */
+    None = 'None',
 }
 
 /**
@@ -105,8 +118,11 @@ export default class SourcesController {
                 req.body.dateFilter = undefined;
             }
             await source.set(req.body).validate();
-            await this.updateAutomationScheduleAwsResources(source);
+            const emailNotificationType = await this.updateAutomationScheduleAwsResources(
+                source,
+            );
             const result = await source.save();
+            await this.sendNotifications(source, emailNotificationType);
             res.json(result);
         } catch (err) {
             if (err.name === 'ValidationError') {
@@ -128,10 +144,13 @@ export default class SourcesController {
      * updated to be empty is unreachable.
      *
      * TODO: Allow deleting schema-validated fields in update operations.
+     *
+     * @returns Indication of what kind of email notification, if any, should be sent to interested curators
+     * about this change.
      */
     private async updateAutomationScheduleAwsResources(
         source: SourceDocument,
-    ): Promise<void> {
+    ): Promise<NotificationType> {
         if (this.automationScheduleModified(source)) {
             if (source.automation?.schedule?.awsScheduleExpression) {
                 const awsRuleArn = await this.awsEventsClient.putRule(
@@ -144,14 +163,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
-                try {
-                    await this.sendNotifications(source, NotificationType.Add);
-                } catch (err) {
-                    throw {
-                        ...err,
-                        name: 'NotificationSendError',
-                    };
-                }
+                return NotificationType.Add;
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
@@ -160,17 +172,7 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
-                try {
-                    await this.sendNotifications(
-                        source,
-                        NotificationType.Remove,
-                    );
-                } catch (err) {
-                    throw {
-                        ...err,
-                        name: 'NotificationSendError',
-                    };
-                }
+                return NotificationType.Remove;
             }
         } else if (
             source.isModified('name') &&
@@ -180,7 +182,9 @@ export default class SourcesController {
                 source.toAwsRuleName(),
                 source.toAwsRuleDescription(),
             );
+            return NotificationType.None;
         }
+        return NotificationType.None;
     }
 
     /**
@@ -308,7 +312,8 @@ export default class SourcesController {
     ): Promise<void> {
         if (
             !source.notificationRecipients ||
-            source.notificationRecipients.length === 0
+            source.notificationRecipients.length === 0 ||
+            type === NotificationType.None
         ) {
             return;
         }
