@@ -168,6 +168,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200Source"
+        "207":
+          $ref: "#/components/responses/207"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -1823,6 +1825,8 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/LocationArray"
+    "207":
+      description: Mixed response
     "400":
       description: Malformed request
     "403":

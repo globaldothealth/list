@@ -112,6 +112,9 @@ export default class SourcesController {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
+            } else if (err.name === 'NotificationSendError') {
+                res.status(207).json(err);
+                return;
             }
             res.status(500).json(err);
             return;
@@ -144,7 +147,14 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule.awsRuleArn', awsRuleArn);
-                await this.sendNotifications(source, NotificationType.Add);
+                try {
+                    await this.sendNotifications(source, NotificationType.Add);
+                } catch (err) {
+                    throw {
+                        ...err,
+                        name: 'NotificationSendError',
+                    };
+                }
             } else {
                 await this.awsEventsClient.deleteRule(
                     source.toAwsRuleName(),
@@ -153,7 +163,17 @@ export default class SourcesController {
                     source.toAwsStatementId(),
                 );
                 source.set('automation.schedule', undefined);
-                await this.sendNotifications(source, NotificationType.Remove);
+                try {
+                    await this.sendNotifications(
+                        source,
+                        NotificationType.Remove,
+                    );
+                } catch (err) {
+                    throw {
+                        ...err,
+                        name: 'NotificationSendError',
+                    };
+                }
             }
         } else if (
             source.isModified('name') &&
@@ -323,10 +343,17 @@ export default class SourcesController {
                     `Invalid notification type trigger for source event: ${type}`,
                 );
         }
-        await this.emailClient.send(
-            source.notificationRecipients,
-            subject,
-            text,
-        );
+        try {
+            await this.emailClient.send(
+                source.notificationRecipients,
+                subject,
+                text,
+            );
+        } catch (err) {
+            throw {
+                ...err,
+                name: 'NotificationSendError',
+            };
+        }
     }
 }
