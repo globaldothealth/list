@@ -381,7 +381,7 @@ describe('PUT', () => {
             })
             .expect(200, /arn/);
     });
-    it('should return error if sending email notification fails', async () => {
+    it('should return error if sending email notification fails, and still store the change', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
@@ -399,6 +399,10 @@ describe('PUT', () => {
                 },
             })
             .expect(500, /NotificationSendError/);
+        const updatedSourceRes = await curatorRequest
+            .get(`/api/sources/${source.id}`)
+            .expect(200);
+        expect(updatedSourceRes.body.automation).toBeDefined();
     });
 });
 
