@@ -381,7 +381,7 @@ describe('PUT', () => {
             })
             .expect(200, /arn/);
     });
-    it('should return mixed status if sending notification fails', async () => {
+    it('should return error if sending email notification fails', async () => {
         const recipients = ['foo@bar.com'];
         const source = await new Source({
             name: 'test-source',
@@ -398,8 +398,7 @@ describe('PUT', () => {
                     schedule: { awsScheduleExpression: 'rate(1 hour)' },
                 },
             })
-            .expect(207)
-            .expect('Content-Type', /json/);
+            .expect(500, /NotificationSendError/);
     });
 });
 

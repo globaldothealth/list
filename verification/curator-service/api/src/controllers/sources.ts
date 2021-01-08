@@ -112,9 +112,6 @@ export default class SourcesController {
             if (err.name === 'ValidationError') {
                 res.status(422).json(err);
                 return;
-            } else if (err.name === 'NotificationSendError') {
-                res.status(207).json(err);
-                return;
             }
             res.status(500).json(err);
             return;
