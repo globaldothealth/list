@@ -1,6 +1,6 @@
 import os
 import unittest
-from republic_of_korea import republic_of_korea
+import republic_of_korea
 
 _SOURCE_ID = "placeholder_ID"
 _SOURCE_URL = "placeholder_URL"
