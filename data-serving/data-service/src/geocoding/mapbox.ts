@@ -11,6 +11,7 @@ import Geocoding, {
 import LRUCache from 'lru-cache';
 import MapboxAdminsFetcher from './adminsFetcher';
 import { MapiResponse } from '@mapbox/mapbox-sdk/lib/classes/mapi-response';
+import { RateLimiter } from 'limiter';
 
 /**
  * getFeatureDescriptionFromContext will return the feature 'text' field if it is of the provided type.
@@ -66,7 +67,11 @@ export default class MapboxGeocoder {
     private geocodeService: GeocodeService;
     private cache: LRUCache<string, GeocodeResult[]>;
     private adminsFetcher: MapboxAdminsFetcher;
-    constructor(accessToken: string, private readonly endpoint: GeocodeMode) {
+    constructor(
+        accessToken: string,
+        private readonly endpoint: GeocodeMode,
+        private readonly limiter: RateLimiter,
+    ) {
         this.geocodeService = Geocoding({
             accessToken: accessToken,
         });
@@ -116,39 +121,51 @@ export default class MapboxGeocoder {
                     });
                 }
             }
-            const resp: MapiResponse = await this.geocodeService
-                .forwardGeocode(req)
-                .send();
-            const features = (resp.body as GeocodeResponse).features;
-            const geocodes = await Promise.all(
-                features.map(async (feature) => {
-                    const contexts: GeocodeFeature[] = [feature];
-                    if (feature.context) {
-                        contexts.push(...feature.context);
+            return await new Promise<GeocodeResult[]>((resolve, reject) => {
+                this.limiter.removeTokens(1, async (err, _) => {
+                    if (err) {
+                        reject(err);
                     }
-                    const res: GeocodeResult = {
-                        geometry: {
-                            longitude: feature.center[0],
-                            latitude: feature.center[1],
-                        },
-                        country: getFeatureDescriptionFromContext(
-                            contexts,
-                            'country',
-                        ),
-                        place: getFeatureDescriptionFromContext(
-                            contexts,
-                            'poi',
-                        ),
-                        name: feature.place_name,
-                        geoResolution: getResolution(contexts),
-                    };
-                    // Fill in the administrative areas.
-                    await this.adminsFetcher.fillAdmins(res);
-                    return res;
-                }),
-            );
-            this.cache.set(cacheKey, geocodes);
-            return geocodes;
+                    try {
+                        const resp: MapiResponse = await this.geocodeService
+                            .forwardGeocode(req)
+                            .send();
+                        const features = (resp.body as GeocodeResponse)
+                            .features;
+                        const geocodes = await Promise.all(
+                            features.map(async (feature) => {
+                                const contexts: GeocodeFeature[] = [feature];
+                                if (feature.context) {
+                                    contexts.push(...feature.context);
+                                }
+                                const res: GeocodeResult = {
+                                    geometry: {
+                                        longitude: feature.center[0],
+                                        latitude: feature.center[1],
+                                    },
+                                    country: getFeatureDescriptionFromContext(
+                                        contexts,
+                                        'country',
+                                    ),
+                                    place: getFeatureDescriptionFromContext(
+                                        contexts,
+                                        'poi',
+                                    ),
+                                    name: feature.place_name,
+                                    geoResolution: getResolution(contexts),
+                                };
+                                // Fill in the administrative areas.
+                                await this.adminsFetcher.fillAdmins(res);
+                                return res;
+                            }),
+                        );
+                        this.cache.set(cacheKey, geocodes);
+                        resolve(geocodes);
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+            });
         } catch (e) {
             throw e;
         }

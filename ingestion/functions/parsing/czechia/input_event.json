@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5fd8b57dc6f7cd002f570721/2020/12/15/1316/content.csv",
+    "sourceUrl": "https://onemocneni-aktualne.mzcr.cz/api/v2/covid-19/osoby.csv",
+    "sourceId": "5fd8b57dc6f7cd002f570721"
+}

@@ -5,7 +5,13 @@ import {
     Paper,
     Typography,
 } from '@material-ui/core';
-import { Case, GenomeSequence, Location, Travel } from './Case';
+import {
+    Case,
+    GenomeSequence,
+    Location,
+    Travel,
+    VerificationStatus,
+} from './Case';
 import React, { useEffect, useState } from 'react';
 
 import AppModal from './AppModal';
@@ -17,7 +23,7 @@ import StaticMap from './StaticMap';
 import axios from 'axios';
 import createHref from './util/links';
 import { makeStyles } from '@material-ui/core';
-import renderDate from './util/date';
+import renderDate, { renderDateRange } from './util/date';
 import shortId from 'shortid';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
@@ -112,6 +118,11 @@ const useStyles = makeStyles((theme) => ({
         width: '10em',
         textTransform: 'uppercase',
     },
+    alert: {
+        backgroundColor: 'white',
+        borderRadius: theme.spacing(1),
+        marginTop: theme.spacing(1),
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -121,15 +132,6 @@ function ageRange(range?: { start: number; end: number }): string {
     return range.start === range.end
         ? `${range.start}`
         : `${range.start}-${range.end}`;
-}
-
-function dateRange(range?: { start?: string; end?: string }): string {
-    if (!range || !range.start || !range.end) {
-        return '';
-    }
-    return range.start === range.end
-        ? renderDate(range.start)
-        : `${renderDate(range.start)} - ${renderDate(range.end)}`;
 }
 
 function CaseDetails(props: CaseDetailsProps): JSX.Element {
@@ -235,6 +237,17 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Link>
                     )}
                 </Typography>
+                {props.c.caseReference.verificationStatus ===
+                    VerificationStatus.Excluded && (
+                    <MuiAlert
+                        classes={{ root: classes.alert }}
+                        variant="outlined"
+                        severity="error"
+                    >
+                        This case is excluded. That means it's ignored in the
+                        automated ingestion process
+                    </MuiAlert>
+                )}
                 <Paper className={classes.paper} variant="outlined" square>
                     <Scroll.Element name="case-data">
                         <Typography
@@ -273,7 +286,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             {props.c.caseReference?.additionalSources && (
                                 <>
-                                    <RowHeader title="other sources" />
+                                    <RowHeader title="Additional sources" />
                                     <MultilinkRowContent
                                         links={props.c.caseReference?.additionalSources?.map(
                                             (e) => {
@@ -394,7 +407,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         <Grid container className={classes.grid}>
                             <RowHeader title="Confirmed case date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'confirmed',
                                     )?.dateRange,
@@ -412,7 +425,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Symptom onset date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'onsetSymptoms',
                                     )?.dateRange,
@@ -421,7 +434,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="First clinical consultation" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) =>
                                             e.name ===
@@ -432,7 +445,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Date of self isolation" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'selfIsolation',
                                     )?.dateRange,
@@ -450,7 +463,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Hospital admission date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'hospitalAdmission',
                                     )?.dateRange,
@@ -459,7 +472,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Date admitted to isolation unit" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'icuAdmission',
                                     )?.dateRange,
@@ -477,7 +490,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             <RowHeader title="Outcome date" />
                             <RowContent
-                                content={dateRange(
+                                content={renderDateRange(
                                     props.c.events?.find(
                                         (e) => e.name === 'outcome',
                                     )?.dateRange,
@@ -725,7 +738,7 @@ function TravelRow(props: { travel: Travel }): JSX.Element {
             <RowContent content={props.travel.methods?.join(', ') || ''} />
 
             <RowHeader title="Travel dates" />
-            <RowContent content={dateRange(props.travel.dateRange)} />
+            <RowContent content={renderDateRange(props.travel.dateRange)} />
 
             <RowHeader title="Primary reason of travel" />
             <RowContent content={props.travel.purpose || ''} />
@@ -777,7 +790,7 @@ function MultilinkRowContent(props: {
     return (
         <Grid item xs={8}>
             {props.links?.map((e) => (
-                <p key={e.title}>
+                <p key={e.title} style={{ margin: 0 }}>
                     <a
                         href={createHref(e.link)}
                         rel="noopener noreferrer"

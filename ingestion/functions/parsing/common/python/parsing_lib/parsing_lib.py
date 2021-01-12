@@ -14,12 +14,13 @@ SOURCE_URL_FIELD = "sourceUrl"
 S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
-UPLOAD_IDS_FIELD = "uploadIds"
+UPLOAD_ID_FIELD = "uploadId"
 DATE_FILTER_FIELD = "dateFilter"
+DATE_RANGE_FIELD = "dateRange"
 AUTH_FIELD = "auth"
 
 # Expected date fields format.
-DATE_FORMAT = "%m/%d/%YZ"
+DATE_FORMATS = ["%m/%d/%YZ", "%m/%d/%Y"]
 
 # Number of cases to upload in batch.
 # Increasing that number will speed-up the ingestion but will increase memory
@@ -58,8 +59,8 @@ def extract_event_fields(event: Dict):
             f"{SOURCE_ID_FIELD}; {S3_KEY_FIELD} not found in input event json.")
         e = ValueError(error_message)
         common_lib.complete_with_error(e)
-    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_IDS_FIELD), event[
-        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, {}), event.get(AUTH_FIELD, None)
+    return event[ENV_FIELD], event[SOURCE_URL_FIELD], event[SOURCE_ID_FIELD], event.get(UPLOAD_ID_FIELD), event[
+        S3_BUCKET_FIELD], event[S3_KEY_FIELD], event.get(DATE_FILTER_FIELD, None), event.get(DATE_RANGE_FIELD, None), event.get(AUTH_FIELD, None)
 
 
 def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
@@ -69,8 +70,33 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     except Exception as e:
         common_lib.complete_with_error(e)
 
+def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str):
+    if date_range:
+        start_date = date_range["start"]
+        end_date = date_range["end"]
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
-def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
+    elif date_filter:
+        now = get_today()
+        delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
+        cutoff_date = now - delta
+        start_date = datetime.datetime.strftime(cutoff_date, "%Y-%m-%d")
+        end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
+
+    else:
+        now = get_today()
+        start_date = '2019-12-01'
+        end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
+
+    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
+    res = requests.get(excluded_case_ids_endpoint_url)
+    if res and res.status_code == 200:
+        res_json = res.json()
+        res_json["cases"]
+
+def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
     Populates standard required fields for the G.h Case API.
 
@@ -78,7 +104,8 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        yield remove_nested_none_and_empty(case)
+        if excluded_case_ids is None or not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+            yield remove_nested_none_and_empty(case)
 
 
 def remove_nested_none_and_empty(d):
@@ -124,7 +151,8 @@ def write_to_server(
             print(f'\tCurrent speed: {cps} cases/sec')
             remaining_sec = int(remaining_time_func() / 1000)
             max_estimate = int(counter['total'] + remaining_sec * cps)
-            print(f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
+            print(
+                f'\tMax estimate: {max_estimate} in the remaining {remaining_sec} sec')
             res_json = res.json()
             counter['numCreated'] += res_json["numCreated"]
             counter['numUpdated'] += res_json["numUpdated"]
@@ -145,7 +173,8 @@ def write_to_server(
             count_created=counter['numCreated'],
             count_updated=counter['numUpdated'])
         return
-    print(f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
+    print(
+        f'sent {counter["total"]} cases in {time.time() - start_time} seconds')
     return counter['numCreated'], counter['numUpdated']
 
 
@@ -154,40 +183,77 @@ def get_today() -> datetime.datetime:
     return datetime.datetime.today()
 
 
+def get_case_date(date_string) -> datetime.datetime:
+    """Return a datetime parsed from a case."""
+    case_date = ""
+    for fmt in (DATE_FORMATS):
+        try:
+            return datetime.datetime.strptime(
+                date_string,
+                fmt)
+        except ValueError:
+            pass
+    if not case_date:
+        raise ValueError(f"Date {date_string} from case could not be parsed.")
+
+    return case_date
+
+
 def filter_cases_by_date(
         case_data: Generator[Dict, None, None],
-        date_filter: Dict, env: str, source_id: str, upload_id: str, api_creds,
-        cookies):
-    """Filter cases according ot the date_filter provided.
-
-    Returns the cases that matched the date filter or all cases if
-    no filter was requested.
+        date_filter: Dict, date_range: Dict, env: str,
+        source_id: str, upload_id: str, api_creds, cookies):
     """
-    if not date_filter:
+    Filter cases according to the date_range or date_filter provided.
+
+    If a date_range is provided, returns only cases within the specified start
+    and end bounds (inclusive). Else if date_filter is provided, returns the
+    cases within that specification. Else, returns all cases.
+
+    Notice that if _both_ date_range and date_filter are provided, then date_range is used
+    and date_filter is ignored.
+    """
+    if date_range:
+        print(f'Filtering cases using date range {date_range}')
+
+        def case_is_within_range(case, start, end):
+            confirmed_event = [e for e in case["events"]
+                               if e["name"] == "confirmed"][0]
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
+            return start <= case_date <= end
+
+        start = datetime.datetime.strptime(date_range["start"], "%Y-%m-%d")
+        end = datetime.datetime.strptime(date_range["end"], "%Y-%m-%d")
+        return (case for case in case_data if case_is_within_range(case, start, end))
+
+    elif date_filter:
+        print(f'Filtering cases using date filter {date_filter}')
+        now = get_today()
+        delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
+        cutoff_date = now - delta
+        op = date_filter["op"]
+
+        def case_is_within_range(case, cutoff_date, op):
+            confirmed_event = [e for e in case["events"]
+                               if e["name"] == "confirmed"][0]
+            case_date = get_case_date(confirmed_event["dateRange"]["start"])
+            delta_days = (case_date - cutoff_date).days
+            if op == "EQ":
+                return delta_days == 0
+            elif op == "LT":
+                return delta_days < 0
+            elif op == "GT":
+                return delta_days > 0
+            else:
+                e = ValueError(f'Unsupported date filter operand: {op}')
+                common_lib.complete_with_error(
+                    e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
+                    source_id, upload_id, api_creds, cookies)
+
+        return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
+
+    else:
         return case_data
-    print(f'Filtering cases using date filter {date_filter}')
-    now = get_today()
-    delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
-    cutoff_date = now - delta
-    op = date_filter["op"]
-
-    def case_is_within_range(case, cutoff_date, op):
-        confirmed_event = [e for e in case["events"]
-                           if e["name"] == "confirmed"][0]
-        case_date = datetime.datetime.strptime(
-            confirmed_event["dateRange"]["start"], DATE_FORMAT)
-        delta_days = (case_date - cutoff_date).days
-        if op == "EQ":
-            return delta_days == 0
-        elif op == "LT":
-            return delta_days < 0
-        else:
-            e = ValueError(f'Unsupported date filter operand: {op}')
-            common_lib.complete_with_error(
-                e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
-                source_id, upload_id, api_creds, cookies)
-
-    return (case for case in case_data if case_is_within_range(case, cutoff_date, op))
 
 
 def run_lambda(
@@ -227,7 +293,7 @@ def run_lambda(
         https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, local_auth = extract_event_fields(
+    env, source_url, source_id, upload_id, s3_bucket, s3_key, date_filter, date_range, local_auth = extract_event_fields(
         event)
     api_creds = None
     cookies = None
@@ -245,11 +311,13 @@ def run_lambda(
         case_data = parsing_function(
             local_data_file.name, source_id,
             source_url)
-        final_cases = prepare_cases(case_data, upload_id)
+        excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env)
+        final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
                 final_cases,
                 date_filter,
+                date_range,
                 env, source_id, upload_id,
                 api_creds, cookies),
             env, source_id, upload_id,

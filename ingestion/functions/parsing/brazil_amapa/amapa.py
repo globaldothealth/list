@@ -15,24 +15,25 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-_DATE_CONFIRMED_INDEX = 0
-_HEALTHCARE_WORKER_INDEX = 1
-_PREEXISTING_CONDITIONS_INDEX = 2
-_METHOD_CONFIRMATION_INDEX = 3
-_CONFIRMATION_INDEX = 4
-_GENDER_INDEX = 5
-_NOTES_BAIRRO_INDEX = 6
-_MUNICIPALITY_INDEX = 7
-_AGE_INDEX = 8
-_ETHNICITY_INDEX = 9
-_NOTES_INDIGENOUS_GROUP_INDEX = 10
+_DATE_CONFIRMED = "Data de Notificação"
+_HEALTHCARE_WORKER = "Profissional de Saúde"
+_PREEXISTING_CONDITIONS = "Comorbidades"
+_METHOD_CONFIRMATION = "Tipo de Teste"
+_GENDER = "Sexo"
+_NOTES_BAIRRO = "Bairro"
+_MUNICIPALITY = "Município"
+_AGE = "Idade"
+_ETHNICITY = "Raça/Cor"
+_OUTCOME = "Evolução do Caso"
 
-commorbidities = {
+_COMORBIDITIES_MAP = {
     "Diabetes": "diabetes mellitus",
     "Gestante": "pregnancy",
+    "Gestante de alto risco": "high risk pregnancy",
     "Doenças respiratórias crônicas descompensadas": "respiratory system disease",
     "Doenças renais crônicas em estágio avançado (graus 3, 4 ou 5)": "chronic kidney disease",
-    "Doenças cardíacas crônicas": "heart disease"
+    "Doenças cardíacas crônicas": "heart disease",
+    "Obesidade": "obesity"
 }
 
 
@@ -41,14 +42,17 @@ def convert_gender(raw_gender: str):
         return "Male"
     elif raw_gender == "Feminino":
         return "Female"
-    return None
 
 
-def convert_age(age: float):
-    return {
-        "start": age,
-        "end": age
-    }
+def convert_age(age: str):
+    # It seems for some cases the wrong information has been entered into the wrong columns, and so we get instances of Masculino and Feminino in the age column
+    try:
+        return {
+            "start": float(age),
+            "end": float(age)
+        }
+    except:
+        return None
 
 
 def convert_confirmation_method(raw_test: str):
@@ -64,40 +68,35 @@ def convert_confirmation_method(raw_test: str):
 def convert_profession(raw_profession: str):
     if raw_profession == "Sim":
         return "Healthcare worker"
-    return None
 
 
 def convert_ethnicity(raw_ethnicity: str):
-    # I have checked these against the UK government list of ethnicities, with the exception of
-    # indigenous which I have added as it is not on the list
-    if raw_ethnicity == "Preta":
+    if raw_ethnicity == "PRETA":
         return "Black"
-    elif raw_ethnicity == "Parda":
+    elif raw_ethnicity == "PARDA":
         return "Mixed"
-    elif raw_ethnicity == "Amarela":
+    elif raw_ethnicity == "AMARELA":
         return "Asian"
-    elif raw_ethnicity == "Branca":
+    elif raw_ethnicity == "BRANCA":
         return "White"
-    elif raw_ethnicity == "Indigena":
+    elif raw_ethnicity == "INDIGENA":
         return "Indigenous"
-    return None
 
 
-def convert_preexisting_conditions(raw_commorbidities: str):
+def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_commorbidities:
+    comorbidities = []
+
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_comorbidities:
+            comorbidities.append(_COMORBIDITIES_MAP[key])
+    
+    if comorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-
-        commorbidities_list = []
-
-        for key in commorbidities:
-            if key in raw_commorbidities:
-                commorbidities_list.append(commorbidities[key])
-
-        preexistingConditions["values"] = commorbidities_list
+        preexistingConditions["values"] = comorbidities
         return preexistingConditions
-    return None
-
+    else:
+        return None
 
 def convert_location(raw_entry: str):
     query = ", ".join(word for word in [raw_entry, "Amapá", "Brazil"] if word)
@@ -105,19 +104,16 @@ def convert_location(raw_entry: str):
 
 
 def convert_notes(
-        raw_commorbidities: str, raw_notes_neighbourhood: str,
-        raw_notes_indigenousEthnicity: str):
+        raw_comorbidities: str, raw_notes_neighbourhood: str):
     raw_notes = []
-    if "Imunossupressão" in raw_commorbidities:
+    if "Imunossupressão" in raw_comorbidities:
         raw_notes.append("Patient with immunosupression")
-    if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_commorbidities:
-        raw_notes.append(
-            "primary immunodeficiency disease or chromosomal disease")
+    if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
+        raw_notes.append("primary immunodeficiency disease or chromosomal disease")
+    if "Puérpera (até 45 dias do parto)" in raw_comorbidities:
+        raw_notes.append("Patient given birth in the last 45 days")
     if raw_notes_neighbourhood:
         raw_notes.append("Neighbourhood: " + raw_notes_neighbourhood)
-    if raw_notes_indigenousEthnicity:
-        raw_notes.append("Indigenous ethnicity: " +
-                         raw_notes_indigenousEthnicity)
 
     notes = (', ').join(raw_notes)
     return notes
@@ -129,8 +125,35 @@ def convert_date(raw_date: str):
 
     The date filtering API expects mm/dd/YYYYZ format.
     """
-    date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-    return date.strftime("%m/%d/%YZ")
+    if raw_date.startswith("None"):
+        return None
+    try:
+        date = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
+        return date.strftime("%m/%d/%YZ")
+    except ValueError:
+        try:
+            date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            return date.strftime("%m/%d/%YZ")
+        except:
+            return None
+
+
+def convert_outcome(outcome: str):
+    if outcome == "Óbito":
+        return {
+            "name": "outcome",
+            "value": "Death"
+        }
+    elif outcome == "Cura":
+        return {
+            "name": "outcome",
+            "value": "Recovered"
+        }
+    elif outcome == "Internado":
+        return {
+            "name": "hospitalAdmission",
+            "value": "Yes"
+        }
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -142,43 +165,42 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
            deaths; some of these cases may also be deaths but without patient IDs we are unable to confirm.
     """
     with open(raw_data_file, "r") as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the header.
+        reader = csv.DictReader(f)
         for row in reader:
             # We have entries as high as 351 - unclear if this is days.
-            if float(row[_AGE_INDEX]) > 110:
-                print(f'age too high: {row[_AGE_INDEX]}')
-                continue
-            case = {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceUrl": source_url
-                },
-                "location": convert_location(row[_MUNICIPALITY_INDEX]),
-                "demographics": {
-                    "gender": convert_gender(row[_GENDER_INDEX]),
-                    "ageRange": convert_age(float(row[_AGE_INDEX])),
-                    "ethnicity": convert_ethnicity(row[_ETHNICITY_INDEX]),
-                    "occupation": convert_profession(row[_HEALTHCARE_WORKER_INDEX])
-                },
-                "events": [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(row[_DATE_CONFIRMED_INDEX]),
-                            "end": convert_date(row[_DATE_CONFIRMED_INDEX]),
-                        },
-                        "value": convert_confirmation_method(row[_METHOD_CONFIRMATION_INDEX])
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            age = convert_age(row[_AGE])
+            if age is not None and float(row[_AGE]) <= 110 and confirmation_date is not None:
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceUrl": source_url
                     },
-                ],
-                "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS_INDEX]),
-                "notes": convert_notes(
-                    row[_PREEXISTING_CONDITIONS_INDEX],
-                    row[_NOTES_BAIRRO_INDEX],
-                    row[_NOTES_INDIGENOUS_GROUP_INDEX])
-            }
-            yield case
+                    "location": convert_location(row[_MUNICIPALITY]),
+                    "demographics": {
+                        "gender": convert_gender(row[_GENDER]),
+                        "ageRange": convert_age(row[_AGE]),
+                        "ethnicity": convert_ethnicity(row[_ETHNICITY]),
+                        "occupation": convert_profession(row[_HEALTHCARE_WORKER])
+                    },
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
+                            {
+                                "start": confirmation_date,
+                                "end": confirmation_date,
+                            },
+                            "value": convert_confirmation_method(row[_METHOD_CONFIRMATION])
+                        },
+                        convert_outcome(row[_OUTCOME])
+                    ],
+                    "preexistingConditions": convert_preexisting_conditions(row[_PREEXISTING_CONDITIONS]),
+                    "notes": convert_notes(
+                        row[_PREEXISTING_CONDITIONS],
+                        row[_NOTES_BAIRRO])
+                }
+                yield case
 
 
 def lambda_handler(event, context):

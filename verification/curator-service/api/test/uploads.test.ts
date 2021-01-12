@@ -1,3 +1,5 @@
+const mockSend = jest.fn().mockResolvedValue({});
+
 import * as baseUser from './users/base.json';
 
 import { Session, User } from '../src/model/user';
@@ -6,17 +8,19 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Source } from '../src/model/source';
 import { Upload } from '../src/model/upload';
 import { UploadSummary } from '../src/model/upload-summary';
+import _ from 'lodash';
 import app from '../src/index';
 import fullSource from './model/data/source.full.json';
 import minimalSource from './model/data/source.minimal.json';
 import minimalUpload from './model/data/upload.minimal.json';
 import supertest from 'supertest';
 
-const mockSend = jest.fn().mockResolvedValue({});
-const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
-        return { send: mockSend, initialize: mockInitialize };
+        return {
+            send: mockSend,
+            initialize: jest.fn().mockResolvedValue({ send: mockSend }),
+        };
     });
 });
 
@@ -120,7 +124,7 @@ describe('GET', () => {
         expect(res.body.nextPage).toBeUndefined();
         expect(res.body.total).toEqual(15);
     });
-    it('should filter for changes only and sort by created date', async () => {
+    it('should filter for changes only', async () => {
         const sourceWithError = new Source(fullSource);
         sourceWithError.uploads[0].created = new Date(2020, 2, 3);
         await sourceWithError.save();
@@ -170,6 +174,87 @@ describe('GET', () => {
             sourceWithCreatedUploads.uploads[0]._id.toString(),
         );
     });
+    it('should sort by created date then source name', async () => {
+        const source1 = new Source(fullSource);
+        source1.name = 'source1';
+        source1.uploads = [
+            new Upload({
+                status: 'ERROR',
+                summary: new UploadSummary(),
+                created: new Date(2020, 2, 1),
+            }),
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numCreated: 3 }),
+                created: new Date(2020, 2, 6),
+            }),
+        ];
+        await source1.save();
+
+        const source2 = new Source(fullSource);
+        source2.name = 'source2';
+        source2.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numUpdated: 3 }),
+                created: new Date(2020, 2, 5),
+            }),
+            new Upload({
+                status: 'ERROR',
+                summary: new UploadSummary(),
+                created: new Date(2020, 2, 3),
+            }),
+        ];
+        await source2.save();
+
+        const source3 = new Source(fullSource);
+        source3.name = 'source3';
+        source3.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numCreated: 3 }),
+                created: new Date(2020, 2, 3),
+            }),
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary({ numCreated: 3 }),
+                created: new Date(2020, 2, 4),
+            }),
+        ];
+        await source3.save();
+
+        const sourceNoChanges = new Source(fullSource);
+        sourceNoChanges.uploads = [
+            new Upload({
+                status: 'SUCCESS',
+                summary: new UploadSummary(),
+                created: new Date(2020, 2, 7),
+            }),
+        ];
+        await sourceNoChanges.save();
+
+        const res = await curatorRequest
+            .get('/api/sources/uploads?page=1&limit=5&changes_only=true')
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.uploads).toHaveLength(5);
+        expect(res.body.uploads[0].upload._id).toEqual(
+            source1.uploads[1]._id.toString(),
+        );
+        expect(res.body.uploads[1].upload._id).toEqual(
+            source2.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[2].upload._id).toEqual(
+            source3.uploads[1]._id.toString(),
+        );
+        expect(res.body.uploads[3].upload._id).toEqual(
+            source3.uploads[0]._id.toString(),
+        );
+        expect(res.body.uploads[4].upload._id).toEqual(
+            source2.uploads[1]._id.toString(),
+        );
+    });
     it('rejects negative page param', (done) => {
         curatorRequest.get('/api/sources/uploads?page=-7').expect(400, done);
     });
@@ -213,6 +298,7 @@ describe('POST', () => {
         expect(res.body._id).toEqual(upload._id.toString());
         expect(dbSource?.uploads.map((u) => u._id)).toContainEqual(upload._id);
     });
+
     it('should send a notification email if status is error and recipients defined', async () => {
         const source = await new Source(fullSource).save();
         const upload = new Upload(minimalUpload);
@@ -231,6 +317,19 @@ describe('POST', () => {
     it('should not send a notification email if status not error', async () => {
         const source = await new Source(fullSource).save();
         const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        await curatorRequest
+            .post(`/api/sources/${source._id}/uploads`)
+            .send(upload)
+            .expect('Content-Type', /json/)
+            .expect(201);
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+    it('should not send a notification email if no schedule configured', async () => {
+        const noSchedule = _.cloneDeep(fullSource);
+        delete noSchedule.automation.schedule;
+        const source = await new Source(noSchedule).save();
+        const upload = new Upload(minimalUpload); // Status is SUCCESS.
+        upload.status = 'ERROR';
         await curatorRequest
             .post(`/api/sources/${source._id}/uploads`)
             .send(upload)
@@ -296,8 +395,9 @@ describe('PUT', () => {
         expect(dbSource?.uploads[0].summary).toMatchObject(newSummary);
     });
     it('should send a notification email if updated status is error and recipients defined', async () => {
-        fullSource.uploads[0].status = 'SUCCESS';
-        const source = await new Source(fullSource).save();
+        const successSource = _.cloneDeep(fullSource);
+        successSource.uploads[0].status = 'SUCCESS';
+        const source = await new Source(successSource).save();
 
         await curatorRequest
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
@@ -320,6 +420,21 @@ describe('PUT', () => {
             .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
             .send({
                 status: 'IN_PROGRESS',
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+    it('should not send a notification email if schedule not configured', async () => {
+        const noSchedule = _.cloneDeep(fullSource);
+        delete noSchedule.automation.schedule;
+        const source = await new Source(noSchedule).save();
+
+        await curatorRequest
+            .put(`/api/sources/${source._id}/uploads/${source.uploads[0]._id}`)
+            .send({
+                status: 'ERROR',
             })
             .expect('Content-Type', /json/)
             .expect(200);
