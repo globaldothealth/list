@@ -6,7 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withStyles } from '@material-ui/core';
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         container: {
             alignItems: 'center',
@@ -14,16 +14,19 @@ const styles = () =>
             padding: '1em 0',
         },
         title: { marginRight: '1em' },
-        tooltip: { background: 'white' },
     });
 
 const AppTooltip = withStyles((theme: Theme) => ({
+    arrow: {
+        color: theme.palette.primary.main,
+    },
     tooltip: {
-        backgroundColor: '#FEEFC3',
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
         boxShadow: theme.shadows[1],
-        color: 'rgba(0, 0, 0, 0.87)',
-        fontSize: 13,
+        fontSize: 16,
         fontWeight: 'normal',
+        padding: '1rem',
     },
 }))(Tooltip);
 
@@ -42,9 +45,9 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
             </div>
             {props.tooltip && (
                 <AppTooltip
+                    arrow
                     interactive={props.interactive}
                     title={props.tooltip}
-                    className={classes.tooltip}
                 >
                     <HelpOutlineIcon fontSize="small" />
                 </AppTooltip>
