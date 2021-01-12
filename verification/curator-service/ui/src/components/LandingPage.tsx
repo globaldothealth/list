@@ -1,14 +1,22 @@
-import { Button, Paper, Typography } from '@material-ui/core';
-
+import React, { useState } from 'react';
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import {
+    FormControlLabel,
+    FormGroup,
+    Paper,
+    Typography,
+    Checkbox,
+    FormHelperText,
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import GoogleButton from 'react-google-button';
+
 import PolicyLink from './PolicyLink';
 
 const useStyles = makeStyles(() => ({
     paper: {
-        height: '440px',
+        height: 'auto',
         left: '50%',
         maxWidth: '100%',
         padding: '45px',
@@ -31,11 +39,19 @@ const useStyles = makeStyles(() => ({
         margin: '4px 0',
     },
     loginButton: {
-        margin: '35px 0 30px',
+        margin: '35px 0 15px',
+    },
+    registerLengend: {
+        color: '#838D89',
+    },
+    checkboxRow: {
+        display: 'flex',
     },
 }));
 
 export default function LandingPage(): JSX.Element {
+    const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+    const [isAgreementMessage, setIsAgreementMessage] = useState(false);
     const classes = useStyles();
     return (
         <Paper classes={{ root: classes.paper }}>
@@ -102,14 +118,47 @@ export default function LandingPage(): JSX.Element {
                     </PolicyLink>
                 </div>
             </div>
-            <Button
-                variant="contained"
-                color="primary"
-                href={process.env.REACT_APP_LOGIN_URL}
-                classes={{ root: classes.loginButton }}
-            >
-                Login to get started
-            </Button>
+            {isAgreementChecked && (
+                <a href={process.env.REACT_APP_LOGIN_URL}>
+                    <GoogleButton className={classes.loginButton} />
+                </a>
+            )}
+            {!isAgreementChecked && (
+                <GoogleButton
+                    className={classes.loginButton}
+                    onClick={() => {
+                        setIsAgreementMessage(true);
+                    }}
+                />
+            )}
+            <FormGroup className={classes.checkboxRow}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={isAgreementChecked}
+                            onChange={(
+                                event: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                                setIsAgreementChecked(event.target.checked);
+                                setIsAgreementMessage(false);
+                            }}
+                            name="isAgreementChecked"
+                        />
+                    }
+                    label={
+                        <small>
+                            By creating an account, I accept the Global.health
+                            TOS and Privacy Policy, and agree to be added to the
+                            newsletter.
+                        </small>
+                    }
+                />
+                {isAgreementMessage && (
+                    <FormHelperText error>
+                        This agreement is required
+                    </FormHelperText>
+                )}
+            </FormGroup>
             <HealthmapInsignias />
         </Paper>
     );
