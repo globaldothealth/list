@@ -6,7 +6,7 @@ from mexico import mexico
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://mex.ico"
 _PARSED_CASE = {
-    "caseReference": {"sourceId": "abc123", "sourceUrl": "https://mex.ico"},
+    "caseReference": {"sourceId": "abc123", "sourceUrl": "https://mex.ico", "sourceEntryId": "147685"},
     "location": {'query': 'ATIZAPÁN DE ZARAGOZA, MÉXICO, MÉXICO'},
     "events": [
         {
