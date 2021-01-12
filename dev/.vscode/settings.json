@@ -36,5 +36,9 @@
     "--max-line-length",
     "80",
     "--experimental"
-  ]
+  ],
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": ["--ignore=E501", "--verbose"],
+  "python.linting.pylintEnabled": false,
+  "python.linting.enabled": true
 }

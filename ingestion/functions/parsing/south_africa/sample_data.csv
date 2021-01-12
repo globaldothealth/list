@@ -1,0 +1,5 @@
+case_id,origin_case_id,date,age,gender,city,province/state,country,current_status,source,symptoms,date_onset_symptoms,date_admission_hospital,date_confirmation,underlyng_conditions,travel_history_dates,travel_history_location,death_date,notes_for_discussion
+13,,2020-03-11,36.0,male,,WC,South Africa,,github.com/dsfsi/covid19za,,,,,,,Travelled to Germany; Austria; Switzerland and Dubai,,
+25,,2020-03-14,76.0,male,,GP,South Africa,,github.com/dsfsi/covid19za,,,,,,,Travelled to USA and UK,,
+117,,2020-03-19,41.0,female,,GP,South Africa,,github.com/dsfsi/covid19za,,,,,,,Travelled to the Democratic Republic of Congo,,
+366,,2020-03-23,,not specified,,UNK,South Africa,,,,,,,,,,,

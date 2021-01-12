@@ -84,7 +84,7 @@ describe('Uploads table', function () {
             },
         ]);
         cy.visit('/uploads');
-        cy.contains('a', '5').click();
+        cy.contains('a[href="/cases"]', '5').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
         cy.get('input[id="search-field"]').should(
             'have.value',
@@ -96,7 +96,7 @@ describe('Uploads table', function () {
         cy.contains('Germany').should('not.exist');
 
         cy.visit('/uploads');
-        cy.contains('a', '2').click();
+        cy.contains('a[href="/cases"]', '2').click();
         cy.url().should('eq', 'http://localhost:3002/cases');
         cy.get('input[id="search-field"]').should(
             'have.value',
@@ -107,7 +107,7 @@ describe('Uploads table', function () {
         cy.contains('United Kingdom');
         cy.contains('Germany').should('not.exist');
 
-        cy.contains('Linelist').click({ force: true });
+        cy.contains('Line list').click({ force: true });
         cy.get('input[id="search-field"]').should('have.value', '');
         cy.contains('France');
         cy.contains('United States');

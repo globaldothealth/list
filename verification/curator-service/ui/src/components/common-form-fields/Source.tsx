@@ -17,6 +17,7 @@ import { throttle } from 'lodash';
 interface SourceProps {
     initialValue?: CaseReference;
     hasSourceEntryId?: boolean;
+    freeSolo?: boolean;
 }
 
 const TooltipText = () => (
@@ -34,13 +35,18 @@ const TooltipText = () => (
 
 export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
+        const freeSolo =
+            this.props.freeSolo === undefined ? true : this.props.freeSolo;
         return (
             <Scroll.Element name="source">
                 <FieldTitle
                     title="Data Source"
                     tooltip={<TooltipText />}
                 ></FieldTitle>
-                <SourcesAutocomplete initialValue={this.props.initialValue} />
+                <SourcesAutocomplete
+                    initialValue={this.props.initialValue}
+                    freeSolo={freeSolo}
+                />
                 {this.props.hasSourceEntryId && (
                     <FastField
                         label="Source entry ID"
@@ -72,6 +78,7 @@ interface ListSourcesResponse {
 
 interface SourceAutocompleteProps {
     initialValue?: CaseReferenceForm;
+    freeSolo: boolean;
 }
 
 export interface CaseReferenceForm extends CaseReference {
@@ -227,7 +234,8 @@ export function SourcesAutocomplete(
                         !filtered.find(
                             (caseRef) =>
                                 caseRef.sourceUrl === params.inputValue,
-                        )
+                        ) &&
+                        props.freeSolo
                     ) {
                         filtered.push({
                             inputValue: params.inputValue,
@@ -243,7 +251,7 @@ export function SourcesAutocomplete(
                     return filtered;
                 }}
                 autoSelect
-                freeSolo
+                freeSolo={props.freeSolo}
                 selectOnFocus
                 handleHomeEndKeys
                 options={options}
@@ -282,6 +290,7 @@ export function SourcesAutocomplete(
             />
             {/* If this is a new source, show option to add name */}
             {inputValue &&
+                props.freeSolo &&
                 !options.find((option) => option.sourceUrl === inputValue) && (
                     <>
                         <FastField

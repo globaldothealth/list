@@ -1,43 +1,70 @@
-import csv
-import json
 import os
-import tempfile
 import unittest
-from datetime import date
-
-import pytest
 
 from germany import germany
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "foo.bar"
 _PARSED_CASE = [
-   {
-      "caseReference":{
-         "sourceId":"abc123",
-         "sourceUrl":"foo.bar"
-      },
-      "location":{
-         "query":"Germany, Schleswig-Holstein, SK Flensburg",
-         "limitToResolution": "Admin2"
-      },
-      "events":[
-         {
-            "name":"confirmed",
-            "dateRange":{
-               "start":"08/15/2020Z",
-               "end":"08/15/2020Z"
+    {
+        "caseReference": {
+            "sourceId": "abc123",
+            "sourceUrl": "foo.bar"
+        },
+        "location": {
+            "query": "SK Flensburg, Schleswig-Holstein, Germany",
+            "limitToResolution": "Country,Admin1,Admin2",
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": "08/15/2020Z",
+                    "end": "08/15/2020Z"
+                }
             }
-         }
-      ],
-      "demographics":{
-         "gender":"Female",
-         "ageRange":{
-            "start":5.0,
-            "end":14.0
-         }
-      }
-   }
+        ],
+        "demographics": {
+            "gender": "Female",
+            "ageRange": {
+                "start": 5.0,
+                "end": 14.0
+            }
+        }
+    },
+    {
+        "caseReference": {
+            "sourceId": "abc123",
+            "sourceUrl": "foo.bar"
+        },
+        "location": {
+            "query": "SK Kiel, Schleswig-Holstein, Germany",
+            "limitToResolution": "Country,Admin1,Admin2",
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange": {
+                    "start": "03/23/2020Z",
+                    "end": "03/23/2020Z"
+                }
+            },
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": "03/20/2020Z",
+                    "end": "03/20/2020Z"
+                }
+            }            
+        ],
+        "demographics": {
+            "gender": "Male",
+            "ageRange": {
+                "start": 15.0,
+                "end": 34.0
+            }
+        }
+    }
 ]
 
 

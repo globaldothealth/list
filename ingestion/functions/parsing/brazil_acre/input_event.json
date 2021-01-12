@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "5faeae8bec03f700457b63b2/2020/11/13/1608/content.csv",
+    "sourceUrl": "http://covid19.ac.gov.br/monitoramento/notificacoes/csv",
+    "sourceId": "5faeae8bec03f700457b63b2"
+}

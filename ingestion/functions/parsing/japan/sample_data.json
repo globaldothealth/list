@@ -14,5 +14,37 @@
 	    "prefectureSourceURL": "http://www.pref.hokkaido.lg.jp/file.jsp?id=1279351",
 	    "sourceURL": "https://www3.nhk.or.jp/news/html/20200313/k10012329851000.html",
 	    "confirmedPatient": true
-	}
+	},
+	{
+    	"patientId": "1201",
+        "dateAnnounced": "2020-03-23",
+        "ageBracket": 80,
+        "gender": "M",
+        "residence": "Okazaki",
+        "detectedCityTown": "Okazaki",
+    	"detectedPrefecture": "Aichi",
+        "patientStatus": "Deceased",
+        "prefecturePatientNumber": "Aichi#144",
+        "cityPrefectureNumber": "Okazaki#3",
+        "prefectureSourceURL": "https://www.pref.aichi.jp/site/covid19-aichi/pressrelease-ncov200323.html",
+        "citySourceURL": "https://www.city.okazaki.lg.jp/houdou/p025977.html",
+        "deathSourceURL": "https://www3.nhk.or.jp/news/html/20200323/k10012345631000.html",
+        "deceasedDate": "2020-03-23",
+        "sourceURL": "https://www3.nhk.or.jp/news/html/20200323/k10012345631000.html",
+        "confirmedPatient": true
+    },
+    {
+	    "patientId": "468",
+	    "dateAnnounced": "2020-02-11",
+	    "ageBracket": 50,
+	    "gender": "M",
+	    "residence": "Kanagawa",
+	    "detectedPrefecture": "Port Quarantine",
+	    "notes": "Quarantine officer on Cruise ship (Kanagawa patient #2)",
+	    "knownCluster": "Cruise Quarantine Officer",
+	    "prefecturePatientNumber": "Kanagawa#2",
+	    "prefectureSourceURL": "https://www.pref.kanagawa.jp/docs/ga4/bukanshi/occurrence.html",
+	    "sourceURL": "https://www.pref.kanagawa.jp/osirase/1369/",
+	    "confirmedPatient": true
+    }
 ]

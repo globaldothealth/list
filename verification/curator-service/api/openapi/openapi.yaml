@@ -202,6 +202,24 @@ paths:
         schema:
           type: string
           pattern: '^[a-f\d]{24}$'
+      - name: parse_start_date
+        in: query
+        description: >
+          The date on which to begin parsing/ingesting data (inclusive).
+          Provided in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          pattern: '^[\d]{4}-[\d]{2}-[\d]{2}$'
+      - name: parse_end_date
+        in: query
+        description: >
+          The date on which to end parsing/ingesting data (inclusive).
+          Provided in YYYY-MM-DD format.
+        required: false
+        schema:
+          type: string
+          pattern: '^[\d]{4}-[\d]{2}-[\d]{2}$'
     post:
       tags: [Source]
       summary: Trigger a retrieval of the content for the specified source
@@ -512,7 +530,7 @@ paths:
       operationId: downloadCases
       requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               maxProperties: 1
@@ -525,10 +543,9 @@ paths:
                     pattern: '^[a-f\d]{24}$'
                 query:
                   description: >
-                    Cases matching this query will be returned. Must contain
-                    non-whitespace characters.
+                    Cases matching this query will be returned. This is ignored
+                    if empty.
                   type: string
-                  pattern: \S+
       responses:
         "200":
           $ref: "#/components/responses/200CasesDownload"
@@ -609,6 +626,55 @@ paths:
           $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
+  /cases/batchStatusChange:
+    post:
+      summary: Changes status for a list of cases
+      tags: [Case]
+      operationId: batchStatusChange
+      requestBody:
+        description: >
+          Case IDs are passed through an array of strings, note may be provided as well.
+          A query may be provided instead of list of IDs, this will change status for all
+          cases matching the query.
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                caseIds:
+                  description: >
+                    Cases having IDs provided here will have their
+                    status changed to one specified in status field.
+                  type: array
+                  items:
+                    type: string
+                status:
+                  $ref: "#/components/schemas/CaseStatus"
+                query:
+                  description: >
+                    Cases matching this query will have their status
+                    changed. Must contain non-whitespace characters.
+                  type: string
+                  pattern: \S+
+                note:
+                  description: >
+                    The reason behind exclusion (or other important info).
+                    This field is ignored if a status is not "Excluded".
+                  type: string
+              oneOf:
+                - required: [caseIds]
+                - required: [query]
+              required:
+                - status
+      responses:
+        "200":
+          $ref: "#/components/responses/200"
+        "400":
+          $ref: "#/components/responses/400"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /cases/batchUpsert:
     post:
       tags: [Case]
@@ -668,8 +734,6 @@ paths:
                   type: string
                   pattern: \S+
                 case:
-                  description: >
-                    The case fields that all matching cases will be updated to.
                   $ref: "#/components/schemas/Case"
               required:
                 - query
@@ -784,9 +848,21 @@ paths:
           allowReserved: true
           schema:
             type: string
+        - name: limitToResolution
+          in: query
+          allowReserved: true
+          schema:
+            type: string
+          description: >
+            Comma-separated list of resolutions to restrict geocoding to.
+            Allowed values are: Point, Admin3, Admin2, Admin1, Country.
       responses:
         "200":
           $ref: "#/components/responses/200LocationArray"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
   /users:
     get:
       tags: [User]
@@ -868,6 +944,44 @@ paths:
           $ref: "#/components/responses/403"
         "500":
           $ref: "#/components/responses/500"
+  /excludedCaseIds:
+    get:
+      summary: Lists IDs of excluded cases for a specified source
+      tags: [Case]
+      operationId: listExcludedCaseIds
+      parameters:
+        - name: sourceId
+          in: query
+          description: ID of source to filter out only excluded cases from.
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-f\d]{24}$'
+        - name: dateFrom
+          in: query
+          description: Start date for excluded cases lookup
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          description: Start date for excluded cases lookup
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          $ref: "#/components/responses/200CaseIdsArray"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "422":
+          $ref: "#/components/responses/422"
+        "500":
+          $ref: "#/components/responses/500"
 components:
   schemas:
     Parser:
@@ -881,7 +995,6 @@ components:
     ParsersArray:
       type: array
       items:
-        description: An array of parsers
         $ref: "#/components/schemas/Parser"
     Upload:
       description: An instance of case data being written to the server.
@@ -911,6 +1024,7 @@ components:
                 - PARSING_ERROR
                 - VALIDATION_ERROR
                 - DATA_UPLOAD_ERROR
+                - TIMEOUT
         created:
           $ref: "#/components/schemas/Date"
     UploadsArray:
@@ -971,6 +1085,7 @@ components:
             - null
             - CSV
             - JSON
+            - XLSX
         dateFilter:
           type: object
           properties:
@@ -982,6 +1097,7 @@ components:
               type: string
               enum:
                 - EQ
+                - GT
                 - LT
         notificationRecipients:
           description: >
@@ -1074,6 +1190,7 @@ components:
               enum:
                 - UNVERIFIED
                 - VERIFIED
+                - EXCLUDED
             additionalSources:
               type: array
               description: List of additional URLs that described a case
@@ -1299,6 +1416,9 @@ components:
               $ref: "#/components/schemas/EditMetadata"
             editMetadata:
               $ref: "#/components/schemas/EditMetadata"
+    CaseStatus:
+      type: string
+      enum: [UNVERIFIED, VERIFIED, EXCLUDED]
     CaseArray:
       type: object
       properties:
@@ -1306,6 +1426,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Case"
+      required:
+        - cases
+    CaseIdsArray:
+      type: object
+      properties:
+        cases:
+          type: array
+          items:
+            type: string
       required:
         - cases
     SymptomArray:
@@ -1578,6 +1707,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CaseArray"
+    "200CaseIdsArray":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CaseIdsArray"
     "200CasesDownload":
       description: OK
       content:

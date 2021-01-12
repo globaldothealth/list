@@ -6,6 +6,7 @@ import {
 
 import { Error } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import _ from 'lodash';
 import fullModel from './data/automation.full.json';
 import minimalModel from './data/automation.minimal.json';
 import mongoose from 'mongoose';
@@ -38,14 +39,17 @@ const Wrapper = mongoose.model<WrapperDocument>('Wrapper', wrapperSchema);
 
 describe('validate', () => {
     it('an automation without a schedule is valid', async () => {
-        const missingSchedule = { ...fullModel };
+        const missingSchedule = _.cloneDeep(fullModel);
         delete missingSchedule.schedule;
 
         return new Automation(missingSchedule).validate();
     });
 
     it('an automation with both a parser and regexParsing is invalid', async () => {
-        const bothParsing = { ...fullModel, regexParsing: regexParsingModel };
+        const bothParsing = {
+            ...fullModel,
+            regexParsing: regexParsingModel,
+        };
         const wrapper = { automation: bothParsing };
 
         return new Wrapper(wrapper).validate((e) => {
@@ -59,7 +63,7 @@ describe('validate', () => {
 
     it('a fully specified automation with regexParsing is valid', async () => {
         const justRegexParsing = {
-            ...fullModel,
+            ..._.cloneDeep(fullModel),
             regexParsing: regexParsingModel,
         };
         delete justRegexParsing.parser;

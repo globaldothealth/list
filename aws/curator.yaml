@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:main
+          image: ghcr.io/globaldothealth/list/curatorservice:1.2.15
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -85,7 +85,7 @@ spec:
               memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "512Mi"
+              memory: "256Mi"
               cpu: "250m"
 ---
 apiVersion: apps/v1
@@ -100,7 +100,7 @@ spec:
     matchLabels:
       environment: prod
       app: curator
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -109,7 +109,7 @@ spec:
     spec:
       containers:
         - name: curator
-          image: ghcr.io/globaldothealth/list/curatorservice:0.1.1
+          image: ghcr.io/globaldothealth/list/curatorservice:1.2.15
           ports:
             - containerPort: 3001
           livenessProbe:
@@ -168,10 +168,10 @@ spec:
           resources:
             requests:
               memory: "512Mi"
-              cpu: "150m"
+              cpu: "500m"
             limits:
-              memory: "768Mi"
-              cpu: "250m"
+              memory: "1Gi"
+              cpu: "768m"
 ---
 apiVersion: v1
 kind: Service

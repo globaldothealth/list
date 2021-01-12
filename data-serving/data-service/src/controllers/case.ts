@@ -1,13 +1,18 @@
 import { Case, CaseDocument } from '../model/case';
-import { DocumentQuery, Query } from 'mongoose';
+import { EventDocument } from '../model/event';
+import { DocumentQuery, Error, Query } from 'mongoose';
+import { QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
 import stringify from 'csv-stringify';
 import yaml from 'js-yaml';
+
+class GeocodeNotFoundError extends Error {}
 
 class InvalidParamError extends Error {}
 
@@ -40,19 +45,19 @@ export class CasesController {
     download = async (req: Request, res: Response): Promise<void> => {
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let cases: any;
+        let casesQuery: any;
         try {
             if (req.body.query) {
-                cases = await casesMatchingSearchQuery({
+                casesQuery = casesMatchingSearchQuery({
                     searchQuery: req.body.query as string,
                     count: false,
                 });
             } else if (req.body.caseIds) {
-                cases = await Case.find({
+                casesQuery = Case.find({
                     _id: { $in: req.body.caseIds },
                 }).lean();
             } else {
-                cases = await Case.find({}).lean();
+                casesQuery = Case.find({}).lean();
             }
 
             res.setHeader('Content-Type', 'text/csv');
@@ -72,10 +77,16 @@ export class CasesController {
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    stringify(cases, {
-                        header: true,
-                        columns: columns,
-                    }).pipe(res);
+                    casesQuery
+                        .cursor()
+                        .map(parseDownloadedCase)
+                        .pipe(
+                            stringify({
+                                header: true,
+                                columns: columns,
+                            }),
+                        )
+                        .pipe(res);
                 });
         } catch (e) {
             if (e instanceof ParsingError) {
@@ -162,12 +173,7 @@ export class CasesController {
     create = async (req: Request, res: Response): Promise<void> => {
         const numCases = Number(req.query.num_cases) || 1;
         try {
-            if (!(await this.geocode(req))) {
-                res.status(404).send({
-                    message: `no geolocation found for ${req.body['location']?.query}`,
-                });
-                return;
-            }
+            await this.geocode(req);
             const c = new Case(req.body);
 
             let result;
@@ -187,6 +193,12 @@ export class CasesController {
             }
             res.status(201).json(result);
         } catch (err) {
+            if (err instanceof GeocodeNotFoundError) {
+                res.status(404).json({
+                    message: err.message,
+                });
+                return;
+            }
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -194,6 +206,7 @@ export class CasesController {
                 res.status(422).json(err);
                 return;
             }
+            console.error(err);
             res.status(500).json(err);
             return;
         }
@@ -208,15 +221,15 @@ export class CasesController {
         cases: any[],
     ): Promise<BatchValidationErrors> => {
         const errors: { index: number; message: string }[] = [];
-        await Promise.all(
-            // We're about to validate this data; any is fine, here.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            cases.map((c: any, index: number) => {
-                return new Case(c).validate().catch((e) => {
-                    errors.push({ index: index, message: e.message });
-                });
-            }),
-        );
+        // Do not parallelize these requests as it causes an out of memory error
+        // for a large number of cases. However this does take a long time to run
+        // sequentially, so if Mongo creates a batch validate method that should be used here.
+        for (let index = 0; index < cases.length; index++) {
+            const c = cases[index];
+            await new Case(c).validate().catch((e) => {
+                errors.push({ index: index, message: e.message });
+            });
+        }
         return errors;
     };
 
@@ -232,47 +245,43 @@ export class CasesController {
         next: NextFunction,
     ): Promise<void> => {
         const geocodeErrors: { index: number; message: string }[] = [];
-        Promise.all(
-            req.body.cases.map((c: any, index: number) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const geocodeResult = await this.geocode({
-                            body: c,
-                        });
-                        if (!geocodeResult) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: `no geolocation found for ${c.location?.query}`,
-                            });
-                        }
-                        resolve();
-                    } catch (err) {
-                        if (err instanceof InvalidParamError) {
-                            geocodeErrors.push({
-                                index: index,
-                                message: err.message,
-                            });
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    }
-                });
-            }),
-        )
-            .then(() => {
-                if (geocodeErrors.length > 0) {
-                    res.status(207).send({
-                        phase: 'GEOCODE',
-                        numCreated: 0,
-                        numUpdated: 0,
-                        errors: geocodeErrors,
+        try {
+            // Do not parallelize these requests as it causes an out of memory error
+            // for a large number of cases.
+            for (let index = 0; index < req.body.cases.length; index++) {
+                const c = req.body.cases[index];
+                try {
+                    await this.geocode({
+                        body: c,
                     });
-                    return;
+                } catch (err) {
+                    if (err instanceof GeocodeNotFoundError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
+                    } else if (err instanceof InvalidParamError) {
+                        geocodeErrors.push({
+                            index: index,
+                            message: err.message,
+                        });
+                    }
                 }
-                next();
-            })
-            .catch((e) => res.send(e));
+            }
+            if (geocodeErrors.length > 0) {
+                res.status(207).send({
+                    phase: 'GEOCODE',
+                    numCreated: 0,
+                    numUpdated: 0,
+                    errors: geocodeErrors,
+                });
+                return;
+            }
+
+            next();
+        } catch (e) {
+            res.send(e);
+        }
     };
 
     /**
@@ -299,6 +308,7 @@ export class CasesController {
             const bulkWriteResult = await Case.bulkWrite(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 req.body.cases.map((c: any) => {
+                    delete c.caseCount;
                     if (
                         c.caseReference?.sourceId &&
                         c.caseReference?.sourceEntryId
@@ -437,19 +447,16 @@ export class CasesController {
                 return;
             } else {
                 // Geocode new cases.
-                if (!(await this.geocode(req))) {
-                    res.status(404).send({
-                        message: `no geolocation found for ${req.body['location']?.query}`,
-                    });
-                    return;
-                }
+                await this.geocode(req);
                 const c = new Case(req.body);
                 const result = await c.save();
                 res.status(201).json(result);
                 return;
             }
         } catch (err) {
-            logger.error(err);
+            if (err instanceof GeocodeNotFoundError) {
+                res.status(404).json({ message: err.message });
+            }
             if (
                 err.name === 'ValidationError' ||
                 err instanceof InvalidParamError
@@ -516,19 +523,160 @@ export class CasesController {
     };
 
     /**
-     * Geocodes request content if no lat lng were provided.
+     * Excludes multiple cases.
      *
-     * @returns {boolean} Whether lat lng were either provided or geocoded
+     * Handles HTTP POST /api/batchStatusChange.
+     * Receives an array of MongoDB IDs, status to be set for them and optional note.
+     * Note is used only when excluding cases (status set to "Excluded").
      */
-    // For batch requests, the case body is nested.
-    // While we could define a type here, the right change is probably to use a
-    // batch geocoding API for such cases.
+    batchStatusChange = async (req: Request, res: Response): Promise<void> => {
+        const newStatus = req.body.status.toUpperCase();
+        const caseIds = req.body.caseIds;
+
+        if (newStatus === 'EXCLUDED' && !req.body.note) {
+            res.status(422)
+                .send({
+                    message: 'Note is required when excluding cases.',
+                })
+                .end();
+            return;
+        }
+
+        let updateQuery = {};
+
+        try {
+            if (!caseIds) {
+                updateQuery = casesMatchingSearchQuery({
+                    searchQuery: req.body.query,
+                    count: false,
+                });
+            } else {
+                updateQuery = {
+                    _id: { $in: caseIds },
+                };
+                const validIdsCount = await Case.countDocuments(updateQuery);
+                if (validIdsCount != caseIds.length) {
+                    res.status(422)
+                        .send({
+                            message:
+                                'At least one of provided case IDs was not found. No records changed.',
+                        })
+                        .end();
+                    return;
+                }
+            }
+        } catch (err) {
+            if (err.name === 'CastError') {
+                res.status(422)
+                    .send({
+                        message: `Provided ID (${err.value}) is not valid. More IDs may be invalid. No records changed.`,
+                    })
+                    .end();
+                return;
+            }
+            logger.error(err);
+            res.status(500).json(err).end();
+            return;
+        }
+
+        try {
+            let updateDocument = {};
+            if (newStatus === 'EXCLUDED') {
+                updateDocument = {
+                    $set: {
+                        'caseReference.verificationStatus': newStatus,
+                        'exclusionData.date': Date.now(),
+                        'exclusionData.note': req.body.note,
+                    },
+                };
+            } else {
+                updateDocument = {
+                    $set: {
+                        'caseReference.verificationStatus': newStatus,
+                    },
+                    $unset: {
+                        exclusionData: '',
+                    },
+                };
+            }
+            await Case.updateMany(updateQuery, updateDocument);
+
+            res.status(200).end();
+        } catch (err) {
+            logger.error(err);
+            res.status(500).json(err).end();
+        }
+        return;
+    };
+
+    /**
+     * Get a list of excluded cases IDs for a specific source ID.
+     *
+     * Handles HTTP GET /api/excludedCaseIds.
+     */
+    listExcludedCaseIds = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        /*
+            We need to be able to include date filtering or
+            not - requiring events to be an optional property.
+         */
+        const searchQuery: {
+            'caseReference.verificationStatus': string;
+            'caseReference.sourceId': string | undefined;
+            events?: QuerySelector<EventDocument | [EventDocument]>;
+        } = {
+            'caseReference.verificationStatus': 'EXCLUDED',
+            'caseReference.sourceId': req.query.sourceId?.toString(),
+        };
+
+        if (req.query.dateFrom || req.query.dateTo) {
+            let dateRangeFilter = {};
+
+            if (req.query.dateFrom) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $gte: new Date(req.query.dateFrom.toString()),
+                };
+            }
+
+            if (req.query.dateTo) {
+                dateRangeFilter = {
+                    ...dateRangeFilter,
+                    $lte: new Date(req.query.dateTo.toString()),
+                };
+            }
+
+            searchQuery['events'] = {
+                $elemMatch: {
+                    name: 'confirmed',
+                    'dateRange.start': dateRangeFilter,
+                },
+            };
+        }
+
+        const cases = await Case.find(searchQuery).lean();
+
+        const caseIds = cases
+            .filter((c) => !!c.caseReference.sourceEntryId)
+            .map((c) => c.caseReference.sourceEntryId);
+
+        res.status(200).json({ cases: caseIds }).end();
+    };
+
+    /**
+     * Geocodes a single location.
+     * @returns The geocoded location.
+     * @throws GeocodeNotFoundError if no geocode could be found.
+     * @throws InvalidParamError if location.query is not specified and location
+     *         is not complete already.
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async geocode(req: Request | any): Promise<boolean> {
-        // Geocode query if no lat lng were provided.
-        const location = req.body['location'];
+    private async geocodeLocation(location: any): Promise<any> {
+        // Geocode using location.query if no lat lng were provided.
         if (location?.geometry?.latitude && location.geometry?.longitude) {
-            return true;
+            return location;
         }
         if (!location?.query) {
             throw new InvalidParamError(
@@ -557,10 +705,34 @@ export class CasesController {
                 continue;
             }
             // Currently a 1:1 match between the GeocodeResult and the data service API.
-            req.body['location'] = features[0];
-            return true;
+            // We also store the original query to match it later on and help debugging.
+            return {
+                query: location?.query,
+                ...features[0],
+            };
         }
-        return false;
+        throw new GeocodeNotFoundError(
+            `Geocode not found for ${location.query}`,
+        );
+    }
+
+    /**
+     * Geocodes request content if no lat lng were provided.
+     * This geocodes both case location and case travel locations if specified.
+     *
+     * @throws GeocodeNotFoundError if no geocode could be found.
+     * @throws InvalidParamError if location.query is not specified and location
+     *         is not complete already.
+     */
+    // For batch requests, the case body is nested.
+    // While we could define a type here, the right change is probably to use a
+    // batch geocoding API for such cases.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private async geocode(req: Request | any): Promise<void> {
+        req.body['location'] = await this.geocodeLocation(req.body['location']);
+        for (const travel of req.body.travelHistory?.travel || []) {
+            travel['location'] = await this.geocodeLocation(travel.location);
+        }
     }
 }
 

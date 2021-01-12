@@ -22,10 +22,11 @@ describe('Edit case', function () {
             // Check that we have something from the original case.
             cy.contains('France');
             cy.contains('Female').should('not.exist');
-            cy.contains('21').should('not.exist');
+            cy.contains('td', '21').should('not.exist');
+            cy.contains('input', '21').should('not.exist');
             // Change a few things.
             cy.get('div[data-testid="gender"]').click();
-            cy.get('li[data-value="Female"').click();
+            cy.get('li[data-value="Female"]').click();
             cy.get('input[name="age"]').type('21');
             // Submit the changes.
             cy.server();
@@ -37,7 +38,7 @@ describe('Edit case', function () {
             cy.contains(`Case ${resp.body.cases[0]._id} edited`);
             cy.contains('No records to display').should('not.exist');
             cy.contains('Female');
-            cy.contains('21');
+            cy.contains('td', '21');
             // What's untouched should stay as is.
             cy.contains('France');
         });

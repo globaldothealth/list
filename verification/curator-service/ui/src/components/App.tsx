@@ -1,7 +1,6 @@
 import {
     AppBar,
     Avatar,
-    ButtonBase,
     CssBaseline,
     Divider,
     Fab,
@@ -25,6 +24,7 @@ import React, { useEffect, useState } from 'react';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 
 import AddIcon from '@material-ui/icons/Add';
+import AutomatedBackfill from './AutomatedBackfill';
 import AutomatedSourceForm from './AutomatedSourceForm';
 import BulkCaseForm from './BulkCaseForm';
 import CaseForm from './CaseForm';
@@ -32,8 +32,8 @@ import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
-import { ReactComponent as GHMapLogo } from './assets/GHMapLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
+import LandingPage from './LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -46,7 +46,7 @@ import Profile from './Profile';
 import PublishIcon from '@material-ui/icons/Publish';
 import SearchBar from './SearchBar';
 import SourceTable from './SourceTable';
-import TermsOfService from './TermsOfService';
+import TermsOfUse from './TermsOfUse';
 import { ThemeProvider } from '@material-ui/core/styles';
 import UploadsTable from './UploadsTable';
 import User from './User';
@@ -56,6 +56,8 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
+import PolicyLink from './PolicyLink';
+import useCookieBanner from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
@@ -153,6 +155,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     menuButton: {
         marginRight: theme.spacing(2),
     },
+    mapLink: {
+        margin: '0 8px 0 16px',
+    },
     hide: {
         display: 'none',
     },
@@ -176,23 +181,19 @@ const useStyles = makeStyles((theme: Theme) => ({
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
-    mapButton: {
-        backgroundColor: '#CAD9E3',
-        borderRadius: '8px',
-        height: '42px',
-    },
-    viewMapText: {
-        margin: '0 12px',
-    },
     divider: {
         backgroundColor: '#0A7369',
         height: '1px',
         opacity: '0.2',
         margin: '24px 0',
+        marginTop: '12px',
         width: '100%',
     },
-    termsText: {
-        marginBottom: theme.spacing(3),
+    link: {
+        marginTop: 12,
+    },
+    lastLink: {
+        marginBottom: 24,
     },
     content: {
         flexGrow: 1,
@@ -201,6 +202,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
         marginLeft: -drawerWidth,
+        paddingLeft: '24px',
         width: '100%',
     },
     contentShift: {
@@ -209,6 +211,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.enteringScreen,
         }),
         marginLeft: 0,
+        paddingLeft: 0,
         width: `calc(100% - ${drawerWidth}px)`,
     },
     createNewButton: {
@@ -234,7 +237,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-function ProfileMenu(props: { user?: User }): JSX.Element {
+function ProfileMenu(props: { user: User }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -255,7 +258,7 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                 aria-haspopup="true"
                 onClick={handleClick}
             >
-                <Avatar alt={props.user?.email} src={props.user?.picture} />
+                <Avatar alt={props.user.email} src={props.user.picture} />
             </IconButton>
             <Menu
                 anchorEl={anchorEl}
@@ -263,24 +266,13 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                {props.user ? (
-                    <>
-                        <Link to="/profile" onClick={handleClose}>
-                            <MenuItem>Profile</MenuItem>
-                        </Link>
+                <Link to="/profile" onClick={handleClose}>
+                    <MenuItem>Profile</MenuItem>
+                </Link>
 
-                        <a className={classes.link} href="/auth/logout">
-                            <MenuItem>Logout</MenuItem>
-                        </a>
-                    </>
-                ) : (
-                    <a
-                        className={classes.link}
-                        href={process.env.REACT_APP_LOGIN_URL}
-                    >
-                        <MenuItem>Login</MenuItem>
-                    </a>
-                )}
+                <a className={classes.link} href="/auth/logout">
+                    <MenuItem>Logout</MenuItem>
+                </a>
                 <Divider className={classes.divider} />
                 <Link to="/terms" onClick={handleClose}>
                     <MenuItem>About Global.Health</MenuItem>
@@ -289,10 +281,27 @@ function ProfileMenu(props: { user?: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
+                    href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                    onClick={handleClose}
+                >
+                    <MenuItem>Data dictionary</MenuItem>
+                </a>
+                <a
+                    className={classes.link}
+                    rel="noopener noreferrer"
+                    target="_blank"
                     href="https://github.com/globaldothealth/list/issues/new/choose"
                     onClick={handleClose}
                 >
                     <MenuItem>Report an issue</MenuItem>
+                </a>
+                <a
+                    href="https://github.com/globaldothealth/list#globalhealth-list"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    onClick={handleClose}
+                >
+                    <MenuItem>View source on Github</MenuItem>
                 </a>
             </Menu>
         </div>
@@ -304,17 +313,26 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
+    useCookieBanner();
+
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(true);
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
     const [
         createNewButtonAnchorEl,
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
+    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
+    const [listPage, setListPage] = React.useState<number>(0);
+    const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const classes = useStyles();
+
     const menuList = user
         ? [
               {
@@ -324,7 +342,7 @@ export default function App(): JSX.Element {
                   displayCheck: (): boolean => hasAnyRole(['curator', 'admin']),
               },
               {
-                  text: 'Linelist',
+                  text: 'Line list',
                   icon: <ListIcon />,
                   to: { pathname: '/cases', state: { search: '' } },
                   displayCheck: (): boolean => true,
@@ -362,12 +380,11 @@ export default function App(): JSX.Element {
                     : menuItem.to.pathname;
             return pathname === location.pathname;
         });
-        if (menuIndex !== -1) {
-            setSelectedMenuIndex(menuIndex);
-        }
+        setSelectedMenuIndex(menuIndex);
     }, [location.pathname, menuList]);
 
     const getUser = (): void => {
+        setIsLoadingUser(true);
         axios
             .get<User>('/auth/profile')
             .then((resp) => {
@@ -381,7 +398,8 @@ export default function App(): JSX.Element {
             })
             .catch((e) => {
                 setUser(undefined);
-            });
+            })
+            .finally(() => setIsLoadingUser(false));
     };
 
     const hasAnyRole = (requiredRoles: string[]): boolean => {
@@ -415,9 +433,8 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
-    const classes = useStyles();
     return (
-        <div className={classes.root}>
+        <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
@@ -426,16 +443,20 @@ export default function App(): JSX.Element {
                     className={classes.appBar}
                 >
                     <Toolbar>
-                        <IconButton
-                            color="primary"
-                            aria-label="toggle drawer"
-                            onClick={toggleDrawer}
-                            edge="start"
-                            className={classes.menuButton}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <GHListLogo />
+                        {user && (
+                            <IconButton
+                                color="primary"
+                                aria-label="toggle drawer"
+                                onClick={toggleDrawer}
+                                edge="start"
+                                className={classes.menuButton}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                        )}
+                        <Link to="/" data-testid="home-button">
+                            <GHListLogo />
+                        </Link>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
@@ -448,6 +469,8 @@ export default function App(): JSX.Element {
                                                 search: searchQuery,
                                             });
                                         }}
+                                        loading={searchLoading}
+                                        rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
@@ -457,118 +480,161 @@ export default function App(): JSX.Element {
                         ) : (
                             <span className={classes.spacer}></span>
                         )}
-                        <ProfileMenu user={user} />
-                    </Toolbar>
-                </AppBar>
-                <Drawer
-                    className={classes.drawer}
-                    variant="persistent"
-                    anchor="left"
-                    open={drawerOpen}
-                    classes={{
-                        paper: classes.drawerPaper,
-                    }}
-                >
-                    <div className={classes.drawerContents}>
-                        <div className={classes.drawerHeader}></div>
-                        <Typography className={classes.covidTitle}>
-                            COVID-19
-                        </Typography>
-                        {hasAnyRole(['curator']) && (
+                        {user && (
                             <>
-                                <Fab
-                                    variant="extended"
-                                    data-testid="create-new-button"
-                                    className={classes.createNewButton}
-                                    color="secondary"
-                                    onClick={openCreateNewPopup}
-                                >
-                                    <AddIcon
-                                        className={classes.createNewIcon}
-                                    />
-                                    Create new
-                                </Fab>
-                                <Menu
-                                    anchorEl={createNewButtonAnchorEl}
-                                    getContentAnchorEl={null}
-                                    keepMounted
-                                    open={Boolean(createNewButtonAnchorEl)}
-                                    onClose={closeCreateNewPopup}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                >
-                                    <Link
-                                        to="/cases/new"
-                                        onClick={closeCreateNewPopup}
+                                <Typography>
+                                    <a
+                                        className={classes.mapLink}
+                                        data-testid="mapLink"
+                                        href="http://covid-19.global.health"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
                                     >
-                                        <MenuItem>New line list case</MenuItem>
-                                    </Link>
-                                    <Link
-                                        to="/cases/bulk"
-                                        onClick={closeCreateNewPopup}
-                                    >
-                                        <MenuItem>New bulk upload</MenuItem>
-                                    </Link>
-                                    <Link
-                                        to="/sources/automated"
-                                        onClick={closeCreateNewPopup}
-                                    >
-                                        <MenuItem>
-                                            New automated source
-                                        </MenuItem>
-                                    </Link>
-                                </Menu>
+                                        G.h Map
+                                    </a>
+                                </Typography>
+                                <ProfileMenu user={user} />{' '}
                             </>
                         )}
-                        <List>
-                            {menuList.map(
-                                (item, index) =>
-                                    item.displayCheck() && (
-                                        <Link key={item.text} to={item.to}>
-                                            <ListItem
-                                                button
-                                                key={item.text}
-                                                selected={
-                                                    selectedMenuIndex === index
-                                                }
-                                            >
-                                                <ListItemIcon>
-                                                    {item.icon}
-                                                </ListItemIcon>
-
-                                                <ListItemText
-                                                    primary={item.text}
-                                                />
-                                            </ListItem>
-                                        </Link>
-                                    ),
-                            )}
-                        </List>
-                        <div className={classes.spacer}></div>
-                        <ButtonBase
-                            href="http://covid-19.global.health/#coverage"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                            data-testid="mapButton"
-                            classes={{ root: classes.mapButton }}
-                        >
-                            <Typography
-                                variant="caption"
-                                classes={{ root: classes.viewMapText }}
-                            >
-                                View cases on
+                    </Toolbar>
+                </AppBar>
+                {user && (
+                    <Drawer
+                        className={classes.drawer}
+                        variant="persistent"
+                        anchor="left"
+                        open={drawerOpen}
+                        classes={{
+                            paper: classes.drawerPaper,
+                        }}
+                    >
+                        <div className={classes.drawerContents}>
+                            <div className={classes.drawerHeader}></div>
+                            <Typography className={classes.covidTitle}>
+                                COVID-19
                             </Typography>
-                            <GHMapLogo />
-                        </ButtonBase>
-                        <div className={classes.divider}></div>
-                        <div className={classes.termsText}>
-                            <div>Global.health</div>
-                            <Link to="/terms">Terms of use</Link>
+                            {hasAnyRole(['curator']) && (
+                                <>
+                                    <Fab
+                                        variant="extended"
+                                        data-testid="create-new-button"
+                                        className={classes.createNewButton}
+                                        color="secondary"
+                                        onClick={openCreateNewPopup}
+                                    >
+                                        <AddIcon
+                                            className={classes.createNewIcon}
+                                        />
+                                        Create new
+                                    </Fab>
+                                    <Menu
+                                        anchorEl={createNewButtonAnchorEl}
+                                        getContentAnchorEl={null}
+                                        keepMounted
+                                        open={Boolean(createNewButtonAnchorEl)}
+                                        onClose={closeCreateNewPopup}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                        }}
+                                    >
+                                        <Link
+                                            to="/cases/new"
+                                            onClick={closeCreateNewPopup}
+                                        >
+                                            <MenuItem>
+                                                New line list case
+                                            </MenuItem>
+                                        </Link>
+                                        <Link
+                                            to="/cases/bulk"
+                                            onClick={closeCreateNewPopup}
+                                        >
+                                            <MenuItem>New bulk upload</MenuItem>
+                                        </Link>
+                                        <Link
+                                            to="/sources/automated"
+                                            onClick={closeCreateNewPopup}
+                                        >
+                                            <MenuItem>
+                                                New automated source
+                                            </MenuItem>
+                                        </Link>
+                                        <Link
+                                            to="/sources/backfill"
+                                            onClick={closeCreateNewPopup}
+                                        >
+                                            <MenuItem>
+                                                New automated source backfill
+                                            </MenuItem>
+                                        </Link>
+                                    </Menu>
+                                </>
+                            )}
+                            <List>
+                                {menuList.map(
+                                    (item, index) =>
+                                        item.displayCheck() && (
+                                            <Link key={item.text} to={item.to}>
+                                                <ListItem
+                                                    button
+                                                    key={item.text}
+                                                    selected={
+                                                        selectedMenuIndex ===
+                                                        index
+                                                    }
+                                                >
+                                                    <ListItemIcon>
+                                                        {item.icon}
+                                                    </ListItemIcon>
+
+                                                    <ListItemText
+                                                        primary={item.text}
+                                                    />
+                                                </ListItem>
+                                            </Link>
+                                        ),
+                                )}
+                            </List>
+                            <div className={classes.spacer}></div>
+                            <div className={classes.divider}></div>
+                            <a
+                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                data-testid="dictionaryButton"
+                            >
+                                Data dictionary
+                            </a>
+                            <Link
+                                to="/terms"
+                                className={classes.link}
+                                data-testid="termsButton"
+                            >
+                                Terms of use
+                            </Link>
+                            <PolicyLink
+                                type="privacy-policy"
+                                classes={{
+                                    root: classes.link,
+                                }}
+                            >
+                                Privacy policy
+                            </PolicyLink>
+                            <PolicyLink
+                                type="cookie-policy"
+                                classes={{
+                                    root: clsx([
+                                        classes.link,
+                                        classes.lastLink,
+                                    ]),
+                                }}
+                            >
+                                Cookie policy
+                            </PolicyLink>
                         </div>
-                    </div>
-                </Drawer>
+                    </Drawer>
+                )}
                 <main
                     className={clsx(classes.content, {
                         [classes.contentShift]: drawerOpen,
@@ -578,7 +644,14 @@ export default function App(): JSX.Element {
                     <Switch>
                         {user && (
                             <Route exact path="/cases">
-                                <LinelistTable user={user} />
+                                <LinelistTable
+                                    user={user}
+                                    setSearchLoading={setSearchLoading}
+                                    page={listPage}
+                                    pageSize={listPageSize}
+                                    onChangePage={setListPage}
+                                    onChangePageSize={setListPageSize}
+                                />
                             </Route>
                         )}
                         {hasAnyRole(['curator']) && (
@@ -612,6 +685,14 @@ export default function App(): JSX.Element {
                         {user && hasAnyRole(['curator']) && (
                             <Route path="/cases/bulk">
                                 <BulkCaseForm
+                                    user={user}
+                                    onModalClose={onModalClose}
+                                />
+                            </Route>
+                        )}
+                        {user && hasAnyRole(['curator']) && (
+                            <Route path="/sources/backfill">
+                                <AutomatedBackfill
                                     user={user}
                                     onModalClose={onModalClose}
                                 />
@@ -654,15 +735,25 @@ export default function App(): JSX.Element {
                             />
                         )}
                         <Route exact path="/terms">
-                            <TermsOfService />
+                            <TermsOfUse />
                         </Route>
                         <Route exact path="/">
                             {hasAnyRole(['curator', 'admin']) ? (
                                 <Charts />
+                            ) : user ? (
+                                <Redirect to="/cases" />
+                            ) : isLoadingUser ? (
+                                <></>
                             ) : (
-                                user && <Redirect to="/cases" />
+                                <LandingPage />
                             )}
                         </Route>
+                        {/* Redirect any unavailable URLs to / after the user has loaded. */}
+                        {!isLoadingUser && (
+                            <Route path="/">
+                                <Redirect to="/" />
+                            </Route>
+                        )}
                     </Switch>
                 </main>
             </ThemeProvider>

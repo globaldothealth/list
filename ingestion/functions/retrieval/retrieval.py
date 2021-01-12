@@ -1,8 +1,11 @@
 import codecs
+import io
 import json
+import mimetypes
 import os
 import sys
-import io
+import tempfile
+import zipfile
 from chardet import detect
 
 import boto3
@@ -13,7 +16,9 @@ from datetime import datetime, timezone
 ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
+PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
+READ_CHUNK_BYTES = 2048
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
@@ -41,7 +46,9 @@ def extract_event_fields(event):
             f"Required fields {ENV_FIELD}; {SOURCE_ID_FIELD} not found in input event: {event}")
         print(error_message)
         raise ValueError(error_message)
-    return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get('auth', {})
+    return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get(
+        PARSING_DATE_RANGE_FIELD), event.get(
+        'auth', {})
 
 
 def get_source_details(env, source_id, upload_id, api_headers, cookies):
@@ -75,11 +82,34 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             api_headers, cookies)
 
 
+def raw_content(url: str, content: bytes) -> io.BytesIO:
+    # Detect the mimetype of a given URL.
+    print(f'Guessing mimetype of {url}')
+    mimetype, _ = mimetypes.guess_type(url)
+    if mimetype == "application/zip":
+        print('File seems to be a zip file, decompressing it now')
+        # Writing the zip file to temp dir.
+        with tempfile.NamedTemporaryFile("wb", delete=False) as temp:
+            temp.write(content)
+            temp.flush()
+            # Opening the zip file, extracting its first file.
+            with zipfile.ZipFile(temp.name, "r") as zf:
+                for name in zf.namelist():
+                    with zf.open(name) as f:
+                        return io.BytesIO(f.read())
+    elif not mimetype:
+        print('Could not determine mimetype')
+    return io.BytesIO(content)
+
+
 def retrieve_content(
         env, source_id, upload_id, url, source_format, api_headers, cookies):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
-        if source_format != "JSON" and source_format != "CSV":
+        if (
+            source_format != "JSON"
+            and source_format != "CSV"
+            and source_format != "XSLX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
@@ -97,29 +127,25 @@ def retrieve_content(
         # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = io.BytesIO(r.content)
+        bytesio = raw_content(url, r.content)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         print(f'Source encoding is presumably {detected_enc}')
-        source_encoding = detected_enc['encoding']
-        if source_encoding != "utf-8":
-            with codecs.open(f"/tmp/{key_filename_part}", "wb", 'utf-8') as f:
-                # Write the output file as utf-8 in chunks because decoding the
-                # whole data in one shot becomes really slow with big files.
-                content = bytesio.read(2048)
-                while content:
-                    f.write(codecs.decode(content, source_encoding))
-                    content = bytesio.read(2048)
-        else:
-            with open(f"/tmp/{key_filename_part}", "wb") as f:
-                f.write(r.content)
-        s3_object_key = (
-            f"{source_id}"
-            f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
-            f"{key_filename_part}")
-        return (f.name, s3_object_key)
+        with codecs.open(f"/tmp/{key_filename_part}", "w", 'utf-8') as outfile:
+            text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
+            # Write the output file as utf-8 in chunks because decoding the
+            # whole data in one shot becomes really slow with big files.
+            content = text_stream.read(READ_CHUNK_BYTES)
+            while content:
+                outfile.write(content)
+                content = text_stream.read(READ_CHUNK_BYTES)
+            s3_object_key = (
+                f"{source_id}"
+                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{key_filename_part}")
+            return (outfile.name, s3_object_key)
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
@@ -146,7 +172,7 @@ def upload_to_s3(
 
 def invoke_parser(
     env, parser_arn, source_id, upload_id, api_headers, cookies, s3_object_key,
-        source_url, date_filter):
+        source_url, date_filter, parsing_date_range):
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -155,6 +181,7 @@ def invoke_parser(
         "sourceUrl": source_url,
         "uploadId": upload_id,
         "dateFilter": date_filter,
+        "dateRange": parsing_date_range,
     }
     print(f"Invoking parser (ARN: {parser_arn})")
     # This is asynchronous due to the "Event" invocation type.
@@ -222,7 +249,8 @@ def lambda_handler(event, context):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_id, local_auth = extract_event_fields(event)
+    env, source_id, parsing_date_range, local_auth = extract_event_fields(
+        event)
     auth_headers = None
     cookies = None
     if local_auth and env == 'local':
@@ -239,8 +267,9 @@ def lambda_handler(event, context):
     upload_to_s3(file_name, s3_object_key, env,
                  source_id, upload_id, auth_headers, cookies)
     if parser_arn:
-        invoke_parser(env, parser_arn, source_id, upload_id,
-                      auth_headers, cookies, s3_object_key, url, date_filter)
+        invoke_parser(
+            env, parser_arn, source_id, upload_id, auth_headers, cookies,
+            s3_object_key, url, date_filter, parsing_date_range)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,

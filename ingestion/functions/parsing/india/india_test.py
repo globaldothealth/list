@@ -1,60 +1,86 @@
-
-import json
 import os
-import pytest
-import tempfile
+import unittest
+
+from india import india
 
 _SOURCE_ID = "abc123"
 _SOURCE_URL = "https://foo.bar"
-_PARSED_CASE = (
+_PARSED_CASES = [
     {
         "caseReference": {
             "sourceId": _SOURCE_ID,
-            "sourceEntryId": "48765",
-            "sourceUrl": _SOURCE_URL
+            "sourceEntryId": "Entry-297649-1",
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [
+                {
+                    "sourceUrl": "https://twitter.com/PIB_Patna/status/1308375952653611008"
+                }
+            ]
         },
         "location": {
-            "country": "India",
-            "administrativeAreaLevel1": "Bihar",
-            "administrativeAreaLevel2": "Darbhanga",
-            "administrativeAreaLevel3": "Hanuman Nagar",
-            "query": "Hanuman Nagar, Darbhanga, Bihar, India"
+            "limitToResolution": "Admin2,Admin1,Country",
+            "query": "Arwal, Bihar, India"
         },
         "events": [
             {
                 "name": "confirmed",
                 "dateRange":
                         {
-                            "start": "06/05/2020Z",
-                            "end": "06/05/2020Z"
+                            "start": "09/22/2020Z",
+                            "end": "09/22/2020Z"
                         }
             }
         ],
         "demographics": {
             "ageRange": {
-                "start": 65,
-                "end": 65
-            },
-            "gender": "Male"
+                "start": 28,
+                "end": 35
+            }
         },
         "notes": None
-    })
+    },
+    {
+        "caseReference": {
+            "sourceId": _SOURCE_ID,
+            "sourceEntryId": "Entry-297649-2",
+            "sourceUrl": _SOURCE_URL,
+            "additionalSources": [
+                {
+                    "sourceUrl": "https://twitter.com/PIB_Patna/status/1308375952653611008"
+                }
+            ]
+        },
+        "location": {
+            "limitToResolution": "Admin2,Admin1,Country",
+            "query": "Arwal, Bihar, India"
+        },
+        "events": [
+            {
+                "name": "confirmed",
+                "dateRange":
+                        {
+                            "start": "09/22/2020Z",
+                            "end": "09/22/2020Z"
+                        }
+            }
+        ],
+        "demographics": {
+            "ageRange": {
+                "start": 28,
+                "end": 35
+            }
+        },
+        "notes": None
+    },
+]
 
 
-@pytest.fixture()
-def sample_data():
-    """Loads sample source data from file."""
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "sample_data.json")
-    with open(file_path) as event_file:
-        return json.load(event_file)
+class IndiaTest(unittest.TestCase):
+    def test_parse(self):
+        # Default of 1500 is not enough to show diffs when there is one.
+        self.maxDiff = 5000
+        current_dir = os.path.dirname(__file__)
+        sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
-
-def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
-    from india import india  # Import locally to avoid superseding mock
-    with tempfile.NamedTemporaryFile("w") as f:
-        json.dump(sample_data, f)
-        f.flush()
-
-        result = next(india.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL))
-        assert result == _PARSED_CASE
+        result = india.parse_cases(sample_data_file, _SOURCE_ID, _SOURCE_URL)
+        self.assertCountEqual(list(result), _PARSED_CASES)

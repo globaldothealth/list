@@ -1,3 +1,7 @@
+import React, { RefObject } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import axios from 'axios';
+import { round } from 'lodash';
 import {
     Button,
     Dialog,
@@ -15,28 +19,28 @@ import {
     makeStyles,
     withStyles,
 } from '@material-ui/core';
-import { Case, VerificationStatus } from './Case';
+import { createStyles } from '@material-ui/core/styles';
+import { WithStyles } from '@material-ui/core/styles/withStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
-import React, { RefObject } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import { Case, VerificationStatus } from './Case';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import EditIcon from '@material-ui/icons/EditOutlined';
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import { Link } from 'react-router-dom';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MuiAlert from '@material-ui/lab/Alert';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
 import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
+import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
-import { ReactComponent as VerifiedIcon } from './assets/verified_icon.svg';
-import { WithStyles } from '@material-ui/core/styles/withStyles';
-import axios from 'axios';
-import { createStyles } from '@material-ui/core/styles';
-import fileDownload from 'js-file-download';
-import renderDate from './util/date';
+import CaseExcludeDialog from './CaseExcludeDialog';
+import CaseIncludeDialog from './CaseIncludeDialog';
+import renderDate, { renderDateRange } from './util/date';
 
 interface ListResponse {
     cases: Case[];
@@ -47,6 +51,7 @@ interface ListResponse {
 interface LinelistTableState {
     url: string;
     error: string;
+    page: number;
     pageSize: number;
     // The rows which are selected on the current page.
     selectedRowsCurrentPage: TableRow[];
@@ -55,9 +60,12 @@ interface LinelistTableState {
     numSelectedRows: number;
     totalNumRows: number;
     deleteDialogOpen: boolean;
+    excludeDialogOpen: boolean;
+    includeDialogOpen: boolean;
     isLoading: boolean;
-    isDownloading: boolean;
     isDeleting: boolean;
+
+    selectedVerificationStatus: VerificationStatus;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -68,11 +76,19 @@ interface TableRow {
     adminArea2: string;
     adminArea1: string;
     country: string;
+    latitude: number;
+    longitude: number;
     age: [number, number]; // start, end.
     gender: string;
     outcome?: string;
+    hospitalizationDateRange?: string;
+    symptomsOnsetDate?: string;
     sourceUrl: string;
     verificationStatus?: VerificationStatus;
+    exclusionData?: {
+        date: string;
+        note: string;
+    };
 }
 
 interface LocationState {
@@ -80,12 +96,21 @@ interface LocationState {
     editedCaseIds: string[];
     bulkMessage: string;
     search: string;
+    page: number;
+    pageSize: number;
 }
 
 interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
+    setSearchLoading: (a: boolean) => void;
+    page: number;
+    pageSize: number;
+
+    onChangePage: (page: number) => void;
+
+    onChangePageSize: (pageSize: number) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -130,11 +155,18 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
 
 function RowMenu(props: {
     rowId: string;
+    rowData: TableRow;
     setError: (error: string) => void;
     refreshData: () => void;
 }): JSX.Element {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(
+        false,
+    );
+    const [excludeDialogOpen, setExcludeDialogOpen] = React.useState<boolean>(
+        false,
+    );
+    const [includeDialogOpen, setIncludeDialogOpen] = React.useState<boolean>(
         false,
     );
     const [isDeleting, setIsDeleting] = React.useState(false);
@@ -155,6 +187,16 @@ function RowMenu(props: {
         setDeleteDialogOpen(true);
     };
 
+    const openExcludeDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setExcludeDialogOpen(true);
+    };
+
+    const openIncludeDialog = async (event?: any): Promise<void> => {
+        event?.stopPropagation();
+        setIncludeDialogOpen(true);
+    };
+
     const handleDelete = async (event?: any): Promise<void> => {
         event?.stopPropagation();
         try {
@@ -171,6 +213,31 @@ function RowMenu(props: {
             handleClose();
         }
     };
+
+    const handleStatusChange = async (
+        status: VerificationStatus,
+        note?: string,
+    ): Promise<void> => {
+        try {
+            props.setError('');
+            await axios.post(`/api/cases/batchStatusChange`, {
+                status,
+                caseIds: [props.rowId],
+                ...(note ? { note } : {}),
+            });
+            props.refreshData();
+        } catch (e) {
+            props.setError(e.toString());
+        } finally {
+            status === VerificationStatus.Excluded
+                ? setIncludeDialogOpen(false)
+                : setExcludeDialogOpen(false);
+            handleClose();
+        }
+    };
+
+    const isCaseExcluded =
+        props.rowData.verificationStatus === VerificationStatus.Excluded;
 
     return (
         <>
@@ -200,6 +267,17 @@ function RowMenu(props: {
                     <DeleteIcon />
                     <span className={classes.menuItemTitle}>Delete</span>
                 </MenuItem>
+                {isCaseExcluded ? (
+                    <MenuItem onClick={openIncludeDialog}>
+                        <NotInterestedIcon />
+                        <span className={classes.menuItemTitle}>Include</span>
+                    </MenuItem>
+                ) : (
+                    <MenuItem onClick={openExcludeDialog}>
+                        <NotInterestedIcon />
+                        <span className={classes.menuItemTitle}>Exclude</span>
+                    </MenuItem>
+                )}
             </Menu>
             <Dialog
                 open={deleteDialogOpen}
@@ -239,45 +317,55 @@ function RowMenu(props: {
                     )}
                 </DialogActions>
             </Dialog>
+            <CaseExcludeDialog
+                isOpen={excludeDialogOpen}
+                onClose={(): void => setExcludeDialogOpen(false)}
+                onSubmit={(values: { note: string }): Promise<void> =>
+                    handleStatusChange(VerificationStatus.Excluded, values.note)
+                }
+                caseIds={[props.rowId]}
+            />
+            <CaseIncludeDialog
+                isOpen={includeDialogOpen}
+                onClose={(): void => setIncludeDialogOpen(false)}
+                onSubmit={(): Promise<void> =>
+                    handleStatusChange(VerificationStatus.Unverified)
+                }
+                caseIds={[props.rowId]}
+            />
         </>
     );
 }
 
-const downloadFilename = `globalhealth_covid19_cases_${renderDate(
-    new Date(),
-)}.csv`;
-
 export function DownloadButton(props: { search: string }): JSX.Element {
-    const [downloading, setDownloading] = React.useState(false);
-
-    const downloadCases = (): void => {
-        const requestBody = props.search.trim() ? { query: props.search } : {};
-        setDownloading(true);
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => fileDownload(response.data, downloadFilename))
-            .catch((e) => console.error(e))
-            .finally(() => setDownloading(false));
-    };
+    const formRef: RefObject<any> = React.createRef();
 
     return (
-        <Button
-            variant="outlined"
-            color="primary"
-            onClick={downloadCases}
-            disabled={downloading}
-            startIcon={
-                downloading ? <CircularProgress size={20} /> : <SaveAltIcon />
-            }
-        >
-            Download
-        </Button>
+        <>
+            <form
+                hidden
+                ref={formRef}
+                method="POST"
+                action="/api/cases/download"
+            >
+                <input name="query" value={props.search.trim()} />
+            </form>
+            <Button
+                variant="outlined"
+                color="primary"
+                onClick={(): void => formRef.current.submit()}
+                startIcon={<SaveAltIcon />}
+            >
+                Download
+            </Button>
+        </>
     );
 }
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
     tableRef: RefObject<any> = React.createRef();
+    formRef: RefObject<any> = React.createRef();
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     unlisten: () => void = () => {};
 
@@ -286,32 +374,42 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.state = {
             url: '/api/cases/',
             error: '',
-            pageSize: 50,
+            page: this.props.page ?? 0,
+            pageSize: this.props.pageSize ?? 50,
             selectedRowsCurrentPage: [],
             numSelectedRows: 0,
             totalNumRows: 0,
             deleteDialogOpen: false,
+            excludeDialogOpen: false,
+            includeDialogOpen: false,
             isLoading: false,
-            isDownloading: false,
             isDeleting: false,
+            selectedVerificationStatus: VerificationStatus.Unverified,
         };
         this.deleteCases = this.deleteCases.bind(this);
-        this.setCaseVerificationWithQuery = this.setCaseVerificationWithQuery.bind(
-            this,
-        );
-        this.downloadSelectedCases = this.downloadSelectedCases.bind(this);
+        this.setCaseVerification = this.setCaseVerification.bind(this);
         this.confirmationDialogTitle = this.confirmationDialogTitle.bind(this);
         this.confirmationDialogBody = this.confirmationDialogBody.bind(this);
+        this.showConfirmationDialogError = this.showConfirmationDialogError.bind(
+            this,
+        );
+        this.changeVerificationStatus = this.changeVerificationStatus.bind(
+            this,
+        );
+        this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
     }
 
-    componentDidMount(): void {
-        // history.location.state can be updated with new values on which we
-        // must refresh the table
-        this.unlisten = this.props.history.listen((_, __) => {
-            this.tableRef.current?.onQueryChange();
-        });
+    componentDidUpdate(
+        prevProps: Readonly<Props>,
+        prevState: Readonly<LinelistTableState>,
+    ): void {
+        if (
+            this.props.location.state?.search !==
+            prevProps.location.state?.search
+        ) {
+            this.setState({ page: 0 }, this.tableRef.current?.onQueryChange);
+        }
     }
-
     componentWillUnmount(): void {
         this.unlisten();
     }
@@ -339,99 +437,41 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this.setState({ deleteDialogOpen: false, isDeleting: false });
         }
     }
-
     hasSelectedRowsAcrossPages(): boolean {
         return (
             this.state.totalNumRows === this.state.numSelectedRows &&
             this.state.numSelectedRows > this.state.pageSize
         );
     }
-
-    setCaseVerification(
+    async setCaseVerification(
         rowData: TableRow[],
         verificationStatus: VerificationStatus,
-    ): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + 'batchUpdate';
-            this.setState({ error: '', isLoading: true });
-            const response = axios.post(updateUrl, {
-                cases: rowData.map((row) => {
-                    return {
-                        _id: row.id,
-                        'caseReference.verificationStatus': verificationStatus,
-                    };
-                }),
-            });
-            response
-                .then(() => {
-                    this.setState({ isLoading: false });
-                    resolve();
-                })
-                .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                        isLoading: false,
-                    });
-                    reject(e);
-                });
-        });
-    }
+        note?: string,
+    ): Promise<void> {
+        this.setState({ error: '', isLoading: true });
+        const payload = {
+            status: verificationStatus,
+            ...(note ? { note } : {}),
+            ...(this.hasSelectedRowsAcrossPages()
+                ? { query: this.props.location.state.search }
+                : { caseIds: rowData.map((row: TableRow) => row.id) }),
+        };
 
-    setCaseVerificationWithQuery(
-        verificationStatus: VerificationStatus,
-    ): Promise<unknown> {
-        return new Promise((resolve, reject) => {
-            const updateUrl = this.state.url + 'batchUpdateQuery';
-            this.setState({ error: '', isLoading: true });
-            const response = axios.post(updateUrl, {
-                query: this.props.location.state.search,
-                case: {
-                    'caseReference.verificationStatus': verificationStatus,
-                },
-            });
-            response
-                .then(() => {
-                    this.setState({ isLoading: false });
-                    resolve();
-                })
-                .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                        isLoading: false,
-                    });
-                    reject(e);
-                });
-        });
-    }
+        try {
+            await axios.post(`/api/cases/batchStatusChange`, payload);
 
-    downloadSelectedCases(): void {
-        this.setState({ error: '', isDownloading: true });
-        let requestBody = {};
-        if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { query: this.props.location.state.search };
-        } else {
-            requestBody = {
-                caseIds: this.state.selectedRowsCurrentPage.map(
-                    (row: TableRow) => row.id,
-                ),
-            };
+            this.tableRef.current.onQueryChange();
+        } catch (e) {
+            this.setState({ error: e.toString(), isLoading: false });
+        } finally {
+            verificationStatus === VerificationStatus.Excluded
+                ? this.setState({ excludeDialogOpen: false, isLoading: false })
+                : this.setState({ includeDialogOpen: false, isLoading: false });
         }
-        axios
-            .post('/api/cases/download', requestBody)
-            .then((response) => {
-                fileDownload(response.data, downloadFilename);
-                this.setState({ isDownloading: false });
-            })
-            .catch((e) => {
-                this.setState({
-                    error: e.response?.data?.message || e.toString(),
-                    isDownloading: false,
-                });
-            });
     }
 
     confirmationDialogTitle(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return 'Error';
         }
         return (
@@ -444,10 +484,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
 
     confirmationDialogBody(): string {
-        if (this.state.numSelectedRows > this.maxDeletionThreshold) {
+        if (this.showConfirmationDialogError()) {
             return (
                 `${this.state.numSelectedRows} cases selected to delete which is greater than the allowed maximum of ${this.maxDeletionThreshold}.` +
-                ' An admin can preform the deletion if it is valid.'
+                ' An admin can perform the deletion if it is valid.'
             );
         }
         return (
@@ -456,6 +496,40 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 : `${this.state.numSelectedRows} cases`) +
             ' will be permanently deleted.'
         );
+    }
+
+    showConfirmationDialogError(): boolean {
+        return (
+            !this.props.user.roles.includes('admin') &&
+            this.state.numSelectedRows > this.maxDeletionThreshold
+        );
+    }
+
+    async changeVerificationStatus(
+        rows: TableRow[],
+        status: VerificationStatus,
+    ): Promise<void> {
+        const excludedCases = this.getExcludedCaseIds(rows);
+
+        if (excludedCases.length) {
+            this.setState({
+                selectedVerificationStatus: status,
+                includeDialogOpen: true,
+            });
+
+            return;
+        }
+
+        await this.setCaseVerification(rows, status);
+    }
+
+    getExcludedCaseIds(rows: TableRow[]): string[] {
+        return rows
+            .filter(
+                ({ verificationStatus }) =>
+                    verificationStatus === VerificationStatus.Excluded,
+            )
+            .map(({ id }) => id);
     }
 
     render(): JSX.Element {
@@ -531,6 +605,37 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {this.props.location.state.bulkMessage}
                     </MuiAlert>
                 )}
+                <CaseExcludeDialog
+                    isOpen={this.state.excludeDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ excludeDialogOpen: false })
+                    }
+                    onSubmit={(values: { note: string }): Promise<void> =>
+                        this.setCaseVerification(
+                            this.state.selectedRowsCurrentPage,
+                            VerificationStatus.Excluded,
+                            values.note,
+                        )
+                    }
+                    caseIds={this.state.selectedRowsCurrentPage.map(
+                        ({ id }) => id,
+                    )}
+                />
+                <CaseIncludeDialog
+                    isOpen={this.state.includeDialogOpen}
+                    onClose={(): void =>
+                        this.setState({ includeDialogOpen: false })
+                    }
+                    onSubmit={(): Promise<void> =>
+                        this.setCaseVerification(
+                            this.state.selectedRowsCurrentPage,
+                            this.state.selectedVerificationStatus,
+                        )
+                    }
+                    caseIds={this.getExcludedCaseIds(
+                        this.state.selectedRowsCurrentPage,
+                    )}
+                />
                 <Dialog
                     open={this.state.deleteDialogOpen}
                     onClose={(): void =>
@@ -564,8 +669,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 >
                                     Cancel
                                 </Button>
-                                {this.state.numSelectedRows <=
-                                    this.maxDeletionThreshold && (
+                                {!this.showConfirmationDialogError() && (
                                     <Button
                                         onClick={this.deleteCases}
                                         color="primary"
@@ -593,6 +697,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                       ): JSX.Element => (
                                           <RowMenu
                                               rowId={rowData.id}
+                                              rowData={rowData}
                                               refreshData={(): void =>
                                                   this.tableRef.current.onQueryChange()
                                               }
@@ -626,6 +731,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <div className={classes.centeredContent}>
                                         <VerificationStatusIndicator
                                             status={rowData.verificationStatus}
+                                            exclusionData={
+                                                rowData.exclusionData
+                                            }
                                         />
                                     </div>
                                 );
@@ -641,22 +749,35 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
+                            headerStyle: { whiteSpace: 'nowrap' },
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
                             field: 'country',
+                        },
+                        {
+                            title: 'Latitude',
+                            field: 'latitude',
+                        },
+                        {
+                            title: 'Longitude',
+                            field: 'longitude',
                         },
                         {
                             title: 'Age',
@@ -665,6 +786,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 rowData.age[0] === rowData.age[1]
                                     ? rowData.age[0]
                                     : `${rowData.age[0]}-${rowData.age[1]}`,
+                            cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Gender',
@@ -675,22 +797,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'outcome',
                         },
                         {
+                            title: 'Hospitalization date/period',
+                            field: 'hospitalizationDateRange',
+                        },
+                        {
+                            title: 'Symptoms onset date',
+                            field: 'symptomsOnsetDate',
+                        },
+                        {
                             title: 'Source URL',
                             field: 'sourceUrl',
+                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
                     data={(query): Promise<QueryResult<TableRow>> =>
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
-                            listUrl += '?limit=' + this.state.pageSize;
-                            listUrl += '&page=' + (query.page + 1);
+                            listUrl += '?limit=' + query.pageSize;
+                            listUrl += '&page=' + (this.state.page + 1);
                             const trimmedQ = this.props.location.state?.search?.trim();
                             if (trimmedQ) {
                                 listUrl += '&q=' + encodeURIComponent(trimmedQ);
                             }
-                            this.setState({ error: '' });
+                            this.setState({ isLoading: true, error: '' });
+                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
+
                             response
                                 .then((result) => {
                                     const flattenedCases: TableRow[] = [];
@@ -718,6 +851,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 c.location
                                                     ?.administrativeAreaLevel1,
                                             country: c.location.country,
+                                            latitude: round(
+                                                c.location?.geometry?.latitude,
+                                                4,
+                                            ),
+                                            longitude: round(
+                                                c.location?.geometry?.longitude,
+                                                4,
+                                            ),
                                             age: [
                                                 c.demographics?.ageRange?.start,
                                                 c.demographics?.ageRange?.end,
@@ -727,6 +868,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                 (event) =>
                                                     event.name === 'outcome',
                                             )?.value,
+                                            hospitalizationDateRange: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'hospitalAdmission',
+                                                )?.dateRange,
+                                            ),
+                                            symptomsOnsetDate: renderDateRange(
+                                                c.events.find(
+                                                    (event) =>
+                                                        event.name ===
+                                                        'onsetSymptoms',
+                                                )?.dateRange,
+                                            ),
                                             sourceUrl:
                                                 c.caseReference?.sourceUrl,
                                             verificationStatus:
@@ -741,7 +896,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     });
                                     resolve({
                                         data: flattenedCases,
-                                        page: query.page,
+                                        page: this.state.page,
                                         totalCount: result.data.total,
                                     });
                                 })
@@ -752,6 +907,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             e.toString(),
                                     });
                                     reject(e);
+                                })
+                                .finally(() => {
+                                    this.setState({ isLoading: false });
+                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
@@ -766,6 +925,33 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <span className={classes.spacer}></span>
                                     <TablePagination
                                         {...props}
+                                        onChangeRowsPerPage={(event): void => {
+                                            const newPage = 0;
+                                            const newPageSize = Number(
+                                                event.target.value,
+                                            );
+
+                                            this.setState({
+                                                page: newPage,
+                                                pageSize: newPageSize,
+                                            });
+
+                                            props.onChangeRowsPerPage(event);
+
+                                            this.props.onChangePage(newPage);
+                                            this.props.onChangePageSize(
+                                                newPageSize,
+                                            );
+                                        }}
+                                        onChangePage={(
+                                            event,
+                                            newPage: number,
+                                        ): void => {
+                                            this.setState({ page: newPage });
+
+                                            this.props.onChangePage(newPage);
+                                            props.onChangePage(event, newPage);
+                                        }}
                                     ></TablePagination>
                                 </div>
                             ) : (
@@ -817,19 +1003,27 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             zIndex: 1,
                         },
                         // TODO: style highlighted rows to spec
-                        rowStyle: (rowData) =>
-                            (
-                                this.props.location.state?.newCaseIds ?? []
-                            ).includes(rowData.id) ||
-                            (
-                                this.props.location.state?.editedCaseIds ?? []
-                            ).includes(rowData.id)
-                                ? { backgroundColor: '#F0FBF9' }
-                                : {},
-                    }}
-                    onChangeRowsPerPage={(newPageSize: number) => {
-                        this.setState({ pageSize: newPageSize });
-                        this.tableRef.current.onQueryChange();
+                        rowStyle: (rowData) => {
+                            const isHighlighted =
+                                (
+                                    this.props.location.state?.newCaseIds ?? []
+                                ).includes(rowData.id) ||
+                                (
+                                    this.props.location.state?.editedCaseIds ??
+                                    []
+                                ).includes(rowData.id);
+
+                            const isExcluded =
+                                rowData.verificationStatus ===
+                                VerificationStatus.Excluded;
+
+                            return {
+                                ...(isHighlighted
+                                    ? { backgroundColor: '#F0FBF9' }
+                                    : {}),
+                                opacity: isExcluded ? 0.6 : 1,
+                            };
+                        },
                     }}
                     onRowClick={(_, rowData?: TableRow): void => {
                         if (rowData) {
@@ -910,19 +1104,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
-                                          if (
-                                              this.hasSelectedRowsAcrossPages()
-                                          ) {
-                                              await this.setCaseVerificationWithQuery(
-                                                  VerificationStatus.Verified,
-                                              );
-                                          } else {
-                                              await this.setCaseVerification(
-                                                  rows,
-                                                  VerificationStatus.Verified,
-                                              );
-                                          }
-                                          this.tableRef.current.onQueryChange();
+                                          this.changeVerificationStatus(
+                                              rows,
+                                              VerificationStatus.Verified,
+                                          );
                                       },
                                   },
                                   {
@@ -938,49 +1123,57 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                           _: any,
                                           rows: any,
                                       ): Promise<void> => {
-                                          if (
-                                              this.hasSelectedRowsAcrossPages()
-                                          ) {
-                                              await this.setCaseVerificationWithQuery(
-                                                  VerificationStatus.Unverified,
-                                              );
-                                          } else {
-                                              await this.setCaseVerification(
-                                                  rows,
-                                                  VerificationStatus.Unverified,
-                                              );
-                                          }
-                                          this.tableRef.current.onQueryChange();
+                                          this.changeVerificationStatus(
+                                              rows,
+                                              VerificationStatus.Unverified,
+                                          );
+                                      },
+                                  },
+                                  {
+                                      icon: (): JSX.Element => (
+                                          <ExcludedIcon data-testid="exclude-action" />
+                                      ),
+                                      hidden: !this.props.user.roles.includes(
+                                          'curator',
+                                      ),
+                                      tooltip: 'Exclude selected rows',
+                                      onClick: async (): Promise<void> => {
+                                          this.setState({
+                                              excludeDialogOpen: true,
+                                          });
                                       },
                                   },
                                   {
                                       icon: (): JSX.Element => (
                                           <span aria-label="download selected rows">
-                                              {this.state.isDownloading ? (
-                                                  <CircularProgress
-                                                      size={24}
-                                                      classes={{
-                                                          root:
-                                                              classes.toolbarItems,
-                                                      }}
-                                                  />
-                                              ) : (
-                                                  <SaveAltIcon
-                                                      classes={{
-                                                          root:
-                                                              classes.toolbarItems,
-                                                      }}
-                                                  />
-                                              )}
+                                              <form
+                                                  hidden
+                                                  ref={this.formRef}
+                                                  method="POST"
+                                                  action="/api/cases/download"
+                                              >
+                                                  {this.state.selectedRowsCurrentPage.map(
+                                                      (row: TableRow) => (
+                                                          <input
+                                                              name="caseIds[]"
+                                                              key={row.id}
+                                                              value={row.id}
+                                                          />
+                                                      ),
+                                                  )}
+                                              </form>
+                                              <SaveAltIcon
+                                                  classes={{
+                                                      root:
+                                                          classes.toolbarItems,
+                                                  }}
+                                              />
                                           </span>
                                       ),
-                                      tooltip: this.state.isDownloading
-                                          ? 'Downloading...'
-                                          : 'Download selected rows',
+                                      tooltip: 'Download selected rows',
                                       onClick: (): void => {
-                                          this.downloadSelectedCases();
+                                          this.formRef.current.submit();
                                       },
-                                      disabled: this.state.isDownloading,
                                   },
                                   // This action is for deleting selected rows.
                                   // The action for deleting single rows is in the

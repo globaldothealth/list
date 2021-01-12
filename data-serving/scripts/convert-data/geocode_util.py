@@ -32,7 +32,7 @@ def lookup_location(
     Returns:
       Geocode
     '''
-    normalized_tokens = [l.lower() for l in location_tokens]
+    normalized_tokens = [loc.lower() for loc in location_tokens]
 
     if not normalized_tokens:
         raise ValueError('No location tokens')
