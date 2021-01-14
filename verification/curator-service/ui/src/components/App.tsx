@@ -58,6 +58,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
 import useCookieBanner from '../hooks/useCookieBanner';
+import { URLToSearchQuery } from './util/searchQuery';
 
 const theme = createMuiTheme({
     palette: {
@@ -475,7 +476,7 @@ export default function App(): JSX.Element {
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
-                                    search={location.state?.search ?? ''}
+                                    search={encodeURIComponent(URLToSearchQuery(location.search)) ?? ''}
                                 ></DownloadButton>
                             </>
                         ) : (
