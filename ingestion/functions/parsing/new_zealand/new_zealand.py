@@ -15,22 +15,14 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
-import json
-import os
-import sys
-from datetime import date, datetime
-import csv
-
 
 def convert_date(raw_date: str, dataserver=True):
     """
     Convert raw date field into a value interpretable by the dataserver.
 
-    Removing timestamp as always midnight.
-
     Set dataserver to False in order to return version appropriate for notes.
     """
-    date = datetime.strptime(raw_date.split(' ')[0], "%Y-%m-%d")
+    date = datetime.strptime(raw_date.split(' ')[0], "%d/%m/%Y")
     if not dataserver:
         return date.strftime("%m/%d/%Y")
     return date.strftime("%m/%d/%YZ")
@@ -45,10 +37,10 @@ def convert_gender(raw_gender):
 
 
 def convert_location(raw_entry):
-    if 'Managed Isolation' in raw_entry['DHB']:
-        return None
+    if 'Managed Isolation' in raw_entry['DHB_label']:
+        return {"query": "New Zealand"}
     else:
-        return {"query": f"{raw_entry['DHB']}, New Zealand"}
+        return {"query": f"{raw_entry['DHB_label']}, New Zealand"}
 
 
 def convert_demographics(entry):
@@ -56,8 +48,8 @@ def convert_demographics(entry):
     If age is listed as 90+, setting age range as between 90 and 120.
     '''
     demo = {}
-    if entry['Age group']:
-        if '90+' in entry['Age group']:
+    if entry['age_bands_fixed']:
+        if '90+' in entry['age_bands_fixed']:
             demo["ageRange"] = {
                 "start": 90,
                 "end": 120
@@ -65,11 +57,11 @@ def convert_demographics(entry):
         else:
 
             demo["ageRange"] = {
-                "start": float(entry['Age group'].split(' to ')[0]),
-                "end": float(entry['Age group'].split(' to ')[1])
+                "start": float(entry['age_bands_fixed'].split(' to ')[0]),
+                "end": float(entry['age_bands_fixed'].split(' to ')[1])
             }
-    if entry['Sex']:
-        demo["gender"] = convert_gender(entry['Sex'])
+    if entry['Gender']:
+        demo["gender"] = convert_gender(entry['Gender'])
 
     return demo or None
 
@@ -80,20 +72,26 @@ def parse_cases(raw_data_file, source_id, source_url):
 
     New Zealand case data has no UUIDs, and provides just 6 fields:
 
-    Age range - we convert 90+ to ageRange of 90 - 120
+    age_bands_fixed - we convert 90+ to ageRange of 90 - 120
     Status - (confirmed/suspected), we take only confirmed
     DHB (where the case lives - listed as "Managed isolation & quarantine" for border cases)
     Overseas Travel - boolean, no details on where. We assume this means travel in last 30 days.
-    Report Date
-    Sex
+    ReportDate
+    Gender
+
+    We only count cases with a ReportDate and with Status=Confirmed
+
+    Cases arriving to NZ from 'Overseas' are geocoded generically to 'New Zealand'. Cases arising in NZ should
+    have county data.
 
 
     """
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
+        cases = []
         for entry in reader:
-            if entry['Case Status'] == 'Confirmed':
+            if entry['CaseStatus'] == 'Confirmed' and entry['ReportDate']:
                 notes = []
                 case = {
                     "caseReference": {
@@ -101,27 +99,25 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "sourceUrl": source_url
                     },
                     "location": convert_location(entry),
-                    "demographics": convert_demographics(entry)
-                }
-
-                if entry["Report Date"]:
-                    case["events"] = [
+                    "demographics": convert_demographics(entry),
+                    "events": [
                         {
                             "name": "confirmed",
                             "dateRange":
                             {
-                                "start": convert_date(entry["Report Date"]),
-                                "end": convert_date(entry["Report Date"])
+                                "start": convert_date(entry["ReportDate"]),
+                                "end": convert_date(entry["ReportDate"])
                             }
                         },
                     ]
-                if entry['Overseas travel'] == 'Yes':
+                }
+                if entry['Overseas'] == 'Yes':
                     case["travelHistory"] = {
                         "traveledPrior30Days": True
                     }
                     notes.append('Case imported from abroad.')
 
-                if 'Managed Isolation & quarantine' in entry['DHB']:
+                if 'Managed Isolation' in entry['DHB_label']:
                     notes.append(
                         'Case identified at border and placed into managed quarantine.')
 
