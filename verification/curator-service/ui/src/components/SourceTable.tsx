@@ -194,6 +194,9 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                      */
 
                     if (e.response?.data?.name === 'NotificationSendError') {
+                        this.setState({
+                            error: "Failed to send e-mail notifications to registered addresses",
+                        });
                         resolve();
                     } else {
                         this.setState({
