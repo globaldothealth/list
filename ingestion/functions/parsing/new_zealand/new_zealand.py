@@ -55,7 +55,6 @@ def convert_demographics(entry):
                 "end": 120
             }
         else:
-
             demo["ageRange"] = {
                 "start": float(entry['age_bands_fixed'].split(' to ')[0]),
                 "end": float(entry['age_bands_fixed'].split(' to ')[1])
