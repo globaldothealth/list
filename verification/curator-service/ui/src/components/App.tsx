@@ -77,6 +77,9 @@ const theme = createMuiTheme({
             main: '#FD685B',
             contrastText: '#454545',
         },
+        button: {
+            buttonCaption: '#ECF3F0',
+        },
     },
     typography: {
         fontFamily: 'Mabry Pro, sans-serif',
@@ -313,7 +316,10 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
-    useCookieBanner();
+    const CookieBanner = () => {
+        useCookieBanner();
+        return null;
+    };
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
@@ -436,6 +442,7 @@ export default function App(): JSX.Element {
     return (
         <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
+                <CookieBanner />
                 <CssBaseline />
                 <AppBar
                     position="fixed"
