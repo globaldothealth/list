@@ -16,7 +16,8 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
-
+import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
+ 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
         paddingTop: theme.spacing(1),
@@ -26,7 +27,7 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         flex: 1,
     },
     divider: {
-        backgroundColor: '#0E7569',
+        backgroundColor: theme.palette.primary.main,
         height: '40px',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
@@ -75,7 +76,10 @@ export default function SearchBar(props: {
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
-        setSearch(props.searchQuery ?? '');
+        if (!props.searchQuery) return;
+
+        const searchString = URLToSearchQuery(props.searchQuery);
+        setSearch(searchString);
     }, [props.searchQuery]);
 
     const handleFilterClick = (
@@ -97,17 +101,19 @@ export default function SearchBar(props: {
         setIsSearchGuideOpen((isOpen) => !isOpen);
     };
 
+    const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();            
+            props.onSearchChange(searchQueryToURL(search));
+        }
+    }
+
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
-                onKeyPress={(ev): void => {
-                    if (ev.key === 'Enter') {
-                        ev.preventDefault();
-                        props.onSearchChange(search);
-                    }
-                }}
-                onChange={(event): void => {
+                onKeyPress={handleKeyPress}
+                onChange={(event): void => {                    
                     setSearch(event.target.value);
                 }}
                 placeholder="Search"

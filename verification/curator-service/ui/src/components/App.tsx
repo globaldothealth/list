@@ -461,12 +461,13 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={
-                                            location.state?.search ?? ''
+                                        searchQuery={                                            
+                                            location.search ?? ''
                                         }
                                         onSearchChange={(searchQuery): void => {
-                                            history.push('/cases', {
-                                                search: searchQuery,
+                                            history.push({
+                                                pathname: '/cases',
+                                                search: searchQuery,                                                
                                             });
                                         }}
                                         loading={searchLoading}
