@@ -1,8 +1,8 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f4fa7dc9767ff004b750977/2020/11/13/1901/content.csv",
+    "s3Key": "test/peru/Peru_positivos_covid_jan14_head5k.csv",
     "sourceUrl": "https://cloud.minsa.gob.pe/s/Y8w3wHsEdYQSZRp/download",
-    "sourceId": "5f4fa7dc9767ff004b750977"
+    "sourceId": "60006af8d22cdc005c3f637c"
 }
 
