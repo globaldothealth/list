@@ -77,9 +77,6 @@ const theme = createMuiTheme({
             main: '#FD685B',
             contrastText: '#454545',
         },
-        button: {
-            buttonCaption: '#ECF3F0',
-        },
     },
     typography: {
         fontFamily: 'Mabry Pro, sans-serif',
@@ -121,6 +118,13 @@ const theme = createMuiTheme({
                     fontFamily: 'Inter',
                     fontSize: '14px',
                 },
+            },
+        },
+    },
+    custom: {
+        palette: {
+            button: {
+                buttonCaption: '#ECF3F0',
             },
         },
     },
