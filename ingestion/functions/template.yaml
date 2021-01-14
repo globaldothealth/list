@@ -22,7 +22,7 @@ Resources:
       CodeUri: retrieval/
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
-      MemorySize: 1024
+      MemorySize: 2048
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
@@ -434,6 +434,18 @@ Resources:
       CodeUri: parsing/republic_of_korea/
       Handler: republic_of_korea.lambda_handler
       Description: Parse case data for Republic of Korea
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  NewZealandParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/new_zealand/
+      Handler: new_zealand.lambda_handler
+      Description: Parse case data for New Zealand
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
