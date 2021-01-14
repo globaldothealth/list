@@ -26,7 +26,7 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         flex: 1,
     },
     divider: {
-        backgroundColor: '#0E7569',
+        backgroundColor: theme.palette.primary.main,
         height: '40px',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
