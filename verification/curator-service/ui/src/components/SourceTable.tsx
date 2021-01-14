@@ -181,10 +181,26 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     resolve();
                 })
                 .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                    });
-                    reject(e);
+                    /*
+                     * Warning: this is not a nice kludge.
+                     * Updating the source can fail for multiple reasons:
+                     * 1. our backend won't save the update
+                     * 2. AWS won't accept the scheduling update
+                     * 3. The email notifying curators of the update doesn't get sent.
+                     * 
+                     * Here, we check for the third case (email didn't get sent), and
+                     * call that a success anyway, so the table updates with the genuine
+                     * current values.
+                     */
+
+                    if (e.response?.data?.name === 'NotificationSendError') {
+                        resolve();
+                    } else {
+                        this.setState({
+                            error: e.response?.data?.message || e.toString(),
+                        });
+                        reject(e);
+                    }
                 });
         });
     }
