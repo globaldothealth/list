@@ -57,7 +57,7 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
-import useCookieBanner from '../hooks/useCookieBanner';
+import { useCookieBanner } from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
@@ -128,7 +128,7 @@ const theme = createMuiTheme({
                 customizeButtonColor: '#ECF3F0',
             },
             tooltip: {
-                backgroundColor:  '#FEEFC3',
+                backgroundColor: '#FEEFC3',
                 textColor: 'rgba(0, 0, 0, 0.87)',
             },
             appBar: {
@@ -329,7 +329,8 @@ interface LocationState {
 
 export default function App(): JSX.Element {
     const CookieBanner = () => {
-        useCookieBanner();
+        const { initCookieBanner } = useCookieBanner();
+        initCookieBanner();
         return null;
     };
 
