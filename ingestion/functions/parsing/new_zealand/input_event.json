@@ -1,0 +1,8 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/new_zealand/new_zealand_jan14.csv",
+    "sourceUrl": "https://www.health.govt.nz/system/files/documents/pages/covid_cases_2021-01-13_0.csv",
+    "sourceId": "5ffd5fb27a354a0038b37dfd"
+}
+
