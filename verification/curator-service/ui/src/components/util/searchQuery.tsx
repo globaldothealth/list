@@ -1,27 +1,30 @@
 export const searchQueryToURL = (searchQuery: string): string => {
-    const withFilters = searchQuery.includes(':');    
+    const withFilters = searchQuery.includes(':');
     let searchParams;
 
     if (withFilters) {
         const filters = searchQuery.trim().match(/\w+:/g) ?? [];
-        const params = searchQuery.trim().split(/\w+:/g).slice(1) ?? [];        
+        const params = searchQuery.trim().split(/\w+:/g).slice(1) ?? [];
 
         searchParams = new URLSearchParams();
-        for (let i=0; i<filters.length; i++) {
-            searchParams.append(filters[i].replace(':', '').trim(), params[i].trim());
-        }                        
+        for (let i = 0; i < filters.length; i++) {
+            searchParams.append(
+                filters[i].replace(':', '').trim(),
+                params[i].trim(),
+            );
+        }
 
         return searchParams.toString();
     } else {
-        searchParams = searchQuery.replaceAll(' ', '+');
+        searchParams = searchQuery.replace(/\s/g, '+');
         return searchParams === '' ? '' : 'q=' + searchParams;
-    }    
-}
+    }
+};
 
-export const URLToSearchQuery = (url: string): string => {    
-    const withFilters = url.includes('?q=');
+export const URLToSearchQuery = (url: string): string => {
+    const isQuery = url.includes('?q=');
 
-    if (!withFilters) {
+    if (!isQuery) {
         const searchParams = new URLSearchParams(url);
         let searchQuery = '';
 
@@ -31,6 +34,6 @@ export const URLToSearchQuery = (url: string): string => {
 
         return searchQuery.trim();
     } else {
-        return url.replace('?q=', '').replaceAll('+', ' ');
-    }    
-}
+        return url.replace('?q=', '').replace(/[+]/g, ' ');
+    }
+};
