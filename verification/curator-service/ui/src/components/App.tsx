@@ -63,15 +63,15 @@ const theme = createMuiTheme({
     palette: {
         background: {
             default: '#ecf3f0',
-            paper: '#ffffff',
+            paper: '#fff',
         },
         primary: {
             main: '#0E7569',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         secondary: {
             main: '#00C6AF',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         error: {
             main: '#FD685B',
@@ -125,6 +125,14 @@ const theme = createMuiTheme({
         palette: {
             button: {
                 buttonCaption: '#ECF3F0',
+                customizeButtonColor: '#ECF3F0',
+            },
+            tooltip: {
+                backgroundColor:  '#FEEFC3',
+                textColor: 'rgba(0, 0, 0, 0.87)',
+            },
+            appBar: {
+                backgroundColor: '#31A497',
             },
         },
     },

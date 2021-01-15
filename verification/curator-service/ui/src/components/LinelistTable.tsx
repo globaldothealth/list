@@ -116,7 +116,7 @@ interface Props
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
-            backgroundColor: 'white',
+            backgroundColor: theme.palette.background.paper,
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(1),
         },
@@ -131,7 +131,7 @@ const styles = (theme: Theme) =>
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             height: '64px',
         },
@@ -139,7 +139,7 @@ const styles = (theme: Theme) =>
             backgroundColor: '#31A497',
         },
         toolbarItems: {
-            color: 'white',
+            color: theme.palette.background.paper,
         },
     });
 
