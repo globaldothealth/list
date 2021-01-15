@@ -6,7 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withStyles } from '@material-ui/core';
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         container: {
             alignItems: 'center',
@@ -14,14 +14,14 @@ const styles = () =>
             padding: '1em 0',
         },
         title: { marginRight: '1em' },
-        tooltip: { background: 'white' },
+        tooltip: { background: theme.palette.background.paper },
     });
 
 const AppTooltip = withStyles((theme: Theme) => ({
     tooltip: {
-        backgroundColor: '#FEEFC3',
+        backgroundColor: theme.custom.palette.tooltip.backgroundColor,
         boxShadow: theme.shadows[1],
-        color: 'rgba(0, 0, 0, 0.87)',
+        color: theme.custom.palette.tooltip.textColor,
         fontSize: 13,
         fontWeight: 'normal',
     },
