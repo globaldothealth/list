@@ -330,7 +330,11 @@ interface LocationState {
 export default function App(): JSX.Element {
     const CookieBanner = () => {
         const { initCookieBanner } = useCookieBanner();
-        initCookieBanner();
+
+        useEffect(() => {
+            initCookieBanner();
+        }, [initCookieBanner]);
+
         return null;
     };
 
