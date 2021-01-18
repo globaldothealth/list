@@ -134,6 +134,9 @@ const theme = createMuiTheme({
             appBar: {
                 backgroundColor: '#31A497',
             },
+            landingPage: {
+                descriptionTextColor: '#838D89',
+            },
         },
     },
 });
