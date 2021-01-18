@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-curatorui-dev-114129-authRole",
+      "UnauthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-114129-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-114129-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-curatorui-dev-114129-deployment",
+      "UnauthRoleName": "amplify-curatorui-dev-114129-unauthRole",
+      "StackName": "amplify-curatorui-dev-114129",
+      "StackId": "arn:aws:cloudformation:us-east-2:516053802872:stack/amplify-curatorui-dev-114129/bd3e3e60-5979-11eb-9f0f-0a855f8e3818",
+      "AmplifyAppId": "dl7flpsux46r"
+    }
+  }
+}

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import {
-    FormControlLabel,
-    FormGroup,
     Paper,
     Typography,
-    Checkbox,
     FormHelperText,
+    Button,
+    LinearProgress,
 } from '@material-ui/core';
+import { Formik, Form, Field } from 'formik';
+import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
 
@@ -38,21 +39,56 @@ const useStyles = makeStyles(() => ({
         display: 'block',
         margin: '4px 0',
     },
-    loginButton: {
-        margin: '35px 0 15px',
+    googleButton: {
+        margin: '35px 0 0 0',
+        fontWeight: 400,
     },
     registerLengend: {
         color: '#838D89',
     },
-    checkboxRow: {
-        display: 'flex',
+    emailField: {
+        display: 'block',
+        width: '240px',
+        marginBottom: '15px',
+    },
+    signInButton: {
+        margin: '15px 0',
+    },
+    anotherOptionText: {
+        margin: '15px 0',
+    },
+    loader: {
+        marginTop: '15px',
     },
 }));
 
+interface FormValues {
+    email: string;
+    isAgreementChecked: boolean;
+}
+
 export default function LandingPage(): JSX.Element {
-    const [isAgreementChecked, setIsAgreementChecked] = useState(false);
-    const [isAgreementMessage, setIsAgreementMessage] = useState(false);
+    const [isAgreementChecked, setIsAgreementChecked] = useState<boolean>(
+        false,
+    );
+    const [isAgreementMessage, setIsAgreementMessage] = useState<boolean>(
+        false,
+    );
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const classes = useStyles();
+
+    const handleSignIn = (
+        values: FormValues,
+        setSubmitting: (value: boolean) => void,
+    ) => {
+        setIsSubmitting(true);
+        setTimeout(() => {
+            setSubmitting(false);
+            setIsSubmitting(false);
+            alert(JSON.stringify(values, null, 2));
+        }, 500);
+    };
+
     return (
         <Paper classes={{ root: classes.paper }}>
             <Typography variant="h4">
@@ -118,47 +154,97 @@ export default function LandingPage(): JSX.Element {
                     </PolicyLink>
                 </div>
             </div>
-            {isAgreementChecked && (
-                <a href={process.env.REACT_APP_LOGIN_URL}>
-                    <GoogleButton className={classes.loginButton} />
-                </a>
-            )}
-            {!isAgreementChecked && (
-                <GoogleButton
-                    className={classes.loginButton}
-                    onClick={() => {
+
+            <GoogleButton
+                className={classes.googleButton}
+                disabled={isSubmitting}
+                onClick={() => {
+                    if (!isAgreementChecked) {
                         setIsAgreementMessage(true);
-                    }}
-                />
-            )}
-            <FormGroup className={classes.checkboxRow}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={isAgreementChecked}
-                            onChange={(
-                                event: React.ChangeEvent<HTMLInputElement>,
-                            ) => {
-                                setIsAgreementChecked(event.target.checked);
-                                setIsAgreementMessage(false);
-                            }}
-                            name="isAgreementChecked"
+                    } else {
+                        window.location.href = process.env.REACT_APP_LOGIN_URL!;
+                    }
+                }}
+            />
+
+            <Typography className={classes.anotherOptionText}>
+                Or sign in with email
+            </Typography>
+
+            <Formik
+                initialValues={{ email: '', isAgreementChecked: false }}
+                validate={(values) => {
+                    const errors: Partial<FormValues> = {};
+                    if (!values.email) {
+                        errors.email = 'Required';
+                    } else if (
+                        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(
+                            values.email,
+                        )
+                    ) {
+                        errors.email = 'Invalid email address';
+                    }
+                    if (!values.isAgreementChecked) {
+                        errors.isAgreementChecked = true;
+                    }
+
+                    return errors;
+                }}
+                onSubmit={(values, { setSubmitting }) =>
+                    handleSignIn(values, setSubmitting)
+                }
+            >
+                {({ errors, touched, submitForm, isSubmitting }) => (
+                    <Form>
+                        <Field
+                            className={classes.emailField}
+                            variant="outlined"
+                            fullWidth={true}
+                            component={TextField}
+                            name="email"
+                            type="email"
+                            label="Email"
                         />
-                    }
-                    label={
-                        <small>
-                            By creating an account, I accept the Global.health
-                            TOS and Privacy Policy, and agree to be added to the
-                            newsletter.
-                        </small>
-                    }
-                />
-                {isAgreementMessage && (
-                    <FormHelperText error>
-                        This agreement is required
-                    </FormHelperText>
+                        <Field
+                            component={CheckboxWithLabel}
+                            type="checkbox"
+                            name="isAgreementChecked"
+                            onClick={() => {
+                                setIsAgreementChecked(!isAgreementChecked);
+                                setIsAgreementMessage(isAgreementChecked);
+                            }}
+                            Label={{
+                                label: (
+                                    <small>
+                                        By creating an account, I accept the
+                                        Global.health TOS and Privacy Policy,
+                                        and agree to be added to the newsletter
+                                    </small>
+                                ),
+                            }}
+                        />
+                        {(isAgreementMessage ||
+                            (errors.isAgreementChecked &&
+                                touched.isAgreementChecked)) && (
+                            <FormHelperText error>
+                                This agreement is required
+                            </FormHelperText>
+                        )}
+                        {isSubmitting && (
+                            <LinearProgress className={classes.loader} />
+                        )}
+                        <Button
+                            className={classes.signInButton}
+                            variant="contained"
+                            color="primary"
+                            disabled={isSubmitting}
+                            onClick={submitForm}
+                        >
+                            Sign in
+                        </Button>
+                    </Form>
                 )}
-            </FormGroup>
+            </Formik>
             <HealthmapInsignias />
         </Paper>
     );
