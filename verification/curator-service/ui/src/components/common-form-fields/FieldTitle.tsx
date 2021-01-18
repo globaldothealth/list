@@ -42,9 +42,9 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
             </div>
             {props.tooltip && (
                 <AppTooltip
+                    arrow
                     interactive={props.interactive}
                     title={props.tooltip}
-                    className={classes.tooltip}
                 >
                     <HelpOutlineIcon fontSize="small" />
                 </AppTooltip>
