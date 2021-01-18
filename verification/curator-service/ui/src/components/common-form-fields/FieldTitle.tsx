@@ -14,16 +14,16 @@ const styles = (theme: Theme) =>
             padding: '1em 0',
         },
         title: { marginRight: '1em' },
-        tooltip: { background: theme.palette.background.paper },
     });
 
 const AppTooltip = withStyles((theme: Theme) => ({
     tooltip: {
-        backgroundColor: theme.custom.palette.tooltip.backgroundColor,
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
         boxShadow: theme.shadows[1],
-        color: theme.custom.palette.tooltip.textColor,
-        fontSize: 13,
+        fontSize: 16,
         fontWeight: 'normal',
+        padding: '1rem',
     },
 }))(Tooltip);
 
