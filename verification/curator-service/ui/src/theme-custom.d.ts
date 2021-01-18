@@ -13,8 +13,11 @@ declare module '@material-ui/core/styles/createMuiTheme' {
                     textColor: string;
                 };
                 appBar: {
-                  backgroundColor: string,
-              };
+                    backgroundColor: string;
+                };
+                landingPage: {
+                    descriptionTextColor: string;
+                };
             };
         };
     }
@@ -31,8 +34,11 @@ declare module '@material-ui/core/styles/createMuiTheme' {
                     textColor?: string;
                 };
                 appBar?: {
-                  backgroundColor?: string,
-              }
+                    backgroundColor?: string;
+                };
+                landingPage?: {
+                    descriptionTextColor?: string;
+                };
             };
         };
     }

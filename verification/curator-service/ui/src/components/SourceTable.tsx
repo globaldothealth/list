@@ -100,7 +100,7 @@ interface TableRow {
 const styles = (theme: Theme) =>
     createStyles({
         error: {
-            color: 'red',
+            color: theme.palette.error.main,
             marginTop: theme.spacing(2),
         },
         alert: {
@@ -328,14 +328,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
-                                            <MenuItem
-                                                key={`format-${value}`}
-                                                value={value || ''}
-                                            >
-                                                {value || 'Unknown'}
-                                            </MenuItem>
-                                        ))}
+                                        {['', 'JSON', 'CSV', 'XLSX'].map(
+                                            (value) => (
+                                                <MenuItem
+                                                    key={`format-${value}`}
+                                                    value={value || ''}
+                                                >
+                                                    {value || 'Unknown'}
+                                                </MenuItem>
+                                            ),
+                                        )}
                                     </TextField>
                                 ),
                             },
