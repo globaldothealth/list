@@ -77,25 +77,25 @@ def parse_cases(raw_data_file, source_id, source_url):
         for entry in reader:
             if int(entry['DailyPositive']
                    ) > 0 and entry['Sex'] != 'Total' and entry['AgeGroup'] != 'Total':
-                for k in range(0, int(entry['DailyPositive'])):
-                    case = {
-                        "caseReference": {
-                            "sourceId": source_id,
-                            "sourceUrl": source_url
-                        },
-                        "events": [
-                            {
-                                "name": "confirmed",
-                                "dateRange":
-                                    {
-                                        "start": convert_date(entry["Date"]),
-                                        "end": convert_date(entry["Date"])
-                                    }
-                            }
-                        ],
-                        "demographics": convert_demographics(entry),
-                        "location": {"query": 'Scotland'}
-                    }
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceUrl": source_url
+                    },
+                    "events": [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
+                                {
+                                    "start": convert_date(entry["Date"]),
+                                    "end": convert_date(entry["Date"])
+                                }
+                        }
+                    ],
+                    "demographics": convert_demographics(entry),
+                    "location": {"query": 'Scotland'}
+                }
+                for _ in range(int(entry['DailyPositive'])):
                     yield case
 
 
