@@ -27,13 +27,16 @@ def convert_gender(raw_gender):
 
 
 def convert_age(raw_age):
-    age_range = {}
-    if raw_age["ageBracket"] != -1:
-        age_range["start"] = raw_age["ageBracket"]
-        age_range["end"] = raw_age["ageBracket"] + 9
-        return age_range
-    else:
+    if "ageBracket" not in raw_age.keys():
         return None
+    else:
+        age_range = {}
+        if raw_age["ageBracket"] != -1:
+            age_range["start"] = raw_age["ageBracket"]
+            age_range["end"] = raw_age["ageBracket"] + 9
+            return age_range
+        else:
+            return None
 
 
 def convert_location(raw_entry):
