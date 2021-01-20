@@ -15,7 +15,7 @@ import { withStyles } from '@material-ui/core';
 const styles = (theme: Theme) =>
     createStyles({
         modalContents: {
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             left: '15%',
             height: '100%',
             position: 'absolute',

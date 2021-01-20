@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
         marginRight: theme.spacing(4),
     },
     summary: {
-        color: 'red',
+        color: theme.palette.error.main,
         marginTop: '4em',
     },
 }));
