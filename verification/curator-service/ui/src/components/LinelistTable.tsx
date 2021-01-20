@@ -136,7 +136,7 @@ const styles = (theme: Theme) =>
             height: '64px',
         },
         tableToolbar: {
-            backgroundColor: theme.custom.palette.appBar.backgroundColor,
+            backgroundColor: "#31A497",
         },
         toolbarItems: {
             color: theme.palette.background.paper,
