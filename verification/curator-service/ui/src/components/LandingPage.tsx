@@ -3,10 +3,10 @@ import { Button, Paper, Typography } from '@material-ui/core';
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { Theme, makeStyles } from '@material-ui/core/styles';
 import PolicyLink from './PolicyLink';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
     paper: {
         height: '440px',
         left: '50%',
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
         marginTop: '20px',
     },
     description: {
-        color: '#838D89',
+        color: "#838D89",
         marginRight: '90px',
         width: '60%',
     },

@@ -26,7 +26,7 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         flex: 1,
     },
     divider: {
-        backgroundColor: '#0E7569',
+        backgroundColor: theme.palette.primary.main,
         height: '40px',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
@@ -37,21 +37,21 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-const StyledSearchTextField = withStyles({
+const StyledSearchTextField = withStyles((theme: Theme) => ({
     root: {
-        backgroundColor: 'white',
+        backgroundColor: theme.palette.background.paper,
         borderRadius: '8px',
         '& .MuiOutlinedInput-root': {
             borderRadius: '8px',
             '& fieldset': {
-                border: '1px solid #0E7569',
+                border: `1px solid  ${theme.palette.primary.main}`,
             },
             '&.Mui-focused fieldset': {
-                border: '1px solid #0E7569',
+                border: `1px solid  ${theme.palette.primary.main}`,
             },
         },
     },
-})(TextField);
+}))(TextField);
 
 const StyledInputAdornment = withStyles({
     positionStart: {

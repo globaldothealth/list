@@ -6,7 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withStyles } from '@material-ui/core';
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         container: {
             alignItems: 'center',

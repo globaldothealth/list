@@ -1,29 +1,33 @@
-import { useEffect } from 'react';
+import { useTheme, Theme } from '@material-ui/core/styles';
 
 const POLICY_ID = process.env.REACT_APP_POLICY_PUBLIC_ID;
 const SITE_ID = process.env.REACT_APP_COOKIE_CONSENT_PUBLIC_ID;
 
-const configuration = {
-    whitelabel: false,
-    lang: 'en',
-    siteId: SITE_ID,
-    cookiePolicyId: POLICY_ID,
-    banner: {
-        rejectButtonColor: '#ECF3F0',
-        rejectButtonCaptionColor: '#0E7569',
-        position: 'float-bottom-center',
-        textColor: 'white',
-        backgroundColor: '#0E7569',
-        acceptButtonDisplay: true,
-        acceptButtonColor: 'white',
-        acceptButtonCaptionColor: '#0E7569',
-        customizeButtonDisplay: true,
-        customizeButtonColor: '#ECF3F0',
-        customizeButtonCaptionColor: '#0E7569',
-    },
-};
-export default function useCookieBanner(): void {
-    const insertConfiguration = (): void => {
+const useCookieBanner = () => {
+    const theme = useTheme<Theme>();
+    const configuration = {
+        whitelabel: false,
+        lang: 'en',
+        siteId: SITE_ID,
+        cookiePolicyId: POLICY_ID,
+        banner: {
+            rejectButtonColor: theme.palette.background.default,
+            rejectButtonCaptionColor: theme.palette.primary.main,
+            position: 'float-bottom-center',
+            textColor: theme.palette.primary.contrastText,
+            backgroundColor: theme.palette.primary.main,
+            acceptButtonDisplay: true,
+            acceptButtonColor: theme.palette.background.paper,
+            acceptButtonCaptionColor: theme.palette.primary.main,
+            customizeButtonDisplay: true,
+            customizeButtonColor:
+                theme.custom.palette.button.customizeButtonColor,
+            customizeButtonCaptionColor:
+                theme.custom.palette.button.buttonCaption,
+        },
+    };
+
+    const insertConfiguration = () => {
         const script = document.createElement('script');
 
         script.text = `
@@ -34,7 +38,7 @@ export default function useCookieBanner(): void {
         document.head.appendChild(script);
     };
 
-    const insertScript = (): void => {
+    const insertScript = () => {
         const script = document.createElement('script');
 
         script.src = 'https://cdn.iubenda.com/cs/iubenda_cs.js';
@@ -42,8 +46,14 @@ export default function useCookieBanner(): void {
         document.body.appendChild(script);
     };
 
-    useEffect(() => {
+    const initCookieBanner = () => {
         insertConfiguration();
         insertScript();
-    }, []);
-}
+    };
+
+    return {
+        initCookieBanner,
+    };
+};
+
+export { useCookieBanner };

@@ -57,21 +57,21 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
-import useCookieBanner from '../hooks/useCookieBanner';
+import { useCookieBanner } from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
     palette: {
         background: {
             default: '#ecf3f0',
-            paper: '#ffffff',
+            paper: '#fff',
         },
         primary: {
             main: '#0E7569',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         secondary: {
             main: '#00C6AF',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         error: {
             main: '#FD685B',
@@ -118,6 +118,24 @@ const theme = createMuiTheme({
                     fontFamily: 'Inter',
                     fontSize: '14px',
                 },
+            },
+        },
+    },
+    custom: {
+        palette: {
+            button: {
+                buttonCaption: '#ECF3F0',
+                customizeButtonColor: '#ECF3F0',
+            },
+            tooltip: {
+                backgroundColor: '#FEEFC3',
+                textColor: 'rgba(0, 0, 0, 0.87)',
+            },
+            appBar: {
+                backgroundColor: '#31A497',
+            },
+            landingPage: {
+                descriptionTextColor: '#838D89',
             },
         },
     },
@@ -313,7 +331,15 @@ interface LocationState {
 }
 
 export default function App(): JSX.Element {
-    useCookieBanner();
+    const CookieBanner = () => {
+        const { initCookieBanner } = useCookieBanner();
+
+        useEffect(() => {
+            initCookieBanner();
+        }, [initCookieBanner]);
+
+        return null;
+    };
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
@@ -436,6 +462,7 @@ export default function App(): JSX.Element {
     return (
         <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
+                <CookieBanner />
                 <CssBaseline />
                 <AppBar
                     position="fixed"
