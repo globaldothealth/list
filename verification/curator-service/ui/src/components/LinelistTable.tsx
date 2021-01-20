@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { round } from 'lodash';
@@ -18,6 +18,7 @@ import {
     Typography,
     makeStyles,
     withStyles,
+    Modal,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -338,26 +339,32 @@ function RowMenu(props: {
 }
 
 export function DownloadButton(props: { search: string }): JSX.Element {
-    const formRef: RefObject<any> = React.createRef();
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
     return (
         <>
-            <form
-                hidden
-                ref={formRef}
-                method="POST"
-                action="/api/cases/download"
-            >
-                <input name="query" value={props.search.trim()} />
-            </form>
             <Button
                 variant="outlined"
                 color="primary"
-                onClick={(): void => formRef.current.submit()}
+                onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
                 Download
             </Button>
+            <Dialog open={isDownloadModalOpen}>
+                <DialogTitle>Download full data set</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2">
+                        This download link provides access to the full
+                        Global.health line list dataset, cached daily at 12:00am
+                        UTC. Any cases added past that time will not be in the
+                        current download, but will be available the next day.
+                    </Typography>
+                    <Typography variant="h6">
+                        <a href="#">Download</a>
+                    </Typography>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
