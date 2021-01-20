@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '20px',
     },
     description: {
-        color: theme.custom.palette.landingPage.descriptionTextColor,
+        color: "#838D89",
         marginRight: '90px',
         width: '60%',
     },
