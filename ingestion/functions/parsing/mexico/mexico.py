@@ -163,7 +163,10 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
         for row in reader:
             try:
                 case = {
-                    "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
+                    "caseReference": {
+                        "sourceId": source_id, 
+                        "sourceUrl": source_url,
+                        "sourceEntryId": row["ID_REGISTRO"]},
                     "location": convert_location(
                         row["ENTIDAD_RES"], row["MUNICIPIO_RES"]
                     ),

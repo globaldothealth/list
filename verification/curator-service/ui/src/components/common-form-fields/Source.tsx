@@ -10,6 +10,7 @@ import React from 'react';
 import { RequiredHelperText } from './FormikFields';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
+import { StyledTooltip } from '../new-case-form-fields/StyledTooltip';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
@@ -19,11 +20,18 @@ interface SourceProps {
     freeSolo?: boolean;
 }
 
-// TODO: format this text to have newlines in it
-const tooltipText =
-    'Enter the URL of the data source used for reporting the line list case. ' +
-    'If this is a new data source you will need to add it to the system along with a data source name. The form will prompt you to do this if this is the case. ' +
-    'If the URL is an existing source already in the system, select the appropriate source from the list provided. ';
+const TooltipText = () => (
+  <StyledTooltip>
+    <ul>
+      <li>Enter the URL of the data source used for reporting the line list case.
+        <ul>
+          <li>If this is a new data source you will need to add it to the system along with a data source name. The form will prompt you to do this if this is the case.</li>
+          <li>If the URL is an existing source already in the system, select the appropriate source from the list provided.</li>
+        </ul>
+      </li>
+    </ul>
+  </StyledTooltip>
+);
 
 export default class Source extends React.Component<SourceProps, {}> {
     render(): JSX.Element {
@@ -33,7 +41,7 @@ export default class Source extends React.Component<SourceProps, {}> {
             <Scroll.Element name="source">
                 <FieldTitle
                     title="Data Source"
-                    tooltip={freeSolo ? tooltipText : undefined}
+                    tooltip={<TooltipText />}
                 ></FieldTitle>
                 <SourcesAutocomplete
                     initialValue={this.props.initialValue}
