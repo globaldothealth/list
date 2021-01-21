@@ -31,9 +31,9 @@ detailedDataWithoutSources['date_confirmation'] = pd.to_datetime(detailedDataWit
 detailedDataWithoutSources.date_confirmation.describe()
 
 validDataWithoutADI = detailedDataWithoutSources.loc[~detailedDataWithoutSources['country_new'].isin(
-    ['Argentina', 'Bolivia', 'Brazil', 'Colombia', 'Cuba', 'El Salvador', 'Estonia', 'France', 'Germany', 'India', 
-     'Italy', 'Japan', 'Latvia', 'Peru', 'Philippines', 'Puerto Rico', 'South Africa', 'Spain', 'Switzerland',
-     'Taiwan', 'Thailand', ''])].copy()
+    ['Argentina', 'Bolivia', 'Brazil', 'Colombia', 'Cuba', 'Czech Republic', 'El Salvador', 'Estonia', 'France',
+     'Germany', 'India', 'Italy', 'Japan', 'Latvia', 'Peru', 'Philippines', 'Puerto Rico', 'South Africa',
+     'Spain', 'Switzerland', 'Taiwan', 'Thailand', ''])].copy()
 print("validDataWithoutADI total cases: " + str(validDataWithoutADI.shape[0]))
 
 validDataWithCountryNew = validDataWithoutADI.dropna(subset=['country_new']).copy()
