@@ -98,7 +98,7 @@ interface LocationState {
     editedCaseIds: string[];
     bulkMessage: string;
     page: number;
-    pageSize: number;    
+    pageSize: number;
 }
 
 interface Props
@@ -173,7 +173,7 @@ function RowMenu(props: {
     const [isDeleting, setIsDeleting] = React.useState(false);
     const classes = rowMenuStyles();
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {        
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
         event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
@@ -386,7 +386,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             isLoading: false,
             isDeleting: false,
             selectedVerificationStatus: VerificationStatus.Unverified,
-            searchQuery: encodeURIComponent(URLToSearchQuery(this.props.location.search)) ?? ''
+            searchQuery:
+                encodeURIComponent(
+                    URLToSearchQuery(this.props.location.search),
+                ) ?? '',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -404,13 +407,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     componentDidUpdate(
         prevProps: Readonly<Props>,
         prevState: Readonly<LinelistTableState>,
-    ): void {        
-        if (
-            this.props.location.search !==
-            prevProps.location.search
-        ) {            
-            this.setState({ page: 0, searchQuery: encodeURIComponent(URLToSearchQuery(this.props.location.search)) }, this.tableRef.current?.onQueryChange);
-        }        
+    ): void {
+        if (this.props.location.search !== prevProps.location.search) {
+            this.setState(
+                {
+                    page: 0,
+                    searchQuery: encodeURIComponent(
+                        URLToSearchQuery(this.props.location.search),
+                    ),
+                },
+                this.tableRef.current?.onQueryChange(),
+            );
+        }
     }
     componentWillUnmount(): void {
         this.unlisten();
@@ -418,9 +426,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     async deleteCases(): Promise<void> {
         this.setState({ error: '', isDeleting: true });
-        let requestBody;        
+        let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.state.searchQuery } };
+            requestBody = {
+                data: { query: decodeURIComponent(this.state.searchQuery) },
+            };
         } else {
             requestBody = {
                 data: {
@@ -455,7 +465,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             status: verificationStatus,
             ...(note ? { note } : {}),
             ...(this.hasSelectedRowsAcrossPages()
-                ? { query: this.state.searchQuery }
+                ? { query: decodeURIComponent(this.state.searchQuery) }
                 : { caseIds: rowData.map((row: TableRow) => row.id) }),
         };
 
@@ -817,7 +827,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         new Promise((resolve, reject) => {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
-                            listUrl += '&page=' + (this.state.page + 1);                                                         
+                            listUrl += '&page=' + (this.state.page + 1);
                             if (this.state.searchQuery !== '') {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
@@ -901,7 +911,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                         totalCount: result.data.total,
                                     });
                                 })
-                                .catch((e) => {                                    
+                                .catch((e) => {
                                     this.setState({
                                         error:
                                             e.response?.data?.message ||
@@ -1037,7 +1047,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...((this.state.searchQuery) !== ''
+                                  ...(this.state.searchQuery !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -1078,6 +1088,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             .totalNumRows !==
                                                         this.state
                                                             .numSelectedRows;
+
                                                     await this.tableRef.current.onAllSelected(
                                                         shouldSelectAll,
                                                     );

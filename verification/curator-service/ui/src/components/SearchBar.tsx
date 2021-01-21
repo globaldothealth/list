@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Button,
     IconButton,
@@ -17,7 +18,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
 import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
- 
+
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
         paddingTop: theme.spacing(1),
@@ -66,21 +67,23 @@ export default function SearchBar(props: {
     loading: boolean;
     rootComponentRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element {
+    const location = useLocation();
     const classes = searchBarStyles();
 
-    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    const [search, setSearch] = React.useState<string>(location.search);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
         false,
     );
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    React.useEffect(() => {
-        if (!props.searchQuery) return;
+    useEffect(() => {
+        const searchString = URLToSearchQuery(location.search);
+        if (searchString === search) return;
 
-        const searchString = URLToSearchQuery(props.searchQuery);
         setSearch(searchString);
-    }, [props.searchQuery]);
+        //eslint-disable-next-line
+    }, [location.search]);
 
     const handleFilterClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -103,17 +106,17 @@ export default function SearchBar(props: {
 
     const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
         if (ev.key === 'Enter') {
-            ev.preventDefault();            
+            ev.preventDefault();
             props.onSearchChange(searchQueryToURL(search));
         }
-    }
+    };
 
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
                 onKeyPress={handleKeyPress}
-                onChange={(event): void => {                    
+                onChange={(event): void => {
                     setSearch(event.target.value);
                 }}
                 placeholder="Search"

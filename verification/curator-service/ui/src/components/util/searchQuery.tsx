@@ -29,7 +29,7 @@ export const URLToSearchQuery = (url: string): string => {
         let searchQuery = '';
 
         searchParams.forEach((value, key) => {
-            searchQuery += `${key}: ${value} `;
+            searchQuery += `${key}:${value} `;
         });
 
         return searchQuery.trim();

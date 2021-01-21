@@ -123,9 +123,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     <Link
                                         to={{
                                             pathname: '/cases',
-                                            state: {
-                                                search: `uploadid:${rowData.id}`,
-                                            },
+                                            search: `?uploadid=${rowData.id}`,
                                         }}
                                     >
                                         {rowData.numCreated}
@@ -139,9 +137,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     <Link
                                         to={{
                                             pathname: '/cases',
-                                            state: {
-                                                search: `uploadid:${rowData.id}`,
-                                            },
+                                            search: `?uploadid=${rowData.id}`,
                                         }}
                                     >
                                         {rowData.numUpdated}
