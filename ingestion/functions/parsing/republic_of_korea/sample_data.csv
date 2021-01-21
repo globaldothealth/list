@@ -1,0 +1,11 @@
+,global_id,local_id,sex,birth_year,country,province,disease,group,exposure_start,exposure_end,infection_reason,infection_order,infected_by,contact_number,confirmed_date,released_date,deceased_date,state
+0,1,,female,1984.0,China,filtered at airport,,,1/19/20,1/19/20,visit to Wuhan,1.0,,45.0,1/20/20,2/6/20,,released
+1,2,,male,1964.0,Korea,filtered at airport,,,1/22/20,1/22/20,visit to Wuhan,1.0,,75.0,1/24/20,2/5/20,,released
+2,3,,male,1966.0,Korea,capital area,,,1/20/20,1/20/20,visit to Wuhan,1.0,,16.0,1/26/20,2/12/20,,released
+3,4,,male,1964.0,Korea,capital area,,,1/20/20,1/20/20,visit to Wuhan,1.0,,95.0,1/27/20,2/9/20,,released
+4,5,,male,1987.0,Korea,capital area,,,1/24/20,1/24/20,visit to Wuhan,1.0,,31.0,1/30/20,3/2/20,,released
+5,6,,male,1964.0,Korea,capital area,,,1/26/20,1/26/20,contact with patient,2.0,3.0,17.0,1/30/20,2/19/20,,released
+6,7,,male,1991.0,Korea,capital area,,,1/23/20,1/23/20,visit to Wuhan,1.0,,9.0,1/30/20,2/15/20,,released
+7,8,,female,1957.0,Korea,Jeollabuk-do,,,1/23/20,1/23/20,visit to Wuhan,1.0,,113.0,1/31/20,2/12/20,,released
+8,9,,female,1992.0,Korea,capital area,,,1/30/20,1/30/20,contact with patient,2.0,5.0,2.0,1/31/20,2/24/20,,released
+9,10,,female,1966.0,Korea,capital area,,,1/30/20,1/30/20,contact with patient,3.0,6.0,43.0,1/31/20,2/19/20,,released

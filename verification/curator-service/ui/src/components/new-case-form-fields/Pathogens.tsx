@@ -6,12 +6,30 @@ import FieldTitle from '../common-form-fields/FieldTitle';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
+import { StyledTooltip } from './StyledTooltip';
 import axios from 'axios';
+
+const TooltipText = () => (
+  <StyledTooltip>
+    <ul>
+      <li><strong>Pathogens:</strong> Provide details of any other pathogens the case has reported.
+        <ul>
+          <li>You can search for pathogens by starting to type and then selecting from the autocomplete list. </li>
+          <li>Multi pathogens can be selected if required for a single case</li>
+          <li>You do not need to select the pathogen for the disease of the dataset e.g. coronavirus, that will automatically be selected for the case</li>
+        </ul>
+      </li>
+    </ul>
+  </StyledTooltip>
+);
 
 export default function Pathogens(): JSX.Element {
     return (
         <Scroll.Element name="pathogens">
-            <FieldTitle title="Pathogens"></FieldTitle>
+            <FieldTitle
+              title="Pathogens"
+              tooltip={<TooltipText />}
+            ></FieldTitle>
             <PathogensAutocomplete />
         </Scroll.Element>
     );
