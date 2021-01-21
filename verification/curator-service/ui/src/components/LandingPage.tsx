@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import {
@@ -12,6 +12,11 @@ import { Formik, Form, Field } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
+
+import getRandomString from './util/randomString';
+import { Auth } from 'aws-amplify';
+import { CognitoUser } from '@aws-amplify/auth';
+import User from './User';
 
 import PolicyLink from './PolicyLink';
 
@@ -54,7 +59,7 @@ const useStyles = makeStyles(() => ({
     signInButton: {
         margin: '15px 0',
     },
-    anotherOptionText: {
+    authFormTitle: {
         margin: '15px 0',
     },
     loader: {
@@ -62,12 +67,32 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-interface FormValues {
+interface SignInFormValues {
     email: string;
     isAgreementChecked: boolean;
 }
 
-export default function LandingPage(): JSX.Element {
+interface CodeFormValues {
+    code: string;
+}
+
+interface UserAttributes {
+    sub: string;
+    email: string;
+    email_verified: boolean;
+}
+
+interface CognitoUserExtended extends CognitoUser {
+    attributes: UserAttributes;
+}
+
+interface LandingPageProps {
+    setUser: (user: User | undefined) => void;
+}
+
+export default function LandingPage({
+    setUser,
+}: LandingPageProps): JSX.Element {
     const [isAgreementChecked, setIsAgreementChecked] = useState<boolean>(
         false,
     );
@@ -75,19 +100,148 @@ export default function LandingPage(): JSX.Element {
         false,
     );
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [codeSent, setCodeSent] = useState<boolean>(false);
+    const [failedAttempts, setFailedAttempts] = useState<number>(0);
+    const [wrongCodeMessage, setWrongCodeMessage] = useState<boolean>(false);
+    const [authState, setAuthState] = useState<{
+        user: CognitoUserExtended | null;
+        email: string;
+        status: string;
+    }>();
     const classes = useStyles();
 
-    const handleSignIn = (
-        values: FormValues,
-        setSubmitting: (value: boolean) => void,
-    ) => {
-        setIsSubmitting(true);
-        setTimeout(() => {
-            setSubmitting(false);
-            setIsSubmitting(false);
-            alert(JSON.stringify(values, null, 2));
-        }, 500);
+    // useEffect(() => {
+    //     Auth.currentAuthenticatedUser()
+    //         .then((user) => {
+    //             console.log('currentUser: ', user.attributes.sub);
+    //         })
+    //         .catch((err) => {
+    //             console.log('User not authenticated');
+    //         });
+    // }, []);
+
+    const resetState = () => {
+        setCodeSent(false);
+        setWrongCodeMessage(false);
+        setFailedAttempts(0);
+        setIsAgreementChecked(false);
+        setAuthState({ user: null, email: '', status: '' });
     };
+
+    useEffect(() => {
+        if (!authState) return;
+
+        const { user, status, email } = authState;
+        switch (status) {
+            case 'UserNotFoundException':
+                signUp(email);
+                break;
+            case 'signedUp':
+                signIn(email);
+                break;
+            case 'signedIn':
+                setCodeSent(true);
+                break;
+            case 'authenticated':
+                if (!user) return;
+
+                console.log('TODO: Authenticate user ');
+                // const newUser: User = {
+                //     _id: user.attributes.sub,
+                //     email: user.attributes.email,
+                //     name: '',
+                //     roles: [],
+                // };
+                // setUser(newUser);
+                break;
+            case 'wrongCode':
+                if (failedAttempts >= 3) {
+                    resetState();
+                    alert('Too many failed attempts, please try again later.');
+                } else {
+                    setWrongCodeMessage(true);
+                }
+                break;
+            case 'error':
+                if (failedAttempts < 2) {
+                    alert('There was an error, please try again.');
+                }
+                break;
+            case 'UserLambdaValidationException':
+                alert('There was an error, please try again.');
+                break;
+            default:
+                console.log(authState);
+                break;
+        }
+        setIsSubmitting(false);
+    }, [authState, failedAttempts]);
+
+    const signUp = (email: string) => {
+        const params = {
+            username: email,
+            password: getRandomString(30),
+            attributes: {
+                email,
+            },
+        };
+
+        Auth.signUp(params)
+            .then((res) => {
+                setAuthState({ user: null, email, status: 'signedUp' });
+            })
+            .catch((err) => {
+                setAuthState({ user: null, email, status: err.code });
+            });
+    };
+
+    const signIn = async (email: string, resetForm?: () => void) => {
+        Auth.signIn(email)
+            .then((user) => {
+                setAuthState({ user, email, status: 'signedIn' });
+                if (resetForm) resetForm();
+            })
+            .catch((err) => {
+                setAuthState({ user: null, email, status: err.code });
+            });
+    };
+
+    const submitVerificationCode = async (code: string) => {
+        if (!authState?.user) return;
+
+        try {
+            await Auth.sendCustomChallengeAnswer(authState.user, code);
+        } catch (err) {
+            setAuthState({
+                user: authState.user,
+                email: '',
+                status: 'error',
+            });
+        }
+
+        Auth.currentAuthenticatedUser()
+            .then((user) => {
+                setAuthState({
+                    user,
+                    email: '',
+                    status: 'authenticated',
+                });
+            })
+            .catch((err) => {
+                setFailedAttempts((val) => val + 1);
+                setAuthState({
+                    user: authState.user,
+                    email: '',
+                    status: 'wrongCode',
+                });
+            });
+    };
+
+    useEffect(() => {
+        setTimeout(() => {
+            Auth.signOut().then(() => console.log('signed out'));
+        }, 1000);
+    }, []);
 
     return (
         <Paper classes={{ root: classes.paper }}>
@@ -155,96 +309,160 @@ export default function LandingPage(): JSX.Element {
                 </div>
             </div>
 
-            <GoogleButton
-                className={classes.googleButton}
-                disabled={isSubmitting}
-                onClick={() => {
-                    if (!isAgreementChecked) {
-                        setIsAgreementMessage(true);
-                    } else {
-                        window.location.href = process.env.REACT_APP_LOGIN_URL!;
-                    }
-                }}
-            />
+            {!codeSent && (
+                <GoogleButton
+                    className={classes.googleButton}
+                    disabled={isSubmitting}
+                    onClick={() => {
+                        if (!isAgreementChecked) {
+                            setIsAgreementMessage(true);
+                        } else {
+                            window.location.href = process.env.REACT_APP_LOGIN_URL!;
+                        }
+                    }}
+                />
+            )}
 
-            <Typography className={classes.anotherOptionText}>
-                Or sign in with email
+            <Typography className={classes.authFormTitle}>
+                {codeSent
+                    ? 'Enter verification code sent to your email address'
+                    : 'Or sign in with email'}
             </Typography>
 
-            <Formik
-                initialValues={{ email: '', isAgreementChecked: false }}
-                validate={(values) => {
-                    const errors: Partial<FormValues> = {};
-                    if (!values.email) {
-                        errors.email = 'Required';
-                    } else if (
-                        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(
-                            values.email,
-                        )
-                    ) {
-                        errors.email = 'Invalid email address';
-                    }
-                    if (!values.isAgreementChecked) {
-                        errors.isAgreementChecked = true;
-                    }
+            {!codeSent && (
+                <Formik
+                    initialValues={{ email: '', isAgreementChecked: false }}
+                    validate={(values) => {
+                        const errors: Partial<SignInFormValues> = {};
+                        if (!values.email) {
+                            errors.email = 'Required';
+                        } else if (
+                            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(
+                                values.email,
+                            )
+                        ) {
+                            errors.email = 'Invalid email address';
+                        }
+                        if (!values.isAgreementChecked) {
+                            errors.isAgreementChecked = true;
+                        }
 
-                    return errors;
-                }}
-                onSubmit={(values, { setSubmitting }) =>
-                    handleSignIn(values, setSubmitting)
-                }
-            >
-                {({ errors, touched, submitForm, isSubmitting }) => (
-                    <Form>
-                        <Field
-                            className={classes.emailField}
-                            variant="outlined"
-                            fullWidth={true}
-                            component={TextField}
-                            name="email"
-                            type="email"
-                            label="Email"
-                        />
-                        <Field
-                            component={CheckboxWithLabel}
-                            type="checkbox"
-                            name="isAgreementChecked"
-                            onClick={() => {
-                                setIsAgreementChecked(!isAgreementChecked);
-                                setIsAgreementMessage(isAgreementChecked);
-                            }}
-                            Label={{
-                                label: (
-                                    <small>
-                                        By creating an account, I accept the
-                                        Global.health TOS and Privacy Policy,
-                                        and agree to be added to the newsletter
-                                    </small>
-                                ),
-                            }}
-                        />
-                        {(isAgreementMessage ||
-                            (errors.isAgreementChecked &&
-                                touched.isAgreementChecked)) && (
-                            <FormHelperText error>
-                                This agreement is required
-                            </FormHelperText>
-                        )}
-                        {isSubmitting && (
-                            <LinearProgress className={classes.loader} />
-                        )}
-                        <Button
-                            className={classes.signInButton}
-                            variant="contained"
-                            color="primary"
-                            disabled={isSubmitting}
-                            onClick={submitForm}
-                        >
-                            Sign in
-                        </Button>
-                    </Form>
-                )}
-            </Formik>
+                        return errors;
+                    }}
+                    onSubmit={(values, { resetForm }) => {
+                        setIsSubmitting(true);
+                        signIn(values.email, resetForm);
+                    }}
+                >
+                    {({ errors, touched, submitForm }) => (
+                        <Form>
+                            <Field
+                                className={classes.emailField}
+                                variant="outlined"
+                                fullWidth={true}
+                                component={TextField}
+                                disabled={isSubmitting}
+                                name="email"
+                                type="email"
+                                label="Email"
+                            />
+                            <Field
+                                component={CheckboxWithLabel}
+                                type="checkbox"
+                                name="isAgreementChecked"
+                                onClick={() => {
+                                    setIsAgreementChecked(!isAgreementChecked);
+                                    setIsAgreementMessage(isAgreementChecked);
+                                }}
+                                disabled={isSubmitting}
+                                Label={{
+                                    label: (
+                                        <small>
+                                            By creating an account, I accept the
+                                            Global.health TOS and Privacy
+                                            Policy, and agree to be added to the
+                                            newsletter
+                                        </small>
+                                    ),
+                                }}
+                            />
+                            {(isAgreementMessage ||
+                                (errors.isAgreementChecked &&
+                                    touched.isAgreementChecked)) && (
+                                <FormHelperText error>
+                                    This agreement is required
+                                </FormHelperText>
+                            )}
+                            {isSubmitting && (
+                                <LinearProgress className={classes.loader} />
+                            )}
+                            <Button
+                                className={classes.signInButton}
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting}
+                                onClick={submitForm}
+                            >
+                                Sign in
+                            </Button>
+                        </Form>
+                    )}
+                </Formik>
+            )}
+            {codeSent && (
+                <Formik
+                    initialValues={{ code: '' }}
+                    validate={(values) => {
+                        const errors: Partial<CodeFormValues> = {};
+
+                        if (wrongCodeMessage) {
+                            setWrongCodeMessage(false);
+                        }
+
+                        if (!values.code) {
+                            errors.code = 'Required';
+                        }
+
+                        return errors;
+                    }}
+                    onSubmit={(values) => {
+                        setIsSubmitting(true);
+                        submitVerificationCode(values.code);
+                    }}
+                >
+                    {({ submitForm }) => (
+                        <Form>
+                            <Field
+                                className={classes.emailField}
+                                variant="outlined"
+                                fullWidth={true}
+                                component={TextField}
+                                disabled={isSubmitting}
+                                name="code"
+                                type="text"
+                                label="Verification code"
+                            />
+                            {wrongCodeMessage && (
+                                <FormHelperText error>
+                                    Wrong verification code entered
+                                </FormHelperText>
+                            )}
+                            {isSubmitting && (
+                                <LinearProgress className={classes.loader} />
+                            )}
+                            <Button
+                                className={classes.signInButton}
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting}
+                                onClick={submitForm}
+                            >
+                                Submit
+                            </Button>
+                        </Form>
+                    )}
+                </Formik>
+            )}
             <HealthmapInsignias />
         </Paper>
     );

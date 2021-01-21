@@ -1,15 +1,84 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-curatorui-dev-114129-authRole",
-      "UnauthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-114129-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-114129-authRole",
+      "AuthRoleName": "amplify-curatorui-dev-94706-authRole",
+      "UnauthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-94706-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::516053802872:role/amplify-curatorui-dev-94706-authRole",
       "Region": "us-east-2",
-      "DeploymentBucketName": "amplify-curatorui-dev-114129-deployment",
-      "UnauthRoleName": "amplify-curatorui-dev-114129-unauthRole",
-      "StackName": "amplify-curatorui-dev-114129",
-      "StackId": "arn:aws:cloudformation:us-east-2:516053802872:stack/amplify-curatorui-dev-114129/bd3e3e60-5979-11eb-9f0f-0a855f8e3818",
-      "AmplifyAppId": "dl7flpsux46r"
+      "DeploymentBucketName": "amplify-curatorui-dev-94706-deployment",
+      "UnauthRoleName": "amplify-curatorui-dev-94706-unauthRole",
+      "StackName": "amplify-curatorui-dev-94706",
+      "StackId": "arn:aws:cloudformation:us-east-2:516053802872:stack/amplify-curatorui-dev-94706/ebf9e6a0-5a32-11eb-bf6f-027590a47dea",
+      "AmplifyAppId": "d1i7y80u3r74nr"
+    },
+    "categories": {
+      "function": {
+        "curatoruic254d982DefineAuthChallenge": {},
+        "curatoruic254d982CreateAuthChallenge": {
+          "CHALLENGEANSWER": ""
+        },
+        "curatoruic254d982VerifyAuthChallengeResponse": {},
+        "curatoruic254d982PreSignup": {
+          "DOMAINWHITELIST": ""
+        }
+      },
+      "auth": {
+        "curatoruic254d982": {}
+      }
+    },
+    "nonCFNdata": {
+      "function": {
+        "curatorui1fac50bc": {
+          "layerVersionMap": {
+            "1": {
+              "permissions": [
+                {
+                  "type": "private"
+                }
+              ]
+            }
+          }
+        },
+        "preSignUp": {
+          "layerVersionMap": {
+            "1": {
+              "permissions": [
+                {
+                  "type": "private"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "ghaws": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-curatorui-ghaws-153155-authRole",
+      "UnauthRoleArn": "arn:aws:iam::612888738066:role/amplify-curatorui-ghaws-153155-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::612888738066:role/amplify-curatorui-ghaws-153155-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-curatorui-ghaws-153155-deployment",
+      "UnauthRoleName": "amplify-curatorui-ghaws-153155-unauthRole",
+      "StackName": "amplify-curatorui-ghaws-153155",
+      "StackId": "arn:aws:cloudformation:us-east-2:612888738066:stack/amplify-curatorui-ghaws-153155/43003db0-5b2c-11eb-bc4f-06994f12b84a",
+      "AmplifyAppId": "dh5s5jmk7z8dz"
+    },
+    "categories": {
+      "auth": {
+        "curatoruic254d982": {}
+      },
+      "function": {
+        "curatoruic254d982DefineAuthChallenge": {},
+        "curatoruic254d982CreateAuthChallenge": {
+          "CHALLENGEANSWER": ""
+        },
+        "curatoruic254d982VerifyAuthChallengeResponse": {},
+        "curatoruic254d982PreSignup": {
+          "DOMAINWHITELIST": ""
+        }
+      }
     }
   }
 }

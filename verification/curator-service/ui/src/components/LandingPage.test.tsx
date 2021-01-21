@@ -3,10 +3,12 @@ import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { render } from '@testing-library/react';
 
+const setUser = jest.fn();
+
 test('shows all content', async () => {
     const { getByText } = render(
         <MemoryRouter>
-            <LandingPage />
+            <LandingPage setUser={setUser} />
         </MemoryRouter>,
     );
 

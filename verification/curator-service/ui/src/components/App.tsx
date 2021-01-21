@@ -745,7 +745,7 @@ export default function App(): JSX.Element {
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage />
+                                <LandingPage setUser={setUser} />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}
