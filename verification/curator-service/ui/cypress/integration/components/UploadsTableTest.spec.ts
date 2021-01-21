@@ -84,8 +84,14 @@ describe('Uploads table', function () {
             },
         ]);
         cy.visit('/uploads');
-        cy.contains('a[href="/cases"]', '5').click();
-        cy.url().should('eq', 'http://localhost:3002/cases');
+        cy.contains(
+            'a[href="/cases?uploadid=5ef8e943dfe6e00030892d58"]',
+            '5',
+        ).click();
+        cy.url().should(
+            'eq',
+            'http://localhost:3002/cases?uploadid=5ef8e943dfe6e00030892d58',
+        );
         cy.get('input[id="search-field"]').should(
             'have.value',
             'uploadid:5ef8e943dfe6e00030892d58',
@@ -96,8 +102,14 @@ describe('Uploads table', function () {
         cy.contains('Germany').should('not.exist');
 
         cy.visit('/uploads');
-        cy.contains('a[href="/cases"]', '2').click();
-        cy.url().should('eq', 'http://localhost:3002/cases');
+        cy.contains(
+            'a[href="/cases?uploadid=5ef8e943dfe6e00030892d59"]',
+            '2',
+        ).click();
+        cy.url().should(
+            'eq',
+            'http://localhost:3002/cases?uploadid=5ef8e943dfe6e00030892d59',
+        );
         cy.get('input[id="search-field"]').should(
             'have.value',
             'uploadid:5ef8e943dfe6e00030892d59',

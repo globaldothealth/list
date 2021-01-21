@@ -57,6 +57,7 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
+import { URLToSearchQuery } from './util/searchQuery';
 import { useCookieBanner } from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
@@ -370,7 +371,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', state: { search: '' } },
+                  to: { pathname: '/cases', search: '' },
                   displayCheck: (): boolean => true,
               },
               {
@@ -488,11 +489,10 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={
-                                            location.state?.search ?? ''
-                                        }
+                                        searchQuery={location.search ?? ''}
                                         onSearchChange={(searchQuery): void => {
-                                            history.push('/cases', {
+                                            history.push({
+                                                pathname: '/cases',
                                                 search: searchQuery,
                                             });
                                         }}
@@ -501,7 +501,11 @@ export default function App(): JSX.Element {
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
-                                    search={location.state?.search ?? ''}
+                                    search={
+                                        encodeURIComponent(
+                                            URLToSearchQuery(location.search),
+                                        ) ?? ''
+                                    }
                                 ></DownloadButton>
                             </>
                         ) : (
