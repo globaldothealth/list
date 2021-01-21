@@ -345,7 +345,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', state: { search: '' } },
+                  to: { pathname: '/cases', search: '' },
                   displayCheck: (): boolean => true,
               },
               {
@@ -462,13 +462,11 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={                                            
-                                            location.search ?? ''
-                                        }
+                                        searchQuery={location.search ?? ''}
                                         onSearchChange={(searchQuery): void => {
                                             history.push({
                                                 pathname: '/cases',
-                                                search: searchQuery,                                                
+                                                search: searchQuery,
                                             });
                                         }}
                                         loading={searchLoading}
@@ -476,7 +474,11 @@ export default function App(): JSX.Element {
                                     ></SearchBar>
                                 </div>
                                 <DownloadButton
-                                    search={encodeURIComponent(URLToSearchQuery(location.search)) ?? ''}
+                                    search={
+                                        encodeURIComponent(
+                                            URLToSearchQuery(location.search),
+                                        ) ?? ''
+                                    }
                                 ></DownloadButton>
                             </>
                         ) : (
