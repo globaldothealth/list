@@ -786,6 +786,11 @@ components:
                     type: array
                     items:
                       type: string
+        variant:
+          type: object
+          properties:
+            name:
+              type: string
         genomeSequences:
           type: array
           items:
