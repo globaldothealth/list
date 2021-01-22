@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk');
+    const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-2'});
 // const nodemailer = require('nodemailer');
 

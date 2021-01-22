@@ -33,7 +33,7 @@ import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
-import LandingPage from './LandingPage';
+import LandingPage from './landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
