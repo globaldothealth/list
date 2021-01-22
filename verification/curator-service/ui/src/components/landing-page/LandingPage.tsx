@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
+import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import {
     Paper,
@@ -8,17 +8,20 @@ import {
     Button,
     LinearProgress,
 } from '@material-ui/core';
+//TODO: Add Dialog
 import { Formik, Form, Field } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
 
-import getRandomString from './util/randomString';
+import getRandomString from '../util/randomString';
 import { Auth } from 'aws-amplify';
 import { CognitoUser } from '@aws-amplify/auth';
-import User from './User';
+import User from '../User';
+import WrongCodeDialog from './WrongCodeDialog';
+import ErrorDialog from './ErrorDialog';
 
-import PolicyLink from './PolicyLink';
+import PolicyLink from '../PolicyLink';
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -103,6 +106,8 @@ export default function LandingPage({
     const [codeSent, setCodeSent] = useState<boolean>(false);
     const [failedAttempts, setFailedAttempts] = useState<number>(0);
     const [wrongCodeMessage, setWrongCodeMessage] = useState<boolean>(false);
+    const [wrongCodeDialog, setWrongCodeDialog] = useState<boolean>(false);
+    const [errorDialog, setErrorDialog] = useState<boolean>(false);
     const [authState, setAuthState] = useState<{
         user: CognitoUserExtended | null;
         email: string;
@@ -141,6 +146,7 @@ export default function LandingPage({
                 break;
             case 'signedIn':
                 setCodeSent(true);
+                setIsSubmitting(false);
                 break;
             case 'authenticated':
                 if (!user) return;
@@ -153,28 +159,31 @@ export default function LandingPage({
                 //     roles: [],
                 // };
                 // setUser(newUser);
+                setIsSubmitting(false);
                 break;
             case 'wrongCode':
                 if (failedAttempts >= 3) {
-                    resetState();
-                    alert('Too many failed attempts, please try again later.');
+                    setWrongCodeDialog(true);
                 } else {
                     setWrongCodeMessage(true);
                 }
+                setIsSubmitting(false);
                 break;
             case 'error':
                 if (failedAttempts < 2) {
-                    alert('There was an error, please try again.');
+                    setErrorDialog(true);
                 }
+                setIsSubmitting(false);
                 break;
             case 'UserLambdaValidationException':
-                alert('There was an error, please try again.');
+                setErrorDialog(true);
+                setIsSubmitting(false);
                 break;
             default:
+                setIsSubmitting(false);
                 console.log(authState);
                 break;
         }
-        setIsSubmitting(false);
     }, [authState, failedAttempts]);
 
     const signUp = (email: string) => {
@@ -463,6 +472,12 @@ export default function LandingPage({
                     )}
                 </Formik>
             )}
+            <WrongCodeDialog
+                isOpen={wrongCodeDialog}
+                setIsOpen={setWrongCodeDialog}
+                onClose={resetState}
+            />
+            <ErrorDialog isOpen={errorDialog} setIsOpen={setErrorDialog} />
             <HealthmapInsignias />
         </Paper>
     );
