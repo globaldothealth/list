@@ -1,57 +1,39 @@
-    const AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-2'});
-// const nodemailer = require('nodemailer');
+const randomDigit = require('crypto-secure-random-digit');
+const ses = new AWS.SES();
 
 exports.handler = async (event, context) => {
-
     let secretLoginCode;
     if (!event.request.session || !event.request.session.length) {
 
         // This is a new auth session
         // Generate a new secret login code and mail it to the user
-        secretLoginCode = '1234';   
-        // const testAccount = await nodemailer.createTestAccount();
+        secretLoginCode = randomDigit.randomDigits(6).join('');
 
-        // const transporter = nodemailer.createTransport({
-        //     host: "smtp.ethereal.email",
-        //     port: 587,
-        //     secure: false, // true for 465, false for other ports
-        //     auth: {
-        //         user: testAccount.user, // generated ethereal user
-        //         pass: testAccount.pass, // generated ethereal password
-        //     },
-        // });
+        const params = {
+        Destination: { ToAddresses: [event.request.userAttributes.email] },
+        Message: {
+            Body: {
+                Html: {
+                    Charset: 'UTF-8',
+                    Data: `<html><body><p>This is your secret login code:</p>
+                           <h3>${secretLoginCode}</h3></body></html>`
+                },
+                Text: {
+                    Charset: 'UTF-8',
+                    Data: `Your secret login code: ${secretLoginCode}`
+                }
+            },
+            Subject: {
+                Charset: 'UTF-8',
+                Data: 'Your secret login code'
+            }
+        },
+        Source: 'maciek3609@gmail.com'
+        };
 
-        // // send mail with defined transport object
-        // await transporter.sendMail({
-        //     from: '"Fred Foo 👻" <foo@example.com>', // sender address
-        //     to: "maciek3609@gmail.com", // list of receivers
-        //     subject: "Verification code", // Subject line
-        //     text: "Your verification code is: 1234", // plain text body
-        //     html: "<b>Hello world?</b>", // html body
-        // });
-        // const params = {
-        // Destination: { ToAddresses: [event.request.userAttributes.email] },
-        // Message: {
-        //     Body: {
-        //         Html: {
-        //             Charset: 'UTF-8',
-        //             Data: `<html><body><p>This is your secret login code:</p>
-        //                    <h3>${secretLoginCode}</h3></body></html>`
-        //         },
-        //         Text: {
-        //             Charset: 'UTF-8',
-        //             Data: `Your secret login code: ${secretLoginCode}`
-        //         }
-        //     },
-        //     Subject: {
-        //         Charset: 'UTF-8',
-        //         Data: 'Your secret login code'
-        //     }
-        // },
-        // Source: 'maciek3609@gmail.com'
-        // };
-    // await ses.sendEmail(params).promise();
+    await ses.sendEmail(params).promise();
     } else {
 
         // There's an existing session. Don't generate new digits but
@@ -73,7 +55,7 @@ exports.handler = async (event, context) => {
 
     // Add the secret login code to the session so it is available
     // in a next invocation of the "Create Auth Challenge" trigger
-    event.response.challengeMetadata = `CODE-${secretLoginCode}`;
+    event.response.challengeMetadata = `CODE-${secretLoginCode}`;    
 
     context.done(null, event);
 };
