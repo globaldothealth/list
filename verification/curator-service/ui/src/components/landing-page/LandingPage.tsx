@@ -8,7 +8,6 @@ import {
     Button,
     LinearProgress,
 } from '@material-ui/core';
-//TODO: Add Dialog
 import { Formik, Form, Field } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,6 +19,7 @@ import { CognitoUser } from '@aws-amplify/auth';
 import User from '../User';
 import WrongCodeDialog from './WrongCodeDialog';
 import ErrorDialog from './ErrorDialog';
+import axios from 'axios';
 
 import PolicyLink from '../PolicyLink';
 
@@ -115,16 +115,6 @@ export default function LandingPage({
     }>();
     const classes = useStyles();
 
-    // useEffect(() => {
-    //     Auth.currentAuthenticatedUser()
-    //         .then((user) => {
-    //             console.log('currentUser: ', user.attributes.sub);
-    //         })
-    //         .catch((err) => {
-    //             console.log('User not authenticated');
-    //         });
-    // }, []);
-
     const resetState = () => {
         setCodeSent(false);
         setWrongCodeMessage(false);
@@ -151,15 +141,27 @@ export default function LandingPage({
             case 'authenticated':
                 if (!user) return;
 
-                console.log('TODO: Authenticate user ');
-                // const newUser: User = {
-                //     _id: user.attributes.sub,
-                //     email: user.attributes.email,
-                //     name: '',
-                //     roles: [],
-                // };
-                // setUser(newUser);
-                setIsSubmitting(false);
+                axios
+                    .post('/auth/register', {
+                        name: user.attributes.email,
+                        email: user.attributes.email,
+                        roles: [],
+                    })
+                    .then((res) => {
+                        const { _id, email, name, roles } = res.data;
+                        const newUser: User = {
+                            _id,
+                            email,
+                            name,
+                            roles,
+                        };
+                        setUser(newUser);
+                        setIsSubmitting(false);
+                    })
+                    .catch((err) => {
+                        setErrorDialog(true);
+                        setIsSubmitting(false);
+                    });
                 break;
             case 'wrongCode':
                 if (failedAttempts >= 3) {
@@ -184,7 +186,7 @@ export default function LandingPage({
                 console.log(authState);
                 break;
         }
-    }, [authState, failedAttempts]);
+    }, [authState, failedAttempts, setUser]);
 
     const signUp = (email: string) => {
         const params = {
@@ -245,12 +247,6 @@ export default function LandingPage({
                 });
             });
     };
-
-    useEffect(() => {
-        setTimeout(() => {
-            Auth.signOut().then(() => console.log('signed out'));
-        }, 1000);
-    }, []);
 
     return (
         <Paper classes={{ root: classes.paper }}>

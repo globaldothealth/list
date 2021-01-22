@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
                 Data: 'Your secret login code'
             }
         },
-        Source: 'maciek3609@gmail.com'
+        Source: process.env.SOURCEEMAIL
         };
                 
         await ses.sendEmail(params).promise();

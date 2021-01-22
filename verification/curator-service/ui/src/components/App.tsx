@@ -58,6 +58,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
 import useCookieBanner from '../hooks/useCookieBanner';
+import { Auth } from 'aws-amplify';
 
 const theme = createMuiTheme({
     palette: {
@@ -270,9 +271,14 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     <MenuItem>Profile</MenuItem>
                 </Link>
 
-                <a className={classes.link} href="/auth/logout">
-                    <MenuItem>Logout</MenuItem>
-                </a>
+                <MenuItem
+                    onClick={() => {
+                        Auth.signOut();
+                        window.location.href = '/auth/logout';
+                    }}
+                >
+                    Logout
+                </MenuItem>
                 <Divider className={classes.divider} />
                 <Link to="/terms" onClick={handleClose}>
                     <MenuItem>About Global.Health</MenuItem>
