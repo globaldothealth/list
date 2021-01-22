@@ -17,6 +17,7 @@ import { TextField } from 'formik-material-ui';
 import axios from 'axios';
 import { hasKey } from '../Utils';
 import { makeStyles } from '@material-ui/core';
+import { FormatListBulleted } from '@material-ui/icons';
 
 const useStyles = makeStyles(() => ({
     fieldRow: {
@@ -216,6 +217,7 @@ export function DateField(props: DateFieldProps): JSX.Element {
 
 interface RequiredHelperTextProps {
     name: string;
+    wrongUrl?: boolean;
 }
 
 export function RequiredHelperText(
@@ -224,6 +226,13 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<
         CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
+    
+    let finalHelperText = "Required";
+    if (props.wrongUrl === false) {
+        finalHelperText = "Please enter a valid URL"
+    }
+    
+    
     return (
         <div>
             <FormHelperText
@@ -232,10 +241,10 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null)
+                        values[props.name] === null) || props.wrongUrl === false
                 }
             >
-                Required
+                {finalHelperText}
             </FormHelperText>
         </div>
     );
