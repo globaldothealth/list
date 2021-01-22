@@ -25,7 +25,9 @@ const TooltipText = () => (
     <ul>
       <li>Enter the URL of the data source used for reporting the line list case.
         <ul>
-          <li>If this is a new data source you will need to add it to the system along with a data source name. The form will prompt you to do this if this is the case.</li>
+        <p>New data source</p>
+          <li>If this is a new data source you will need to add it to the system along with the root data source name. For example if the raw source was the ""7th July Press Release from Honduras” the source name would be the issuer of the press release e.g. “Honduras ministry of health'.  The source name needs to reflect the actually provider of the data, not the method of reporting.</li>
+          <p>Existing data source</p>
           <li>If the URL is an existing source already in the system, select the appropriate source from the list provided.</li>
         </ul>
       </li>
