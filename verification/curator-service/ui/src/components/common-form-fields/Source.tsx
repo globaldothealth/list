@@ -149,6 +149,24 @@ export function SourcesAutocomplete(
         [],
     );
 
+    const sourceURLValidation = (str: string) => {
+        if (str.length > 0) {
+            var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator                     
+                return !!pattern.test(str);
+        } else {
+            return true
+        }
+        
+    }
+
+    
+
+
     React.useEffect(() => {
         let active = true;
 
@@ -275,7 +293,7 @@ export function SourcesAutocomplete(
                             component={TextField}
                             fullWidth
                         ></Field>
-                        <RequiredHelperText name={name}></RequiredHelperText>
+                        <RequiredHelperText name={name} wrongUrl={sourceURLValidation(inputValue)}></RequiredHelperText>
                     </div>
                 )}
                 renderOption={(option: CaseReferenceForm): React.ReactNode => {
@@ -292,6 +310,7 @@ export function SourcesAutocomplete(
             {inputValue &&
                 props.freeSolo &&
                 !options.find((option) => option.sourceUrl === inputValue) && (
+                    
                     <>
                         <FastField
                             className={classes.sourceNameField}
