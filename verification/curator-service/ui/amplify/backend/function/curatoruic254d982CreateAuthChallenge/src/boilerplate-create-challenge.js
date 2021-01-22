@@ -32,8 +32,8 @@ exports.handler = async (event, context) => {
         },
         Source: 'maciek3609@gmail.com'
         };
-
-    await ses.sendEmail(params).promise();
+                
+        await ses.sendEmail(params).promise();
     } else {
 
         // There's an existing session. Don't generate new digits but

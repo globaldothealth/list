@@ -109,7 +109,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-curatorui-ghaws-153155-deployment",
-          "S3Key": "amplify-builds/curatoruic254d982PreSignup-436f6e4973366c596535-build.zip"
+          "S3Key": "amplify-builds/curatoruic254d982PreSignup-2f45367a364841326951-build.zip"
         }
       }
     },
