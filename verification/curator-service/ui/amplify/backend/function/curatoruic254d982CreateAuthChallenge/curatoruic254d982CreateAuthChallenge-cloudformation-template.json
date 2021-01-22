@@ -102,7 +102,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-curatorui-ghaws-153155-deployment",
-          "S3Key": "amplify-builds/curatoruic254d982CreateAuthChallenge-6138657679712b567631-build.zip"
+          "S3Key": "amplify-builds/curatoruic254d982CreateAuthChallenge-4172584337777249355a-build.zip"
         }
       }
     },
@@ -165,24 +165,11 @@
               "Action": [
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
-                "logs:PutLogEvents"
+                "logs:PutLogEvents",
+                "ses:SendEmail",
+                "ses:SendRawEmail"
               ],
-              "Resource": {
-                "Fn::Sub": [
-                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
-                  {
-                    "region": {
-                      "Ref": "AWS::Region"
-                    },
-                    "account": {
-                      "Ref": "AWS::AccountId"
-                    },
-                    "lambda": {
-                      "Ref": "LambdaFunction"
-                    }
-                  }
-                ]
-              }
+              "Resource": "*"
             }
           ]
         }
