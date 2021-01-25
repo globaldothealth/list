@@ -37,7 +37,7 @@ const TooltipText = () => (
             <li><strong>Unknown:</strong> The method used to confirm the case was not reported in the source</li>
           </ul>
         </li>
-        <li><strong>Onset of symptoms date:</strong> Enter the date if reported for the onset of symptoms.  If not reported leave blank.</li>
+        <li><strong>Onset of symptoms date:</strong> Enter the date if reported for the onset of symptoms.  Leave blank if not reported.</li>
         <li><strong>First clinical consultation date:</strong> Enter the date of the first clinical consultation of any type reported by the patient.
           <ul>
             <li>This could be visiting a doctor or nurse or calling a healthcare helpline to report their symptoms / condition</li>
@@ -49,9 +49,13 @@ const TooltipText = () => (
             <li>If the case did not go into self isolation, or the source does not report the information leave blank</li>
           </ul>
         </li>
-        <li><strong>Hospital admission:</strong> Enter if the case was admitted to hospital or not. If source does not provide any information leave blank</li>
-        <li><strong>ICU admission:</strong> Enter if the case was admitted to ICU or not. If the source does not provide any information leave blank</li>
-        <li><strong>Outcome:</strong> This is a required field so must be entered. Enter the outcome of the case. If the source does not provide any information select unknown</li>
+        <li><strong>Hospital admission:</strong> Enter if the case was admitted to hospital.</li>
+        <li>If the case did not get admitted to hospital or the source does not provide any information leave blank</li>
+        <li><strong>ICU admission:</strong> Enter if the case was admitted to ICU ward.</li>
+        <li>If the case did not get admitted to ICU or the source does not provide any information leave blank</li>
+        <li><strong>Outcome:</strong> Enter the outcome of the case</li>
+        <li>If the source does not provide any information enter unknown</li>
+        <li>This is a required field so must be entered</li>
       </ul>
     </StyledTooltip>
 );
