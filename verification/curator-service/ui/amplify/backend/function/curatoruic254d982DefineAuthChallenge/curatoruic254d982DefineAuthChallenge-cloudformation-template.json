@@ -94,7 +94,7 @@
         "Runtime": "nodejs10.x",
         "Timeout": "25",
         "Code": {
-          "S3Bucket": "amplify-curatorui-ghaws-153155-deployment",
+          "S3Bucket": "amplify-curatorui-prod-123117-deployment",
           "S3Key": "amplify-builds/curatoruic254d982DefineAuthChallenge-61414c4a784c4d5a4361-build.zip"
         }
       }
