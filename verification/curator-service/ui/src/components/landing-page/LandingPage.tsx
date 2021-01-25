@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
-import {
-    Paper,
-    Typography,
-    FormHelperText,
-    Button,
-    LinearProgress,
-} from '@material-ui/core';
-import { Formik, Form, Field } from 'formik';
-import { TextField, CheckboxWithLabel } from 'formik-material-ui';
+import { Paper, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
 
@@ -20,6 +12,8 @@ import User from '../User';
 import WrongCodeDialog from './WrongCodeDialog';
 import ErrorDialog from './ErrorDialog';
 import axios from 'axios';
+import SignInForm from './SignInForm';
+import VerificationCodeForm from './VerificationCodeForm';
 
 import PolicyLink from '../PolicyLink';
 
@@ -69,15 +63,6 @@ const useStyles = makeStyles(() => ({
         marginTop: '15px',
     },
 }));
-
-interface SignInFormValues {
-    email: string;
-    isAgreementChecked: boolean;
-}
-
-interface CodeFormValues {
-    code: string;
-}
 
 interface UserAttributes {
     sub: string;
@@ -177,13 +162,9 @@ export default function LandingPage({
                 }
                 setIsSubmitting(false);
                 break;
-            case 'UserLambdaValidationException':
+            default:
                 setErrorDialog(true);
                 setIsSubmitting(false);
-                break;
-            default:
-                setIsSubmitting(false);
-                console.log(authState);
                 break;
         }
     }, [authState, failedAttempts, setUser]);
@@ -207,6 +188,8 @@ export default function LandingPage({
     };
 
     const signIn = async (email: string, resetForm?: () => void) => {
+        setIsSubmitting(true);
+
         Auth.signIn(email)
             .then((user) => {
                 setAuthState({ user, email, status: 'signedIn' });
@@ -219,6 +202,7 @@ export default function LandingPage({
 
     const submitVerificationCode = async (code: string) => {
         if (!authState?.user) return;
+        setIsSubmitting(true);
 
         try {
             await Auth.sendCustomChallengeAnswer(authState.user, code);
@@ -335,138 +319,32 @@ export default function LandingPage({
             </Typography>
 
             {!codeSent && (
-                <Formik
-                    initialValues={{ email: '', isAgreementChecked: false }}
-                    validate={(values) => {
-                        const errors: Partial<SignInFormValues> = {};
-                        if (!values.email) {
-                            errors.email = 'Required';
-                        } else if (
-                            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(
-                                values.email,
-                            )
-                        ) {
-                            errors.email = 'Invalid email address';
-                        }
-                        if (!values.isAgreementChecked) {
-                            errors.isAgreementChecked = true;
-                        }
-
-                        return errors;
+                <SignInForm
+                    handleSubmit={signIn}
+                    isAgreementChecked={isAgreementChecked}
+                    setIsAgreementChecked={setIsAgreementChecked}
+                    setIsAgreementMessage={setIsAgreementMessage}
+                    isAgreementMessage={isAgreementMessage}
+                    isSubmitting={isSubmitting}
+                    classes={{
+                        emailField: classes.emailField,
+                        loader: classes.loader,
+                        signInButton: classes.signInButton,
                     }}
-                    onSubmit={(values, { resetForm }) => {
-                        setIsSubmitting(true);
-                        signIn(values.email, resetForm);
-                    }}
-                >
-                    {({ errors, touched, submitForm }) => (
-                        <Form>
-                            <Field
-                                className={classes.emailField}
-                                variant="outlined"
-                                fullWidth={true}
-                                component={TextField}
-                                disabled={isSubmitting}
-                                name="email"
-                                type="email"
-                                label="Email"
-                            />
-                            <Field
-                                component={CheckboxWithLabel}
-                                type="checkbox"
-                                name="isAgreementChecked"
-                                onClick={() => {
-                                    setIsAgreementChecked(!isAgreementChecked);
-                                    setIsAgreementMessage(isAgreementChecked);
-                                }}
-                                disabled={isSubmitting}
-                                Label={{
-                                    label: (
-                                        <small>
-                                            By creating an account, I accept the
-                                            Global.health TOS and Privacy
-                                            Policy, and agree to be added to the
-                                            newsletter
-                                        </small>
-                                    ),
-                                }}
-                            />
-                            {(isAgreementMessage ||
-                                (errors.isAgreementChecked &&
-                                    touched.isAgreementChecked)) && (
-                                <FormHelperText error>
-                                    This agreement is required
-                                </FormHelperText>
-                            )}
-                            {isSubmitting && (
-                                <LinearProgress className={classes.loader} />
-                            )}
-                            <Button
-                                className={classes.signInButton}
-                                variant="contained"
-                                color="primary"
-                                disabled={isSubmitting}
-                                onClick={submitForm}
-                            >
-                                Sign in
-                            </Button>
-                        </Form>
-                    )}
-                </Formik>
+                />
             )}
             {codeSent && (
-                <Formik
-                    initialValues={{ code: '' }}
-                    validate={(values) => {
-                        const errors: Partial<CodeFormValues> = {};
-
-                        if (wrongCodeMessage) {
-                            setWrongCodeMessage(false);
-                        }
-
-                        if (!values.code) {
-                            errors.code = 'Required';
-                        }
-
-                        return errors;
+                <VerificationCodeForm
+                    handleSubmit={submitVerificationCode}
+                    setWrongCodeMessage={setWrongCodeMessage}
+                    wrongCodeMessage={wrongCodeMessage}
+                    isSubmitting={isSubmitting}
+                    classes={{
+                        emailField: classes.emailField,
+                        loader: classes.loader,
+                        signInButton: classes.signInButton,
                     }}
-                    onSubmit={(values) => {
-                        setIsSubmitting(true);
-                        submitVerificationCode(values.code);
-                    }}
-                >
-                    {({ submitForm }) => (
-                        <Form>
-                            <Field
-                                className={classes.emailField}
-                                variant="outlined"
-                                fullWidth={true}
-                                component={TextField}
-                                disabled={isSubmitting}
-                                name="code"
-                                type="text"
-                                label="Verification code"
-                            />
-                            {wrongCodeMessage && (
-                                <FormHelperText error>
-                                    Wrong verification code entered
-                                </FormHelperText>
-                            )}
-                            {isSubmitting && (
-                                <LinearProgress className={classes.loader} />
-                            )}
-                            <Button
-                                className={classes.signInButton}
-                                variant="contained"
-                                color="primary"
-                                disabled={isSubmitting}
-                                onClick={submitForm}
-                            >
-                                Submit
-                            </Button>
-                        </Form>
-                    )}
-                </Formik>
+                />
             )}
             <WrongCodeDialog
                 isOpen={wrongCodeDialog}
