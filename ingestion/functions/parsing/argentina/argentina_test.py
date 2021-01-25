@@ -27,7 +27,7 @@ class ArgentinaTest(unittest.TestCase):
                                                           'value': 'Laboratory Test',
                                                           'dateRange': {'start': '06/25/2020', 'end': '06/25/2020'}},
                                                          {'name': 'outcome', 'value': 'Recovered'}],
-                                              'notes': 'Using Date of Diagnosis as the date of confirmation.\nPatient recovery was confirmed by a negative laboratory test.\nCase was registered as being from Formosa, Patiño, Argentina.\nCase last updated on 09/18/2020.\nCase was dealt with through Public health system.\nDiagnostic notes: Caso confirmado por laboratorio - No Activo por criterio de laboratorio'},
+                                              'notes': 'Using Date of Diagnosis as the date of confirmation., Patient recovery was confirmed by a negative laboratory test., Case was registered as being from Formosa, Patiño, Argentina., Case last updated on 09/18/2020., Case was dealt with through Public health system., Diagnostic notes: Caso confirmado por laboratorio - No Activo por criterio de laboratorio'},
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000010',
                                                                 'sourceUrl': 'placeholder_URL'},
@@ -37,7 +37,7 @@ class ArgentinaTest(unittest.TestCase):
                                                           'value': 'Laboratory Test',
                                                           'dateRange': {'start': '06/01/2020', 'end': '06/01/2020'}},
                                                          {'name': 'outcome', 'value': 'Recovered'}],
-                                              'notes': 'Using Date of Diagnosis as the date of confirmation.\nPatient recovery was confirmed by a number of days elapsing with no symptoms.\nCase was registered as being from CABA, COMUNA 07, Argentina.\nCase last updated on 09/18/2020.\nCase was dealt with through Public health system.\nDiagnostic notes: Caso confirmado por laboratorio - No activo (por tiempo de evolución)'},
+                                              'notes': 'Using Date of Diagnosis as the date of confirmation., Patient recovery was confirmed by a number of days elapsing with no symptoms., Case was registered as being from CABA, COMUNA 07, Argentina., Case last updated on 09/18/2020., Case was dealt with through Public health system., Diagnostic notes: Caso confirmado por laboratorio - No activo (por tiempo de evolución)'},
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000012',
                                                                 'sourceUrl': 'placeholder_URL'},
@@ -53,7 +53,7 @@ class ArgentinaTest(unittest.TestCase):
                                                           'dateRange': {'start': '05/31/2020', 'end': '05/31/2020'}},
                                                          {'name': 'outcome', 'value': 'Recovered'}],
                                               'symptoms': {'status': 'Symptomatic'},
-                                              'notes': 'Using Date of Diagnosis as the date of confirmation.\nPatient recovery was confirmed by a negative laboratory test.\nCase was registered as being from CABA, SIN ESPECIFICAR, Argentina.\nCase last updated on 09/18/2020.\nCase was dealt with through Private health system.\nDiagnostic notes: Caso confirmado por laboratorio - No Activo por criterio de laboratorio'},
+                                              'notes': 'Using Date of Diagnosis as the date of confirmation., Patient recovery was confirmed by a negative laboratory test., Case was registered as being from CABA, SIN ESPECIFICAR, Argentina., Case last updated on 09/18/2020., Case was dealt with through Private health system., Diagnostic notes: Caso confirmado por laboratorio - No Activo por criterio de laboratorio'},
                                              {'caseReference': {'sourceId': 'placeholder_ID',
                                                                 'sourceEntryId': '1000015',
                                                                 'sourceUrl': 'placeholder_URL'},
@@ -67,4 +67,4 @@ class ArgentinaTest(unittest.TestCase):
                                                           'dateRange': {'start': '05/18/2020', 'end': '05/18/2020'}},
                                                          {'name': 'outcome', 'value': 'Recovered'}],
                                               'symptoms': {'status': 'Symptomatic'},
-                                              'notes': 'Using Date of Diagnosis as the date of confirmation.\nPatient recovery was confirmed by a number of days elapsing with no symptoms.\nCase was registered as being from CABA, COMUNA 07, Argentina.\nCase last updated on 09/18/2020.\nCase was dealt with through Private health system.\nDiagnostic notes: Caso confirmado por laboratorio - No activo (por tiempo de evolución)'}])
+                                              'notes': 'Using Date of Diagnosis as the date of confirmation., Patient recovery was confirmed by a number of days elapsing with no symptoms., Case was registered as being from CABA, COMUNA 07, Argentina., Case last updated on 09/18/2020., Case was dealt with through Private health system., Diagnostic notes: Caso confirmado por laboratorio - No activo (por tiempo de evolución)'}])

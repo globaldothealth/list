@@ -28,7 +28,7 @@ except ImportError:
     import common_lib
 
 _SOURCE_API_URL = "http://bar.baz"
-_SOURCE_ID = "abc123"
+_SOURCE_ID = "5f0b9a7ead3a2b003edc0e7f"
 _SOURCE_URL = "https://foo.bar"
 _PARSED_CASE = (
     {
@@ -187,13 +187,23 @@ def test_run_lambda_e2e(
         json={"_id": upload_id, "status": "SUCCESS",
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
+    # Mock the excluded case IDs endpoint call.
+    start_date = input_event[parsing_lib.DATE_RANGE_FIELD]["start"]
+    end_date = input_event[parsing_lib.DATE_RANGE_FIELD]["end"]
+    excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}&dateFrom={start_date}&dateTo={end_date}"
+    requests_mock.register_uri(
+                "GET", excluded_case_ids_url,
+                [{"json": {"cases": []},
+                  "status_code": 200}])
+
     response = parsing_lib.run_lambda(
         input_event, FakeContext(),
         fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
-    assert requests_mock.request_history[1].url == full_source_url
-    assert requests_mock.request_history[2].url == update_upload_url
+    assert requests_mock.request_history[1].url == excluded_case_ids_url
+    assert requests_mock.request_history[2].url == full_source_url
+    assert requests_mock.request_history[3].url == update_upload_url
     assert response["count_created"] == num_created
     assert response["count_updated"] == num_updated
 
@@ -262,28 +272,34 @@ def test_extract_event_fields_errors_if_missing_env_field(input_event):
 
 def test_prepare_cases_adds_upload_id():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    case = copy.deepcopy(_PARSED_CASE)
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        upload_id)
+        [case],
+        upload_id,
+        [])
     assert next(result)["caseReference"]["uploadIds"] == [upload_id]
 
 
 def test_prepare_cases_removes_nones():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    _PARSED_CASE["demographics"] = None
+    case = copy.deepcopy(_PARSED_CASE)
+    case["demographics"] = None
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        "123456789012345678901234")
+        [case],
+        "123456789012345678901234",
+        [])
     assert "demographics" not in next(result).keys()
 
 
 def test_prepare_cases_removes_empty_strings():
     from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
-    _PARSED_CASE["notes"] = ""
+    case = copy.deepcopy(_PARSED_CASE)
+    case["notes"] = ""
     result = parsing_lib.prepare_cases(
-        [_PARSED_CASE],
-        "123456789012345678901234")
+        [case],
+        "123456789012345678901234",
+        [])
     assert "notes" not in next(result).keys()
 
 
@@ -524,3 +540,15 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
                 "multi": {"multikeep": "ok"},
                 "emptyobject": {}}
     assert parsing_lib.remove_nested_none_and_empty(data) == expected
+
+def test_excluded_case_are_removed_from_cases():
+    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+
+    valid_case = copy.deepcopy(_PARSED_CASE)
+    excluded_case = copy.deepcopy(_PARSED_CASE)
+    excluded_case["caseReference"]["sourceEntryId"] = "999"
+
+    cases = parsing_lib.prepare_cases([excluded_case, valid_case], "0", ["999"])
+    cases_list = list(cases)
+    assert len(cases_list) == 1
+    assert cases_list[0]["caseReference"]["sourceEntryId"] == valid_case["caseReference"]["sourceEntryId"]

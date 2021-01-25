@@ -70,8 +70,33 @@ def retrieve_raw_data_file(s3_bucket: str, s3_key: str, out_file):
     except Exception as e:
         common_lib.complete_with_error(e)
 
+def retrieve_excluded_case_ids(source_id: str, date_filter: Dict, date_range: Dict, env: str):
+    if date_range:
+        start_date = date_range["start"]
+        end_date = date_range["end"]
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
 
-def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
+    elif date_filter:
+        now = get_today()
+        delta = datetime.timedelta(days=date_filter["numDaysBeforeToday"])
+        cutoff_date = now - delta
+        start_date = datetime.datetime.strftime(cutoff_date, "%Y-%m-%d")
+        end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
+
+    else:
+        now = get_today()
+        start_date = '2019-12-01'
+        end_date = datetime.datetime.strftime(now, "%Y-%m-%d")
+        date_limits = f"&dateFrom={start_date}&dateTo={end_date}"
+
+    excluded_case_ids_endpoint_url =  f"{common_lib.get_source_api_url(env)}/excludedCaseIds?sourceId={source_id}{date_limits}"
+    res = requests.get(excluded_case_ids_endpoint_url)
+    if res and res.status_code == 200:
+        res_json = res.json()
+        res_json["cases"]
+
+def prepare_cases(cases: Generator[Dict, None, None], upload_id: str, excluded_case_ids: list):
     """
     Populates standard required fields for the G.h Case API.
 
@@ -79,7 +104,8 @@ def prepare_cases(cases: Generator[Dict, None, None], upload_id: str):
     """
     for case in cases:
         case["caseReference"]["uploadIds"] = [upload_id]
-        yield remove_nested_none_and_empty(case)
+        if excluded_case_ids is None or not case["caseReference"]["sourceEntryId"] in excluded_case_ids:
+            yield remove_nested_none_and_empty(case)
 
 
 def remove_nested_none_and_empty(d):
@@ -285,7 +311,8 @@ def run_lambda(
         case_data = parsing_function(
             local_data_file.name, source_id,
             source_url)
-        final_cases = prepare_cases(case_data, upload_id)
+        excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env)
+        final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
         count_created, count_updated = write_to_server(
             filter_cases_by_date(
                 final_cases,

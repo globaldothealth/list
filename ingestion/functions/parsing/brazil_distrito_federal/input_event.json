@@ -1,7 +1,7 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "5f6db1abbebdca003155fc6e/2020/09/25/1343/content.csv",
-    "sourceUrl": "https://covid19.ssp.df.gov.br/resources/dados/dados-abertos.csv?param=[random]",
-    "sourceId": "5f6db1abbebdca003155fc6e"
+    "s3Key": "5ff34f6a5556a3004c58a270/2021/01/04/1729/content.csv",
+    "sourceUrl": "https://covid19.ssp.df.gov.br/resources/dados/dados-abertos.csv",
+    "sourceId": "5ff34f6a5556a3004c58a270"
 }

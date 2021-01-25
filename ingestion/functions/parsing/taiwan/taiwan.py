@@ -21,8 +21,8 @@ TAIWAN_LOCATION = {
     "geoResolution": "Country",
     "name": "Taiwan",
     "geometry": {
-        "longitude": "120.930229378541",
-        "latitude": "23.7779779950014"
+        "longitude": float("120.930229378541"),
+        "latitude": float("23.7779779950014")
     }
 }
 

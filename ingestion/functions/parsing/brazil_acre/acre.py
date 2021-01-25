@@ -70,6 +70,7 @@ def convert_date(raw_date):
     except:
         return None
 
+
 def convert_gender(raw_gender: str):
     if raw_gender == "Masculino":
         return "Male"
@@ -201,7 +202,7 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str, indigenous_group: s
     raw_notes = []
     if "imunossupressão" in raw_comorbidities.lower():
         raw_notes.append("Patient with immunosuppression")
-    if "portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
+    if "portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities.lower():
         raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
     if "puérpera (até 45 dias do parto)" in raw_comorbidities.lower():
         raw_notes.append("Patient given birth in the last 45 days")

@@ -388,7 +388,6 @@ describe('Linelist table', function () {
             cy.addCase({
                 country: 'France',
                 notes: 'some notes',
-                sourceUrl: 'foo.bar',
             });
         }
         cy.server();
