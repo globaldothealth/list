@@ -51,7 +51,7 @@ const genderValues = [
 const TooltipText = () => (
   <StyledTooltip>
     <ul>
-      <li><strong>Gender:</strong> Enter the Gender of the case provided. If none provided leave blank</li>
+      <li><strong>Gender:</strong> Enter the Gender of the case provided. If no gender is provided select Unknown.</li>
       <li><strong>Age:</strong> Enter the age of the case.
         <ul>
           <li>If a range is provided enter in the Min and max fields.</li>

@@ -31,7 +31,7 @@ const TooltipText = () => (
       <li><strong>Example:</strong> If your case has 'Location = USA, California, Santa Clara' type 'Santa Clara' and select that option from the drop down list. On selection the rest of the location fields would be prepopulated.
         <ul>
           <li>If you need to change the location you can press X in the location field and then retype the location and select. This will change the prepoulated fields to the new location.</li>
-          <li>If you cannot find a specific location you can enter it manually by clicking the 'Specify Geocode manually' button and entering the required location fields</li>
+          <li>If you cannot find a specific location please provide details to your Global.health contact.</li>
         </ul>
       </li>
     </ul>
@@ -193,8 +193,9 @@ export function PlacesAutocomplete(
                     ></Field>
                     {props.required && (
                         <RequiredHelperText
-                            name={props.name}
+                            name={props.name} locationRequiredText="A location must be provided"
                         ></RequiredHelperText>
+                        
                     )}
                 </>
             )}
