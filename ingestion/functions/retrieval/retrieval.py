@@ -109,7 +109,7 @@ def retrieve_content(
         if (
             source_format != "JSON"
             and source_format != "CSV"
-            and source_format != "XSLX"):
+            and source_format != "XLSX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
