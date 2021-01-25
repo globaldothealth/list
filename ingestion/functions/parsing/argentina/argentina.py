@@ -216,7 +216,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 if entry['clasificacion']:
                     notes.append(f"Diagnostic notes: {entry['clasificacion']}")
 
-                case["notes"] = "\n".join(notes)
+                case["notes"] = ", ".join(notes)
                 yield case
 
 

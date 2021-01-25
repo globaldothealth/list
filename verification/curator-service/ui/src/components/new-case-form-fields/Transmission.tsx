@@ -3,6 +3,7 @@ import { Chip, makeStyles } from '@material-ui/core';
 import CaseFormValues from './CaseFormValues';
 import ChipInput from 'material-ui-chip-input';
 import FieldTitle from '../common-form-fields/FieldTitle';
+import { StyledTooltip } from './StyledTooltip';
 import { FormikAutocomplete } from '../common-form-fields/FormikFields';
 import React from 'react';
 import Scroll from 'react-scroll';
@@ -21,6 +22,23 @@ const useStyles = makeStyles(() => ({
         marginBottom: '1em',
     },
 }));
+
+const TooltipText = () => (
+    <StyledTooltip>
+        <ul>
+            <li>
+                <strong>Route of transmission:</strong> Enter the route of
+                transmission if provided by the source. If none provided leave
+                blank
+            </li>
+            <li>
+                <strong>Place of transmission:</strong> Enter the place of
+                transmission if provided by the source, If none provided leave
+                blank
+            </li>
+        </ul>
+    </StyledTooltip>
+);
 
 export default function Transmission(): JSX.Element {
     const {
@@ -51,7 +69,10 @@ export default function Transmission(): JSX.Element {
 
     return (
         <Scroll.Element name="transmission">
-            <FieldTitle title="Transmission"></FieldTitle>
+            <FieldTitle
+                title="Transmission"
+                tooltip={<TooltipText />}
+            ></FieldTitle>
             <div className={classes.fieldRow}>
                 <FormikAutocomplete
                     name="transmissionRoutes"

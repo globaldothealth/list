@@ -21,8 +21,8 @@ _LOCATION = {
     "geoResolution": "Country",
     "name": "Estonia",
     "geometry": {
-        "longitude": "25.7615268448868",
-        "latitude": "58.7783968568071"
+        "longitude": float("25.7615268448868"),
+        "latitude": float("58.7783968568071")
     }
 }
 

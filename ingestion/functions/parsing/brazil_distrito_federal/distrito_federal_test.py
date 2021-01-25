@@ -9,7 +9,17 @@ _PARSED_CASE = ({
         "sourceId": "abc123",
         "sourceUrl": "https://covid19.ssp.df.gov.br/resources/dados/dados-abertos.csv?param=[random]",
     },
-    "location": {"query": "Lago Sul, Distrito Federal, Brazil"},
+    "location": {
+        "place": "Lago Sul",
+        "country": "Brazil",
+        "administrativeAreaLevel1": "Distrito Federal",
+        "geoResolution": "Point",
+        "name": "Lago Sul, Distrito Federal, Brazil",
+        "geometry": {
+            "latitude": -15.8428,
+            "longitude": -47.8778
+        }
+    },
     "events": [
         {
             "name": "confirmed",

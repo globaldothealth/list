@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'uppercase',
     },
     alert: {
-        backgroundColor: 'white',
+        backgroundColor: theme.palette.background.paper,
         borderRadius: theme.spacing(1),
         marginTop: theme.spacing(1),
     },

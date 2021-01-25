@@ -144,16 +144,13 @@ def convert_symptoms(raw_symptoms: str):
 
 def convert_preexisting_conditions(raw_comorbidities: str):
     preexistingConditions = {}
-    if raw_comorbidities not in ["null", "Puérpera (até 45 dias do parto)", "Portador  de  doenças cromossômicas ou estado de fragilidade imunológica", "Imunossupressão"]:
+    comorbidities = []
+    for key in _COMORBIDITIES_MAP:
+        if key in raw_comorbidities:
+            comorbidities.append(_COMORBIDITIES_MAP[key])
+    if comorbidities:
         preexistingConditions["hasPreexistingConditions"] = True
-
-        comorbidities = []
-
-        for key in _COMORBIDITIES_MAP:
-            if key in raw_comorbidities:
-                comorbidities.append(_COMORBIDITIES_MAP[key])
-        if comorbidities:
-            preexistingConditions["values"] = comorbidities
+        preexistingConditions["values"] = comorbidities
         return preexistingConditions
     else:
         return None
@@ -176,7 +173,7 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str):
     raw_notes = []
     if "Imunossupressão" in raw_comorbidities:
         raw_notes.append("Patient with immunosuppression")
-    if "Portador  de  doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
+    if "Portador de doenças cromossômicas ou estado de fragilidade imunológica" in raw_comorbidities:
         raw_notes.append("Primary immunodeficiency disease or chromosomal disease")
     if "Puérpera" in raw_comorbidities:
         raw_notes.append("Recently gave birth")
