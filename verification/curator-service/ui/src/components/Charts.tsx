@@ -40,7 +40,7 @@ function a11yProps(index: any) {
 
 const useStyles = makeStyles((theme: Theme) => ({
     appBar: {
-        backgroundColor: '#31A497',
+        backgroundColor: theme.custom.palette.appBar.backgroundColor,
     },
 }));
 

@@ -6,6 +6,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import CaseFormValues from './CaseFormValues';
 import { DateField } from '../common-form-fields/FormikFields';
 import FieldTitle from '../common-form-fields/FieldTitle';
+import { StyledTooltip } from './StyledTooltip';
 import React from 'react';
 import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
@@ -25,12 +26,46 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
+const TooltipText = () => (
+    <StyledTooltip>
+        <ul>
+            <li>
+                <strong>Add a Genome sequence:</strong> Allows for a genome
+                sequence to be linked to a specific reported case. If the source
+                has a linked genome case select add and complete all of the
+                fields you are able to
+            </li>
+            <li>
+                <strong>Sample collection date:</strong> Date the sample was
+                collected on
+            </li>
+            <li>
+                <strong>Repository URL:</strong> URL link to the location that
+                the sequence is stored. e.g. GISAID and Genbank URL
+            </li>
+            <li>
+                <strong>Sequence accession:</strong> The sequence accession, see
+                here for format details
+            </li>
+            <li>
+                <strong>Sequence name:</strong> The name of the sequence
+            </li>
+            <li>
+                <strong>Sequence length:</strong> The length of the sequence
+            </li>
+        </ul>
+    </StyledTooltip>
+);
+
 export default function GenomeSequences(): JSX.Element {
     const { values } = useFormikContext<CaseFormValues>();
     const classes = useStyles();
     return (
         <Scroll.Element name="genomeSequences">
-            <FieldTitle title="Genome Sequences"></FieldTitle>
+            <FieldTitle
+                title="Genome Sequences"
+                tooltip={<TooltipText />}
+            ></FieldTitle>
             <FieldArray name="genomeSequences">
                 {({ push, remove }): JSX.Element => {
                     return (
