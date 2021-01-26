@@ -473,9 +473,7 @@ export default function App(): JSX.Element {
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
-                                <DownloadButton
-                                    search={location.state?.search ?? ''}
-                                ></DownloadButton>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
