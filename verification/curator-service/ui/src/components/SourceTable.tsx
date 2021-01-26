@@ -100,7 +100,7 @@ interface TableRow {
 const styles = (theme: Theme) =>
     createStyles({
         error: {
-            color: 'red',
+            color: theme.palette.error.main,
             marginTop: theme.spacing(2),
         },
         alert: {
@@ -114,7 +114,7 @@ const styles = (theme: Theme) =>
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             height: '64px',
         },
@@ -181,10 +181,30 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     resolve();
                 })
                 .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                    });
-                    reject(e);
+                    /*
+                     * Warning: this is not a nice kludge.
+                     * Updating the source can fail for multiple reasons:
+                     * 1. our backend won't save the update
+                     * 2. AWS won't accept the scheduling update
+                     * 3. The email notifying curators of the update doesn't get sent.
+                     *
+                     * Here, we check for the third case (email didn't get sent), and
+                     * call that a success anyway, so the table updates with the genuine
+                     * current values.
+                     */
+
+                    if (e.response?.data?.name === 'NotificationSendError') {
+                        this.setState({
+                            error:
+                                'Failed to send e-mail notifications to registered addresses',
+                        });
+                        resolve();
+                    } else {
+                        this.setState({
+                            error: e.response?.data?.message || e.toString(),
+                        });
+                        reject(e);
+                    }
                 });
         });
     }
@@ -328,14 +348,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
-                                            <MenuItem
-                                                key={`format-${value}`}
-                                                value={value || ''}
-                                            >
-                                                {value || 'Unknown'}
-                                            </MenuItem>
-                                        ))}
+                                        {['', 'JSON', 'CSV', 'XLSX'].map(
+                                            (value) => (
+                                                <MenuItem
+                                                    key={`format-${value}`}
+                                                    value={value || ''}
+                                                >
+                                                    {value || 'Unknown'}
+                                                </MenuItem>
+                                            ),
+                                        )}
                                     </TextField>
                                 ),
                             },

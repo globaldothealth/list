@@ -41,6 +41,7 @@ import VerificationStatusIndicator from './VerificationStatusIndicator';
 import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
+import { URLToSearchQuery } from './util/searchQuery';
 
 interface ListResponse {
     cases: Case[];
@@ -66,6 +67,7 @@ interface LinelistTableState {
     isDeleting: boolean;
 
     selectedVerificationStatus: VerificationStatus;
+    searchQuery: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -95,7 +97,6 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
-    search: string;
     page: number;
     pageSize: number;
 }
@@ -116,7 +117,7 @@ interface Props
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
-            backgroundColor: 'white',
+            backgroundColor: theme.palette.background.paper,
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(1),
         },
@@ -131,7 +132,7 @@ const styles = (theme: Theme) =>
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             height: '64px',
         },
@@ -139,7 +140,7 @@ const styles = (theme: Theme) =>
             backgroundColor: '#31A497',
         },
         toolbarItems: {
-            color: 'white',
+            color: theme.palette.background.paper,
         },
         modalDownloadButton: {
             marginTop: '30px',
@@ -415,6 +416,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             isLoading: false,
             isDeleting: false,
             selectedVerificationStatus: VerificationStatus.Unverified,
+            searchQuery:
+                encodeURIComponent(
+                    URLToSearchQuery(this.props.location.search),
+                ) ?? '',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -433,11 +438,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         prevProps: Readonly<Props>,
         prevState: Readonly<LinelistTableState>,
     ): void {
-        if (
-            this.props.location.state?.search !==
-            prevProps.location.state?.search
-        ) {
-            this.setState({ page: 0 }, this.tableRef.current?.onQueryChange);
+        if (this.props.location.search !== prevProps.location.search) {
+            this.setState(
+                {
+                    page: 0,
+                    searchQuery: encodeURIComponent(
+                        URLToSearchQuery(this.props.location.search),
+                    ),
+                },
+                this.tableRef.current?.onQueryChange(),
+            );
         }
     }
     componentWillUnmount(): void {
@@ -448,7 +458,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.props.location.state.search } };
+            requestBody = {
+                data: { query: decodeURIComponent(this.state.searchQuery) },
+            };
         } else {
             requestBody = {
                 data: {
@@ -483,7 +495,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             status: verificationStatus,
             ...(note ? { note } : {}),
             ...(this.hasSelectedRowsAcrossPages()
-                ? { query: this.props.location.state.search }
+                ? { query: decodeURIComponent(this.state.searchQuery) }
                 : { caseIds: rowData.map((row: TableRow) => row.id) }),
         };
 
@@ -846,9 +858,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
-                            const trimmedQ = this.props.location.state?.search?.trim();
-                            if (trimmedQ) {
-                                listUrl += '&q=' + encodeURIComponent(trimmedQ);
+                            if (this.state.searchQuery !== '') {
+                                listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
                             this.props.setSearchLoading(true);
@@ -1066,8 +1077,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...((this.props.location.state?.search?.trim() ??
-                                      '') !== ''
+                                  ...(this.state.searchQuery !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -1108,6 +1118,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             .totalNumRows !==
                                                         this.state
                                                             .numSelectedRows;
+
                                                     await this.tableRef.current.onAllSelected(
                                                         shouldSelectAll,
                                                     );

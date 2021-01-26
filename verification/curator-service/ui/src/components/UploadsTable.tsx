@@ -24,7 +24,7 @@ const styles = (theme: Theme) =>
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             height: '64px',
         },
@@ -123,9 +123,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     <Link
                                         to={{
                                             pathname: '/cases',
-                                            state: {
-                                                search: `uploadid:${rowData.id}`,
-                                            },
+                                            search: `?uploadid=${rowData.id}`,
                                         }}
                                     >
                                         {rowData.numCreated}
@@ -139,9 +137,7 @@ class UploadsTable extends React.Component<Props, UploadsTableState> {
                                     <Link
                                         to={{
                                             pathname: '/cases',
-                                            state: {
-                                                search: `uploadid:${rowData.id}`,
-                                            },
+                                            search: `?uploadid=${rowData.id}`,
                                         }}
                                     >
                                         {rowData.numUpdated}
