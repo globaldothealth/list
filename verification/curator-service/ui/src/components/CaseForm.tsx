@@ -39,7 +39,7 @@ import { useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
     appBar: {
-        background: 'white',
+        background: theme.palette.background.paper,
     },
     tableOfContents: {
         position: 'fixed',

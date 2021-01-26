@@ -1,6 +1,12 @@
 import * as Yup from 'yup';
 
-import { Button, Paper, Typography, makeStyles } from '@material-ui/core';
+import {
+    Button,
+    Paper,
+    Typography,
+    makeStyles,
+    Theme,
+} from '@material-ui/core';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';
@@ -20,7 +26,7 @@ enum Format {
     Xlsx = 'XLSX',
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
     headerBlurb: {
         maxWidth: '70%',
         paddingBottom: '3em',
@@ -63,7 +69,7 @@ const useStyles = makeStyles(() => ({
         marginLeft: '1em',
     },
     errorHelper: {
-        color: 'red',
+        color: theme.palette.error.main,
     },
 }));
 
