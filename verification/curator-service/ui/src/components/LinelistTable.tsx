@@ -377,7 +377,6 @@ export function DownloadButton(): JSX.Element {
                         current download, but will be available the next day.
                     </Typography>
                     <Typography variant="h6">
-                        {/* <a href="#">Download</a> */}
                         <Button
                             variant="contained"
                             color="primary"
