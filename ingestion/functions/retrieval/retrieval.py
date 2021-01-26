@@ -105,7 +105,7 @@ def raw_content(url: str, content: bytes) -> io.BytesIO:
 
 
 def retrieve_content_csv(
-        env, source_id, upload_id, url, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES):
+        env, source_id, upload_id, url, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, header=True):
     """ Retrieves and locally persists the content in CSV format at the provided URL.
 
     This method chunks the CSV file to avoid timeouts in the ingestion functions.
@@ -134,11 +134,13 @@ def retrieve_content_csv(
         print(f'Source encoding is presumably {detected_enc}')
         Reader = codecs.getreader(detected_enc['encoding'])
 
-        # Detect if CSV has header
-        header_sample = Reader(bytesio).read(READ_CHUNK_BYTES)
-        if csv.Sniffer().has_header(header_sample):
-            csv_header = header_sample.split("\n")[0] + "\n"
-        bytesio.seek(len(csv_header))  # skip to first line
+        if header:
+            header_sample = Reader(bytesio).read(READ_CHUNK_BYTES)
+            lines = header_sample.split("\n")
+            if len(lines) == 1:  # did not reach newline, raise error
+                raise ValueError(f"No header found in first {READ_CHUNK_BYTES} bytes")
+            csv_header = lines[0] + "\n"
+            bytesio.seek(len(csv_header))  # skip to first line
 
         text_stream = Reader(bytesio)
         content = text_stream.read(chunk_bytes)
