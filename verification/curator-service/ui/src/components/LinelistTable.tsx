@@ -18,7 +18,6 @@ import {
     Typography,
     makeStyles,
     withStyles,
-    Modal,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -142,6 +141,9 @@ const styles = (theme: Theme) =>
         toolbarItems: {
             color: 'white',
         },
+        modalDownloadButton: {
+            marginTop: '30px',
+        },
     });
 
 const rowMenuStyles = makeStyles((theme: Theme) => ({
@@ -151,6 +153,12 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     dialogLoadingSpinner: {
         marginRight: theme.spacing(2),
         padding: '6px',
+    },
+}));
+
+const downloadDataModalStyles = makeStyles((theme: Theme) => ({
+    downloadButton: {
+        margin: '16px 0',
     },
 }));
 
@@ -338,8 +346,9 @@ function RowMenu(props: {
     );
 }
 
-export function DownloadButton(props: { search: string }): JSX.Element {
+export function DownloadButton(): JSX.Element {
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+    const classes = downloadDataModalStyles();
 
     return (
         <>
@@ -351,7 +360,13 @@ export function DownloadButton(props: { search: string }): JSX.Element {
             >
                 Download
             </Button>
-            <Dialog open={isDownloadModalOpen}>
+            <Dialog
+                open={isDownloadModalOpen}
+                onClose={(): void => setIsDownloadModalOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
                 <DialogTitle>Download full data set</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
@@ -361,7 +376,15 @@ export function DownloadButton(props: { search: string }): JSX.Element {
                         current download, but will be available the next day.
                     </Typography>
                     <Typography variant="h6">
-                        <a href="#">Download</a>
+                        {/* <a href="#">Download</a> */}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className={classes.downloadButton}
+                            href="#" //@TODO: Add link to download S3 data
+                        >
+                            Download
+                        </Button>
                     </Typography>
                 </DialogContent>
             </Dialog>
