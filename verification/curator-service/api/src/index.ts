@@ -240,6 +240,7 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
         );
         apiRouter.get(
             '/cases/getDownloadLink',
+            mustBeAuthenticated,
             casesController.getDownloadLink,
         );
         apiRouter.post(

@@ -143,9 +143,6 @@ const styles = (theme: Theme) =>
         toolbarItems: {
             color: theme.palette.background.paper,
         },
-        modalDownloadButton: {
-            marginTop: '30px',
-        },
     });
 
 const rowMenuStyles = makeStyles((theme: Theme) => ({
@@ -362,7 +359,6 @@ export function DownloadButton(): JSX.Element {
         setIsLoading(true);
         try {
             const response = await axios.get('/api/cases/getDownloadLink');
-            // window.open(response.data.signedUrl, '_blank');
             window.location.href = response.data.signedUrl;
             setIsLoading(false);
             setIsDownloadModalOpen(false);
