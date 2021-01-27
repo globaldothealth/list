@@ -378,7 +378,7 @@ export function DownloadButton(): JSX.Element {
                 onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download
+                Download full dataset
             </Button>
             <Dialog
                 open={isDownloadModalOpen}
@@ -387,7 +387,7 @@ export function DownloadButton(): JSX.Element {
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
             >
-                <DialogTitle>Download full data set</DialogTitle>
+                <DialogTitle>Download full dataset</DialogTitle>
                 <DialogContent>
                     <Typography variant="body2">
                         This download link provides access to the full
