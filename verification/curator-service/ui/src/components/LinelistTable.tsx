@@ -18,6 +18,7 @@ import {
     Typography,
     makeStyles,
     withStyles,
+    LinearProgress,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -160,6 +161,9 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
 const downloadDataModalStyles = makeStyles((theme: Theme) => ({
     downloadButton: {
         margin: '16px 0',
+    },
+    loader: {
+        marginTop: '16px',
     },
 }));
 
@@ -348,8 +352,26 @@ function RowMenu(props: {
 }
 
 export function DownloadButton(): JSX.Element {
-    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
+        false,
+    );
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const classes = downloadDataModalStyles();
+
+    const downloadDataSet = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/cases/getDownloadLink');
+            window.open(response.data.signedUrl, '_blank');
+            setIsLoading(false);
+            setIsDownloadModalOpen(false);
+        } catch (err) {
+            alert(
+                'There was an error while downloading data, please try again later.',
+            );
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
@@ -376,16 +398,18 @@ export function DownloadButton(): JSX.Element {
                         UTC. Any cases added past that time will not be in the
                         current download, but will be available the next day.
                     </Typography>
-                    <Typography variant="h6">
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.downloadButton}
-                            href="#" //@TODO: Add link to download S3 data
-                        >
-                            Download
-                        </Button>
-                    </Typography>
+
+                    {isLoading && <LinearProgress className={classes.loader} />}
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.downloadButton}
+                        onClick={downloadDataSet}
+                        disabled={isLoading}
+                    >
+                        Download
+                    </Button>
                 </DialogContent>
             </Dialog>
         </>
