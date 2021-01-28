@@ -137,7 +137,7 @@ const styles = (theme: Theme) =>
             height: '64px',
         },
         tableToolbar: {
-            backgroundColor: "#31A497",
+            backgroundColor: '#31A497',
         },
         toolbarItems: {
             color: theme.palette.background.paper,
@@ -402,6 +402,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
+    }
+
+    componentDidMount() {
+        localStorage.setItem('searchQuery', '');
     }
 
     componentDidUpdate(
