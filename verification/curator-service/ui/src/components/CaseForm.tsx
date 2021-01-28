@@ -27,6 +27,7 @@ import Scroll from 'react-scroll';
 import Symptoms from './new-case-form-fields/Symptoms';
 import Transmission from './new-case-form-fields/Transmission';
 import TravelHistory from './new-case-form-fields/TravelHistory';
+import Variant from './new-case-form-fields/Variant';
 import User from './User';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
@@ -87,6 +88,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             outcome: '',
             symptomsStatus: '',
             symptoms: [],
+            variant: null,
             hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
@@ -152,6 +154,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             c.events.find((event) => event.name === 'outcome')?.value || '',
         symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
+        variant: c.variant || null,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
                 ? ''
@@ -418,6 +421,9 @@ export default function CaseForm(props: Props): JSX.Element {
                     values.symptomsStatus === 'Symptomatic'
                         ? values.symptoms
                         : [],
+            },
+            variant: {
+                name: values.variant?.name,
             },
             preexistingConditions: {
                 hasPreexistingConditions:
@@ -758,6 +764,23 @@ export default function CaseForm(props: Props): JSX.Element {
                                 </div>
                                 <div
                                     className={classes.tableOfContentsRow}
+                                    onClick={(): void =>
+                                        scrollTo('variantOfConcern')
+                                    }
+                                >
+                                    {tableOfContentsIcon({
+                                        isChecked:
+                                            (values?.variant?.name !== undefined) && (values?.variant?.name?.length ?? 0) > 0,
+                                        hasError: hasErrors(
+                                            ['variant'],
+                                            errors,
+                                            touched,
+                                        ),
+                                    })}
+                                    {'Variant of Concern'.toLocaleUpperCase()}
+                                </div>
+                                <div
+                                    className={classes.tableOfContentsRow}
                                     onClick={(): void => scrollTo('pathogens')}
                                 >
                                     {tableOfContentsIcon({
@@ -847,6 +870,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                 </Paper>
                                 <Paper classes={{ root: classes.formSection }}>
                                     <GenomeSequences></GenomeSequences>
+                                </Paper>
+                                <Paper classes={{ root: classes.formSection }}>
+                                    <Variant></Variant>
                                 </Paper>
                                 <Paper classes={{ root: classes.formSection }}>
                                     <Pathogens></Pathogens>
