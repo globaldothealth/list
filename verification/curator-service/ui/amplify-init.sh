@@ -2,9 +2,6 @@
 set -e
 IFS='|'
 
-AWS_ACCESS_KEY_ID=$1
-AWS_SECRET_ACCESS_KEY=$2
-
 REACTCONFIG="{\
 \"SourceDir\":\"src\",\
 \"DistributionDir\":\"build\",\
@@ -16,8 +13,6 @@ AWSCLOUDFORMATIONCONFIG="{\
 \"configLevel\":\"project\",\
 \"useProfile\":true,\
 \"profileName\":\"default\",\
-\"accessKeyId\":\"$AWS_ACCESS_KEY_ID\",\
-\"secretAccessKey\":\"$AWS_SECRET_ACCESS_KEY\",\
 \"region\":\"us-east-2\"\
 }"
 
