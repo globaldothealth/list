@@ -8,7 +8,7 @@ import { TextField } from 'formik-material-ui';
 const TooltipText = () => (
   <StyledTooltip>
     <ul>
-      <li>Add any additional notes you want to include in the line list case</li>
+      <li>Provide any additional detils that may not fit into any of the previous sections.</li>
     </ul>
   </StyledTooltip>
 );
