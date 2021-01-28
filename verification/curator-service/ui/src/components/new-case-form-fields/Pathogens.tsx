@@ -15,8 +15,8 @@ const TooltipText = () => (
       <li><strong>Pathogens:</strong> Provide details of any other pathogens the case has reported.
         <ul>
           <li>You can search for pathogens by starting to type and then selecting from the autocomplete list. </li>
-          <li>Multi pathogens can be selected if required for a single case</li>
-          <li>You do not need to select the pathogen for the disease of the dataset e.g. coronavirus, that will automatically be selected for the case</li>
+          <li>Multiple pathogens can be selected if required.</li>
+          <li>You do not need to select the pathogen for the disease of the dataset e.g. coronavirus, that will automatically be selected for the case.</li>
         </ul>
       </li>
     </ul>
