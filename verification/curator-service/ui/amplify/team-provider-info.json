@@ -72,9 +72,13 @@
       },
       "function": {
         "curatoruic254d982DefineAuthChallenge": {},
-        "curatoruic254d982CreateAuthChallenge": {},
+        "curatoruic254d982CreateAuthChallenge": {
+          "CHALLENGEANSWER": ""
+        },
         "curatoruic254d982VerifyAuthChallengeResponse": {},
-        "curatoruic254d982PreSignup": {}
+        "curatoruic254d982PreSignup": {
+          "DOMAINWHITELIST": ""
+        }
       }
     }
   },
