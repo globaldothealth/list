@@ -29,7 +29,11 @@ jobs:
           npm install -g @aws-amplify/cli --unsafe-perm=true
       - name: Init Amplify
         run: |
-          bash verification/curator-service/ui/amplify-init.sh
+          bash amplify-init.sh
+        working-directory: verification/curator-service/ui
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Build and test
         run: |
           npm ci
