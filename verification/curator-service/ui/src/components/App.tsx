@@ -354,6 +354,7 @@ export default function App(): JSX.Element {
     const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const [searchQuery, setSearchQuery] = React.useState<string>('');
     const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
@@ -458,6 +459,15 @@ export default function App(): JSX.Element {
 
     useEffect(() => {
         getUser();
+    }, []);
+
+    useEffect(() => {
+        if (
+            localStorage.getItem('searchQuery') &&
+            localStorage.getItem('searchQuery') !== ''
+        ) {
+            setSearchQuery(localStorage.getItem('searchQuery')!);
+        }
     }, []);
 
     return (
@@ -772,11 +782,16 @@ export default function App(): JSX.Element {
                             {hasAnyRole(['curator', 'admin']) ? (
                                 <Charts />
                             ) : user ? (
-                                <Redirect to="/cases" />
+                                <Redirect
+                                    to={{
+                                        pathname: '/cases',
+                                        search: searchQuery,
+                                    }}
+                                />
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage />
+                                <LandingPage setSearchQuery={setSearchQuery} />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}

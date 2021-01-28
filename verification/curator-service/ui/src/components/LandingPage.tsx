@@ -1,8 +1,9 @@
+import React, { useEffect } from 'react';
 import { Button, Paper, Typography } from '@material-ui/core';
 
 import { ReactComponent as HealthmapInsignias } from './assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import { useLastLocation } from 'react-router-last-location';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import PolicyLink from './PolicyLink';
 
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: '20px',
     },
     description: {
-        color: "#838D89",
+        color: '#838D89',
         marginRight: '90px',
         width: '60%',
     },
@@ -35,8 +36,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-export default function LandingPage(): JSX.Element {
+interface Props {
+    setSearchQuery: (query: string) => void;
+}
+
+export default function LandingPage({ setSearchQuery }: Props): JSX.Element {
     const classes = useStyles();
+    const lastLocation = useLastLocation();
+
+    useEffect(() => {
+        if (!lastLocation || lastLocation.search === '') return;
+
+        localStorage.setItem('searchQuery', lastLocation.search);
+        setSearchQuery(lastLocation.search);
+    }, [lastLocation, setSearchQuery]);
+
     return (
         <Paper classes={{ root: classes.paper }}>
             <Typography variant="h4">
