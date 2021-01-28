@@ -24,6 +24,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
+      - name: Install Amplify CLI and init amplify
+        run: |
+          npm install -g @aws-amplify/cli --unsafe-perm=true
+          bash amplify-init.sh
       - name: Build and test
         run: |
           npm ci
