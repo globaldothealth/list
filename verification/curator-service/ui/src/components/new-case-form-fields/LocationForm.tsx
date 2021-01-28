@@ -24,13 +24,12 @@ const TooltipText = () => (
       <li>Enter the location for the case.
         <ul>
           <li>Start typing the location and the field will be auto completed with supported locations.</li>
-          <li>You can enter a location up to Admin level 3, for example in the USA this is county level location data.</li>
-          <li>Specific locations are not supported</li>
+          <li>You can enter a location up to Admin level 3; as an example this corresponds to country level ocation data in the USA. Specific locations are not supported</li>
         </ul>
       </li>
       <li><strong>Example:</strong> If your case has 'Location = USA, California, Santa Clara' type 'Santa Clara' and select that option from the drop down list. On selection the rest of the location fields would be prepopulated.
         <ul>
-          <li>If you need to change the location you can press X in the location field and then retype the location and select. This will change the prepoulated fields to the new location.</li>
+          <li>If you need to change the location you can press X in the location field and then retype the location and select the desidered one. This will change the prepoulated fields to the new location.</li>
           <li>If you cannot find a specific location please provide details to your Global.health contact.</li>
         </ul>
       </li>
