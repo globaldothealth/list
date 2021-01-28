@@ -28,8 +28,7 @@ jobs:
         run: |
           npm install -g @aws-amplify/cli --unsafe-perm=true
       - name: Init Amplify
-          run: verification/curator-service/ui/amplify-init.sh
-          shell: bash          
+          run: bash verification/curator-service/ui/amplify-init.sh          
       - name: Build and test
         run: |
           npm ci
