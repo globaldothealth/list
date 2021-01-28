@@ -361,6 +361,8 @@ export default function App(): JSX.Element {
     const location = useLocation<LocationState>();
     const classes = useStyles();
 
+    const savedSearchQuery = localStorage.getItem('searchQuery');
+
     const menuList = user
         ? [
               {
@@ -372,7 +374,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', search: '' },
+                  to: { pathname: '/cases', search: searchQuery },
                   displayCheck: (): boolean => true,
               },
               {
@@ -462,13 +464,10 @@ export default function App(): JSX.Element {
     }, []);
 
     useEffect(() => {
-        if (
-            localStorage.getItem('searchQuery') &&
-            localStorage.getItem('searchQuery') !== ''
-        ) {
-            setSearchQuery(localStorage.getItem('searchQuery')!);
-        }
-    }, []);
+        if (savedSearchQuery === null) return;
+
+        setSearchQuery(savedSearchQuery);
+    }, [savedSearchQuery]);
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -779,7 +778,8 @@ export default function App(): JSX.Element {
                             <TermsOfUse />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) ? (
+                            {hasAnyRole(['curator', 'admin']) &&
+                            searchQuery === '' ? (
                                 <Charts />
                             ) : user ? (
                                 <Redirect
