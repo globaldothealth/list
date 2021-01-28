@@ -27,6 +27,7 @@ export default interface CaseFormValues {
     outcome?: string;
     symptomsStatus?: string;
     symptoms: string[];
+    variant: { name: string | null} | null;
     hasPreexistingConditions?: string;
     preexistingConditions: string[];
     transmissionRoutes: string[];
