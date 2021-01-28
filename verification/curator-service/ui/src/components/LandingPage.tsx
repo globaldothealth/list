@@ -36,11 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-interface Props {
-    setSearchQuery: (query: string) => void;
-}
-
-export default function LandingPage({ setSearchQuery }: Props): JSX.Element {
+export default function LandingPage(): JSX.Element {
     const classes = useStyles();
     const lastLocation = useLastLocation();
 
@@ -48,8 +44,7 @@ export default function LandingPage({ setSearchQuery }: Props): JSX.Element {
         if (!lastLocation || lastLocation.search === '') return;
 
         localStorage.setItem('searchQuery', lastLocation.search);
-        setSearchQuery(lastLocation.search);
-    }, [lastLocation, setSearchQuery]);
+    }, [lastLocation]);
 
     return (
         <Paper classes={{ root: classes.paper }}>

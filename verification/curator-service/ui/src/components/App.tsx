@@ -791,7 +791,7 @@ export default function App(): JSX.Element {
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage setSearchQuery={setSearchQuery} />
+                                <LandingPage />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}
