@@ -41,7 +41,7 @@ const TooltipText = () => (
         <li><strong>First clinical consultation date:</strong> Enter the date of the first clinical consultation of any type reported by the patient.
           <ul>
             <li>This could be visiting a doctor or nurse or calling a healthcare helpline to report their symptoms / condition.</li>
-            <li>If no clinical consultation was sought, or the source does not provide any details leave blank.</li>
+            <li>If no clinical consultation was sought, or the source does not provide any details, leave blank.</li>
           </ul>
         </li>
         <li><strong>Self isolation date:</strong> Enter the date the case went into self isolation.

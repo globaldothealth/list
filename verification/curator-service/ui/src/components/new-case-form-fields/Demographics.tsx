@@ -54,8 +54,8 @@ const TooltipText = () => (
       <li><strong>Gender:</strong> Enter the Gender of the case provided. If no gender is provided select Unknown.</li>
       <li><strong>Age:</strong> Enter the age of the case.
         <ul>
-          <li>If a range is provided enter in the  msin and max fields.</li>
-          <li>If an exact age is provided just enter the age field.</li>
+          <li>If a range is provided enter in the min and max fields.</li>
+          <li>If an exact age is provided enter it in the age field.</li>
           <li>Note: If the data source provides an age range such as 65{'>'} or 65+ tthen set the minimum age value as 65 and the maximum age value to 120 (the maximum allowed age value).</li>
         </ul>
       </li>
