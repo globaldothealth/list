@@ -187,7 +187,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                      * 1. our backend won't save the update
                      * 2. AWS won't accept the scheduling update
                      * 3. The email notifying curators of the update doesn't get sent.
-                     * 
+                     *
                      * Here, we check for the third case (email didn't get sent), and
                      * call that a success anyway, so the table updates with the genuine
                      * current values.
@@ -195,7 +195,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
 
                     if (e.response?.data?.name === 'NotificationSendError') {
                         this.setState({
-                            error: "Failed to send e-mail notifications to registered addresses",
+                            error:
+                                'Failed to send e-mail notifications to registered addresses',
                         });
                         resolve();
                     } else {
