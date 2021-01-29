@@ -360,11 +360,14 @@ export default function App(): JSX.Element {
     const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const [searchQuery, setSearchQuery] = React.useState<string>('');
     const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
     const classes = useStyles();
+
+    const savedSearchQuery = localStorage.getItem('searchQuery');
 
     const menuList = user
         ? [
@@ -377,7 +380,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', search: '' },
+                  to: { pathname: '/cases', search: searchQuery },
                   displayCheck: (): boolean => true,
               },
               {
@@ -465,6 +468,12 @@ export default function App(): JSX.Element {
     useEffect(() => {
         getUser();
     }, []);
+
+    useEffect(() => {
+        if (savedSearchQuery === null) return;
+
+        setSearchQuery(savedSearchQuery);
+    }, [savedSearchQuery]);
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -775,10 +784,16 @@ export default function App(): JSX.Element {
                             <TermsOfUse />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) ? (
+                            {hasAnyRole(['curator', 'admin']) &&
+                            searchQuery === '' ? (
                                 <Charts />
                             ) : user ? (
-                                <Redirect to="/cases" />
+                                <Redirect
+                                    to={{
+                                        pathname: '/cases',
+                                        search: searchQuery,
+                                    }}
+                                />
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (

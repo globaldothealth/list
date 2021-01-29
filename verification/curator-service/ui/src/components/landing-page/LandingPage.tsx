@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
 import { Link } from 'react-router-dom';
 import { Paper, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Theme, makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
+import { useLastLocation } from 'react-router-last-location';
 
 import getRandomString from '../util/randomString';
 import { Auth } from 'aws-amplify';
@@ -17,7 +18,7 @@ import VerificationCodeForm from './VerificationCodeForm';
 
 import PolicyLink from '../PolicyLink';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
     paper: {
         height: 'auto',
         left: '50%',
@@ -99,6 +100,7 @@ export default function LandingPage({
         status: string;
     }>();
     const classes = useStyles();
+    const lastLocation = useLastLocation();
 
     const resetState = () => {
         setCodeSent(false);
@@ -168,6 +170,12 @@ export default function LandingPage({
                 break;
         }
     }, [authState, failedAttempts, setUser]);
+
+    useEffect(() => {
+        if (!lastLocation || lastLocation.search === '') return;
+
+        localStorage.setItem('searchQuery', lastLocation.search);
+    }, [lastLocation]);
 
     const signUp = (email: string) => {
         const params = {
