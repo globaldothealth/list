@@ -57,7 +57,6 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
-import { URLToSearchQuery } from './util/searchQuery';
 import { useCookieBanner } from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
@@ -509,13 +508,7 @@ export default function App(): JSX.Element {
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
-                                <DownloadButton
-                                    search={
-                                        encodeURIComponent(
-                                            URLToSearchQuery(location.search),
-                                        ) ?? ''
-                                    }
-                                ></DownloadButton>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
