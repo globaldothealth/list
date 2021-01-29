@@ -88,7 +88,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             outcome: '',
             symptomsStatus: '',
             symptoms: [],
-            variant: null,
+            variantName: undefined,
             hasPreexistingConditions: '',
             preexistingConditions: [],
             transmissionRoutes: [],
@@ -154,7 +154,7 @@ function initialValuesFromCase(c?: Case): CaseFormValues {
             c.events.find((event) => event.name === 'outcome')?.value || '',
         symptomsStatus: c.symptoms?.status || '',
         symptoms: c.symptoms?.values,
-        variant: c.variant || null,
+        variantName: c.variant?.name || undefined,
         hasPreexistingConditions:
             c.preexistingConditions?.hasPreexistingConditions === undefined
                 ? ''
@@ -423,7 +423,7 @@ export default function CaseForm(props: Props): JSX.Element {
                         : [],
             },
             variant: {
-                name: values.variant?.name,
+                name: values.variantName,
             },
             preexistingConditions: {
                 hasPreexistingConditions:
@@ -770,7 +770,7 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            (values?.variant?.name !== undefined) && (values?.variant?.name?.length ?? 0) > 0,
+                                            (values?.variantName !== undefined) && (values?.variantName?.length ?? 0) > 0,
                                         hasError: hasErrors(
                                             ['variant'],
                                             errors,
