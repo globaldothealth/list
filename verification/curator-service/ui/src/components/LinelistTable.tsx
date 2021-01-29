@@ -404,6 +404,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
     }
 
+    componentDidMount() {
+        localStorage.setItem('searchQuery', '');
+    }
+
     componentDidUpdate(
         prevProps: Readonly<Props>,
         prevState: Readonly<LinelistTableState>,
