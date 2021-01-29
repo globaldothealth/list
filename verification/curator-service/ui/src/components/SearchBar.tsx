@@ -51,6 +51,9 @@ const StyledSearchTextField = withStyles((theme: Theme) => ({
             '&.Mui-focused fieldset': {
                 border: `1px solid  ${theme.palette.primary.main}`,
             },
+            '& #search-field': {
+                minWidth: '100px',
+            },
         },
     },
 }))(TextField);

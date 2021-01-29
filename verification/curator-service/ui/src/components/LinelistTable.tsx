@@ -155,6 +155,12 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
+const StyledDownloadButton = withStyles((theme: Theme) => ({
+    root: {
+        minWidth: '160px',
+    },
+}))(Button);
+
 const downloadDataModalStyles = makeStyles((theme: Theme) => ({
     downloadButton: {
         margin: '16px 0',
@@ -372,14 +378,14 @@ export function DownloadButton(): JSX.Element {
 
     return (
         <>
-            <Button
+            <StyledDownloadButton
                 variant="outlined"
                 color="primary"
                 onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
                 Download full dataset
-            </Button>
+            </StyledDownloadButton>
             <Dialog
                 open={isDownloadModalOpen}
                 onClose={(): void => setIsDownloadModalOpen(false)}
