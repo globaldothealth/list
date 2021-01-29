@@ -12,11 +12,11 @@ const hasPreexistingConditionsValues = ['Unknown', 'Yes', 'No'];
 const TooltipText = () => (
   <StyledTooltip>
     <ul>
-      <li><strong>Has pre existing conditions:</strong> Enter if the case has reported pre existing conditions If none reported leave blank</li>
+      <li><strong>Has pre existing conditions:</strong> Enter if the case has reported pre existing conditions If none reported leave blank.</li>
       <li><strong>Pre existing conditions:</strong> Select the pre existing conditions reported for the case.
         <ul>
-          <li>You can either manually search in the field by typing and selecting each from the prepopulated list or click the most common populated below.</li>
-          <li>You can select multiple pre existing conditions per case</li>
+          <li>You can either manually search in the field by typing and selecting each from the prepopulated list.</li>
+          <li>You can select multiple pre existing-conditions per case</li>
         </ul>
       </li>
     </ul>

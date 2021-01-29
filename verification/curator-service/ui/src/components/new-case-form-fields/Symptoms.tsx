@@ -44,7 +44,7 @@ const TooltipText = () => (
       <li><strong>Symptoms:</strong> Select the symptoms reported for the case.
         <ul>
           <li>You can either manually search in the field by typing and selecting each from the prepopulated list or click the most common populated below.</li>
-          <li>You can select multiple symptoms per case as reported by the source. Try and be as specific as the source reports to</li>
+          <li>You can select multiple symptoms per case as reported by the source. Try and be as specific as possible.</li>
         </ul>
       </li>
     </ul>

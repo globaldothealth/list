@@ -32,7 +32,7 @@ const TooltipText = () => (
       <li><strong>Add a Genome sequence:</strong> Allows for a genome sequence to be linked to a specific reported case. If the source has a linked genome case select add and complete all of the fields you are able to</li>
       <li><strong>Sample collection date:</strong> Date the sample was collected on</li>
       <li><strong>Repository URL:</strong> URL link to the location that the sequence is stored. e.g. GISAID and Genbank URL</li>
-      <li><strong>Sequence accession:</strong> The sequence accession, see here for format details</li>
+      <li><strong>Sequence accession:</strong> The sequence accession, see <a href="https://www.ncbi.nlm.nih.gov/genbank/sequenceids/" target="_blank" rel="noopener noreferrer">here</a> for format details</li>
       <li><strong>Sequence name:</strong> The name of the sequence</li>
       <li><strong>Sequence length:</strong> The length of the sequence</li>
     </ul>
@@ -47,6 +47,7 @@ export default function GenomeSequences(): JSX.Element {
         <Scroll.Element name="genomeSequences">
             <FieldTitle
               title="Genome Sequences"
+              interactive
               tooltip={<TooltipText />}
             ></FieldTitle>
             <FieldArray name="genomeSequences">

@@ -24,8 +24,8 @@ const TooltipText = () => (
       <ul>
         <li><strong>Confirmed case date:</strong> Enter the date the case was confirmed.
           <ul>
-            <li>This is a required field so a date must be provided to submit the entry</li>
-            <li>If the data source does not provide a case confirmed date then the data or case reporting will be used in it's place. If there is no case confirmed date please enter the date he source reports the case in it's place</li>
+            <li>This is a required field so a date must be provided to submit the entry.</li>
+            <li>If the data source does not provide a date for when the case was confirmed, then the date of case reporting will be used instead. If there is no date of confirmed case please enter the date the source reports the case instead.</li>
           </ul>
         </li>
         <li><strong>Method of confirmation:</strong> Provide the type of method used to confirm the case. If there is no method provided selected unknown

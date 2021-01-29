@@ -11,6 +11,9 @@ const styles = makeStyles(() => ({
       },
       '& li': {
         marginBottom: "8px",
+        '& a': {
+          color: "#fff",
+        },
         '& >ul': {
           listStyle: 'bullet',
           margin: '0 0 8px 20px',
