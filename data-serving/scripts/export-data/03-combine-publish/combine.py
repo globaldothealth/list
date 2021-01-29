@@ -1,109 +1,75 @@
-import os 
-import time
+import os
+import tarfile
 import boto3
-from botocore.exceptions import ClientError
 
-AWS_REGION = os.environ['region']
-projectId = os.environ['projectId']
-importRoleArn = os.environ['importRoleArn']
+
+def all_files_processed(bucket, folder, full_path):
+    number_of_parts = int((full_path.split("-of-")[1]).split(".")[0])
+    
+    s3 = boto3.resource('s3')
+    bucket_obj = s3.Bucket(bucket)
+    file_count = len([x for x in bucket_obj.objects.filter(Prefix=folder)])
+
+    ready_to_combine = False
+
+    if file_count == number_of_parts:
+        ready_to_combine = True
+
+    return ready_to_combine  
+
+def get_files(bucket, folder):
+    s3 = boto3.resource('s3')
+    bucket_obj = s3.Bucket(bucket)
+    all_keys [x.key for x in bucket_obj.objects.filter(Prefix=folder)]
+    downloaded_files = []
+    for k in all_keys:
+        filename = "/mnt/efs/" + k.split("/")[-1]
+        bucket_obj.download_file(k, filename)
+        downloaded_files.append(filename)
+    return downloaded_files
+
+
+def combine_files(downloaded_files):
+    combined_file = "mnt/efs/latestdata.csv"
+    with open(combined_file, "wb") as fout:
+        # first file:
+        with open(downloaded_files[0], "rb") as f:
+            fout.write(f.read())
+        # now the rest:    
+        for k in downloaded_files[1:]:
+            with open(k, "rb") as f:
+                next(f) # skip the header
+                fout.write(f.read())
+    return combined_file
+
+
+def compress_file(output_file):
+    compressed_file = "mnt/efs/latestdata.tar.gz"
+    with tarfile.open(compressed_file, "w:gz") as tar:
+        tar.add(output_file)
+    return compressed_file
+
+
+def upload_to_production():
+    """
+    Upload parsed .csv file to s3.
+    """
+    filename = "/".join(processed_file.split("/")[-2:])
+    s3 = boto3.resource('s3')
+    s3.Object("covid-19-data-export",
+              f"processing/combine/{filename}").upload_file(processed_file)
 
 def lambda_handler(event, context):
-    print("Received event: " + str(event))
-    for record in event['Records']:
-        # Assign some variables to make it easier to work with the data in the 
-        # event recordi
-        bucket = record['s3']['bucket']['name']
-        key = record['s3']['object']['key']
-        folder =  os.path.split(key)[0]
-        folder_path = os.path.join(bucket, folder)
-        full_path = os.path.join(bucket, key)
-        s3_url = "s3://" + folder_path
-        
-        # Check to see if all file parts have been processed.
-        if all_files_processed(bucket, folder, full_path):
-            # If you haven't recently run an import job that uses a file stored in 
-            # the specified S3 bucket, then create a new import job. This prevents
-            # the creation of duplicate segments.
-            if not (check_import_jobs(bucket, folder, s3_url)):
-                create_import_job(s3_url)
-            else: 
-                print("Import job found with URL s3://" 
-                        + os.path.join(bucket,folder) + ". Aborting.")
-        else:
-            print("Parts haven't finished processing yet.")
+    record = event['Records'][0]
+    bucket = record['s3']['bucket']['name']
+    key = record['s3']['object']['key']
+    folder =  os.path.split(key)[0]
+    folder_path = os.path.join(bucket, folder)
+    full_path = os.path.join(bucket, key)
+    s3_url = "s3://" + folder_path
 
-# Determine if all of the file parts have been processed.
-def all_files_processed(bucket, folder, full_path):
-    # Use the "__ofN" part of the file name to determine how many files there 
-    # should be.
-    number_of_parts = int((full_path.split("__of")[1]).split("_processed")[0])
-    
-    # Figure out how many keys contain the prefix for the current batch of 
-    # folders (basically, how many files are in the appropriate "folder").
-    client = boto3.client('s3')
-    objs = client.list_objects_v2(Bucket=bucket,Prefix=folder)
-    file_count = objs['KeyCount']
-
-    ready_for_import = False
-    
-    if file_count == number_of_parts:
-        ready_for_import = True
-    
-    return ready_for_import    
-
-# Check Amazon Pinpoint to see if any import jobs have been created by using 
-# the same S3 folder. 
-def check_import_jobs(bucket, folder, s3_url):
-    url_list = []
-    
-    # Retrieve a list of import jobs for the current project ID.
-    client = boto3.client('pinpoint')
-    try:
-        client_response = client.get_import_jobs(
-            ApplicationId=projectId
-        )
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        segment_response = client_response['ImportJobsResponse']['Item']
-        # Parse responses. Add all S3Url values to a list.
-        for item in segment_response:
-            s3_url_existing = item['Definition']['S3Url']
-            url_list.append(s3_url_existing)
-    
-    # Search for the current S3 URL in the list.
-    if s3_url in url_list:
-        found = True
-    else:
-        found = False
-    
-    return found
-
-# Create the import job in Amazon Pinpoint.
-def create_import_job(s3_url):
-    client = boto3.client('pinpoint')
-    
-    segment_name = s3_url.split('/')[4]
-
-    try:
-        response = client.create_import_job(
-            ApplicationId=projectId,
-            ImportJobRequest={
-                'DefineSegment': True,
-                'Format': 'CSV',
-                'RegisterEndpoints': True,
-                'RoleArn': importRoleArn,
-                'S3Url': s3_url,
-                'SegmentName': segment_name
-            }
-        )
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        print("Import job " + response['ImportJobResponse']['Id'] + " " 
-                + response['ImportJobResponse']['JobStatus'] + ".")
-                
-        print("Segment ID: " 
-                + response['ImportJobResponse']['Definition']['SegmentId'])
-        
-        print("Application ID: " + projectId)
+    if all_files_processed(bucket, folder, full_path):
+        downloaded_files = get_files(bucket, folder)
+        combined_file = combine_files(downloaded_files)
+        compressed_file = compress_file(combined_file)
+        upload_to_production(compressed_file)
