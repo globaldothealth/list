@@ -31,24 +31,50 @@ const symptomStatusValues = [
 ];
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li><strong>Symptom status:</strong> Enter the symptom status for the case. If no data is provided leave blank
+    <StyledTooltip>
         <ul>
-          <li><strong>Presymptomatic:</strong> Case is a confirmed carrier but hasn’t developed symptoms at the time of confirmation but may have at a later time point.</li>
-          <li><strong>Asymtomatic:</strong> Case is a confirmed carrier of the disease but has not experienced any symptoms.</li>
-          <li><strong>Symptomatic:</strong> Case is a confirmed carrier of the disease and experiences symptoms</li>
-          <li><strong>Unknown:</strong> There is no symptom data provided for the case</li>
+            <li>
+                <strong>Symptom status:</strong> Enter the symptom status for
+                the case. If no data is provided leave blank
+                <ul>
+                    <li>
+                        <strong>Presymptomatic:</strong> Case is a confirmed
+                        carrier but hasn’t developed symptoms at the time of
+                        confirmation but may have at a later time point.
+                    </li>
+                    <li>
+                        <strong>Asymtomatic:</strong> Case is a confirmed
+                        carrier of the disease but has not experienced any
+                        symptoms.
+                    </li>
+                    <li>
+                        <strong>Symptomatic:</strong> Case is a confirmed
+                        carrier of the disease and experiences symptoms
+                    </li>
+                    <li>
+                        <strong>Unknown:</strong> There is no symptom data
+                        provided for the case
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Symptoms:</strong> Select the symptoms reported for the
+                case.
+                <ul>
+                    <li>
+                        You can either manually search in the field by typing
+                        and selecting each from the prepopulated list or click
+                        the most common populated below.
+                    </li>
+                    <li>
+                        You can select multiple symptoms per case as reported by
+                        the source. Try and be as specific as the source reports
+                        to
+                    </li>
+                </ul>
+            </li>
         </ul>
-      </li>
-      <li><strong>Symptoms:</strong> Select the symptoms reported for the case.
-        <ul>
-          <li>You can either manually search in the field by typing and selecting each from the prepopulated list or click the most common populated below.</li>
-          <li>You can select multiple symptoms per case as reported by the source. Try and be as specific as the source reports to</li>
-        </ul>
-      </li>
-    </ul>
-  </StyledTooltip>
+    </StyledTooltip>
 );
 
 export default function Symptoms(): JSX.Element {
@@ -72,10 +98,7 @@ export default function Symptoms(): JSX.Element {
     const classes = useStyles();
     return (
         <Scroll.Element name="symptoms">
-            <FieldTitle
-              title="Symptoms"
-              tooltip={<TooltipText />}>
-            </FieldTitle>
+            <FieldTitle title="Symptoms" tooltip={<TooltipText />}></FieldTitle>
             <SelectField
                 name="symptomsStatus"
                 label="Symptom status"

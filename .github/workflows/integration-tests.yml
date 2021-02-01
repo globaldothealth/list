@@ -34,7 +34,7 @@ jobs:
         with:
           working-directory: verification/curator-service/ui
           browser: ${{ matrix.browser }}
-          wait-on: 'http://localhost:3002'
+          wait-on: "http://localhost:3002"
           wait-on-timeout: 300
         env:
           CI: true
