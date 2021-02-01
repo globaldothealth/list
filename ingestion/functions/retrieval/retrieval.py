@@ -186,6 +186,9 @@ def retrieve_content(
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
+        if source_format == "CSV":
+            return retrieve_content_csv(env, source_id, upload_id, url,
+                                        api_headers, cookies)
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
@@ -217,7 +220,7 @@ def retrieve_content(
                 f"{source_id}"
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
                 f"{key_filename_part}")
-            return (outfile.name, s3_object_key)
+            return [(outfile.name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
@@ -335,14 +338,16 @@ def lambda_handler(event, context):
     url, source_format, parser_arn, date_filter = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
-    file_name, s3_object_key = retrieve_content(
+    file_names_s3_object_keys = retrieve_content(
         env, source_id, upload_id, url, source_format, auth_headers, cookies)
-    upload_to_s3(file_name, s3_object_key, env,
-                 source_id, upload_id, auth_headers, cookies)
+    for file_name, s3_object_key in file_names_s3_object_keys:
+        upload_to_s3(file_name, s3_object_key, env,
+                     source_id, upload_id, auth_headers, cookies)
     if parser_arn:
-        invoke_parser(
-            env, parser_arn, source_id, upload_id, auth_headers, cookies,
-            s3_object_key, url, date_filter, parsing_date_range)
+        for _, s3_object_key in file_names_s3_object_keys:
+            invoke_parser(
+                env, parser_arn, source_id, upload_id, auth_headers, cookies,
+                s3_object_key, url, date_filter, parsing_date_range)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
