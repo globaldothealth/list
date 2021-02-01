@@ -11,7 +11,7 @@ RUN npm install -g @aws-amplify/cli --unsafe-perm=true
 # Bundle app source
 COPY verification/curator-service/ui/. .
 # RUN amplify checkout
-RUN amplify env checkout develop
+RUN ./amplify-pull.sh
 # Bundle common files
 COPY common/* ../../../common/
 # Start the service.
