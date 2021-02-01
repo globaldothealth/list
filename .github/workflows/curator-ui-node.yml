@@ -24,13 +24,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-      - name: Install Amplify CLI
-        run: |
-          npm install -g @aws-amplify/cli --unsafe-perm=true
-      - name: Pull amplify configuration
-        run: |
-          bash amplify-pull.sh ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        working-directory: verification/curator-service/ui
       - name: Build and test
         run: |
           npm ci
