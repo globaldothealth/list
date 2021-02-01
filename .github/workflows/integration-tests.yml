@@ -30,9 +30,9 @@ jobs:
       - uses: actions/checkout@v2
       - name: Configure AWS profile
         run: |
-          docker run -rm -it amazon/aws-cli configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile default
-          docker run -rm -it amazon/aws-cli configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile default
-          docker run -rm -it amazon/aws-cli configure set default.region us-east-2
+          docker run --rm -it amazon/aws-cli configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile default
+          docker run --rm -it amazon/aws-cli configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile default
+          docker run --rm -it amazon/aws-cli configure set default.region us-east-2
       - name: Build stack
         run: docker-compose -f dev/docker-compose.yml -f dev/docker-compose.ci.yml up --build -d -V
       - uses: cypress-io/github-action@v2
