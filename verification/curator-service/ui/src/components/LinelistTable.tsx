@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { round } from 'lodash';
@@ -18,6 +18,7 @@ import {
     Typography,
     makeStyles,
     withStyles,
+    LinearProgress,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -41,6 +42,7 @@ import VerificationStatusIndicator from './VerificationStatusIndicator';
 import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
+import { URLToSearchQuery } from './util/searchQuery';
 
 interface ListResponse {
     cases: Case[];
@@ -66,6 +68,7 @@ interface LinelistTableState {
     isDeleting: boolean;
 
     selectedVerificationStatus: VerificationStatus;
+    searchQuery: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -95,7 +98,6 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
-    search: string;
     page: number;
     pageSize: number;
 }
@@ -136,7 +138,7 @@ const styles = (theme: Theme) =>
             height: '64px',
         },
         tableToolbar: {
-            backgroundColor: "#31A497",
+            backgroundColor: '#31A497',
         },
         toolbarItems: {
             color: theme.palette.background.paper,
@@ -150,6 +152,21 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     dialogLoadingSpinner: {
         marginRight: theme.spacing(2),
         padding: '6px',
+    },
+}));
+
+const StyledDownloadButton = withStyles((theme: Theme) => ({
+    root: {
+        minWidth: '160px',
+    },
+}))(Button);
+
+const downloadDataModalStyles = makeStyles((theme: Theme) => ({
+    downloadButton: {
+        margin: '16px 0',
+    },
+    loader: {
+        marginTop: '16px',
     },
 }));
 
@@ -337,27 +354,67 @@ function RowMenu(props: {
     );
 }
 
-export function DownloadButton(props: { search: string }): JSX.Element {
-    const formRef: RefObject<any> = React.createRef();
+export function DownloadButton(): JSX.Element {
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
+        false,
+    );
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const classes = downloadDataModalStyles();
+
+    const downloadDataSet = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/cases/getDownloadLink');
+            window.location.href = response.data.signedUrl;
+            setIsLoading(false);
+            setIsDownloadModalOpen(false);
+        } catch (err) {
+            alert(
+                'There was an error while downloading data, please try again later.',
+            );
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
-            <form
-                hidden
-                ref={formRef}
-                method="POST"
-                action="/api/cases/download"
-            >
-                <input name="query" value={props.search.trim()} />
-            </form>
-            <Button
+            <StyledDownloadButton
                 variant="outlined"
                 color="primary"
-                onClick={(): void => formRef.current.submit()}
+                onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download
-            </Button>
+                Download full dataset
+            </StyledDownloadButton>
+            <Dialog
+                open={isDownloadModalOpen}
+                onClose={(): void => setIsDownloadModalOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>Download full dataset</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2">
+                        This download link provides access to the full
+                        Global.health line list dataset, cached daily at 12:00am
+                        UTC. Any cases added past that time will not be in the
+                        current download, but will be available the next day.
+                    </Typography>
+
+                    {isLoading && <LinearProgress className={classes.loader} />}
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.downloadButton}
+                        onClick={downloadDataSet}
+                        disabled={isLoading}
+                    >
+                        Download
+                    </Button>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
@@ -385,6 +442,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             isLoading: false,
             isDeleting: false,
             selectedVerificationStatus: VerificationStatus.Unverified,
+            searchQuery:
+                encodeURIComponent(
+                    URLToSearchQuery(this.props.location.search),
+                ) ?? '',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -399,15 +460,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
     }
 
+    componentDidMount() {
+        localStorage.setItem('searchQuery', '');
+    }
+
     componentDidUpdate(
         prevProps: Readonly<Props>,
         prevState: Readonly<LinelistTableState>,
     ): void {
-        if (
-            this.props.location.state?.search !==
-            prevProps.location.state?.search
-        ) {
-            this.setState({ page: 0 }, this.tableRef.current?.onQueryChange);
+        if (this.props.location.search !== prevProps.location.search) {
+            this.setState(
+                {
+                    page: 0,
+                    searchQuery: encodeURIComponent(
+                        URLToSearchQuery(this.props.location.search),
+                    ),
+                },
+                this.tableRef.current?.onQueryChange(),
+            );
         }
     }
     componentWillUnmount(): void {
@@ -418,7 +488,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.props.location.state.search } };
+            requestBody = {
+                data: { query: decodeURIComponent(this.state.searchQuery) },
+            };
         } else {
             requestBody = {
                 data: {
@@ -453,7 +525,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             status: verificationStatus,
             ...(note ? { note } : {}),
             ...(this.hasSelectedRowsAcrossPages()
-                ? { query: this.props.location.state.search }
+                ? { query: decodeURIComponent(this.state.searchQuery) }
                 : { caseIds: rowData.map((row: TableRow) => row.id) }),
         };
 
@@ -816,9 +888,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
-                            const trimmedQ = this.props.location.state?.search?.trim();
-                            if (trimmedQ) {
-                                listUrl += '&q=' + encodeURIComponent(trimmedQ);
+                            if (this.state.searchQuery !== '') {
+                                listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
                             this.props.setSearchLoading(true);
@@ -1036,8 +1107,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...((this.props.location.state?.search?.trim() ??
-                                      '') !== ''
+                                  ...(this.state.searchQuery !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -1078,6 +1148,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             .totalNumRows !==
                                                         this.state
                                                             .numSelectedRows;
+
                                                     await this.tableRef.current.onAllSelected(
                                                         shouldSelectAll,
                                                     );

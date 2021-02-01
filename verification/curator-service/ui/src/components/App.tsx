@@ -33,7 +33,7 @@ import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
 import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
 import HomeIcon from '@material-ui/icons/Home';
-import LandingPage from './LandingPage';
+import LandingPage from './landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -57,6 +57,7 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
+import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../hooks/useCookieBanner';
 
 const theme = createMuiTheme({
@@ -288,9 +289,14 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     <MenuItem>Profile</MenuItem>
                 </Link>
 
-                <a className={classes.link} href="/auth/logout">
-                    <MenuItem>Logout</MenuItem>
-                </a>
+                <MenuItem
+                    onClick={() => {
+                        Auth.signOut();
+                        window.location.href = '/auth/logout';
+                    }}
+                >
+                    Logout
+                </MenuItem>
                 <Divider className={classes.divider} />
                 <Link to="/terms" onClick={handleClose}>
                     <MenuItem>About Global.Health</MenuItem>
@@ -353,11 +359,14 @@ export default function App(): JSX.Element {
     const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
+    const [searchQuery, setSearchQuery] = React.useState<string>('');
     const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
     const classes = useStyles();
+
+    const savedSearchQuery = localStorage.getItem('searchQuery');
 
     const menuList = user
         ? [
@@ -370,7 +379,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', state: { search: '' } },
+                  to: { pathname: '/cases', search: searchQuery },
                   displayCheck: (): boolean => true,
               },
               {
@@ -459,6 +468,12 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
+    useEffect(() => {
+        if (savedSearchQuery === null) return;
+
+        setSearchQuery(savedSearchQuery);
+    }, [savedSearchQuery]);
+
     return (
         <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
@@ -488,11 +503,10 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={
-                                            location.state?.search ?? ''
-                                        }
+                                        searchQuery={location.search ?? ''}
                                         onSearchChange={(searchQuery): void => {
-                                            history.push('/cases', {
+                                            history.push({
+                                                pathname: '/cases',
                                                 search: searchQuery,
                                             });
                                         }}
@@ -500,9 +514,7 @@ export default function App(): JSX.Element {
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
-                                <DownloadButton
-                                    search={location.state?.search ?? ''}
-                                ></DownloadButton>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
@@ -765,14 +777,20 @@ export default function App(): JSX.Element {
                             <TermsOfUse />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) ? (
+                            {hasAnyRole(['curator', 'admin']) &&
+                            searchQuery === '' ? (
                                 <Charts />
                             ) : user ? (
-                                <Redirect to="/cases" />
+                                <Redirect
+                                    to={{
+                                        pathname: '/cases',
+                                        search: searchQuery,
+                                    }}
+                                />
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage />
+                                <LandingPage setUser={setUser} />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}

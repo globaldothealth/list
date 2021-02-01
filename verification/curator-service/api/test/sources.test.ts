@@ -5,7 +5,7 @@ const mockPutRule = jest
     .fn()
     .mockResolvedValue('arn:aws:events:fake:event:rule/name');
 const mockInvoke = jest.fn().mockResolvedValue({ Payload: '' });
-const mockSend = jest.fn().mockResolvedValue({});
+const mockSend = jest.fn();
 const mockInitialize = jest.fn().mockResolvedValue({ send: mockSend });
 
 import * as baseUser from './users/base.json';
@@ -45,9 +45,14 @@ afterAll(async () => {
 
 beforeEach(async () => {
     jest.clearAllMocks();
+    mockSend.mockResolvedValue({});
     await Source.deleteMany({});
     await User.deleteMany({});
     await Session.deleteMany({});
+});
+
+afterEach(async () => {
+    mockSend.mockReset();
 });
 
 afterAll(async () => {
@@ -375,6 +380,29 @@ describe('PUT', () => {
                 },
             })
             .expect(200, /arn/);
+    });
+    it('should return error if sending email notification fails, and still store the change', async () => {
+        const recipients = ['foo@bar.com'];
+        const source = await new Source({
+            name: 'test-source',
+            origin: { url: 'http://foo.bar', license: 'MIT' },
+            format: 'JSON',
+            notificationRecipients: recipients,
+        }).save();
+        mockSend.mockReset();
+        mockSend.mockRejectedValue({});
+        await curatorRequest
+            .put(`/api/sources/${source.id}`)
+            .send({
+                automation: {
+                    schedule: { awsScheduleExpression: 'rate(1 hour)' },
+                },
+            })
+            .expect(500, /NotificationSendError/);
+        const updatedSourceRes = await curatorRequest
+            .get(`/api/sources/${source.id}`)
+            .expect(200);
+        expect(updatedSourceRes.body.automation).toBeDefined();
     });
 });
 

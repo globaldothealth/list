@@ -30,6 +30,7 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
+import AWS from 'aws-sdk';
 
 const app = express();
 
@@ -130,6 +131,7 @@ const awsEventsClient = new AwsEventsClient(
     awsLambdaClient,
     env.SERVICE_ENV,
 );
+const s3Client = new AWS.S3({ region: 'us-east-1', signatureVersion: 'v4' });
 
 // API validation.
 app.use(
@@ -211,7 +213,10 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
         );
 
         // Configure cases controller proxying to data service.
-        const casesController = new CasesController(env.DATASERVER_URL);
+        const casesController = new CasesController(
+            env.DATASERVER_URL,
+            s3Client,
+        );
         apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
@@ -232,6 +237,11 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             '/cases/:id([a-z0-9]{24})',
             mustBeAuthenticated,
             casesController.get,
+        );
+        apiRouter.get(
+            '/cases/getDownloadLink',
+            mustBeAuthenticated,
+            casesController.getDownloadLink,
         );
         apiRouter.post(
             '/cases',
