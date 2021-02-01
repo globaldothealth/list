@@ -1,69 +1,69 @@
 version: "3.7"
 services:
-    mongo:
-        image: mongo
-        restart: always
-        init: true
-        ports:
-            - "27017:27017"
-        environment:
-            MONGO_INITDB_DATABASE: "covid19"
-    curator:
-        build:
-            context: ../.
-            dockerfile: verification/curator-service/api/Dockerfile
-        init: true
-        ports:
-            - "3001:3001"
-        depends_on:
-            - mongo
-            - data
-        environment:
-            AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-            AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-            DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
-            DATASERVER_URL: "http://data:3000"
-            EMAIL_USER_ADDRESS: "${EMAIL_USER_ADDRESS}"
-            EMAIL_USER_PASSWORD: "${EMAIL_USER_PASSWORD}"
-            GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
-            GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://curator:3001"]
-            interval: 30s
-            timeout: 10s
-            retries: 3
-            start_period: 30s
-    data:
-        build:
-            context: ../.
-            dockerfile: data-serving/data-service/Dockerfile
-            target: dev
-        init: true
-        ports:
-            - "3000:3000"
-        depends_on:
-            - mongo
-        environment:
-            DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
-            MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://data:3000"]
-            interval: 30s
-            timeout: 10s
-            retries: 3
-            start_period: 30s
-    curatorui:
-        build:
-            context: ../.
-            dockerfile: verification/curator-service/ui/Dockerfile
-        init: true
-        ports:
-            - "3002:3002"
-        depends_on:
-            - curator
-        # Necessary because react start script requires a TTY.
-        stdin_open: true
-        environment:
-            PORT: "3002"
-            # UI and API run on different ports in dev, make the custom proxy work.
-            REACT_APP_PROXY_URL: "http://curator:3001"
+  mongo:
+    image: mongo
+    restart: always
+    init: true
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: "covid19"
+  curator:
+    build:
+      context: ../.
+      dockerfile: verification/curator-service/api/Dockerfile
+    init: true
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+      - data
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+      DATASERVER_URL: "http://data:3000"
+      EMAIL_USER_ADDRESS: "${EMAIL_USER_ADDRESS}"
+      EMAIL_USER_PASSWORD: "${EMAIL_USER_PASSWORD}"
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://curator:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+  data:
+    build:
+      context: ../.
+      dockerfile: data-serving/data-service/Dockerfile
+      target: dev
+    init: true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      DB_CONNECTION_STRING: "mongodb://mongo:27017/covid19"
+      MAPBOX_TOKEN: "${MAPBOX_TOKEN}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://data:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+  curatorui:
+    build:
+      context: ../.
+      dockerfile: verification/curator-service/ui/Dockerfile
+    init: true
+    ports:
+      - "3002:3002"
+    depends_on:
+      - curator
+    # Necessary because react start script requires a TTY.
+    stdin_open: true
+    environment:
+      PORT: "3002"
+      # UI and API run on different ports in dev, make the custom proxy work.
+      REACT_APP_PROXY_URL: "http://curator:3001"
