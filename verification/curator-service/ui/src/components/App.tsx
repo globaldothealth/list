@@ -515,13 +515,7 @@ export default function App(): JSX.Element {
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
-                                <DownloadButton
-                                    search={
-                                        encodeURIComponent(
-                                            URLToSearchQuery(location.search),
-                                        ) ?? ''
-                                    }
-                                ></DownloadButton>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
