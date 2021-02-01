@@ -21,16 +21,25 @@ interface SourceProps {
 }
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li>Enter the URL of the data source used for reporting the line list case.
+    <StyledTooltip>
         <ul>
-          <li>If this is a new data source you will need to add it to the system along with a data source name. The form will prompt you to do this if this is the case.</li>
-          <li>If the URL is an existing source already in the system, select the appropriate source from the list provided.</li>
+            <li>
+                Enter the URL of the data source used for reporting the line
+                list case.
+                <ul>
+                    <li>
+                        If this is a new data source you will need to add it to
+                        the system along with a data source name. The form will
+                        prompt you to do this if this is the case.
+                    </li>
+                    <li>
+                        If the URL is an existing source already in the system,
+                        select the appropriate source from the list provided.
+                    </li>
+                </ul>
+            </li>
         </ul>
-      </li>
-    </ul>
-  </StyledTooltip>
+    </StyledTooltip>
 );
 
 export default class Source extends React.Component<SourceProps, {}> {
