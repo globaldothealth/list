@@ -31,7 +31,7 @@ def convert_date(raw_date):
     """
     Convert raw date field into a value interpretable by the dataserver.
     """
-    date = datetime.strptime(raw_date, "%Y/%m/%d %H:%M:%S")
+    date = datetime.strptime(raw_date.split(" ")[0], "%Y/%m/%d")
     return date.strftime("%m/%d/%YZ")
 
 
