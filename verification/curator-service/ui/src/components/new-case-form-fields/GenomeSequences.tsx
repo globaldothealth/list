@@ -27,18 +27,35 @@ const useStyles = makeStyles(() => ({
 }));
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li><strong>Add a Genome sequence:</strong> Allows for a genome sequence to be linked to a specific reported case. If the source has a linked genome case select add and complete all of the fields you are able to</li>
-      <li><strong>Sample collection date:</strong> Date the sample was collected on</li>
-      <li><strong>Repository URL:</strong> URL link to the location that the sequence is stored. e.g. GISAID and Genbank URL</li>
-      <li><strong>Sequence accession:</strong> The sequence accession, see here for format details</li>
-      <li><strong>Sequence name:</strong> The name of the sequence</li>
-      <li><strong>Sequence length:</strong> The length of the sequence</li>
-    </ul>
-  </StyledTooltip>
+    <StyledTooltip>
+        <ul>
+            <li>
+                <strong>Add a Genome sequence:</strong> Allows for a genome
+                sequence to be linked to a specific reported case. If the source
+                has a linked genome case select add and complete all of the
+                fields you are able to
+            </li>
+            <li>
+                <strong>Sample collection date:</strong> Date the sample was
+                collected on
+            </li>
+            <li>
+                <strong>Repository URL:</strong> URL link to the location that
+                the sequence is stored. e.g. GISAID and Genbank URL
+            </li>
+            <li>
+                <strong>Sequence accession:</strong> The sequence accession, see
+                here for format details
+            </li>
+            <li>
+                <strong>Sequence name:</strong> The name of the sequence
+            </li>
+            <li>
+                <strong>Sequence length:</strong> The length of the sequence
+            </li>
+        </ul>
+    </StyledTooltip>
 );
-
 
 export default function GenomeSequences(): JSX.Element {
     const { values } = useFormikContext<CaseFormValues>();
@@ -46,8 +63,8 @@ export default function GenomeSequences(): JSX.Element {
     return (
         <Scroll.Element name="genomeSequences">
             <FieldTitle
-              title="Genome Sequences"
-              tooltip={<TooltipText />}
+                title="Genome Sequences"
+                tooltip={<TooltipText />}
             ></FieldTitle>
             <FieldArray name="genomeSequences">
                 {({ push, remove }): JSX.Element => {

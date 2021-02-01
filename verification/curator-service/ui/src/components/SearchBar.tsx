@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     Button,
     IconButton,
@@ -16,6 +17,7 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
+import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -49,6 +51,9 @@ const StyledSearchTextField = withStyles((theme: Theme) => ({
             '&.Mui-focused fieldset': {
                 border: `1px solid  ${theme.palette.primary.main}`,
             },
+            '& #search-field': {
+                minWidth: '100px',
+            },
         },
     },
 }))(TextField);
@@ -65,18 +70,23 @@ export default function SearchBar(props: {
     loading: boolean;
     rootComponentRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element {
+    const location = useLocation();
     const classes = searchBarStyles();
 
-    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
+    const [search, setSearch] = React.useState<string>(location.search);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
         false,
     );
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    React.useEffect(() => {
-        setSearch(props.searchQuery ?? '');
-    }, [props.searchQuery]);
+    useEffect(() => {
+        const searchString = URLToSearchQuery(location.search);
+        if (searchString === search) return;
+
+        setSearch(searchString);
+        //eslint-disable-next-line
+    }, [location.search]);
 
     const handleFilterClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -97,16 +107,18 @@ export default function SearchBar(props: {
         setIsSearchGuideOpen((isOpen) => !isOpen);
     };
 
+    const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            props.onSearchChange(searchQueryToURL(search));
+        }
+    };
+
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
-                onKeyPress={(ev): void => {
-                    if (ev.key === 'Enter') {
-                        ev.preventDefault();
-                        props.onSearchChange(search);
-                    }
-                }}
+                onKeyPress={handleKeyPress}
                 onChange={(event): void => {
                     setSearch(event.target.value);
                 }}

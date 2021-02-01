@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
+import AWS from 'aws-sdk';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -14,7 +15,10 @@ axios.defaults.timeout = 0;
  * It handles CRUD operations from curators.
  */
 export default class CasesController {
-    constructor(private readonly dataServerURL: string) {}
+    constructor(
+        private readonly dataServerURL: string,
+        private readonly s3Client: AWS.S3,
+    ) {}
 
     /** List simply forwards the request to the data service */
     list = async (req: Request, res: Response): Promise<void> => {
@@ -67,6 +71,31 @@ export default class CasesController {
             }
             res.status(500).send(err);
         }
+    };
+
+    /* getDownloadLink generates signed URL to download full data set from AWS S3 */
+    getDownloadLink = async (req: Request, res: Response): Promise<void> => {
+        const params = {
+            Bucket: 'covid-19-data-export',
+            Key: 'latest/latestdata.tar.gz',
+            Expires: 5 * 60,
+        };
+
+        try {
+            const signedUrl: string = await new Promise((resolve, reject) => {
+                this.s3Client.getSignedUrl('getObject', params, (err, url) => {
+                    if (err) reject(err);
+
+                    resolve(url);
+                });
+            });
+
+            res.status(200).send({ signedUrl });
+        } catch (err) {
+            res.status(500).send(err);
+        }
+
+        return;
     };
 
     /** listSymptoms simply forwards the request to the data service */
