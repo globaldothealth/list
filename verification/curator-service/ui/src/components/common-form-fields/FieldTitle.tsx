@@ -16,6 +16,10 @@ const styles = (theme: Theme) =>
         title: { marginRight: '1em' },
     });
 
+interface wideToolTip {
+    maxWidth: 'auto' | '40vw';
+}
+
 const AppTooltip = withStyles((theme: Theme) => ({
     arrow: {
         color: theme.palette.primary.main,
@@ -27,6 +31,9 @@ const AppTooltip = withStyles((theme: Theme) => ({
         fontSize: 16,
         fontWeight: 'normal',
         padding: '1rem',
+
+        maxWidth: (props: wideToolTip) =>
+            props.maxWidth === 'auto' ? 'auto' : '40vw',
     },
 }))(Tooltip);
 
@@ -34,10 +41,12 @@ interface FieldTitleProps extends WithStyles<typeof styles> {
     title: string;
     tooltip?: string | JSX.Element;
     interactive?: boolean;
+    maxWidth?: string;
 }
 
 function FieldTitle(props: FieldTitleProps): JSX.Element {
     const { classes } = props;
+
     return (
         <div className={classes.container}>
             <div className={classes.title}>
@@ -47,9 +56,10 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
                 <AppTooltip
                     arrow
                     interactive={props.interactive}
-                    title={props.tooltip}
+                    title={props.tooltip || ''}
+                    maxWidth={props.maxWidth ? '40vw' : 'auto'}
                 >
-                    <HelpOutlineIcon fontSize="small" />
+                      <HelpOutlineIcon fontSize="small" />
                 </AppTooltip>
             )}
         </div>
