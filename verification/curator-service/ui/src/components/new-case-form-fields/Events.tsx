@@ -66,7 +66,8 @@ export default function Events(): JSX.Element {
         <Scroll.Element name="events">
             <FieldTitle
               title="Events"
-              tooltip={<TooltipText />}
+              interactive
+              tooltip={<TooltipText  />}
             ></FieldTitle>
             <DateField
                 name="confirmedDate"
