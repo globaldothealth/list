@@ -263,10 +263,10 @@ def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     source_id = "id"
     content_url = "http://foo.bar/"
     requests_mock.get(content_url, json={"data": "yes"})
-    result = retrieval.retrieve_content(
+    results = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, "JSON", {}, {})
-    assert "/tmp/" in result[0]
-    assert source_id in result[1]
+    assert all("/tmp/" in fn for fn, s3key in results)
+    assert all(source_id in s3key for fn, s3key in results)
 
 
 def test_retrieve_content_raises_error_for_non_supported_format(
