@@ -67,6 +67,7 @@ export default function Events(): JSX.Element {
             <FieldTitle
               title="Events"
               interactive
+              wideToolTip
               tooltip={<TooltipText  />}
             ></FieldTitle>
             <DateField
