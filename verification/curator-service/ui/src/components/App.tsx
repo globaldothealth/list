@@ -468,7 +468,7 @@ export default function App(): JSX.Element {
         if (!user) return;
 
         setDrawerOpen(hasAnyRole(['curator', 'admin']) && showMenu);
-    }, [user]);
+    }, [user, hasAnyRole, showMenu]);
 
     useEffect(() => {
         if (savedSearchQuery === null) return;
