@@ -404,10 +404,6 @@ export default function App(): JSX.Element {
         : [];
 
     useEffect(() => {
-        setDrawerOpen(showMenu);
-    }, [showMenu]);
-
-    useEffect(() => {
         const menuIndex = menuList.findIndex((menuItem) => {
             const pathname =
                 typeof menuItem.to === 'string'
@@ -467,6 +463,12 @@ export default function App(): JSX.Element {
     useEffect(() => {
         getUser();
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        setDrawerOpen(hasAnyRole(['curator', 'admin']));
+    }, [user]);
 
     useEffect(() => {
         if (savedSearchQuery === null) return;

@@ -130,12 +130,15 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             padding: '6px',
         },
-        spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: theme.palette.background.default,
             display: 'flex',
+            justifyContent: 'space-between',
             height: '64px',
+        },
+        tableTitle: {
+            minWidth: '150px',
         },
         tableToolbar: {
             backgroundColor: '#31A497',
@@ -992,8 +995,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         Pagination: (props): JSX.Element => {
                             return this.state.numSelectedRows === 0 ? (
                                 <div className={classes.tablePaginationBar}>
-                                    <Typography>Linelist</Typography>
-                                    <span className={classes.spacer}></span>
+                                    <Typography className={classes.tableTitle}>
+                                        COVID-19 Linelist
+                                    </Typography>
                                     <TablePagination
                                         {...props}
                                         onChangeRowsPerPage={(event): void => {
