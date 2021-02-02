@@ -468,7 +468,8 @@ export default function App(): JSX.Element {
         if (!user) return;
 
         setDrawerOpen(hasAnyRole(['curator', 'admin']) && showMenu);
-    }, [user, hasAnyRole, showMenu]);
+        //eslint-disable-next-line
+    }, [user]);
 
     useEffect(() => {
         if (savedSearchQuery === null) return;
