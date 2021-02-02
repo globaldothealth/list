@@ -467,7 +467,7 @@ export default function App(): JSX.Element {
     useEffect(() => {
         if (!user) return;
 
-        setDrawerOpen(hasAnyRole(['curator', 'admin']));
+        setDrawerOpen(hasAnyRole(['curator', 'admin']) && showMenu);
     }, [user]);
 
     useEffect(() => {
