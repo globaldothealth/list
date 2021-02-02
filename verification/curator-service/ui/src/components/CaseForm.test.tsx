@@ -69,7 +69,7 @@ it('renders form', async () => {
     expect(getByText('Enter the details for a new case')).toBeInTheDocument();
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(1);
-    expect(getAllByText(/Location/i)).toHaveLength(2);
+    expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(1);
     expect(getByTestId('caseReference')).toBeInTheDocument();
     expect(getByText(/Nationalities/i)).toBeInTheDocument();
