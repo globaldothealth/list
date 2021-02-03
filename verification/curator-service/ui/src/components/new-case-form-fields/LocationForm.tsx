@@ -19,22 +19,42 @@ import { hasKey } from '../Utils';
 import throttle from 'lodash/throttle';
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li>Enter the location for the case.
+    <StyledTooltip>
         <ul>
-          <li>Start typing the location and the field will be auto completed with supported locations.</li>
-          <li>You can enter a location up to Admin level 3; as an example this corresponds to country level ocation data in the USA. Specific locations are not supported</li>
+            <li>
+                Enter the location for the case.
+                <ul>
+                    <li>
+                        Start typing the location and the field will be auto
+                        completed with supported locations.
+                    </li>
+                    <li>
+                        You can enter a location up to Admin level 3; as an
+                        example this corresponds to country level ocation data
+                        in the USA. Specific locations are not supported
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Example:</strong> If your case has 'Location = USA,
+                California, Santa Clara' type 'Santa Clara' and select that
+                option from the drop down list. On selection the rest of the
+                location fields would be prepopulated.
+                <ul>
+                    <li>
+                        If you need to change the location you can press X in
+                        the location field and then retype the location and
+                        select the desidered one. This will change the
+                        prepoulated fields to the new location.
+                    </li>
+                    <li>
+                        If you cannot find a specific location please provide
+                        details to your Global.health contact.
+                    </li>
+                </ul>
+            </li>
         </ul>
-      </li>
-      <li><strong>Example:</strong> If your case has 'Location = USA, California, Santa Clara' type 'Santa Clara' and select that option from the drop down list. On selection the rest of the location fields would be prepopulated.
-        <ul>
-          <li>If you need to change the location you can press X in the location field and then retype the location and select the desidered one. This will change the prepoulated fields to the new location.</li>
-          <li>If you cannot find a specific location please provide details to your Global.health contact.</li>
-        </ul>
-      </li>
-    </ul>
-  </StyledTooltip>
+    </StyledTooltip>
 );
 
 function LocationForm(): JSX.Element {
@@ -43,10 +63,7 @@ function LocationForm(): JSX.Element {
     >();
     return (
         <Scroll.Element name="location">
-            <FieldTitle
-              title="Location"
-              tooltip={<TooltipText />}>
-            </FieldTitle>
+            <FieldTitle title="Location" tooltip={<TooltipText />}></FieldTitle>
             <PlacesAutocomplete
                 initialValue={initialValues.location?.name}
                 name="location"
@@ -153,7 +170,6 @@ export function PlacesAutocomplete(
             active = false;
         };
     }, [value, inputValue, fetch]);
-
     return (
         <Autocomplete
             itemType="Loc"
@@ -189,12 +205,13 @@ export function PlacesAutocomplete(
                         }
                         component={TextField}
                         fullWidth
+                        // inputProps={{ "data-testid": "locationInputText" }}
                     ></Field>
                     {props.required && (
                         <RequiredHelperText
-                            name={props.name} locationRequiredText="A location must be provided"
+                            name={props.name}
+                            locationRequiredText="A location must be provided"
                         ></RequiredHelperText>
-                        
                     )}
                 </>
             )}

@@ -1,9 +1,11 @@
 import { fireEvent, render, wait } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import CaseForm from './CaseForm';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
+import { isEmpty } from 'lodash';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -73,6 +75,25 @@ it('renders form', async () => {
     expect(getAllByText(/Events/i)).toHaveLength(1);
     expect(getByTestId('caseReference')).toBeInTheDocument();
     expect(getByText(/Nationalities/i)).toBeInTheDocument();
+});
+
+test('Check location error message to become red on blur', () => {
+    const { getByTestId, getByText } = render(
+        <MemoryRouter>
+            <CaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
+
+    const mandatoryLocationMessage = getByText('A location must be provided');
+    const locationInputField = getByTestId('locationInputText');
+    userEvent.type(locationInputField, 'Warsaw');
+    userEvent.type(locationInputField, '');
+    expect(mandatoryLocationMessage).toHaveClass('Mui-error');
 });
 
 it('can add and remove genome sequencing sections', async () => {
