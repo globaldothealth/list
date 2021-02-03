@@ -1,0 +1,7 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "santa_cat_test/content.csv",
+    "sourceUrl": "ftp://boavista:dados_abertos@ftp2.ciasc.gov.br/boavista_covid_dados_abertos.csv",
+    "sourceId": "5f7dddf22d0ee7002fe0d56d"
+}
