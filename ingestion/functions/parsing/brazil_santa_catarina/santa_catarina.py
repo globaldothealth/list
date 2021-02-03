@@ -35,7 +35,7 @@ _ETHNICITY = "raca"
 _CLASSIFICATION = "classificacao"
 _DATE_HOSPITALIZATION = "data_internacao"
 _DATE_ICU_ADMISSION = "data_entrada_uti"
-_NEIGHBOURHOOD = "bairro"
+_NEIGHBOURHOOD = "bairro,,,,,,,,,,,,,"
 
 _COMORBIDITIES_MAP = {
     "ASMA": "asthma",
@@ -224,7 +224,7 @@ def convert_notes(raw_comorbidities: str, raw_symptoms: str, neighbourhood, give
         raw_notes.append("Patient with coryza")
     if "PUERPERA" in given_birth:
         raw_notes.append("Recently gave birth")
-    # The neighbourhood entry is very variable and includes entries such as "00000"
+    #  The neighbourhood entry is very variable and includes entries such as "00000"
     if neighbourhood and neighbourhood != "NULL":
         raw_notes.append("Neighbourhood: " + neighbourhood)
     if raw_notes:
