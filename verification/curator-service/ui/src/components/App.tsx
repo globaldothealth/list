@@ -291,7 +291,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
                 <MenuItem
                     onClick={() => {
-                        Auth.signOut();
+                        try {
+                            Auth.signOut();
+                        } catch (err) {}
                         window.location.href = '/auth/logout';
                     }}
                 >
