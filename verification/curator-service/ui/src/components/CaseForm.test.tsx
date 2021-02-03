@@ -5,7 +5,6 @@ import CaseForm from './CaseForm';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { isEmpty } from 'lodash';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
