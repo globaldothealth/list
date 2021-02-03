@@ -108,6 +108,14 @@ final case in the CSV. If it was successful, the message will be `Success!`;
 otherwise, it's likely to say that the request failed with `422`, which means
 the data wasn't properly formatted. This is changing in the near future.
 
+#### Updating variants list
+
+Edit `./variantsofconcern.csv` to add the new variants, then run:
+
+    npm run prepare-variants
+
+This updates `src/assets/variants.json`, which you should then commit and push.
+
 ## Development
 
 The React application was built with the `create-react-app` new project generator.

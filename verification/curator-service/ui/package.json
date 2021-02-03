@@ -58,7 +58,7 @@
   "scripts": {
     "start-noenv": "react-scripts start",
     "start": "PORT=3002 react-scripts start",
-    "build": "npm run prepare-variants && react-scripts build",
+    "build": "react-scripts build",
     "prepare-variants": "csvtojson ./variantsofconcern.csv > src/components/assets/variants.json",
     "init-case-db": "cd ../../../data-serving/scripts/setup-db && npm run setup-cases",
     "init-sources-db": "cd ../../../data-serving/scripts/setup-db && npm run setup-sources",
