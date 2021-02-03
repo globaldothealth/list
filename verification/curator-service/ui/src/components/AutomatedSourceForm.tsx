@@ -1,6 +1,12 @@
 import * as Yup from 'yup';
 
-import { Button, Paper, Typography, makeStyles, Theme } from '@material-ui/core';
+import {
+    Button,
+    Paper,
+    Typography,
+    makeStyles,
+    Theme,
+} from '@material-ui/core';
 import { FastField, Form, Formik } from 'formik';
 
 import AppModal from './AppModal';

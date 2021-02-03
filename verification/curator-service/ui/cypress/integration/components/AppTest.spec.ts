@@ -53,7 +53,7 @@ describe('App', function () {
 
         cy.contains('Detailed line list data');
         cy.contains('Terms of use');
-        cy.contains('Login to get started');
+        cy.contains('Or sign in with email');
     });
 
     it('Homepage with logged in user with no roles', function () {

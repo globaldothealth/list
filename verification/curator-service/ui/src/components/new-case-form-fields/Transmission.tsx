@@ -24,12 +24,18 @@ const useStyles = makeStyles(() => ({
 }));
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li><strong>Route of transmission:</strong> Enter the route of transmission if provided by the source.</li>
-      <li><strong>Place of transmission:</strong> Enter the place of transmission if provided by the source.</li>
-    </ul>
-  </StyledTooltip>
+    <StyledTooltip>
+        <ul>
+            <li>
+                <strong>Route of transmission:</strong> Enter the route of
+                transmission if provided by the source.
+            </li>
+            <li>
+                <strong>Place of transmission:</strong> Enter the place of
+                transmission if provided by the source.
+            </li>
+        </ul>
+    </StyledTooltip>
 );
 
 export default function Transmission(): JSX.Element {
@@ -62,10 +68,9 @@ export default function Transmission(): JSX.Element {
     return (
         <Scroll.Element name="transmission">
             <FieldTitle
-              title="Transmission"
-              tooltip={<TooltipText />}
-            >
-            </FieldTitle>
+                title="Transmission"
+                tooltip={<TooltipText />}
+            ></FieldTitle>
             <div className={classes.fieldRow}>
                 <FormikAutocomplete
                     name="transmissionRoutes"

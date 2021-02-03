@@ -98,7 +98,7 @@ it('navigates to the home screen (charts) after clicking on home button', async 
         </Router>,
     );
 
-    expect(await findByText('Linelist')).toBeInTheDocument();
+    expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
 
     fireEvent.click(await findByTestId('home-button'));
 

@@ -10,17 +10,28 @@ import { useFormikContext } from 'formik';
 const hasPreexistingConditionsValues = ['Unknown', 'Yes', 'No'];
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li><strong>Has pre-existing conditions:</strong> Enter if the case has reported pre-existing conditions If none reported leave blank.</li>
-      <li><strong>Pre-existing conditions:</strong> Select the pre existing conditions reported for the case.
+    <StyledTooltip>
         <ul>
-          <li>You can either manually search in the field by typing and selecting each from the prepopulated list.</li>
-          <li>You can select multiple pre-existing conditions per case.</li>
+            <li>
+                <strong>Has pre-existing conditions:</strong> Enter if the case
+                has reported pre-existing conditions If none reported leave
+                blank.
+            </li>
+            <li>
+                <strong>Pre-existing conditions:</strong> Select the pre
+                existing conditions reported for the case.
+            </li>
+            <ul>
+                <li>
+                    You can either manually search in the field by typing and
+                    selecting each from the prepopulated list.
+                </li>
+                <li>
+                    You can select multiple pre-existing conditions per case.
+                </li>
+            </ul>
         </ul>
-      </li>
-    </ul>
-  </StyledTooltip>
+    </StyledTooltip>
 );
 
 export default function PreexistingConditions(): JSX.Element {
@@ -28,10 +39,9 @@ export default function PreexistingConditions(): JSX.Element {
     return (
         <Scroll.Element name="preexistingConditions">
             <FieldTitle
-              title="Pre-existing conditions"
-              tooltip={<TooltipText />}
-            >
-            </FieldTitle>
+                title="Pre-existing conditions"
+                tooltip={<TooltipText />}
+            ></FieldTitle>
             <SelectField
                 name="hasPreexistingConditions"
                 label="Has preexisting conditions"
