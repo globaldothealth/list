@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { round } from 'lodash';
@@ -18,6 +18,7 @@ import {
     Typography,
     makeStyles,
     withStyles,
+    LinearProgress,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -129,15 +130,18 @@ const styles = (theme: Theme) =>
             marginRight: theme.spacing(2),
             padding: '6px',
         },
-        spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
             backgroundColor: theme.palette.background.default,
             display: 'flex',
+            justifyContent: 'space-between',
             height: '64px',
         },
+        tableTitle: {
+            minWidth: '150px',
+        },
         tableToolbar: {
-            backgroundColor: "#31A497",
+            backgroundColor: '#31A497',
         },
         toolbarItems: {
             color: theme.palette.background.paper,
@@ -151,6 +155,21 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     dialogLoadingSpinner: {
         marginRight: theme.spacing(2),
         padding: '6px',
+    },
+}));
+
+const StyledDownloadButton = withStyles((theme: Theme) => ({
+    root: {
+        minWidth: '160px',
+    },
+}))(Button);
+
+const downloadDataModalStyles = makeStyles((theme: Theme) => ({
+    downloadButton: {
+        margin: '16px 0',
+    },
+    loader: {
+        marginTop: '16px',
     },
 }));
 
@@ -338,27 +357,67 @@ function RowMenu(props: {
     );
 }
 
-export function DownloadButton(props: { search: string }): JSX.Element {
-    const formRef: RefObject<any> = React.createRef();
+export function DownloadButton(): JSX.Element {
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
+        false,
+    );
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const classes = downloadDataModalStyles();
+
+    const downloadDataSet = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/cases/getDownloadLink');
+            window.location.href = response.data.signedUrl;
+            setIsLoading(false);
+            setIsDownloadModalOpen(false);
+        } catch (err) {
+            alert(
+                'There was an error while downloading data, please try again later.',
+            );
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
-            <form
-                hidden
-                ref={formRef}
-                method="POST"
-                action="/api/cases/download"
-            >
-                <input name="query" value={props.search.trim()} />
-            </form>
-            <Button
+            <StyledDownloadButton
                 variant="outlined"
                 color="primary"
-                onClick={(): void => formRef.current.submit()}
+                onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download
-            </Button>
+                Download full dataset
+            </StyledDownloadButton>
+            <Dialog
+                open={isDownloadModalOpen}
+                onClose={(): void => setIsDownloadModalOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>Download full dataset</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2">
+                        This download link provides access to the full
+                        Global.health line list dataset, cached daily at 12:00am
+                        UTC. Any cases added past that time will not be in the
+                        current download, but will be available the next day.
+                    </Typography>
+
+                    {isLoading && <LinearProgress className={classes.loader} />}
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.downloadButton}
+                        onClick={downloadDataSet}
+                        disabled={isLoading}
+                    >
+                        Download
+                    </Button>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
@@ -402,6 +461,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
+    }
+
+    componentDidMount() {
+        localStorage.setItem('searchQuery', '');
     }
 
     componentDidUpdate(
@@ -932,8 +995,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         Pagination: (props): JSX.Element => {
                             return this.state.numSelectedRows === 0 ? (
                                 <div className={classes.tablePaginationBar}>
-                                    <Typography>Linelist</Typography>
-                                    <span className={classes.spacer}></span>
+                                    <Typography className={classes.tableTitle}>
+                                        COVID-19 Linelist
+                                    </Typography>
                                     <TablePagination
                                         {...props}
                                         onChangeRowsPerPage={(event): void => {
