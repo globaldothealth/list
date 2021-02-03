@@ -12,7 +12,6 @@ import {
     Event,
     PreexistingConditions,
     Symptoms,
-    Variant,
     VerificationStatus,
 } from './Case';
 import { Form, Formik } from 'formik';
