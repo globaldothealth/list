@@ -26,7 +26,6 @@
     "@typescript-eslint/parser": "^2.34.0",
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
-    "csv2json": "^2.0.2",
     "date-fns": "^2.16.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-cypress": "^2.11.1",
@@ -60,7 +59,7 @@
     "start-noenv": "react-scripts start",
     "start": "PORT=3002 react-scripts start",
     "build": "npm run prepare-variants && react-scripts build",
-    "prepare-variants": "csv2json -d ./variantsofconcern.csv src/components/assets/variants.json",
+    "prepare-variants": "csvtojson ./variantsofconcern.csv > src/components/assets/variants.json",
     "init-case-db": "cd ../../../data-serving/scripts/setup-db && npm run setup-cases",
     "init-sources-db": "cd ../../../data-serving/scripts/setup-db && npm run setup-sources",
     "import-case-data": "cd ../../../data-serving/data-service && npm run import-data",
@@ -90,6 +89,7 @@
     ]
   },
   "devDependencies": {
+    "csvtojson": "^2.0.10",
     "cypress": "^5.2.0",
     "cypress-file-upload": "^4.1.1",
     "jest-canvas-mock": "^2.2.0"
