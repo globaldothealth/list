@@ -209,7 +209,7 @@ def convert_demographics(gender: str, age: str, raw_ethnicity: str):
     demo = {}
     if gender:
         demo["gender"] = convert_gender(gender)
-    if age and float(age) <= 120.0:
+    if age and age != "NULL" and float(age) <= 120.0:
         demo["ageRange"] = {"start": float(age), "end": float(age)}
     if raw_ethnicity:
         demo["ethnicity"] = convert_ethnicity(raw_ethnicity)
