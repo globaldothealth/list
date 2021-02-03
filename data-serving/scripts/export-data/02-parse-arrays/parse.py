@@ -12,7 +12,11 @@ __ARRAYS = [
     "preexistingConditions.values",
     "transmission.linkedCaseIds",
     "transmission.places",
-    "transmission.routes"
+    "transmission.routes",
+]
+
+__OMIT = [
+    "location.query"
 ]
 
 
@@ -20,8 +24,15 @@ def deep_get(dictionary, keys, default=None):
     """
     Retrieve values from nested dictionaries
     """
-    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else default, keys.split("."), dictionary)
+    return reduce(
+        lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
+        keys.split("."),
+        dictionary,
+    )
 
+def convert_date(date_string):
+    if date_string:
+        return date_string[:10]
 
 def convert_event(event):
     """
@@ -29,21 +40,27 @@ def convert_event(event):
 
     Returns an unnested dictionary.
     """
-    suffix = event['name']
+    suffix = event["name"]
     col_name = f"events.{suffix}"
 
-    return ({
+    return {
         f"{col_name}.value": event.get("value"),
-        f"{col_name}.date.start": deep_get(event, "dateRange.start.$date"),
-        f"{col_name}.date.end": deep_get(event, "dateRange.end.$date")
-    })
+        f"{col_name}.date.start": convert_date(deep_get(event, "dateRange.start.$date")),
+        f"{col_name}.date.end": convert_date(deep_get(event, "dateRange.end.$date")),
+    }
 
+def convert_addl_sources(sources_string):
+    if sources_string == "[]":
+        return None
+    sources_array = json.loads(sources_string)
+    source_urls = [x["sourceUrl"] for x in sources_array]
+    return ", ".join(source_urls)
 
 def convert_string_list(item):
     """
     Converts text list into comma-separated string.
     """
-    if (type(item) != str) or (item == '') or (item == '[]'):
+    if (type(item) != str) or (item == "") or (item == "[]"):
         return None
     if type(json.loads(item)) == list:
         return ", ".join(json.loads(item))
@@ -55,18 +72,26 @@ def get_fields(infile):
     """
     Add processed event fieldnames to fields.
     """
-    with open(infile, 'r') as f:
+    with open(infile, "r") as f:
         reader = csv.DictReader(f)
         row = next(reader)
         headers = set(row.keys())
     cols_to_add = []
-    for col_name in ["confirmed", "firstClinicalConsultation", "hospitalAdmission", "icuAdmission", "onsetSymptoms", "outcome", "selfIsolation"]:
+    for col_name in [
+        "confirmed",
+        "firstClinicalConsultation",
+        "hospitalAdmission",
+        "icuAdmission",
+        "onsetSymptoms",
+        "outcome",
+        "selfIsolation",
+    ]:
         cols_to_add.append(f"events.{col_name}.value")
         cols_to_add.append(f"events.{col_name}.date.start")
         cols_to_add.append(f"events.{col_name}.date.end")
 
     fields = headers.union(set(cols_to_add))
-    fields = sorted(list(fields - set(['events'])))
+    fields = sorted(list(fields - set(["events"])))
     return fields
 
 
@@ -77,33 +102,35 @@ def process_chunk(infile, outfile=None):
     fields = get_fields(infile)
     if not outfile:
         outfile = infile[:-4] + "_processed.csv"
-    with open(outfile, 'w+') as g:
-        with open(infile, 'r') as f:
+    with open(outfile, "w+") as g:
+        with open(infile, "r") as f:
             reader = csv.DictReader(f)
-            writer = csv.DictWriter(
-                g, fieldnames=fields, extrasaction='ignore')
+            writer = csv.DictWriter(g, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
             for row in reader:
-                if "ObjectId" not in row['_id']:
+                if "ObjectId" not in row["_id"]:
                     continue
-                if type(row['notes']) == str:
-                    row['notes'] = row['notes'].replace('\n', ', ')
+                if type(row["notes"]) == str:
+                    row["notes"] = row["notes"].replace("\n", ", ")
                 for arr_field in __ARRAYS:
                     if row[arr_field]:
                         row[arr_field] = convert_string_list(row[arr_field])
-                if row['events']:
-                    for event in json.loads(row['events']):
-                        row = row | convert_event(event)
+                if row["caseReference.additionalSources"]:
+                    row["caseReference.additionalSources"] = convert_addl_sources(row["caseReference.additionalSources"])
+                if row["events"]:
+                    for e in json.loads(row["events"]):
+                        converted = convert_event(e)
+                        row = {**row, **converted}
                 writer.writerow(row)
     print(outfile)
-    return(outfile)
+    return outfile
 
 
 def get_chunk(event):
     """
     Retrieves single chunk and stores in /tmp/
     """
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource("s3")
     src_bucket = event["Records"][0]["s3"]["bucket"]["name"]
     src_key = event["Records"][0]["s3"]["object"]["key"]
     target = f"/tmp/{src_key}"
@@ -118,9 +145,10 @@ def upload_processed_chunk(processed_file):
     Upload parsed .csv file to s3.
     """
     filename = "/".join(processed_file.split("/")[-2:])
-    s3 = boto3.resource('s3')
-    s3.Object("covid-19-data-export",
-              f"processing/combine/{filename}").upload_file(processed_file)
+    s3 = boto3.resource("s3")
+    s3.Object("covid-19-data-export", f"processing/combine/{filename}").upload_file(
+        processed_file
+    )
 
 
 def lambda_handler(event, context):
@@ -139,15 +167,3 @@ def lambda_handler(event, context):
     upload_processed_chunk(processed_chunk)
     print("Chunk uploaded!")
     print("Job complete.")
-
-
-if __name__ == "__main__":
-    event = {
-        "Records": [
-            {"s3": {
-                "bucket": {"name": "covid-19-data-export"},
-                "object": {"key": "processing/combine/2021-01-27/cases_1-of-51.csv"}
-            }}
-        ]
-    }
-    lambda_handler(event, "zzz")
