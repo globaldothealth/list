@@ -162,6 +162,19 @@ describe('GET', () => {
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
             });
+            it('returns the case on wildcard variant check', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=variant%3A%2A')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns no case if no wildcard match', async () => {
+                const res = await request(app)
+                    .get('/api/cases?page=1&limit=1&q=admin3%3A%2A')
+                    .expect('Content-Type', /json/);
+                expect(res.body.cases).toHaveLength(0);
+                expect(res.body.total).toEqual(0);
+            });
             it('returns the case if non case sensitive matches', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=country%3Agermany')
