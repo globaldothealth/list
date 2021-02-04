@@ -1,5 +1,4 @@
 import { fireEvent, render, wait } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import CaseForm from './CaseForm';
 import { MemoryRouter } from 'react-router-dom';
@@ -76,7 +75,7 @@ it('renders form', async () => {
     expect(getByText(/Nationalities/i)).toBeInTheDocument();
 });
 
-test('Check location error message to become red on blur', () => {
+test('Check location error message to become red on submit', () => {
     const { getByTestId, getByText } = render(
         <MemoryRouter>
             <CaseForm
@@ -89,9 +88,8 @@ test('Check location error message to become red on blur', () => {
     );
 
     const mandatoryLocationMessage = getByText('A location must be provided');
-    const locationInputField = getByTestId('locationInputText');
-    userEvent.type(locationInputField, 'Warsaw');
-    userEvent.type(locationInputField, '');
+    const submittButton = getByText(/Submit case/i);
+    fireEvent.click(submittButton);
     expect(mandatoryLocationMessage).toHaveClass('Mui-error');
 });
 

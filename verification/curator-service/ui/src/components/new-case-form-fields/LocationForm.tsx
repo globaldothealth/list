@@ -205,7 +205,6 @@ export function PlacesAutocomplete(
                         }
                         component={TextField}
                         fullWidth
-                        inputProps={{ 'data-testid': 'locationInputText' }}
                     ></Field>
                     {props.required && (
                         <RequiredHelperText
