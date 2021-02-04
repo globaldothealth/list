@@ -62,7 +62,7 @@ paths:
                 with a comma to union them. Only equality operator is supported.
                 Supported keywords are: curator, gender, nationality, occupation,
                 country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
-                admin1, admin2, admin3
+                admin1, admin2, admin3, variant
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
