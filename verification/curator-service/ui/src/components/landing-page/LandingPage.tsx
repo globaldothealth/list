@@ -129,18 +129,19 @@ export default function LandingPage({
                 if (!user) return;
 
                 axios
-                    .post('/auth/register', {
-                        name: user.attributes.email,
+                    .post('/auth/signup', {
+                        name: undefined,
                         email: user.attributes.email,
                         roles: [],
                     })
                     .then((res) => {
-                        const { _id, email, name, roles } = res.data;
+                        const { _id, email, name, roles, picture } = res.data;
                         const newUser: User = {
                             _id,
                             email,
                             name,
                             roles,
+                            picture,
                         };
                         setUser(newUser);
                         setIsSubmitting(false);
