@@ -103,6 +103,10 @@ export interface Pathogen {
     id: number;
 }
 
+export interface Variant {
+    name: string;
+}
+
 interface Revision {
     curator: string;
     date: string;
@@ -137,4 +141,5 @@ export interface Case {
     notes: string;
     revisionMetadata: RevisionMetadata;
     exclusionData?: ExclusionData;
+    variant: Variant;
 }
