@@ -139,6 +139,7 @@ describe('GET', () => {
                 const c = new Case(minimalCase);
                 c.location.country = 'Germany';
                 c.set('demographics.occupation', 'engineer');
+                c.set('variant.name', 'B.1.1.7');
                 await c.save();
             });
             it('returns no case if no match', async () => {
@@ -152,6 +153,12 @@ describe('GET', () => {
             it('returns the case if matches', async () => {
                 await request(app)
                     .get('/api/cases?page=1&limit=1&q=country%3AGermany')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns the case if variant matches', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=variant%3AB.1.1.7')
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
             });
