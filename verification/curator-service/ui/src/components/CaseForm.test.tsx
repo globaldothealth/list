@@ -76,7 +76,7 @@ it('renders form', async () => {
 });
 
 test('Check location error message to become red on submit', () => {
-    const { getByTestId, getByText } = render(
+    const { getByText } = render(
         <MemoryRouter>
             <CaseForm
                 user={user}
