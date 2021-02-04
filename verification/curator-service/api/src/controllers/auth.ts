@@ -143,6 +143,42 @@ export class AuthController {
                 res.json(req.user);
             },
         );
+
+        this.router.post(
+            '/signup',
+            async (req: Request, res: Response): Promise<void> => {
+                const user = await User.findOne({
+                    email: req.body.email,
+                }).exec();
+
+                if (user) {
+                    req.login(user, (err: Error) => {
+                        if (!err) {
+                            res.json(user);
+                            return;
+                        }
+                        logger.error(err);
+                        res.sendStatus(500);
+                    });
+                } else {
+                    const newUser = await User.create({
+                        name: req.body.name,
+                        email: req.body.email,
+                        googleID: '42',
+                        roles: req.body.roles,
+                    });
+
+                    req.login(newUser, (err: Error) => {
+                        if (!err) {
+                            res.json(newUser);
+                            return;
+                        }
+                        logger.error(err);
+                        res.sendStatus(500);
+                    });
+                }
+            },
+        );
     }
 
     /**
