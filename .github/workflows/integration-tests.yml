@@ -36,7 +36,7 @@ jobs:
           browser: ${{ matrix.browser }}
           wait-on: "http://localhost:3002"
           wait-on-timeout: 300
-          install-command: ./install_in_ci.sh
+          install-command: sh ./install_in_ci.sh
         env:
           CI: true
       # Screenshots are only available on failures.
