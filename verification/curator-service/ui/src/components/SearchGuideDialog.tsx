@@ -145,6 +145,7 @@ const SearchGuideDialog = ({
                             <li>ethnicity</li>
                             <li>location name</li>
                             <li>verification status</li>
+                            <li>variant of concern</li>
                         </ul>
                         <Box mt={3} mb={1}>
                             <Typography className={classes.subtitle}>
