@@ -5,6 +5,7 @@ import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
 import { useLastLocation } from 'react-router-last-location';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import getRandomString from '../util/randomString';
 import { Auth } from 'aws-amplify';
@@ -18,15 +19,21 @@ import VerificationCodeForm from './VerificationCodeForm';
 
 import PolicyLink from '../PolicyLink';
 
+interface StylesProps {
+    smallHeight: boolean;
+}
+
 const useStyles = makeStyles((theme: Theme) => ({
     paper: {
-        height: 'auto',
+        position: 'absolute',
+        top: (props: StylesProps) => (props.smallHeight ? '64px' : '50%'),
         left: '50%',
+        transform: (props: StylesProps) =>
+            props.smallHeight ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
+
+        height: 'auto',
         maxWidth: '100%',
         padding: '45px',
-        position: 'absolute',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
         width: '840px',
     },
     body: {
@@ -99,7 +106,8 @@ export default function LandingPage({
         email: string;
         status: string;
     }>();
-    const classes = useStyles();
+    const smallHeight = useMediaQuery('(max-height:850px)');
+    const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
 
     const resetState = () => {
