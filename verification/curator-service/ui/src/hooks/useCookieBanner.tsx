@@ -20,8 +20,10 @@ const useCookieBanner = () => {
             acceptButtonColor: theme.palette.background.paper,
             acceptButtonCaptionColor: theme.palette.primary.main,
             customizeButtonDisplay: true,
-            customizeButtonColor: theme.palette.background.default,
-            customizeButtonCaptionColor: theme.palette.primary.main,
+            customizeButtonColor:
+                theme.custom.palette.button.customizeButtonColor,
+            customizeButtonCaptionColor:
+                theme.custom.palette.button.buttonCaption,
         },
     };
 

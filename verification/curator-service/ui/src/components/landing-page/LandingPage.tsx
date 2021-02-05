@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
+import { Link } from 'react-router-dom';
 import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
 import { useLastLocation } from 'react-router-last-location';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 import getRandomString from '../util/randomString';
 import { Auth } from 'aws-amplify';
@@ -18,21 +18,15 @@ import VerificationCodeForm from './VerificationCodeForm';
 
 import PolicyLink from '../PolicyLink';
 
-interface StylesProps {
-    smallHeight: boolean;
-}
-
 const useStyles = makeStyles((theme: Theme) => ({
     paper: {
-        position: 'absolute',
-        top: (props: StylesProps) => (props.smallHeight ? '64px' : '50%'),
-        left: '50%',
-        transform: (props: StylesProps) =>
-            props.smallHeight ? 'translate(-50%, 0)' : 'translate(-50%, -50%)',
-
         height: 'auto',
+        left: '50%',
         maxWidth: '100%',
         padding: '45px',
+        position: 'absolute',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
         width: '840px',
     },
     body: {
@@ -105,8 +99,7 @@ export default function LandingPage({
         email: string;
         status: string;
     }>();
-    const smallHeight = useMediaQuery('(max-height:850px)');
-    const classes = useStyles({ smallHeight });
+    const classes = useStyles();
     const lastLocation = useLastLocation();
 
     const resetState = () => {
@@ -293,23 +286,16 @@ export default function LandingPage({
                         </a>
                     </div>
                     <div className={classes.link}>
-                        <a
-                            href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Terms of use
-                        </a>
+                        <Link to="/terms">Terms of use</Link>
                     </div>
-                    <div className={classes.link}>
-                        <a
-                            href="https://test-globalhealth.pantheonsite.io/privacy/"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Privacy policy
-                        </a>
-                    </div>
+                    <PolicyLink
+                        type="privacy-policy"
+                        classes={{
+                            root: classes.link,
+                        }}
+                    >
+                        Privacy policy
+                    </PolicyLink>
                     <PolicyLink
                         type="cookie-policy"
                         classes={{
