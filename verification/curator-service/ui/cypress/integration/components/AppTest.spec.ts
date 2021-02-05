@@ -181,7 +181,6 @@ describe('App', function () {
         cy.contains('Line list');
 
         cy.get('a[data-testid="home-button"').click();
-
         cy.url().should('eq', 'http://localhost:3002/');
 
         cy.contains('Completeness').should('exist');
