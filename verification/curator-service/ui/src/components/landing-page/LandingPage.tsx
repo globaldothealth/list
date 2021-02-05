@@ -286,7 +286,13 @@ export default function LandingPage({
                         </a>
                     </div>
                     <div className={classes.link}>
-                        <Link to="/terms">Terms of use</Link>
+                        <a
+                            href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            Terms of use
+                        </a>
                     </div>
                     <PolicyLink
                         type="privacy-policy"

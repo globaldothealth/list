@@ -2,6 +2,7 @@ import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { TextField, CheckboxWithLabel } from 'formik-material-ui';
 import { FormHelperText, LinearProgress, Button } from '@material-ui/core';
+import PolicyLink from '../PolicyLink';
 
 interface Props {
     handleSubmit: (email: string, resetForm: () => void) => void;
@@ -76,8 +77,19 @@ export default function SignInForm({
                             label: (
                                 <small>
                                     By creating an account, I accept the
-                                    Global.health TOS and Privacy Policy, and
-                                    agree to be added to the newsletter
+                                    Global.health{' '}
+                                    <a
+                                        href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        Terms of Use
+                                    </a>{' '}
+                                    and{' '}
+                                    <PolicyLink type="privacy-policy">
+                                        Privacy Policy
+                                    </PolicyLink>
+                                    , and agree to be added to the newsletter
                                 </small>
                             ),
                         }}
