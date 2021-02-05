@@ -764,8 +764,14 @@ export const casesMatchingSearchQuery = (opts: {
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
-            casesQuery.where(f.path).equals(f.values[0]);
-            countQuery.where(f.path).equals(f.values[0]);
+            const searchTerm = f.values[0];
+            if (searchTerm === '*') {
+                casesQuery.where(f.path).exists();
+                countQuery.where(f.path).exists();
+            } else {
+                casesQuery.where(f.path).equals(f.values[0]);
+                countQuery.where(f.path).equals(f.values[0]);
+            }
         } else {
             casesQuery.where(f.path).in(f.values);
             countQuery.where(f.path).in(f.values);

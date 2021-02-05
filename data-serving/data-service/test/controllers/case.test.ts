@@ -139,6 +139,7 @@ describe('GET', () => {
                 const c = new Case(minimalCase);
                 c.location.country = 'Germany';
                 c.set('demographics.occupation', 'engineer');
+                c.set('variant.name', 'B.1.1.7');
                 await c.save();
             });
             it('returns no case if no match', async () => {
@@ -154,6 +155,25 @@ describe('GET', () => {
                     .get('/api/cases?page=1&limit=1&q=country%3AGermany')
                     .expect(200, /Germany/)
                     .expect('Content-Type', /json/);
+            });
+            it('returns the case if variant matches', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=variant%3AB.1.1.7')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns the case on wildcard variant check', async () => {
+                await request(app)
+                    .get('/api/cases?page=1&limit=1&q=variant%3A%2A')
+                    .expect(200, /Germany/)
+                    .expect('Content-Type', /json/);
+            });
+            it('returns no case if no wildcard match', async () => {
+                const res = await request(app)
+                    .get('/api/cases?page=1&limit=1&q=admin3%3A%2A')
+                    .expect('Content-Type', /json/);
+                expect(res.body.cases).toHaveLength(0);
+                expect(res.body.total).toEqual(0);
             });
             it('returns the case if non case sensitive matches', async () => {
                 await request(app)
