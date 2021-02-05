@@ -43,17 +43,14 @@ describe('LandingPage', () => {
             'href',
             'https://test-globalhealth.pantheonsite.io/terms-of-use/',
         );
+        expect(screen.getByText('Privacy policy')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/privacy/',
+        );
 
-        const privacyPolicyBtn = screen.getByText(
-            'Privacy policy',
-        ) as HTMLAnchorElement;
         const cookiePolicyBtn = screen.getByText(
             'Cookie policy',
         ) as HTMLAnchorElement;
-
-        expect(privacyPolicyBtn.href).toContain(
-            'https://www.iubenda.com/privacy-policy',
-        );
 
         expect(cookiePolicyBtn.href).toContain(
             'https://www.iubenda.com/privacy-policy',

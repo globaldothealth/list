@@ -301,14 +301,15 @@ export default function LandingPage({
                             Terms of use
                         </a>
                     </div>
-                    <PolicyLink
-                        type="privacy-policy"
-                        classes={{
-                            root: classes.link,
-                        }}
-                    >
-                        Privacy policy
-                    </PolicyLink>
+                    <div className={classes.link}>
+                        <a
+                            href="https://test-globalhealth.pantheonsite.io/privacy/"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            Privacy policy
+                        </a>
+                    </div>
                     <PolicyLink
                         type="cookie-policy"
                         classes={{
