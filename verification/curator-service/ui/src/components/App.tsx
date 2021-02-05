@@ -293,16 +293,23 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={() => {
                         try {
                             Auth.signOut();
-                        } catch (err) {}
+                        } catch (err) {
+                            console.error(err);
+                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
                     Logout
                 </MenuItem>
                 <Divider className={classes.divider} />
-                <Link to="/terms" onClick={handleClose}>
-                    <MenuItem>About Global.Health</MenuItem>
-                </Link>
+                <a
+                    href="https://test-globalhealth.pantheonsite.io/about/"
+                    onClick={handleClose}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <MenuItem>Global.Health</MenuItem>
+                </a>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
@@ -501,9 +508,13 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <Link to="/" data-testid="home-button">
+                        <a
+                            href="https://test-globalhealth.pantheonsite.io/"
+                            data-testid="home-button"
+                            rel="noopener noreferrer"
+                        >
                             <GHListLogo />
-                        </Link>
+                        </a>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
@@ -650,21 +661,24 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <Link
-                                to="/terms"
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/terms-of-use"
+                                rel="noopener noreferrer"
+                                target="_blank"
                                 className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
-                            </Link>
-                            <PolicyLink
-                                type="privacy-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
+                            </a>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="privacypolicybutton"
                             >
                                 Privacy policy
-                            </PolicyLink>
+                            </a>
                             <PolicyLink
                                 type="cookie-policy"
                                 classes={{
