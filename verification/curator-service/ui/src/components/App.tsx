@@ -211,9 +211,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     link: {
         marginTop: 12,
     },
-    termsOfUseSidelink: {
-        marginTop: 12,
-    },
     lastLink: {
         marginBottom: 24,
     },
@@ -659,19 +656,20 @@ export default function App(): JSX.Element {
                                 href="https://test-globalhealth.pantheonsite.io/terms-of-use"
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                className={classes.termsOfUseSidelink}
+                                className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
                             </a>
-                            <PolicyLink
-                                type="privacy-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="privacypolicybutton"
                             >
                                 Privacy policy
-                            </PolicyLink>
+                            </a>
                             <PolicyLink
                                 type="cookie-policy"
                                 classes={{

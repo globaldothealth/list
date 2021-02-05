@@ -184,6 +184,22 @@ describe('App', function () {
         );
     });
 
+    it('Privacy policy link is right and has target _blank', function () {
+        cy.login();
+        cy.visit('/');
+        cy.contains('Line list');
+
+        cy.contains('Terms of use');
+        cy.get('[data-testid="privacypolicybutton"]')
+            .should('have.attr', 'href')
+            .and('equal', 'https://test-globalhealth.pantheonsite.io/privacy/');
+        cy.get('[data-testid="privacypolicybutton"]').should(
+            'have.attr',
+            'target',
+            '_blank',
+        );
+    });
+
     it('Can navigate to home screen by clicking on logo', function () {
         cy.login();
         cy.visit('/cases');
