@@ -209,7 +209,6 @@ export default function SearchBar(props: {
                     { desc: 'location admin 1', value: 'admin1' },
                     { desc: 'location admin 2', value: 'admin2' },
                     { desc: 'location admin 3', value: 'admin3' },
-                    { desc: 'variant of concern', value: 'variant' },
                 ].map((item) => (
                     <MenuItem
                         key={item.value}
