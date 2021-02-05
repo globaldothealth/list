@@ -76,8 +76,23 @@ export default function SignInForm({
                             label: (
                                 <small>
                                     By creating an account, I accept the
-                                    Global.health TOS and Privacy Policy, and
-                                    agree to be added to the newsletter
+                                    Global.health{' '}
+                                    <a
+                                        href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        Terms of Use
+                                    </a>{' '}
+                                    and{' '}
+                                    <a
+                                        href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        Privacy Policy
+                                    </a>
+                                    , and agree to be added to the newsletter
                                 </small>
                             ),
                         }}
