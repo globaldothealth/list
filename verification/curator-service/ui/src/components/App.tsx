@@ -509,7 +509,7 @@ export default function App(): JSX.Element {
                             </IconButton>
                         )}
                         <a
-                            href="https://dev-curator.ghdsi.org/"
+                            href="https://test-globalhealth.pantheonsite.io/"
                             data-testid="home-button"
                             rel="noopener noreferrer"
                         >

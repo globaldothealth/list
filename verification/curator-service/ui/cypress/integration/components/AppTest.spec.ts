@@ -207,6 +207,6 @@ describe('App', function () {
 
         cy.get('a[data-testid="home-button"')
             .should('have.attr', 'href')
-            .and('equal', 'https://dev-curator.ghdsi.org/');
+            .and('equal', 'https://test-globalhealth.pantheonsite.io/');
     });
 });
