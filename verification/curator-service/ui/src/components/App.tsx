@@ -302,9 +302,14 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     Logout
                 </MenuItem>
                 <Divider className={classes.divider} />
-                <Link to="/terms" onClick={handleClose}>
-                    <MenuItem>About Global.Health</MenuItem>
-                </Link>
+                <a
+                    href="https://test-globalhealth.pantheonsite.io/about/"
+                    onClick={handleClose}
+                    target="_blank"
+                    rel="noopener norefferrer"
+                >
+                    <MenuItem>Global.Health</MenuItem>
+                </a>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
