@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
-import { Link } from 'react-router-dom';
 import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
