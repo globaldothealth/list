@@ -200,17 +200,13 @@ describe('App', function () {
         );
     });
 
-    it('Can navigate to home screen by clicking on logo', function () {
+    it('The logo links to the marketing website', function () {
         cy.login();
         cy.visit('/cases');
         cy.contains('Line list');
 
-        cy.get('a[data-testid="home-button"').click();
-
-        cy.url().should('eq', 'http://localhost:3002/');
-
-        cy.contains('Completeness').should('exist');
-        cy.contains('Cumulative').should('exist');
-        cy.contains('Freshness').should('exist');
+        cy.get('a[data-testid="home-button"')
+            .should('have.attr', 'href')
+            .and('equal', 'https://dev-curator.ghdsi.org/');
     });
 });

@@ -306,7 +306,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     href="https://test-globalhealth.pantheonsite.io/about/"
                     onClick={handleClose}
                     target="_blank"
-                    rel="noopener norefferrer"
+                    rel="noopener noreferrer"
                 >
                     <MenuItem>Global.Health</MenuItem>
                 </a>
@@ -508,9 +508,13 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <Link to="/" data-testid="home-button">
+                        <a
+                            href="https://dev-curator.ghdsi.org/"
+                            data-testid="home-button"
+                            rel="noopener noreferrer"
+                        >
                             <GHListLogo />
-                        </Link>
+                        </a>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
