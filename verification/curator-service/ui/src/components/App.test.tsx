@@ -75,7 +75,10 @@ it('has drawer links', async () => {
         'href',
         'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
     );
-    expect(await findByTestId('termsButton')).toHaveAttribute('href', '/terms');
+    expect(await findByTestId('termsButton')).toHaveAttribute(
+        'href',
+        'https://test-globalhealth.pantheonsite.io/terms-of-use',
+    );
 });
 
 it('navigates to the home screen (charts) after clicking on home button', async () => {

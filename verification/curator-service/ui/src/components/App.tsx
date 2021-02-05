@@ -211,6 +211,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     link: {
         marginTop: 12,
     },
+    termsOfUseSidelink: {
+        marginTop: 12,
+    },
     lastLink: {
         marginBottom: 24,
     },
@@ -293,7 +296,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={() => {
                         try {
                             Auth.signOut();
-                        } catch (err) {}
+                        } catch (err) {
+                            console.error(err);
+                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
@@ -650,13 +655,15 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <Link
-                                to="/terms"
-                                className={classes.link}
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/terms-of-use"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.termsOfUseSidelink}
                                 data-testid="termsButton"
                             >
                                 Terms of use
-                            </Link>
+                            </a>
                             <PolicyLink
                                 type="privacy-policy"
                                 classes={{

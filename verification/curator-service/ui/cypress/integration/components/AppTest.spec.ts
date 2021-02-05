@@ -164,15 +164,24 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
-    it('Can navigate to terms of service', function () {
+    it('Terms of Service link is right and has target _blank', function () {
         cy.login();
         cy.visit('/');
         cy.contains('Line list');
 
         cy.contains('Global.health Terms of Use').should('not.exist');
-        cy.contains('Terms of use').click({ force: true });
-        cy.url().should('eq', 'http://localhost:3002/terms');
-        cy.contains('Global.health Terms of Use');
+        cy.contains('Terms of use');
+        cy.get('[data-testid="termsButton"]')
+            .should('have.attr', 'href')
+            .and(
+                'equal',
+                'https://test-globalhealth.pantheonsite.io/terms-of-use',
+            );
+        cy.get('[data-testid="termsButton"]').should(
+            'have.attr',
+            'target',
+            '_blank',
+        );
     });
 
     it('Can navigate to home screen by clicking on logo', function () {
