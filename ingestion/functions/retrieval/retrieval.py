@@ -20,6 +20,7 @@ SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 READ_CHUNK_BYTES = 2048
+HEADER_CHUNK_BYTES = 1024 * 1024
 CSV_CHUNK_BYTES = 100 * 1024 * 1024
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
@@ -109,7 +110,7 @@ def retrieve_content_csv(
     """ Retrieves and locally persists the content in CSV format at the provided URL.
 
     This method chunks the CSV file to avoid timeouts in the ingestion functions.
-    Chunking is controlled by the `chunk_bytes` parameter, which defaults to 10 MiB.
+    Chunking is controlled by the `chunk_bytes` parameter, which defaults to 100 MiB.
     """
     csv_header = None  # Assume no header by default
     try:
@@ -135,10 +136,18 @@ def retrieve_content_csv(
         Reader = codecs.getreader(detected_enc['encoding'])
 
         if header:
-            header_sample = Reader(bytesio).read(READ_CHUNK_BYTES)
+            header_sample = Reader(bytesio).read(HEADER_CHUNK_BYTES)
             lines = header_sample.split("\n")
-            if len(lines) == 1:  # did not reach newline, raise error
-                raise ValueError(f"No header found in first {READ_CHUNK_BYTES} bytes")
+            if len(lines) == 1:
+                # Did not reach newline, which either means
+                #
+                # (a) there is only the header, and the CSV file is empty
+                # (b) the header line itself is larger than 1 MB in size.
+                #
+                # We assume (b) is not true, and for (a) we return an empty
+                # list which will skip uploading to S3 and calling
+                # ingestion.
+                return []
             csv_header = lines[0] + "\n"
             bytesio.seek(len(csv_header))  # skip to first line
 
