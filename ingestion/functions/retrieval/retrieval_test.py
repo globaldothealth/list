@@ -249,13 +249,13 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     source_id = "id"
     content_url = "http://foo.bar/"
     format = "CSV"
-    requests_mock.get(content_url, content=b"foo,bar")
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux")
     retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, format, {}, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.csv", "r") as f:
-        assert f.read() == "foo,bar"
+        assert f.read() == "foo,bar\nbaz,quux"
 
 
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
