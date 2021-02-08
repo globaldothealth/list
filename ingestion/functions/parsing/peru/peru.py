@@ -15,6 +15,7 @@ except ImportError:
             'common/python'))
     import parsing_lib
 
+
 def convert_date(raw_date: str):
     """
     Convert raw date field into a value interpretable by the dataserver.
@@ -36,11 +37,14 @@ def convert_gender(raw_gender):
 def convert_location(raw_entry):
     query_terms = [
         term for term in [
-            raw_entry.get("DEPARTAMENTO", ""),
-            raw_entry.get("PROVINCIA", ""),
             raw_entry.get("DISTRITO", ""),
+            raw_entry.get("PROVINCIA", ""),
+            raw_entry.get("DEPARTAMENTO", ""),
             "Peru"]
         if term != "EN INVESTIGACIÓN"]
+    if len(query_terms) > 2:
+        if query_terms[2] == 'LIMA':
+            query_terms[2] = 'Lima Province'
 
     return {"query": ", ".join(query_terms)}
 
@@ -48,10 +52,13 @@ def convert_location(raw_entry):
 def convert_demographics(age: str, sex: str):
     demo = {}
     if age:
-        demo["ageRange"] = {
-            "start": float(age),
-            "end": float(age)
-        }
+        if float(age) > 120:
+            pass
+        else:
+            demo["ageRange"] = {
+                "start": float(age),
+                "end": float(age)
+            }
     if sex:
         demo["gender"] = convert_gender(sex)
     return demo or None
@@ -62,6 +69,8 @@ def parse_cases(raw_data_file, source_id, source_url):
     Parses G.h-format case data from raw API data.
     Creates a dict to map type of confirming diagnostic test from Spanish abbreviation to English.
     Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test
+    "Lima" is often provided as all three locations ("Lima, Lima, Lima, Peru") - to geocode this with mapbox
+    the final Lima needs to be replaced with "Lima Province".
     """
 
     conf_methods = {
@@ -72,26 +81,26 @@ def parse_cases(raw_data_file, source_id, source_url):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=';')
         for entry in reader:
-            if entry["UUID"] and entry['FECHA_RESULTADO'] and float(entry['EDAD']) < 121:
+            if entry["UUID"] and entry['FECHA_RESULTADO']:
                 case = {
                     "caseReference": {
                         "sourceId": source_id,
                         "sourceEntryId": entry["UUID"],
-                        "sourceUrl": source_url},
+                        "sourceUrl": source_url
+                    },
                     "location": convert_location(entry),
                     "events": [
                         {
                             "name": "confirmed",
-                            "value": conf_methods.get(
-                                entry['METODODX']),
-                            "dateRange": {
-                                "start": convert_date(
-                                    entry["FECHA_RESULTADO"]),
-                                "end": convert_date(
-                                    entry["FECHA_RESULTADO"])}}],
-                    "demographics": convert_demographics(
-                        entry["EDAD"],
-                        entry["SEXO"]),
+                            "value": conf_methods.get(entry['METODODX']),
+                            "dateRange":
+                                {
+                                    "start": convert_date(entry["FECHA_RESULTADO"]),
+                                    "end": convert_date(entry["FECHA_RESULTADO"])
+                            }
+                        }
+                    ],
+                    "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
                 }
                 yield case
 
