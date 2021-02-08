@@ -254,7 +254,7 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
         "env", source_id, "upload_id", content_url, format, {}, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
-    with open("/tmp/content.csv", "r") as f:
+    with open("/tmp/content.csv.0", "r") as f:
         assert f.read() == "foo,bar\nbaz,quux"
 
 
