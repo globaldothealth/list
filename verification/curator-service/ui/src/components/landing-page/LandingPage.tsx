@@ -58,7 +58,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     emailField: {
         display: 'block',
         width: '240px',
-        marginBottom: '15px',
+    },
+    divider: {
+        marginTop: '15px',
     },
     signInButton: {
         margin: '15px 0',
@@ -351,6 +353,7 @@ export default function LandingPage({
                     isSubmitting={isSubmitting}
                     classes={{
                         emailField: classes.emailField,
+                        divider: classes.divider,
                         loader: classes.loader,
                         signInButton: classes.signInButton,
                     }}
