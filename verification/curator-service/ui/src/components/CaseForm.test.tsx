@@ -73,6 +73,7 @@ it('renders form', async () => {
     expect(getAllByText(/Events/i)).toHaveLength(1);
     expect(getByTestId('caseReference')).toBeInTheDocument();
     expect(getByText(/Nationalities/i)).toBeInTheDocument();
+    expect(getByText(/Variant of Concern/i)).toBeInTheDocument();
 });
 
 test('Check location error message to become red on submit', () => {

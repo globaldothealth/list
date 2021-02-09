@@ -291,16 +291,25 @@ function ProfileMenu(props: { user: User }): JSX.Element {
 
                 <MenuItem
                     onClick={() => {
-                        Auth.signOut();
+                        try {
+                            Auth.signOut();
+                        } catch (err) {
+                            console.error(err);
+                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
                     Logout
                 </MenuItem>
                 <Divider className={classes.divider} />
-                <Link to="/terms" onClick={handleClose}>
-                    <MenuItem>About Global.Health</MenuItem>
-                </Link>
+                <a
+                    href="https://test-globalhealth.pantheonsite.io/about/"
+                    onClick={handleClose}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <MenuItem>Global.Health</MenuItem>
+                </a>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
@@ -309,15 +318,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
-                </a>
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://github.com/globaldothealth/list/issues/new/choose"
-                    onClick={handleClose}
-                >
-                    <MenuItem>Report an issue</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
@@ -499,9 +499,13 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <Link to="/" data-testid="home-button">
+                        <a
+                            href="https://test-globalhealth.pantheonsite.io/"
+                            data-testid="home-button"
+                            rel="noopener noreferrer"
+                        >
                             <GHListLogo />
-                        </Link>
+                        </a>
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
@@ -648,21 +652,24 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <Link
-                                to="/terms"
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/terms-of-use"
+                                rel="noopener noreferrer"
+                                target="_blank"
                                 className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
-                            </Link>
-                            <PolicyLink
-                                type="privacy-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
+                            </a>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="privacypolicybutton"
                             >
                                 Privacy policy
-                            </PolicyLink>
+                            </a>
                             <PolicyLink
                                 type="cookie-policy"
                                 classes={{
