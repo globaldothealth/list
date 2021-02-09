@@ -69,11 +69,29 @@ it('renders form', async () => {
     expect(getByText('Enter the details for a new case')).toBeInTheDocument();
     expect(getByText(/Submit case/i)).toBeInTheDocument();
     expect(getAllByText(/Demographics/i)).toHaveLength(1);
-    expect(getAllByText(/Location/i)).toHaveLength(2);
+    expect(getAllByText(/Location/i)).toHaveLength(3);
     expect(getAllByText(/Events/i)).toHaveLength(1);
     expect(getByTestId('caseReference')).toBeInTheDocument();
     expect(getByText(/Nationalities/i)).toBeInTheDocument();
     expect(getByText(/Variant of Concern/i)).toBeInTheDocument();
+});
+
+test('Check location error message to become red on submit', () => {
+    const { getByText } = render(
+        <MemoryRouter>
+            <CaseForm
+                user={user}
+                onModalClose={(): void => {
+                    return;
+                }}
+            />
+        </MemoryRouter>,
+    );
+
+    const mandatoryLocationMessage = getByText('A location must be provided');
+    const submittButton = getByText(/Submit case/i);
+    fireEvent.click(submittButton);
+    expect(mandatoryLocationMessage).toHaveClass('Mui-error');
 });
 
 it('can add and remove genome sequencing sections', async () => {

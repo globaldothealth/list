@@ -770,7 +770,9 @@ export default function CaseForm(props: Props): JSX.Element {
                                 >
                                     {tableOfContentsIcon({
                                         isChecked:
-                                            (values?.variantName !== undefined) && (values?.variantName?.length ?? 0) > 0,
+                                            values?.variantName !== undefined &&
+                                            (values?.variantName?.length ?? 0) >
+                                                0,
                                         hasError: hasErrors(
                                             ['variant'],
                                             errors,
