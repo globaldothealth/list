@@ -59,10 +59,12 @@ paths:
               summary: >
                 values are OR'ed for the same keyword and all keywords are AND'ed.
                 Keyword values can be quoted for multi-words matches and concatenated
-                with a comma to union them. Only equality operator is supported.
+                with a comma to union them. Bare words are compared for equality, e.g.
+                country:Germany. The special character '*' matches any value, e.g. 
+                variant:* returns any case where the variant is not empty.
                 Supported keywords are: curator, gender, nationality, occupation,
                 country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
-                admin1, admin2, admin3
+                admin1, admin2, admin3, variant
       responses:
         "200":
           $ref: "#/components/responses/200CaseArray"
