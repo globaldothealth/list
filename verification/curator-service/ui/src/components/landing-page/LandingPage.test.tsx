@@ -2,14 +2,21 @@ import LandingPage from './LandingPage';
 import { MemoryRouter } from 'react-router-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 const setUser = jest.fn();
+
+const theme = createMuiTheme({
+    custom: { palette: { landingPage: { descriptionTextColor: '#838D89' } } },
+});
 
 describe('LandingPage', () => {
     test('shows all content', async () => {
         render(
             <MemoryRouter>
-                <LandingPage setUser={setUser} />
+                <ThemeProvider theme={theme}>
+                    <LandingPage setUser={setUser} />
+                </ThemeProvider>
             </MemoryRouter>,
         );
 
@@ -56,5 +63,12 @@ describe('LandingPage', () => {
             'https://www.iubenda.com/privacy-policy',
         );
         expect(cookiePolicyBtn.href).toContain('cookie-policy');
+
+        // Check partners logos
+        expect(
+            screen.getByText(/Participating Institutions:/i),
+        ).toBeInTheDocument();
+        expect(screen.getByText(/With funding from:/i)).toBeInTheDocument();
+        expect(screen.getAllByAltText(/Partner logo/i)).toHaveLength(10);
     });
 });
