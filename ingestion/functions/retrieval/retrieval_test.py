@@ -249,14 +249,41 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     source_id = "id"
     content_url = "http://foo.bar/"
     format = "CSV"
-    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux")
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\n")
     retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, format, {}, {})
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
     with open("/tmp/content.csv.0", "r") as f:
-        assert f.read() == "foo,bar\nbaz,quux"
+        assert f.read().strip() == "foo,bar\nbaz,quux"
 
+def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    format = "CSV"
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\n")
+    retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {})
+    assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open("/tmp/content.csv.0", "r") as f:
+        assert f.read().strip() == "foo,bar\nbaz,quux"
+
+def test_retrieve_content_persists_downloaded_csv_locally_chunked(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    format = "CSV"
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\nbuzz,beak\ndew,drop\n")
+    retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, chunk_bytes=16)
+    assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open("/tmp/content.csv.0", "r") as f:
+        assert f.read().strip() == "foo,bar\nbaz,quux"
+    with open("/tmp/content.csv.1", "r") as f:
+        assert f.read().strip() == "foo,bar\nbuzz,beak\ndew,drop"
 
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
