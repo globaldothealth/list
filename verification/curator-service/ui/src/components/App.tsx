@@ -293,7 +293,9 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={() => {
                         try {
                             Auth.signOut();
-                        } catch (err) {}
+                        } catch (err) {
+                            console.error(err);
+                        }
                         window.location.href = '/auth/logout';
                     }}
                 >
@@ -311,15 +313,6 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
-                </a>
-                <a
-                    className={classes.link}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://github.com/globaldothealth/list/issues/new/choose"
-                    onClick={handleClose}
-                >
-                    <MenuItem>Report an issue</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
