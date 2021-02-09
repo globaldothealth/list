@@ -1,7 +1,11 @@
 import React from 'react';
-import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { FormHelperText, LinearProgress, Button } from '@material-ui/core';
+import { Formik, Form, Field, FieldProps } from 'formik';
+import {
+    FormHelperText,
+    LinearProgress,
+    Button,
+    TextField,
+} from '@material-ui/core';
 
 interface Props {
     handleSubmit: (code: string) => void;
@@ -42,16 +46,31 @@ export default function VerificationCodeForm({
         >
             {({ submitForm }) => (
                 <Form>
-                    <Field
-                        className={classes.emailField}
-                        variant="outlined"
-                        fullWidth={true}
-                        component={TextField}
-                        disabled={isSubmitting}
-                        name="code"
-                        type="text"
-                        label="Verification code"
-                    />
+                    <Field name="code">
+                        {({ field, meta }: FieldProps<FormProps>) => (
+                            <>
+                                <TextField
+                                    className={classes.emailField}
+                                    label="Verification code"
+                                    type="text"
+                                    variant="outlined"
+                                    disabled={isSubmitting}
+                                    error={
+                                        (meta.error !== undefined &&
+                                            meta.touched) ||
+                                        wrongCodeMessage
+                                    }
+                                    fullWidth
+                                    {...field}
+                                />
+                                {meta.touched && meta.error && (
+                                    <FormHelperText error>
+                                        {meta.error}
+                                    </FormHelperText>
+                                )}
+                            </>
+                        )}
+                    </Field>
                     {wrongCodeMessage && (
                         <FormHelperText error>
                             Wrong verification code entered
