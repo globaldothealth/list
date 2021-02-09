@@ -171,6 +171,10 @@ def retrieve_content_csv(
             chunk_n += 1
             content = text_stream.read(chunk_bytes)
 
+        if unwritten_chunk:
+            with codecs.open(f"/tmp/{key_filename_part}.{chunk_n}", "w", 'utf-8') as outfile:
+                outfile.write(unwritten_chunk)
+
         return chunk_s3
     except requests.exceptions.RequestException as e:
         upload_error = (
@@ -184,7 +188,7 @@ def retrieve_content_csv(
 
 
 def retrieve_content(
-        env, source_id, upload_id, url, source_format, api_headers, cookies):
+        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (
@@ -197,7 +201,7 @@ def retrieve_content(
                 source_id, upload_id, api_headers, cookies)
         if source_format == "CSV":
             return retrieve_content_csv(env, source_id, upload_id, url,
-                                        api_headers, cookies)
+                                        api_headers, cookies, chunk_bytes=chunk_bytes)
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
