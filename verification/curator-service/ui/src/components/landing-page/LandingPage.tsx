@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ReactComponent as HealthmapInsignias } from '../assets/healthmap_insignias.svg';
 import { Paper, Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import GoogleButton from 'react-google-button';
@@ -17,6 +16,7 @@ import SignInForm from './SignInForm';
 import VerificationCodeForm from './VerificationCodeForm';
 
 import PolicyLink from '../PolicyLink';
+import PartnerLogos from './PartnerLogos';
 
 interface StylesProps {
     smallHeight: boolean;
@@ -33,16 +33,22 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: 'auto',
         maxWidth: '100%',
         padding: '45px',
-        width: '840px',
+        width: '1000px',
     },
     body: {
         display: 'flex',
         marginTop: '20px',
     },
     description: {
-        color: '#838D89',
+        color: theme.custom.palette.landingPage.descriptionTextColor,
         marginRight: '90px',
         width: '60%',
+    },
+    linksContainer: {
+        width: '40%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
     },
     link: {
         display: 'block',
@@ -53,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         fontWeight: 400,
     },
     registerLengend: {
-        color: '#838D89',
+        color: theme.custom.palette.landingPage.descriptionTextColor,
     },
     emailField: {
         display: 'block',
@@ -62,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     signInButton: {
         margin: '15px 0',
+        display: 'block',
     },
     authFormTitle: {
         margin: '15px 0',
@@ -105,7 +112,7 @@ export default function LandingPage({
         email: string;
         status: string;
     }>();
-    const smallHeight = useMediaQuery('(max-height:850px)');
+    const smallHeight = useMediaQuery('(max-height:1050px)');
     const classes = useStyles({ smallHeight });
     const lastLocation = useLastLocation();
 
@@ -262,10 +269,11 @@ export default function LandingPage({
                     global data repository with open access to real-time
                     epidemiological anonymized line list data.
                 </Typography>
-                <div>
-                    <Typography>More information</Typography>
-                    <div className={classes.link}>
-                        {/* TODO: add in once link is available
+                <div className={classes.linksContainer}>
+                    <div>
+                        <Typography>More information</Typography>
+                        <div className={classes.link}>
+                            {/* TODO: add in once link is available
                         <a
                             href=""
                             rel="noopener noreferrer"
@@ -273,51 +281,52 @@ export default function LandingPage({
                         >
                             Global.health website
                         </a> */}
-                    </div>
-                    <div className={classes.link}>
-                        <a
-                            href="http://covid-19.global.health/"
-                            rel="noopener noreferrer"
-                            target="_blank"
+                        </div>
+                        <div className={classes.link}>
+                            <a
+                                href="http://covid-19.global.health/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Global.health map
+                            </a>
+                        </div>
+                        <div className={classes.link}>
+                            <a
+                                href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Data dictionary
+                            </a>
+                        </div>
+                        <div className={classes.link}>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Terms of use
+                            </a>
+                        </div>
+                        <div className={classes.link}>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Privacy policy
+                            </a>
+                        </div>
+                        <PolicyLink
+                            type="cookie-policy"
+                            classes={{
+                                root: classes.link,
+                            }}
                         >
-                            Global.health map
-                        </a>
+                            Cookie policy
+                        </PolicyLink>
                     </div>
-                    <div className={classes.link}>
-                        <a
-                            href="https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Data dictionary
-                        </a>
-                    </div>
-                    <div className={classes.link}>
-                        <a
-                            href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Terms of use
-                        </a>
-                    </div>
-                    <div className={classes.link}>
-                        <a
-                            href="https://test-globalhealth.pantheonsite.io/privacy/"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Privacy policy
-                        </a>
-                    </div>
-                    <PolicyLink
-                        type="cookie-policy"
-                        classes={{
-                            root: classes.link,
-                        }}
-                    >
-                        Cookie policy
-                    </PolicyLink>
                 </div>
             </div>
 
@@ -375,7 +384,7 @@ export default function LandingPage({
                 onClose={resetState}
             />
             <ErrorDialog isOpen={errorDialog} setIsOpen={setErrorDialog} />
-            <HealthmapInsignias />
+            <PartnerLogos />
         </Paper>
     );
 }
