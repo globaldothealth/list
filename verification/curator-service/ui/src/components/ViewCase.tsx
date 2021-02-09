@@ -10,6 +10,7 @@ import {
     GenomeSequence,
     Location,
     Travel,
+    Variant,
     VerificationStatus,
 } from './Case';
 import React, { useEffect, useState } from 'react';
@@ -643,6 +644,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     sequence={e}
                                 />
                             ))}
+                            <VariantRows variant={props.c.variant} />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -684,6 +686,15 @@ function GenomeSequenceRows(props: { sequence: GenomeSequence }): JSX.Element {
 
             <RowHeader title="Genome sequence accession" />
             <RowContent content={props.sequence?.sequenceId || ''} />
+        </>
+    );
+}
+
+function VariantRows(props: { variant: Variant }): JSX.Element {
+    return (
+        <>
+            <RowHeader title="Variant of Concern" />
+            <RowContent content={props.variant?.name || ''} />
         </>
     );
 }
