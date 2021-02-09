@@ -4,6 +4,7 @@ import json
 import mimetypes
 import os
 import sys
+import csv
 import tempfile
 import zipfile
 from chardet import detect
@@ -19,6 +20,8 @@ SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 READ_CHUNK_BYTES = 2048
+HEADER_CHUNK_BYTES = 1024 * 1024
+CSV_CHUNK_BYTES = 100 * 1024 * 1024
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
@@ -102,18 +105,103 @@ def raw_content(url: str, content: bytes) -> io.BytesIO:
     return io.BytesIO(content)
 
 
+def retrieve_content_csv(
+        env, source_id, upload_id, url, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, header=True):
+    """ Retrieves and locally persists the content in CSV format at the provided URL.
+
+    This method chunks the CSV file to avoid timeouts in the ingestion functions.
+    Chunking is controlled by the `chunk_bytes` parameter, which defaults to 100 MiB.
+    """
+    csv_header = None  # Assume no header by default
+    try:
+        print(f"Downloading CSV content from {url}")
+        headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
+        r = requests.get(url, headers=headers)
+        r.raise_for_status()
+        print('Download finished')
+
+        key_filename_part = "content.csv"
+        # Lambda limitations: 512MB ephemeral disk space.
+        # Memory range is from 128 to 3008 MB so we could switch to
+        # https://docs.python.org/3/library/io.html#io.StringIO for bigger
+        # sources.
+        # Make the encoding of retrieved content consistent (UTF-8) for all
+        # parsers as per https://github.com/globaldothealth/list/issues/867.
+        bytesio = raw_content(url, r.content)
+        print('detecting encoding of retrieved content.')
+        # Read 2MB to be quite sure about the encoding.
+        detected_enc = detect(bytesio.read(2 << 20))
+        bytesio.seek(0)
+        print(f'Source encoding is presumably {detected_enc}')
+        Reader = codecs.getreader(detected_enc['encoding'])
+
+        if header:
+            header_sample = Reader(bytesio).read(HEADER_CHUNK_BYTES)
+            lines = header_sample.split("\n")
+            if len(lines) == 1:
+                # Did not reach newline, which either means
+                #
+                # (a) there is only the header, and the CSV file is empty
+                # (b) the header line itself is larger than 1 MB in size.
+                #
+                # We assume (b) is not true, and for (a) we return an empty
+                # list which will skip uploading to S3 and calling
+                # ingestion.
+                return []
+            csv_header = lines[0] + "\n"
+            bytesio.seek(len(csv_header))  # skip to first line
+
+        text_stream = Reader(bytesio)
+        content = text_stream.read(chunk_bytes)
+        chunk_n = 0
+        unwritten_chunk = ""
+        chunk_s3 = []
+        while content:
+            lines = content.split("\n")
+            with codecs.open(f"/tmp/{key_filename_part}.{chunk_n}", "w", 'utf-8') as outfile:
+                if csv_header:
+                    outfile.write(csv_header)
+                outfile.write(unwritten_chunk + "\n".join(lines[:-1]) + "\n")
+                unwritten_chunk = lines[-1]
+            s3_object_key = (
+                f"{source_id}"
+                f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
+                f"{key_filename_part}.{chunk_n}")
+            chunk_s3.append((outfile.name, s3_object_key))
+            chunk_n += 1
+            content = text_stream.read(chunk_bytes)
+
+        if unwritten_chunk:
+            with codecs.open(f"/tmp/{key_filename_part}.{chunk_n}", "w", 'utf-8') as outfile:
+                outfile.write(unwritten_chunk)
+
+        return chunk_s3
+    except requests.exceptions.RequestException as e:
+        upload_error = (
+            common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
+            if e.response.status_code == 404 else
+            common_lib.UploadError.SOURCE_CONTENT_DOWNLOAD_ERROR)
+        common_lib.complete_with_error(
+            e, env, upload_error, source_id, upload_id,
+            api_headers, cookies)
+
+
+
 def retrieve_content(
-        env, source_id, upload_id, url, source_format, api_headers, cookies):
+        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (
             source_format != "JSON"
             and source_format != "CSV"
-            and source_format != "XSLX"):
+            and source_format != "XLSX"):
             e = ValueError(f"Unsupported source format: {source_format}")
             common_lib.complete_with_error(
                 e, env, common_lib.UploadError.SOURCE_CONFIGURATION_ERROR,
                 source_id, upload_id, api_headers, cookies)
+        if source_format == "CSV":
+            return retrieve_content_csv(env, source_id, upload_id, url,
+                                        api_headers, cookies, chunk_bytes=chunk_bytes)
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
@@ -145,7 +233,7 @@ def retrieve_content(
                 f"{source_id}"
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
                 f"{key_filename_part}")
-            return (outfile.name, s3_object_key)
+            return [(outfile.name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND
@@ -154,6 +242,7 @@ def retrieve_content(
         common_lib.complete_with_error(
             e, env, upload_error, source_id, upload_id,
             api_headers, cookies)
+
 
 
 def upload_to_s3(
@@ -262,14 +351,16 @@ def lambda_handler(event, context):
     url, source_format, parser_arn, date_filter = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
-    file_name, s3_object_key = retrieve_content(
+    file_names_s3_object_keys = retrieve_content(
         env, source_id, upload_id, url, source_format, auth_headers, cookies)
-    upload_to_s3(file_name, s3_object_key, env,
-                 source_id, upload_id, auth_headers, cookies)
+    for file_name, s3_object_key in file_names_s3_object_keys:
+        upload_to_s3(file_name, s3_object_key, env,
+                     source_id, upload_id, auth_headers, cookies)
     if parser_arn:
-        invoke_parser(
-            env, parser_arn, source_id, upload_id, auth_headers, cookies,
-            s3_object_key, url, date_filter, parsing_date_range)
+        for _, s3_object_key in file_names_s3_object_keys:
+            invoke_parser(
+                env, parser_arn, source_id, upload_id, auth_headers, cookies,
+                s3_object_key, url, date_filter, parsing_date_range)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
