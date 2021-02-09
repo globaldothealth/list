@@ -28,13 +28,11 @@ const TooltipText = () => (
         <ul>
             <li>
                 <strong>Route of transmission:</strong> Enter the route of
-                transmission if provided by the source. If none provided leave
-                blank
+                transmission if provided by the source.
             </li>
             <li>
                 <strong>Place of transmission:</strong> Enter the place of
-                transmission if provided by the source, If none provided leave
-                blank
+                transmission if provided by the source.
             </li>
         </ul>
     </StyledTooltip>

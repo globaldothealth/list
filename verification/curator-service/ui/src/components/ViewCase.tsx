@@ -644,7 +644,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                                     sequence={e}
                                 />
                             ))}
-                            <VariantRows variant={props.c.variant}/>
+                            <VariantRows variant={props.c.variant} />
                         </Grid>
                     </Scroll.Element>
                 </Paper>
@@ -694,7 +694,7 @@ function VariantRows(props: { variant: Variant }): JSX.Element {
     return (
         <>
             <RowHeader title="Variant of Concern" />
-            <RowContent content={props.variant?.name || ''}/>
+            <RowContent content={props.variant?.name || ''} />
         </>
     );
 }

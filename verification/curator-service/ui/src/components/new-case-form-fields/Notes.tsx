@@ -9,8 +9,8 @@ const TooltipText = () => (
     <StyledTooltip>
         <ul>
             <li>
-                Add any additional notes you want to include in the line list
-                case
+                Provide any additional detils that may not fit into any of the
+                previous sections.
             </li>
         </ul>
     </StyledTooltip>

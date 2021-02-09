@@ -24,19 +24,18 @@ const TooltipText = () => (
     <StyledTooltip>
         <ul>
             <li>
-                Enter the URL of the data source used for reporting the line
-                list case.
-                <ul>
-                    <li>
-                        If this is a new data source you will need to add it to
-                        the system along with a data source name. The form will
-                        prompt you to do this if this is the case.
-                    </li>
-                    <li>
-                        If the URL is an existing source already in the system,
-                        select the appropriate source from the list provided.
-                    </li>
-                </ul>
+                <strong>New data source:</strong> If this is a new data source
+                you will need to add it to the system along with the root data
+                source name. For example if the raw source was the ""7th July
+                Press Release from Honduras” the source name would be the issuer
+                of the press release e.g. “Honduras ministry of health'. The
+                source name needs to reflect the actually provider of the data,
+                not the method of reporting.
+            </li>
+            <li>
+                <strong>Existing data source:</strong> If the URL is an existing
+                source already in the system, select the appropriate source from
+                the list provided.
             </li>
         </ul>
     </StyledTooltip>
@@ -157,6 +156,23 @@ export function SourcesAutocomplete(
             ),
         [],
     );
+
+    const sourceURLValidation = (str: string) => {
+        if (str.length > 0) {
+            const pattern = new RegExp(
+                '^(https?:\\/\\/)?' + // protocol
+                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+                    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+                    '(\\#[-a-z\\d_]*)?$',
+                'i',
+            ); // fragment locator
+            return !!pattern.test(str);
+        } else {
+            return true;
+        }
+    };
 
     React.useEffect(() => {
         let active = true;
@@ -284,7 +300,10 @@ export function SourcesAutocomplete(
                             component={TextField}
                             fullWidth
                         ></Field>
-                        <RequiredHelperText name={name}></RequiredHelperText>
+                        <RequiredHelperText
+                            name={name}
+                            wrongUrl={sourceURLValidation(inputValue)}
+                        ></RequiredHelperText>
                     </div>
                 )}
                 renderOption={(option: CaseReferenceForm): React.ReactNode => {

@@ -55,16 +55,16 @@ const TooltipText = () => (
             <li>
                 <strong>Travelled in the last 30 days:</strong> Enter if the
                 source reports the case travelled in the 30 days prior to
-                confirmation
+                confirmation.
                 <ul>
                     <li>
                         If you select yes then you will be able to fill in more
                         details as to the location and details of the travel,
-                        duration and purpose
+                        duration and purpose.
                     </li>
                     <li>
                         If the source does not provide information on if the
-                        case traveled in the previous 30 days select unknown
+                        case traveled in the previous 30 days select unknown.
                     </li>
                 </ul>
             </li>
@@ -74,13 +74,13 @@ const TooltipText = () => (
                 <ul>
                     <li>
                         Location is entered using the same rules as location for
-                        the case, allowing a depth of location to Admin level
-                        1,2 or 3. Enter the level of depth the source provides.
+                        the case, allowing a depth of location to Admin level 1,
+                        2 or 3. Enter the level of depth the source provides.
                     </li>
                     <li>
                         If no specific location information is provided do not
                         add a travel location but complete the 'Travelled in the
-                        last 30 days' field as 'yes'
+                        last 30 days' field as 'yes'.
                     </li>
                 </ul>
             </li>
@@ -94,7 +94,7 @@ const TooltipText = () => (
             </li>
             <li>
                 <strong>Primary reason for travel:</strong> Enter the primary
-                reason for travel if provided:
+                reason for travel:
                 <ul>
                     <li>
                         <strong>Business:</strong> The case was traveling on
@@ -105,7 +105,7 @@ const TooltipText = () => (
                         leisure purposes e.g. holiday
                     </li>
                     <li>
-                        <strong>Family:</strong> The case was traveling to met
+                        <strong>Family:</strong> The case was traveling to meet
                         family
                     </li>
                     <li>
