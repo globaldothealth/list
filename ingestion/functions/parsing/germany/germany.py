@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -22,9 +23,19 @@ _CASECOUNT = "AnzahlFall"
 _DEATHCOUNT = "AnzahlTodesfall"
 _RECOVERYCOUNT = "NeuGenesen"
 _ADMIN1 = "Bundesland"
-_ADMIN2 = "Landkreis"
+_ADMIN3_ID = "IdLandkreis"
 _DATE_ONSET_SYMPTOMS = "Refdatum"
 _ONSET_DATE_PROVIDED = "IstErkrankungsbeginn"
+
+# The German admin3 entries are very often not accepted by mapbox and so need to be cross-referenced with data from Nationale Plattform für geographische Daten (https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/esri-de-content::kreisgrenzen-2019) to extract longitude and latitude information.
+# This way we can collect geographic information down to admin level 3 but without relying on mapbox
+# This data has been collated into two dictionaries
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")) as json_file:
+    dictionaries = json.load(json_file)
+
+_LOCATION_ID_MAP = dictionaries["name_id_dict"]
+
+_LOCATION_LAT_LONG_MAP = dictionaries["id_long_lat_dict"]
 
 
 def convert_date(raw_date):
@@ -72,6 +83,33 @@ def convert_demographics(gender: str, age: str):
     return demo
 
 
+def convert_location(admin1, admin3_id):
+    location = {}
+    geometry = {}
+    # Some entries have leading zeros which are not recognized
+    admin3_id = (admin3_id[1:] if admin3_id.startswith('0') else admin3_id)
+    if admin3_id in _LOCATION_ID_MAP.keys():
+        # Matching by ID rather than name is more robust to things like formatting differences or slight differences in spelling/abbreviation
+        location["administrativeAreaLevel3"] = _LOCATION_ID_MAP[admin3_id]
+        location["country"] = "Germany"
+        location["administrativeAreaLevel1"] = admin1
+        location["geoResolution"] = "Point"
+        location["name"] = ", ".join([_LOCATION_ID_MAP[admin3_id], admin1, "Germany"])
+        
+        geometry["latitude"] = _LOCATION_LAT_LONG_MAP[admin3_id]["latitude"]
+        geometry["longitude"] = _LOCATION_LAT_LONG_MAP[admin3_id]["longitude"]
+        location["geometry"] = geometry
+    else:
+        # Some entries are still not recognized and will therefore be geocoded at admin1 level. 
+        # In e2e testing these were limited to the subdivisions of Berlin which are officially admin level 2 and so where not present in the source data used.
+        print(f'Unknown administrative district: {admin3_id}')
+        location["query"] = ", ".join([admin1, "Germany"])
+    if location:
+        return location
+    else:
+        return None
+
+
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     """
     Parses G.h-format case data from raw API data.
@@ -85,13 +123,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
             try:
                 case = {
                     "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
-                    "location": {
-                        "query": ", ".join((row[_ADMIN2], row[_ADMIN1], "Germany")),
-                        # Mapbox doesn't fare well with Germany's districts so
-                        # we restrict to district (Admin2) and above to fail
-                        # gracefully.
-                        "limitToResolution": "Country,Admin1,Admin2",
-                    },
+                    "location": convert_location(row[_ADMIN1], row[_ADMIN3_ID]),
                     "events": [
                         {
                             "name": "confirmed",
