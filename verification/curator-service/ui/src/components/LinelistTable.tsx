@@ -824,23 +824,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
-                            headerStyle: { whiteSpace: 'nowrap' },
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
@@ -882,7 +878,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -1076,6 +1071,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
                         },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) => {
