@@ -1,4 +1,4 @@
-import { Tooltip } from '@material-ui/core';
+import { AppTooltip } from '../components/common-form-fields/AppTooltip';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
@@ -13,14 +13,15 @@ export default function ColumnHeaderTooltip(props: any): JSX.Element {
     const classes = helpIconStyle();
     const { tooltip } = props;
     return (
-        <Tooltip
+        <AppTooltip
             title={tooltip}
             color="primary"
             interactive
             placement="top"
             arrow
+            maxwidth={props.widetooltip ? '40vw' : 'auto'}
         >
             <HelpIcon fontSize="small" className={classes.addMarginLeft} />
-        </Tooltip>
+        </AppTooltip>
     );
 }
