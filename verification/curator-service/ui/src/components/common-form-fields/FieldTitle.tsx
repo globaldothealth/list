@@ -2,9 +2,9 @@ import { Theme, createStyles } from '@material-ui/core/styles';
 
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withStyles } from '@material-ui/core';
+import { AppTooltip } from './AppTooltip';
 
 const styles = (theme: Theme) =>
     createStyles({
@@ -15,26 +15,6 @@ const styles = (theme: Theme) =>
         },
         title: { marginRight: '1em' },
     });
-
-interface Widetooltip {
-    maxwidth: 'auto' | '40vw';
-}
-
-const AppTooltip = withStyles((theme: Theme) => ({
-    arrow: {
-        color: theme.palette.primary.main,
-    },
-    tooltip: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
-        boxShadow: theme.shadows[1],
-        fontSize: 16,
-        fontWeight: 'normal',
-        padding: '1rem',
-
-        maxWidth: (props: Widetooltip) => props.maxwidth,
-    },
-}))(Tooltip);
 
 interface FieldTitleProps extends WithStyles<typeof styles> {
     title: string;
