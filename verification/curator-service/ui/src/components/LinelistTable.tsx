@@ -38,11 +38,13 @@ import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
+import ColumnHeaderTooltip from './ColumnHeaderTooltip';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
 import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
+import { StyledTooltip } from './new-case-form-fields/StyledTooltip';
 
 interface ListResponse {
     cases: Case[];
@@ -609,6 +611,29 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     render(): JSX.Element {
         const { history, classes } = this.props;
+
+        const TooltipText = () => (
+            <StyledTooltip>
+                <ul>
+                    <li>
+                        <strong>New data source:</strong> If this is a new data
+                        source you will need to add it to the system along with
+                        the root data source name. For example if the raw source
+                        was the ""7th July Press Release from Honduras” the
+                        source name would be the issuer of the press release
+                        e.g. “Honduras ministry of health'. The source name
+                        needs to reflect the actually provider of the data, not
+                        the method of reporting.
+                    </li>
+                    <li>
+                        <strong>Existing data source:</strong> If the URL is an
+                        existing source already in the system, select the
+                        appropriate source from the list provided.
+                    </li>
+                </ul>
+            </StyledTooltip>
+        );
+
         return (
             <>
                 {this.state.error && (
@@ -815,7 +840,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                         },
                         {
-                            title: 'Case ID',
+                            title: (
+                                <div className={classes.centeredContent}>
+                                    Case ID
+                                    <ColumnHeaderTooltip
+                                        tooltip={<TooltipText />}
+                                    />
+                                </div>
+                            ),
                             field: 'id',
                             type: 'string',
                         },
