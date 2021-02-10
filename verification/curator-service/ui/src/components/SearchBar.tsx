@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
     Button,
@@ -18,6 +18,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
 import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
+import { useDebounce } from '../hooks/useDebounce';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -64,21 +65,36 @@ const StyledInputAdornment = withStyles({
     },
 })(InputAdornment);
 
-export default function SearchBar(props: {
-    searchQuery: string;
+interface SearchBarProps {
     onSearchChange: (search: string) => void;
-    loading: boolean;
     rootComponentRef: React.RefObject<HTMLDivElement>;
-}): JSX.Element {
+}
+
+export default function SearchBar({
+    onSearchChange,
+    rootComponentRef,
+}: SearchBarProps): JSX.Element {
     const location = useLocation();
     const classes = searchBarStyles();
 
-    const [search, setSearch] = React.useState<string>(location.search);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
-        false,
-    );
+    const [isUserTyping, setIsUserTyping] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>(location.search);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = useState<boolean>(false);
+
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
+
+    // Set search query debounce to 2000ms
+    const debouncedSearch = useDebounce(search, 1000);
+
+    // Apply filter parameters after delay
+    useEffect(() => {
+        if (!isUserTyping) return;
+
+        onSearchChange(searchQueryToURL(debouncedSearch));
+        setIsUserTyping(false);
+        //eslint-disable-next-line
+    }, [debouncedSearch]);
 
     useEffect(() => {
         const searchString = URLToSearchQuery(location.search);
@@ -110,7 +126,8 @@ export default function SearchBar(props: {
     const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
         if (ev.key === 'Enter') {
             ev.preventDefault();
-            props.onSearchChange(searchQueryToURL(search));
+            onSearchChange(searchQueryToURL(search));
+            setIsUserTyping(false);
         }
     };
 
@@ -122,11 +139,15 @@ export default function SearchBar(props: {
                 onChange={(event): void => {
                     setSearch(event.target.value);
                 }}
+                onKeyDown={() => {
+                    if (!isUserTyping) {
+                        setIsUserTyping(true);
+                    }
+                }}
                 placeholder="Search"
                 value={search}
                 variant="outlined"
                 fullWidth
-                disabled={props.loading}
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
@@ -156,7 +177,7 @@ export default function SearchBar(props: {
                                 <SearchGuideDialog
                                     isOpen={isSearchGuideOpen}
                                     onToggle={toggleSearchGuide}
-                                    rootComponentRef={props.rootComponentRef}
+                                    rootComponentRef={rootComponentRef}
                                     triggerComponentRef={guideButtonRef}
                                 />
                                 <div className={classes.divider}></div>
@@ -172,7 +193,7 @@ export default function SearchBar(props: {
                                     aria-label="clear search"
                                     onClick={(): void => {
                                         setSearch('');
-                                        props.onSearchChange('');
+                                        onSearchChange('');
                                     }}
                                 >
                                     <CloseIcon />
