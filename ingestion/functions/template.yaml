@@ -11,6 +11,11 @@ Globals:
     Layers:
       - !Ref CommonLibLayer
 
+Parameters:
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -23,9 +28,14 @@ Resources:
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
       MemorySize: 2048
+      FileSystemConfigs:
+        - Arn: covid19DataIngestionEFS
+          LocalMountPath: !Ref EFSpath
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
   ParsingLibLayer:
