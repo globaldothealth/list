@@ -609,6 +609,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
+    handleTooltipAddFilterClick = (e: any) => {
+        e.preventDefault();
+        console.log('The link was clicked.');
+    };
+
     render(): JSX.Element {
         const { history, classes } = this.props;
 
@@ -616,19 +621,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             <StyledTooltip>
                 <ul>
                     <li>
-                        <strong>New data source:</strong> If this is a new data
-                        source you will need to add it to the system along with
-                        the root data source name. For example if the raw source
-                        was the ""7th July Press Release from Honduras” the
-                        source name would be the issuer of the press release
-                        e.g. “Honduras ministry of health'. The source name
-                        needs to reflect the actually provider of the data, not
-                        the method of reporting.
-                    </li>
-                    <li>
-                        <strong>Existing data source:</strong> If the URL is an
-                        existing source already in the system, select the
-                        appropriate source from the list provided.
+                        <strong>Test link</strong>{' '}
+                        <button onClick={this.handleTooltipAddFilterClick}>
+                            click
+                        </button>
                     </li>
                 </ul>
             </StyledTooltip>
