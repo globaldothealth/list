@@ -106,7 +106,6 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    setSearchLoading: (a: boolean) => void;
     page: number;
     pageSize: number;
 
@@ -895,7 +894,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
-                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
 
                             response
@@ -984,7 +982,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 })
                                 .finally(() => {
                                     this.setState({ isLoading: false });
-                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
