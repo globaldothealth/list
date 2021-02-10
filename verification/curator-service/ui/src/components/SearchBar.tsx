@@ -84,7 +84,7 @@ export default function SearchBar({
 
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    // Set search query debounce to 2000ms
+    // Set search query debounce to 1000ms
     const debouncedSearch = useDebounce(search, 1000);
 
     // Apply filter parameters after delay
