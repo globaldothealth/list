@@ -704,6 +704,7 @@ export default function App(): JSX.Element {
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
                                     setSearch={setSearch}
+                                    search={search}
                                 />
                             </Route>
                         )}

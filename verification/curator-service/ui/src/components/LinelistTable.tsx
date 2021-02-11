@@ -45,7 +45,7 @@ import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { StyledTooltip } from './new-case-form-fields/StyledTooltip';
-
+import isEqual from 'lodash/isEqual';
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -117,6 +117,7 @@ interface Props
     onChangePageSize: (pageSize: number) => void;
 
     setSearch: (value: string) => void;
+    search: any;
 }
 
 const styles = (theme: Theme) =>
@@ -491,6 +492,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.unlisten();
     }
 
+    shouldComponentUpdate(nextProps: any): boolean {
+        const { page, pageSize, location } = this.props;
+        console.log(this.props);
+        if (!isEqual(nextProps.location, location)) {
+            return true;
+        }
+        if (nextProps.page !== page || nextProps.pageSize !== pageSize) {
+            return true;
+        }
+        return false;
+    }
+
     async deleteCases(): Promise<void> {
         this.setState({ error: '', isDeleting: true });
         let requestBody;
@@ -613,7 +626,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleTooltipAddFilterClick = (e: any) => {
         e.preventDefault();
-        this.props.setSearch('caseid:');
+        const searchParameter = 'caseid:';
+        // Avoids duplicated search parameters
+        if (!this.props.search.includes(searchParameter)) {
+            this.props.setSearch(this.props.search + searchParameter);
+        }
     };
 
     render(): JSX.Element {
