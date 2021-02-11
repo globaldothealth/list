@@ -6,9 +6,11 @@ import userEvent from '@testing-library/user-event';
 describe('SignInForm', () => {
     const setIsAgreementChecked = jest.fn();
     const setIsAgreementMessage = jest.fn();
+    const setIsNewsletterChecked = jest.fn();
 
     test('renders and submits form', async () => {
         const handleSubmit = jest.fn();
+
         render(
             <SignInForm
                 handleSubmit={handleSubmit}
@@ -17,12 +19,19 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={false}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
         userEvent.type(screen.getByRole('textbox'), 'test@email.com');
-        userEvent.click(screen.getByRole('checkbox'));
+        userEvent.click(screen.getAllByRole('checkbox')[0]);
 
         userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
@@ -44,7 +53,14 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={false}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
@@ -69,11 +85,18 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={false}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
-        userEvent.click(screen.getByRole('checkbox'));
+        userEvent.click(screen.getAllByRole('checkbox')[0]);
         userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
         await wait(() => {
@@ -92,7 +115,14 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={false}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
@@ -117,7 +147,14 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={false}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
@@ -140,7 +177,14 @@ describe('SignInForm', () => {
                 isAgreementChecked={false}
                 isAgreementMessage={false}
                 isSubmitting={true}
-                classes={{ emailField: '', loader: '', signInButton: '' }}
+                isNewsletterChecked={false}
+                setIsNewsletterChecked={setIsNewsletterChecked}
+                classes={{
+                    emailField: '',
+                    loader: '',
+                    signInButton: '',
+                    divider: '',
+                }}
             />,
         );
 
