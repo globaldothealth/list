@@ -29,7 +29,7 @@ Resources:
       Description: Retrieve raw source content
       MemorySize: 2048
       FileSystemConfigs:
-        - Arn: covid19DataIngestionEFS
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-0f32b66a953e8629c
           LocalMountPath: !Ref EFSpath
       # Function's execution role
       Policies:
