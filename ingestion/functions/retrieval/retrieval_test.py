@@ -236,11 +236,11 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     content_url = "http://foo.bar/"
     format = "JSON"
     requests_mock.get(content_url, json={"data": "yes"})
-    retrieval.retrieve_content(
+    files_s3_keys = retrieval.retrieve_content(
         "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
-    with open("/tmp/content.json", "r") as f:
+    with open(files_s3_keys[0][0], "r") as f:
         assert json.load(f)["data"] == "yes"
 
 
