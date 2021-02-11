@@ -364,6 +364,7 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const [search, setSearch] = React.useState<string>(location.search);
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -510,6 +511,8 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
+                                        search={search}
+                                        setSearch={setSearch}
                                         searchQuery={location.search ?? ''}
                                         onSearchChange={(searchQuery): void => {
                                             history.push({
@@ -700,6 +703,7 @@ export default function App(): JSX.Element {
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
+                                    setSearch={setSearch}
                                 />
                             </Route>
                         )}

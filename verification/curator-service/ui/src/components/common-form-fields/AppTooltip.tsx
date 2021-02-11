@@ -15,6 +15,17 @@ export const AppTooltip = withStyles((theme: Theme) => ({
         padding: '1rem',
 
         maxWidth: (props: Widetooltip) => props.maxwidth,
+        '& button': {
+            background: 'unset',
+            border: 'none',
+            fontWeight: 'bold',
+            fontFamily: 'inherit',
+            fontSize: 'inherit',
+            color: 'inherit',
+            cursor: 'pointer',
+            padding: '0',
+            borderBottom: '1px dotted white',
+        },
     },
 }))(Tooltip);
 

@@ -66,14 +66,16 @@ const StyledInputAdornment = withStyles({
 
 export default function SearchBar(props: {
     searchQuery: string;
+    search: string;
+    setSearch: (value: string) => void;
     onSearchChange: (search: string) => void;
     loading: boolean;
     rootComponentRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element {
     const location = useLocation();
     const classes = searchBarStyles();
+    const { search, setSearch } = props;
 
-    const [search, setSearch] = React.useState<string>(location.search);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
         false,

@@ -115,6 +115,8 @@ interface Props
     onChangePage: (page: number) => void;
 
     onChangePageSize: (pageSize: number) => void;
+
+    setSearch: (value: string) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -611,7 +613,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleTooltipAddFilterClick = (e: any) => {
         e.preventDefault();
-        console.log('The link was clicked.');
+        this.props.setSearch('caseid:');
     };
 
     render(): JSX.Element {
@@ -621,9 +623,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             <StyledTooltip>
                 <ul>
                     <li>
-                        <strong>Test link</strong>{' '}
+                        <strong>To filter for Case ID, click</strong>{' '}
                         <button onClick={this.handleTooltipAddFilterClick}>
-                            click
+                            here
                         </button>
                     </li>
                 </ul>
