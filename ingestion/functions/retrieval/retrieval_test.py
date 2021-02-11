@@ -77,7 +77,7 @@ def test_format_url(mock_today):
 
 
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
-                            mock_source_api_url_fixture):
+                            mock_source_api_url_fixture, tempdir="/tmp"):
     from retrieval import retrieval  # Import locally to avoid superseding mock
 
     # Mock/stub retrieving credentials, invoking the parser lambda, and S3.
@@ -113,7 +113,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     # Mock the request to retrieve source content.
     requests_mock.get(origin_url, json={"data": "yes"})
 
-    response = retrieval.lambda_handler(valid_event, "")
+    response = retrieval.lambda_handler(valid_event, "", tempdir=tempdir)
 
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(

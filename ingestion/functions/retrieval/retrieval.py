@@ -315,7 +315,7 @@ def format_source_url(url: str) -> str:
     return url
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, context, tempdir=EFS_PATH):
     """Global ingestion retrieval function.
 
     Parameters
@@ -331,6 +331,10 @@ def lambda_handler(event, context):
         Lambda Context runtime methods and attributes.
         For more information, see:
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+
+    tempdir: str, optional
+        Temporary folder to store retrieve content in. Should be /tmp for test runs
+        and EFS_PATH for actual runs (the default)
 
     Returns
     ------
@@ -353,7 +357,7 @@ def lambda_handler(event, context):
         env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
-        env, source_id, upload_id, url, source_format, auth_headers, cookies)
+        env, source_id, upload_id, url, source_format, auth_headers, cookies, tempdir=tempdir)
     for file_name, s3_object_key in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
