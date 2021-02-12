@@ -529,7 +529,7 @@ export default function App(): JSX.Element {
                                     <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="http://covid-19.global.health"
+                                        href="http://map.covid-19.global.health"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
