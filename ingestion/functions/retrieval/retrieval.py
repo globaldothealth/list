@@ -4,7 +4,6 @@ import json
 import mimetypes
 import os
 import sys
-import csv
 import tempfile
 import zipfile
 from chardet import detect
@@ -14,6 +13,7 @@ import requests
 
 from datetime import datetime, timezone
 
+EFS_PATH = "/mnt/efs"
 ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
@@ -85,14 +85,14 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             api_headers, cookies)
 
 
-def raw_content(url: str, content: bytes) -> io.BytesIO:
+def raw_content(url: str, content: bytes, tempdir: str = EFS_PATH) -> io.BytesIO:
     # Detect the mimetype of a given URL.
     print(f'Guessing mimetype of {url}')
     mimetype, _ = mimetypes.guess_type(url)
     if mimetype == "application/zip":
         print('File seems to be a zip file, decompressing it now')
         # Writing the zip file to temp dir.
-        with tempfile.NamedTemporaryFile("wb", delete=False) as temp:
+        with tempfile.NamedTemporaryFile("wb", delete=False, dir=tempdir) as temp:
             temp.write(content)
             temp.flush()
             # Opening the zip file, extracting its first file.
@@ -106,7 +106,7 @@ def raw_content(url: str, content: bytes) -> io.BytesIO:
 
 
 def retrieve_content_csv(
-        env, source_id, upload_id, url, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, header=True):
+        env, source_id, upload_id, url, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, header=True, tempdir=EFS_PATH):
     """ Retrieves and locally persists the content in CSV format at the provided URL.
 
     This method chunks the CSV file to avoid timeouts in the ingestion functions.
@@ -127,7 +127,7 @@ def retrieve_content_csv(
         # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = raw_content(url, r.content)
+        bytesio = raw_content(url, r.content, tempdir)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
@@ -158,7 +158,7 @@ def retrieve_content_csv(
         chunk_s3 = []
         while content:
             lines = content.split("\n")
-            with codecs.open(f"/tmp/{key_filename_part}.{chunk_n}", "w", 'utf-8') as outfile:
+            with tempfile.NamedTemporaryFile("w", encoding="utf-8", delete=False, dir=tempdir) as outfile:
                 if csv_header:
                     outfile.write(csv_header)
                 outfile.write(unwritten_chunk + "\n".join(lines[:-1]) + "\n")
@@ -172,7 +172,7 @@ def retrieve_content_csv(
             content = text_stream.read(chunk_bytes)
 
         if unwritten_chunk:
-            with codecs.open(f"/tmp/{key_filename_part}.{chunk_n}", "w", 'utf-8') as outfile:
+            with codecs.open(outfile.name, "w", 'utf-8') as outfile:
                 outfile.write(unwritten_chunk)
 
         return chunk_s3
@@ -188,7 +188,7 @@ def retrieve_content_csv(
 
 
 def retrieve_content(
-        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES):
+        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, tempdir=EFS_PATH):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (
@@ -201,7 +201,7 @@ def retrieve_content(
                 source_id, upload_id, api_headers, cookies)
         if source_format == "CSV":
             return retrieve_content_csv(env, source_id, upload_id, url,
-                                        api_headers, cookies, chunk_bytes=chunk_bytes)
+                                        api_headers, cookies, chunk_bytes=chunk_bytes, tempdir=tempdir)
         print(f"Downloading {source_format} content from {url}")
         headers = {"user-agent": "GHDSI/1.0 (http://ghdsi.org)"}
         r = requests.get(url, headers=headers)
@@ -215,13 +215,13 @@ def retrieve_content(
         # sources.
         # Make the encoding of retrieved content consistent (UTF-8) for all
         # parsers as per https://github.com/globaldothealth/list/issues/867.
-        bytesio = raw_content(url, r.content)
+        bytesio = raw_content(url, r.content, tempdir)
         print('detecting encoding of retrieved content.')
         # Read 2MB to be quite sure about the encoding.
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         print(f'Source encoding is presumably {detected_enc}')
-        with codecs.open(f"/tmp/{key_filename_part}", "w", 'utf-8') as outfile:
+        with tempfile.NamedTemporaryFile("w", encoding='utf-8', delete=False, dir=tempdir) as outfile:
             text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
             # Write the output file as utf-8 in chunks because decoding the
             # whole data in one shot becomes really slow with big files.
@@ -253,6 +253,7 @@ def upload_to_s3(
             file_name, OUTPUT_BUCKET, s3_object_key)
         print(
             f"Uploaded source content to s3://{OUTPUT_BUCKET}/{s3_object_key}")
+        os.unlink(file_name)
     except Exception as e:
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
@@ -314,7 +315,7 @@ def format_source_url(url: str) -> str:
     return url
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, context, tempdir=EFS_PATH):
     """Global ingestion retrieval function.
 
     Parameters
@@ -330,6 +331,10 @@ def lambda_handler(event, context):
         Lambda Context runtime methods and attributes.
         For more information, see:
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+
+    tempdir: str, optional
+        Temporary folder to store retrieve content in. Should be /tmp for test runs
+        and EFS_PATH for actual runs (the default)
 
     Returns
     ------
@@ -352,7 +357,7 @@ def lambda_handler(event, context):
         env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
-        env, source_id, upload_id, url, source_format, auth_headers, cookies)
+        env, source_id, upload_id, url, source_format, auth_headers, cookies, tempdir=tempdir)
     for file_name, s3_object_key in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
