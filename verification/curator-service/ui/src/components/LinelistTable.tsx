@@ -46,6 +46,7 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { StyledTooltip } from './new-case-form-fields/StyledTooltip';
 import isEqual from 'lodash/isEqual';
+import { BorderStyle } from '@material-ui/icons';
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -130,6 +131,15 @@ const styles = (theme: Theme) =>
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+            cursor: 'pointer',
+            margin: 'auto',
+            width: 'fit-content',
+            paddingBottom: '1px',
+            '&:hover': {
+                borderBottomWidth: '1px',
+                borderBottomStyle: 'dotted',
+                borderColor: 'black',
+            },
         },
         dialogLoadingSpinner: {
             marginRight: theme.spacing(2),
@@ -494,7 +504,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     shouldComponentUpdate(nextProps: any): boolean {
         const { page, pageSize, location } = this.props;
-        console.log(this.props);
         if (!isEqual(nextProps.location, location)) {
             return true;
         }
@@ -624,30 +633,23 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
-    handleTooltipAddFilterClick = (e: any) => {
+    handleTooltipAddFilterClick = (e: any, filter: any) => {
         e.preventDefault();
-        const searchParameter = 'caseid:';
+        const searchParameter = filter;
+        console.log(this.props.search);
+
         // Avoids duplicated search parameters
         if (!this.props.search.includes(searchParameter)) {
-            this.props.setSearch(this.props.search + searchParameter);
+            if (this.props.search.length === 0) {
+                this.props.setSearch(this.props.search + searchParameter);
+            } else {
+                this.props.setSearch(this.props.search + ' ' + searchParameter);
+            }
         }
     };
 
     render(): JSX.Element {
         const { history, classes } = this.props;
-
-        const TooltipText = () => (
-            <StyledTooltip>
-                <ul>
-                    <li>
-                        <strong>To filter for Case ID, click</strong>{' '}
-                        <button onClick={this.handleTooltipAddFilterClick}>
-                            here
-                        </button>
-                    </li>
-                </ul>
-            </StyledTooltip>
-        );
 
         return (
             <>
@@ -856,11 +858,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <div className={classes.centeredContent}>
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'caseid:',
+                                        )
+                                    }
+                                >
                                     Case ID
-                                    <ColumnHeaderTooltip
-                                        tooltip={<TooltipText />}
-                                    />
                                 </div>
                             ),
                             field: 'id',
@@ -875,22 +883,74 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 3',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'admin3:',
+                                        )
+                                    }
+                                >
+                                    Admin 3
+                                </div>
+                            ),
                             field: 'adminArea3',
                             headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 2',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'admin2:',
+                                        )
+                                    }
+                                >
+                                    Admin 2
+                                </div>
+                            ),
                             field: 'adminArea2',
                             headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 1',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'admin1:',
+                                        )
+                                    }
+                                >
+                                    Admin 1
+                                </div>
+                            ),
                             field: 'adminArea1',
                             headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Country',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'country:',
+                                        )
+                                    }
+                                >
+                                    Country
+                                </div>
+                            ),
                             field: 'country',
                         },
                         {
@@ -911,11 +971,37 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Gender',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'gender:',
+                                        )
+                                    }
+                                >
+                                    Gender
+                                </div>
+                            ),
                             field: 'gender',
                         },
                         {
-                            title: 'Outcome',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'outcome:',
+                                        )
+                                    }
+                                >
+                                    Outcome
+                                </div>
+                            ),
                             field: 'outcome',
                         },
                         {
@@ -927,7 +1013,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'symptomsOnsetDate',
                         },
                         {
-                            title: 'Source URL',
+                            title: (
+                                <div
+                                    className={classes.centeredContent}
+                                    title="Click to add this filter"
+                                    onClick={(e: any) =>
+                                        this.handleTooltipAddFilterClick(
+                                            e,
+                                            'sourceurl:',
+                                        )
+                                    }
+                                >
+                                    Source URL
+                                </div>
+                            ),
                             field: 'sourceUrl',
                             headerStyle: { whiteSpace: 'nowrap' },
                         },
