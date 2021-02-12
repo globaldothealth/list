@@ -11,6 +11,18 @@ Globals:
     Layers:
       - !Ref CommonLibLayer
 
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-0c134fcb2d6886b1c
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-90ab5bf6,subnet-9a5fdfd7,subnet-8b872d85,subnet-782bd627,subnet-7594904b,subnet-51748b70
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -23,9 +35,17 @@ Resources:
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
       MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-0f32b66a953e8629c
+          LocalMountPath: !Ref EFSpath
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
   ParsingLibLayer:

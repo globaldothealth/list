@@ -38,15 +38,12 @@ import { ReactComponent as UnverifiedIcon } from './assets/unverified_icon.svg';
 import { ReactComponent as ExcludedIcon } from './assets/excluded_icon.svg';
 import User from './User';
 import VerificationStatusHeader from './VerificationStatusHeader';
-import ColumnHeaderTooltip from './ColumnHeaderTooltip';
 import VerificationStatusIndicator from './VerificationStatusIndicator';
 import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
-import { StyledTooltip } from './new-case-form-fields/StyledTooltip';
 import isEqual from 'lodash/isEqual';
-import { BorderStyle } from '@material-ui/icons';
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -109,7 +106,6 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    setSearchLoading: (a: boolean) => void;
     page: number;
     pageSize: number;
 
@@ -879,7 +875,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
-                            headerStyle: { whiteSpace: 'nowrap' },
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
@@ -898,7 +893,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 </div>
                             ),
                             field: 'adminArea3',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: (
@@ -916,7 +910,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 </div>
                             ),
                             field: 'adminArea2',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: (
@@ -934,7 +927,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 </div>
                             ),
                             field: 'adminArea1',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: (
@@ -1028,7 +1020,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 </div>
                             ),
                             field: 'sourceUrl',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -1041,7 +1032,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
-                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
 
                             response
@@ -1130,7 +1120,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 })
                                 .finally(() => {
                                     this.setState({ isLoading: false });
-                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
@@ -1222,6 +1211,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
                         },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) => {

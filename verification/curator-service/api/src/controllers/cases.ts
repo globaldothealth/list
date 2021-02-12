@@ -75,10 +75,21 @@ export default class CasesController {
 
     /* getDownloadLink generates signed URL to download full data set from AWS S3 */
     getDownloadLink = async (req: Request, res: Response): Promise<void> => {
+        const dateObj = new Date();
+
+        // adjust 0 before single digit date
+        const day = ('0' + dateObj.getDate()).slice(-2);
+        const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+        const year = dateObj.getFullYear();
+
+        const filename = `gh_${year}-${month}-${day}.tar.gz`;
+
         const params = {
             Bucket: 'covid-19-data-export',
             Key: 'latest/latestdata.tar.gz',
             Expires: 5 * 60,
+            ResponseContentDisposition:
+                'attachment; filename ="' + filename + '"',
         };
 
         try {

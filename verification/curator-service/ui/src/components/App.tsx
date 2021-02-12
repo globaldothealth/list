@@ -356,7 +356,6 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
     const [searchQuery, setSearchQuery] = React.useState<string>('');
@@ -520,7 +519,6 @@ export default function App(): JSX.Element {
                                                 search: searchQuery,
                                             });
                                         }}
-                                        loading={searchLoading}
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
@@ -698,7 +696,6 @@ export default function App(): JSX.Element {
                             <Route exact path="/cases">
                                 <LinelistTable
                                     user={user}
-                                    setSearchLoading={setSearchLoading}
                                     page={listPage}
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
