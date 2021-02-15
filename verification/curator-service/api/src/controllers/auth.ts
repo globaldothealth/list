@@ -14,6 +14,7 @@ import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
+import AWS from 'aws-sdk';
 
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
@@ -107,7 +108,11 @@ interface GoogleProfile extends Profile {
  */
 export class AuthController {
     public router: Router;
-    constructor(private readonly afterLoginRedirURL: string) {
+    constructor(
+        private readonly afterLoginRedirURL: string,
+        private readonly sesClient: AWS.SES,
+        private readonly senderEmail: string,
+    ) {
         this.router = Router();
 
         this.router.get(
@@ -168,6 +173,12 @@ export class AuthController {
                         roles: req.body.roles,
                     });
 
+                    try {
+                        await this.sendWelcomeEmail(req.body.email);
+                    } catch (err) {
+                        logger.info('error: ' + JSON.stringify(err, null, 2));
+                    }
+
                     req.login(newUser, (err: Error) => {
                         if (!err) {
                             res.json(newUser);
@@ -179,6 +190,45 @@ export class AuthController {
                 }
             },
         );
+    }
+
+    private async sendWelcomeEmail(recipient: string) {
+        const params = {
+            Destination: { ToAddresses: [recipient] },
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: 'UTF-8',
+                        Data: `<html><body>
+                                <p>Hello ${recipient},</p>
+                                <p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
+                                <p>Here are a few things you can do:</p>
+                                <ul>
+                                    <li>Filter and export <b>G.h</b> Data containing detailed information on over five million anonymized COVID-19 cases from over 100 countries.</li>
+                                    <li>Explore the <b>G.h Map</b> to see available case data visualized by country, region, and coverage. You can also find currently available line-list data on variants of concern which will be updated regularly.</li>
+                                    <li>Check out our <b>FAQs</b> for more information on our platform, process, team, data sources, citation guidelines, and plans for the future.</li>
+                                    <li>Get involved! G.h is being built via a network of hundreds of volunteers that could use your help. If you're interested in joining us, please fill out this <b>form</b>.</li>
+                                    <li>Connect with <b>@globaldothealth</b> on <b>Twitter</b>, <b>LinkedIn</b>, and <b>GitHub</b> for the latest news and updates.</li>
+                                </ul>
+                                <p>If you have any questions, suggestions, or connections don't hesitate to email us and a member of our team will be sure to follow up.</p>
+                                <p>Thank you again for your interest and support! We hope G.h proves valuable to your work and look forward to hearing from you.</p>
+                                <p>The G.h Team</p>
+                                </body></html>`,
+                    },
+                    Text: {
+                        Charset: 'UTF-8',
+                        Data: 'Sample text',
+                    },
+                },
+                Subject: {
+                    Charset: 'UTF-8',
+                    Data: 'Welcome to Global.health!',
+                },
+            },
+            Source: this.senderEmail,
+        };
+
+        await this.sesClient.sendEmail(params).promise();
     }
 
     /**
@@ -270,6 +320,14 @@ export class AuthController {
                                 roles: [],
                                 picture: picture,
                             });
+
+                            try {
+                                await this.sendWelcomeEmail(user.email);
+                            } catch (err) {
+                                logger.info(
+                                    'error: ' + JSON.stringify(err, null, 2),
+                                );
+                            }
                         }
                         if (picture !== user.picture) {
                             logger.info(
