@@ -432,6 +432,27 @@ export function DownloadButton(): JSX.Element {
         </>
     );
 }
+interface ColumnHeaderProps {
+    theClass: any;
+    columnTitle: string;
+    onClickAction: any;
+}
+
+const ColumnHeaderTitle: React.FC<ColumnHeaderProps> = ({
+    theClass,
+    columnTitle,
+    onClickAction,
+}) => {
+    return (
+        <div
+            className={theClass}
+            title="Click to add this filter"
+            onClick={onClickAction}
+        >
+            {columnTitle}
+        </div>
+    );
+};
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
@@ -632,7 +653,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     handleTooltipAddFilterClick = (e: any, filter: any) => {
         e.preventDefault();
         const searchParameter = filter;
-        console.log(this.props.search);
 
         // Avoids duplicated search parameters
         if (!this.props.search.includes(searchParameter)) {
@@ -854,19 +874,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Case ID"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'caseid:',
                                         )
                                     }
-                                >
-                                    Case ID
-                                </div>
+                                />
                             ),
+
                             field: 'id',
                             type: 'string',
                         },
