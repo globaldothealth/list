@@ -106,7 +106,6 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    setSearchLoading: (a: boolean) => void;
     page: number;
     pageSize: number;
 
@@ -824,23 +823,19 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
-                            headerStyle: { whiteSpace: 'nowrap' },
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 3',
                             field: 'adminArea3',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 2',
                             field: 'adminArea2',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Admin 1',
                             field: 'adminArea1',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
                             title: 'Country',
@@ -882,7 +877,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: 'Source URL',
                             field: 'sourceUrl',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -895,7 +889,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
-                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
 
                             response
@@ -984,7 +977,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 })
                                 .finally(() => {
                                     this.setState({ isLoading: false });
-                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
@@ -1076,6 +1068,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
                         },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) => {
