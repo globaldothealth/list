@@ -521,12 +521,17 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     shouldComponentUpdate(nextProps: any): boolean {
         const { page, pageSize, location } = this.props;
+
         if (!isEqual(nextProps.location, location)) {
             return true;
         }
         if (nextProps.page !== page || nextProps.pageSize !== pageSize) {
             return true;
         }
+        if (this.state.error.length) {
+            return true;
+        }
+
         return false;
     }
 
