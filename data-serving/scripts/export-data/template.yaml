@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda functions for Global.health Data Export
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 900
+    EventInvokeConfig:
+      MaximumRetryAttempts: 0
+    Environment:
+      Variables:
+        MONGO_USERNAME: xxxxx
+        MONGO_PASSWORD: xxxxx
+
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-0c134fcb2d6886b1c
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-90ab5bf6,subnet-9a5fdfd7,subnet-8b872d85,subnet-782bd627,subnet-7594904b,subnet-51748b70
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+  AccessPointARN:
+    Type: String
+    Default: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-033b989586cd41ffe
+
+Resources:
+  DataExportSplitFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      CodeUri: functions/01-split/
+      Handler: app.lambda_handler
+      Description: Partition raw data into chunks
+      Policies:
+        LambdaInvokePolicy:
+          FunctionName:
+            !Ref DataExportExportFunction
+      Environment:
+        Variables:
+          EXPORT_FUNCTION: !Ref DataExportExportFunction
+
+  DataExportExportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/02-export/
+      Handler: app.lambda_handler
+      Description: Export chunk as flattened .csv
+      MemorySize: 1024
+      Policies:
+        - S3CrudPolicy:
+            BucketName: global-dot-health-data-export-bucket
+      Environment:
+        Variables:
+          EXPORT_BUCKET: global-dot-health-data-export-bucket
+
+  DataExportParseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/03-parse/
+      Handler: app.lambda_handler
+      Description: Parse .csv chunk
+      MemorySize: 1024
+      Events:
+        ChunkEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket
+            Events: s3:ObjectCreated:*
+      Policies:
+        - S3CrudPolicy:
+            BucketName: global-dot-health-data-export-bucket
+      Environment:
+        Variables:
+          EXPORT_BUCKET: global-dot-health-data-export-bucket
+
+  DataExportCombineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/04-combine/
+      Handler: app.lambda_handler
+      Description: Combine chunks and upload to s3
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-0f32b66a953e8629c
+          LocalMountPath: !Ref EFSpath
+      Policies:
+        - AWSLambdaFullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
+
+  Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: global-dot-health-data-export-bucket
