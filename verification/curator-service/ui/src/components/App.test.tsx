@@ -69,7 +69,7 @@ it('has drawer links', async () => {
 
     expect(await findByTestId('mapLink')).toHaveAttribute(
         'href',
-        'http://covid-19.global.health',
+        'http://map.covid-19.global.health',
     );
     expect(await findByTestId('dictionaryButton')).toHaveAttribute(
         'href',
