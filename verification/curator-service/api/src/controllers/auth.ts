@@ -204,11 +204,11 @@ export class AuthController {
                                 <p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
                                 <p>Here are a few things you can do:</p>
                                 <ul>
-                                    <li>Filter and export <b>G.h</b> Data containing detailed information on over five million anonymized COVID-19 cases from over 100 countries.</li>
-                                    <li>Explore the <b>G.h Map</b> to see available case data visualized by country, region, and coverage. You can also find currently available line-list data on variants of concern which will be updated regularly.</li>
-                                    <li>Check out our <b>FAQs</b> for more information on our platform, process, team, data sources, citation guidelines, and plans for the future.</li>
-                                    <li>Get involved! G.h is being built via a network of hundreds of volunteers that could use your help. If you're interested in joining us, please fill out this <b>form</b>.</li>
-                                    <li>Connect with <b>@globaldothealth</b> on <b>Twitter</b>, <b>LinkedIn</b>, and <b>GitHub</b> for the latest news and updates.</li>
+                                    <li>Filter and export <a href="https://dev-curator.ghdsi.org/">G.h</a> Data containing detailed information on over five million anonymized COVID-19 cases from over 100 countries.</li>
+                                    <li>Explore the <a href="http://covid-19.global.health/">G.h Map</a> to see available case data visualized by country, region, and coverage. You can also find currently available line-list data on variants of concern which will be updated regularly.</li>
+                                    <li>Check out our <a href="https://test-globalhealth.pantheonsite.io/faqs/">FAQs</a> for more information on our platform, process, team, data sources, citation guidelines, and plans for the future.</li>
+                                    <li>Get involved! G.h is being built via a network of hundreds of volunteers that could use your help. If you're interested in joining us, please fill out this <a href="https://test-globalhealth.pantheonsite.io/about/#get-involved">form</a>.</li>
+                                    <li>Connect with <a href="https://twitter.com/globaldothealth">@globaldothealth</a> on <a href="https://twitter.com/globaldothealth">Twitter</a>, <a href="https://www.linkedin.com/company/globaldothealth">LinkedIn</a>, and <a href="https://github.com/globaldothealth">GitHub</a> for the latest news and updates.</li>
                                 </ul>
                                 <p>If you have any questions, suggestions, or connections don't hesitate to email us and a member of our team will be sure to follow up.</p>
                                 <p>Thank you again for your interest and support! We hope G.h proves valuable to your work and look forward to hearing from you.</p>
