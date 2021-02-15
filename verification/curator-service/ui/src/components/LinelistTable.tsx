@@ -650,7 +650,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
-    handleTooltipAddFilterClick = (e: any, filter: any) => {
+    handleAddFilterClick = (e: any, filter: any) => {
         e.preventDefault();
         const searchParameter = filter;
 
@@ -878,10 +878,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Case ID"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'caseid:',
-                                        )
+                                        this.handleAddFilterClick(e, 'caseid:')
                                     }
                                 />
                             ),
@@ -902,10 +899,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 3"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'admin3:',
-                                        )
+                                        this.handleAddFilterClick(e, 'admin3:')
                                     }
                                 />
                             ),
@@ -917,10 +911,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 2"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'admin2:',
-                                        )
+                                        this.handleAddFilterClick(e, 'admin2:')
                                     }
                                 />
                             ),
@@ -932,10 +923,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 1"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'admin1:',
-                                        )
+                                        this.handleAddFilterClick(e, 'admin1:')
                                     }
                                 />
                             ),
@@ -947,10 +935,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Country"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'country:',
-                                        )
+                                        this.handleAddFilterClick(e, 'country:')
                                     }
                                 />
                             ),
@@ -979,10 +964,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Gender"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'gender:',
-                                        )
+                                        this.handleAddFilterClick(e, 'gender:')
                                     }
                                 />
                             ),
@@ -994,10 +976,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Outcome"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
-                                            e,
-                                            'outcome:',
-                                        )
+                                        this.handleAddFilterClick(e, 'outcome:')
                                     }
                                 />
                             ),
@@ -1017,7 +996,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     theClass={classes.centeredContent}
                                     columnTitle="Source URL"
                                     onClickAction={(e: any) =>
-                                        this.handleTooltipAddFilterClick(
+                                        this.handleAddFilterClick(
                                             e,
                                             'sourceurl:',
                                         )
