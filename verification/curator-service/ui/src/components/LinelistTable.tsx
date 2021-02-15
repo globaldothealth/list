@@ -898,69 +898,61 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 3"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'admin3:',
                                         )
                                     }
-                                >
-                                    Admin 3
-                                </div>
+                                />
                             ),
                             field: 'adminArea3',
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 2"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'admin2:',
                                         )
                                     }
-                                >
-                                    Admin 2
-                                </div>
+                                />
                             ),
                             field: 'adminArea2',
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 1"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'admin1:',
                                         )
                                     }
-                                >
-                                    Admin 1
-                                </div>
+                                />
                             ),
                             field: 'adminArea1',
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Country"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'country:',
                                         )
                                     }
-                                >
-                                    Country
-                                </div>
+                                />
                             ),
                             field: 'country',
                         },
@@ -983,35 +975,31 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Gender"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'gender:',
                                         )
                                     }
-                                >
-                                    Gender
-                                </div>
+                                />
                             ),
                             field: 'gender',
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Outcome"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'outcome:',
                                         )
                                     }
-                                >
-                                    Outcome
-                                </div>
+                                />
                             ),
                             field: 'outcome',
                         },
@@ -1025,18 +1013,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <div
-                                    className={classes.centeredContent}
-                                    title="Click to add this filter"
-                                    onClick={(e: any) =>
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Source URL"
+                                    onClickAction={(e: any) =>
                                         this.handleTooltipAddFilterClick(
                                             e,
                                             'sourceurl:',
                                         )
                                     }
-                                >
-                                    Source URL
-                                </div>
+                                />
                             ),
                             field: 'sourceUrl',
                         },
