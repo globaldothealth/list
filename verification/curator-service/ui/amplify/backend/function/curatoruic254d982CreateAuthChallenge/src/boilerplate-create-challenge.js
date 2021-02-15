@@ -11,25 +11,23 @@ exports.handler = async (event, context) => {
         // Generate a new secret login code and mail it to the user
         secretLoginCode = randomDigit.randomDigits(6).join('');
 
-        console.log(event.request.userAttributes.email);
         const params = {
         Destination: { ToAddresses: [event.request.userAttributes.email] },
         Message: {
             Body: {
                 Html: {
                     Charset: 'UTF-8',
-                    Data: `<html><body><p>Hello ${event.request.userAttributes.email}, <br>This is your secret login code:</p>
+                    Data: `<html><body><p>This is your secret login code:</p>
                            <h3>${secretLoginCode}</h3></body></html>`
                 },
                 Text: {
                     Charset: 'UTF-8',
-                    Data: `Hello ${event.request.userAttributes.email}, 
-                    Thank you for signing up with Global.health! To securely verify your registration, please enter this secret login code: ${secretLoginCode}`
+                    Data: `Your secret login code: ${secretLoginCode}`
                 }
             },
             Subject: {
                 Charset: 'UTF-8',
-                Data: 'Your secret Global.health login code'
+                Data: 'Your secret login code'
             }
         },
         Source: process.env.SOURCEEMAIL
