@@ -8,20 +8,3 @@ const helpIconStyle = makeStyles(() => ({
         marginLeft: '10px',
     },
 }));
-
-export default function ColumnHeaderTooltip(props: any): JSX.Element {
-    const classes = helpIconStyle();
-    const { tooltip } = props;
-    return (
-        <AppTooltip
-            title={tooltip}
-            color="primary"
-            interactive
-            placement="top"
-            arrow
-            maxwidth={props.widetooltip ? '40vw' : 'auto'}
-        >
-            <HelpIcon fontSize="small" className={classes.addMarginLeft} />
-        </AppTooltip>
-    );
-}
