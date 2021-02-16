@@ -29,4 +29,11 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["DataExportCombineFunction"]
 
+[function_build_definitions.d7bc6a09-97c1-44a8-8e52-5c4046879000]
+codeuri = "functions/05-aggregate/"
+runtime = "python3.8"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["DataExportAggregateFunction"]
+
 [layer_build_definitions]
