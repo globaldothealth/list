@@ -18,7 +18,7 @@ Parameters:
   SubnetIDs:
     Type: CommaDelimitedList
     Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
-    Default: subnet-0debd15e1a8e1a75c
+    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
   EFSpath:
     Type: String
     Default: /mnt/efs
