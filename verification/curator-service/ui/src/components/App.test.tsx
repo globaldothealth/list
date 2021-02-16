@@ -2,7 +2,13 @@ import App from './App';
 import { MemoryRouter, Router } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { fireEvent, render, wait } from '@testing-library/react';
+import {
+    fireEvent,
+    render,
+    wait,
+    screen,
+    within,
+} from '@testing-library/react';
 import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
@@ -14,104 +20,173 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-it('renders without crashing when logged in', async () => {
-    const axiosResponse = {
-        data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-    const { findByTestId } = render(
-        <MemoryRouter>
-            <App />
-        </MemoryRouter>,
-    );
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
-    expect(await findByTestId('profile-menu')).toBeInTheDocument();
-});
-
-it('renders without crashing when logged out', async () => {
-    const axiosResponse = {
-        data: {},
-        status: 403,
-        statusText: 'Forbidden',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValue(axiosResponse);
-    const { queryByTestId } = render(
-        <MemoryRouter>
-            <App />
-        </MemoryRouter>,
-    );
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
-    expect(queryByTestId('profile-menu')).not.toBeInTheDocument();
-});
-
-it('has drawer links', async () => {
-    const axiosResponse = {
-        data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValue(axiosResponse);
-    const { findByTestId } = render(
-        <MemoryRouter>
-            <App />
-        </MemoryRouter>,
-    );
-
-    expect(await findByTestId('mapLink')).toHaveAttribute(
-        'href',
-        'http://map.covid-19.global.health',
-    );
-    expect(await findByTestId('dictionaryButton')).toHaveAttribute(
-        'href',
-        'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
-    );
-    expect(await findByTestId('termsButton')).toHaveAttribute(
-        'href',
-        'https://test-globalhealth.pantheonsite.io/terms-of-use',
-    );
-    expect(await findByTestId('privacypolicybutton')).toHaveAttribute(
-        'href',
-        'https://test-globalhealth.pantheonsite.io/privacy/',
-    );
-});
-
-it('navigates to the home screen (charts) after clicking on home button', async () => {
-    const axiosResponse = {
-        data: { name: 'Alice Smith', email: 'foo@bar.com', roles: ['admin'] },
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {},
-    };
-    mockedAxios.get.mockResolvedValueOnce(axiosResponse);
-    const history = createMemoryHistory({
-        initialEntries: ['/cases'],
-        initialIndex: 0,
+describe('<App />', () => {
+    it('renders without crashing when logged in', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        const { findByTestId } = render(
+            <MemoryRouter>
+                <App />
+            </MemoryRouter>,
+        );
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
+        expect(await findByTestId('profile-menu')).toBeInTheDocument();
     });
 
-    const { getByText, findByText, findByTestId } = render(
-        <Router history={history}>
-            <App />
-        </Router>,
-    );
+    it('renders without crashing when logged out', async () => {
+        const axiosResponse = {
+            data: {},
+            status: 403,
+            statusText: 'Forbidden',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValue(axiosResponse);
+        const { queryByTestId } = render(
+            <MemoryRouter>
+                <App />
+            </MemoryRouter>,
+        );
+        expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+        expect(mockedAxios.get).toHaveBeenCalledWith('/auth/profile');
+        expect(queryByTestId('profile-menu')).not.toBeInTheDocument();
+    });
 
-    expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
+    it('has drawer links', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValue(axiosResponse);
+        const { findByTestId } = render(
+            <MemoryRouter>
+                <App />
+            </MemoryRouter>,
+        );
 
-    fireEvent.click(await findByTestId('home-button-data'));
+        expect(await findByTestId('mapLink')).toHaveAttribute(
+            'href',
+            'http://map.covid-19.global.health',
+        );
+        expect(await findByTestId('dictionaryButton')).toHaveAttribute(
+            'href',
+            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+        );
+        expect(await findByTestId('acknowledgmentsButton')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/ackowledgement/',
+        );
+        expect(await findByTestId('termsButton')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/terms-of-use',
+        );
+        expect(await findByTestId('privacypolicybutton')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/privacy/',
+        );
+    });
 
-    wait(() => {
-        expect(getByText('Cumulative')).toBeInTheDocument();
-        expect(getByText('Completeness')).toBeInTheDocument();
-        expect(getByText('Freshness')).toBeInTheDocument();
+    it('navigates to the home screen (charts) after clicking on home button', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        const history = createMemoryHistory({
+            initialEntries: ['/cases'],
+            initialIndex: 0,
+        });
+
+        const { getByText, findByText, findByTestId } = render(
+            <Router history={history}>
+                <App />
+            </Router>,
+        );
+
+        expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
+
+        fireEvent.click(await findByTestId('home-button-data'));
+
+        wait(() => {
+            expect(getByText('Cumulative')).toBeInTheDocument();
+            expect(getByText('Completeness')).toBeInTheDocument();
+            expect(getByText('Freshness')).toBeInTheDocument();
+        });
+    });
+
+    it('opens profile menu and contains all the links', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        const history = createMemoryHistory({
+            initialEntries: ['/cases'],
+            initialIndex: 0,
+        });
+
+        render(
+            <Router history={history}>
+                <App />
+            </Router>,
+        );
+
+        fireEvent.click(await screen.findByTestId('profile-menu'));
+
+        await wait(() => {
+            const profileMenu = screen.getByTestId('profile-menu-dropdown');
+            expect(profileMenu).toBeInTheDocument();
+
+            expect(
+                within(profileMenu).getByText(/Logout/i),
+            ).toBeInTheDocument();
+            expect(
+                within(profileMenu).getByText(/Profile/i),
+            ).toBeInTheDocument();
+            expect(
+                within(profileMenu).getByText(/Global.Health/i),
+            ).toBeInTheDocument();
+            expect(
+                within(profileMenu).getByText(/Data dictionary/i),
+            ).toBeInTheDocument();
+            expect(
+                within(profileMenu).getByText(/Data acknowledgments/i),
+            ).toBeInTheDocument();
+            expect(
+                within(profileMenu).getByText(/View source on Github/i),
+            ).toBeInTheDocument();
+        });
     });
 });

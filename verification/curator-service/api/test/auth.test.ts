@@ -12,11 +12,20 @@ import express from 'express';
 import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
+import MockSES from 'aws-sdk/clients/ses';
 
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
         return { initialize: jest.fn().mockResolvedValue({}) };
     });
+});
+
+jest.mock('aws-sdk/clients/ses', () => {
+    const mSES = {
+        sendEmail: jest.fn().mockReturnThis(),
+        promise: jest.fn(),
+    };
+    return jest.fn(() => mSES);
 });
 
 jest.mock('axios');
@@ -139,7 +148,12 @@ describe('mustHaveAnyRole', () => {
         // Setup a fake server.
         localApp = express();
         localApp.use(bodyParser.json());
-        const authController = new AuthController('/redirect-after-login');
+        const mSES = new MockSES();
+        const authController = new AuthController(
+            '/redirect-after-login',
+            mSES,
+            'foo@bar.com',
+        );
         authController.configurePassport('foo', 'bar');
         authController.configureLocalAuth();
         localApp.use(passport.initialize());

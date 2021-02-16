@@ -14,6 +14,10 @@ import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
+import SES from 'aws-sdk/clients/ses';
+
+// Global variable for newsletter acceptance
+let isNewsletterAccepted: boolean;
 
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
@@ -107,7 +111,11 @@ interface GoogleProfile extends Profile {
  */
 export class AuthController {
     public router: Router;
-    constructor(private readonly afterLoginRedirURL: string) {
+    constructor(
+        private readonly afterLoginRedirURL: string,
+        private readonly sesClient: SES,
+        private readonly senderEmail: string,
+    ) {
         this.router = Router();
 
         this.router.get(
@@ -116,7 +124,6 @@ export class AuthController {
             // This 'google' string is hardcoded within passport.
             passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
-                // User has successfully logged-in.
                 res.redirect(this.afterLoginRedirURL);
             },
         );
@@ -130,6 +137,14 @@ export class AuthController {
         // This will redirect the browser to the OAuth consent screen.
         this.router.get(
             '/google',
+            (req: Request, res: Response, next) => {
+                if (req.query.newsletterAccepted) {
+                    isNewsletterAccepted =
+                        req.query.newsletterAccepted === 'true' ? true : false;
+                }
+
+                return next();
+            },
             passport.authenticate('google', {
                 scope: ['email'],
                 prompt: 'select_account',
@@ -147,9 +162,21 @@ export class AuthController {
         this.router.post(
             '/signup',
             async (req: Request, res: Response): Promise<void> => {
-                const user = await User.findOne({
+                let user = await User.findOne({
                     email: req.body.email,
                 }).exec();
+
+                // Update newsletter preferences
+                if (
+                    user &&
+                    user.newsletterAccepted === false &&
+                    req.body.newsletter
+                ) {
+                    user = await User.findOneAndUpdate(
+                        { email: req.body.email },
+                        { newsletterAccepted: req.body.newsletter },
+                    );
+                }
 
                 if (user) {
                     req.login(user, (err: Error) => {
@@ -166,7 +193,14 @@ export class AuthController {
                         email: req.body.email,
                         googleID: '42',
                         roles: req.body.roles,
+                        newsletterAccepted: req.body.newsletter || false,
                     });
+
+                    try {
+                        await this.sendWelcomeEmail(req.body.email);
+                    } catch (err) {
+                        logger.info('error: ' + JSON.stringify(err, null, 2));
+                    }
 
                     req.login(newUser, (err: Error) => {
                         if (!err) {
@@ -179,6 +213,45 @@ export class AuthController {
                 }
             },
         );
+    }
+
+    private async sendWelcomeEmail(recipient: string) {
+        const params = {
+            Destination: { ToAddresses: [recipient] },
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: 'UTF-8',
+                        Data: `<html><body>
+                                <p>Hello ${recipient},</p>
+                                <p>Thank you for registering with Global.health! We're thrilled to have you join our international community and mission to advance the global response to infectious diseases through the sharing of trusted and open public health data.</p>
+                                <p>Here are a few things you can do:</p>
+                                <ul>
+                                    <li>Filter and export <a href="https://dev-curator.ghdsi.org/">G.h</a> Data containing detailed information on over five million anonymized COVID-19 cases from over 100 countries.</li>
+                                    <li>Explore the <a href="http://covid-19.global.health/">G.h Map</a> to see available case data visualized by country, region, and coverage. You can also find currently available line-list data on variants of concern which will be updated regularly.</li>
+                                    <li>Check out our <a href="https://test-globalhealth.pantheonsite.io/faqs/">FAQs</a> for more information on our platform, process, team, data sources, citation guidelines, and plans for the future.</li>
+                                    <li>Get involved! G.h is being built via a network of hundreds of volunteers that could use your help. If you're interested in joining us, please fill out this <a href="https://test-globalhealth.pantheonsite.io/about/#get-involved">form</a>.</li>
+                                    <li>Connect with <a href="https://twitter.com/globaldothealth">@globaldothealth</a> on <a href="https://twitter.com/globaldothealth">Twitter</a>, <a href="https://www.linkedin.com/company/globaldothealth">LinkedIn</a>, and <a href="https://github.com/globaldothealth">GitHub</a> for the latest news and updates.</li>
+                                </ul>
+                                <p>If you have any questions, suggestions, or connections don't hesitate to email us and a member of our team will be sure to follow up.</p>
+                                <p>Thank you again for your interest and support! We hope G.h proves valuable to your work and look forward to hearing from you.</p>
+                                <p>The G.h Team</p>
+                                </body></html>`,
+                    },
+                    Text: {
+                        Charset: 'UTF-8',
+                        Data: 'Sample text',
+                    },
+                },
+                Subject: {
+                    Charset: 'UTF-8',
+                    Data: 'Welcome to Global.health!',
+                },
+            },
+            Source: this.senderEmail,
+        };
+
+        await this.sesClient.sendEmail(params).promise();
     }
 
     /**
@@ -269,7 +342,16 @@ export class AuthController {
                                 )[0],
                                 roles: [],
                                 picture: picture,
+                                newsletterAccepted: isNewsletterAccepted,
                             });
+
+                            try {
+                                await this.sendWelcomeEmail(user.email);
+                            } catch (err) {
+                                logger.info(
+                                    'error: ' + JSON.stringify(err, null, 2),
+                                );
+                            }
                         }
                         if (picture !== user.picture) {
                             logger.info(
@@ -278,6 +360,18 @@ export class AuthController {
                             user = await User.findOneAndUpdate(
                                 { googleID: googleProfile.id },
                                 { picture: picture },
+                            );
+                        }
+
+                        if (
+                            user &&
+                            !user.newsletterAccepted &&
+                            isNewsletterAccepted
+                        ) {
+                            logger.info('Updating newsletter preferences');
+                            user = await User.findOneAndUpdate(
+                                { googleID: googleProfile.id },
+                                { newsletterAccepted: true },
                             );
                         }
                         cb(undefined, user);
