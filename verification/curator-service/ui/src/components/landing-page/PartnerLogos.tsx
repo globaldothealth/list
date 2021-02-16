@@ -7,7 +7,7 @@ import bch from '../assets/partner-logos/bch.png';
 import georgetown from '../assets/partner-logos/georgetown.png';
 import hopkins from '../assets/partner-logos/hopkins.png';
 import harvard from '../assets/partner-logos/harvard.png';
-import ihme from '../assets/partner-logos/ihme.png';
+import washington from '../assets/partner-logos/washington.png';
 import northeastern from '../assets/partner-logos/northeastern.png';
 import oxford from '../assets/partner-logos/oxford.png';
 
@@ -50,10 +50,10 @@ export default function PartnerLogos(): JSX.Element {
         bch,
         georgetown,
         harvard,
-        ihme,
         hopkins,
         northeastern,
         oxford,
+        washington,
     ];
 
     const fundingLogos = [google, oxfordMartin, rockefeller];
