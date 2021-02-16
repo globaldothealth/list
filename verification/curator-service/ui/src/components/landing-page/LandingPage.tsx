@@ -103,6 +103,9 @@ export default function LandingPage({
     const [isAgreementMessage, setIsAgreementMessage] = useState<boolean>(
         false,
     );
+    const [isNewsletterChecked, setIsNewsletterChecked] = useState<boolean>(
+        false,
+    );
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [codeSent, setCodeSent] = useState<boolean>(false);
     const [failedAttempts, setFailedAttempts] = useState<number>(0);
@@ -149,6 +152,7 @@ export default function LandingPage({
                         name: undefined,
                         email: user.attributes.email,
                         roles: [],
+                        newsletter: isNewsletterChecked,
                     })
                     .then((res) => {
                         const { _id, email, name, roles, picture } = res.data;
@@ -186,6 +190,7 @@ export default function LandingPage({
                 setIsSubmitting(false);
                 break;
         }
+        // eslint-disable-next-line
     }, [authState, failedAttempts, setUser]);
 
     useEffect(() => {
@@ -349,7 +354,8 @@ export default function LandingPage({
                         if (!isAgreementChecked) {
                             setIsAgreementMessage(true);
                         } else {
-                            window.location.href = process.env.REACT_APP_LOGIN_URL!;
+                            window.location.href = `${process.env
+                                .REACT_APP_LOGIN_URL!}?newsletterAccepted=${isNewsletterChecked}`;
                         }
                     }}
                 />
@@ -369,6 +375,8 @@ export default function LandingPage({
                     setIsAgreementMessage={setIsAgreementMessage}
                     isAgreementMessage={isAgreementMessage}
                     isSubmitting={isSubmitting}
+                    isNewsletterChecked={isNewsletterChecked}
+                    setIsNewsletterChecked={setIsNewsletterChecked}
                     classes={{
                         emailField: classes.emailField,
                         divider: classes.divider,
