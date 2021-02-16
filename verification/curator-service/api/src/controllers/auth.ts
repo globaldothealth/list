@@ -14,7 +14,7 @@ import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
-import AWS from 'aws-sdk';
+import SES from 'aws-sdk/clients/ses';
 
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
@@ -110,7 +110,7 @@ export class AuthController {
     public router: Router;
     constructor(
         private readonly afterLoginRedirURL: string,
-        private readonly sesClient: AWS.SES,
+        private readonly sesClient: SES,
         private readonly senderEmail: string,
     ) {
         this.router = Router();
