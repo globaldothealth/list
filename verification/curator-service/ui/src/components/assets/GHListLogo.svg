@@ -3,10 +3,15 @@
 <svg version="1.1" id="ghdata_logo" width="140" height="40" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 4324.1 1211" style="enable-background:new 0 0 4324.1 1211;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#221F1F;}
-	.st1{fill:#0E766A;}
+	.st0{fill:#221F1F; pointer-events: bounding-box;}
+	.st1{fill:#0E766A; pointer-events: bounding-box;}
 	.st2{fill:none;stroke:#010101;stroke-width:6;stroke-miterlimit:10;}
 </style>
+ <a
+                                href="https://test-globalhealth.pantheonsite.io/"
+                                data-testid="home-button"
+                                rel="noopener noreferrer"
+>
 <g>
 	<path class="st0" d="M425.4,111.6c91.6,0,156.3,17.2,194.2,51.6c5.9-6.7,11.8-19.9,17.7-42.3h71.4l-34.2,166.3H634
 		c-12.8-47.7-35.3-83.3-71-106.7c-35.8-23.7-78.8-35.6-129.2-35.6c-93.5,0-155.8,47.9-186.7,143.5c-18.7,57.6-23.2,125-13.6,202.3
@@ -22,7 +27,13 @@
 		c0-23.8,18.4-82.7,55.3-176.9c37.7-94.2,56.5-154.8,56.5-181.8c0-51.6-18.8-77.4-56.5-77.4c-40.9,0-85.1,33.2-132.7,99.5
 		C776.5,712.4,729.4,847.5,686.8,1038.2z"/>
 </g>
+</a>
 <line class="st2" x1="1279.9" y1="121.5" x2="1279.9" y2="1051.7"/>
+ <a
+                                href="/"
+                                data-testid="home-button"
+                                rel="noopener noreferrer"
+>
 <g>
 	<g>
 		<path class="st1" d="M1516.5,118.4H1858c96.3,0,178.6,19.7,246.9,59.1c68.3,39.4,120,94.1,155,164.2s52.6,150.2,52.6,240.4
@@ -50,4 +61,5 @@
 			/>
 	</g>
 </g>
+</a>
 </svg>

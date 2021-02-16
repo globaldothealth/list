@@ -498,13 +498,15 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <a
-                            href="https://test-globalhealth.pantheonsite.io/"
-                            data-testid="home-button"
-                            rel="noopener noreferrer"
-                        >
-                            <GHListLogo />
-                        </a>
+
+                        {/* <a
+                                href="https://test-globalhealth.pantheonsite.io/"
+                                data-testid="home-button"
+                                rel="noopener noreferrer"
+                            > */}
+                        <GHListLogo />
+                        {/* </a> */}
+
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
