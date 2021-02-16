@@ -284,6 +284,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                data-testid="profile-menu-dropdown"
             >
                 <Link to="/profile" onClick={handleClose}>
                     <MenuItem>Profile</MenuItem>
@@ -318,6 +319,15 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     onClick={handleClose}
                 >
                     <MenuItem>Data dictionary</MenuItem>
+                </a>
+                <a
+                    className={classes.link}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                    onClick={handleClose}
+                >
+                    <MenuItem>Data acknowledgments</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
@@ -648,6 +658,15 @@ export default function App(): JSX.Element {
                                 data-testid="dictionaryButton"
                             >
                                 Data dictionary
+                            </a>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="acknowledgmentsButton"
+                            >
+                                Data acknowledgments
                             </a>
                             <a
                                 href="https://test-globalhealth.pantheonsite.io/terms-of-use"

@@ -46,6 +46,10 @@ describe('LandingPage', () => {
             'href',
             'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
         );
+        expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/ackowledgement/',
+        );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',
             'https://test-globalhealth.pantheonsite.io/terms-of-use/',

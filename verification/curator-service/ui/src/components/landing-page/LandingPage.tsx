@@ -304,6 +304,15 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
+                                href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Data acknowledgments
+                            </a>
+                        </div>
+                        <div className={classes.link}>
+                            <a
                                 href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
                                 rel="noopener noreferrer"
                                 target="_blank"
