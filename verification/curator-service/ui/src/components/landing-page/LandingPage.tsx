@@ -286,7 +286,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="http://covid-19.global.health/"
+                                href="http://map.covid-19.global.health"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
@@ -300,6 +300,15 @@ export default function LandingPage({
                                 target="_blank"
                             >
                                 Data dictionary
+                            </a>
+                        </div>
+                        <div className={classes.link}>
+                            <a
+                                href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Data acknowledgments
                             </a>
                         </div>
                         <div className={classes.link}>
