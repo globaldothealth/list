@@ -30,7 +30,8 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
-import AWS from 'aws-sdk';
+import S3 from 'aws-sdk/clients/s3';
+import SES from 'aws-sdk/clients/ses';
 
 const app = express();
 
@@ -108,17 +109,6 @@ if (process.env.NODE_ENV === 'production') {
     }
 }
 app.use(session(sess));
-const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
-authController.configurePassport(
-    env.GOOGLE_OAUTH_CLIENT_ID,
-    env.GOOGLE_OAUTH_CLIENT_SECRET,
-);
-if (env.ENABLE_LOCAL_AUTH) {
-    authController.configureLocalAuth();
-}
-app.use(passport.initialize());
-app.use(passport.session());
-app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
@@ -131,7 +121,28 @@ const awsEventsClient = new AwsEventsClient(
     awsLambdaClient,
     env.SERVICE_ENV,
 );
-const s3Client = new AWS.S3({ region: 'us-east-1', signatureVersion: 'v4' });
+const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
+const sesClient = new SES({
+    region: 'us-east-2',
+    apiVersion: '2010-12-01',
+});
+
+// Configure auth controller
+const authController = new AuthController(
+    env.AFTER_LOGIN_REDIRECT_URL,
+    sesClient,
+    env.EMAIL_USER_ADDRESS,
+);
+authController.configurePassport(
+    env.GOOGLE_OAUTH_CLIENT_ID,
+    env.GOOGLE_OAUTH_CLIENT_SECRET,
+);
+if (env.ENABLE_LOCAL_AUTH) {
+    authController.configureLocalAuth();
+}
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/auth', authController.router);
 
 // API validation.
 app.use(
