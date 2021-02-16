@@ -40,11 +40,15 @@ describe('LandingPage', () => {
         expect(tosMessage).toBeInTheDocument();
         expect(screen.getByText('Global.health map')).toHaveAttribute(
             'href',
-            'http://covid-19.global.health/',
+            'http://map.covid-19.global.health',
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
             'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+        );
+        expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
+            'href',
+            'https://test-globalhealth.pantheonsite.io/ackowledgement/',
         );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',
