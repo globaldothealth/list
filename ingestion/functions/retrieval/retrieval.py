@@ -21,7 +21,7 @@ PARSING_DATE_RANGE_FIELD = "parsingDateRange"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 READ_CHUNK_BYTES = 2048
 HEADER_CHUNK_BYTES = 1024 * 1024
-CSV_CHUNK_BYTES = 100 * 1024 * 1024
+CSV_CHUNK_BYTES = 50 * 1024 * 1024
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
