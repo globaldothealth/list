@@ -14,11 +14,11 @@ Globals:
 Parameters:
   SecurityGroupIds:
     Type: CommaDelimitedList
-    Default: sg-0c134fcb2d6886b1c
+    Default: sg-0f3446d2b82eff09a
   SubnetIDs:
     Type: CommaDelimitedList
     Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
-    Default: subnet-90ab5bf6,subnet-9a5fdfd7,subnet-8b872d85,subnet-782bd627,subnet-7594904b,subnet-51748b70
+    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
   EFSpath:
     Type: String
     Default: /mnt/efs
@@ -39,7 +39,7 @@ Resources:
         SecurityGroupIds: !Ref SecurityGroupIds
         SubnetIds: !Ref SubnetIDs
       FileSystemConfigs:
-        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-0f32b66a953e8629c
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
           LocalMountPath: !Ref EFSpath
       # Function's execution role
       Policies:
