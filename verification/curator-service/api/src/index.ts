@@ -30,7 +30,8 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
-import AWS from 'aws-sdk';
+import S3 from 'aws-sdk/clients/s3';
+import SES from 'aws-sdk/clients/ses';
 
 const app = express();
 
@@ -120,8 +121,8 @@ const awsEventsClient = new AwsEventsClient(
     awsLambdaClient,
     env.SERVICE_ENV,
 );
-const s3Client = new AWS.S3({ region: 'us-east-1', signatureVersion: 'v4' });
-const sesClient = new AWS.SES({
+const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
+const sesClient = new SES({
     region: 'us-east-2',
     apiVersion: '2010-12-01',
 });
