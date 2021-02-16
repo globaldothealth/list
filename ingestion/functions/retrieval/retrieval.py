@@ -136,9 +136,8 @@ def retrieve_content_csv(
         Reader = codecs.getreader(detected_enc['encoding'])
 
         if header:
-            header_sample = Reader(bytesio).read(HEADER_CHUNK_BYTES)
-            lines = header_sample.split("\n")
-            if len(lines) == 1:
+            header_sample = bytesio.read(HEADER_CHUNK_BYTES)
+            if b"\n" not in header_sample:
                 # Did not reach newline, which either means
                 #
                 # (a) there is only the header, and the CSV file is empty
@@ -148,8 +147,9 @@ def retrieve_content_csv(
                 # list which will skip uploading to S3 and calling
                 # ingestion.
                 return []
-            csv_header = lines[0] + "\n"
-            bytesio.seek(len(csv_header))  # skip to first line
+            header_offset = header_sample.find(b"\n") + 1
+            csv_header = header_sample[:header_offset].decode(detected_enc["encoding"])
+            bytesio.seek(header_offset)  # skip to first line
 
         text_stream = Reader(bytesio)
         content = text_stream.read(chunk_bytes)
