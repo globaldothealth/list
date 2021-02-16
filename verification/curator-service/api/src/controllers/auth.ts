@@ -16,6 +16,9 @@ import { logger } from '../util/logger';
 import passport from 'passport';
 import SES from 'aws-sdk/clients/ses';
 
+// Global variable for newsletter acceptance
+let isNewsletterAccepted: boolean;
+
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
  * Subsequent request handlers can be assured req.user will be defined.
@@ -121,7 +124,6 @@ export class AuthController {
             // This 'google' string is hardcoded within passport.
             passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
-                // User has successfully logged-in.
                 res.redirect(this.afterLoginRedirURL);
             },
         );
@@ -135,6 +137,14 @@ export class AuthController {
         // This will redirect the browser to the OAuth consent screen.
         this.router.get(
             '/google',
+            (req: Request, res: Response, next) => {
+                if (req.query.newsletterAccepted) {
+                    isNewsletterAccepted =
+                        req.query.newsletterAccepted === 'true' ? true : false;
+                }
+
+                return next();
+            },
             passport.authenticate('google', {
                 scope: ['email'],
                 prompt: 'select_account',
@@ -152,9 +162,21 @@ export class AuthController {
         this.router.post(
             '/signup',
             async (req: Request, res: Response): Promise<void> => {
-                const user = await User.findOne({
+                let user = await User.findOne({
                     email: req.body.email,
                 }).exec();
+
+                // Update newsletter preferences
+                if (
+                    user &&
+                    user.newsletterAccepted === false &&
+                    req.body.newsletter
+                ) {
+                    user = await User.findOneAndUpdate(
+                        { email: req.body.email },
+                        { newsletterAccepted: req.body.newsletter },
+                    );
+                }
 
                 if (user) {
                     req.login(user, (err: Error) => {
@@ -171,6 +193,7 @@ export class AuthController {
                         email: req.body.email,
                         googleID: '42',
                         roles: req.body.roles,
+                        newsletterAccepted: req.body.newsletter || false,
                     });
 
                     try {
@@ -319,6 +342,7 @@ export class AuthController {
                                 )[0],
                                 roles: [],
                                 picture: picture,
+                                newsletterAccepted: isNewsletterAccepted,
                             });
 
                             try {
@@ -336,6 +360,18 @@ export class AuthController {
                             user = await User.findOneAndUpdate(
                                 { googleID: googleProfile.id },
                                 { picture: picture },
+                            );
+                        }
+
+                        if (
+                            user &&
+                            !user.newsletterAccepted &&
+                            isNewsletterAccepted
+                        ) {
+                            logger.info('Updating newsletter preferences');
+                            user = await User.findOneAndUpdate(
+                                { googleID: googleProfile.id },
+                                { newsletterAccepted: true },
                             );
                         }
                         cb(undefined, user);

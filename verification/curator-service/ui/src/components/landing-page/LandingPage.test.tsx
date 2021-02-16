@@ -28,7 +28,7 @@ describe('LandingPage', () => {
         const tosMessage = screen.getByText((content, node) => {
             const hasText = (node: Node) =>
                 node.textContent ===
-                'By creating an account, I accept the Global.health Terms of Use and Privacy Policy, and agree to be added to the newsletter';
+                'By creating an account, I accept the Global.health Terms of Use and Privacy Policy *';
             const nodeHasText = hasText(node);
             const childrenDontHaveText = Array.from(node.children).every(
                 (child) => !hasText(child),
