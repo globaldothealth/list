@@ -52,6 +52,7 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
 
 
 def lambda_handler(event, context):
+    print("Let's export some data")
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     skip, limit, num_cases, num_chunk, num_chunks, field_names = extract_event_fields(
         event

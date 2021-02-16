@@ -183,4 +183,7 @@ def lambda_handler(event, context):
     print("Uploading chunk...")
     upload_processed_chunk(processed_chunk)
     print("Chunk uploaded!")
+    print("Cleaning up...")
+    os.remove(chunk)
+    os.remove(processed_chunk)
     print("Job complete.")
