@@ -286,7 +286,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="http://covid-19.global.health/"
+                                href="http://map.covid-19.global.health"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

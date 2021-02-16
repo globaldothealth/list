@@ -40,7 +40,7 @@ describe('LandingPage', () => {
         expect(tosMessage).toBeInTheDocument();
         expect(screen.getByText('Global.health map')).toHaveAttribute(
             'href',
-            'http://covid-19.global.health/',
+            'http://map.covid-19.global.health',
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
