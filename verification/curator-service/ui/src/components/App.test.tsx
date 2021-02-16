@@ -107,7 +107,7 @@ it('navigates to the home screen (charts) after clicking on home button', async 
 
     expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
 
-    fireEvent.click(await findByTestId('home-button'));
+    fireEvent.click(await findByTestId('home-button-data'));
 
     wait(() => {
         expect(getByText('Cumulative')).toBeInTheDocument();

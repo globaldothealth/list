@@ -9,7 +9,7 @@
 </style>
  <a
                                 href="https://test-globalhealth.pantheonsite.io/"
-                                data-testid="home-button"
+                                data-testid="home-button-gh"
                                 rel="noopener noreferrer"
 >
 <g>
@@ -31,7 +31,7 @@
 <line class="st2" x1="1279.9" y1="121.5" x2="1279.9" y2="1051.7"/>
  <a
                                 href="/"
-                                data-testid="home-button"
+                                data-testid="home-button-data"
                                 rel="noopener noreferrer"
 >
 <g>
