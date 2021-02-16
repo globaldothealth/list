@@ -31,7 +31,7 @@ import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
-import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
+import GHListLogo from './GHListLogo';
 import HomeIcon from '@material-ui/icons/Home';
 import LandingPage from './landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
@@ -498,15 +498,7 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-
-                        {/* <a
-                                href="https://test-globalhealth.pantheonsite.io/"
-                                data-testid="home-button"
-                                rel="noopener noreferrer"
-                            > */}
                         <GHListLogo />
-                        {/* </a> */}
-
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
