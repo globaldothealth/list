@@ -309,7 +309,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <MenuItem>Global.Health</MenuItem>
+                    <MenuItem>About Global.Health</MenuItem>
                 </a>
                 <a
                     className={classes.link}
