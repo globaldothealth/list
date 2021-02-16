@@ -130,7 +130,7 @@ describe('<App />', () => {
 
         expect(await findByText('COVID-19 Linelist')).toBeInTheDocument();
 
-        fireEvent.click(await findByTestId('home-button'));
+        fireEvent.click(await findByTestId('home-button-data'));
 
         wait(() => {
             expect(getByText('Cumulative')).toBeInTheDocument();

@@ -200,13 +200,23 @@ describe('App', function () {
         );
     });
 
-    it('The logo links to the marketing website', function () {
+    it('The logo GH part links to the marketing website', function () {
         cy.login();
         cy.visit('/cases');
         cy.contains('Line list');
 
-        cy.get('a[data-testid="home-button"')
+        cy.get('a[data-testid="home-button-gh"')
             .should('have.attr', 'href')
             .and('equal', 'https://test-globalhealth.pantheonsite.io/');
+    });
+
+    it('The logo DATA part links to the data home', function () {
+        cy.login();
+        cy.visit('/cases');
+        cy.contains('Line list');
+
+        cy.get('a[data-testid="home-button-data"')
+            .should('have.attr', 'href')
+            .and('equal', '/');
     });
 });
