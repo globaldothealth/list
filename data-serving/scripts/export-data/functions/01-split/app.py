@@ -9,6 +9,7 @@ import pymongo
 username = os.environ.get("MONGO_USERNAME")
 password = os.environ.get("MONGO_PASSWORD")
 export_arn = os.environ.get("EXPORT_FUNCTION")
+limit = int(os.environ.get("CHUNK_SIZE"))
 
 
 uri = f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19?retryWrites=true&w=majority"
@@ -48,7 +49,6 @@ def lambda_handler(event, context):
     print(f"There are {num_cases} total cases.")
     with open("fields.txt", "r") as f:
         field_names = ",".join(f.read().split("\n"))
-    limit = int(100000)
     num_chunks = num_cases // limit
     print(
         f"Using a size of {limit} cases, there are {num_chunks} chunks to export.")
