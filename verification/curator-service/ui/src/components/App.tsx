@@ -525,7 +525,6 @@ export default function App(): JSX.Element {
                                 <div className={classes.searchBar}>
                                     <SearchBar
                                         search={search}
-                                        setSearch={setSearch}
                                         onSearchChange={(
                                             searchInput: string,
                                         ): void => {

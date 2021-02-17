@@ -67,14 +67,12 @@ interface SearchBarProps {
     onSearchChange: (search: string) => void;
     rootComponentRef: React.RefObject<HTMLDivElement>;
     search: string;
-    setSearch: (value: string) => void;
 }
 
 export default function SearchBar({
     onSearchChange,
     rootComponentRef,
     search,
-    setSearch,
 }: SearchBarProps): JSX.Element {
     const classes = searchBarStyles();
 
@@ -112,7 +110,12 @@ export default function SearchBar({
     };
 
     const clickItem = (text: string): void => {
-        setSearchInput(searchInput + (searchInput ? ` ${text}:` : `${text}:`));
+        if (!searchInput.includes(text)) {
+            setSearchInput(
+                searchInput + (searchInput ? ` ${text}:` : `${text}:`),
+            );
+        }
+
         handleFilterClose();
     };
 
