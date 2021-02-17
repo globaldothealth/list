@@ -59,6 +59,7 @@ import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
 import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../hooks/useCookieBanner';
+import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
 
 const theme = createMuiTheme({
     palette: {
@@ -368,11 +369,13 @@ export default function App(): JSX.Element {
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
-    const [searchQuery, setSearchQuery] = React.useState<string>('');
     const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const [search, setSearch] = React.useState<string>(
+        URLToSearchQuery(location.search),
+    );
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -388,7 +391,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', search: searchQuery },
+                  to: { pathname: '/cases', search: '' },
                   displayCheck: (): boolean => true,
               },
               {
@@ -411,6 +414,17 @@ export default function App(): JSX.Element {
               },
           ]
         : [];
+
+    // Update search whenever location search changes
+    useEffect(() => {
+        const searchString = URLToSearchQuery(location.search);
+        if (searchString === search || location.pathname !== '/cases') return;
+
+        console.log('update: ', searchString);
+
+        setSearch(searchString);
+        //eslint-disable-next-line
+    }, [location.search]);
 
     useEffect(() => {
         const menuIndex = menuList.findIndex((menuItem) => {
@@ -466,6 +480,7 @@ export default function App(): JSX.Element {
             history.goBack();
         } else {
             history.push('/cases');
+            // @TODO
         }
     };
 
@@ -481,9 +496,9 @@ export default function App(): JSX.Element {
     }, [user]);
 
     useEffect(() => {
-        if (savedSearchQuery === null) return;
+        if (savedSearchQuery === null || savedSearchQuery === '') return;
 
-        setSearchQuery(savedSearchQuery);
+        setSearch(URLToSearchQuery(savedSearchQuery));
     }, [savedSearchQuery]);
 
     return (
@@ -513,10 +528,15 @@ export default function App(): JSX.Element {
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        onSearchChange={(searchQuery): void => {
+                                        search={search}
+                                        onSearchChange={(
+                                            searchInput: string,
+                                        ): void => {
                                             history.push({
                                                 pathname: '/cases',
-                                                search: searchQuery,
+                                                search: searchQueryToURL(
+                                                    searchInput,
+                                                ),
                                             });
                                         }}
                                         rootComponentRef={rootRef}
@@ -709,6 +729,8 @@ export default function App(): JSX.Element {
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
+                                    setSearch={setSearch}
+                                    search={search}
                                 />
                             </Route>
                         )}
@@ -797,13 +819,13 @@ export default function App(): JSX.Element {
                         </Route>
                         <Route exact path="/">
                             {hasAnyRole(['curator', 'admin']) &&
-                            searchQuery === '' ? (
+                            search === '' ? (
                                 <Charts />
                             ) : user ? (
                                 <Redirect
                                     to={{
                                         pathname: '/cases',
-                                        search: searchQuery,
+                                        search: searchQueryToURL(search),
                                     }}
                                 />
                             ) : isLoadingUser ? (
