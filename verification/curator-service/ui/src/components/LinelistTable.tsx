@@ -639,7 +639,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
-    handleAddFilterClick(e: any, filter: any) {
+    handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
         // Avoids duplicated search parameters
         if (this.props.search.includes(filter)) return;
