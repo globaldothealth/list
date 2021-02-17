@@ -25,6 +25,8 @@ afterEach(() => {
     mockedAxios.put.mockClear();
 });
 
+const setSearch = jest.fn();
+
 it('loads and displays cases', async () => {
     const cases = [
         {
@@ -105,7 +107,8 @@ it('loads and displays cases', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
@@ -174,7 +177,8 @@ it('API errors are displayed', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
@@ -242,7 +246,8 @@ it('can delete a row', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
@@ -336,7 +341,8 @@ it('can cancel delete action', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
@@ -410,7 +416,8 @@ it('cannot edit data if not curator', async () => {
                     roles: [],
                 }}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
@@ -471,7 +478,8 @@ it('initializes with correct page and page size values', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={1}
                 pageSize={10}
                 onChangePage={jest.fn()}
@@ -535,7 +543,8 @@ it('paginates through data', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
                 page={0}
                 pageSize={10}
                 onChangePage={changePage}
