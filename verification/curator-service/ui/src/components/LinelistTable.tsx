@@ -43,7 +43,7 @@ import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
-import isEqual from 'lodash/isEqual';
+
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -114,7 +114,7 @@ interface Props
     onChangePageSize: (pageSize: number) => void;
 
     setSearch: (value: string) => void;
-    search: any;
+    search: string;
 }
 
 const styles = (theme: Theme) =>
@@ -435,7 +435,7 @@ export function DownloadButton(): JSX.Element {
 interface ColumnHeaderProps {
     theClass: any;
     columnTitle: string;
-    onClickAction: any;
+    onClickAction: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const ColumnHeaderTitle: React.FC<ColumnHeaderProps> = ({
@@ -517,22 +517,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
     componentWillUnmount(): void {
         this.unlisten();
-    }
-
-    shouldComponentUpdate(nextProps: any): boolean {
-        const { page, pageSize, location } = this.props;
-
-        if (!isEqual(nextProps.location, location)) {
-            return true;
-        }
-        if (nextProps.page !== page || nextProps.pageSize !== pageSize) {
-            return true;
-        }
-        if (this.state.error.length) {
-            return true;
-        }
-
-        return false;
     }
 
     async deleteCases(): Promise<void> {
@@ -655,19 +639,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
-    handleAddFilterClick = (e: any, filter: any) => {
+    handleAddFilterClick(e: any, filter: any) {
         e.preventDefault();
-        const searchParameter = filter;
-
         // Avoids duplicated search parameters
-        if (!this.props.search.includes(searchParameter)) {
-            if (this.props.search.length === 0) {
-                this.props.setSearch(this.props.search + searchParameter);
-            } else {
-                this.props.setSearch(this.props.search + ' ' + searchParameter);
-            }
-        }
-    };
+        if (this.props.search.includes(filter)) return;
+
+        this.props.setSearch(
+            this.props.search +
+                (this.props.search ? ` ${filter}:` : `${filter}:`),
+        );
+    }
 
     render(): JSX.Element {
         const { history, classes } = this.props;
@@ -882,12 +863,11 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Case ID"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'caseid:')
-                                    }
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'caseid')}
                                 />
                             ),
-
                             field: 'id',
                             type: 'string',
                         },
@@ -903,9 +883,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 3"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'admin3:')
-                                    }
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin3')}
                                 />
                             ),
                             field: 'adminArea3',
@@ -915,9 +895,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 2"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'admin2:')
-                                    }
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin2')}
                                 />
                             ),
                             field: 'adminArea2',
@@ -927,9 +907,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Admin 1"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'admin1:')
-                                    }
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin1')}
                                 />
                             ),
                             field: 'adminArea1',
@@ -939,11 +919,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Country"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'country:')
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(e, 'country')
                                     }
                                 />
                             ),
+
                             field: 'country',
                         },
                         {
@@ -968,24 +951,28 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Gender"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'gender:')
-                                    }
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'gender')}
                                 />
                             ),
                             field: 'gender',
+                            render: (rowData) => rowData.gender,
                         },
                         {
                             title: (
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Outcome"
-                                    onClickAction={(e: any) =>
-                                        this.handleAddFilterClick(e, 'outcome:')
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(e, 'outcome')
                                     }
                                 />
                             ),
                             field: 'outcome',
+                            render: (rowData) => rowData.outcome,
                         },
                         {
                             title: 'Hospitalization date/period',
@@ -1000,15 +987,18 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 <ColumnHeaderTitle
                                     theClass={classes.centeredContent}
                                     columnTitle="Source URL"
-                                    onClickAction={(e: any) =>
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
                                         this.handleAddFilterClick(
                                             e,
-                                            'sourceurl:',
+                                            'sourceurl',
                                         )
                                     }
                                 />
                             ),
                             field: 'sourceUrl',
+                            render: (rowData) => rowData.sourceUrl,
                         },
                     ]}
                     isLoading={this.state.isLoading}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import {
     Button,
     IconButton,
@@ -17,7 +16,6 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
-import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
 import { useDebounce } from '../hooks/useDebounce';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
@@ -68,7 +66,6 @@ const StyledInputAdornment = withStyles({
 interface SearchBarProps {
     onSearchChange: (search: string) => void;
     rootComponentRef: React.RefObject<HTMLDivElement>;
-    searchQuery: string;
     search: string;
     setSearch: (value: string) => void;
 }
@@ -79,34 +76,30 @@ export default function SearchBar({
     search,
     setSearch,
 }: SearchBarProps): JSX.Element {
-    const location = useLocation();
     const classes = searchBarStyles();
 
     const [isUserTyping, setIsUserTyping] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isSearchGuideOpen, setIsSearchGuideOpen] = useState<boolean>(false);
+    const [searchInput, setSearchInput] = useState<string>(search);
 
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
     // Set search query debounce to 1000ms
-    const debouncedSearch = useDebounce(search, 1000);
+    const debouncedSearch = useDebounce(searchInput, 1000);
+
+    useEffect(() => {
+        setSearchInput(search);
+    }, [search]);
 
     // Apply filter parameters after delay
     useEffect(() => {
         if (!isUserTyping) return;
 
-        onSearchChange(searchQueryToURL(debouncedSearch));
+        onSearchChange(debouncedSearch);
         setIsUserTyping(false);
         //eslint-disable-next-line
     }, [debouncedSearch]);
-
-    useEffect(() => {
-        const searchString = URLToSearchQuery(location.search);
-        if (searchString === search) return;
-
-        setSearch(searchString);
-        //eslint-disable-next-line
-    }, [location.search]);
 
     const handleFilterClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -119,7 +112,7 @@ export default function SearchBar({
     };
 
     const clickItem = (text: string): void => {
-        setSearch(search + (search ? ` ${text}:` : `${text}:`));
+        setSearchInput(searchInput + (searchInput ? ` ${text}:` : `${text}:`));
         handleFilterClose();
     };
 
@@ -130,7 +123,7 @@ export default function SearchBar({
     const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
         if (ev.key === 'Enter') {
             ev.preventDefault();
-            onSearchChange(searchQueryToURL(search));
+            onSearchChange(searchInput);
             setIsUserTyping(false);
         }
     };
@@ -141,7 +134,7 @@ export default function SearchBar({
                 id="search-field"
                 onKeyPress={handleKeyPress}
                 onChange={(event): void => {
-                    setSearch(event.target.value);
+                    setSearchInput(event.target.value);
                 }}
                 onKeyDown={() => {
                     if (!isUserTyping) {
@@ -149,7 +142,7 @@ export default function SearchBar({
                     }
                 }}
                 placeholder="Search"
-                value={search}
+                value={searchInput}
                 variant="outlined"
                 fullWidth
                 InputProps={{
@@ -191,12 +184,12 @@ export default function SearchBar({
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
-                            {search && (
+                            {searchInput && (
                                 <IconButton
                                     color="primary"
                                     aria-label="clear search"
                                     onClick={(): void => {
-                                        setSearch('');
+                                        setSearchInput('');
                                         onSearchChange('');
                                     }}
                                 >
