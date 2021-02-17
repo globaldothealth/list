@@ -17,7 +17,7 @@ except ImportError:
 
 _AGE = "age_group"
 _GENDER = "sex"
-_ETHNICITY = "Race and ethnicity (combined)"
+_ETHNICITY = "race_ethnicity_combined"
 _DATE_CONFIRMED = "cdc_report_dt"
 _DATE_SYMPTOMS = "onset_dt"
 _COMORBIDITIES = "medcond_yn"
