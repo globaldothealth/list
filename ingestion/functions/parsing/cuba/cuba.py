@@ -60,14 +60,14 @@ def convert_nationality(two_letter_country_code):
             pass
 
 
-def convert_demographics(raw_entry,case_keys):
+def convert_demographics(raw_entry, case_keys):
     demo = {}
     if 'edad' in case_keys and raw_entry['edad']:
-            demo["ageRange"] = {
-                "start": float(
-                    raw_entry["edad"]),
-                "end": float(
-                    raw_entry["edad"])}
+        demo["ageRange"] = {
+            "start": float(
+                raw_entry["edad"]),
+            "end": float(
+                raw_entry["edad"])}
     if 'sexo' in case_keys and raw_entry['sexo']:
         demo["gender"] = convert_gender(
             raw_entry["sexo"])
@@ -101,11 +101,12 @@ def parse_cases(raw_data_file, source_id, source_url):
             for centre in json_data[centre_type]:
                 hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
                     ", " + json_data[centre_type][centre]['provincia']
-                
+
         # Get schema_version
         schema_version = json_data['schema-version']
         if schema_version != 7:
-            print(f'Schema version has been updated from 7 to {schema_version}')
+            print(
+                f'Schema version has been updated from 7 to {schema_version}')
 
         for day in json_data['casos']['dias']:
             if 'diagnosticados' in json_data['casos']['dias'][day]:
@@ -127,7 +128,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                                         "start": convert_date(fecha),
                                         "end": convert_date(fecha)}}]}
 
-                        case["demographics"] = convert_demographics(entry,case_keys)
+                        case["demographics"] = convert_demographics(
+                            entry, case_keys)
 
                         if entry.get("consulta_medico", ""):
                             case["events"].append({
@@ -138,10 +140,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                                 }}
                             )
 
-
                         if entry.get('posible_procedencia_contagio', ""):
                             if 'crucero' in entry['posible_procedencia_contagio']:
-                                case["transmission"] = {"places": "Cruise Ship"}
+                                case["transmission"] = {
+                                    "places": "Cruise Ship"}
 
                             elif len(entry['posible_procedencia_contagio'][0]) == 2:
                                 for two_letter_country_code in entry['posible_procedencia_contagio']:
@@ -160,7 +162,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                                                     }]
                                             }
 
-                                            if entry.get('arribo_a_cuba_foco', ""):
+                                            if entry.get(
+                                                    'arribo_a_cuba_foco', ""):
                                                 notes.append(
                                                     f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'])}")
 
@@ -195,8 +198,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                         case["notes"] = ",".join(notes)
 
                         yield case
-                
-
 
 
 def lambda_handler(event, context):
