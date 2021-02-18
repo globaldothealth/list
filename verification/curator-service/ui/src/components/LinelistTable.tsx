@@ -23,6 +23,7 @@ import {
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
+import Chip from '@material-ui/core/Chip';
 
 import { Case, VerificationStatus } from './Case';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -43,6 +44,7 @@ import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
+import { ChipData } from './App';
 
 interface ListResponse {
     cases: Case[];
@@ -115,6 +117,8 @@ interface Props
 
     setSearch: (value: string) => void;
     search: string;
+    filterBreadcrumbs: ChipData[];
+    handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -156,6 +160,9 @@ const styles = (theme: Theme) =>
         },
         toolbarItems: {
             color: theme.palette.background.paper,
+        },
+        breadcrumbChip: {
+            margin: theme.spacing(0.5),
         },
     });
 
@@ -1112,6 +1119,32 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <Typography className={classes.tableTitle}>
                                         COVID-19 Linelist
                                     </Typography>
+
+                                    {this.props.filterBreadcrumbs.length >
+                                        0 && (
+                                        <Chip
+                                            label="Filters"
+                                            color="primary"
+                                            className={classes.breadcrumbChip}
+                                        />
+                                    )}
+                                    {this.props.filterBreadcrumbs.map(
+                                        (breadcrumb) => (
+                                            <Chip
+                                                key={breadcrumb.key}
+                                                label={`${breadcrumb.key} - ${breadcrumb.value}`}
+                                                onDelete={() =>
+                                                    this.props.handleBreadcrumbDelete(
+                                                        breadcrumb,
+                                                    )
+                                                }
+                                                className={
+                                                    classes.breadcrumbChip
+                                                }
+                                            />
+                                        ),
+                                    )}
+
                                     <TablePagination
                                         {...props}
                                         onChangeRowsPerPage={(event): void => {
@@ -1136,7 +1169,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             event,
                                             newPage: number,
                                         ): void => {
-                                            this.setState({ page: newPage });
+                                            this.setState({
+                                                page: newPage,
+                                            });
 
                                             this.props.onChangePage(newPage);
                                             props.onChangePage(event, newPage);
