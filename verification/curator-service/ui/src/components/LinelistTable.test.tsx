@@ -109,10 +109,12 @@ it('loads and displays cases', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -179,10 +181,12 @@ it('API errors are displayed', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -248,10 +252,12 @@ it('can delete a row', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -343,10 +349,12 @@ it('can cancel delete action', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -418,10 +426,12 @@ it('cannot edit data if not curator', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -480,10 +490,12 @@ it('initializes with correct page and page size values', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={1}
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -545,10 +557,12 @@ it('paginates through data', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 search=""
                 setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={10}
                 onChangePage={changePage}
                 onChangePageSize={changePageSize}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
