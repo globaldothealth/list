@@ -22,7 +22,15 @@ class USATest(unittest.TestCase):
                     "sourceId": "abc123",
                     "sourceUrl": "https://data.cdc.gov/api/views/vbim-akqf/rows.csv?accessType=DOWNLOAD",
                 },
-                "location": {"query": "United States"},
+                "location": {
+                    "country": "United States",
+                    "geoResolution": "Point",
+                    "name": "United States",
+                    "geometry": {
+                        "latitude": 37.0902,
+                        "longitude": 95.7129
+                    }
+                },
                 "events": [
                     {
                         "name": "confirmed",
