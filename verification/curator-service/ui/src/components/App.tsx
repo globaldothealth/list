@@ -347,6 +347,11 @@ interface LocationState {
     search: string;
 }
 
+export interface ChipData {
+    key: string;
+    value: string;
+}
+
 export default function App(): JSX.Element {
     const CookieBanner = () => {
         const { initCookieBanner } = useCookieBanner();
@@ -376,6 +381,9 @@ export default function App(): JSX.Element {
     const [search, setSearch] = React.useState<string>(
         URLToSearchQuery(location.search),
     );
+    const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
+        ChipData[]
+    >([]);
     const classes = useStyles();
 
     const savedSearchQuery = localStorage.getItem('searchQuery');
@@ -415,14 +423,26 @@ export default function App(): JSX.Element {
           ]
         : [];
 
-    // Update search whenever location search changes
+    // Update search and filter breadcrumbs whenever location search changes
     useEffect(() => {
         const searchString = URLToSearchQuery(location.search);
         if (searchString === search || location.pathname !== '/cases') return;
 
-        console.log('update: ', searchString);
-
         setSearch(searchString);
+        //eslint-disable-next-line
+    }, [location.search]);
+
+    // Update filter breadcrumbs
+    useEffect(() => {
+        if (location.pathname !== '/cases') return;
+
+        const searchParams = new URLSearchParams(location.search);
+        const tempFilterBreadcrumbs: ChipData[] = [];
+        searchParams.forEach((value, key) => {
+            tempFilterBreadcrumbs.push({ key, value });
+        });
+
+        setFilterBreadcrumbs(tempFilterBreadcrumbs);
         //eslint-disable-next-line
     }, [location.search]);
 
@@ -480,7 +500,6 @@ export default function App(): JSX.Element {
             history.goBack();
         } else {
             history.push('/cases');
-            // @TODO
         }
     };
 
@@ -500,6 +519,22 @@ export default function App(): JSX.Element {
 
         setSearch(URLToSearchQuery(savedSearchQuery));
     }, [savedSearchQuery]);
+
+    // Function for deleting filter breadcrumbs
+    const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
+        setFilterBreadcrumbs((filterBreadcrumbs) =>
+            filterBreadcrumbs.filter(
+                (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
+            ),
+        );
+
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.delete(breadcrumbToDelete.key);
+        history.push({
+            pathname: '/cases',
+            search: searchParams.toString(),
+        });
+    };
 
     return (
         <div className={classes.root} ref={rootRef}>
@@ -731,6 +766,10 @@ export default function App(): JSX.Element {
                                     onChangePageSize={setListPageSize}
                                     setSearch={setSearch}
                                     search={search}
+                                    filterBreadcrumbs={filterBreadcrumbs}
+                                    handleBreadcrumbDelete={
+                                        handleFilterBreadcrumbDelete
+                                    }
                                 />
                             </Route>
                         )}
