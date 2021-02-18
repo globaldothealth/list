@@ -142,7 +142,13 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                         "location": {
-                            "query": "United States"
+                            "country": "United States",
+                            "geoResolution": "Point",
+                            "name": "United States",
+                            "geometry": {
+                                "latitude": 37.0902,
+                                "longitude": 95.7129
+                            }
                         },
                         "events": convert_events(
                             row[_DATE_CONFIRMED],
