@@ -60,18 +60,18 @@ def convert_nationality(two_letter_country_code):
             pass
 
 
-def convert_demographics(raw_entry):
+def convert_demographics(raw_entry,case_keys):
     demo = {}
-    if raw_entry['edad']:
-        demo["ageRange"] = {
-            "start": float(
-                raw_entry["edad"]),
-            "end": float(
-                raw_entry["edad"])}
-    if raw_entry['sexo']:
+    if 'edad' in case_keys and raw_entry['edad']:
+            demo["ageRange"] = {
+                "start": float(
+                    raw_entry["edad"]),
+                "end": float(
+                    raw_entry["edad"])}
+    if 'sexo' in case_keys and raw_entry['sexo']:
         demo["gender"] = convert_gender(
             raw_entry["sexo"])
-    if raw_entry['pais']:
+    if 'pais' in case_keys and raw_entry['pais']:
         demo["nationalities"] = [convert_nationality(raw_entry['pais'])]
 
     return demo or None
@@ -91,10 +91,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     Currently no parsing of symptoms, as field is always left empty - worth rechecking this in future in case this field
     becomes populated. No disease outcome data is provided either.
 
-    Also includes any case-specific notes made.
-
-    Including a note on JSON schema version (currently v7)
-
     """
     with open(raw_data_file, "r") as f:
         json_data = json.load(f)
@@ -103,23 +99,21 @@ def parse_cases(raw_data_file, source_id, source_url):
         hospital_map = {}
         for centre_type in ['centros_aislamiento', 'centros_diagnostico']:
             for centre in json_data[centre_type]:
-                hospital_map[centre] = (
-                    json_data[centre_type][centre]['nombre'] +
-                    ", " +
-                    json_data[centre_type][centre]['provincia'])
-
-        # Get schema_version and print if it changes
+                hospital_map[centre] = json_data[centre_type][centre]['nombre'] + \
+                    ", " + json_data[centre_type][centre]['provincia']
+                
+        # Get schema_version
         schema_version = json_data['schema-version']
         if schema_version != 7:
-            print(
-                f'Schema version has been updated from 7 to {schema_version}')
+            print(f'Schema version has been updated from 7 to {schema_version}')
 
         for day in json_data['casos']['dias']:
             if 'diagnosticados' in json_data['casos']['dias'][day]:
                 fecha = json_data['casos']['dias'][day]['fecha']
                 for entry in json_data['casos']['dias'][day]['diagnosticados']:
-                    if entry['id']:
-                        notes = []
+                    case_keys = entry.keys()
+                    notes = []
+                    if 'id' in entry:
                         case = {
                             "caseReference": {
                                 "sourceId": source_id,
@@ -132,7 +126,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                                     "dateRange": {
                                         "start": convert_date(fecha),
                                         "end": convert_date(fecha)}}]}
-                        case["demographics"] = convert_demographics(entry)
+
+                        case["demographics"] = convert_demographics(entry,case_keys)
 
                         if entry.get("consulta_medico", ""):
                             case["events"].append({
@@ -143,10 +138,10 @@ def parse_cases(raw_data_file, source_id, source_url):
                                 }}
                             )
 
+
                         if entry.get('posible_procedencia_contagio', ""):
                             if 'crucero' in entry['posible_procedencia_contagio']:
-                                case["transmission"] = {
-                                    "places": ["Cruise Ship"]}
+                                case["transmission"] = {"places": "Cruise Ship"}
 
                             elif len(entry['posible_procedencia_contagio'][0]) == 2:
                                 for two_letter_country_code in entry['posible_procedencia_contagio']:
@@ -165,10 +160,9 @@ def parse_cases(raw_data_file, source_id, source_url):
                                                     }]
                                             }
 
-                                            if entry.get(
-                                                    'arribo_a_cuba_foco', ""):
+                                            if entry.get('arribo_a_cuba_foco', ""):
                                                 notes.append(
-                                                    f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'],dataserver=False)}")
+                                                    f"Case arrived in Cuba from {country} on {convert_date(entry['arribo_a_cuba_foco'])}")
 
                         if entry.get('contagio', "") == 'introducido':
                             notes.append(
@@ -192,17 +186,17 @@ def parse_cases(raw_data_file, source_id, source_url):
                             notes.append(
                                 f"A further {entry['contacto_focal']} people who this case was in contact with are being monitored for symptoms")
 
-                        if entry['info']:
+                        if 'info' in case_keys and entry['info']:
                             notes.append(
                                 f"Notes provided are as follows: \n {entry['info']}")
 
-                        if schema_version:
-                            notes.append(
-                                f'Using schema version {schema_version}')
+                        notes.append(f'Using schema version {schema_version}')
 
-                        case["notes"] = ", ".join(notes)
+                        case["notes"] = ",".join(notes)
 
                         yield case
+                
+
 
 
 def lambda_handler(event, context):
