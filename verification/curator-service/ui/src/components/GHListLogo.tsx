@@ -26,7 +26,7 @@ export default function GHListLogo(props: any) {
                 `}
                 </style>
                 <a
-                    href="https://test-globalhealth.pantheonsite.io/"
+                    href="https://global.health/"
                     data-testid="home-button-gh"
                     rel="noopener noreferrer"
                 >
