@@ -182,7 +182,8 @@ export default function SignInForm({
                                 }
                                 label={
                                     <small>
-                                        I agree to be added to newsletter
+                                        I agree to be added to the Global.health
+                                        newsletter
                                     </small>
                                 }
                             />
