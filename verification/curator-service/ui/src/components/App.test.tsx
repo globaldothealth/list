@@ -84,7 +84,7 @@ describe('<App />', () => {
 
         expect(await findByTestId('mapLink')).toHaveAttribute(
             'href',
-            'http://map.covid-19.global.health',
+            'https://map.covid-19.global.health/',
         );
         expect(await findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
@@ -92,15 +92,15 @@ describe('<App />', () => {
         );
         expect(await findByTestId('acknowledgmentsButton')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/ackowledgement/',
+            'https://global.health/ackowledgement/',
         );
         expect(await findByTestId('termsButton')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/terms-of-use',
+            'https://global.health/terms-of-use',
         );
         expect(await findByTestId('privacypolicybutton')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/privacy/',
+            'https://global.health/privacy/',
         );
     });
 

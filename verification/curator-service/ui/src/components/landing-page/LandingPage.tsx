@@ -280,18 +280,17 @@ export default function LandingPage({
                     <div>
                         <Typography>More information</Typography>
                         <div className={classes.link}>
-                            {/* TODO: add in once link is available
-                        <a
-                            href=""
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            Global.health website
-                        </a> */}
+                            <a
+                                href="https://global.health/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Global.health website
+                            </a>
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="http://map.covid-19.global.health"
+                                href="https://map.covid-19.global.health/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
@@ -309,7 +308,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                                href="https://global.health/ackowledgement/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
@@ -318,7 +317,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                                href="https://global.health/terms-of-use/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
@@ -327,7 +326,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                href="https://global.health/privacy/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >
