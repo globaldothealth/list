@@ -13,18 +13,46 @@ __ARRAYS = [
     "transmission.linkedCaseIds",
     "transmission.places",
     "transmission.routes",
-    "genomeSequences",
-    "pathogens"
+    "pathogens",
 ]
 
 __OMIT = [
     "location.query",
     "revisionMetadata.creationMetadata.curator",
     "revisionMetadata.editMetadata.curator",
-    "events"
+    "events",
+    "travelHistory.travel",
+]
+
+__TRAVEL = [
+    "travelHistory.travel.dateRange.end",
+    "travelHistory.travel.dateRange.start",
+    "travelHistory.travel.location.administrativeAreaLevel1",
+    "travelHistory.travel.location.administrativeAreaLevel2",
+    "travelHistory.travel.location.administrativeAreaLevel3",
+    "travelHistory.travel.location.country",
+    "travelHistory.travel.location.geoResolution",
+    "travelHistory.travel.location.geometry.coordinates",
+    "travelHistory.travel.location.name",
+    "travelHistory.travel.location.place",
+    "travelHistory.travel.methods",
+    "travelHistory.travel.purpose",
+]
+
+__GENOME = [
+    "genomeSequences.sampleCollectionDate",
+    "genomeSequences.repositoryUrl",
+    "genomeSequences.sequenceId",
+    "genomeSequences.sequenceName",
+    "genomeSequences.sequenceLength",
+]
+
+__VARIANT = [
+    "variantOfConcern"
 ]
 
 bucket = os.environ.get("EXPORT_BUCKET")
+
 
 def deep_get(dictionary, keys, default=None):
     """
@@ -83,6 +111,66 @@ def convert_string_list(item):
         return item
 
 
+def convert_travel(travel_array):
+    if travel_array == "[]":
+        return {k: None for k in __TRAVEL}
+    try:
+        travel_array = json.loads(travel_array)
+        travel_dict = {}
+        print("Processing travel arrays...")
+        for field in __TRAVEL:
+            if field not in [
+                "travelHistory.travel.dateRange.end",
+                "travelHistory.travel.dateRange.start",
+                "travelHistory.travel.location.geometry.coordinates",
+                "travelHistory.travel.methods",
+            ]:
+                unnest = field[21:]
+                items = [deep_get(x, unnest) for x in travel_array if unnest in x.keys()]
+                if items:
+                    travel_dict[field] = ", ".join(items)
+        print("Travel arrays processed!")
+        print("Processing travel dates...")
+        end_dates = [convert_date(deep_get(x, "dateRange.end")) for x in travel_array if "dateRange" in x.keys()]
+        print(end_dates)
+        if end_dates:
+            travel_dict["travelHistory.travel.dateRange.end"] = ", ".join(end_dates)
+        start_dates = [convert_date(deep_get(x, "dateRange.start")) for x in travel_array if "dateRange" in x.keys()]
+        if start_dates:
+            travel_dict["travelHistory.travel.dateRange.start"] = ", ".join(start_dates)
+        print("Travel dates processed!")
+        print("Processing travel methods...")
+        methods = [str(x["methods"]) for x in travel_array if "methods" in x.keys()]
+        methods = [x for x in methods if x != '[]']
+        if methods:
+            travel_dict["travelHistory.travel.methods"] = ", ".join(methods)
+        print("Travel methods processed!")
+        print("Processing coordinates...")
+        try:
+            coordinates = ", ".join(
+                [
+                    str(
+                        (
+                            deep_get(x, "location.geometry.latitude"),
+                            deep_get(x, "location.geometry.longitude"),
+                        )
+                    )
+                    for x in travel_array
+                ]
+            )
+            travel_dict["travelHistory.travel.location.geometry.coordinates"] = coordinates
+        except Exception as e:
+            print("No coordinates found.")
+        print("Coordinates processed!")
+        print(travel_dict)
+        return travel_dict
+    except Exception as e:
+        print("Couldn't convert travel.")
+        print(e)
+        print(travel_array)
+        return {k: None for k in __TRAVEL}
+
+
 def get_fields(infile):
     """
     Add processed event fieldnames to fields.
@@ -105,6 +193,7 @@ def get_fields(infile):
         cols_to_add.append(f"events.{col_name}.date")
 
     fields = headers.union(set(cols_to_add))
+    fields = fields.union(set(__TRAVEL + __GENOME + __VARIANT))
     fields = sorted(list(fields - set(__OMIT)))
     return fields
 
@@ -120,8 +209,7 @@ def process_chunk(infile, outfile=None):
     with open(outfile, "w+") as g:
         with open(infile, "r") as f:
             reader = csv.DictReader(f)
-            writer = csv.DictWriter(
-                g, fieldnames=fields, extrasaction="ignore")
+            writer = csv.DictWriter(g, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
             for row in reader:
                 if "ObjectId" not in row["_id"]:
@@ -133,11 +221,15 @@ def process_chunk(infile, outfile=None):
                         row[arr_field] = convert_string_list(row[arr_field])
                 if row["caseReference.additionalSources"]:
                     row["caseReference.additionalSources"] = convert_addl_sources(
-                        row["caseReference.additionalSources"])
+                        row["caseReference.additionalSources"]
+                    )
                 if row["events"]:
                     for e in json.loads(row["events"]):
                         converted = convert_event(e)
                         row = {**row, **converted}
+                if row['travelHistory.traveledPrior30Days'] == "true":
+                    converted = convert_travel(row['travelHistory.travel'])
+                    row = {**row, **converted}
                 writer.writerow(row)
     print(outfile)
     return outfile
@@ -163,9 +255,7 @@ def upload_processed_chunk(processed_file):
     """
     filename = "/".join(processed_file.split("/")[-2:])
     s3 = boto3.resource("s3")
-    s3.Object(bucket, f"processing/combine/{filename}").upload_file(
-        processed_file
-    )
+    s3.Object(bucket, f"processing/combine/{filename}").upload_file(processed_file)
 
 
 def lambda_handler(event, context):

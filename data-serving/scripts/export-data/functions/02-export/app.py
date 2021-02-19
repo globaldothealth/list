@@ -45,7 +45,7 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
             f'--out="/tmp/{chunk_fn}"',
             "--jsonArray",
             f"--skip={skip}",
-            f"--limit={limit}",
+            f"--limit={limit}"
         ]
     )
     return chunk_fn
