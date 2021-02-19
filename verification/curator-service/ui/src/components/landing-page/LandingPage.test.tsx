@@ -38,9 +38,13 @@ describe('LandingPage', () => {
         });
 
         expect(tosMessage).toBeInTheDocument();
+        expect(screen.getByText('Global.health website')).toHaveAttribute(
+            'href',
+            'https://global.health/',
+        );
         expect(screen.getByText('Global.health map')).toHaveAttribute(
             'href',
-            'http://map.covid-19.global.health',
+            'https://map.covid-19.global.health/',
         );
         expect(screen.getByText('Data dictionary')).toHaveAttribute(
             'href',
@@ -48,15 +52,15 @@ describe('LandingPage', () => {
         );
         expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/ackowledgement/',
+            'https://global.health/ackowledgement/',
         );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/terms-of-use/',
+            'https://global.health/terms-of-use/',
         );
         expect(screen.getByText('Privacy policy')).toHaveAttribute(
             'href',
-            'https://test-globalhealth.pantheonsite.io/privacy/',
+            'https://global.health/privacy/',
         );
 
         const cookiePolicyBtn = screen.getByText(
