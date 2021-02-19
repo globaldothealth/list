@@ -265,9 +265,9 @@ def upload_to_s3(
             api_headers, cookies)
 
 
-def invoke_parser(
-    env, parser_arn, source_id, upload_id, api_headers, cookies, s3_object_key,
-        source_url, date_filter, parsing_date_range):
+def generate_payload(
+    env, source_id, upload_id, s3_object_key, source_url, 
+    date_filter, parsing_date_range):
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -278,6 +278,13 @@ def invoke_parser(
         "dateFilter": date_filter,
         "dateRange": parsing_date_range,
     }
+
+    return payload
+
+def invoke_parser(
+    env, parser_arn, source_id, upload_id, api_headers, cookies, s3_object_key,
+    source_url, date_filter, parsing_date_range):
+    payload = generate_payload(env, source_id, upload_id, s3_object_key, source_url, date_filter, parsing_date_range)
     print(f"Invoking parser (ARN: {parser_arn})")
     # This is asynchronous due to the "Event" invocation type.
     response = lambda_client.invoke(
@@ -398,20 +405,13 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
                      source_id, upload_id, auth_headers, cookies)
     chunk_list = [x[1] for x in file_names_s3_object_keys]
     if parser_arn:
-        s3_object_key = chunk_list[0]
-        chunk_list = chunk_list[1:]
-        payload = invoke_parser(
-            env, parser_arn, source_id, upload_id, auth_headers, cookies,
-            s3_object_key, url, date_filter, parsing_date_range)
-    if not chunk_list:
-        print("Done!")
-    else:
-        event[CHUNK_LIST_FIELD] = chunk_list
-        event[PAYLOAD_FIELD] = payload
-        lambda_client.invoke(
-            FunctionName=RETRIEVAL_ARN,
-            InvocationType='Event',
-            Payload=json.dumps(event))
+        payload = generate_payload(env, source_id, upload_id, s3_object_key, url, date_filter, parsing_date_range)
+    event[CHUNK_LIST_FIELD] = chunk_list
+    event[PAYLOAD_FIELD] = payload
+    lambda_client.invoke(
+        FunctionName=RETRIEVAL_ARN,
+        InvocationType='Event',
+        Payload=json.dumps(event))
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
