@@ -55,10 +55,11 @@ def combine_files(downloaded_files):
     return combined_file
 
 
-def compress_file(output_file):
-    compressed_file = "/mnt/efs/out/latestdata.tar.gz"
+def compress_file(input_file):
+    compressed_file = "/mnt/efs/latestdata.tar.gz"
     with tarfile.open(compressed_file, "w:gz") as tar:
-        tar.add(output_file, arcname="latestdata.csv")
+        tar.add(input_file, "latestdata.csv")
+        tar.add('data-dictionary.csv', 'data-dictionary.csv')
     return compressed_file
 
 
