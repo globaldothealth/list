@@ -60,6 +60,7 @@ def compress_file(input_file):
     with tarfile.open(compressed_file, "w:gz") as tar:
         tar.add(input_file, f"globaldothealth_{now}.csv")
         tar.add('data_dictionary.csv', 'data_dictionary.csv')
+        tar.add('citation_data.rtf', 'citation_data.rtf')
     return compressed_file
 
 
