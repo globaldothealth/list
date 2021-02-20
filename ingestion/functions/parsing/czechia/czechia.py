@@ -67,15 +67,17 @@ def convert_demographics(gender: str, age: str):
 
 def convert_location(region, district):
     # Both the regions and districts are entered in a slighty altered ISO 3166-2 format, where the '-' is replaced with a '0'
-    region = region.replace("0", "-", 1)
-    district = district.replace("0", "-", 1)
     location = []
-    for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
-        if region_district.code == district:
-            location.append(region_district.name)
-    for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
-        if region_district.code == region:
-            location.append(region_district.name)
+    if district:
+        district = district.replace("0", "-", 1)
+        for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
+            if region_district.code == district:
+                location.append(region_district.name)
+    if region:
+        region = region.replace("0", "-", 1)
+        for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
+            if region_district.code == region:
+                location.append(region_district.name)
     if location:
         location.append("Czech Republic")
         return ", ".join(location)
