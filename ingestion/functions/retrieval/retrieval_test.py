@@ -131,7 +131,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
 
 def test_extract_event_fields_returns_env_source_id_and_date_range(valid_event):
     from retrieval import retrieval
-    env, source_id, date_range, _, _, _ = retrieval.extract_event_fields(valid_event)
+    env, source_id, date_range, _ = retrieval.extract_event_fields(valid_event)
     assert env == valid_event["env"]
     assert source_id == valid_event["sourceId"]
     assert date_range == valid_event["parsingDateRange"]
