@@ -10,8 +10,8 @@ Globals:
       MaximumRetryAttempts: 0
     Environment:
       Variables:
-        MONGO_USERNAME: calremmel
-        MONGO_PASSWORD: vVWD3bTFAXzlkpJ0
+        MONGO_USERNAME: XXXXX
+        MONGO_PASSWORD: XXXXX
 
 Parameters:
   SecurityGroupIds:

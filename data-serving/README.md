@@ -58,10 +58,7 @@ however, this is likely to be disabled and future imports will be done selective
 
 ### Exporting data
 
-To provide collaborators with easy access to the G.h data, as of writing, we have a
-[daily Github workflow](https://github.com/globaldothealth/list/blob/main/.github/workflows/case-data-export-prod.yml)
-that invokes [a script](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data) to export
-the prod data in (a gzip of) CSV and JSON formats.
+We provide a flattened version of the complete dataset accessible through the Data page, refreshed on a nightly basis and stored on S3. [The scripts that orchestrate this](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data) are organized using AWS SAM, and export the dataset in chunks in parallel, parse them, recombine them and then compress and upload the result along with a data dictionary.
 
 ### Updating the case schema
 #### What needs to be changed & where
