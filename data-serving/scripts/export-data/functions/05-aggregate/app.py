@@ -70,12 +70,13 @@ def get_jhu_counts():
     """
 
     now = datetime.datetime.now().strftime("%m-%d-%Y")
+    date = datetime.datetime.now()
     url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
     req = requests.head(url, timeout=10)
 
     while req.status_code != 200:
         print("Got status " + str(req.status_code) + " for '" + url + "'")
-        date = datetime.datetime.now() - datetime.timedelta(days=1)
+        date = date - datetime.timedelta(days=1)
         now = date.strftime("%m-%d-%Y")
         print(f"Checking for JHU data on {now}")
         url = f"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/{now}.csv"
@@ -144,7 +145,7 @@ def generate_country_json():
     records = [record for record in records if record["_id"] not in _EXCLUDE]
 
     jhu_counts = get_jhu_counts()
-    with open ('variants.json') as v:
+    with open("variants.json") as v:
         variant_counts = json.load(v)
     country_codes = get_country_codes()
 
@@ -241,7 +242,7 @@ def generate_total_json():
 
     count = cases.count_documents({})
 
-    with open ('variants.json') as v:
+    with open("variants.json") as v:
         variant_counts = json.load(v)
 
     total_p1 = 0
@@ -249,12 +250,12 @@ def generate_total_json():
     for record in variant_counts.values():
         total_p1 += record["casecount_p1"]
         total_b1351 += record["casecount_b1351"]
-    
+
     record = {
         "total": int(count),
         "total_p1": int(total_p1),
-        "total_b1351": int(total_b1351)
-        }
+        "total_b1351": int(total_b1351),
+    }
 
     s3 = boto3.client("s3")
     s3.put_object(

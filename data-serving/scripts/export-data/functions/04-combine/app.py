@@ -6,7 +6,6 @@ import shutil
 
 import boto3
 
-# hi
 def all_files_processed(bucket, folder, full_path):
     number_of_parts = int((full_path.split("-of-")[1]).split("_")[0])
 
@@ -56,10 +55,11 @@ def combine_files(downloaded_files):
 
 
 def compress_file(input_file):
+    now = datetime.datetime.now().strftime("%m-%d-%Y")
     compressed_file = "/mnt/efs/latestdata.tar.gz"
     with tarfile.open(compressed_file, "w:gz") as tar:
-        tar.add(input_file, "latestdata.csv")
-        tar.add('data-dictionary.csv', 'data-dictionary.csv')
+        tar.add(input_file, f"globaldothealth_{now}.csv")
+        tar.add('data_dictionary.csv', 'data_dictionary.csv')
     return compressed_file
 
 
