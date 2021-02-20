@@ -19,14 +19,11 @@ ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
 PARSING_DATE_RANGE_FIELD = "parsingDateRange"
-CHUNK_LIST_FIELD = "chunkList"
-PAYLOAD_FIELD = "payload"
 TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 READ_CHUNK_BYTES = 2048
 HEADER_CHUNK_BYTES = 1024 * 1024
 CSV_CHUNK_BYTES = 2 * 1024 * 1024
 LAMBDA_MAX_TIME = 900  # 15 minutes
-RETRIEVAL_ARN = "arn:aws:lambda:us-east-1:612888738066:function:epid-ingestion-RetrievalFunction-1CEVOE6F2OOIV"
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
@@ -56,7 +53,7 @@ def extract_event_fields(event):
         raise ValueError(error_message)
     return event[ENV_FIELD], event[SOURCE_ID_FIELD], event.get(
         PARSING_DATE_RANGE_FIELD), event.get(
-        'auth', {}), event.get(CHUNK_LIST_FIELD), event.get(PAYLOAD_FIELD)
+        'auth', {})
 
 
 def get_source_details(env, source_id, upload_id, api_headers, cookies):
@@ -290,7 +287,6 @@ def invoke_parser(
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_headers, cookies)
-    return payload
 
 
 def get_today():
@@ -349,7 +345,8 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_id, parsing_date_range, local_auth, chunk_list, payload = extract_event_fields(
+    start = time.time()
+    env, source_id, parsing_date_range, local_auth = extract_event_fields(
         event)
     auth_headers = None
     cookies = None
@@ -357,35 +354,6 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
         cookies = common_lib.login(local_auth['email'])
     else:
         auth_headers = common_lib.obtain_api_credentials(s3_client)
-    
-    if chunk_list:
-        env = payload["env"]
-        source_id = payload["sourceId"]
-        upload_id = payload["uploadId"]
-        date_filter = payload["dateFilter"]
-        parsing_date_range = payload["dateRange"]
-        url, source_format, parser_arn, _ = get_source_details(
-            env, source_id, upload_id, auth_headers, cookies)
-        url = format_source_url(url)
-        if parser_arn:
-            s3_object_key = chunk_list[0]
-            chunk_list = chunk_list[1:]
-            _ = invoke_parser(
-                env, parser_arn, source_id, upload_id, auth_headers, cookies,
-                s3_object_key, url, date_filter, parsing_date_range)
-        if not chunk_list:
-            print("Done!")
-        else:
-            event[CHUNK_LIST_FIELD] = chunk_list
-            lambda_client.invoke(
-                FunctionName=RETRIEVAL_ARN,
-                InvocationType='Event',
-                Payload=json.dumps(event))
-        return {
-            "bucket": OUTPUT_BUCKET,
-            "key": s3_object_key,
-            "upload_id": upload_id,
-        }
     upload_id = common_lib.create_upload_record(
         env, source_id, auth_headers, cookies)
     url, source_format, parser_arn, date_filter = get_source_details(
@@ -396,11 +364,16 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
     for file_name, s3_object_key in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
+    remaining_time = LAMBDA_MAX_TIME - (time.time() - start)
+    if remaining_time < 0:
+        raise TimeoutError("No time left to invoke parsers")
     if parser_arn:
+        chunk_wait_time = int(remaining_time / len(file_names_s3_object_keys))
         for _, s3_object_key in file_names_s3_object_keys:
             invoke_parser(
                 env, parser_arn, source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
+            time.sleep(chunk_wait_time)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
