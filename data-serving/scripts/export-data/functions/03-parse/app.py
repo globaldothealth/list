@@ -47,9 +47,7 @@ __GENOME = [
     "genomeSequences.sequenceLength",
 ]
 
-__VARIANT = [
-    "variantOfConcern"
-]
+__VARIANT = ["variantOfConcern"]
 
 bucket = os.environ.get("EXPORT_BUCKET")
 
@@ -126,22 +124,32 @@ def convert_travel(travel_array):
                 "travelHistory.travel.methods",
             ]:
                 unnest = field[21:]
-                items = [deep_get(x, unnest) for x in travel_array if unnest in x.keys()]
+                items = [
+                    deep_get(x, unnest) for x in travel_array if unnest in x.keys()
+                ]
                 if items:
                     travel_dict[field] = ", ".join(items)
         print("Travel arrays processed!")
         print("Processing travel dates...")
-        end_dates = [convert_date(deep_get(x, "dateRange.end")) for x in travel_array if "dateRange" in x.keys()]
+        end_dates = [
+            convert_date(deep_get(x, "dateRange.end"))
+            for x in travel_array
+            if "dateRange" in x.keys()
+        ]
         print(end_dates)
         if end_dates:
             travel_dict["travelHistory.travel.dateRange.end"] = ", ".join(end_dates)
-        start_dates = [convert_date(deep_get(x, "dateRange.start")) for x in travel_array if "dateRange" in x.keys()]
+        start_dates = [
+            convert_date(deep_get(x, "dateRange.start"))
+            for x in travel_array
+            if "dateRange" in x.keys()
+        ]
         if start_dates:
             travel_dict["travelHistory.travel.dateRange.start"] = ", ".join(start_dates)
         print("Travel dates processed!")
         print("Processing travel methods...")
         methods = [str(x["methods"]) for x in travel_array if "methods" in x.keys()]
-        methods = [x for x in methods if x != '[]']
+        methods = [x for x in methods if x != "[]"]
         if methods:
             travel_dict["travelHistory.travel.methods"] = ", ".join(methods)
         print("Travel methods processed!")
@@ -158,9 +166,12 @@ def convert_travel(travel_array):
                     for x in travel_array
                 ]
             )
-            travel_dict["travelHistory.travel.location.geometry.coordinates"] = coordinates
+            travel_dict[
+                "travelHistory.travel.location.geometry.coordinates"
+            ] = coordinates
         except Exception as e:
             print("No coordinates found.")
+            print(e)
         print("Coordinates processed!")
         print(travel_dict)
         return travel_dict
@@ -227,9 +238,10 @@ def process_chunk(infile, outfile=None):
                     for e in json.loads(row["events"]):
                         converted = convert_event(e)
                         row = {**row, **converted}
-                if row['travelHistory.traveledPrior30Days'] == "true":
-                    converted = convert_travel(row['travelHistory.travel'])
-                    row = {**row, **converted}
+                if row["travelHistory.traveledPrior30Days"] == "true":
+                    if "travelHistory.travel" in row.keys():
+                        converted = convert_travel(row["travelHistory.travel"])
+                        row = {**row, **converted}
                 writer.writerow(row)
     print(outfile)
     return outfile
