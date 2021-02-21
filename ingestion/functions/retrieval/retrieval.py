@@ -174,7 +174,7 @@ def retrieve_content_csv(
             content = text_stream.read(chunk_bytes)
 
         if unwritten_chunk:
-            with codecs.open(outfile.name, "w", 'utf-8') as outfile:
+            with codecs.open(outfile.name, "a", 'utf-8') as outfile:
                 outfile.write(unwritten_chunk)
 
         return chunk_s3
