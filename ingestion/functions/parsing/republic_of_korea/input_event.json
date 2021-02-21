@@ -1,8 +1,8 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "test/korea_jan5.csv",
+    "s3Key": "test/republic_of_korea/rok_feb21.csv",
     "sourceUrl": "https://raw.githubusercontent.com/ThisIsIsaac/Data-Science-for-COVID-19/master/Covid19_Dataset/patients.csv",
-    "sourceId": "5ffc6a9e7a354a0038b37dfc"
+    "sourceId": "6032763bc73880004393e502"
 }
 
