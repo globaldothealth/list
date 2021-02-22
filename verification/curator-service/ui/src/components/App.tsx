@@ -177,6 +177,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     mapLink: {
         margin: '0 8px 0 16px',
+        whiteSpace: 'nowrap',
     },
     hide: {
         display: 'none',

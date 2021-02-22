@@ -3,6 +3,7 @@ import React from 'react';
 export default function GHListLogo(props: any) {
     const enableBackground = {
         enableBackground: 'new 0 0 4324.1 1211',
+        minWidth: '80px',
     };
     return (
         <>
