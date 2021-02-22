@@ -2,6 +2,7 @@ import React from 'react';
 import { Typography } from '@material-ui/core';
 import { Theme, makeStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import clsx from 'clsx';
 
 import bch from '../assets/partner-logos/bch.png';
 import georgetown from '../assets/partner-logos/georgetown.png';
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     logo: {
         maxWidth: '100px',
         height: 'auto',
+        '&.big': {
+            maxWidth: '120px',
+        },
     },
     title: {
         marginTop: '20px',
@@ -59,7 +63,12 @@ export default function PartnerLogos(): JSX.Element {
     const fundingLogos = [google, oxfordMartin, rockefeller];
 
     const renderedLogos = logos.map((logo, idx) => (
-        <img src={logo} className={classes.logo} key={idx} alt="Partner logo" />
+        <img
+            key={idx}
+            src={logo}
+            className={clsx({ [classes.logo]: true, big: idx === 1 })}
+            alt="Partner logo"
+        />
     ));
 
     const renderedFundingLogos = fundingLogos.map((logo, idx) => (
