@@ -326,7 +326,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
-                    href="https://global.health/ackowledgement/"
+                    href="https://global.health/acknowledgement/"
                     onClick={handleClose}
                 >
                     <MenuItem>Data acknowledgments</MenuItem>
@@ -710,7 +710,7 @@ export default function App(): JSX.Element {
                                 Data dictionary
                             </a>
                             <a
-                                href="https://global.health/ackowledgement/"
+                                href="https://global.health/acknowledgement/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 className={classes.link}
