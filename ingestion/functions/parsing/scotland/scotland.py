@@ -29,7 +29,7 @@ def convert_date(raw_date: str, dataserver=True):
 
 def convert_demographics(entry):
     '''
-    If age is 85plus then give age range 85-120, otherwise extract lower bound and upper bound of age
+    If age is 85plus then give age range 85-120, and if age is 60+ give range 60-120. Otherwise extract lower bound and upper bound of age
     No need for convert_gender function, as string is provided in correct format
     '''
     demo = {}
@@ -38,8 +38,12 @@ def convert_demographics(entry):
             "start": 85.0,
             "end": 120.0
         }
+    if entry['AgeGroup'] == '60+':
+        demo["ageRange"] = {
+            "start": 60.0,
+            "end": 120.0
+        }
     else:
-
         lb, ub = entry['AgeGroup'].split(' to ')
         demo["ageRange"] = {
             "start": float(lb),
