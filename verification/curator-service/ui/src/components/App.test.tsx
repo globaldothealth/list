@@ -92,7 +92,7 @@ describe('<App />', () => {
         );
         expect(await findByTestId('acknowledgmentsButton')).toHaveAttribute(
             'href',
-            'https://global.health/ackowledgement/',
+            'https://global.health/acknowledgement/',
         );
         expect(await findByTestId('termsButton')).toHaveAttribute(
             'href',
