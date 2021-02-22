@@ -178,7 +178,8 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
 
 const StyledDownloadButton = withStyles((theme: Theme) => ({
     root: {
-        minWidth: '160px',
+        whiteSpace: 'nowrap',
+        minWidth: '240px',
     },
 }))(Button);
 
