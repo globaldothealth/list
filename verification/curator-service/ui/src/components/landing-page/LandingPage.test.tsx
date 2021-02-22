@@ -38,6 +38,11 @@ describe('LandingPage', () => {
         });
 
         expect(tosMessage).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                /I agree to be added to the Global.health newsletter/i,
+            ),
+        ).toBeInTheDocument();
         expect(screen.getByText('Global.health website')).toHaveAttribute(
             'href',
             'https://global.health/',
