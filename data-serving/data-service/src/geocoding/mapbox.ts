@@ -121,6 +121,11 @@ export default class MapboxGeocoder {
                     });
                 }
             }
+
+            if (opts?.limitToCountry) {
+                req.countries = opts?.limitToCountry;
+            }
+
             return await new Promise<GeocodeResult[]>((resolve, reject) => {
                 this.limiter.removeTokens(1, async (err, _) => {
                     if (err) {
