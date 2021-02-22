@@ -133,7 +133,7 @@ export default function SignInForm({
                                         By creating an account, I accept the
                                         Global.health{' '}
                                         <a
-                                            href="https://test-globalhealth.pantheonsite.io/terms-of-use/"
+                                            href="https://global.health/terms-of-use/"
                                             rel="noopener noreferrer"
                                             target="_blank"
                                         >
@@ -141,7 +141,7 @@ export default function SignInForm({
                                         </a>{' '}
                                         and{' '}
                                         <a
-                                            href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                            href="https://global.health/privacy/"
                                             rel="noopener noreferrer"
                                             target="_blank"
                                         >

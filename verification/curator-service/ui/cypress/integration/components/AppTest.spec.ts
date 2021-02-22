@@ -173,10 +173,7 @@ describe('App', function () {
         cy.contains('Terms of use');
         cy.get('[data-testid="termsButton"]')
             .should('have.attr', 'href')
-            .and(
-                'equal',
-                'https://test-globalhealth.pantheonsite.io/terms-of-use',
-            );
+            .and('equal', 'https://global.health/terms-of-use');
         cy.get('[data-testid="termsButton"]').should(
             'have.attr',
             'target',
@@ -192,7 +189,7 @@ describe('App', function () {
         cy.contains('Terms of use');
         cy.get('[data-testid="privacypolicybutton"]')
             .should('have.attr', 'href')
-            .and('equal', 'https://test-globalhealth.pantheonsite.io/privacy/');
+            .and('equal', 'https://global.health/privacy/');
         cy.get('[data-testid="privacypolicybutton"]').should(
             'have.attr',
             'target',
@@ -207,7 +204,7 @@ describe('App', function () {
 
         cy.get('a[data-testid="home-button-gh"')
             .should('have.attr', 'href')
-            .and('equal', 'https://test-globalhealth.pantheonsite.io/');
+            .and('equal', 'https://global.health/');
     });
 
     it('The logo DATA part links to the data home', function () {

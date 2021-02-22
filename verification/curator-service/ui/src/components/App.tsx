@@ -177,6 +177,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     mapLink: {
         margin: '0 8px 0 16px',
+        whiteSpace: 'nowrap',
     },
     hide: {
         display: 'none',
@@ -305,12 +306,12 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 </MenuItem>
                 <Divider className={classes.divider} />
                 <a
-                    href="https://test-globalhealth.pantheonsite.io/about/"
+                    href="https://global.health/about/"
                     onClick={handleClose}
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <MenuItem>About Global.Health</MenuItem>
+                    <MenuItem>About Global.health</MenuItem>
                 </a>
                 <a
                     className={classes.link}
@@ -325,7 +326,7 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
-                    href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                    href="https://global.health/ackowledgement/"
                     onClick={handleClose}
                 >
                     <MenuItem>Data acknowledgments</MenuItem>
@@ -588,7 +589,7 @@ export default function App(): JSX.Element {
                                     <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="http://map.covid-19.global.health"
+                                        href="https://map.covid-19.global.health/"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
@@ -709,7 +710,7 @@ export default function App(): JSX.Element {
                                 Data dictionary
                             </a>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/ackowledgement/"
+                                href="https://global.health/ackowledgement/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 className={classes.link}
@@ -718,7 +719,7 @@ export default function App(): JSX.Element {
                                 Data acknowledgments
                             </a>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/terms-of-use"
+                                href="https://global.health/terms-of-use"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 className={classes.link}
@@ -727,7 +728,7 @@ export default function App(): JSX.Element {
                                 Terms of use
                             </a>
                             <a
-                                href="https://test-globalhealth.pantheonsite.io/privacy/"
+                                href="https://global.health/privacy/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 className={classes.link}
