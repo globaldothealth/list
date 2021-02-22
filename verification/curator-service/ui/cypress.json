@@ -3,5 +3,7 @@
     "pluginsFile": "cypress/plugins/index.ts",
     "supportFile": "cypress/support/index.ts",
     "videoCompression": false,
-    "videoUploadOnPasses": false
+    "videoUploadOnPasses": false,
+    "viewportWidth": 1280,
+    "viewportHeight": 1024
 }

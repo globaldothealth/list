@@ -27,12 +27,16 @@ const SearchGuideTestCase = ({ defaultOpen = false }): JSX.Element => {
 it('opens properly after clicking on button', async () => {
     const { getByText, queryByText } = render(<SearchGuideTestCase />);
 
-    expect(queryByText('Search syntax')).not.toBeInTheDocument();
+    expect(
+        queryByText(/Welcome to Global.health Data!/i),
+    ).not.toBeInTheDocument();
 
     fireEvent.click(getByText('Open'));
 
     wait(() => {
-        expect(queryByText('Search syntax')).toBeInTheDocument();
+        expect(
+            queryByText(/Welcome to Global.health Data!/i),
+        ).toBeInTheDocument();
     });
 });
 
@@ -41,11 +45,15 @@ it('closes properly after clicking on close button', async () => {
         <SearchGuideTestCase defaultOpen={true} />,
     );
 
-    expect(await findByText('Search syntax')).toBeInTheDocument();
+    expect(
+        await findByText(/Welcome to Global.health Data!/i),
+    ).toBeInTheDocument();
 
     fireEvent.click(getByTestId('close-search-guide-button'));
 
     wait(() => {
-        expect(queryByText('Search syntax')).not.toBeInTheDocument();
+        expect(
+            queryByText(/Welcome to Global.health Data!/i),
+        ).not.toBeInTheDocument();
     });
 });

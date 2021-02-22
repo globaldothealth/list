@@ -4,7 +4,6 @@ import json
 import mimetypes
 import os
 import sys
-import time
 import tempfile
 import zipfile
 from chardet import detect
@@ -23,7 +22,6 @@ TIME_FILEPART_FORMAT = "/%Y/%m/%d/%H%M/"
 READ_CHUNK_BYTES = 2048
 HEADER_CHUNK_BYTES = 1024 * 1024
 CSV_CHUNK_BYTES = 2 * 1024 * 1024
-LAMBDA_MAX_TIME = 900  # 15 minutes
 
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
@@ -174,7 +172,7 @@ def retrieve_content_csv(
             content = text_stream.read(chunk_bytes)
 
         if unwritten_chunk:
-            with codecs.open(outfile.name, "w", 'utf-8') as outfile:
+            with codecs.open(outfile.name, "a", 'utf-8') as outfile:
                 outfile.write(unwritten_chunk)
 
         return chunk_s3
@@ -345,7 +343,6 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    start = time.time()
     env, source_id, parsing_date_range, local_auth = extract_event_fields(
         event)
     auth_headers = None
@@ -364,16 +361,11 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
     for file_name, s3_object_key in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
-    remaining_time = LAMBDA_MAX_TIME - (time.time() - start)
-    if remaining_time < 0:
-        raise TimeoutError("No time left to invoke parsers")
     if parser_arn:
-        chunk_wait_time = int(remaining_time / len(file_names_s3_object_keys))
         for _, s3_object_key in file_names_s3_object_keys:
             invoke_parser(
                 env, parser_arn, source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
-            time.sleep(chunk_wait_time)
     return {
         "bucket": OUTPUT_BUCKET,
         "key": s3_object_key,
