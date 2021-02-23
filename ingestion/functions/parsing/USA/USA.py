@@ -187,6 +187,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str, last_date: 
 def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = None):
     """Prepares JSON file for import to MongoDB"""
     last_date = last_date or (datetime.now() - timedelta(days=1)).date().isoformat()
+    if last_date:
+        print(f"Will load cases before {last_date}")
     from tqdm import tqdm
     source_id = f"{Path(__file__).stem.lower()}-manual-import"
     case_json = Path('cases.json')
