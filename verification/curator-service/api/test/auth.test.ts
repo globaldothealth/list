@@ -12,7 +12,7 @@ import express from 'express';
 import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
-import MockSES from 'aws-sdk/clients/ses';
+import MockLambdaClient from '../src/clients/aws-lambda-client';
 
 jest.mock('../src/clients/email-client', () => {
     return jest.fn().mockImplementation(() => {
@@ -20,12 +20,10 @@ jest.mock('../src/clients/email-client', () => {
     });
 });
 
-jest.mock('aws-sdk/clients/ses', () => {
-    const mSES = {
-        sendEmail: jest.fn().mockReturnThis(),
-        promise: jest.fn(),
-    };
-    return jest.fn(() => mSES);
+jest.mock('../src/clients/aws-lambda-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: jest.fn().mockResolvedValue({}) };
+    });
 });
 
 jest.mock('axios');
@@ -148,11 +146,10 @@ describe('mustHaveAnyRole', () => {
         // Setup a fake server.
         localApp = express();
         localApp.use(bodyParser.json());
-        const mSES = new MockSES();
+        const mLambdaClient = new MockLambdaClient('', '', '');
         const authController = new AuthController(
             '/redirect-after-login',
-            mSES,
-            'foo@bar.com',
+            mLambdaClient,
         );
         authController.configurePassport('foo', 'bar');
         authController.configureLocalAuth();
