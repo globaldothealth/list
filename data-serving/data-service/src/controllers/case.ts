@@ -683,7 +683,9 @@ export class CasesController {
                 'location.query must be specified to be able to geocode',
             );
         }
+
         const opts: GeocodeOptions = {};
+
         if (location['limitToResolution']) {
             opts.limitToResolution = [];
             location['limitToResolution']
@@ -699,6 +701,13 @@ export class CasesController {
                     opts.limitToResolution?.push(resolution);
                 });
         }
+
+        if (location['limitToCountry']) {
+            opts.limitToCountry = location['limitToCountry']
+                .split(',')
+                .filter((countryCode: string) => countryCode.length === 2);
+        }
+
         for (const geocoder of this.geocoders) {
             const features = await geocoder.geocode(location?.query, opts);
             if (features.length === 0) {
@@ -735,6 +744,25 @@ export class CasesController {
         }
     }
 }
+
+/*
+"location": {
+    "country": "Costa Rica",
+    "administrativeAreaLevel1": "Any province in Costa Rica",
+    "administrativeAreaLevel2": "Any canton in Costa Rica",
+    "administrativeAreaLevel3": "Any district in Costa Rica",
+    "place": "Boston Children's Hospital",
+    "name": "Lyon, Auvergne-Rhône-Alpes, France",
+    "geoResolution": "Point",
+    "geometry": {
+      "latitude": 0,
+      "longitude": 0
+    },
+    "query": "string",
+    "limitToResolution": "string",
+    "limitToCountry": string[]
+  }
+ */
 
 // Returns a mongoose query for all cases matching the given search query.
 // If count is true, it returns a query for the number of cases matching

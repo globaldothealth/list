@@ -32,6 +32,7 @@ export interface GeocodeOptions {
     // If set, will only return features with the given resolutions.
     // Otherwise all available resolutions can be returned.
     limitToResolution?: Resolution[];
+    limitToCountry?: string[];
 }
 
 // A geocoder can geocode queries into places.
