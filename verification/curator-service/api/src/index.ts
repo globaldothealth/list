@@ -31,7 +31,6 @@ import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
 import S3 from 'aws-sdk/clients/s3';
-import SES from 'aws-sdk/clients/ses';
 
 const app = express();
 
@@ -122,16 +121,11 @@ const awsEventsClient = new AwsEventsClient(
     env.SERVICE_ENV,
 );
 const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
-const sesClient = new SES({
-    region: 'us-east-2',
-    apiVersion: '2010-12-01',
-});
 
 // Configure auth controller
 const authController = new AuthController(
     env.AFTER_LOGIN_REDIRECT_URL,
-    sesClient,
-    env.EMAIL_USER_ADDRESS,
+    awsLambdaClient,
 );
 authController.configurePassport(
     env.GOOGLE_OAUTH_CLIENT_ID,
