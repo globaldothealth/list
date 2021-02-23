@@ -24,7 +24,7 @@ class USATest(unittest.TestCase):
                 },
                 "location": {
                     "country": "United States",
-                    "geoResolution": "Point",
+                    "geoResolution": "Country",
                     "name": "United States",
                     "geometry": {
                         "latitude": 37.0902,
