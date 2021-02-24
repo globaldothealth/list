@@ -51,8 +51,8 @@ _CODES_COUNTRY_ADD = {
 
 _EXCLUDE = ["Puerto Rico"]
 
-username = "calremmel"
-password = "vVWD3bTFAXzlkpJ0"
+username = os.environ.get("MONGO_USERNAME")
+password = os.environ.get("MONGO_PASSWORD")
 print("Logging into MongoDB...")
 client = pymongo.MongoClient(
     f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19?retryWrites=true&w=majority"
