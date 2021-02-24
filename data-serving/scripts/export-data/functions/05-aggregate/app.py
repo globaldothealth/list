@@ -2,7 +2,6 @@ import datetime
 import io
 import json
 import re
-import time
 
 import boto3
 import pandas as pd
@@ -54,12 +53,13 @@ _EXCLUDE = ["Puerto Rico"]
 
 username = "calremmel"
 password = "vVWD3bTFAXzlkpJ0"
-
+print("Logging into MongoDB...")
 client = pymongo.MongoClient(
     f"mongodb+srv://{username}:{password}@covid19-map-cluster01.sc7u9.mongodb.net/covid19?retryWrites=true&w=majority"
 )
 db = client.covid19
 cases = db.cases
+print("And we're in!")
 
 
 def get_jhu_counts():
@@ -203,23 +203,60 @@ def generate_region_json():
     now = datetime.datetime.now().strftime("%m-%d-%Y")
     pipeline = [
         {
+            "$project": {
+                "_id": 0,
+                "location.country": 1,
+                "location.administrativeAreaLevel1": 1,
+                "location.administrativeAreaLevel2": 1,
+                "location.administrativeAreaLevel3": 1,
+                "location.geometry.latitude": 1,
+                "location.geometry.longitude": 1,
+            }
+        },
+        {
             "$group": {
-                "_id": "$location.administrativeAreaLevel3",
+                "_id": {
+                    "latitude": "$location.geometry.latitude",
+                    "longitude": "$location.geometry.longitude",
+                },
                 "casecount": {"$sum": 1},
                 "country": {"$first": "$location.country"},
-                "lat": {"$first": "$location.geometry.latitude"},
-                "long": {"$first": "$location.geometry.longitude"},
+                "admin1": {"$first": "$location.administrativeAreaLevel1"},
+                "admin2": {"$first": "$location.administrativeAreaLevel2"},
+                "admin3": {"$first": "$location.administrativeAreaLevel3"},
             }
-        }
+        },
     ]
 
     results = cases.aggregate(pipeline)
-    records = list(results)
+    raw_records = list(results)
     # Set null entries as equal to country
     # This could need more work in case of no admin3 but admin1/2 exists
-    for record in records:
-        if type(record["_id"]) != str:
-            record["_id"] = record["country"]
+    records = []
+    for record in raw_records:
+        if "latitude" in record["_id"].keys():
+            if record["admin3"]:
+                id = record["admin3"]
+                search_term = "admin3"
+            elif record["admin2"]:
+                id = record["admin2"]
+                search_term = "admin2"
+            elif record["admin1"]:
+                id = record["admin1"]
+                search_term = "admin1"
+            else:
+                id = record["country"]
+                search_term = "country"
+            new_record = {
+                "_id": id,
+                "casecount": record["casecount"],
+                "country": record["country"],
+                "lat": record["_id"]["latitude"],
+                "long": record["_id"]["longitude"],
+                "search": search_term
+            }
+            print(new_record)
+            records.append(new_record)
     records = {now: records}
 
     s3 = boto3.client("s3")
@@ -273,6 +310,13 @@ def generate_total_json():
 
 
 def lambda_handler(event, context):
+    print("Generating country json...")
     generate_country_json()
+    print("Country json generated!")
+    print("Generating region json...")
     generate_region_json()
+    print("Region json generated!")
+    print("Generating total json...")
     generate_total_json()
+    print("Total json generated!")
+    print("Done!")
