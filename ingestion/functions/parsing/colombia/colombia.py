@@ -11,8 +11,8 @@ try:
 except ImportError:
     sys.path.append(
         os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            'common/python'))
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir,os.pardir, 'common'))
     import parsing_lib
 
 
@@ -256,5 +256,10 @@ def parse_cases(raw_data_file, source_id, source_url):
             yield case
 
 
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
+def lambda_handler(event):
+    return parsing_lib.run_lambda(event, parse_cases)
+
+if __name__ == "__main__":
+    with open('input_event.json') as f:
+        event = json.load(f)
+        lambda_handler(event)

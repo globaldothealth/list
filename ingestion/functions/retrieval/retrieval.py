@@ -38,6 +38,265 @@ except ImportError:
             os.pardir, 'common'))
     import common_lib
 
+try:
+    import argentina
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/argentina'))
+    import argentina
+
+try:
+    import acre
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_acre'))
+    import acre
+try:
+    import amapa
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_amapa'))
+    import amapa
+try:
+    import ceara
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_ceara'))
+    import ceara
+try:
+    import distrito_federal
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_distrito_federal'))
+    import distrito_federal
+try:
+    import espirito_santo
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_espirito_santo'))
+    import espirito_santo
+try:
+    import goias
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_goias'))
+    import goias
+try:
+    import para
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_para'))
+    import para
+try:
+    import paraiba
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_paraiba'))
+    import paraiba
+try:
+    import rio_de_janeiro
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_rio_de_janeiro'))
+    import rio_de_janeiro
+try:
+    import santa_catarina
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/brazil_santa_catarina'))
+    import santa_catarina
+try:
+    import canada
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/canada'))
+    import canada
+
+try:
+    import zurich
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/ch_zurich'))
+    import zurich
+try:
+    import colombia
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/colombia'))
+    import colombia
+try:
+    import cuba
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/cuba'))
+    import cuba
+try:
+    import czechia
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/czechia'))
+    import czechia
+try:
+    import estonia
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/estonia'))
+    import estonia
+try:
+    import germany
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/germany'))
+    import germany
+try:
+    import hongkong
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/hongkong'))
+    import hongkong
+try:
+    import india
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/india'))
+    import india
+try:
+    import japan
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/japan'))
+    import japan
+try:
+    import mexico
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/mexico'))
+    import mexico
+try:
+    import new_zealand
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/new_zealand'))
+    import new_zealand
+try:
+    import paraguay
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/paraguay'))
+    import paraguay
+try:
+    import republic_of_korea
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/republic_of_korea'))
+    import republic_of_korea
+try:
+    import riograndedosul
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/riograndedosul'))
+    import riograndedosul
+try:
+    import saopaolo
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/saopaolo'))
+    import saopaolo
+try:
+    import scotland
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/scotland'))
+    import scotland
+
+try:
+    import south_africa
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/south_africa'))
+    import south_africa
+try:
+    import taiwan
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/taiwan'))
+    import taiwan
+try:
+    import thailand
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/thailand'))
+    import thailand
+try:
+    import USA
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/USA'))
+    import USA
 
 def extract_event_fields(event):
     print('Extracting fields from event', event)
@@ -275,16 +534,92 @@ def invoke_parser(
     }
     print(f"Invoking parser (ARN: {parser_arn})")
     # This is asynchronous due to the "Event" invocation type.
-    response = lambda_client.invoke(
-        FunctionName=parser_arn,
-        InvocationType='Event',
-        Payload=json.dumps(payload))
-    print(f"Parser response: {response}")
-    if "StatusCode" not in response or response["StatusCode"] != 202:
-        e = Exception(f"Parser invocation unsuccessful. Response: {response}")
-        common_lib.complete_with_error(
-            e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
-            api_headers, cookies)
+    lambdaFunctionName = parser_arn.split("-")[2];
+    print(f"{lambdaFunctionName}")
+    country = lambdaFunctionName[:-15]
+    print(f"Invoking parser for Country : {country}")
+
+    if country == 'Argentina':
+       argentina.lambda_handler(payload)
+    elif country == 'BrazilAcre':
+       acre.lambda_handler(payload)
+    elif country == 'BrazilAmapa':
+       amapa.lambda_handler(payload)
+    elif country == 'BrazilCeara':
+       ceara.lambda_handler(payload)
+    elif country == 'BrazilDistritoFederal':
+       distrito_federal.lambda_handler(payload)
+    elif country == 'BrazilEspiritoSanto':
+       espirito_santo.lambda_handler(payload)
+    elif country == 'BrazilGoias':
+       goias.lambda_handler(payload)
+    elif country == 'BrazilPara':
+       para.lambda_handler(payload)
+    elif country == 'BrazilParaiba':
+       paraiba.lambda_handler(payload)
+    elif country == 'BrazilRGDS':
+       rio_de_janeiro.lambda_handler(payload)
+    elif country == 'BrazilRioDeJaneiro':
+       rio_de_janeiro.lambda_handler(payload)
+    elif country == 'BrazilSantaCatarina':
+       santa_catarina.lambda_handler(payload)
+    elif country == 'CHZurich':
+       ch_zurich.lambda_handler(payload)
+    elif country == 'Canada':
+       canada.lambda_handler(payload)
+    elif country == 'Colombia':
+       colombia.lambda_handler(payload)
+    elif country == 'Cuba':
+       cuba.lambda_handler(payload)  
+    elif country == 'Czechia':
+       czechia.lambda_handler(payload)
+    elif country == 'Estonia':
+       estonia.lambda_handler(payload)
+    elif country == 'Germany':
+       germany.lambda_handler(payload)
+    elif country == 'HongKong':
+       hongkong.lambda_handler(payload)
+    elif country == 'India':
+       india.lambda_handler(payload)
+    elif country == 'Japan':
+       japan.lambda_handler(payload)
+    elif country == 'Mexico':
+       mexico.lambda_handler(payload)
+    elif country == 'NewZealand':
+       new_zealand.lambda_handler(payload)
+    elif country == 'Paraguay':
+       paraguay.lambda_handler(payload)
+    elif country == 'Peru':
+       peru.lambda_handler(payload)
+    elif country == 'RepublicOfKorea':
+       republic_of_korea.lambda_handler(payload)  
+    elif country == 'SaoPaolo':
+       sa.lambda_handler(payload)
+    elif country == 'Scotland':
+       scotland.lambda_handler(payload)
+    elif country == 'SouthAfrica':
+       south_africa.lambda_handler(payload)
+    elif country == 'Taiwan':
+       taiwan.lambda_handler(payload)
+    elif country == 'Thailand':
+       thailand.lambda_handler(payload)
+    elif country == 'USA':
+       USA.lambda_handler(payload)
+    else:
+       print(f"No parser found for  Country : {country}")
+
+
+    
+    # response = lambda_client.invoke(
+    #     FunctionName=parser_arn,
+    #     InvocationType='Event',
+    #     Payload=json.dumps(payload))
+    # print(f"Parser response: {response}")
+    # if "StatusCode" not in response or response["StatusCode"] != 202:
+    #     e = Exception(f"Parser invocation unsuccessful. Response: {response}")
+    #     common_lib.complete_with_error(
+    #         e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
+    #         api_headers, cookies)
 
 
 def get_today():
@@ -315,7 +650,7 @@ def format_source_url(url: str) -> str:
     return url
 
 
-def lambda_handler(event, context, tempdir=EFS_PATH):
+def lambda_handler(tempdir=EFS_PATH):
     """Global ingestion retrieval function.
 
     Parameters
@@ -343,8 +678,13 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
       https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
-    env, source_id, parsing_date_range, local_auth = extract_event_fields(
-        event)
+    #env, source_id, parsing_date_range, local_auth = extract_event_fields(
+    #    event)
+    env = os.environ['EPID_INGESTION_ENV']
+    source_id = os.environ['EPID_INGESTION_SOURCE_ID']
+    parsing_date_range = os.getenv('EPID_INGESTION_PARSING_DATE_RANGE',{})
+    local_auth = os.getenv('EPID_INGESTION_AUTH',{})
+   
     auth_headers = None
     cookies = None
     if local_auth and env == 'local':
@@ -371,3 +711,6 @@ def lambda_handler(event, context, tempdir=EFS_PATH):
         "key": s3_object_key,
         "upload_id": upload_id,
     }
+
+lambda_handler(tempdir=EFS_PATH)
+
