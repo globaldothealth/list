@@ -545,9 +545,6 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             {
                                 title: 'Exclude from line list?',
                                 field: 'excludeFromLineList',
-                                render: (row): JSX.Element => (
-                                    <Switch disabled checked={row.excludeFromLineList}/>
-                                ),
                                 editComponent: (props): JSX.Element => (
                                     <Switch checked={props.value ?? false} 
                                     onChange={(event):void => {
