@@ -19,6 +19,7 @@ const sourceSchema = new mongoose.Schema({
         required: 'Enter an origin',
     },
     format: String,
+    excludeFromLineList: Boolean,
     automation: {
         type: automationSchema,
         validate: automationParsingValidator,
@@ -48,6 +49,7 @@ export type SourceDocument = mongoose.Document & {
     name: string;
     origin: OriginDocument;
     format: string;
+    excludeFromLineList: boolean,
     automation: AutomationDocument;
     uploads: UploadDocument[];
     dateFilter: DateFilterDocument;
