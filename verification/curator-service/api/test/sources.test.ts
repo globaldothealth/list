@@ -450,8 +450,6 @@ describe('POST', () => {
             .send(source)
             .expect('Content-Type', /json/)
             .expect(201);
-        console.error('watwatwat');
-        console.error(res.body);
         expect(res.body.excludeFromLineList).toBeTruthy();
         expect(mockPutRule).not.toHaveBeenCalled();
     });
