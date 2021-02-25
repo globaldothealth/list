@@ -8,6 +8,7 @@ import {
     WithStyles,
     createStyles,
     withStyles,
+    Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
@@ -68,6 +69,7 @@ interface Source {
     automation?: Automation;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
+    excludeFromLineList?: boolean;
 }
 
 interface SourceTableState {
@@ -93,6 +95,7 @@ interface TableRow {
     awsScheduleExpression?: string;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
+    excludeFromLineList?: boolean;
 }
 
 // Return type isn't meaningful.
@@ -178,7 +181,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             response
                 .then(() => {
                     this.setState({ error: '' });
-                    resolve();
+                    resolve(undefined);
                 })
                 .catch((e) => {
                     /*
@@ -198,7 +201,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                             error:
                                 'Failed to send e-mail notifications to registered addresses',
                         });
-                        resolve();
+                        resolve(undefined);
                     } else {
                         this.setState({
                             error: e.response?.data?.message || e.toString(),
@@ -246,6 +249,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     ? rowData.dateFilter
                     : {},
             notificationRecipients: rowData.notificationRecipients,
+            excludeFromLineList: rowData.excludeFromLineList,
         };
     }
 
@@ -538,6 +542,22 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                                 editable: 'never',
                             },
+                            {
+                                title: 'Exclude from line list?',
+                                field: 'excludeFromLineList',
+                                render: (row): JSX.Element => (
+                                    <Switch disabled checked={row.excludeFromLineList}/>
+                                ),
+                                editComponent: (props): JSX.Element => (
+                                    <Switch checked={props.value?.excludeFromLineList ?? false} 
+                                    onChange={(event):void => {
+                                        props.onChange({
+                                            excludeFromLineList:
+                                                event.target.checked,
+                                        })
+                                    }}/>
+                                ),
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -571,6 +591,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 dateFilter: s.dateFilter,
                                                 notificationRecipients:
                                                     s.notificationRecipients,
+                                                excludeFromLineList:
+                                                    s.excludeFromLineList,
                                             });
                                         }
                                         resolve({
