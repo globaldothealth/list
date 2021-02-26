@@ -1,7 +1,7 @@
 import { Case, CaseDocument } from '../model/case';
 import { EventDocument } from '../model/event';
 import { DocumentQuery, Error, Query } from 'mongoose';
-import { QuerySelector } from 'mongodb';
+import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
@@ -57,7 +57,15 @@ export class CasesController {
                 casesQuery = await Case.aggregate([
                     {
                         $match: {
-                            _id: { $in: req.body.caseIds },
+                            $expr: {
+                                $in: [
+                                    '$_id',
+                                    _.map(
+                                        req.body.caseIds,
+                                        (anID: string) => new ObjectId(anID),
+                                    ),
+                                ],
+                            },
                         },
                     },
                     {
@@ -118,8 +126,6 @@ export class CasesController {
                     'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
                 )
                 .then((yamlRes) => {
-                    console.error('watwatwat');
-                    console.error(casesQuery);
                     const dataDictionary = yaml.safeLoad(yamlRes.data);
                     const columns = (dataDictionary as Array<{
                         name: string;
