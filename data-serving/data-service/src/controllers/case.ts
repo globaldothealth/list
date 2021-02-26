@@ -9,8 +9,9 @@ import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
-import stringify from 'csv-stringify';
+import stringify from 'csv-stringify/lib/sync';
 import yaml from 'js-yaml';
+import _ from 'lodash';
 
 class GeocodeNotFoundError extends Error {}
 
@@ -53,11 +54,56 @@ export class CasesController {
                     count: false,
                 });
             } else if (req.body.caseIds) {
-                casesQuery = Case.find({
-                    _id: { $in: req.body.caseIds },
-                }).lean();
+                casesQuery = await Case.aggregate([
+                    {
+                        $match: {
+                            _id: { $in: req.body.caseIds },
+                        },
+                    },
+                    {
+                        $lookup: {
+                            localField: 'caseReference.sourceId',
+                            foreignField: '_id',
+                            from: 'sources',
+                            as: 'source',
+                        },
+                    },
+                    {
+                        $addFields: {
+                            isExcluded: {
+                                $anyElementTrue: '$source.excludeFromLineList',
+                            },
+                        },
+                    },
+                    {
+                        $match: {
+                            isExcluded: false,
+                        },
+                    },
+                ]);
             } else {
-                casesQuery = Case.find({}).lean();
+                casesQuery = await Case.aggregate([
+                    {
+                        $lookup: {
+                            localField: 'caseReference.sourceId',
+                            foreignField: '_id',
+                            from: 'sources',
+                            as: 'source',
+                        },
+                    },
+                    {
+                        $addFields: {
+                            isExcluded: {
+                                $anyElementTrue: '$source.excludeFromLineList',
+                            },
+                        },
+                    },
+                    {
+                        $match: {
+                            isExcluded: false,
+                        },
+                    },
+                ]);
             }
 
             res.setHeader('Content-Type', 'text/csv');
@@ -72,21 +118,20 @@ export class CasesController {
                     'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
                 )
                 .then((yamlRes) => {
+                    console.error('watwatwat');
+                    console.error(casesQuery);
                     const dataDictionary = yaml.safeLoad(yamlRes.data);
                     const columns = (dataDictionary as Array<{
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    casesQuery
-                        .cursor()
-                        .map(parseDownloadedCase)
-                        .pipe(
-                            stringify({
-                                header: true,
-                                columns: columns,
-                            }),
-                        )
-                        .pipe(res);
+                    const parsedCases = _.map(casesQuery, parseDownloadedCase);
+                    const stringifiedCases = stringify(parsedCases, {
+                        header: true,
+                        columns: columns,
+                    });
+                    res.setHeader('content-type', 'text/csv');
+                    res.end(stringifiedCases);
                 });
         } catch (e) {
             if (e instanceof ParsingError) {
