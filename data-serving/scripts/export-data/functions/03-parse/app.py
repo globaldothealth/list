@@ -123,7 +123,7 @@ def convert_travel(travel_array):
                 "travelHistory.travel.location.geometry.coordinates",
                 "travelHistory.travel.methods",
             ]:
-                unnest = field[21:]
+                unnest = field[len("travelHistory.travel."):]
                 items = [
                     deep_get(x, unnest) for x in travel_array if unnest in x.keys()
                 ]

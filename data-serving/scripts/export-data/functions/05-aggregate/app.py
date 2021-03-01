@@ -1,6 +1,7 @@
 import datetime
 import io
 import json
+import os
 import re
 
 import boto3
@@ -155,6 +156,7 @@ def generate_country_json():
         if country in variant_counts.keys():
             record["casecount_p1"] = variant_counts[country]["casecount_p1"]
             record["casecount_b1351"] = variant_counts[country]["casecount_b1351"]
+            merged_countries.append(country)
         else:
             record["casecount_p1"] = 0
             record["casecount_b1351"] = 0
@@ -253,7 +255,7 @@ def generate_region_json():
                 "country": record["country"],
                 "lat": record["_id"]["latitude"],
                 "long": record["_id"]["longitude"],
-                "search": search_term
+                "search": search_term,
             }
             print(new_record)
             records.append(new_record)
