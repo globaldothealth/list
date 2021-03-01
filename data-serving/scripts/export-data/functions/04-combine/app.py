@@ -55,7 +55,7 @@ def combine_files(downloaded_files):
 
 
 def compress_file(input_file):
-    now = datetime.datetime.now().strftime("%m-%d-%Y")
+    now = datetime.datetime.now().strftime("%Y-%m-%d")
     compressed_file = "/mnt/efs/latestdata.tar.gz"
     with tarfile.open(compressed_file, "w:gz") as tar:
         tar.add(input_file, f"globaldothealth_{now}.csv")
@@ -68,7 +68,7 @@ def upload_to_production(compressed_file):
     """
     Upload parsed .csv file to s3.
     """
-    now = datetime.datetime.now().strftime("%m-%d-%Y")
+    now = datetime.datetime.now().strftime("%Y-%m-%d")
     filename = compressed_file.split("/")[-1]
     s3 = boto3.resource("s3")
     s3.Object("covid-19-data-export",
