@@ -1177,7 +1177,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             this.props.onChangePage(newPage);
                                             props.onChangePage(event, newPage);
                                         }}
-                                    ></TablePagination>
+                                    />
                                 </div>
                             ) : (
                                 <></>
@@ -1201,6 +1201,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         })
                     }
                     localization={{
+                        pagination: {
+                            labelDisplayedRows:
+                                // this value has to correspond to data limit value in data-service api
+                                this.state.totalNumRows === 5
+                                    ? '{from}-{to} of many'
+                                    : '{from}-{to} of {count}',
+                        },
                         toolbar: {
                             nRowsSelected:
                                 this.state.numSelectedRows === 1

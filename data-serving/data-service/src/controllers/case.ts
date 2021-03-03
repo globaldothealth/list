@@ -773,6 +773,7 @@ export const casesMatchingSearchQuery = (opts: {
     // Goofy Mongoose types require this.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any => {
+    const dataLimit = 5;
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
@@ -780,15 +781,31 @@ export const casesMatchingSearchQuery = (opts: {
           }
         : {};
 
-    // Always search with case-insensitivity.
-    const casesQuery = Case.find(queryOpts).collation({
-        locale: 'en_US',
-        strength: 2,
-    });
-    const countQuery = Case.countDocuments(queryOpts).collation({
-        locale: 'en_US',
-        strength: 2,
-    });
+    let casesQuery: DocumentQuery<CaseDocument[], CaseDocument>;
+    let countQuery: Query<number>;
+
+    if (opts.searchQuery === '') {
+        // Always search with case-insensitivity.
+        casesQuery = Case.find(queryOpts).collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+        countQuery = Case.estimatedDocumentCount().collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+    } else {
+        // Always search with case-insensitivity.
+        casesQuery = Case.find(queryOpts).limit(dataLimit).collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+        countQuery = Case.countDocuments(queryOpts).limit(dataLimit).collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+    }
+
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
