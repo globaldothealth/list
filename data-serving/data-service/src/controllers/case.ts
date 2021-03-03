@@ -55,7 +55,7 @@ export class CasesController {
                           $text: { $search: parsedSearch.fullTextSearch },
                       }
                     : {};
-                casesQuery = await Case.aggregate([
+                casesQuery = [
                     {
                         $match: query,
                     },
@@ -79,12 +79,9 @@ export class CasesController {
                             isExcluded: false,
                         },
                     },
-                ]);
-                console.error('watwatwat');
-                console.error(casesQuery);
-                console.error(query);
+                ];
             } else if (req.body.caseIds) {
-                casesQuery = await Case.aggregate([
+                casesQuery = [
                     {
                         $match: {
                             $expr: {
@@ -118,9 +115,9 @@ export class CasesController {
                             isExcluded: false,
                         },
                     },
-                ]);
+                ];
             } else {
-                casesQuery = await Case.aggregate([
+                casesQuery = [
                     {
                         $lookup: {
                             localField: 'caseReference.sourceId',
@@ -141,8 +138,10 @@ export class CasesController {
                             isExcluded: false,
                         },
                     },
-                ]);
+                ];
             }
+
+            const matchingCases = await Case.aggregate(casesQuery);
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader(
@@ -161,7 +160,10 @@ export class CasesController {
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    const parsedCases = _.map(casesQuery, parseDownloadedCase);
+                    const parsedCases = _.map(
+                        matchingCases,
+                        parseDownloadedCase,
+                    );
                     const stringifiedCases = stringify(parsedCases, {
                         header: true,
                         columns: columns,
