@@ -49,10 +49,40 @@ export class CasesController {
         let casesQuery: any;
         try {
             if (req.body.query) {
-                casesQuery = casesMatchingSearchQuery({
-                    searchQuery: req.body.query as string,
-                    count: false,
-                });
+                const parsedSearch = parseSearchQuery(req.body.query as string);
+                const query = parsedSearch.fullTextSearch
+                    ? {
+                          $text: { $search: parsedSearch.fullTextSearch },
+                      }
+                    : {};
+                casesQuery = await Case.aggregate([
+                    {
+                        $match: query,
+                    },
+                    {
+                        $lookup: {
+                            localField: 'caseReference.sourceId',
+                            foreignField: '_id',
+                            from: 'sources',
+                            as: 'source',
+                        },
+                    },
+                    {
+                        $addFields: {
+                            isExcluded: {
+                                $anyElementTrue: '$source.excludeFromLineList',
+                            },
+                        },
+                    },
+                    {
+                        $match: {
+                            isExcluded: false,
+                        },
+                    },
+                ]);
+                console.error('watwatwat');
+                console.error(casesQuery);
+                console.error(query);
             } else if (req.body.caseIds) {
                 casesQuery = await Case.aggregate([
                     {
