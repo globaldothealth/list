@@ -46,7 +46,7 @@ export class CasesController {
     download = async (req: Request, res: Response): Promise<void> => {
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let casesQuery: any;
+        let casesQuery: any[];
         try {
             if (req.body.query) {
                 const parsedSearch = parseSearchQuery(req.body.query as string);
@@ -58,26 +58,6 @@ export class CasesController {
                 casesQuery = [
                     {
                         $match: query,
-                    },
-                    {
-                        $lookup: {
-                            localField: 'caseReference.sourceId',
-                            foreignField: '_id',
-                            from: 'sources',
-                            as: 'source',
-                        },
-                    },
-                    {
-                        $addFields: {
-                            isExcluded: {
-                                $anyElementTrue: '$source.excludeFromLineList',
-                            },
-                        },
-                    },
-                    {
-                        $match: {
-                            isExcluded: false,
-                        },
                     },
                 ];
             } else if (req.body.caseIds) {
@@ -95,53 +75,34 @@ export class CasesController {
                             },
                         },
                     },
-                    {
-                        $lookup: {
-                            localField: 'caseReference.sourceId',
-                            foreignField: '_id',
-                            from: 'sources',
-                            as: 'source',
-                        },
-                    },
-                    {
-                        $addFields: {
-                            isExcluded: {
-                                $anyElementTrue: '$source.excludeFromLineList',
-                            },
-                        },
-                    },
-                    {
-                        $match: {
-                            isExcluded: false,
-                        },
-                    },
                 ];
             } else {
-                casesQuery = [
-                    {
-                        $lookup: {
-                            localField: 'caseReference.sourceId',
-                            foreignField: '_id',
-                            from: 'sources',
-                            as: 'source',
-                        },
-                    },
-                    {
-                        $addFields: {
-                            isExcluded: {
-                                $anyElementTrue: '$source.excludeFromLineList',
-                            },
-                        },
-                    },
-                    {
-                        $match: {
-                            isExcluded: false,
-                        },
-                    },
-                ];
+                casesQuery = [];
             }
 
-            const matchingCases = await Case.aggregate(casesQuery);
+            const casesIgnoringExcluded = _.concat(casesQuery, [
+                {
+                    $lookup: {
+                        localField: 'caseReference.sourceId',
+                        foreignField: '_id',
+                        from: 'sources',
+                        as: 'source',
+                    },
+                },
+                {
+                    $addFields: {
+                        isExcluded: {
+                            $anyElementTrue: '$source.excludeFromLineList',
+                        },
+                    },
+                },
+                {
+                    $match: {
+                        isExcluded: false,
+                    },
+                },
+            ]);
+            const matchingCases = await Case.aggregate(casesIgnoringExcluded);
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader(
