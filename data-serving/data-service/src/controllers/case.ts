@@ -60,6 +60,35 @@ export class CasesController {
                         $match: query,
                     },
                 ];
+                const filters = parsedSearch.filters.map((f) => {
+                    if (f.values.length == 1) {
+                        const searchTerm = f.values[0];
+                        if (searchTerm === '*') {
+                            return {
+                                $match: {
+                                    $expr: {
+                                        $ne: [`$${f.path}`, undefined],
+                                    },
+                                },
+                            };
+                        } else {
+                            return {
+                                $match: {
+                                    [f.path]: f.values[0],
+                                },
+                            };
+                        }
+                    } else {
+                        return {
+                            $match: {
+                                $expr: {
+                                    $in: [`$${f.path}`, f.values],
+                                },
+                            },
+                        };
+                    }
+                });
+                casesQuery = _.concat(casesQuery, filters);
             } else if (req.body.caseIds) {
                 casesQuery = [
                     {
