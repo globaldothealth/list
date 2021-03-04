@@ -111,8 +111,15 @@ export class CasesController {
 
             const casesIgnoringExcluded = _.concat(casesQuery, [
                 {
+                    $addFields: {
+                        sourceID: {
+                            $toObjectId: '$caseReference.sourceId',
+                        },
+                    },
+                },
+                {
                     $lookup: {
-                        localField: 'caseReference.sourceId',
+                        localField: 'sourceID',
                         foreignField: '_id',
                         from: 'sources',
                         as: 'source',
