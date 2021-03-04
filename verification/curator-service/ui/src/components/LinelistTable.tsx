@@ -598,8 +598,8 @@ export function DownloadButton(): JSX.Element {
                                         isLoading || downloadButtonDisabled
                                     }
                                 >
-                                    Download more than {rowsToDownload} through
-                                    link delivered by email
+                                    Download more than {rowsToDownload} rows
+                                    through link delivered by email
                                 </Button>
                             </span>
                         </Tooltip>
