@@ -16,6 +16,8 @@ describe('initialize', () => {
 
 describe('send', () => {
     it('sends specified properties via email', async () => {
+        jest.setTimeout(15000);
+
         const client = await new EmailClient().initialize();
         const address = 'foo@bar.com';
         const result = await client.send(
