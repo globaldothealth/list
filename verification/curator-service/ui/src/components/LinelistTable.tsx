@@ -404,15 +404,28 @@ export function DownloadButton(): JSX.Element {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const classes = downloadDataModalStyles();
 
-    const downloadDataSet = async (formatType: string) => {
+    const downloadDataSet = async (
+        formatType: string,
+        dataSet: string,
+        searchQuery: string,
+    ) => {
         setIsLoading(true);
+        let url;
+        if (dataSet === 'fullDataset') {
+            url = '/api/cases/getDownloadLink';
+        } else if (dataSet === 'mailDataset') {
+            url = '/api/cases/downloadLarge';
+        } else if (dataSet === 'partialDataset') {
+            url = '/api/cases/download';
+        }
         try {
             const response = await axios({
                 method: 'get',
-                url: '/api/cases/getDownloadLink',
+                url: url,
                 headers: {},
                 data: {
                     format: formatType,
+                    query: searchQuery,
                 },
             });
 
@@ -522,7 +535,11 @@ export function DownloadButton(): JSX.Element {
                                     color="primary"
                                     className={classes.downloadButton}
                                     onClick={() =>
-                                        downloadDataSet('fullDataset')
+                                        downloadDataSet(
+                                            fileFormat,
+                                            'fullDataset',
+                                            location.search,
+                                        )
                                     }
                                     disabled={
                                         isLoading || downloadButtonDisabled
@@ -544,7 +561,11 @@ export function DownloadButton(): JSX.Element {
                                     color="primary"
                                     className={classes.downloadButton}
                                     onClick={() =>
-                                        downloadDataSet('partialDataset')
+                                        downloadDataSet(
+                                            fileFormat,
+                                            'partialDataset',
+                                            location.search,
+                                        )
                                     }
                                     disabled={
                                         isLoading || downloadButtonDisabled
@@ -567,7 +588,11 @@ export function DownloadButton(): JSX.Element {
                                     color="primary"
                                     className={classes.downloadButton}
                                     onClick={() =>
-                                        downloadDataSet('emailDataset')
+                                        downloadDataSet(
+                                            fileFormat,
+                                            'mailDataset',
+                                            location.search,
+                                        )
                                     }
                                     disabled={
                                         isLoading || downloadButtonDisabled
