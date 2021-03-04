@@ -1440,6 +1440,14 @@ components:
                             $ref: '#/components/schemas/EditMetadata'
                         editMetadata:
                             $ref: '#/components/schemas/EditMetadata'
+                variant:
+                    type: object
+                    description: Details of the variant of concern/interest if applicable.
+                    properties:
+                        name:
+                            type: string
+                            example: B.1.351
+                            description: Name of the variant of concern or interest.
         CaseStatus:
             type: string
             enum: [UNVERIFIED, VERIFIED, EXCLUDED]
