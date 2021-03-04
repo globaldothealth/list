@@ -448,7 +448,7 @@ export function DownloadButton(): JSX.Element {
         ? 'Please first select the file format you want to download'
         : '';
 
-    const rowsToDownload = 2000;
+    const rowsToDownload = 10000;
     useEffect(() => {
         if (location.search !== '') {
             setShowFullDatasetButton(false);
