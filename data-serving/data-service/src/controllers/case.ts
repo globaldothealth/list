@@ -192,8 +192,6 @@ export class CasesController {
                 locale: 'en_US',
                 strength: 2,
             });
-            console.error('watwatwat');
-            console.error(results);
             const docs = results[0].docs;
             const total = results[0].total ?? 0;
             // If we have more items than limit, add a response param
@@ -771,8 +769,8 @@ export class CasesController {
                 if (searchTerm === '*') {
                     return {
                         $match: {
-                            $expr: {
-                                $ne: [`$${f.path}`, undefined],
+                            [f.path]: {
+                                $exists: true,
                             },
                         },
                     };
