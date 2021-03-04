@@ -481,7 +481,7 @@ export function DownloadButton(): JSX.Element {
                 onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download full dataset
+                Download dataset
             </StyledDownloadButton>
             <Dialog
                 open={isDownloadModalOpen}
