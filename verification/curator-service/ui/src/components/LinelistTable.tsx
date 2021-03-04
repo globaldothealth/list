@@ -1016,6 +1016,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
                             if (this.state.searchQuery !== '') {
+                                // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
+                                listUrl += '&count_limit=10000';
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });

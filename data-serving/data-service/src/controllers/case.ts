@@ -107,6 +107,7 @@ export class CasesController {
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const countLimit = Number(req.query.count_limit);
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -131,6 +132,7 @@ export class CasesController {
             const countQuery = casesMatchingSearchQuery({
                 searchQuery: req.query.q || '',
                 count: true,
+                limit: countLimit,
             }) as Query<number>;
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
@@ -770,10 +772,12 @@ export class CasesController {
 export const casesMatchingSearchQuery = (opts: {
     searchQuery: string;
     count: boolean;
+    limit?: number;
     // Goofy Mongoose types require this.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any => {
-    const dataLimit = 5;
+    // set data limit to 10K by default
+    const countLimit = opts.limit ? opts.limit : 10000;
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
@@ -796,14 +800,16 @@ export const casesMatchingSearchQuery = (opts: {
         });
     } else {
         // Always search with case-insensitivity.
-        casesQuery = Case.find(queryOpts).limit(dataLimit).collation({
+        casesQuery = Case.find(queryOpts).collation({
             locale: 'en_US',
             strength: 2,
         });
-        countQuery = Case.countDocuments(queryOpts).limit(dataLimit).collation({
-            locale: 'en_US',
-            strength: 2,
-        });
+        countQuery = Case.countDocuments(queryOpts)
+            .limit(countLimit)
+            .collation({
+                locale: 'en_US',
+                strength: 2,
+            });
     }
 
     // Fill in keyword filters.
