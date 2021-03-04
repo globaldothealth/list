@@ -1205,8 +1205,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                     localization={{
                         pagination: {
                             labelDisplayedRows:
-                                // this value has to correspond to data limit value in data-service api
-                                this.state.totalNumRows === 5
+                                // this value has to correspond to count_limit param in /api/cases query
+                                this.state.totalNumRows === 10000
                                     ? '{from}-{to} of many'
                                     : '{from}-{to} of {count}',
                         },
