@@ -1,5 +1,5 @@
-import React, { RefObject, useState } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import React, { RefObject, useState, useEffect } from 'react';
+import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { round } from 'lodash';
 import {
@@ -19,6 +19,11 @@ import {
     makeStyles,
     withStyles,
     LinearProgress,
+    InputLabel,
+    FormHelperText,
+    FormControl,
+    Select,
+    Tooltip,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -183,14 +188,29 @@ const StyledDownloadButton = withStyles((theme: Theme) => ({
     },
 }))(Button);
 
-const downloadDataModalStyles = makeStyles((theme: Theme) => ({
-    downloadButton: {
-        margin: '16px 0',
-    },
-    loader: {
-        marginTop: '16px',
-    },
-}));
+const downloadDataModalStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        downloadButton: {
+            margin: '16px 0',
+            width: '100%',
+        },
+        loader: {
+            marginTop: '16px',
+        },
+        formControl: {
+            maxWidth: '50%',
+            margin: '8px 8px 8px 24px',
+        },
+        selectMenu: {
+            paddingLeft: '20px',
+        },
+        MuiInputBase: {
+            '& .MuiInput-input': {
+                paddingLeft: '20px',
+            },
+        },
+    }),
+);
 
 function RowMenu(props: {
     rowId: string;
@@ -377,16 +397,25 @@ function RowMenu(props: {
 }
 
 export function DownloadButton(): JSX.Element {
+    const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
         false,
     );
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const classes = downloadDataModalStyles();
 
-    const downloadDataSet = async () => {
+    const downloadDataSet = async (formatType: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/api/cases/getDownloadLink');
+            const response = await axios({
+                method: 'get',
+                url: '/api/cases/getDownloadLink',
+                headers: {},
+                data: {
+                    format: formatType,
+                },
+            });
+
             window.location.href = response.data.signedUrl;
             setIsLoading(false);
             setIsDownloadModalOpen(false);
@@ -396,6 +425,39 @@ export function DownloadButton(): JSX.Element {
             );
             setIsLoading(false);
         }
+    };
+
+    const [fileFormat, setFileFormat] = useState('');
+    const [showFullDatasetButton, setShowFullDatasetButton] = useState(true);
+    const [downloadButtonDisabled, setDownloadButtonDisable] = useState(true);
+
+    const disabledButtonTooltipText = downloadButtonDisabled
+        ? 'Please first select the file format you want to download'
+        : '';
+
+    const rowsToDownload = 2000;
+    useEffect(() => {
+        if (location.search !== '') {
+            setShowFullDatasetButton(false);
+        } else {
+            setShowFullDatasetButton(true);
+        }
+    }, [location.search]);
+
+    const handleFileFormatChange = (
+        event: React.ChangeEvent<{ value: unknown }>,
+    ) => {
+        if (
+            event.target.value === 'csv' ||
+            event.target.value === 'tsv' ||
+            event.target.value === 'json'
+        ) {
+            setDownloadButtonDisable(false);
+        } else {
+            setDownloadButtonDisable(true);
+        }
+
+        setFileFormat(event.target.value as string);
     };
 
     return (
@@ -416,6 +478,30 @@ export function DownloadButton(): JSX.Element {
                 onClick={(e): void => e.stopPropagation()}
             >
                 <DialogTitle>Download full dataset</DialogTitle>
+                <FormControl className={classes.formControl}>
+                    <InputLabel
+                        shrink
+                        id="demo-simple-select-placeholder-label-label"
+                    ></InputLabel>
+                    <Select
+                        labelId="demo-simple-select-placeholder-label-label"
+                        id="demo-simple-select-placeholder-label"
+                        value={fileFormat}
+                        onChange={handleFileFormatChange}
+                        displayEmpty
+                        className={classes.MuiInputBase}
+                    >
+                        <MenuItem value="">
+                            <em>Data format</em>
+                        </MenuItem>
+                        <MenuItem value="csv">csv</MenuItem>
+                        <MenuItem value="tsv">tsv</MenuItem>
+                        <MenuItem value="json">json</MenuItem>
+                    </Select>
+                    <FormHelperText>
+                        Please choose the file export format
+                    </FormHelperText>
+                </FormControl>
                 <DialogContent>
                     <Typography variant="body2">
                         This download link provides access to the full
@@ -425,16 +511,74 @@ export function DownloadButton(): JSX.Element {
                     </Typography>
 
                     {isLoading && <LinearProgress className={classes.loader} />}
-
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={classes.downloadButton}
-                        onClick={downloadDataSet}
-                        disabled={isLoading}
-                    >
-                        Download
-                    </Button>
+                    {showFullDatasetButton && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet('fullDataset')
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    Download Full Dataset
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    )}
+                    {!showFullDatasetButton && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet('partialDataset')
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    Download up to {rowsToDownload} rows
+                                    immediately
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    )}
+                    {!showFullDatasetButton && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet('emailDataset')
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    Download more than {rowsToDownload} through
+                                    link delivered by email
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    )}
                 </DialogContent>
             </Dialog>
         </>
