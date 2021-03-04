@@ -49,46 +49,9 @@ export class CasesController {
         let casesQuery: any[];
         try {
             if (req.body.query) {
-                const parsedSearch = parseSearchQuery(req.body.query as string);
-                const query = parsedSearch.fullTextSearch
-                    ? {
-                          $text: { $search: parsedSearch.fullTextSearch },
-                      }
-                    : {};
-                casesQuery = [
-                    {
-                        $match: query,
-                    },
-                ];
-                const filters = parsedSearch.filters.map((f) => {
-                    if (f.values.length == 1) {
-                        const searchTerm = f.values[0];
-                        if (searchTerm === '*') {
-                            return {
-                                $match: {
-                                    $expr: {
-                                        $ne: [`$${f.path}`, undefined],
-                                    },
-                                },
-                            };
-                        } else {
-                            return {
-                                $match: {
-                                    [f.path]: f.values[0],
-                                },
-                            };
-                        }
-                    } else {
-                        return {
-                            $match: {
-                                $expr: {
-                                    $in: [`$${f.path}`, f.values],
-                                },
-                            },
-                        };
-                    }
-                });
-                casesQuery = _.concat(casesQuery, filters);
+                casesQuery = this.caseAggregationFromQuery(
+                    req.body.query as string,
+                );
             } else if (req.body.caseIds) {
                 casesQuery = [
                     {
@@ -109,35 +72,9 @@ export class CasesController {
                 casesQuery = [];
             }
 
-            const casesIgnoringExcluded = _.concat(casesQuery, [
-                {
-                    $addFields: {
-                        sourceID: {
-                            $toObjectId: '$caseReference.sourceId',
-                        },
-                    },
-                },
-                {
-                    $lookup: {
-                        localField: 'sourceID',
-                        foreignField: '_id',
-                        from: 'sources',
-                        as: 'source',
-                    },
-                },
-                {
-                    $addFields: {
-                        isExcluded: {
-                            $anyElementTrue: '$source.excludeFromLineList',
-                        },
-                    },
-                },
-                {
-                    $match: {
-                        isExcluded: false,
-                    },
-                },
-            ]);
+            const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
+                casesQuery,
+            );
             const matchingCases = await Case.aggregate(casesIgnoringExcluded);
 
             res.setHeader('Content-Type', 'text/csv');
@@ -744,6 +681,83 @@ export class CasesController {
 
         res.status(200).json({ cases: caseIds }).end();
     };
+
+    private excludeRestrictedSourcesFromCaseAggregation(casesQuery: any[]) {
+        return _.concat(casesQuery, [
+            {
+                $addFields: {
+                    sourceID: {
+                        $toObjectId: '$caseReference.sourceId',
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    localField: 'sourceID',
+                    foreignField: '_id',
+                    from: 'sources',
+                    as: 'source',
+                },
+            },
+            {
+                $addFields: {
+                    isExcluded: {
+                        $anyElementTrue: '$source.excludeFromLineList',
+                    },
+                },
+            },
+            {
+                $match: {
+                    isExcluded: false,
+                },
+            },
+        ]);
+    }
+
+    private caseAggregationFromQuery(queryText: string) {
+        let casesQuery: any[] = [];
+        const parsedSearch = parseSearchQuery(queryText);
+        const query = parsedSearch.fullTextSearch
+            ? {
+                  $text: { $search: parsedSearch.fullTextSearch },
+              }
+            : {};
+        casesQuery = [
+            {
+                $match: query,
+            },
+        ];
+        const filters = parsedSearch.filters.map((f) => {
+            if (f.values.length == 1) {
+                const searchTerm = f.values[0];
+                if (searchTerm === '*') {
+                    return {
+                        $match: {
+                            $expr: {
+                                $ne: [`$${f.path}`, undefined],
+                            },
+                        },
+                    };
+                } else {
+                    return {
+                        $match: {
+                            [f.path]: f.values[0],
+                        },
+                    };
+                }
+            } else {
+                return {
+                    $match: {
+                        $expr: {
+                            $in: [`$${f.path}`, f.values],
+                        },
+                    },
+                };
+            }
+        });
+        casesQuery = _.concat(casesQuery, filters);
+        return casesQuery;
+    }
 
     /**
      * Geocodes a single location.
