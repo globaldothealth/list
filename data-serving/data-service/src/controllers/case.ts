@@ -75,7 +75,12 @@ export class CasesController {
             const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
                 casesQuery,
             );
-            const matchingCases = await Case.aggregate(casesIgnoringExcluded);
+            const matchingCases = await Case.aggregate(
+                casesIgnoringExcluded,
+            ).collation({
+                locale: 'en_US',
+                strength: 2,
+            });
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader(
@@ -141,23 +146,56 @@ export class CasesController {
             return;
         }
         try {
-            const casesQuery = casesMatchingSearchQuery({
-                searchQuery: req.query.q || '',
-                count: false,
-            }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
-            const countQuery = casesMatchingSearchQuery({
-                searchQuery: req.query.q || '',
-                count: true,
-            }) as Query<number>;
+            const caseAggregation = this.caseAggregationFromQuery(
+                req.query.q ?? '',
+            );
+            const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
+                caseAggregation,
+            );
+            const addingCount = _.concat(excludingRestrictedSources, [
+                {
+                    $facet: {
+                        metadata: [
+                            {
+                                $group: {
+                                    _id: null,
+                                    total: { $sum: 1 },
+                                },
+                            },
+                        ],
+                        docs: [
+                            {
+                                $skip: limit * (page - 1),
+                            },
+                            {
+                                $limit: limit + 1,
+                            },
+                            {
+                                $sort: {
+                                    'revisionMetadata.creationMetadata.date': -1,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        docs: 1,
+                        // Get total from the first element of the metadata array
+                        total: { $arrayElemAt: ['$metadata.total', 0] },
+                    },
+                },
+            ]);
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const [docs, total] = await Promise.all([
-                casesQuery
-                    .sort({ 'revisionMetadata.creationMetadata.date': -1 })
-                    .skip(limit * (page - 1))
-                    .limit(limit + 1),
-                countQuery,
-            ]);
+            const results = await Case.aggregate(addingCount).collation({
+                locale: 'en_US',
+                strength: 2,
+            });
+            console.error('watwatwat');
+            console.error(results);
+            const docs = results[0].docs;
+            const total = results[0].total ?? 0;
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
             if (docs.length == limit + 1) {
