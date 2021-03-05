@@ -404,31 +404,46 @@ export function DownloadButton(): JSX.Element {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const classes = downloadDataModalStyles();
 
-    const downloadDataSet = async (
-        formatType: string,
-        dataSet: string,
-        searchQuery: string,
-    ) => {
+    const downloadDataSet = async (formatType: string, dataSet: string) => {
         setIsLoading(true);
-        let url;
+
+        let url: string = '';
+        const searchQuery: string = encodeURIComponent(
+            URLToSearchQuery(location.search),
+        );
+
+        let downloadParams: {
+            format: string;
+            limit?: number;
+            query?: string;
+        };
+
         if (dataSet === 'fullDataset') {
             url = '/api/cases/getDownloadLink';
+            downloadParams = { format: formatType };
         } else if (dataSet === 'mailDataset') {
             url = '/api/cases/downloadLarge';
-        } else if (dataSet === 'partialDataset') {
+            downloadParams = { format: formatType, query: searchQuery };
+        } else {
             url = '/api/cases/download';
+            downloadParams = {
+                format: formatType,
+                limit: 10000,
+                query: searchQuery,
+            };
         }
+
         try {
             const response = await axios({
-                method: 'get',
-                url: url,
-                headers: {},
-                data: {
-                    format: formatType,
-                    query: searchQuery,
+                method: 'post',
+                url,
+                data: downloadParams,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
 
+            console.log('Download link respons: ', response);
             window.location.href = response.data.signedUrl;
             setIsLoading(false);
             setIsDownloadModalOpen(false);
@@ -538,7 +553,6 @@ export function DownloadButton(): JSX.Element {
                                         downloadDataSet(
                                             fileFormat,
                                             'fullDataset',
-                                            location.search,
                                         )
                                     }
                                     disabled={
@@ -564,7 +578,6 @@ export function DownloadButton(): JSX.Element {
                                         downloadDataSet(
                                             fileFormat,
                                             'partialDataset',
-                                            location.search,
                                         )
                                     }
                                     disabled={
@@ -591,7 +604,6 @@ export function DownloadButton(): JSX.Element {
                                         downloadDataSet(
                                             fileFormat,
                                             'mailDataset',
-                                            location.search,
                                         )
                                     }
                                     disabled={
