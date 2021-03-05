@@ -1,7 +1,7 @@
 import { Case, CaseDocument } from '../model/case';
 import { EventDocument } from '../model/event';
 import { DocumentQuery, Error, Query } from 'mongoose';
-import { QuerySelector } from 'mongodb';
+import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
@@ -9,8 +9,9 @@ import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
 import { logger } from '../util/logger';
-import stringify from 'csv-stringify';
+import stringify from 'csv-stringify/lib/sync';
 import yaml from 'js-yaml';
+import _ from 'lodash';
 
 class GeocodeNotFoundError extends Error {}
 
@@ -45,20 +46,41 @@ export class CasesController {
     download = async (req: Request, res: Response): Promise<void> => {
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let casesQuery: any;
+        let casesQuery: any[];
         try {
             if (req.body.query) {
-                casesQuery = casesMatchingSearchQuery({
-                    searchQuery: req.body.query as string,
-                    count: false,
-                });
+                casesQuery = this.caseAggregationFromQuery(
+                    req.body.query as string,
+                );
             } else if (req.body.caseIds) {
-                casesQuery = Case.find({
-                    _id: { $in: req.body.caseIds },
-                }).lean();
+                casesQuery = [
+                    {
+                        $match: {
+                            $expr: {
+                                $in: [
+                                    '$_id',
+                                    _.map(
+                                        req.body.caseIds,
+                                        (anID: string) => new ObjectId(anID),
+                                    ),
+                                ],
+                            },
+                        },
+                    },
+                ];
             } else {
-                casesQuery = Case.find({}).lean();
+                casesQuery = [];
             }
+
+            const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
+                casesQuery,
+            );
+            const matchingCases = await Case.aggregate(
+                casesIgnoringExcluded,
+            ).collation({
+                locale: 'en_US',
+                strength: 2,
+            });
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader(
@@ -77,16 +99,16 @@ export class CasesController {
                         name: string;
                         description: string;
                     }>).map((datum) => datum.name);
-                    casesQuery
-                        .cursor()
-                        .map(parseDownloadedCase)
-                        .pipe(
-                            stringify({
-                                header: true,
-                                columns: columns,
-                            }),
-                        )
-                        .pipe(res);
+                    const parsedCases = _.map(
+                        matchingCases,
+                        parseDownloadedCase,
+                    );
+                    const stringifiedCases = stringify(parsedCases, {
+                        header: true,
+                        columns: columns,
+                    });
+                    res.setHeader('content-type', 'text/csv');
+                    res.end(stringifiedCases);
                 });
         } catch (e) {
             if (e instanceof ParsingError) {
@@ -125,24 +147,54 @@ export class CasesController {
             return;
         }
         try {
-            const casesQuery = casesMatchingSearchQuery({
-                searchQuery: req.query.q || '',
-                count: false,
-            }) as DocumentQuery<CaseDocument[], CaseDocument, unknown>;
-            const countQuery = casesMatchingSearchQuery({
-                searchQuery: req.query.q || '',
-                count: true,
-                limit: countLimit,
-            }) as Query<number>;
+            const caseAggregation = this.caseAggregationFromQuery(
+                req.query.q ?? '',
+            );
+            const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
+                caseAggregation,
+            );
+            const addingCount = _.concat(excludingRestrictedSources, [
+                {
+                    $facet: {
+                        metadata: [
+                            {
+                                $group: {
+                                    _id: null,
+                                    total: { $sum: 1 },
+                                },
+                            },
+                        ],
+                        docs: [
+                            {
+                                $skip: limit * (page - 1),
+                            },
+                            {
+                                $limit: limit + 1,
+                            },
+                            {
+                                $sort: {
+                                    'revisionMetadata.creationMetadata.date': -1,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        docs: 1,
+                        // Get total from the first element of the metadata array
+                        total: { $arrayElemAt: ['$metadata.total', 0] },
+                    },
+                },
+            ]);
             // Do a fetch of documents and another fetch in parallel for total documents
             // count used in pagination.
-            const [docs, total] = await Promise.all([
-                casesQuery
-                    .sort({ 'revisionMetadata.creationMetadata.date': -1 })
-                    .skip(limit * (page - 1))
-                    .limit(limit + 1),
-                countQuery,
-            ]);
+            const results = await Case.aggregate(addingCount).collation({
+                locale: 'en_US',
+                strength: 2,
+            });
+            const docs = results[0].docs;
+            const total = results[0].total ?? 0;
             // If we have more items than limit, add a response param
             // indicating that there is more to fetch on the next page.
             if (docs.length == limit + 1) {
@@ -666,6 +718,83 @@ export class CasesController {
 
         res.status(200).json({ cases: caseIds }).end();
     };
+
+    private excludeRestrictedSourcesFromCaseAggregation(casesQuery: any[]) {
+        return _.concat(casesQuery, [
+            {
+                $addFields: {
+                    sourceID: {
+                        $toObjectId: '$caseReference.sourceId',
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    localField: 'sourceID',
+                    foreignField: '_id',
+                    from: 'sources',
+                    as: 'source',
+                },
+            },
+            {
+                $addFields: {
+                    isExcluded: {
+                        $anyElementTrue: '$source.excludeFromLineList',
+                    },
+                },
+            },
+            {
+                $match: {
+                    isExcluded: false,
+                },
+            },
+        ]);
+    }
+
+    private caseAggregationFromQuery(queryText: string) {
+        let casesQuery: any[] = [];
+        const parsedSearch = parseSearchQuery(queryText);
+        const query = parsedSearch.fullTextSearch
+            ? {
+                  $text: { $search: parsedSearch.fullTextSearch },
+              }
+            : {};
+        casesQuery = [
+            {
+                $match: query,
+            },
+        ];
+        const filters = parsedSearch.filters.map((f) => {
+            if (f.values.length == 1) {
+                const searchTerm = f.values[0];
+                if (searchTerm === '*') {
+                    return {
+                        $match: {
+                            [f.path]: {
+                                $exists: true,
+                            },
+                        },
+                    };
+                } else {
+                    return {
+                        $match: {
+                            [f.path]: f.values[0],
+                        },
+                    };
+                }
+            } else {
+                return {
+                    $match: {
+                        $expr: {
+                            $in: [`$${f.path}`, f.values],
+                        },
+                    },
+                };
+            }
+        });
+        casesQuery = _.concat(casesQuery, filters);
+        return casesQuery;
+    }
 
     /**
      * Geocodes a single location.
