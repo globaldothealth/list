@@ -243,7 +243,12 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             mustBeAuthenticated,
             casesController.get,
         );
-        apiRouter.get(
+        apiRouter.post(
+            '/cases/downloadLarge',
+            mustBeAuthenticated,
+            casesController.downloadLarge,
+        );
+        apiRouter.post(
             '/cases/getDownloadLink',
             mustBeAuthenticated,
             casesController.getDownloadLink,

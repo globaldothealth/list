@@ -551,12 +551,45 @@ paths:
                     $ref: '#/components/responses/200CasesDownload'
                 '500':
                     $ref: '#/components/responses/500'
+    /cases/downloadLarge:
+        post:
+            summary: >
+                Makes request to AWS to generate link that allows downloading
+                larger amount of data filtered by search query
+            tags: [Case]
+            operationId: downloadLargeCases
+            requestBody:
+                content:
+                    application/x-www-form-urlencoded:
+                        schema:
+                            type: object
+                            properties:
+                                format:
+                                    description: Format in which data should be downloaded
+                                    type: string
+                                query:
+                                    description: Search query to filter data to be downloaded
+                                    type: string
+            responses:
+                '200':
+                    $ref: '#components/responses/200CasesLargeDownload'
+                '500':
+                    $ref: '#components/responses/500'
     /cases/getDownloadLink:
-        get:
+        post:
             summary: >
                 Generates signed URL to download full data set from AWS S3
             tags: [Case]
             operationId: generateSignedUrl
+            requestBody:
+                content:
+                    application/x-www-form-urlencoded:
+                        schema:
+                            type: object
+                            properties:
+                                format:
+                                    description: Format in which data should be downloaded
+                                    type: string
             responses:
                 '200':
                     $ref: '#/components/responses/200FullDataSetDownload'
@@ -1461,6 +1494,11 @@ components:
                         type: string
             required:
                 - cases
+        downloadLarge:
+            type: object
+            properties:
+                message:
+                    type: string
         SignedUrl:
             type: object
             properties:
@@ -1754,6 +1792,12 @@ components:
                 text/csv:
                     schema:
                         description: A CSV with headers detailing case data.
+        '200CasesLargeDownload':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/downloadLarge'
         '200FullDataSetDownload':
             description: OK
             content:
