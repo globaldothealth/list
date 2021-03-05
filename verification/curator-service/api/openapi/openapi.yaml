@@ -1126,6 +1126,10 @@ components:
                     items:
                         type: string
                         format: email
+                excludeFromLineList:
+                    description: >
+                        Whether cases from this source should be left out of the line list feed.
+                    type: boolean
                 automation:
                     type: object
                     properties:
