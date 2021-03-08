@@ -394,6 +394,7 @@ paths:
                       type: integer
                       format: int32
                       minimum: 100
+                      default: 10000
                       maximum: 50000
                 - name: q
                   in: query

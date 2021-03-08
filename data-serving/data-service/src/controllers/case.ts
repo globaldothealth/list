@@ -129,7 +129,7 @@ export class CasesController {
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
-        const countLimit = Number(req.query.count_limit);
+        const countLimit = Number(req.query.count_limit) || 10000;
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -157,6 +157,9 @@ export class CasesController {
                 {
                     $facet: {
                         metadata: [
+                            {
+                                $limit: countLimit,
+                            },
                             {
                                 $group: {
                                     _id: null,
