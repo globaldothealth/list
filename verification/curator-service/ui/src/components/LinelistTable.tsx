@@ -19,10 +19,14 @@ import {
     makeStyles,
     withStyles,
     LinearProgress,
+    TableSortLabel,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
-import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
+import MaterialTable, {
+    MTableToolbar,
+    QueryResult,
+} from '@material-table/core';
 import Chip from '@material-ui/core/Chip';
 
 import { Case, VerificationStatus } from './Case';
@@ -868,13 +872,21 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         },
                         {
                             title: (
-                                <ColumnHeaderTitle
-                                    theClass={classes.centeredContent}
-                                    columnTitle="Case ID"
-                                    onClickAction={(
-                                        e: React.MouseEvent<HTMLDivElement>,
-                                    ) => this.handleAddFilterClick(e, 'caseid')}
-                                />
+                                <>
+                                    <TableSortLabel active />
+                                    <ColumnHeaderTitle
+                                        theClass={classes.centeredContent}
+                                        columnTitle="Case ID"
+                                        onClickAction={(
+                                            e: React.MouseEvent<HTMLDivElement>,
+                                        ) =>
+                                            this.handleAddFilterClick(
+                                                e,
+                                                'caseid',
+                                            )
+                                        }
+                                    />
+                                </>
                             ),
                             field: 'id',
                             type: 'string',
@@ -1213,7 +1225,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         search: false,
                         emptyRowsWhenPaging: false,
                         filtering: false,
-                        sorting: false, // Would be nice but has to wait on indexes to properly query the DB.
+                        sorting: false,
+                        thirdSortClick: false,
                         padding: 'dense',
                         draggable: false, // No need to be able to drag and drop headers.
                         selection:

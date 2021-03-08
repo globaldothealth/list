@@ -10,7 +10,7 @@ import {
     withStyles,
     Switch,
 } from '@material-ui/core';
-import MaterialTable, { QueryResult } from 'material-table';
+import MaterialTable, { QueryResult } from '@material-table/core';
 import React, { RefObject } from 'react';
 
 import MuiAlert from '@material-ui/lab/Alert';
@@ -546,10 +546,14 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 title: 'Exclude from line list?',
                                 field: 'excludeFromLineList',
                                 editComponent: (props): JSX.Element => (
-                                    <Switch checked={props.value ?? false} 
-                                    onChange={(event):void => {
-                                        props.onChange(event.target.checked)
-                                    }}/>
+                                    <Switch
+                                        checked={props.value ?? false}
+                                        onChange={(event): void => {
+                                            props.onChange(
+                                                event.target.checked,
+                                            );
+                                        }}
+                                    />
                                 ),
                             },
                         ]}

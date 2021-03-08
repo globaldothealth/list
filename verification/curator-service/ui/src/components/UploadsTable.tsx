@@ -1,4 +1,4 @@
-import MaterialTable, { QueryResult } from 'material-table';
+import MaterialTable, { QueryResult } from '@material-table/core';
 import { Paper, TablePagination, Typography } from '@material-ui/core';
 import React, { RefObject } from 'react';
 import {
