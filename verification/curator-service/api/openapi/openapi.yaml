@@ -470,7 +470,7 @@ paths:
                     application/json:
                         schema:
                             allOf:
-                                - $ref: '#/components/schemas/Case'
+                                - $ref: '#/components/schemas/NewCase'
                             required:
                                 - caseReference
             responses:
@@ -1454,6 +1454,14 @@ components:
                             $ref: '#/components/schemas/EditMetadata'
                         editMetadata:
                             $ref: '#/components/schemas/EditMetadata'
+                variant:
+                    type: object
+                    description: Details of the variant of concern/interest if applicable.
+                    properties:
+                        name:
+                            type: string
+                            example: B.1.351
+                            description: Name of the variant of concern or interest.
         CaseStatus:
             type: string
             enum: [UNVERIFIED, VERIFIED, EXCLUDED]
@@ -1554,7 +1562,6 @@ components:
                             description: >
                                 Limit results to one or more countries. 
                                 Permitted values are ISO 3166 alpha 2 country codes separated by commas.
-
             required:
                 - caseReference
                 - location
