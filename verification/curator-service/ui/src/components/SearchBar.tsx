@@ -166,7 +166,7 @@ export default function SearchBar({
                 multiple
                 disableClearable
                 forcePopupIcon={false}
-                id="tags-standard"
+                id="search-field"
                 options={filtersList}
                 getOptionLabel={(option) => option.desc}
                 getOptionSelected={(option, value) =>
