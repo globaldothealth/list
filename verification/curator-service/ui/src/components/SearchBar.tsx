@@ -17,6 +17,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
 import { useDebounce } from '../hooks/useDebounce';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -25,6 +26,10 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         alignItems: 'center',
         flex: 1,
+        width: '100%',
+        '& .MuiAutocomplete-root': {
+            width: '100%',
+        },
     },
     divider: {
         backgroundColor: theme.palette.primary.main,
@@ -131,77 +136,121 @@ export default function SearchBar({
         }
     };
 
+    const filtersList = [
+        { desc: 'curator email', value: 'curator' },
+        { desc: 'gender', value: 'gender' },
+        { desc: 'nationality', value: 'nationality' },
+        { desc: 'occupation', value: 'occupation' },
+        { desc: 'country', value: 'country' },
+        { desc: 'outcome', value: 'outcome' },
+        { desc: 'case ID', value: 'caseid' },
+        { desc: 'source URL', value: 'sourceurl' },
+        {
+            desc: 'verification status',
+            value: 'verificationstatus',
+        },
+        { desc: 'upload ID', value: 'uploadid' },
+        { desc: 'location admin 1', value: 'admin1' },
+        { desc: 'location admin 2', value: 'admin2' },
+        { desc: 'location admin 3', value: 'admin3' },
+        { desc: 'variant of concern', value: 'variant' },
+    ];
+
+    const handleChange = (stringToChange: any) => {
+        clickItem(stringToChange);
+    };
+
     return (
         <div className={classes.searchRoot}>
-            <StyledSearchTextField
-                id="search-field"
-                onKeyPress={handleKeyPress}
-                onChange={(event): void => {
-                    setSearchInput(event.target.value);
-                }}
-                onKeyDown={() => {
-                    if (!isUserTyping) {
-                        setIsUserTyping(true);
-                    }
-                }}
-                placeholder="Search"
-                value={searchInput}
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                    margin: 'dense',
-                    startAdornment: (
-                        <>
-                            <StyledInputAdornment position="start">
-                                <Button
-                                    color="primary"
-                                    startIcon={<FilterListIcon />}
-                                    onClick={handleFilterClick}
-                                >
-                                    Filter
-                                </Button>
-                                <div className={classes.divider}></div>
-                            </StyledInputAdornment>
-                            <InputAdornment position="start">
-                                <Button
-                                    color="primary"
-                                    startIcon={<HelpIcon />}
-                                    onClick={toggleSearchGuide}
-                                    className={clsx({
-                                        [classes.activeButton]: isSearchGuideOpen,
-                                    })}
-                                    ref={guideButtonRef}
-                                >
-                                    Search guide
-                                </Button>
-                                <SearchGuideDialog
-                                    isOpen={isSearchGuideOpen}
-                                    onToggle={toggleSearchGuide}
-                                    rootComponentRef={rootComponentRef}
-                                    triggerComponentRef={guideButtonRef}
-                                />
-                                <div className={classes.divider}></div>
-                                <SearchIcon color="primary" />
-                            </InputAdornment>
-                        </>
-                    ),
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            {searchInput && (
-                                <IconButton
-                                    color="primary"
-                                    aria-label="clear search"
-                                    onClick={(): void => {
-                                        setSearchInput('');
-                                        onSearchChange('');
-                                    }}
-                                >
-                                    <CloseIcon />
-                                </IconButton>
-                            )}
-                        </InputAdornment>
-                    ),
-                }}
+            <Autocomplete
+                multiple
+                disableClearable
+                forcePopupIcon={false}
+                id="tags-standard"
+                options={filtersList}
+                getOptionLabel={(option) => option.desc}
+                getOptionSelected={(option, value) =>
+                    option.value === value.value
+                }
+                onChange={(event, value) =>
+                    handleChange(value.map((el) => el.value))
+                }
+                inputValue={searchInput}
+                // onInputChange={(event, value) => setSearchInput(value)}
+                renderInput={(params) => (
+                    <StyledSearchTextField
+                        {...params}
+                        id="search-field"
+                        onKeyPress={handleKeyPress}
+                        onChange={(event): void => {
+                            setSearchInput(event.target.value);
+                        }}
+                        onKeyDown={() => {
+                            if (!isUserTyping) {
+                                setIsUserTyping(true);
+                            }
+                        }}
+                        placeholder="Search"
+                        value={searchInput}
+                        variant="outlined"
+                        fullWidth
+                        InputProps={{
+                            ...params.InputProps,
+                            margin: 'dense',
+                            startAdornment: (
+                                <>
+                                    <StyledInputAdornment position="start">
+                                        <Button
+                                            color="primary"
+                                            startIcon={<FilterListIcon />}
+                                            onClick={handleFilterClick}
+                                        >
+                                            Filter
+                                        </Button>
+                                        <div className={classes.divider}></div>
+                                    </StyledInputAdornment>
+                                    <InputAdornment position="start">
+                                        <Button
+                                            color="primary"
+                                            startIcon={<HelpIcon />}
+                                            onClick={toggleSearchGuide}
+                                            className={clsx({
+                                                [classes.activeButton]: isSearchGuideOpen,
+                                            })}
+                                            ref={guideButtonRef}
+                                        >
+                                            Search guide
+                                        </Button>
+                                        <SearchGuideDialog
+                                            isOpen={isSearchGuideOpen}
+                                            onToggle={toggleSearchGuide}
+                                            rootComponentRef={rootComponentRef}
+                                            triggerComponentRef={guideButtonRef}
+                                        />
+                                        <div className={classes.divider}></div>
+                                        <SearchIcon color="primary" />
+                                    </InputAdornment>
+                                </>
+                            ),
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    {searchInput && (
+                                        <IconButton
+                                            color="primary"
+                                            aria-label="clear search"
+                                            onClick={(): void => {
+                                                setSearchInput('');
+                                                onSearchChange('');
+                                            }}
+                                        >
+                                            <CloseIcon />
+                                        </IconButton>
+                                    )}
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                )}
             />
             <Menu
                 anchorEl={anchorEl}
@@ -213,25 +262,7 @@ export default function SearchBar({
                 open={Boolean(anchorEl)}
                 onClose={handleFilterClose}
             >
-                {[
-                    { desc: 'curator email', value: 'curator' },
-                    { desc: 'gender', value: 'gender' },
-                    { desc: 'nationality', value: 'nationality' },
-                    { desc: 'occupation', value: 'occupation' },
-                    { desc: 'country', value: 'country' },
-                    { desc: 'outcome', value: 'outcome' },
-                    { desc: 'case ID', value: 'caseid' },
-                    { desc: 'source URL', value: 'sourceurl' },
-                    {
-                        desc: 'verification status',
-                        value: 'verificationstatus',
-                    },
-                    { desc: 'upload ID', value: 'uploadid' },
-                    { desc: 'location admin 1', value: 'admin1' },
-                    { desc: 'location admin 2', value: 'admin2' },
-                    { desc: 'location admin 3', value: 'admin3' },
-                    { desc: 'variant of concern', value: 'variant' },
-                ].map((item) => (
+                {filtersList.map((item) => (
                     <MenuItem
                         key={item.value}
                         onClick={(): void => clickItem(item.value)}

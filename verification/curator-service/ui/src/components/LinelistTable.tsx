@@ -873,7 +873,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         {
                             title: (
                                 <>
-                                    <TableSortLabel active />
                                     <ColumnHeaderTitle
                                         theClass={classes.centeredContent}
                                         columnTitle="Case ID"
