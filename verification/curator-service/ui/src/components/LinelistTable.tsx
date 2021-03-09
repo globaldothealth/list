@@ -19,7 +19,6 @@ import {
     makeStyles,
     withStyles,
     LinearProgress,
-    TableSortLabel,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
