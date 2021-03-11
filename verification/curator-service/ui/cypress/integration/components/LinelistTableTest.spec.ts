@@ -395,7 +395,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1').as('get5Cases');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('get5Cases');
         cy.get('li').contains('5').click();
         cy.wait('@get5Cases');
         cy.get('input[type="checkbox"]').should('have.length', 6);
@@ -471,7 +471,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1').as('getFirstPage');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('getFirstPage');
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 
@@ -496,7 +496,7 @@ describe('Linelist table', function () {
         cy.visit('/cases');
         cy.wait('@getCases');
         cy.contains('rows').click();
-        cy.route('GET', '/api/cases/?limit=5&page=1').as('getFirstPage');
+        cy.route('GET', '/api/cases/?limit=5&page=1&count_limit=10000').as('getFirstPage');
         cy.get('li').contains('5').click();
         cy.wait('@getFirstPage');
 

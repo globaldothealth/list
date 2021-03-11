@@ -21,6 +21,14 @@ const creatorMetadata = {
     },
 };
 
+const location = {
+    query: '',
+    limitToResolution: '',
+    limitToCountry: '',
+};
+
+const events = [{ name: 'confirmed' }];
+
 const minimalCreateRequest = {
     ...caseReference,
     ...creatorMetadata,
@@ -309,7 +317,7 @@ describe('Cases', () => {
         });
         await curatorRequest
             .put('/api/cases')
-            .send({ age: '42', ...caseReference })
+            .send({ age: '42', ...caseReference, location, events })
             .expect(201)
             .expect('Content-Type', /json/);
 
@@ -320,6 +328,8 @@ describe('Cases', () => {
                 age: '42',
                 ...creatorMetadata,
                 ...caseReference,
+                location,
+                events,
             },
         );
     });
@@ -332,7 +342,7 @@ describe('Cases', () => {
         });
         const res = await curatorRequest
             .put('/api/cases')
-            .send({ age: '42', ...caseReference })
+            .send({ age: '42', ...caseReference, location, events })
             .expect(code);
         expect(res.text).toEqual(message);
     });
