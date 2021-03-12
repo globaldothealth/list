@@ -10,7 +10,7 @@ Function 5 handles the aggregated data export for the Map visualizations.
 
 ## Total Data Export
 
-- **[01-split](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data/functions/01-split)** Determines how many chunks are needed and invokes exporting each chunk by sending indices to parallel executions of **02-Split**.
+- **[01-split](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data/functions/01-split)** Determines how many chunks are needed and invokes exporting each chunk by sending indices to parallel executions of **02-export**.
 - **[02-export](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data/functions/02-export)** Is a lightweight wrapper for [mongoexport](). If you need to add new columns, the `fields.txt` file is one of the first things you will need to change. Data is stored on an EFS instance at the end of this step.
 - **[03-parse](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data/functions/03-parse)** Performs transformations for flattening data nested in arrays. This is very similar to the parsers used in the ingestion process. Processed files are stored in S3.
 - **[04-combine](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data/functions/04-combine)** Checks to see whether all processed chunks are available on S3. If yes, downloads them all, combines them, and uploads to production. The data dictionary and acknowledgements are added here.
