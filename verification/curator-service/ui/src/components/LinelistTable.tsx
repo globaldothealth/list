@@ -1,6 +1,7 @@
 import React, { RefObject, useState, useEffect } from 'react';
 import { RouteComponentProps, withRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import qs from 'qs';
 import { round } from 'lodash';
 import {
     Button,
@@ -407,52 +408,83 @@ export function DownloadButton(): JSX.Element {
     const downloadDataSet = async (formatType: string, dataSet: string) => {
         setIsLoading(true);
 
-        let url: string = '';
         const searchQuery: string = encodeURIComponent(
             URLToSearchQuery(location.search),
         );
 
-        let downloadParams: {
-            format: string;
-            limit?: number;
-            query?: string;
-        };
+        switch (dataSet) {
+            case 'fullDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/getDownloadLink',
+                        data: { format: formatType },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } catch (err) {
+                    alert(
+                        'There was an error while downloading data, please try again later.',
+                    );
+                }
+                break;
 
-        if (dataSet === 'fullDataset') {
-            url = '/api/cases/getDownloadLink';
-            downloadParams = { format: formatType };
-        } else if (dataSet === 'mailDataset') {
-            url = '/api/cases/downloadLarge';
-            downloadParams = { format: formatType, query: searchQuery };
-        } else {
-            url = '/api/cases/download';
-            downloadParams = {
-                format: formatType,
-                limit: 10000,
-                query: searchQuery,
-            };
+            case 'mailDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/downloadLarge',
+                        data: { format: formatType, query: searchQuery },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } catch (err) {
+                    alert(
+                        'There was an error while downloading data, please try again later.',
+                    );
+                }
+                break;
+
+            case 'partialDataset':
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/download',
+                        data: qs.stringify({
+                            format: formatType,
+                            limit: 10000,
+                            query: searchQuery,
+                        }),
+                        responseType: 'blob',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                    });
+
+                    const filename = response.headers['content-disposition']
+                        .split('filename=')[1]
+                        .replace(/["]/g, '');
+                    const downloadUrl = window.URL.createObjectURL(
+                        new Blob([response.data]),
+                    );
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.setAttribute('download', filename);
+                    document.body.appendChild(link);
+                    link.click();
+                } catch (err) {
+                    alert(
+                        'There was an error while downloading data, please try again later.',
+                    );
+                }
+                break;
         }
 
-        try {
-            const response = await axios({
-                method: 'post',
-                url,
-                data: downloadParams,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-
-            console.log('Download link respons: ', response);
-            window.location.href = response.data.signedUrl;
-            setIsLoading(false);
-            setIsDownloadModalOpen(false);
-        } catch (err) {
-            alert(
-                'There was an error while downloading data, please try again later.',
-            );
-            setIsLoading(false);
-        }
+        setIsLoading(false);
+        setIsDownloadModalOpen(false);
+        // window.location.href = response.data.signedUrl;
     };
 
     const [fileFormat, setFileFormat] = useState('');

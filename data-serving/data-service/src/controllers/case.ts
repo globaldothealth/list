@@ -75,12 +75,23 @@ export class CasesController {
             const casesIgnoringExcluded = this.excludeRestrictedSourcesFromCaseAggregation(
                 casesQuery,
             );
-            const matchingCases = await Case.aggregate(
-                casesIgnoringExcluded,
-            ).collation({
-                locale: 'en_US',
-                strength: 2,
-            });
+
+            let matchingCases: any;
+            if (req.body.limit) {
+                matchingCases = await Case.aggregate(casesIgnoringExcluded)
+                    .collation({
+                        locale: 'en_US',
+                        strength: 2,
+                    })
+                    .limit(Number(req.body.limit));
+            } else {
+                matchingCases = await Case.aggregate(
+                    casesIgnoringExcluded,
+                ).collation({
+                    locale: 'en_US',
+                    strength: 2,
+                });
+            }
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader(

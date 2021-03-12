@@ -543,7 +543,6 @@ paths:
                     application/x-www-form-urlencoded:
                         schema:
                             type: object
-                            maxProperties: 1
                             properties:
                                 caseIds:
                                     description: Cases corresponding to these ids will returned
@@ -555,6 +554,13 @@ paths:
                                     description: >
                                         Cases matching this query will be returned. This is ignored
                                         if empty.
+                                    type: string
+                                limit:
+                                    description: >
+                                        Max number of rows that can be downloaded when query is provided
+                                    type: string
+                                format:
+                                    description: Format of data to be downloaded
                                     type: string
             responses:
                 '200':
@@ -570,9 +576,8 @@ paths:
             operationId: downloadLargeCases
             requestBody:
                 content:
-                    application/x-www-form-urlencoded:
+                    application/json:
                         schema:
-                            type: object
                             properties:
                                 format:
                                     description: Format in which data should be downloaded
@@ -593,9 +598,8 @@ paths:
             operationId: generateSignedUrl
             requestBody:
                 content:
-                    application/x-www-form-urlencoded:
+                    application/json:
                         schema:
-                            type: object
                             properties:
                                 format:
                                     description: Format in which data should be downloaded

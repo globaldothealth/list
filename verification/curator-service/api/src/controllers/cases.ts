@@ -38,10 +38,14 @@ export default class CasesController {
     };
 
     todaysDate = (): string => {
-        const today = new Date();
-        return `${today.getFullYear()}_${
-            today.getMonth() + 1
-        }_${today.getDate()}`;
+        const dateObj = new Date();
+
+        // adjust 0 before single digit date
+        const day = ('0' + dateObj.getDate()).slice(-2);
+        const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+        const year = dateObj.getFullYear();
+
+        return `${year}-${month}-${day}`;
     };
 
     /** Download forwards the request to the data service and streams the
@@ -57,7 +61,7 @@ export default class CasesController {
                 res.setHeader('Content-Type', 'text/csv');
                 res.setHeader(
                     'Content-Disposition',
-                    `attachment; filename="globalhealth_covid19_cases_${this.todaysDate()}.csv"`,
+                    `attachment; filename="gh_${this.todaysDate()}.csv"`,
                 );
                 res.setHeader('Cache-Control', 'no-cache');
                 res.setHeader('Pragma', 'no-cache');
@@ -90,7 +94,7 @@ export default class CasesController {
         const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
         const year = dateObj.getFullYear();
 
-        const filename = `gh_${year}-${month}-${day}.tar.gz`;
+        const filename = `gh_${this.todaysDate()}.tar.gz`;
 
         const params = {
             Bucket: 'covid-19-data-export',
