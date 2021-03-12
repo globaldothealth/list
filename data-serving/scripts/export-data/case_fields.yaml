@@ -33,6 +33,8 @@
     national or cultural tradition.
 - name: genomeSequences
   description: Genome sequences of the pathogen
+- name: variant.name
+  description: Name of the variant of interest or concern detected in this case.
 - name: location.country
   description: English name of country this case was reported in
 - name: location.administrativeAreaLevel1
