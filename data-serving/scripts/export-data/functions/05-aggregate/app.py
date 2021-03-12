@@ -112,6 +112,9 @@ def get_jhu_counts():
 
 
 def get_country_codes():
+    """
+    Retrieve standardized country codes and coordinates.
+    """
     url = "https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv"
     req = requests.get(url, timeout=10)
 
@@ -280,6 +283,9 @@ def generate_region_json():
 
 
 def generate_total_json():
+    """
+    Generate json of total count of cases in MongoDB Atlas and upload to S3.
+    """
     now = datetime.datetime.now().strftime("%m-%d-%Y")
 
     count = cases.count_documents({})
@@ -315,6 +321,17 @@ def generate_total_json():
 
 
 def lambda_handler(event, context):
+    """Generates aggregate data for Map and uploads to S3.
+
+    Parameters
+    ----------
+    event: dict, required
+        Input event JSON-as-dict specified by EventBridge.
+    context: object, required
+        Lambda Context runtime methods and attributes.
+        For more information, see:
+          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+    """
     print("Generating country json...")
     generate_country_json()
     print("Country json generated!")

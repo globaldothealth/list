@@ -52,6 +52,19 @@ def export_chunk(skip, limit, num_cases, num_chunk, num_chunks, field_names):
 
 
 def lambda_handler(event, context):
+    """Lightweight wrapper for mongoexport.
+
+    Exports data from MongoDB Atlas and uploads to S3.
+
+    Parameters
+    ----------
+    event: dict, required
+        Input event JSON-as-dict specified by 01-split.
+    context: object, required
+        Lambda Context runtime methods and attributes.
+        For more information, see:
+          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+    """
     print("Let's export some data")
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     skip, limit, num_cases, num_chunk, num_chunks, field_names = extract_event_fields(

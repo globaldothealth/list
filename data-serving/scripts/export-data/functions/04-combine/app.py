@@ -7,6 +7,9 @@ import shutil
 import boto3
 
 def all_files_processed(bucket, folder, full_path):
+    """
+    Check to see if all processed chunks are present in S3 Bucket.
+    """
     number_of_parts = int((full_path.split("-of-")[1]).split("_")[0])
 
     s3 = boto3.resource("s3")
@@ -20,6 +23,9 @@ def all_files_processed(bucket, folder, full_path):
     return ready_to_combine
 
 def setup_directories():
+    """
+    Make sure directories exist on EFS.
+    """
     print("Creating directories...")
     os.makedirs("/mnt/efs/in/")
     os.makedirs("/mnt/efs/out/")
@@ -27,6 +33,9 @@ def setup_directories():
 
 
 def get_files(bucket, folder):
+    """
+    Retrieve all chunks from S3.
+    """
     print("Retrieving files...")
     s3 = boto3.resource("s3")
     bucket_obj = s3.Bucket(bucket)
@@ -55,6 +64,9 @@ def combine_files(downloaded_files):
 
 
 def compress_file(input_file):
+    """
+    Add combined file, data dictionary, and acknowledgements to tar.gz.
+    """
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     compressed_file = "/mnt/efs/latestdata.tar.gz"
     with tarfile.open(compressed_file, "w:gz") as tar:
@@ -66,7 +78,7 @@ def compress_file(input_file):
 
 def upload_to_production(compressed_file):
     """
-    Upload parsed .csv file to s3.
+    Upload tar.gz file to s3.
     """
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     filename = compressed_file.split("/")[-1]
@@ -78,6 +90,9 @@ def upload_to_production(compressed_file):
     )
 
 def cleanup_directories():
+    """
+    Remove processing directories from EFS.
+    """
     print("Cleaning up...")
     shutil.rmtree("/mnt/efs/out/")
     shutil.rmtree("/mnt/efs/in/")
@@ -85,6 +100,22 @@ def cleanup_directories():
 
 
 def lambda_handler(event, context):
+    """
+    1. Checks if all chunks have been processed
+    2. Downloads all chunks to EFS
+    3. Combines all chunks
+    4. Adds combined file to tar.gz with data dictionary and acknowledgements
+    5. Uploads to S3
+
+    Parameters
+    ----------
+    event: dict, required
+        Input event JSON-as-dict specified by S3.
+    context: object, required
+        Lambda Context runtime methods and attributes.
+        For more information, see:
+          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+    """
     if type(event) == str:
         event = json.loads(event)
     record = event["Records"][0]

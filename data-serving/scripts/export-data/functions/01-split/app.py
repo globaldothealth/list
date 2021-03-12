@@ -22,27 +22,16 @@ s3 = boto3.client("s3")
 
 
 def lambda_handler(event, context):
-    """Global ingestion retrieval function.
+    """Determines number of chunks and invokes export function with appropriate indices.
 
     Parameters
     ----------
     event: dict, required
-        Input event JSON-as-dict specified by the CloudWatch Event Rule.
-        This must contain a `sourceId` field specifying the canonical epid
-        system source UUID.
-        For more information, see:
-          https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/EventTypes.html#schedule_event_type
-
+        Input event JSON-as-dict specified by EventBridge.
     context: object, required
         Lambda Context runtime methods and attributes.
         For more information, see:
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    JSON object containing the bucket and key at which the retrieved data was
-    uploaded to S3. For more information on return types, see:
-      https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
     """
 
     num_cases = cases.count_documents({})
