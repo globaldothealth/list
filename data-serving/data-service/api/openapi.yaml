@@ -226,8 +226,6 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            maxProperties: 1
                             properties:
                                 caseIds:
                                     description: Cases corresponding to these ids will returned
@@ -240,11 +238,41 @@ paths:
                                         Cases matching this query will be returned. This is ignored
                                         if empty.
                                     type: string
+                                limit:
+                                    description: >
+                                        Max number of rows that can be downloaded when query is provided
+                                    type: string
+                                format:
+                                    description: Format of data to be downloaded
+                                    type: string
             responses:
                 '200':
                     $ref: '#/components/responses/200CasesDownload'
                 '500':
                     $ref: '#/components/responses/500'
+    /cases/downloadLarge:
+        post:
+            summary: >
+                Makes request to AWS to generate link that allows downloading
+                larger amount of data filtered by search query
+            tags: [Case]
+            operationId: downloadLargeCases
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                format:
+                                    description: Format in which data should be downloaded
+                                    type: string
+                                query:
+                                    description: Search query to filter data to be downloaded
+                                    type: string
+            responses:
+                '200':
+                    $ref: '#components/responses/200CasesLargeDownload'
+                '500':
+                    $ref: '#components/responses/500'
     /cases/batchUpsert:
         post:
             summary: Batch upserts cases
@@ -884,6 +912,11 @@ components:
                         type: string
             required:
                 - cases
+        downloadLarge:
+            type: object
+            properties:
+                message:
+                    type: string
         CaseStatus:
             type: string
             enum: [UNVERIFIED, VERIFIED, EXCLUDED]
@@ -1017,6 +1050,12 @@ components:
                 text/csv:
                     schema:
                         description: A CSV with headers detailing case data.
+        '200CasesLargeDownload':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/downloadLarge'
         '200BatchUpdateResponse':
             description: OK
             content:
