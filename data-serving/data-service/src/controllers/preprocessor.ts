@@ -273,6 +273,7 @@ export const batchDeleteCheckThreshold = async (
             const total = await casesMatchingSearchQuery({
                 searchQuery: request.body.query,
                 count: true,
+                limit: maxCasesThreshold + 1,
             });
             if (total > Number(maxCasesThreshold)) {
                 response.status(422).json({

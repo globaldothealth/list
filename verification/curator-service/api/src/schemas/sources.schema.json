@@ -27,6 +27,9 @@
             "format": {
                 "bsonType": "string"
             },
+            "excludeFromLineList": {
+                "bsonType": "boolean"
+            },
             "automation": {
                 "bsonType": "object",
                 "properties": {
