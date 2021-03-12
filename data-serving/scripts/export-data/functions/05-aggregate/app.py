@@ -15,13 +15,14 @@ _JHU_COUNTRY_MAP = {
     # there are cases in G.h under both Algiers and Algeria
     "Algeria": "Algiers",
     "US": "United States",
-    #     '': 'Gibraltar',
+    "Gibraltar, United Kingdom": 'Gibraltar',
     "Congo Kinshasa": "Democratic Republic of the Congo",
     "Cote dIvoire": "Cote d'Ivoire",
     "GuineaBissau": "Guinea-Bissau",
     "Congo Brazzaville": "Republic of Congo",
-    #     '': 'Virgin Islands, U.S.',
-    #     '': 'Reunion',
+    "Virgin Islands, US": 'Virgin Islands, U.S.',
+    "Reunion, France": 'Reunion',
+    "Faroe Islands, Denmark": "Faroe Islands"
 }
 
 _CODES_COUNTRY_MAP = {
@@ -40,6 +41,13 @@ _CODES_COUNTRY_MAP = {
     "United States of America": "United States",
     "Czechia": "Czech Republic",
     "The former Yugoslav Republic of Macedonia": "North Macedonia",
+    "Réunion": "Reunion",
+    "Congo [DRC]": "Democratic Republic of the Congo",
+    "Congo [Republic]": "Republic of Congo",
+    "Macedonia [FYROM]": "North Macedonia",
+    "U.S. Virgin Islands": "Virgin Islands, U.S.",
+    "Swaziland": "Eswatini",
+    "Cape Verde": "Cabo Verde"
 }
 
 _CODES_COUNTRY_ADD = {
@@ -104,25 +112,15 @@ def get_jhu_counts():
 
 
 def get_country_codes():
-    url = "https://github.com/datasets/country-codes/raw/master/data/country-codes.csv"
+    url = "https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv"
     req = requests.get(url, timeout=10)
 
     countrycodes_df = pd.read_csv(io.StringIO(req.text))
-    countrycodes_filtered = (
-        countrycodes_df[["official_name_en", "ISO3166-1-Alpha-2"]].dropna().copy()
-    )
-    countrycodes_filtered["official_name_en"] = countrycodes_filtered[
-        "official_name_en"
-    ].apply(lambda x: _CODES_COUNTRY_MAP[x] if x in _CODES_COUNTRY_MAP.keys() else x)
-    countrycodes_series = pd.Series(
-        data=countrycodes_filtered["ISO3166-1-Alpha-2"].values.flatten(),
-        index=countrycodes_filtered["official_name_en"],
-    )
+    countrycodes_df["name"] = countrycodes_df["name"].apply(lambda x: _CODES_COUNTRY_MAP[x] if x in _CODES_COUNTRY_MAP.keys() else x)
+    countrycodes_df = countrycodes_df.set_index('name')
 
-    for k, v in _CODES_COUNTRY_ADD.items():
-        countrycodes_series[k] = v
-
-    return countrycodes_series
+    countrycodes_dict = countrycodes_df.to_dict('index')
+    return countrycodes_dict
 
 
 def generate_country_json():
@@ -134,9 +132,7 @@ def generate_country_json():
         {
             "$group": {
                 "_id": "$location.country",
-                "casecount": {"$sum": 1},
-                "lat": {"$first": "$location.geometry.latitude"},
-                "long": {"$first": "$location.geometry.longitude"},
+                "casecount": {"$sum": 1}
             }
         }
     ]
@@ -175,11 +171,18 @@ def generate_country_json():
             print(f"I couldn't find {country} in the JHU case counts.")
             record["jhu"] = 0
         try:
-            code = country_codes[country]
-            record["code"] = code
+            if country != "Namibia":
+                code = country_codes[country]['country']
+                record["code"] = code
+            else:
+                record["code"] = str("NA")
+            record["lat"] = country_codes[country]['latitude']
+            record["long"] = country_codes[country]['longitude']
         except:
             print(f"I couldn't find {country} in the list of country codes.")
             record["code"] = "ZZ"
+            record["lat"] = -1.0
+            record["long"] = -1.0
 
     records = {now: records}
 

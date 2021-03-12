@@ -60,6 +60,8 @@ however, this is likely to be disabled and future imports will be done selective
 
 We provide a flattened version of the complete dataset accessible through the Data page, refreshed on a nightly basis and stored on S3. [The scripts that orchestrate this](https://github.com/globaldothealth/list/tree/main/data-serving/scripts/export-data) are organized using AWS SAM, and export the dataset in chunks in parallel, parse them, recombine them and then compress and upload the result along with a data dictionary.
 
+The script that aggregates and exports counts for the Map visualizations may also be found in this set of scripts.
+
 ### Updating the case schema
 #### What needs to be changed & where
 
