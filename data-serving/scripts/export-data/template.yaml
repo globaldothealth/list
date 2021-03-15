@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Lambda functions for Global.health Data Export
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 900
+    EventInvokeConfig:
+      MaximumRetryAttempts: 0
+    Environment:
+      Variables:
+        MONGO_USERNAME: XXXXX
+        MONGO_PASSWORD: XXXXX
+
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-0f3446d2b82eff09a
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+  Version:
+    Type: Number
+    Default: 1
+
+Resources:
+  DataExportSplitFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      CodeUri: functions/01-split/
+      Handler: app.lambda_handler
+      Description: Partition raw data into chunks
+      Events:
+        NightlyExportSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 0 * * ? *)'
+            Description: Triggers function at 12am UTC nightly
+            Enabled: True
+      Policies:
+        LambdaInvokePolicy:
+          FunctionName:
+            !Ref DataExportExportFunction
+      Environment:
+        Variables:
+          EXPORT_FUNCTION: !Ref DataExportExportFunction
+          CHUNK_SIZE: 100000
+
+  DataExportExportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/02-export/
+      Handler: app.lambda_handler
+      Description: Export chunk as flattened .csv
+      MemorySize: 1024
+      Policies:
+        - S3CrudPolicy:
+            BucketName: global-dot-health-data-export-bucket
+      Environment:
+        Variables:
+          EXPORT_BUCKET: global-dot-health-data-export-bucket
+
+  DataExportParseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/03-parse/
+      Handler: app.lambda_handler
+      Description: Parse .csv chunk
+      MemorySize: 1024
+      Events:
+        ChunkEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value: processing/parse/
+      Policies:
+        - S3CrudPolicy:
+            BucketName: global-dot-health-data-export-bucket
+      Environment:
+        Variables:
+          EXPORT_BUCKET: global-dot-health-data-export-bucket
+
+  DataExportCombineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/04-combine/
+      Handler: app.lambda_handler
+      Description: Combine chunks and upload to s3
+      MemorySize: 1024
+      Events:
+        ParsedChunkEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                - Name: prefix
+                  Value: processing/combine/
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
+          LocalMountPath: !Ref EFSpath
+      Policies:
+        - AWSLambdaFullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
+
+  DataExportAggregateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/05-aggregate/
+      Handler: app.lambda_handler
+      Description: Generate aggregate data for map
+      Events:
+        AggSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(6 hours)'
+            Description: Triggers function every 6 hours
+            Enabled: True
+      Layers:
+        - arn:aws:lambda:us-east-1:612888738066:layer:awsdatawrangler:1
+      Policies:
+        - AWSLambdaFullAccess
+
+  Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: global-dot-health-data-export-bucket
+

@@ -129,6 +129,7 @@ export class CasesController {
     list = async (req: Request, res: Response): Promise<void> => {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const countLimit = Number(req.query.count_limit) || 10000;
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -156,6 +157,9 @@ export class CasesController {
                 {
                     $facet: {
                         metadata: [
+                            {
+                                $limit: countLimit,
+                            },
                             {
                                 $group: {
                                     _id: null,
@@ -900,9 +904,12 @@ export class CasesController {
 export const casesMatchingSearchQuery = (opts: {
     searchQuery: string;
     count: boolean;
+    limit?: number;
     // Goofy Mongoose types require this.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any => {
+    // set data limit to 10K by default
+    const countLimit = opts.limit ? opts.limit : 10000;
     const parsedSearch = parseSearchQuery(opts.searchQuery);
     const queryOpts = parsedSearch.fullTextSearch
         ? {
@@ -910,15 +917,33 @@ export const casesMatchingSearchQuery = (opts: {
           }
         : {};
 
-    // Always search with case-insensitivity.
-    const casesQuery = Case.find(queryOpts).collation({
-        locale: 'en_US',
-        strength: 2,
-    });
-    const countQuery = Case.countDocuments(queryOpts).collation({
-        locale: 'en_US',
-        strength: 2,
-    });
+    let casesQuery: DocumentQuery<CaseDocument[], CaseDocument>;
+    let countQuery: Query<number>;
+
+    if (opts.searchQuery === '') {
+        // Always search with case-insensitivity.
+        casesQuery = Case.find(queryOpts).collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+        countQuery = Case.estimatedDocumentCount().collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+    } else {
+        // Always search with case-insensitivity.
+        casesQuery = Case.find(queryOpts).collation({
+            locale: 'en_US',
+            strength: 2,
+        });
+        countQuery = Case.countDocuments(queryOpts)
+            .limit(countLimit)
+            .collation({
+                locale: 'en_US',
+                strength: 2,
+            });
+    }
+
     // Fill in keyword filters.
     parsedSearch.filters.forEach((f) => {
         if (f.values.length == 1) {
