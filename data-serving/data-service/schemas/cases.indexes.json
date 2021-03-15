@@ -215,5 +215,15 @@
             "locale": "en_US",
             "strength": 2
         }
+    },
+    {
+        "name": "eventCaseCreationDate",
+        "key": {
+            "events.dateRange.start": -1
+        },
+        "collation": {
+            "locale": "en_US",
+            "strength": 2
+        }
     }
 ]
