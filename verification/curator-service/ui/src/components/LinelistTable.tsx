@@ -52,6 +52,9 @@ import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
 
+// Limit number of data that can be displayed or downloaded to avoid long execution times of mongo queries
+const DATA_LIMIT = 10000;
+
 interface ListResponse {
     cases: Case[];
     nextPage: number;
@@ -125,6 +128,7 @@ interface Props
     search: string;
     filterBreadcrumbs: ChipData[];
     handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
+    setTotalDataCount: (value: number) => void;
 }
 
 const styles = (theme: Theme) =>
@@ -397,7 +401,13 @@ function RowMenu(props: {
     );
 }
 
-export function DownloadButton(): JSX.Element {
+interface DownloadButtonProps {
+    totalCasesCount: number;
+}
+
+export function DownloadButton({
+    totalCasesCount,
+}: DownloadButtonProps): JSX.Element {
     const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
         false,
@@ -423,6 +433,8 @@ export function DownloadButton(): JSX.Element {
                             'Content-Type': 'application/json',
                         },
                     });
+
+                    window.location.href = response.data.signedUrl;
                 } catch (err) {
                     alert(
                         'There was an error while downloading data, please try again later.',
@@ -454,7 +466,7 @@ export function DownloadButton(): JSX.Element {
                         url: '/api/cases/download',
                         data: qs.stringify({
                             format: formatType,
-                            limit: 10000,
+                            limit: DATA_LIMIT,
                             query: searchQuery,
                         }),
                         responseType: 'blob',
@@ -484,7 +496,6 @@ export function DownloadButton(): JSX.Element {
 
         setIsLoading(false);
         setIsDownloadModalOpen(false);
-        // window.location.href = response.data.signedUrl;
     };
 
     const [fileFormat, setFileFormat] = useState('');
@@ -495,7 +506,6 @@ export function DownloadButton(): JSX.Element {
         ? 'Please first select the file format you want to download'
         : '';
 
-    const rowsToDownload = 10000;
     useEffect(() => {
         if (location.search !== '') {
             setShowFullDatasetButton(false);
@@ -537,7 +547,7 @@ export function DownloadButton(): JSX.Element {
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
             >
-                <DialogTitle>Download full dataset</DialogTitle>
+                <DialogTitle>Download dataset</DialogTitle>
                 <FormControl className={classes.formControl}>
                     <InputLabel
                         shrink
@@ -563,12 +573,15 @@ export function DownloadButton(): JSX.Element {
                     </FormHelperText>
                 </FormControl>
                 <DialogContent>
-                    <Typography variant="body2">
-                        This download link provides access to the full
-                        Global.health line list dataset, cached daily at 12:00am
-                        UTC. Any cases added past that time will not be in the
-                        current download, but will be available the next day.
-                    </Typography>
+                    {showFullDatasetButton && (
+                        <Typography variant="body2">
+                            This download link provides access to the full
+                            Global.health line list dataset, cached daily at
+                            12:00am UTC. Any cases added past that time will not
+                            be in the current download, but will be available
+                            the next day.
+                        </Typography>
+                    )}
 
                     {isLoading && <LinearProgress className={classes.loader} />}
                     {showFullDatasetButton && (
@@ -616,13 +629,14 @@ export function DownloadButton(): JSX.Element {
                                         isLoading || downloadButtonDisabled
                                     }
                                 >
-                                    Download up to {rowsToDownload} rows
-                                    immediately
+                                    {totalCasesCount >= DATA_LIMIT
+                                        ? `Download up to ${DATA_LIMIT} rows immediately`
+                                        : `Download ${totalCasesCount} rows`}
                                 </Button>
                             </span>
                         </Tooltip>
                     )}
-                    {!showFullDatasetButton && (
+                    {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && (
                         <Tooltip
                             title={disabledButtonTooltipText}
                             placement="top"
@@ -642,8 +656,8 @@ export function DownloadButton(): JSX.Element {
                                         isLoading || downloadButtonDisabled
                                     }
                                 >
-                                    Download more than {rowsToDownload} rows
-                                    through link delivered by email
+                                    Download more than {DATA_LIMIT} rows through
+                                    link delivered by email
                                 </Button>
                             </span>
                         </Tooltip>
@@ -1228,7 +1242,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
-                            listUrl += '&count_limit=10000';
+                            listUrl += `&count_limit=${DATA_LIMIT}`;
                             if (this.state.searchQuery !== '') {
                                 // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                                 listUrl += '&q=' + this.state.searchQuery;
@@ -1301,6 +1315,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                     ?.verificationStatus,
                                         });
                                     }
+                                    this.props.setTotalDataCount(
+                                        result.data.total,
+                                    );
                                     this.setState({
                                         totalNumRows: result.data.total,
                                         selectedRowsCurrentPage: [],
@@ -1419,7 +1436,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         pagination: {
                             labelDisplayedRows:
                                 // this value has to correspond to count_limit param in /api/cases query
-                                this.state.totalNumRows === 10000
+                                this.state.totalNumRows === DATA_LIMIT
                                     ? '{from}-{to} of many'
                                     : '{from}-{to} of {count}',
                         },
