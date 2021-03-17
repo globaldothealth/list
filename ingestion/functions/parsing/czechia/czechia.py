@@ -108,26 +108,28 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            try:
-                case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceUrl": source_url
-                    },
-                    "location": {
-                        "query": convert_location(row[_REGION], row[_DISTRICT])
-                    },
-                    "demographics": convert_demographics(
-                        row[_GENDER], row[_AGE]
-                    ),
-                    "events": convert_events(
-                        row[_DATE_CONFIRMED]
-                    ),
-                    "travelHistory": convert_travel(row[_TRAVEL_YN], row[_TRAVEL_LOCATION])
-                }
-                yield case
-            except ValueError as ve:
-                raise ValueError(f"error converting case: {ve}")
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if confirmation_date is not None:
+                try:
+                    case = {
+                        "caseReference": {
+                            "sourceId": source_id,
+                            "sourceUrl": source_url
+                        },
+                        "location": {
+                            "query": convert_location(row[_REGION], row[_DISTRICT])
+                        },
+                        "demographics": convert_demographics(
+                            row[_GENDER], row[_AGE]
+                        ),
+                        "events": convert_events(
+                            row[_DATE_CONFIRMED]
+                        ),
+                        "travelHistory": convert_travel(row[_TRAVEL_YN], row[_TRAVEL_LOCATION])
+                    }
+                    yield case
+                except ValueError as ve:
+                    raise ValueError(f"error converting case: {ve}")
 
 def lambda_handler(event):
     return parsing_lib.run_lambda(event, parse_cases)

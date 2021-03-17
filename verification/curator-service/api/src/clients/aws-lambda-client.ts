@@ -151,4 +151,25 @@ export default class AwsLambdaClient {
             throw e;
         }
     };
+
+    /**
+     * Invoke welcome email lambda.
+     *
+     * @param emailAddress - Email address to send welcome message
+     */
+    sendWelcomeEmail = async (email: string): Promise<void> => {
+        const params = {
+            FunctionName: 'SendWelcomeEmail',
+            Payload: JSON.stringify({
+                email_address: email,
+            }),
+        };
+
+        await this.lambdaClient
+            .invoke(params)
+            .promise()
+            .catch((err) => {
+                throw err;
+            });
+    };
 }

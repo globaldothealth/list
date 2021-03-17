@@ -1,0 +1,71 @@
+Field,Description
+_id,Unique ID of the case
+caseReference.additionalSources,Additional sources that provided data for this case
+caseReference.sourceEntryId,The ID of this case that was assigned by the source
+caseReference.sourceId,Unique ID of the source for this case
+caseReference.sourceUrl,URL of the raw source for this case
+caseReference.uploadIds,An array of UUIDs of uploads where this case was created or updated through bulk upload or automated ingestion
+caseReference.verificationStatus,"Whether this case was verified by a curator.  This is verification at the ingestion level, which means that curators verified that source outside the system. It does not mean that the curators personally verified the existence of the case. Values can be VERIFIED, UNVERIFIED or EXCLUDED. EXCLUDED cases contain a note describing the reason for exclusion and the date of exclusion."
+demographics.ageRange.end,"Maximum age bracket, excluded if different than start age"
+demographics.ageRange.start,Minimum age bracket
+demographics.ethnicity,"Ethnicity of the case, Asian, Caucasian, etc. Social group that has a common national or cultural tradition."
+demographics.gender,"Male, Female, Non-binary/Third gender, Other"
+demographics.nationalities,Nationalities of the case in English
+demographics.occupation,Primary occupation
+events.confirmed.date,Confirmed case date
+events.confirmed.value,Confirmation method
+events.firstClinicalConsultation.date,First clinical consultation date
+events.firstClinicalConsultation.value,First clinical consultation binary
+events.hospitalAdmission.date,Hospital admission date
+events.hospitalAdmission.value,Hospital admission binary
+events.icuAdmission.date.end,End of ICU stay
+events.icuAdmission.date.start,Admission to isolation unit date
+events.icuAdmission.value,Admission to isolation unit binary
+events.onsetSymptoms.date,Symptom onset date
+events.onsetSymptoms.date.value,Symptom onset binary
+events.outcome.date,Outcome date
+events.outcome.value,Outcome binary
+events.selfIsolation.date.end,Date self isolation end
+events.selfIsolation.date.start,Date self isolation start
+events.selfIsolation.value,Self isolation binary
+genomeSequences.sampleCollectionDate,Sample collection date
+genomeSequences.repositoryUrl,URL for source repository
+genomeSequences.sequenceId,Sequence ID
+genomeSequences.sequenceName,Name of sequence
+genomeSequences.sequenceLength,Length of sequence
+location.administrativeAreaLevel1,First administrative subdivision of a country
+location.administrativeAreaLevel2,Second administrative subdivision of a country
+location.administrativeAreaLevel3,Third administrative subdivision of a country
+location.country,Country
+location.geoResolution,"How granular the location is, i.e. Country, Admin2, etc"
+location.geometry.latitude,Latitude of the centroid of the location
+location.geometry.longitude,Longitude of the centroid of the location
+location.name,"Full name of the location, i.e. ""Lyon, Auvergne-Rhône-Alpes, France"""
+location.place,Name of the place this location refers to
+notes,Anything that does not fit in the schema but worth mentioning about the case
+pathogens,"List of pathogens for this case if additional to primary (e.g., co-infection)"
+preexistingConditions.hasPreexistingConditions,Whether the case had known preexisting conditions
+preexistingConditions.values,Preexisting conditions if any
+revisionMetadata.creationMetadata.date,Date this case was first entered in the system
+revisionMetadata.creationMetadata.notes,Creation notes from curator
+revisionMetadata.editMetadata.date,Date an update was made to the case
+revisionMetadata.editMetadata.notes,Update notes from curator
+revisionMetadata.revisionNumber,Revision number (smaller is older)
+symptoms.status,"Asymptomatic, Symptomatic or Presymptomatic"
+symptoms.values,List of symptoms
+transmission.linkedCaseIds,List of case IDs for which transmission occurred with this case
+transmission.places,List of places of transmission
+transmission.routes,List of routes of transmission
+travelHistory.travel.dateRange.end,Date of end of travel
+travelHistory.travel.dateRange.start,Date of start of travel
+travelHistory.travel.location.administrativeAreaLevel1,First administrative subdivision(s) of a country
+travelHistory.travel.location.administrativeAreaLevel2,Second administrative subdivision(s) of a country
+travelHistory.travel.location.administrativeAreaLevel3,Third administrative subdivision(s) of a country
+travelHistory.travel.location.country,Country/countries
+travelHistory.travel.location.geoResolution,"How granular the location(s) is/are, i.e. Country, Admin2, etc"
+travelHistory.travel.location.geometry.coordinates,Latitude/Longitude pairs for the centroid of each location visited
+travelHistory.travel.location.name,Full location name(s)
+travelHistory.travel.location.place,Name(s) of the place(s) listed
+travelHistory.travel.methods,Mode of travel
+travelHistory.travel.purpose,Purpose of travel
+travelHistory.traveledPrior30Days,Whether the case had travelled in the 30 days prior to becoming infected
