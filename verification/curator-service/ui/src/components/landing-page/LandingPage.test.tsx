@@ -57,7 +57,7 @@ describe('LandingPage', () => {
         );
         expect(screen.getByText('Data acknowledgments')).toHaveAttribute(
             'href',
-            'https://global.health/ackowledgement/',
+            'https://global.health/acknowledgement/',
         );
         expect(screen.getByText('Terms of use')).toHaveAttribute(
             'href',

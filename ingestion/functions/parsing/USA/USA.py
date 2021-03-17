@@ -1,6 +1,9 @@
 import os
+import argparse
+import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 import csv
 
 # Layer code, like parsing_lib, is added to the path by AWS.
@@ -27,16 +30,21 @@ _HOSPITALIZED = "hosp_yn"
 _ICU = "icu_yn"
 _DEATH = "death_yn"
 
-_NONE_TYPES = set(["Missing", "Unknown", "NA", None])
+_NONE_TYPES = set(["Missing", "Unknown", "NA", None, ""])
 
 
-def convert_date(raw_date):
+def convert_date(raw_date, manual_import=False):
     """
     Convert raw date field into a value interpretable by the dataserver.
+
+    If manual_import is set to True, returns in format recognized by MongoDB.
     """
     try:
         date = datetime.strptime(raw_date, "%Y/%m/%d")
-        return date.strftime("%m/%d/%YZ")
+        return (
+            {"$date": date.strftime("%Y-%m-%dT00:00:00Z")}
+            if manual_import else date.strftime("%m/%d/%YZ")
+        )
     except:
         return None
 
@@ -68,13 +76,13 @@ def convert_outcome(hospitalized: str, icu: str, death: str):
         }
 
 
-def convert_events(date_confirmed, date_symptoms, hospitalized, icu, death):
+def convert_events(date_confirmed, date_symptoms, hospitalized, icu, death, manual_import=False):
     events = [
         {
             "name": "confirmed",
             "dateRange": {
-                "start": convert_date(date_confirmed),
-                "end": convert_date(date_confirmed)
+                "start": convert_date(date_confirmed, manual_import),
+                "end": convert_date(date_confirmed, manual_import)
             }
         }
     ]
@@ -83,8 +91,8 @@ def convert_events(date_confirmed, date_symptoms, hospitalized, icu, death):
             {
                 "name": "onsetSymptoms",
                 "dateRange": {
-                    "start": convert_date(date_symptoms),
-                    "end": convert_date(date_symptoms)
+                    "start": convert_date(date_symptoms, manual_import),
+                    "end": convert_date(date_symptoms, manual_import)
                 },
             }
         )
@@ -129,22 +137,27 @@ def convert_symptoms(date_symptoms):
     if date_symptoms not in _NONE_TYPES:
         return {"status": "Symptomatic"}
 
-
-def parse_cases(raw_data_file: str, source_id: str, source_url: str):
+def parse_cases(raw_data_file: str, source_id: str, source_url: str, last_date: str = None, manual_import: bool = False):
     """
     Parses G.h-format case data from raw API data.
     """
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            confirmation_date = convert_date(row[_DATE_CONFIRMED], manual_import)
+            if (
+                manual_import and last_date and confirmation_date and
+                confirmation_date["$date"] >= last_date
+            ):
+                print(f"Skipping too recent case, on or after {last_date}")
+                continue
             if row[_CONFIRMED] == "Laboratory-confirmed case" and confirmation_date is not None:
                 try:
                     case = {
                         "caseReference": {"sourceId": source_id, "sourceUrl": source_url},
                         "location": {
                             "country": "United States",
-                            "geoResolution": "Point",
+                            "geoResolution": "Country",
                             "name": "United States",
                             "geometry": {
                                 "latitude": 37.0902,
@@ -156,7 +169,8 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                             row[_DATE_SYMPTOMS],
                             row[_HOSPITALIZED],
                             row[_ICU],
-                            row[_DEATH]
+                            row[_DEATH],
+                            manual_import
                         ),
                         "symptoms": convert_symptoms(row[_DATE_SYMPTOMS]),
                         "demographics": convert_demographics(
@@ -169,6 +183,24 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                     yield case
                 except ValueError as ve:
                     raise ValueError(f"error converting case: {ve}")
+
+def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = None):
+    """Prepares JSON file for import to MongoDB"""
+    last_date = last_date or (datetime.now() - timedelta(days=2)).date().isoformat()
+    if last_date:
+        print(f"Will load cases before {last_date}")
+    from tqdm import tqdm
+    source_id = f"{Path(__file__).stem.lower()}-manual-import"
+    case_json = Path('cases.json')
+    if case_json.exists():
+        print("Existing cases.json found, remove and rerun")
+        return None
+    with case_json.open('w') as f:
+        for c in tqdm(parse_cases(raw_data_file, source_id, source_url, last_date, manual_import=True)):
+            for non_null_field in ['symptoms', 'preexistingConditions']:
+                if c[non_null_field] is None:
+                    del c[non_null_field]
+            f.write(json.dumps(c) + "\n")
 
 
 def lambda_handler(event):
