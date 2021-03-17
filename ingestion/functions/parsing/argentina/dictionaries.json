@@ -1,0 +1,3478 @@
+{
+    "country_iso2": {
+        "afganistán": "AF",
+        "albania": "AL",
+        "alemania": "DE",
+        "andorra": "AD",
+        "angola": "AO",
+        "anguila": "AI",
+        "antártida": "AQ",
+        "antigua y barbuda": "AG",
+        "arabia saudí": "SA",
+        "argelia": "DZ",
+        "argentina": "AR",
+        "armenia": "AM",
+        "aruba": "AW",
+        "australia": "AU",
+        "austria": "AT",
+        "azerbaiyán": "AZ",
+        "bahamas": "BS",
+        "bangladés": "BD",
+        "barbados": "BB",
+        "baréin": "BH",
+        "bélgica": "BE",
+        "belice": "BZ",
+        "benín": "BJ",
+        "bermudas": "BM",
+        "bielorrusia": "BY",
+        "bolivia": "BO",
+        "bosnia y herzegovina": "BA",
+        "botsuana": "BW",
+        "brasil": "BR",
+        "brunéi": "BN",
+        "bulgaria": "BG",
+        "burkina faso": "BF",
+        "burundi": "BI",
+        "bután": "BT",
+        "cabo verde": "CV",
+        "camboya": "KH",
+        "camerún": "CM",
+        "canadá": "CA",
+        "caribe neerlandés": "BQ",
+        "catar": "QA",
+        "chad": "TD",
+        "chequia": "CZ",
+        "chile": "CL",
+        "china": "CN",
+        "chipre": "CY",
+        "ciudad del vaticano": "VA",
+        "colombia": "CO",
+        "comoras": "KM",
+        "congo": "CG",
+        "corea del norte": "KP",
+        "corea del sur": "KR",
+        "costa rica": "CR",
+        "côte d’ivoire": "CI",
+        "croacia": "HR",
+        "cuba": "CU",
+        "curazao": "CW",
+        "dinamarca": "DK",
+        "dominica": "DM",
+        "ecuador": "EC",
+        "egipto": "EG",
+        "el salvador": "SV",
+        "emiratos árabes unidos": "AE",
+        "eritrea": "ER",
+        "eslovaquia": "SK",
+        "eslovenia": "SI",
+        "españa": "ES",
+        "estados unidos": "US",
+        "estonia": "EE",
+        "esuatini": "SZ",
+        "etiopía": "ET",
+        "filipinas": "PH",
+        "finlandia": "FI",
+        "fiyi": "FJ",
+        "francia": "FR",
+        "gabón": "GA",
+        "gambia": "GM",
+        "georgia": "GE",
+        "ghana": "GH",
+        "gibraltar": "GI",
+        "granada": "GD",
+        "grecia": "GR",
+        "groenlandia": "GL",
+        "guadalupe": "GP",
+        "guam": "GU",
+        "guatemala": "GT",
+        "guayana francesa": "GF",
+        "guernsey": "GG",
+        "guinea": "GN",
+        "guinea ecuatorial": "GQ",
+        "guinea-bisáu": "GW",
+        "guyana": "GY",
+        "haití": "HT",
+        "honduras": "HN",
+        "hungría": "HU",
+        "india": "IN",
+        "indonesia": "ID",
+        "irak": "IQ",
+        "irán": "IR",
+        "irlanda": "IE",
+        "isla bouvet": "BV",
+        "isla de man": "IM",
+        "isla de navidad": "CX",
+        "isla norfolk": "NF",
+        "islandia": "IS",
+        "islas åland": "AX",
+        "islas caimán": "KY",
+        "islas cocos": "CC",
+        "islas cook": "CK",
+        "islas feroe": "FO",
+        "islas georgia del sur y sandwich del sur": "GS",
+        "islas heard y mcdonald": "HM",
+        "islas malvinas": "FK",
+        "islas marianas del norte": "MP",
+        "islas marshall": "MH",
+        "islas menores alejadas de ee. uu.": "UM",
+        "islas pitcairn": "PN",
+        "islas salomón": "SB",
+        "islas turcas y caicos": "TC",
+        "islas vírgenes británicas": "VG",
+        "islas vírgenes de ee. uu.": "VI",
+        "israel": "IL",
+        "italia": "IT",
+        "jamaica": "JM",
+        "japón": "JP",
+        "jersey": "JE",
+        "jordania": "JO",
+        "kazajistán": "KZ",
+        "kenia": "KE",
+        "kirguistán": "KG",
+        "kiribati": "KI",
+        "kuwait": "KW",
+        "laos": "LA",
+        "lesoto": "LS",
+        "letonia": "LV",
+        "líbano": "LB",
+        "liberia": "LR",
+        "libia": "LY",
+        "liechtenstein": "LI",
+        "lituania": "LT",
+        "luxemburgo": "LU",
+        "macedonia del norte": "MK",
+        "madagascar": "MG",
+        "malasia": "MY",
+        "malaui": "MW",
+        "maldivas": "MV",
+        "mali": "ML",
+        "malta": "MT",
+        "marruecos": "MA",
+        "martinica": "MQ",
+        "mauricio": "MU",
+        "mauritania": "MR",
+        "mayotte": "YT",
+        "méxico": "MX",
+        "micronesia": "FM",
+        "moldavia": "MD",
+        "mónaco": "MC",
+        "mongolia": "MN",
+        "montenegro": "ME",
+        "montserrat": "MS",
+        "mozambique": "MZ",
+        "myanmar (birmania)": "MM",
+        "namibia": "NA",
+        "nauru": "NR",
+        "nepal": "NP",
+        "nicaragua": "NI",
+        "níger": "NE",
+        "nigeria": "NG",
+        "niue": "NU",
+        "noruega": "NO",
+        "nueva caledonia": "NC",
+        "nueva zelanda": "NZ",
+        "omán": "OM",
+        "países bajos": "NL",
+        "pakistán": "PK",
+        "palaos": "PW",
+        "panamá": "PA",
+        "papúa nueva guinea": "PG",
+        "paraguay": "PY",
+        "perú": "PE",
+        "polinesia francesa": "PF",
+        "polonia": "PL",
+        "portugal": "PT",
+        "puerto rico": "PR",
+        "rae de hong kong (china)": "HK",
+        "rae de macao (china)": "MO",
+        "reino unido": "GB",
+        "república centroafricana": "CF",
+        "república democrática del congo": "CD",
+        "república dominicana": "DO",
+        "reunión": "RE",
+        "ruanda": "RW",
+        "rumanía": "RO",
+        "rusia": "RU",
+        "sáhara occidental": "EH",
+        "samoa": "WS",
+        "samoa americana": "AS",
+        "san bartolomé": "BL",
+        "san cristóbal y nieves": "KN",
+        "san marino": "SM",
+        "san martín": "MF",
+        "san pedro y miquelón": "PM",
+        "san vicente y las granadinas": "VC",
+        "santa elena": "SH",
+        "santa lucía": "LC",
+        "santo tomé y príncipe": "ST",
+        "senegal": "SN",
+        "serbia": "RS",
+        "seychelles": "SC",
+        "sierra leona": "SL",
+        "singapur": "SG",
+        "sint maarten": "SX",
+        "siria": "SY",
+        "somalia": "SO",
+        "sri lanka": "LK",
+        "sudáfrica": "ZA",
+        "sudán": "SD",
+        "sudán del sur": "SS",
+        "suecia": "SE",
+        "suiza": "CH",
+        "surinam": "SR",
+        "svalbard y jan mayen": "SJ",
+        "tailandia": "TH",
+        "taiwán": "TW",
+        "tanzania": "TZ",
+        "tayikistán": "TJ",
+        "territorio británico del océano índico": "IO",
+        "territorios australes franceses": "TF",
+        "territorios palestinos": "PS",
+        "timor-leste": "TL",
+        "togo": "TG",
+        "tokelau": "TK",
+        "tonga": "TO",
+        "trinidad y tobago": "TT",
+        "túnez": "TN",
+        "turkmenistán": "TM",
+        "turquía": "TR",
+        "tuvalu": "TV",
+        "ucrania": "UA",
+        "uganda": "UG",
+        "uruguay": "UY",
+        "uzbekistán": "UZ",
+        "vanuatu": "VU",
+        "venezuela": "VE",
+        "vietnam": "VN",
+        "wallis y futuna": "WF",
+        "yemen": "YE",
+        "yibuti": "DJ",
+        "zambia": "ZM",
+        "zimbabue": "ZW",
+        "afganistan": "AF",
+        "antartida": "AQ",
+        "arabia saudi": "SA",
+        "azerbaiyan": "AZ",
+        "banglades": "BD",
+        "barein": "BH",
+        "belgica": "BE",
+        "benin": "BJ",
+        "brunei": "BN",
+        "butan": "BT",
+        "camerun": "CM",
+        "canada": "CA",
+        "caribe neerlandes": "BQ",
+        "cote d'ivoire": "CI",
+        "emiratos arabes unidos": "AE",
+        "espana": "ES",
+        "etiopia": "ET",
+        "gabon": "GA",
+        "guinea-bisau": "GW",
+        "haiti": "HT",
+        "hungria": "HU",
+        "iran": "IR",
+        "islas aland": "AX",
+        "islas caiman": "KY",
+        "islas salomon": "SB",
+        "islas virgenes britanicas": "VG",
+        "islas virgenes de ee. uu.": "VI",
+        "japon": "JP",
+        "kazajistan": "KZ",
+        "kirguistan": "KG",
+        "libano": "LB",
+        "mexico": "MX",
+        "monaco": "MC",
+        "niger": "NE",
+        "oman": "OM",
+        "paises bajos": "NL",
+        "pakistan": "PK",
+        "panama": "PA",
+        "papua nueva guinea": "PG",
+        "peru": "PE",
+        "republica centroafricana": "CF",
+        "republica democratica del congo": "CD",
+        "republica dominicana": "DO",
+        "reunion": "RE",
+        "rumania": "RO",
+        "sahara occidental": "EH",
+        "san bartolome": "BL",
+        "san cristobal y nieves": "KN",
+        "san martin": "MF",
+        "san pedro y miquelon": "PM",
+        "santa lucia": "LC",
+        "santo tome y principe": "ST",
+        "sudafrica": "ZA",
+        "sudan": "SD",
+        "sudan del sur": "SS",
+        "taiwan": "TW",
+        "tayikistan": "TJ",
+        "territorio britanico del oceano indico": "IO",
+        "tunez": "TN",
+        "turkmenistan": "TM",
+        "turquia": "TR",
+        "uzbekistan": "UZ",
+        "república árabe siria": "SY",
+        "república de corea": "KR",
+        "arabia saudita": "SA",
+        "belarusia": "BY",
+        "estados unidos de américa": "US",
+        "islas vírgenes de los estados unidos": "VI",
+        "federación de rusia": "RU",
+        "reino unido de gran bretaña e irlanda del norte": "GB",
+        "república docimincana": "DO",
+        "santa helena": "SH",
+        "veneuela": "VE",
+        "kenya": "KE",
+        "qatar": "QA",
+        "antillas neerlandesas": "BQ"
+    },
+    "mismatch_locations": {
+        "Juan F. Ibarra": "Juan Felipe Ibarra",
+        "General Juan F. Quiroga": "General Juan Facundo Quiroga",
+        "1º de Mayo": "1° de Mayo",
+        "Ullúm": "Ullum",
+        "General Ocampo": "General Ortiz de Ocampo",
+        "Grl. José de San Martín": "General José de San Martín",
+        "Coronel de Marina L. Rosales": "Coronel de Marina Leonardo Rosales",
+        "Ñorquincó": "Ñorquinco",
+        "General Angel V. Peñaloza": "Ángel Vicente Peñaloza",
+        "Coronel Felipe Varela": "General Felipe Varela",
+        "San Blas de los Sauces": "San Blas de Los Sauces",
+        "COMUNA 01": "Comuna 1",
+        "COMUNA 02": "Comuna 2",
+        "COMUNA 03": "Comuna 3",
+        "COMUNA 04": "Comuna 4",
+        "COMUNA 05": "Comuna 5",
+        "COMUNA 06": "Comuna 6",
+        "COMUNA 07": "Comuna 7",
+        "COMUNA 08": "Comuna 8",
+        "COMUNA 09": "Comuna 9",
+        "COMUNA 10": "Comuna 10",
+        "COMUNA 11": "Comuna 11",
+        "COMUNA 12": "Comuna 12",
+        "COMUNA 13": "Comuna 13",
+        "COMUNA 14": "Comuna 14",
+        "COMUNA 15": "Comuna 15",
+        "CABA": "Ciudad Autónoma de Buenos Aires",
+        "Tierra del Fuego": "Tierra del Fuego, Antártida e Islas del Atlántico Sur"
+    },
+    "country_translate_lat_long": {
+        "AD": {
+            "name_english": "Andorra",
+            "latitude": 42.546245,
+            "longitude": 1.601554
+        },
+        "AE": {
+            "name_english": "United Arab Emirates",
+            "latitude": 23.424076,
+            "longitude": 53.847818
+        },
+        "AF": {
+            "name_english": "Afghanistan",
+            "latitude": 33.93911,
+            "longitude": 67.709953
+        },
+        "AG": {
+            "name_english": "Antigua and Barbuda",
+            "latitude": 17.060816,
+            "longitude": -61.796428
+        },
+        "AI": {
+            "name_english": "Anguilla",
+            "latitude": 18.220554,
+            "longitude": -63.068615
+        },
+        "AL": {
+            "name_english": "Albania",
+            "latitude": 41.153332,
+            "longitude": 20.168331
+        },
+        "AM": {
+            "name_english": "Armenia",
+            "latitude": 40.069099,
+            "longitude": 45.038189
+        },
+        "AN": {
+            "name_english": "Netherlands Antilles",
+            "latitude": 12.226079,
+            "longitude": -69.060087
+        },
+        "AO": {
+            "name_english": "Angola",
+            "latitude": -11.202692,
+            "longitude": 17.873887
+        },
+        "AQ": {
+            "name_english": "Antarctica",
+            "latitude": -75.250973,
+            "longitude": -0.071389
+        },
+        "AR": {
+            "name_english": "Argentina",
+            "latitude": -38.416097,
+            "longitude": -63.616672
+        },
+        "AS": {
+            "name_english": "American Samoa",
+            "latitude": -14.270972,
+            "longitude": -170.132217
+        },
+        "AT": {
+            "name_english": "Austria",
+            "latitude": 47.516231,
+            "longitude": 14.550072
+        },
+        "AU": {
+            "name_english": "Australia",
+            "latitude": -25.274398,
+            "longitude": 133.775136
+        },
+        "AW": {
+            "name_english": "Aruba",
+            "latitude": 12.52111,
+            "longitude": -69.968338
+        },
+        "AZ": {
+            "name_english": "Azerbaijan",
+            "latitude": 40.143105,
+            "longitude": 47.576927
+        },
+        "BA": {
+            "name_english": "Bosnia and Herzegovina",
+            "latitude": 43.915886,
+            "longitude": 17.679076
+        },
+        "BB": {
+            "name_english": "Barbados",
+            "latitude": 13.193887,
+            "longitude": -59.543198
+        },
+        "BD": {
+            "name_english": "Bangladesh",
+            "latitude": 23.684994,
+            "longitude": 90.356331
+        },
+        "BE": {
+            "name_english": "Belgium",
+            "latitude": 50.503887,
+            "longitude": 4.469936
+        },
+        "BF": {
+            "name_english": "Burkina Faso",
+            "latitude": 12.238333,
+            "longitude": -1.561593
+        },
+        "BG": {
+            "name_english": "Bulgaria",
+            "latitude": 42.733883,
+            "longitude": 25.48583
+        },
+        "BH": {
+            "name_english": "Bahrain",
+            "latitude": 25.930414,
+            "longitude": 50.637772
+        },
+        "BI": {
+            "name_english": "Burundi",
+            "latitude": -3.373056,
+            "longitude": 29.918886
+        },
+        "BJ": {
+            "name_english": "Benin",
+            "latitude": 9.30769,
+            "longitude": 2.315834
+        },
+        "BM": {
+            "name_english": "Bermuda",
+            "latitude": 32.321384,
+            "longitude": -64.75737
+        },
+        "BN": {
+            "name_english": "Brunei",
+            "latitude": 4.535277,
+            "longitude": 114.727669
+        },
+        "BO": {
+            "name_english": "Bolivia",
+            "latitude": -16.290154,
+            "longitude": -63.588653
+        },
+        "BR": {
+            "name_english": "Brazil",
+            "latitude": -14.235004,
+            "longitude": -51.92528
+        },
+        "BS": {
+            "name_english": "Bahamas",
+            "latitude": 25.03428,
+            "longitude": -77.39628
+        },
+        "BT": {
+            "name_english": "Bhutan",
+            "latitude": 27.514162,
+            "longitude": 90.433601
+        },
+        "BV": {
+            "name_english": "Bouvet Island",
+            "latitude": -54.423199,
+            "longitude": 3.413194
+        },
+        "BW": {
+            "name_english": "Botswana",
+            "latitude": -22.328474,
+            "longitude": 24.684866
+        },
+        "BY": {
+            "name_english": "Belarus",
+            "latitude": 53.709807,
+            "longitude": 27.953389
+        },
+        "BZ": {
+            "name_english": "Belize",
+            "latitude": 17.189877,
+            "longitude": -88.49765
+        },
+        "CA": {
+            "name_english": "Canada",
+            "latitude": 56.130366,
+            "longitude": -106.346771
+        },
+        "CC": {
+            "name_english": "Cocos [Keeling] Islands",
+            "latitude": -12.164165,
+            "longitude": 96.870956
+        },
+        "CD": {
+            "name_english": "Congo [DRC]",
+            "latitude": -4.038333,
+            "longitude": 21.758664
+        },
+        "CF": {
+            "name_english": "Central African Republic",
+            "latitude": 6.611111,
+            "longitude": 20.939444
+        },
+        "CG": {
+            "name_english": "Congo [Republic]",
+            "latitude": -0.228021,
+            "longitude": 15.827659
+        },
+        "CH": {
+            "name_english": "Switzerland",
+            "latitude": 46.818188,
+            "longitude": 8.227512
+        },
+        "CI": {
+            "name_english": "Côte d'Ivoire",
+            "latitude": 7.539989,
+            "longitude": -5.54708
+        },
+        "CK": {
+            "name_english": "Cook Islands",
+            "latitude": -21.236736,
+            "longitude": -159.777671
+        },
+        "CL": {
+            "name_english": "Chile",
+            "latitude": -35.675147,
+            "longitude": -71.542969
+        },
+        "CM": {
+            "name_english": "Cameroon",
+            "latitude": 7.369722,
+            "longitude": 12.354722
+        },
+        "CN": {
+            "name_english": "China",
+            "latitude": 35.86166,
+            "longitude": 104.195397
+        },
+        "CO": {
+            "name_english": "Colombia",
+            "latitude": 4.570868,
+            "longitude": -74.297333
+        },
+        "CR": {
+            "name_english": "Costa Rica",
+            "latitude": 9.748917,
+            "longitude": -83.753428
+        },
+        "CU": {
+            "name_english": "Cuba",
+            "latitude": 21.521757,
+            "longitude": -77.781167
+        },
+        "CV": {
+            "name_english": "Cape Verde",
+            "latitude": 16.002082,
+            "longitude": -24.013197
+        },
+        "CX": {
+            "name_english": "Christmas Island",
+            "latitude": -10.447525,
+            "longitude": 105.690449
+        },
+        "CY": {
+            "name_english": "Cyprus",
+            "latitude": 35.126413,
+            "longitude": 33.429859
+        },
+        "CZ": {
+            "name_english": "Czech Republic",
+            "latitude": 49.817492,
+            "longitude": 15.472962
+        },
+        "DE": {
+            "name_english": "Germany",
+            "latitude": 51.165691,
+            "longitude": 10.451526
+        },
+        "DJ": {
+            "name_english": "Djibouti",
+            "latitude": 11.825138,
+            "longitude": 42.590275
+        },
+        "DK": {
+            "name_english": "Denmark",
+            "latitude": 56.26392,
+            "longitude": 9.501785
+        },
+        "DM": {
+            "name_english": "Dominica",
+            "latitude": 15.414999,
+            "longitude": -61.370976
+        },
+        "DO": {
+            "name_english": "Dominican Republic",
+            "latitude": 18.735693,
+            "longitude": -70.162651
+        },
+        "DZ": {
+            "name_english": "Algeria",
+            "latitude": 28.033886,
+            "longitude": 1.659626
+        },
+        "EC": {
+            "name_english": "Ecuador",
+            "latitude": -1.831239,
+            "longitude": -78.183406
+        },
+        "EE": {
+            "name_english": "Estonia",
+            "latitude": 58.595272,
+            "longitude": 25.013607
+        },
+        "EG": {
+            "name_english": "Egypt",
+            "latitude": 26.820553,
+            "longitude": 30.802498
+        },
+        "EH": {
+            "name_english": "Western Sahara",
+            "latitude": 24.215527,
+            "longitude": -12.885834
+        },
+        "ER": {
+            "name_english": "Eritrea",
+            "latitude": 15.179384,
+            "longitude": 39.782334
+        },
+        "ES": {
+            "name_english": "Spain",
+            "latitude": 40.463667,
+            "longitude": -3.74922
+        },
+        "ET": {
+            "name_english": "Ethiopia",
+            "latitude": 9.145,
+            "longitude": 40.489673
+        },
+        "FI": {
+            "name_english": "Finland",
+            "latitude": 61.92411,
+            "longitude": 25.748151
+        },
+        "FJ": {
+            "name_english": "Fiji",
+            "latitude": -16.578193,
+            "longitude": 179.414413
+        },
+        "FK": {
+            "name_english": "Falkland Islands [Islas Malvinas]",
+            "latitude": -51.796253,
+            "longitude": -59.523613
+        },
+        "FM": {
+            "name_english": "Micronesia",
+            "latitude": 7.425554,
+            "longitude": 150.550812
+        },
+        "FO": {
+            "name_english": "Faroe Islands",
+            "latitude": 61.892635,
+            "longitude": -6.911806
+        },
+        "FR": {
+            "name_english": "France",
+            "latitude": 46.227638,
+            "longitude": 2.213749
+        },
+        "GA": {
+            "name_english": "Gabon",
+            "latitude": -0.803689,
+            "longitude": 11.609444
+        },
+        "GB": {
+            "name_english": "United Kingdom",
+            "latitude": 55.378051,
+            "longitude": -3.435973
+        },
+        "GD": {
+            "name_english": "Grenada",
+            "latitude": 12.262776,
+            "longitude": -61.604171
+        },
+        "GE": {
+            "name_english": "Georgia",
+            "latitude": 42.315407,
+            "longitude": 43.356892
+        },
+        "GF": {
+            "name_english": "French Guiana",
+            "latitude": 3.933889,
+            "longitude": -53.125782
+        },
+        "GG": {
+            "name_english": "Guernsey",
+            "latitude": 49.465691,
+            "longitude": -2.585278
+        },
+        "GH": {
+            "name_english": "Ghana",
+            "latitude": 7.946527,
+            "longitude": -1.023194
+        },
+        "GI": {
+            "name_english": "Gibraltar",
+            "latitude": 36.137741,
+            "longitude": -5.345374
+        },
+        "GL": {
+            "name_english": "Greenland",
+            "latitude": 71.706936,
+            "longitude": -42.604303
+        },
+        "GM": {
+            "name_english": "Gambia",
+            "latitude": 13.443182,
+            "longitude": -15.310139
+        },
+        "GN": {
+            "name_english": "Guinea",
+            "latitude": 9.945587,
+            "longitude": -9.696645
+        },
+        "GP": {
+            "name_english": "Guadeloupe",
+            "latitude": 16.995971,
+            "longitude": -62.067641
+        },
+        "GQ": {
+            "name_english": "Equatorial Guinea",
+            "latitude": 1.650801,
+            "longitude": 10.267895
+        },
+        "GR": {
+            "name_english": "Greece",
+            "latitude": 39.074208,
+            "longitude": 21.824312
+        },
+        "GS": {
+            "name_english": "South Georgia and the South Sandwich Islands",
+            "latitude": -54.429579,
+            "longitude": -36.587909
+        },
+        "GT": {
+            "name_english": "Guatemala",
+            "latitude": 15.783471,
+            "longitude": -90.230759
+        },
+        "GU": {
+            "name_english": "Guam",
+            "latitude": 13.444304,
+            "longitude": 144.793731
+        },
+        "GW": {
+            "name_english": "Guinea-Bissau",
+            "latitude": 11.803749,
+            "longitude": -15.180413
+        },
+        "GY": {
+            "name_english": "Guyana",
+            "latitude": 4.860416,
+            "longitude": -58.93018
+        },
+        "GZ": {
+            "name_english": "Gaza Strip",
+            "latitude": 31.354676,
+            "longitude": 34.308825
+        },
+        "HK": {
+            "name_english": "Hong Kong",
+            "latitude": 22.396428,
+            "longitude": 114.109497
+        },
+        "HM": {
+            "name_english": "Heard Island and McDonald Islands",
+            "latitude": -53.08181,
+            "longitude": 73.504158
+        },
+        "HN": {
+            "name_english": "Honduras",
+            "latitude": 15.199999,
+            "longitude": -86.241905
+        },
+        "HR": {
+            "name_english": "Croatia",
+            "latitude": 45.1,
+            "longitude": 15.2
+        },
+        "HT": {
+            "name_english": "Haiti",
+            "latitude": 18.971187,
+            "longitude": -72.285215
+        },
+        "HU": {
+            "name_english": "Hungary",
+            "latitude": 47.162494,
+            "longitude": 19.503304
+        },
+        "ID": {
+            "name_english": "Indonesia",
+            "latitude": -0.789275,
+            "longitude": 113.921327
+        },
+        "IE": {
+            "name_english": "Ireland",
+            "latitude": 53.41291,
+            "longitude": -8.24389
+        },
+        "IL": {
+            "name_english": "Israel",
+            "latitude": 31.046051,
+            "longitude": 34.851612
+        },
+        "IM": {
+            "name_english": "Isle of Man",
+            "latitude": 54.236107,
+            "longitude": -4.548056
+        },
+        "IN": {
+            "name_english": "India",
+            "latitude": 20.593684,
+            "longitude": 78.96288
+        },
+        "IO": {
+            "name_english": "British Indian Ocean Territory",
+            "latitude": -6.343194,
+            "longitude": 71.876519
+        },
+        "IQ": {
+            "name_english": "Iraq",
+            "latitude": 33.223191,
+            "longitude": 43.679291
+        },
+        "IR": {
+            "name_english": "Iran",
+            "latitude": 32.427908,
+            "longitude": 53.688046
+        },
+        "IS": {
+            "name_english": "Iceland",
+            "latitude": 64.963051,
+            "longitude": -19.020835
+        },
+        "IT": {
+            "name_english": "Italy",
+            "latitude": 41.87194,
+            "longitude": 12.56738
+        },
+        "JE": {
+            "name_english": "Jersey",
+            "latitude": 49.214439,
+            "longitude": -2.13125
+        },
+        "JM": {
+            "name_english": "Jamaica",
+            "latitude": 18.109581,
+            "longitude": -77.297508
+        },
+        "JO": {
+            "name_english": "Jordan",
+            "latitude": 30.585164,
+            "longitude": 36.238414
+        },
+        "JP": {
+            "name_english": "Japan",
+            "latitude": 36.204824,
+            "longitude": 138.252924
+        },
+        "KE": {
+            "name_english": "Kenya",
+            "latitude": -0.023559,
+            "longitude": 37.906193
+        },
+        "KG": {
+            "name_english": "Kyrgyzstan",
+            "latitude": 41.20438,
+            "longitude": 74.766098
+        },
+        "KH": {
+            "name_english": "Cambodia",
+            "latitude": 12.565679,
+            "longitude": 104.990963
+        },
+        "KI": {
+            "name_english": "Kiribati",
+            "latitude": -3.370417,
+            "longitude": -168.734039
+        },
+        "KM": {
+            "name_english": "Comoros",
+            "latitude": -11.875001,
+            "longitude": 43.872219
+        },
+        "KN": {
+            "name_english": "Saint Kitts and Nevis",
+            "latitude": 17.357822,
+            "longitude": -62.782998
+        },
+        "KP": {
+            "name_english": "North Korea",
+            "latitude": 40.339852,
+            "longitude": 127.510093
+        },
+        "KR": {
+            "name_english": "South Korea",
+            "latitude": 35.907757,
+            "longitude": 127.766922
+        },
+        "KW": {
+            "name_english": "Kuwait",
+            "latitude": 29.31166,
+            "longitude": 47.481766
+        },
+        "KY": {
+            "name_english": "Cayman Islands",
+            "latitude": 19.513469,
+            "longitude": -80.566956
+        },
+        "KZ": {
+            "name_english": "Kazakhstan",
+            "latitude": 48.019573,
+            "longitude": 66.923684
+        },
+        "LA": {
+            "name_english": "Laos",
+            "latitude": 19.85627,
+            "longitude": 102.495496
+        },
+        "LB": {
+            "name_english": "Lebanon",
+            "latitude": 33.854721,
+            "longitude": 35.862285
+        },
+        "LC": {
+            "name_english": "Saint Lucia",
+            "latitude": 13.909444,
+            "longitude": -60.978893
+        },
+        "LI": {
+            "name_english": "Liechtenstein",
+            "latitude": 47.166,
+            "longitude": 9.555373
+        },
+        "LK": {
+            "name_english": "Sri Lanka",
+            "latitude": 7.873054,
+            "longitude": 80.771797
+        },
+        "LR": {
+            "name_english": "Liberia",
+            "latitude": 6.428055,
+            "longitude": -9.429499
+        },
+        "LS": {
+            "name_english": "Lesotho",
+            "latitude": -29.609988,
+            "longitude": 28.233608
+        },
+        "LT": {
+            "name_english": "Lithuania",
+            "latitude": 55.169438,
+            "longitude": 23.881275
+        },
+        "LU": {
+            "name_english": "Luxembourg",
+            "latitude": 49.815273,
+            "longitude": 6.129583
+        },
+        "LV": {
+            "name_english": "Latvia",
+            "latitude": 56.879635,
+            "longitude": 24.603189
+        },
+        "LY": {
+            "name_english": "Libya",
+            "latitude": 26.3351,
+            "longitude": 17.228331
+        },
+        "MA": {
+            "name_english": "Morocco",
+            "latitude": 31.791702,
+            "longitude": -7.09262
+        },
+        "MC": {
+            "name_english": "Monaco",
+            "latitude": 43.750298,
+            "longitude": 7.412841
+        },
+        "MD": {
+            "name_english": "Moldova",
+            "latitude": 47.411631,
+            "longitude": 28.369885
+        },
+        "ME": {
+            "name_english": "Montenegro",
+            "latitude": 42.708678,
+            "longitude": 19.37439
+        },
+        "MG": {
+            "name_english": "Madagascar",
+            "latitude": -18.766947,
+            "longitude": 46.869107
+        },
+        "MH": {
+            "name_english": "Marshall Islands",
+            "latitude": 7.131474,
+            "longitude": 171.184478
+        },
+        "MK": {
+            "name_english": "Macedonia [FYROM]",
+            "latitude": 41.608635,
+            "longitude": 21.745275
+        },
+        "ML": {
+            "name_english": "Mali",
+            "latitude": 17.570692,
+            "longitude": -3.996166
+        },
+        "MM": {
+            "name_english": "Myanmar [Burma]",
+            "latitude": 21.913965,
+            "longitude": 95.956223
+        },
+        "MN": {
+            "name_english": "Mongolia",
+            "latitude": 46.862496,
+            "longitude": 103.846656
+        },
+        "MO": {
+            "name_english": "Macau",
+            "latitude": 22.198745,
+            "longitude": 113.543873
+        },
+        "MP": {
+            "name_english": "Northern Mariana Islands",
+            "latitude": 17.33083,
+            "longitude": 145.38469
+        },
+        "MQ": {
+            "name_english": "Martinique",
+            "latitude": 14.641528,
+            "longitude": -61.024174
+        },
+        "MR": {
+            "name_english": "Mauritania",
+            "latitude": 21.00789,
+            "longitude": -10.940835
+        },
+        "MS": {
+            "name_english": "Montserrat",
+            "latitude": 16.742498,
+            "longitude": -62.187366
+        },
+        "MT": {
+            "name_english": "Malta",
+            "latitude": 35.937496,
+            "longitude": 14.375416
+        },
+        "MU": {
+            "name_english": "Mauritius",
+            "latitude": -20.348404,
+            "longitude": 57.552152
+        },
+        "MV": {
+            "name_english": "Maldives",
+            "latitude": 3.202778,
+            "longitude": 73.22068
+        },
+        "MW": {
+            "name_english": "Malawi",
+            "latitude": -13.254308,
+            "longitude": 34.301525
+        },
+        "MX": {
+            "name_english": "Mexico",
+            "latitude": 23.634501,
+            "longitude": -102.552784
+        },
+        "MY": {
+            "name_english": "Malaysia",
+            "latitude": 4.210484,
+            "longitude": 101.975766
+        },
+        "MZ": {
+            "name_english": "Mozambique",
+            "latitude": -18.665695,
+            "longitude": 35.529562
+        },
+        "NaN": {
+            "name_english": "Namibia",
+            "latitude": -22.95764,
+            "longitude": 18.49041
+        },
+        "NC": {
+            "name_english": "New Caledonia",
+            "latitude": -20.904305,
+            "longitude": 165.618042
+        },
+        "NE": {
+            "name_english": "Niger",
+            "latitude": 17.607789,
+            "longitude": 8.081666
+        },
+        "NF": {
+            "name_english": "Norfolk Island",
+            "latitude": -29.040835,
+            "longitude": 167.954712
+        },
+        "NG": {
+            "name_english": "Nigeria",
+            "latitude": 9.081999,
+            "longitude": 8.675277
+        },
+        "NI": {
+            "name_english": "Nicaragua",
+            "latitude": 12.865416,
+            "longitude": -85.207229
+        },
+        "NL": {
+            "name_english": "Netherlands",
+            "latitude": 52.132633,
+            "longitude": 5.291266
+        },
+        "NO": {
+            "name_english": "Norway",
+            "latitude": 60.472024,
+            "longitude": 8.468946
+        },
+        "NP": {
+            "name_english": "Nepal",
+            "latitude": 28.394857,
+            "longitude": 84.124008
+        },
+        "NR": {
+            "name_english": "Nauru",
+            "latitude": -0.522778,
+            "longitude": 166.931503
+        },
+        "NU": {
+            "name_english": "Niue",
+            "latitude": -19.054445,
+            "longitude": -169.867233
+        },
+        "NZ": {
+            "name_english": "New Zealand",
+            "latitude": -40.900557,
+            "longitude": 174.885971
+        },
+        "OM": {
+            "name_english": "Oman",
+            "latitude": 21.512583,
+            "longitude": 55.923255
+        },
+        "PA": {
+            "name_english": "Panama",
+            "latitude": 8.537981,
+            "longitude": -80.782127
+        },
+        "PE": {
+            "name_english": "Peru",
+            "latitude": -9.189967,
+            "longitude": -75.015152
+        },
+        "PF": {
+            "name_english": "French Polynesia",
+            "latitude": -17.679742,
+            "longitude": -149.406843
+        },
+        "PG": {
+            "name_english": "Papua New Guinea",
+            "latitude": -6.314993,
+            "longitude": 143.95555
+        },
+        "PH": {
+            "name_english": "Philippines",
+            "latitude": 12.879721,
+            "longitude": 121.774017
+        },
+        "PK": {
+            "name_english": "Pakistan",
+            "latitude": 30.375321,
+            "longitude": 69.345116
+        },
+        "PL": {
+            "name_english": "Poland",
+            "latitude": 51.919438,
+            "longitude": 19.145136
+        },
+        "PM": {
+            "name_english": "Saint Pierre and Miquelon",
+            "latitude": 46.941936,
+            "longitude": -56.27111
+        },
+        "PN": {
+            "name_english": "Pitcairn Islands",
+            "latitude": -24.703615,
+            "longitude": -127.439308
+        },
+        "PR": {
+            "name_english": "Puerto Rico",
+            "latitude": 18.220833,
+            "longitude": -66.590149
+        },
+        "PS": {
+            "name_english": "Palestinian Territories",
+            "latitude": 31.952162,
+            "longitude": 35.233154
+        },
+        "PT": {
+            "name_english": "Portugal",
+            "latitude": 39.399872,
+            "longitude": -8.224454
+        },
+        "PW": {
+            "name_english": "Palau",
+            "latitude": 7.51498,
+            "longitude": 134.58252
+        },
+        "PY": {
+            "name_english": "Paraguay",
+            "latitude": -23.442503,
+            "longitude": -58.443832
+        },
+        "QA": {
+            "name_english": "Qatar",
+            "latitude": 25.354826,
+            "longitude": 51.183884
+        },
+        "RE": {
+            "name_english": "Réunion",
+            "latitude": -21.115141,
+            "longitude": 55.536384
+        },
+        "RO": {
+            "name_english": "Romania",
+            "latitude": 45.943161,
+            "longitude": 24.96676
+        },
+        "RS": {
+            "name_english": "Serbia",
+            "latitude": 44.016521,
+            "longitude": 21.005859
+        },
+        "RU": {
+            "name_english": "Russia",
+            "latitude": 61.52401,
+            "longitude": 105.318756
+        },
+        "RW": {
+            "name_english": "Rwanda",
+            "latitude": -1.940278,
+            "longitude": 29.873888
+        },
+        "SA": {
+            "name_english": "Saudi Arabia",
+            "latitude": 23.885942,
+            "longitude": 45.079162
+        },
+        "SB": {
+            "name_english": "Solomon Islands",
+            "latitude": -9.64571,
+            "longitude": 160.156194
+        },
+        "SC": {
+            "name_english": "Seychelles",
+            "latitude": -4.679574,
+            "longitude": 55.491977
+        },
+        "SD": {
+            "name_english": "Sudan",
+            "latitude": 12.862807,
+            "longitude": 30.217636
+        },
+        "SE": {
+            "name_english": "Sweden",
+            "latitude": 60.128161,
+            "longitude": 18.643501
+        },
+        "SG": {
+            "name_english": "Singapore",
+            "latitude": 1.352083,
+            "longitude": 103.819836
+        },
+        "SH": {
+            "name_english": "Saint Helena",
+            "latitude": -24.143474,
+            "longitude": -10.030696
+        },
+        "SI": {
+            "name_english": "Slovenia",
+            "latitude": 46.151241,
+            "longitude": 14.995463
+        },
+        "SJ": {
+            "name_english": "Svalbard and Jan Mayen",
+            "latitude": 77.553604,
+            "longitude": 23.670272
+        },
+        "SK": {
+            "name_english": "Slovakia",
+            "latitude": 48.669026,
+            "longitude": 19.699024
+        },
+        "SL": {
+            "name_english": "Sierra Leone",
+            "latitude": 8.460555,
+            "longitude": -11.779889
+        },
+        "SM": {
+            "name_english": "San Marino",
+            "latitude": 43.94236,
+            "longitude": 12.457777
+        },
+        "SN": {
+            "name_english": "Senegal",
+            "latitude": 14.497401,
+            "longitude": -14.452362
+        },
+        "SO": {
+            "name_english": "Somalia",
+            "latitude": 5.152149,
+            "longitude": 46.199616
+        },
+        "SR": {
+            "name_english": "Suriname",
+            "latitude": 3.919305,
+            "longitude": -56.027783
+        },
+        "ST": {
+            "name_english": "São Tomé and Príncipe",
+            "latitude": 0.18636,
+            "longitude": 6.613081
+        },
+        "SV": {
+            "name_english": "El Salvador",
+            "latitude": 13.794185,
+            "longitude": -88.89653
+        },
+        "SY": {
+            "name_english": "Syria",
+            "latitude": 34.802075,
+            "longitude": 38.996815
+        },
+        "SZ": {
+            "name_english": "Swaziland",
+            "latitude": -26.522503,
+            "longitude": 31.465866
+        },
+        "TC": {
+            "name_english": "Turks and Caicos Islands",
+            "latitude": 21.694025,
+            "longitude": -71.797928
+        },
+        "TD": {
+            "name_english": "Chad",
+            "latitude": 15.454166,
+            "longitude": 18.732207
+        },
+        "TF": {
+            "name_english": "French Southern Territories",
+            "latitude": -49.280366,
+            "longitude": 69.348557
+        },
+        "TG": {
+            "name_english": "Togo",
+            "latitude": 8.619543,
+            "longitude": 0.824782
+        },
+        "TH": {
+            "name_english": "Thailand",
+            "latitude": 15.870032,
+            "longitude": 100.992541
+        },
+        "TJ": {
+            "name_english": "Tajikistan",
+            "latitude": 38.861034,
+            "longitude": 71.276093
+        },
+        "TK": {
+            "name_english": "Tokelau",
+            "latitude": -8.967363,
+            "longitude": -171.855881
+        },
+        "TL": {
+            "name_english": "Timor-Leste",
+            "latitude": -8.874217,
+            "longitude": 125.727539
+        },
+        "TM": {
+            "name_english": "Turkmenistan",
+            "latitude": 38.969719,
+            "longitude": 59.556278
+        },
+        "TN": {
+            "name_english": "Tunisia",
+            "latitude": 33.886917,
+            "longitude": 9.537499
+        },
+        "TO": {
+            "name_english": "Tonga",
+            "latitude": -21.178986,
+            "longitude": -175.198242
+        },
+        "TR": {
+            "name_english": "Turkey",
+            "latitude": 38.963745,
+            "longitude": 35.243322
+        },
+        "TT": {
+            "name_english": "Trinidad and Tobago",
+            "latitude": 10.691803,
+            "longitude": -61.222503
+        },
+        "TV": {
+            "name_english": "Tuvalu",
+            "latitude": -7.109535,
+            "longitude": 177.64933
+        },
+        "TW": {
+            "name_english": "Taiwan",
+            "latitude": 23.69781,
+            "longitude": 120.960515
+        },
+        "TZ": {
+            "name_english": "Tanzania",
+            "latitude": -6.369028,
+            "longitude": 34.888822
+        },
+        "UA": {
+            "name_english": "Ukraine",
+            "latitude": 48.379433,
+            "longitude": 31.16558
+        },
+        "UG": {
+            "name_english": "Uganda",
+            "latitude": 1.373333,
+            "longitude": 32.290275
+        },
+        "UM": {
+            "name_english": "U.S. Minor Outlying Islands",
+            "latitude": NaN,
+            "longitude": NaN
+        },
+        "US": {
+            "name_english": "United States",
+            "latitude": 37.09024,
+            "longitude": -95.712891
+        },
+        "UY": {
+            "name_english": "Uruguay",
+            "latitude": -32.522779,
+            "longitude": -55.765835
+        },
+        "UZ": {
+            "name_english": "Uzbekistan",
+            "latitude": 41.377491,
+            "longitude": 64.585262
+        },
+        "VA": {
+            "name_english": "Vatican City",
+            "latitude": 41.902916,
+            "longitude": 12.453389
+        },
+        "VC": {
+            "name_english": "Saint Vincent and the Grenadines",
+            "latitude": 12.984305,
+            "longitude": -61.287228
+        },
+        "VE": {
+            "name_english": "Venezuela",
+            "latitude": 6.42375,
+            "longitude": -66.58973
+        },
+        "VG": {
+            "name_english": "British Virgin Islands",
+            "latitude": 18.420695,
+            "longitude": -64.639968
+        },
+        "VI": {
+            "name_english": "U.S. Virgin Islands",
+            "latitude": 18.335765,
+            "longitude": -64.896335
+        },
+        "VN": {
+            "name_english": "Vietnam",
+            "latitude": 14.058324,
+            "longitude": 108.277199
+        },
+        "VU": {
+            "name_english": "Vanuatu",
+            "latitude": -15.376706,
+            "longitude": 166.959158
+        },
+        "WF": {
+            "name_english": "Wallis and Futuna",
+            "latitude": -13.768752,
+            "longitude": -177.156097
+        },
+        "WS": {
+            "name_english": "Samoa",
+            "latitude": -13.759029,
+            "longitude": -172.104629
+        },
+        "XK": {
+            "name_english": "Kosovo",
+            "latitude": 42.602636,
+            "longitude": 20.902977
+        },
+        "YE": {
+            "name_english": "Yemen",
+            "latitude": 15.552727,
+            "longitude": 48.516388
+        },
+        "YT": {
+            "name_english": "Mayotte",
+            "latitude": -12.8275,
+            "longitude": 45.166244
+        },
+        "ZA": {
+            "name_english": "South Africa",
+            "latitude": -30.559482,
+            "longitude": 22.937506
+        },
+        "ZM": {
+            "name_english": "Zambia",
+            "latitude": -13.133897,
+            "longitude": 27.849332
+        },
+        "ZW": {
+            "name_english": "Zimbabwe",
+            "latitude": -19.015438,
+            "longitude": 29.154857
+        }
+    },
+    "province_lat_long": {
+        "Ciudad Autónoma de Buenos Aires": {
+            "latitude": -34.61448692,
+            "longitude": -58.44590845
+        },
+        "Neuquén": {
+            "latitude": -38.64169774,
+            "longitude": -70.11876961
+        },
+        "San Luis": {
+            "latitude": -33.75772574,
+            "longitude": -66.02812982
+        },
+        "Santa Fe": {
+            "latitude": -30.7070661,
+            "longitude": -60.94991396
+        },
+        "La Rioja": {
+            "latitude": -29.6857763,
+            "longitude": -67.18173597
+        },
+        "Catamarca": {
+            "latitude": -27.33589277,
+            "longitude": -66.94768934
+        },
+        "Tucumán": {
+            "latitude": -26.94806025,
+            "longitude": -65.36485177
+        },
+        "Chaco": {
+            "latitude": -26.38643104,
+            "longitude": -60.76582969
+        },
+        "Formosa": {
+            "latitude": -24.89494807,
+            "longitude": -59.93245743
+        },
+        "Santa Cruz": {
+            "latitude": -48.81547371,
+            "longitude": -69.95596754
+        },
+        "Chubut": {
+            "latitude": -43.7885142,
+            "longitude": -68.52699392
+        },
+        "Mendoza": {
+            "latitude": -34.62997937,
+            "longitude": -68.5831277
+        },
+        "Córdoba": {
+            "latitude": -32.14291978,
+            "longitude": -63.80186077
+        },
+        "Entre Ríos": {
+            "latitude": -32.05912618,
+            "longitude": -59.20114936
+        },
+        "San Juan": {
+            "latitude": -30.86536801,
+            "longitude": -68.88949084
+        },
+        "Jujuy": {
+            "latitude": -23.31999025,
+            "longitude": -65.76432926
+        },
+        "Santiago del Estero": {
+            "latitude": -27.78241591,
+            "longitude": -63.2523834
+        },
+        "Río Negro": {
+            "latitude": -40.40577072,
+            "longitude": -67.22939812
+        },
+        "Buenos Aires": {
+            "latitude": -36.67373207,
+            "longitude": -60.55722017
+        },
+        "Corrientes": {
+            "latitude": -28.77991795,
+            "longitude": -57.80480706
+        },
+        "Misiones": {
+            "latitude": -26.87540564,
+            "longitude": -54.65167998
+        },
+        "Salta": {
+            "latitude": -24.29927454,
+            "longitude": -64.81450471
+        },
+        "La Pampa": {
+            "latitude": -37.13155377,
+            "longitude": -65.4466547
+        },
+        "Tierra del Fuego, Antártida e Islas del Atlántico Sur": {
+            "latitude": -85.18646388,
+            "longitude": -47.39471187
+        }
+    },
+    "department_lat_long": {
+        "General Lavalle": {
+            "latitude": -36.65075038,
+            "longitude": -56.94100299
+        },
+        "La Costa": {
+            "latitude": -36.69716782,
+            "longitude": -56.71594028
+        },
+        "Magdalena": {
+            "latitude": -35.18510307,
+            "longitude": -57.68612798
+        },
+        "Vicente López": {
+            "latitude": -34.52653142,
+            "longitude": -58.50448651
+        },
+        "San Justo": {
+            "latitude": -31.24269105,
+            "longitude": -62.52725629
+        },
+        "Comuna 14": {
+            "latitude": -34.57387474,
+            "longitude": -58.42229408
+        },
+        "Cerrillos": {
+            "latitude": -24.98854394,
+            "longitude": -65.40381611
+        },
+        "Susques": {
+            "latitude": -23.52067099,
+            "longitude": -66.66171189
+        },
+        "Marcos Paz": {
+            "latitude": -34.81400296,
+            "longitude": -58.8478312
+        },
+        "Concordia": {
+            "latitude": -31.29029837,
+            "longitude": -58.23786969
+        },
+        "Federal": {
+            "latitude": -30.99242678,
+            "longitude": -58.89186005
+        },
+        "Gualeguaychú": {
+            "latitude": -33.02234924,
+            "longitude": -58.78579049
+        },
+        "Islas del Ibicuy": {
+            "latitude": -33.62412882,
+            "longitude": -58.93515806
+        },
+        "Victoria": {
+            "latitude": -32.78394246,
+            "longitude": -60.21807003
+        },
+        "Diamante": {
+            "latitude": -32.2280402,
+            "longitude": -60.52393371
+        },
+        "Uruguay": {
+            "latitude": -32.44996669,
+            "longitude": -58.58226614
+        },
+        "Paraná": {
+            "latitude": -31.6952294,
+            "longitude": -60.0411742
+        },
+        "Saladillo": {
+            "latitude": -35.67680645,
+            "longitude": -59.70266074
+        },
+        "Las Flores": {
+            "latitude": -36.01582666,
+            "longitude": -59.17646095
+        },
+        "Rojas": {
+            "latitude": -34.19281739,
+            "longitude": -60.78802346
+        },
+        "Escobar": {
+            "latitude": -34.32868283,
+            "longitude": -58.77117861
+        },
+        "José C. Paz": {
+            "latitude": -34.51185316,
+            "longitude": -58.7776346
+        },
+        "San Antonio de Areco": {
+            "latitude": -34.22075757,
+            "longitude": -59.51944348
+        },
+        "Maipú": {
+            "latitude": -36.88693321,
+            "longitude": -57.5861191
+        },
+        "Antártida Argentina": {
+            "latitude": -85.18646388,
+            "longitude": -47.39471187
+        },
+        "Iguazú": {
+            "latitude": -25.87473549,
+            "longitude": -54.40041859
+        },
+        "Ushuaia": {
+            "latitude": -54.76808027,
+            "longitude": -66.84699431
+        },
+        "General Ortiz de Ocampo": {
+            "latitude": -31.00664177,
+            "longitude": -66.05905483
+        },
+        "Corpen Aike": {
+            "latitude": -49.9474837,
+            "longitude": -69.44695072
+        },
+        "O'Higgins": {
+            "latitude": -27.25565377,
+            "longitude": -60.67997492
+        },
+        "Moreno": {
+            "latitude": -34.61068079,
+            "longitude": -58.81089851
+        },
+        "La Matanza": {
+            "latitude": -34.77034267,
+            "longitude": -58.62542798
+        },
+        "Tandil": {
+            "latitude": -37.33642932,
+            "longitude": -59.18198279
+        },
+        "Coronel Suárez": {
+            "latitude": -37.53485625,
+            "longitude": -61.88909224
+        },
+        "Adolfo Gonzales Chaves": {
+            "latitude": -37.96461591,
+            "longitude": -60.24828213
+        },
+        "Bahía Blanca": {
+            "latitude": -38.58156561,
+            "longitude": -62.1660766
+        },
+        "General Alvarado": {
+            "latitude": -38.20262771,
+            "longitude": -58.07180537
+        },
+        "General Pueyrredón": {
+            "latitude": -37.96568314,
+            "longitude": -57.74302835
+        },
+        "Mar Chiquita": {
+            "latitude": -37.4986406,
+            "longitude": -57.64326606
+        },
+        "Villa Gesell": {
+            "latitude": -37.36707196,
+            "longitude": -57.06339788
+        },
+        "Conesa": {
+            "latitude": -40.14871618,
+            "longitude": -64.30489265
+        },
+        "Pinamar": {
+            "latitude": -37.11107429,
+            "longitude": -56.87028341
+        },
+        "General Paz": {
+            "latitude": -35.46618301,
+            "longitude": -58.38965196
+        },
+        "General Guido": {
+            "latitude": -36.66603454,
+            "longitude": -57.9957366
+        },
+        "General Juan Madariaga": {
+            "latitude": -37.15351572,
+            "longitude": -57.2306606
+        },
+        "Alberdi": {
+            "latitude": -26.52105131,
+            "longitude": -62.72747422
+        },
+        "Juan Felipe Ibarra": {
+            "latitude": -28.03949631,
+            "longitude": -62.54401375
+        },
+        "General Taboada": {
+            "latitude": -28.56828474,
+            "longitude": -62.33882585
+        },
+        "Cruz del Eje": {
+            "latitude": -30.65701812,
+            "longitude": -65.07771603
+        },
+        "Punilla": {
+            "latitude": -31.21875828,
+            "longitude": -64.58587222
+        },
+        "Santa María": {
+            "latitude": -31.70971231,
+            "longitude": -64.30590216
+        },
+        "Gaiman": {
+            "latitude": -43.27251409,
+            "longitude": -66.17207058
+        },
+        "Rawson": {
+            "latitude": -43.13732926,
+            "longitude": -65.07571706
+        },
+        "Rivadavia": {
+            "latitude": -30.02056338,
+            "longitude": -62.28045304
+        },
+        "Ojo de Agua": {
+            "latitude": -29.30409006,
+            "longitude": -64.01499327
+        },
+        "Choya": {
+            "latitude": -28.75363359,
+            "longitude": -64.76389962
+        },
+        "Gobernador Dupuy": {
+            "latitude": -35.36908708,
+            "longitude": -65.81481938
+        },
+        "Cachi": {
+            "latitude": -25.03875579,
+            "longitude": -66.20262009
+        },
+        "Chicoana": {
+            "latitude": -25.15144133,
+            "longitude": -65.60633276
+        },
+        "La Viña": {
+            "latitude": -25.44717867,
+            "longitude": -65.58058314
+        },
+        "Rauch": {
+            "latitude": -36.57219445,
+            "longitude": -58.94414137
+        },
+        "Metán": {
+            "latitude": -25.42516745,
+            "longitude": -64.58814082
+        },
+        "Molinos": {
+            "latitude": -25.56436428,
+            "longitude": -66.45490599
+        },
+        "Minas": {
+            "latitude": -31.03519016,
+            "longitude": -65.41200432
+        },
+        "San Alberto": {
+            "latitude": -31.70802959,
+            "longitude": -65.15656016
+        },
+        "Río Segundo": {
+            "latitude": -31.73310879,
+            "longitude": -63.47485552
+        },
+        "Salliqueló": {
+            "latitude": -36.67177754,
+            "longitude": -63.04797353
+        },
+        "Berazategui": {
+            "latitude": -34.81824477,
+            "longitude": -58.15546151
+        },
+        "General Güemes": {
+            "latitude": -24.76459748,
+            "longitude": -64.95606022
+        },
+        "San Carlos": {
+            "latitude": -25.82908924,
+            "longitude": -66.17447837
+        },
+        "Santa Rosa": {
+            "latitude": -33.61699891,
+            "longitude": -67.96385611
+        },
+        "Unión": {
+            "latitude": -32.87838166,
+            "longitude": -62.79159706
+        },
+        "Tornquist": {
+            "latitude": -38.25775158,
+            "longitude": -62.29066476
+        },
+        "La Paz": {
+            "latitude": -33.70118911,
+            "longitude": -67.2498855
+        },
+        "Coronel Pringles": {
+            "latitude": -38.14791727,
+            "longitude": -61.26441745
+        },
+        "Tigre": {
+            "latitude": -34.3827776,
+            "longitude": -58.60388624
+        },
+        "Chamical": {
+            "latitude": -30.16770653,
+            "longitude": -65.95628695
+        },
+        "Tercero Arriba": {
+            "latitude": -32.28768002,
+            "longitude": -63.7790049
+        },
+        "General Pinto": {
+            "latitude": -34.66852315,
+            "longitude": -62.03987934
+        },
+        "San Cayetano": {
+            "latitude": -38.3890732,
+            "longitude": -59.58632644
+        },
+        "Tres Arroyos": {
+            "latitude": -38.51181428,
+            "longitude": -60.23741732
+        },
+        "Coronel Dorrego": {
+            "latitude": -38.67081761,
+            "longitude": -61.09555057
+        },
+        "Necochea": {
+            "latitude": -38.255411,
+            "longitude": -59.16738695
+        },
+        "Independencia": {
+            "latitude": -30.11446125,
+            "longitude": -67.33552022
+        },
+        "General Lamadrid": {
+            "latitude": -28.79043536,
+            "longitude": -68.69775473
+        },
+        "Ayacucho": {
+            "latitude": -32.16565656,
+            "longitude": -66.54225098
+        },
+        "Tapalqué": {
+            "latitude": -36.34714364,
+            "longitude": -60.13106503
+        },
+        "Arauco": {
+            "latitude": -28.53307353,
+            "longitude": -66.7191515
+        },
+        "Lezama": {
+            "latitude": -35.84920839,
+            "longitude": -57.89484439
+        },
+        "Chascomús": {
+            "latitude": -35.61868831,
+            "longitude": -57.90398107
+        },
+        "Punta Indio": {
+            "latitude": -35.42605588,
+            "longitude": -57.39923404
+        },
+        "El Carmen": {
+            "latitude": -24.44753764,
+            "longitude": -65.10129753
+        },
+        "Campana": {
+            "latitude": -34.13838712,
+            "longitude": -58.88295716
+        },
+        "Magallanes": {
+            "latitude": -48.83822803,
+            "longitude": -68.46838892
+        },
+        "Comuna 6": {
+            "latitude": -34.61684339,
+            "longitude": -58.44356823
+        },
+        "12 de Octubre": {
+            "latitude": -27.33369034,
+            "longitude": -61.47494578
+        },
+        "Tulumba": {
+            "latitude": -30.21887163,
+            "longitude": -63.82952409
+        },
+        "Río Cuarto": {
+            "latitude": -33.33108084,
+            "longitude": -64.49428791
+        },
+        "Tupungato": {
+            "latitude": -33.29340099,
+            "longitude": -69.2962859
+        },
+        "Pilagás": {
+            "latitude": -25.10537731,
+            "longitude": -58.66162775
+        },
+        "Laishi": {
+            "latitude": -26.46758532,
+            "longitude": -58.56543521
+        },
+        "Pirané": {
+            "latitude": -25.76728934,
+            "longitude": -59.15925735
+        },
+        "Valcheta": {
+            "latitude": -40.97458106,
+            "longitude": -66.3108866
+        },
+        "San Antonio": {
+            "latitude": -40.95280203,
+            "longitude": -65.37127724
+        },
+        "9 de Julio": {
+            "latitude": -40.92563673,
+            "longitude": -67.45749059
+        },
+        "Ñorquinco": {
+            "latitude": -41.73982574,
+            "longitude": -70.40111395
+        },
+        "25 de Mayo": {
+            "latitude": -41.13308231,
+            "longitude": -68.90631545
+        },
+        "Villarino": {
+            "latitude": -39.13064649,
+            "longitude": -62.74572384
+        },
+        "Vera": {
+            "latitude": -28.97001144,
+            "longitude": -60.41351578
+        },
+        "Telsen": {
+            "latitude": -42.4389444,
+            "longitude": -67.17690769
+        },
+        "Pilcaniyeu": {
+            "latitude": -40.88755236,
+            "longitude": -70.46271054
+        },
+        "Adolfo Alsina": {
+            "latitude": -37.19676037,
+            "longitude": -63.05605658
+        },
+        "Capital": {
+            "latitude": -31.41675688,
+            "longitude": -64.18358377
+        },
+        "Pellegrini": {
+            "latitude": -36.27118963,
+            "longitude": -63.2257573
+        },
+        "General Roca": {
+            "latitude": -34.61707448,
+            "longitude": -64.37875981
+        },
+        "General Alvear": {
+            "latitude": -35.21873259,
+            "longitude": -67.08087466
+        },
+        "La Caldera": {
+            "latitude": -24.56239958,
+            "longitude": -65.42909945
+        },
+        "San Rafael": {
+            "latitude": -34.94591144,
+            "longitude": -68.38410496
+        },
+        "Anta": {
+            "latitude": -24.87517533,
+            "longitude": -63.84001552
+        },
+        "Picún Leufú": {
+            "latitude": -39.40396522,
+            "longitude": -69.42719072
+        },
+        "Zapala": {
+            "latitude": -38.92204416,
+            "longitude": -69.82220743
+        },
+        "Aluminé": {
+            "latitude": -39.13148635,
+            "longitude": -71.04631796
+        },
+        "Sarmiento": {
+            "latitude": -45.34502353,
+            "longitude": -69.00283536
+        },
+        "Antofagasta de la Sierra": {
+            "latitude": -25.94564878,
+            "longitude": -67.67783582
+        },
+        "Tunuyán": {
+            "latitude": -33.6228877,
+            "longitude": -69.50929657
+        },
+        "Luján de Cuyo": {
+            "latitude": -33.03849464,
+            "longitude": -69.45168406
+        },
+        "Puán": {
+            "latitude": -38.07604175,
+            "longitude": -63.05741161
+        },
+        "Presidente Roque Sáenz Peña": {
+            "latitude": -34.14010636,
+            "longitude": -63.41877052
+        },
+        "Comuna 1": {
+            "latitude": -34.60644332,
+            "longitude": -58.37151215
+        },
+        "Comuna 4": {
+            "latitude": -34.64211258,
+            "longitude": -58.38756086
+        },
+        "General Belgrano": {
+            "latitude": -30.57769165,
+            "longitude": -65.93163105
+        },
+        "Futaleufú": {
+            "latitude": -43.07059712,
+            "longitude": -71.45546537
+        },
+        "Tapenagá": {
+            "latitude": -27.6588485,
+            "longitude": -59.82781094
+        },
+        "Comuna 5": {
+            "latitude": -34.61736992,
+            "longitude": -58.42057219
+        },
+        "Chapaleufú": {
+            "latitude": -35.22724287,
+            "longitude": -63.66091211
+        },
+        "General Villegas": {
+            "latitude": -34.76871192,
+            "longitude": -62.95376491
+        },
+        "Comuna 12": {
+            "latitude": -34.56622761,
+            "longitude": -58.49042804
+        },
+        "Fray Mamerto Esquiú": {
+            "latitude": -28.33294295,
+            "longitude": -65.73090093
+        },
+        "Cushamen": {
+            "latitude": -42.366391,
+            "longitude": -70.71203082
+        },
+        "Lácar": {
+            "latitude": -40.31422309,
+            "longitude": -71.18426396
+        },
+        "Hucal": {
+            "latitude": -37.97923404,
+            "longitude": -63.95448276
+        },
+        "Río Chico": {
+            "latitude": -48.28732902,
+            "longitude": -71.1138375
+        },
+        "Lago Argentino": {
+            "latitude": -49.83648814,
+            "longitude": -72.06547133
+        },
+        "El Cuy": {
+            "latitude": -39.70035947,
+            "longitude": -68.48279044
+        },
+        "Comuna 7": {
+            "latitude": -34.63655441,
+            "longitude": -58.45188686
+        },
+        "Iruya": {
+            "latitude": -22.81534528,
+            "longitude": -64.92051413
+        },
+        "Quitilipi": {
+            "latitude": -26.66631852,
+            "longitude": -60.17297428
+        },
+        "Los Lagos": {
+            "latitude": -40.77435037,
+            "longitude": -71.48672325
+        },
+        "Comuna 10": {
+            "latitude": -34.62785179,
+            "longitude": -58.50281785
+        },
+        "Ñorquín": {
+            "latitude": -37.63787989,
+            "longitude": -70.67777641
+        },
+        "Realicó": {
+            "latitude": -35.22579174,
+            "longitude": -64.21022693
+        },
+        "Las Heras": {
+            "latitude": -32.52580338,
+            "longitude": -69.26699979
+        },
+        "Lavalle": {
+            "latitude": -32.57529125,
+            "longitude": -67.89690164
+        },
+        "Comuna 11": {
+            "latitude": -34.60613701,
+            "longitude": -58.49674201
+        },
+        "Caleu Caleu": {
+            "latitude": -38.67558326,
+            "longitude": -63.89681799
+        },
+        "Lihuel Calel": {
+            "latitude": -38.26165538,
+            "longitude": -65.0966304
+        },
+        "Curacó": {
+            "latitude": -38.17973755,
+            "longitude": -66.33013347
+        },
+        "Belén": {
+            "latitude": -27.10015885,
+            "longitude": -66.92237823
+        },
+        "Confluencia": {
+            "latitude": -38.83216778,
+            "longitude": -68.79408518
+        },
+        "Picunches": {
+            "latitude": -38.57426979,
+            "longitude": -70.37293477
+        },
+        "Añelo": {
+            "latitude": -38.09877533,
+            "longitude": -69.01232276
+        },
+        "Loncopué": {
+            "latitude": -38.06590543,
+            "longitude": -70.31405684
+        },
+        "San Martín": {
+            "latitude": -28.18776128,
+            "longitude": -63.85411458
+        },
+        "Yavi": {
+            "latitude": -22.29064524,
+            "longitude": -65.56673919
+        },
+        "Santa Catalina": {
+            "latitude": -22.13764069,
+            "longitude": -66.22726138
+        },
+        "San Pedro": {
+            "latitude": -24.29850888,
+            "longitude": -64.81099028
+        },
+        "Valle Grande": {
+            "latitude": -23.46661384,
+            "longitude": -65.01201928
+        },
+        "Patiño": {
+            "latitude": -24.87505855,
+            "longitude": -59.95853733
+        },
+        "Bermejo": {
+            "latitude": -24.02552565,
+            "longitude": -61.28278288
+        },
+        "Matacos": {
+            "latitude": -23.85485708,
+            "longitude": -62.07689066
+        },
+        "Los Andes": {
+            "latitude": -24.6426249,
+            "longitude": -67.34409572
+        },
+        "Orán": {
+            "latitude": -23.49876843,
+            "longitude": -64.15087005
+        },
+        "Tilcara": {
+            "latitude": -23.56040152,
+            "longitude": -65.32001059
+        },
+        "Palpalá": {
+            "latitude": -24.19492252,
+            "longitude": -65.12644981
+        },
+        "Loventué": {
+            "latitude": -36.4787683,
+            "longitude": -65.53296941
+        },
+        "Eldorado": {
+            "latitude": -26.313845,
+            "longitude": -54.44073634
+        },
+        "Limay Mahuida": {
+            "latitude": -37.24190212,
+            "longitude": -66.55523269
+        },
+        "Puelén": {
+            "latitude": -37.43418079,
+            "longitude": -67.60496416
+        },
+        "Chalileo": {
+            "latitude": -36.39540951,
+            "longitude": -66.57275566
+        },
+        "Chical Co": {
+            "latitude": -36.39789947,
+            "longitude": -67.69539326
+        },
+        "Quebrachos": {
+            "latitude": -29.38230242,
+            "longitude": -63.35351277
+        },
+        "Monte Caseros": {
+            "latitude": -30.22895098,
+            "longitude": -57.87028656
+        },
+        "Esquina": {
+            "latitude": -29.98547458,
+            "longitude": -59.24142113
+        },
+        "Montecarlo": {
+            "latitude": -26.65790819,
+            "longitude": -54.56317745
+        },
+        "Presidencia de la Plaza": {
+            "latitude": -27.04462474,
+            "longitude": -59.77456404
+        },
+        "Pergamino": {
+            "latitude": -33.8360889,
+            "longitude": -60.5447827
+        },
+        "Sargento Cabral": {
+            "latitude": -26.7997133,
+            "longitude": -59.51910571
+        },
+        "Belgrano": {
+            "latitude": -32.73561154,
+            "longitude": -66.71500695
+        },
+        "Lago Buenos Aires": {
+            "latitude": -46.83410307,
+            "longitude": -70.63141001
+        },
+        "Malargüe": {
+            "latitude": -36.15863828,
+            "longitude": -69.31378359
+        },
+        "Pichi Mahuida": {
+            "latitude": -39.4076189,
+            "longitude": -64.40069015
+        },
+        "Río Senguer": {
+            "latitude": -45.34045625,
+            "longitude": -70.64007348
+        },
+        "Mayor Luis J. Fontana": {
+            "latitude": -27.74263898,
+            "longitude": -60.65719319
+        },
+        "Fray Justo Santa María de Oro": {
+            "latitude": -27.86534552,
+            "longitude": -61.30078351
+        },
+        "Las Colonias": {
+            "latitude": -31.3153379,
+            "longitude": -61.1094808
+        },
+        "San Cristóbal": {
+            "latitude": -30.22831914,
+            "longitude": -61.36001516
+        },
+        "San Javier": {
+            "latitude": -30.10414611,
+            "longitude": -59.89807047
+        },
+        "General Obligado": {
+            "latitude": -28.67197045,
+            "longitude": -59.5266517
+        },
+        "Maracó": {
+            "latitude": -35.67961776,
+            "longitude": -63.66248915
+        },
+        "Trenel": {
+            "latitude": -35.63187501,
+            "longitude": -64.21437663
+        },
+        "Copo": {
+            "latitude": -25.93925147,
+            "longitude": -62.7304992
+        },
+        "Ancasti": {
+            "latitude": -28.92666788,
+            "longitude": -65.50380878
+        },
+        "Pehuenches": {
+            "latitude": -37.39855847,
+            "longitude": -69.40211983
+        },
+        "Chos Malal": {
+            "latitude": -36.88026675,
+            "longitude": -70.28632751
+        },
+        "La Candelaria": {
+            "latitude": -26.0848734,
+            "longitude": -65.17602232
+        },
+        "Guasayán": {
+            "latitude": -27.97677103,
+            "longitude": -64.87115322
+        },
+        "Biedma": {
+            "latitude": -42.44367092,
+            "longitude": -64.93324812
+        },
+        "Río Hondo": {
+            "latitude": -27.48540567,
+            "longitude": -64.76018737
+        },
+        "Vinchina": {
+            "latitude": -28.31642038,
+            "longitude": -68.52539846
+        },
+        "Río Seco": {
+            "latitude": -30.04284068,
+            "longitude": -63.1974579
+        },
+        "Avellaneda": {
+            "latitude": -39.41023711,
+            "longitude": -66.20635744
+        },
+        "Comuna 2": {
+            "latitude": -34.58578888,
+            "longitude": -58.39490354
+        },
+        "Güer Aike": {
+            "latitude": -51.41344806,
+            "longitude": -70.56194316
+        },
+        "Comuna 13": {
+            "latitude": -34.5541263,
+            "longitude": -58.45400296
+        },
+        "Yerba Buena": {
+            "latitude": -26.78392447,
+            "longitude": -65.34117393
+        },
+        "Comuna 8": {
+            "latitude": -34.67456648,
+            "longitude": -58.46194805
+        },
+        "Pomán": {
+            "latitude": -28.23226322,
+            "longitude": -66.38929908
+        },
+        "Bariloche": {
+            "latitude": -41.49810496,
+            "longitude": -71.5310882
+        },
+        "Huiliches": {
+            "latitude": -39.79467768,
+            "longitude": -71.25900255
+        },
+        "Catán Lil": {
+            "latitude": -39.48079429,
+            "longitude": -70.43355933
+        },
+        "Silípica": {
+            "latitude": -28.18884866,
+            "longitude": -64.27326838
+        },
+        "Sobremonte": {
+            "latitude": -29.76547762,
+            "longitude": -64.14231517
+        },
+        "Río Grande": {
+            "latitude": -53.74629199,
+            "longitude": -68.13610465
+        },
+        "Banda": {
+            "latitude": -27.43470677,
+            "longitude": -64.20986581
+        },
+        "Paso de Indios": {
+            "latitude": -44.03018438,
+            "longitude": -68.68586284
+        },
+        "Mártires": {
+            "latitude": -43.81384795,
+            "longitude": -67.2399811
+        },
+        "Deseado": {
+            "latitude": -47.33044778,
+            "longitude": -68.02937145
+        },
+        "Languiñeo": {
+            "latitude": -43.32349188,
+            "longitude": -70.34840799
+        },
+        "Aguirre": {
+            "latitude": -29.29786827,
+            "longitude": -62.51534168
+        },
+        "Humahuaca": {
+            "latitude": -23.08200995,
+            "longitude": -65.40952266
+        },
+        "Almirante Brown": {
+            "latitude": -25.74412219,
+            "longitude": -61.96098861
+        },
+        "Rosario de la Frontera": {
+            "latitude": -25.8718801,
+            "longitude": -64.72790281
+        },
+        "Collón Curá": {
+            "latitude": -40.05291943,
+            "longitude": -70.28136678
+        },
+        "Comuna 3": {
+            "latitude": -34.61384308,
+            "longitude": -58.40265145
+        },
+        "Famaillá": {
+            "latitude": -26.97596898,
+            "longitude": -65.4789085
+        },
+        "General Donovan": {
+            "latitude": -27.13888999,
+            "longitude": -59.34678294
+        },
+        "Robles": {
+            "latitude": -27.85394407,
+            "longitude": -63.90750926
+        },
+        "Nogoyá": {
+            "latitude": -32.21871235,
+            "longitude": -59.76970192
+        },
+        "Tala": {
+            "latitude": -32.31741172,
+            "longitude": -59.26728649
+        },
+        "Loreto": {
+            "latitude": -28.62448044,
+            "longitude": -64.31072743
+        },
+        "Gualeguay": {
+            "latitude": -33.11990269,
+            "longitude": -59.60162349
+        },
+        "Federación": {
+            "latitude": -30.73489315,
+            "longitude": -58.15915412
+        },
+        "Feliciano": {
+            "latitude": -30.41394446,
+            "longitude": -58.72879589
+        },
+        "Toay": {
+            "latitude": -36.66216215,
+            "longitude": -64.69221101
+        },
+        "Colón": {
+            "latitude": -32.01148275,
+            "longitude": -58.36991296
+        },
+        "Villaguay": {
+            "latitude": -31.6477389,
+            "longitude": -59.05947081
+        },
+        "Castelli": {
+            "latitude": -36.04148974,
+            "longitude": -57.65742519
+        },
+        "San Salvador": {
+            "latitude": -31.57688354,
+            "longitude": -58.48637286
+        },
+        "Libertador Grl. San Martín": {
+            "latitude": -32.57841924,
+            "longitude": -65.70958877
+        },
+        "Chacabuco": {
+            "latitude": -32.7269647,
+            "longitude": -65.19823445
+        },
+        "General Las Heras": {
+            "latitude": -34.90942438,
+            "longitude": -58.99544662
+        },
+        "Presidente Perón": {
+            "latitude": -34.92984784,
+            "longitude": -58.39808421
+        },
+        "Junín": {
+            "latitude": -34.54647513,
+            "longitude": -61.00525013
+        },
+        "Curuzú Cuatiá": {
+            "latitude": -29.69551523,
+            "longitude": -58.32484649
+        },
+        "San Miguel": {
+            "latitude": -27.87585966,
+            "longitude": -57.41004217
+        },
+        "Malvinas Argentinas": {
+            "latitude": -34.48731134,
+            "longitude": -58.71213724
+        },
+        "Brandsen": {
+            "latitude": -35.2225198,
+            "longitude": -58.1752339
+        },
+        "Chivilcoy": {
+            "latitude": -34.91548733,
+            "longitude": -59.95841949
+        },
+        "Alberti": {
+            "latitude": -35.03696851,
+            "longitude": -60.28197659
+        },
+        "Bragado": {
+            "latitude": -35.06141227,
+            "longitude": -60.60404665
+        },
+        "Carlos Casares": {
+            "latitude": -35.74992221,
+            "longitude": -61.37437779
+        },
+        "General Viamonte": {
+            "latitude": -34.99777889,
+            "longitude": -61.04965723
+        },
+        "Ezeiza": {
+            "latitude": -34.87609684,
+            "longitude": -58.56470137
+        },
+        "Angaco": {
+            "latitude": -31.19227187,
+            "longitude": -68.13204833
+        },
+        "Candelaria": {
+            "latitude": -27.46085005,
+            "longitude": -55.58269004
+        },
+        "Carlos Tejedor": {
+            "latitude": -35.37974494,
+            "longitude": -62.42978958
+        },
+        "Pehuajó": {
+            "latitude": -35.88362083,
+            "longitude": -61.92812573
+        },
+        "Santa Bárbara": {
+            "latitude": -24.00726369,
+            "longitude": -64.40229675
+        },
+        "Trenque Lauquen": {
+            "latitude": -36.05676627,
+            "longitude": -62.63507978
+        },
+        "Capayán": {
+            "latitude": -28.90923419,
+            "longitude": -65.90157027
+        },
+        "Monte": {
+            "latitude": -35.50982676,
+            "longitude": -58.76723584
+        },
+        "Roque Pérez": {
+            "latitude": -35.4816357,
+            "longitude": -59.35751182
+        },
+        "Olavarría": {
+            "latitude": -36.85763405,
+            "longitude": -60.6702054
+        },
+        "Merlo": {
+            "latitude": -34.71100328,
+            "longitude": -58.74195841
+        },
+        "Esteban Echeverría": {
+            "latitude": -34.83121357,
+            "longitude": -58.47694793
+        },
+        "Arrecifes": {
+            "latitude": -34.01181191,
+            "longitude": -60.06266255
+        },
+        "Capitán Sarmiento": {
+            "latitude": -34.14984453,
+            "longitude": -59.85401478
+        },
+        "General Felipe Varela": {
+            "latitude": -29.44979561,
+            "longitude": -68.3284823
+        },
+        "Carmen de Areco": {
+            "latitude": -34.40679779,
+            "longitude": -59.88441349
+        },
+        "Salto": {
+            "latitude": -34.27107856,
+            "longitude": -60.30528927
+        },
+        "Exaltación de la Cruz": {
+            "latitude": -34.29513422,
+            "longitude": -59.15594613
+        },
+        "San Andrés de Giles": {
+            "latitude": -34.43773143,
+            "longitude": -59.47319859
+        },
+        "Mercedes": {
+            "latitude": -34.69732133,
+            "longitude": -59.42048114
+        },
+        "Pilar": {
+            "latitude": -34.44816024,
+            "longitude": -58.90333273
+        },
+        "Luján": {
+            "latitude": -34.56732242,
+            "longitude": -59.15845644
+        },
+        "Hurlingham": {
+            "latitude": -34.59928306,
+            "longitude": -58.64952539
+        },
+        "Empedrado": {
+            "latitude": -27.89611267,
+            "longitude": -58.6658403
+        },
+        "Ituzaingó": {
+            "latitude": -27.92537619,
+            "longitude": -56.78835966
+        },
+        "Morón": {
+            "latitude": -34.64938616,
+            "longitude": -58.61983171
+        },
+        "Godoy Cruz": {
+            "latitude": -32.93156193,
+            "longitude": -68.89006895
+        },
+        "Cafayate": {
+            "latitude": -26.12574863,
+            "longitude": -65.87670854
+        },
+        "San Luis del Palmar": {
+            "latitude": -27.60205308,
+            "longitude": -58.26835082
+        },
+        "San Cosme": {
+            "latitude": -27.38251488,
+            "longitude": -58.5175865
+        },
+        "Itatí": {
+            "latitude": -27.34697604,
+            "longitude": -58.07115755
+        },
+        "Berón de Astrada": {
+            "latitude": -27.48166204,
+            "longitude": -57.61765413
+        },
+        "Tres Lomas": {
+            "latitude": -36.49710022,
+            "longitude": -62.86390777
+        },
+        "Guaminí": {
+            "latitude": -36.89067551,
+            "longitude": -62.41853106
+        },
+        "Ensenada": {
+            "latitude": -34.84214974,
+            "longitude": -57.97910909
+        },
+        "General Manuel Belgrano": {
+            "latitude": -25.97843171,
+            "longitude": -53.9638551
+        },
+        "Guaymallén": {
+            "latitude": -32.89295951,
+            "longitude": -68.7332465
+        },
+        "General San Martín": {
+            "latitude": -34.55277193,
+            "longitude": -58.56428217
+        },
+        "Lincoln": {
+            "latitude": -35.07044797,
+            "longitude": -61.68245839
+        },
+        "Laprida": {
+            "latitude": -37.51650558,
+            "longitude": -60.76814818
+        },
+        "San Isidro": {
+            "latitude": -34.48689295,
+            "longitude": -58.53720908
+        },
+        "Benito Juárez": {
+            "latitude": -37.58611071,
+            "longitude": -59.88839784
+        },
+        "Tolhuin": {
+            "latitude": -54.42456089,
+            "longitude": -67.50348495
+        },
+        "General Rodríguez": {
+            "latitude": -34.65061569,
+            "longitude": -58.9878468
+        },
+        "Suipacha": {
+            "latitude": -34.74857414,
+            "longitude": -59.70338605
+        },
+        "Tres de Febrero": {
+            "latitude": -34.59601005,
+            "longitude": -58.57918842
+        },
+        "Florencio Varela": {
+            "latitude": -34.87774482,
+            "longitude": -58.25855489
+        },
+        "Navarro": {
+            "latitude": -35.03048448,
+            "longitude": -59.42935855
+        },
+        "Cañuelas": {
+            "latitude": -35.1448045,
+            "longitude": -58.69109418
+        },
+        "Cainguás": {
+            "latitude": -27.14783658,
+            "longitude": -54.80234379
+        },
+        "Libertador General San Martín": {
+            "latitude": -26.89314489,
+            "longitude": -54.92336296
+        },
+        "San Vicente": {
+            "latitude": -35.07150872,
+            "longitude": -58.43181206
+        },
+        "Lobos": {
+            "latitude": -35.21958579,
+            "longitude": -59.14574188
+        },
+        "Quilmes": {
+            "latitude": -34.7349708,
+            "longitude": -58.27685802
+        },
+        "Pila": {
+            "latitude": -36.20298422,
+            "longitude": -58.34044305
+        },
+        "General La Madrid": {
+            "latitude": -37.35612778,
+            "longitude": -61.34413089
+        },
+        "Bolívar": {
+            "latitude": -36.29894796,
+            "longitude": -61.14986009
+        },
+        "Guaraní": {
+            "latitude": -27.0262349,
+            "longitude": -54.26936513
+        },
+        "Balcarce": {
+            "latitude": -37.71461981,
+            "longitude": -58.27174756
+        },
+        "Hipólito Yrigoyen": {
+            "latitude": -36.25918902,
+            "longitude": -61.66018763
+        },
+        "Oberá": {
+            "latitude": -27.4763636,
+            "longitude": -55.07122211
+        },
+        "Dolores": {
+            "latitude": -36.39893767,
+            "longitude": -57.63192612
+        },
+        "Azul": {
+            "latitude": -36.78593522,
+            "longitude": -59.69647834
+        },
+        "Daireaux": {
+            "latitude": -36.64086922,
+            "longitude": -61.89124955
+        },
+        "Juárez Celman": {
+            "latitude": -33.32957448,
+            "longitude": -63.60638586
+        },
+        "Figueroa": {
+            "latitude": -27.32185675,
+            "longitude": -63.57963202
+        },
+        "Saavedra": {
+            "latitude": -37.77063813,
+            "longitude": -62.43438291
+        },
+        "Monte Hermoso": {
+            "latitude": -38.96162379,
+            "longitude": -61.2921467
+        },
+        "Lobería": {
+            "latitude": -38.09005282,
+            "longitude": -58.69354978
+        },
+        "Berisso": {
+            "latitude": -34.90935511,
+            "longitude": -57.82837977
+        },
+        "Tordillo": {
+            "latitude": -36.39051512,
+            "longitude": -57.27381165
+        },
+        "San Fernando": {
+            "latitude": -34.14710279,
+            "longitude": -58.53839442
+        },
+        "Zárate": {
+            "latitude": -33.9970898,
+            "longitude": -59.1282153
+        },
+        "Ramallo": {
+            "latitude": -33.58717215,
+            "longitude": -60.05736279
+        },
+        "San Nicolás": {
+            "latitude": -33.4829732,
+            "longitude": -60.2931352
+        },
+        "Salavina": {
+            "latitude": -28.91874359,
+            "longitude": -63.30359495
+        },
+        "San Ignacio": {
+            "latitude": -27.17659395,
+            "longitude": -55.33929017
+        },
+        "Leandro N. Alem": {
+            "latitude": -27.63066526,
+            "longitude": -55.38806773
+        },
+        "Guachipas": {
+            "latitude": -25.70295843,
+            "longitude": -65.44454062
+        },
+        "Islas del Atlántico Sur": {
+            "latitude": -51.74139392,
+            "longitude": -58.75617516
+        },
+        "Pocho": {
+            "latitude": -31.46275652,
+            "longitude": -65.43536649
+        },
+        "Conhelo": {
+            "latitude": -36.03154358,
+            "longitude": -64.51060303
+        },
+        "Castro Barros": {
+            "latitude": -28.85998295,
+            "longitude": -66.91858476
+        },
+        "General López": {
+            "latitude": -33.92514834,
+            "longitude": -61.94499869
+        },
+        "Constitución": {
+            "latitude": -33.48547776,
+            "longitude": -60.851259
+        },
+        "Sanagasta": {
+            "latitude": -29.15852697,
+            "longitude": -67.06588363
+        },
+        "General Juan Facundo Quiroga": {
+            "latitude": -30.80095903,
+            "longitude": -66.86810451
+        },
+        "Chilecito": {
+            "latitude": -29.39593748,
+            "longitude": -67.42788679
+        },
+        "Caseros": {
+            "latitude": -33.22149503,
+            "longitude": -61.53101928
+        },
+        "Rosario": {
+            "latitude": -33.12785574,
+            "longitude": -60.71084167
+        },
+        "San Lorenzo": {
+            "latitude": -32.9423146,
+            "longitude": -60.96150147
+        },
+        "Iriondo": {
+            "latitude": -32.70608361,
+            "longitude": -61.27338771
+        },
+        "San Jerónimo": {
+            "latitude": -32.15377136,
+            "longitude": -61.04812658
+        },
+        "Ángel Vicente Peñaloza": {
+            "latitude": -30.31289754,
+            "longitude": -66.66305212
+        },
+        "Rosario Vera Peñaloza": {
+            "latitude": -31.42059777,
+            "longitude": -66.67886217
+        },
+        "Totoral": {
+            "latitude": -30.72634427,
+            "longitude": -63.98440399
+        },
+        "Río Primero": {
+            "latitude": -31.03152408,
+            "longitude": -63.43611478
+        },
+        "Tinogasta": {
+            "latitude": -27.54051817,
+            "longitude": -67.92922497
+        },
+        "Marcos Juárez": {
+            "latitude": -33.03115964,
+            "longitude": -62.27742329
+        },
+        "Famatina": {
+            "latitude": -28.6973038,
+            "longitude": -67.55929204
+        },
+        "San Blas de Los Sauces": {
+            "latitude": -28.54333091,
+            "longitude": -67.15815307
+        },
+        "Cochinoca": {
+            "latitude": -22.93921305,
+            "longitude": -65.93472605
+        },
+        "Tumbaya": {
+            "latitude": -23.74347495,
+            "longitude": -65.6961902
+        },
+        "Dr. Manuel Belgrano": {
+            "latitude": -24.08911842,
+            "longitude": -65.44787838
+        },
+        "Rinconada": {
+            "latitude": -22.621442,
+            "longitude": -66.54156322
+        },
+        "Ramón Lista": {
+            "latitude": -23.12004066,
+            "longitude": -62.13819538
+        },
+        "La Poma": {
+            "latitude": -24.14697651,
+            "longitude": -66.20729736
+        },
+        "Formosa": {
+            "latitude": -25.93963523,
+            "longitude": -58.37731745
+        },
+        "Andalgalá": {
+            "latitude": -27.57094236,
+            "longitude": -66.37382925
+        },
+        "Ambato": {
+            "latitude": -28.0189345,
+            "longitude": -65.92229836
+        },
+        "Paclín": {
+            "latitude": -28.11005166,
+            "longitude": -65.67387787
+        },
+        "Pilcomayo": {
+            "latitude": -25.37003772,
+            "longitude": -58.06260627
+        },
+        "El Alto": {
+            "latitude": -28.43038823,
+            "longitude": -65.35991553
+        },
+        "Tehuelches": {
+            "latitude": -44.2001445,
+            "longitude": -70.57694937
+        },
+        "Escalante": {
+            "latitude": -45.28287529,
+            "longitude": -67.7090277
+        },
+        "Ischilín": {
+            "latitude": -30.39851579,
+            "longitude": -64.60992802
+        },
+        "Gastre": {
+            "latitude": -42.74906887,
+            "longitude": -68.80232253
+        },
+        "General Arenales": {
+            "latitude": -34.23770272,
+            "longitude": -61.28376095
+        },
+        "Calamuchita": {
+            "latitude": -32.2017736,
+            "longitude": -64.61482137
+        },
+        "Cruz Alta": {
+            "latitude": -26.91799251,
+            "longitude": -64.97386945
+        },
+        "Lules": {
+            "latitude": -26.86223535,
+            "longitude": -65.43102459
+        },
+        "Patagones": {
+            "latitude": -40.19651422,
+            "longitude": -62.85803862
+        },
+        "Juan Martín de Pueyrredón": {
+            "latitude": -33.90087952,
+            "longitude": -66.50257757
+        },
+        "General Pedernera": {
+            "latitude": -33.89055146,
+            "longitude": -65.56285208
+        },
+        "Tafí Viejo": {
+            "latitude": -26.66014914,
+            "longitude": -65.46407393
+        },
+        "Comuna 9": {
+            "latitude": -34.6517888,
+            "longitude": -58.49917517
+        },
+        "Mitre": {
+            "latitude": -29.61506599,
+            "longitude": -62.73868052
+        },
+        "Atamisqui": {
+            "latitude": -28.69181817,
+            "longitude": -63.881564
+        },
+        "Burruyacú": {
+            "latitude": -26.53055249,
+            "longitude": -64.81968942
+        },
+        "Trancas": {
+            "latitude": -26.34341255,
+            "longitude": -65.40582095
+        },
+        "Tafí del Valle": {
+            "latitude": -26.59139946,
+            "longitude": -65.88949394
+        },
+        "Jiménez": {
+            "latitude": -26.89959115,
+            "longitude": -64.27251588
+        },
+        "Coronel de Marina Leonardo Rosales": {
+            "latitude": -38.84907733,
+            "longitude": -61.83558442
+        },
+        "Baradero": {
+            "latitude": -33.93196138,
+            "longitude": -59.49278714
+        },
+        "Santa Victoria": {
+            "latitude": -22.39589183,
+            "longitude": -64.89556461
+        },
+        "General José de San Martín": {
+            "latitude": -22.71446238,
+            "longitude": -63.65828643
+        },
+        "Rosario de Lerma": {
+            "latitude": -24.54575198,
+            "longitude": -65.85300787
+        },
+        "Ledesma": {
+            "latitude": -23.78548316,
+            "longitude": -64.82887149
+        },
+        "Florentino Ameghino": {
+            "latitude": -34.87410581,
+            "longitude": -62.40171626
+        },
+        "La Cocha": {
+            "latitude": -27.79370448,
+            "longitude": -65.59812454
+        },
+        "Graneros": {
+            "latitude": -27.71322897,
+            "longitude": -65.25508323
+        },
+        "Juan Bautista Alberdi": {
+            "latitude": -27.60596962,
+            "longitude": -65.78309775
+        },
+        "Simoca": {
+            "latitude": -27.42383706,
+            "longitude": -65.29248478
+        },
+        "Chicligasta": {
+            "latitude": -27.26957375,
+            "longitude": -65.81101509
+        },
+        "Monteros": {
+            "latitude": -27.11060848,
+            "longitude": -65.64313626
+        },
+        "Leales": {
+            "latitude": -27.19182463,
+            "longitude": -65.0850119
+        },
+        "La Capital": {
+            "latitude": -31.47535632,
+            "longitude": -60.66947932
+        },
+        "Rancul": {
+            "latitude": -35.40158891,
+            "longitude": -64.80149044
+        },
+        "Castellanos": {
+            "latitude": -31.23141494,
+            "longitude": -61.65696265
+        },
+        "Garay": {
+            "latitude": -31.05464163,
+            "longitude": -60.12580784
+        },
+        "Quemú Quemú": {
+            "latitude": -36.13063978,
+            "longitude": -63.66373617
+        },
+        "Catriló": {
+            "latitude": -36.58166789,
+            "longitude": -63.66487085
+        },
+        "Atreucó": {
+            "latitude": -37.03249567,
+            "longitude": -63.77888557
+        },
+        "Guatraché": {
+            "latitude": -37.4836474,
+            "longitude": -63.78130867
+        },
+        "Utracán": {
+            "latitude": -37.33387948,
+            "longitude": -65.08283167
+        },
+        "Sauce": {
+            "latitude": -29.99954643,
+            "longitude": -58.79503851
+        },
+        "Paso de los Libres": {
+            "latitude": -29.59363634,
+            "longitude": -57.29963384
+        },
+        "Goya": {
+            "latitude": -29.45145351,
+            "longitude": -59.25591215
+        },
+        "San Roque": {
+            "latitude": -28.70580719,
+            "longitude": -58.6130359
+        },
+        "Concepción": {
+            "latitude": -28.40839953,
+            "longitude": -58.03139284
+        },
+        "Bella Vista": {
+            "latitude": -28.49738701,
+            "longitude": -58.93043543
+        },
+        "Santo Tomé": {
+            "latitude": -28.23111255,
+            "longitude": -56.22221216
+        },
+        "Saladas": {
+            "latitude": -28.21246869,
+            "longitude": -58.61991289
+        },
+        "Mburucuyá": {
+            "latitude": -28.0163839,
+            "longitude": -58.185564
+        },
+        "Apóstoles": {
+            "latitude": -27.88880399,
+            "longitude": -55.6782739
+        },
+        "1° de Mayo": {
+            "latitude": -27.16780374,
+            "longitude": -58.95874156
+        },
+        "Valle Viejo": {
+            "latitude": -28.59871329,
+            "longitude": -65.70718344
+        },
+        "2 de Abril": {
+            "latitude": -27.61985516,
+            "longitude": -61.32895196
+        },
+        "Lanús": {
+            "latitude": -34.70565424,
+            "longitude": -58.3946965
+        },
+        "Lomas de Zamora": {
+            "latitude": -34.75498087,
+            "longitude": -58.42406757
+        },
+        "Libertad": {
+            "latitude": -27.3493251,
+            "longitude": -59.25978777
+        },
+        "Comandante Fernández": {
+            "latitude": -26.78539004,
+            "longitude": -60.46128691
+        },
+        "Comuna 15": {
+            "latitude": -34.59188367,
+            "longitude": -58.46277402
+        },
+        "Santa Lucía": {
+            "latitude": -31.53271976,
+            "longitude": -68.46341005
+        },
+        "Pocito": {
+            "latitude": -31.7472539,
+            "longitude": -68.58467982
+        },
+        "Zonda": {
+            "latitude": -31.64177836,
+            "longitude": -68.95484188
+        },
+        "Ullum": {
+            "latitude": -31.08528537,
+            "longitude": -68.88239092
+        },
+        "Chimbas": {
+            "latitude": -31.48741969,
+            "longitude": -68.52392897
+        },
+        "Albardón": {
+            "latitude": -31.20973551,
+            "longitude": -68.45217924
+        },
+        "Caucete": {
+            "latitude": -31.50681221,
+            "longitude": -67.54607731
+        },
+        "Calingasta": {
+            "latitude": -31.45087369,
+            "longitude": -69.83187423
+        },
+        "Iglesia": {
+            "latitude": -29.60136389,
+            "longitude": -69.43880813
+        },
+        "Jáchal": {
+            "latitude": -30.35456302,
+            "longitude": -68.44008521
+        },
+        "Valle Fértil": {
+            "latitude": -30.71225929,
+            "longitude": -67.53232233
+        },
+        "La Plata": {
+            "latitude": -35.00561232,
+            "longitude": -58.01727784
+        }
+    }
+}
