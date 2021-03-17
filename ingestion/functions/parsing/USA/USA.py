@@ -161,7 +161,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str, last_date: 
                             "name": "United States",
                             "geometry": {
                                 "latitude": 37.0902,
-                                "longitude": 95.7129
+                                "longitude": -95.7129
                             }
                         },
                         "events": convert_events(
