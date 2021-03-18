@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "data-export"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1txyh416iht6x"
+s3_prefix = "data-export"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "SecurityGroupIds=\"sg-0f3446d2b82eff09a\" SubnetIDs=\"subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1\" EFSpath=\"/mnt/efs\" Version=\"1\""

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { UserDocument } from '../model/user';
+import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
@@ -92,6 +92,8 @@ export default class CasesController {
                 'attachment; filename ="' + filename + '"',
         };
 
+        const user = req.user as UserDocument;
+
         try {
             const signedUrl: string = await new Promise((resolve, reject) => {
                 this.s3Client.getSignedUrl('getObject', params, (err, url) => {
@@ -100,6 +102,13 @@ export default class CasesController {
                     resolve(url);
                 });
             });
+
+            await User.findOneAndUpdate(
+                {
+                    _id: user._id,
+                },
+                { $push: { downloads: { timestamp: new Date() } } },
+            );
 
             res.status(200).send({ signedUrl });
         } catch (err) {

@@ -308,7 +308,7 @@ export default function LandingPage({
                         </div>
                         <div className={classes.link}>
                             <a
-                                href="https://global.health/ackowledgement/"
+                                href="https://global.health/acknowledgement/"
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >

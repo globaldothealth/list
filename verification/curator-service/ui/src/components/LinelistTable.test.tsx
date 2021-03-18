@@ -120,7 +120,9 @@ it('loads and displays cases', async () => {
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     expect(await findByText('www.example.com')).toBeInTheDocument();
     expect(await findByText('some admin 1')).toBeInTheDocument();
     expect(await findByText('some admin 2')).toBeInTheDocument();
@@ -262,7 +264,9 @@ it('can delete a row', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
@@ -359,7 +363,9 @@ it('can cancel delete action', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
@@ -436,7 +442,9 @@ it('cannot edit data if not curator', async () => {
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 

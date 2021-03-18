@@ -386,6 +386,16 @@ paths:
                       minimum: 1
                       maximum: 100
                       default: 10
+                - name: count_limit
+                  in: query
+                  description: The maximum number of documents that will be counted in mongoDB to make queries faster
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 100
+                      default: 10000
+                      maximum: 50000
                 - name: q
                   in: query
                   description: The search query
@@ -460,7 +470,7 @@ paths:
                     application/json:
                         schema:
                             allOf:
-                                - $ref: '#/components/schemas/Case'
+                                - $ref: '#/components/schemas/NewCase'
                             required:
                                 - caseReference
             responses:
@@ -1117,6 +1127,10 @@ components:
                     items:
                         type: string
                         format: email
+                excludeFromLineList:
+                    description: >
+                        Whether cases from this source should be left out of the line list feed.
+                    type: boolean
                 automation:
                     type: object
                     properties:
@@ -1440,6 +1454,14 @@ components:
                             $ref: '#/components/schemas/EditMetadata'
                         editMetadata:
                             $ref: '#/components/schemas/EditMetadata'
+                variant:
+                    type: object
+                    description: Details of the variant of concern/interest if applicable.
+                    properties:
+                        name:
+                            type: string
+                            example: B.1.351
+                            description: Name of the variant of concern or interest.
         CaseStatus:
             type: string
             enum: [UNVERIFIED, VERIFIED, EXCLUDED]
@@ -1535,6 +1557,11 @@ components:
                             description: >
                                 Comma-separated list of resolutions to restrict geocoding to.
                                 Allowed values are: Point, Admin3, Admin2, Admin1, Country.
+                        limitToCountry:
+                            type: string
+                            description: >
+                                Limit results to one or more countries. 
+                                Permitted values are ISO 3166 alpha 2 country codes separated by commas.
             required:
                 - caseReference
                 - location
