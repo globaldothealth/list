@@ -169,7 +169,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         cases = []
-        count = 0
         for entry in reader:
             location = get_location(entry)
             if entry["Fecha de diagnóstico"]:
@@ -319,8 +318,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                 if notes:
                     case["notes"] = ", ".join(notes)
 
-                count +=1
-                print(count)
                 yield case
 
 
