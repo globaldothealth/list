@@ -135,6 +135,8 @@ export default function SearchBar({
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
+                data-testid="searchbar"
+                name="searchbar"
                 onKeyPress={handleKeyPress}
                 onChange={(event): void => {
                     setSearchInput(event.target.value);

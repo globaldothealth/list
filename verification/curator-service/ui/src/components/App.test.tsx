@@ -189,4 +189,47 @@ describe('<App />', () => {
             ).toBeInTheDocument();
         });
     });
+
+    it('it adds the date confirmed filter by clicking on column header', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        const history = createMemoryHistory({
+            initialEntries: ['/cases'],
+            initialIndex: 0,
+        });
+        const { getByText, getByRole } = render(
+            <Router history={history}>
+                <App />
+            </Router>,
+        );
+
+        wait(() => {
+            const theSearchField = getByRole('textbox', { name: /searchbar/i });
+            // const theSearchField = screen.getByTestId('searchbar').querySelector('input')?.value;
+
+            console.log('theSearchField', theSearchField);
+
+            // expect(theSearchField).toBeInTheDocument();
+            // expect(screen.getByText('Confirmed date')).toBeInTheDocument();
+            // expect(theSearchField).toBe(undefined);
+
+            // fireEvent.click(screen.getByText('Confirmed date'));
+
+            console.log('theSearchField2222222', theSearchField);
+
+            expect(getByRole('textbox', { name: /searchbar/i })).toHaveValue(
+                'gfifykfhkgfkhfk',
+            );
+        });
+    });
 });
