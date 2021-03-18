@@ -109,7 +109,6 @@ def parse_cases(raw_data_file, source_id, source_url):
         'PR': 'Serological test',
         'PCR': 'PCR test'
     }
-    count = 0
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=';')
         cases = []
