@@ -87,9 +87,7 @@ def get_location(row, first_dict_places, capital_dict_places):
 def convert_demographics(age: str, sex: str):
     demo = {}
     if age:
-        if float(age) > 120:
-            print()
-        else:
+        if float(age) < 120:
             demo["ageRange"] = {
                 "start": float(age),
                 "end": float(age)
@@ -104,8 +102,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     Parses G.h-format case data from raw API data.
     Creates a dict to map type of confirming diagnostic test from Spanish abbreviation to English.
     Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test
-    "Lima" is often provided as all three locations ("Lima, Lima, Lima, Peru") - to geocode this with mapbox
-    the final Lima needs to be replaced with "Lima Province".
     """
     first_dict_places = place_coords_dict.keys()
     capital_dict_places = place_capital_coords_dict.keys()
