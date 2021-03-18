@@ -4,6 +4,37 @@ describe('App', function () {
         cy.task('clearSourcesDB', {});
     });
 
+    it('allows the user to search by date and an additional filter', function () {
+        cy.login();
+
+        const countries: any = ['Germany', 'France', 'India', 'Italy'];
+        const confirmedDate: any = [
+            '2020-05-01',
+            '2020-02-15',
+            '2020-03-22',
+            '2020-06-03',
+        ];
+
+        for (let i = 0; i < countries.length; i++) {
+            cy.addCase({
+                country: countries[i],
+                notes: 'some notes',
+                startConfirmedDate: confirmedDate[i],
+            });
+        }
+
+        cy.visit('/cases');
+
+        cy.get('input#search-field').type(
+            'dateconfirmedafter:2020-04-30 country:italy{enter}',
+        );
+
+        cy.contains('2020-06-03');
+        cy.contains('Italy');
+        cy.contains('2020-02-15').should('not.exist');
+        cy.contains('Germany').should('not.exist');
+    });
+
     it('allows the user to search by date', function () {
         cy.login();
 
