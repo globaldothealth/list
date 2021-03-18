@@ -22,6 +22,7 @@ import sys
 from datetime import date, datetime
 import csv
 
+# Dicts to map place names to coordinates are from ESRI Peru lookup table (add more here)
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_dictionaries.json")) as json_file:
     geocoding_dictionaries = json.load(json_file)
 
@@ -80,7 +81,6 @@ def get_location(row, first_dict_places, capital_dict_places):
         return location
     except Exception as e:
         print(place_name)
-        print(e)
         return None
 
 
