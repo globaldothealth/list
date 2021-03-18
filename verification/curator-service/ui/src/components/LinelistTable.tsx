@@ -443,20 +443,21 @@ export function DownloadButton({
                 break;
 
             case 'mailDataset':
-                try {
-                    const response = await axios({
-                        method: 'post',
-                        url: '/api/cases/downloadLarge',
-                        data: { format: formatType, query: searchQuery },
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                } catch (err) {
-                    alert(
-                        'There was an error while downloading data, please try again later.',
-                    );
-                }
+                alert('This function is not ready yet.');
+                // try {
+                //     const response = await axios({
+                //         method: 'post',
+                //         url: '/api/cases/downloadLarge',
+                //         data: { format: formatType, query: searchQuery },
+                //         headers: {
+                //             'Content-Type': 'application/json',
+                //         },
+                //     });
+                // } catch (err) {
+                //     alert(
+                //         'There was an error while downloading data, please try again later.',
+                //     );
+                // }
                 break;
 
             case 'partialDataset':
@@ -546,6 +547,7 @@ export function DownloadButton({
                 // Stops the click being propagated to the table which
                 // would trigger the onRowClick action.
                 onClick={(e): void => e.stopPropagation()}
+                fullWidth
             >
                 <DialogTitle>Download dataset</DialogTitle>
                 <FormControl className={classes.formControl}>
