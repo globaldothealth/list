@@ -37,17 +37,6 @@ export default class CasesController {
         }
     };
 
-    todaysDate = (): string => {
-        const dateObj = new Date();
-
-        // adjust 0 before single digit date
-        const day = ('0' + dateObj.getDate()).slice(-2);
-        const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
-        const year = dateObj.getFullYear();
-
-        return `${year}-${month}-${day}`;
-    };
-
     /** Download forwards the request to the data service and streams the
      * streamed response as a csv attachment. */
     download = async (req: Request, res: Response): Promise<void> => {
@@ -58,10 +47,10 @@ export default class CasesController {
                 data: req.body,
                 responseType: 'stream',
             }).then((response) => {
-                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader('Content-Type', response.headers['content-type']);
                 res.setHeader(
                     'Content-Disposition',
-                    `attachment; filename="gh_${this.todaysDate()}.csv"`,
+                    response.headers['content-disposition'],
                 );
                 res.setHeader('Cache-Control', 'no-cache');
                 res.setHeader('Pragma', 'no-cache');
@@ -94,7 +83,7 @@ export default class CasesController {
         const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
         const year = dateObj.getFullYear();
 
-        const filename = `gh_${this.todaysDate()}.tar.gz`;
+        const filename = `gh_${year}-${month}-${day}.tar.gz`;
 
         const params = {
             Bucket: 'covid-19-data-export',

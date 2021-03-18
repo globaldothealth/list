@@ -93,34 +93,82 @@ export class CasesController {
                 });
             }
 
-            res.setHeader('Content-Type', 'text/csv');
-            res.setHeader(
-                'Content-Disposition',
-                'attachment; filename="cases.csv"',
-            );
+            //Get current date
+            const dateObj = new Date();
+
+            // adjust 0 before single digit date
+            const day = ('0' + dateObj.getDate()).slice(-2);
+            const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+            const year = dateObj.getFullYear();
+
+            const filename = `gh_${year}-${month}-${day}`;
+
             res.setHeader('Cache-Control', 'no-cache');
             res.setHeader('Pragma', 'no-cache');
-            axios
-                .get<string>(
-                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
-                )
-                .then((yamlRes) => {
-                    const dataDictionary = yaml.safeLoad(yamlRes.data);
-                    const columns = (dataDictionary as Array<{
-                        name: string;
-                        description: string;
-                    }>).map((datum) => datum.name);
-                    const parsedCases = _.map(
-                        matchingCases,
-                        parseDownloadedCase,
+
+            switch (req.body.format) {
+                case 'csv':
+                    res.setHeader('Content-Type', 'text/csv');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.csv"`,
                     );
-                    const stringifiedCases = stringify(parsedCases, {
-                        header: true,
-                        columns: columns,
-                    });
-                    res.setHeader('content-type', 'text/csv');
-                    res.end(stringifiedCases);
-                });
+                    axios
+                        .get<string>(
+                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+                        )
+                        .then((txtRes) => {
+                            const columns = txtRes.data.split('\n');
+                            const parsedCases = _.map(
+                                matchingCases,
+                                parseDownloadedCase,
+                            );
+                            const stringifiedCases = stringify(parsedCases, {
+                                header: true,
+                                columns: columns,
+                            });
+                            res.end(stringifiedCases);
+                        });
+                    break;
+
+                case 'tsv':
+                    res.setHeader('Content-Type', 'text/tsv');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.tsv"`,
+                    );
+                    axios
+                        .get<string>(
+                            'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
+                        )
+                        .then((txtRes) => {
+                            const columns = txtRes.data.split('\n');
+                            const parsedCases = _.map(
+                                matchingCases,
+                                parseDownloadedCase,
+                            );
+                            const stringifiedCases = stringify(parsedCases, {
+                                header: true,
+                                columns: columns,
+                                delimiter: '\t',
+                            });
+                            res.end(stringifiedCases);
+                        });
+                    break;
+
+                case 'json':
+                    const data = JSON.stringify(matchingCases);
+                    res.setHeader('Content-Type', 'application/json');
+                    res.setHeader(
+                        'Content-Disposition',
+                        `attachment; filename="${filename}.json"`,
+                    );
+                    res.end(data);
+                    break;
+
+                default:
+                    break;
+            }
         } catch (e) {
             if (e instanceof ParsingError) {
                 res.status(422).json({ message: e.message });
