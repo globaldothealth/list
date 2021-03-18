@@ -105,6 +105,9 @@
       "pre-commit": "lint-staged"
     }
   },
+  "resolutions": {
+    "jspdf/file-saver": "github:eligrey/FileSaver.js#e865e37af9f9947ddcced76b549e27dc45c1cb2e"
+  },
   "lint-staged": {
     "*/**/*.{js,ts,tsx}": [
       "eslint --fix"
