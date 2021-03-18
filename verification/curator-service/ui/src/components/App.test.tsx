@@ -10,6 +10,8 @@ import {
     within,
 } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
+import { DownloadButton } from './LinelistTable';
+import { debug } from 'console';
 
 jest.mock('axios');
 // Mock charts page so that requests for mongo charts are not sent
@@ -187,6 +189,41 @@ describe('<App />', () => {
             expect(
                 within(profileMenu).getByText(/View source on Github/i),
             ).toBeInTheDocument();
+        });
+    });
+
+    describe('Download dataset', () => {
+        it('Displays download dialog after clicking DownloadButton', async () => {
+            const axiosResponse = {
+                data: {
+                    name: 'Alice Smith',
+                    email: 'foo@bar.com',
+                    roles: ['admin'],
+                },
+                status: 200,
+                statusText: 'OK',
+                config: {},
+                headers: {},
+            };
+            mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+            const history = createMemoryHistory({
+                initialEntries: ['/cases'],
+                initialIndex: 0,
+            });
+
+            render(
+                <Router history={history}>
+                    <App />
+                </Router>,
+            );
+
+            fireEvent.click(await screen.findByText(/download dataset/i));
+
+            await wait(() => {
+                expect(
+                    screen.getByText(/Please choose the file export format/i),
+                ).toBeInTheDocument();
+            });
         });
     });
 });
