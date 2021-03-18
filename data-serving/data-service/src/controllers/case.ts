@@ -44,6 +44,11 @@ export class CasesController {
      * Handles HTTP POST /api/cases/download.
      */
     download = async (req: Request, res: Response): Promise<void> => {
+        if (req.body.query && req.body.caseIds) {
+            res.status(400).json({ message: 'Bad request' });
+            return;
+        }
+
         // Goofy Mongoose types require this.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let casesQuery: any[];
@@ -171,6 +176,7 @@ export class CasesController {
             }
         } catch (e) {
             if (e instanceof ParsingError) {
+                logger.info('Error: ' + e);
                 res.status(422).json({ message: e.message });
                 return;
             }

@@ -115,6 +115,7 @@ it('loads and displays cases', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -189,6 +190,7 @@ it('API errors are displayed', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -260,6 +262,7 @@ it('can delete a row', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -359,6 +362,7 @@ it('can cancel delete action', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -438,6 +442,7 @@ it('cannot edit data if not curator', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -504,6 +509,7 @@ it('initializes with correct page and page size values', async () => {
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -571,6 +577,7 @@ it('paginates through data', async () => {
                 onChangePage={changePage}
                 onChangePageSize={changePageSize}
                 handleBreadcrumbDelete={jest.fn()}
+                setTotalDataCount={jest.fn()}
             />
         </MemoryRouter>,
     );
