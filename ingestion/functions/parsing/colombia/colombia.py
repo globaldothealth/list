@@ -164,11 +164,9 @@ def parse_cases(raw_data_file, source_id, source_url):
     symptom_map = {'leve': 'Mild',
                    'moderado': 'Moderate',
                    'grave': 'Serious'}
-    ref_date = datetime.strptime('21-02-2021', '%d-%m-%Y')
 
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
-        cases = []
         for entry in reader:
             location = get_location(entry)
             if entry["Fecha de diagnóstico"]:
@@ -212,10 +210,8 @@ def parse_cases(raw_data_file, source_id, source_url):
                     notes.append(
                         "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later.")
 
-                # If patient was symptomatic, mark date of onsetSymptoms, otherwise
-                # asymptomatic
-                # maybe change to elif clause and check if can parse field as
-                # date
+                # If patient was symptomatic, mark date of onsetSymptoms,
+                # otherwise asymptomatic
                 if entry["Fecha de inicio de síntomas"]:
                     case["symptoms"] = {
                         "status": "Symptomatic",
@@ -233,13 +229,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                         "status": "Asymptomatic",
                     }
 
-                # Include severity of symptoms
-                if entry["Estado"].lower() in symptom_map.keys():
-                    case["symptoms"]["values"] = [
-                        symptom_map.get(entry['Estado'].lower())]
-
-                # Patient Outcome
-                # If patient died, mark date
+                # Patient Outcome - If patient died, mark date
                 if entry["Fecha de muerte"]:
                     case["events"].append({
                         "name": "outcome",
@@ -281,25 +271,33 @@ def parse_cases(raw_data_file, source_id, source_url):
                     notes.append(
                         "Patient self-isolated and recovered at home.")
 
-                # Add travelHistory and notes for imported cases
-                # Travel History - we currently do not have any travel dates,
+                # Add travelHistory and notes for imported cases - we currently do not have any travel dates,
                 # so unknown whether in last 30 days, assuming YES
                 if entry["Tipo de contagio"].lower() == "importado":
-                    country_of_origin = entry['Nombre del país']
-                    case["travelHistory"] = {
-                        "traveledPrior30Days": True,
-                        "travel": [
-                            {
-                                "location": get_travel_history_location(entry)
-                            }]
-                    }
-                    notes.append(
-                        f"Case is reported as importing the disease into Colombia, and country of origin is {entry['Nombre del país']}.")
+                    if entry['Nombre del país']:
+                        country_of_origin = entry['Nombre del país']
+                        case["travelHistory"] = {
+                            "traveledPrior30Days": True,
+                            "travel": [
+                                {
+                                    "location": get_travel_history_location(entry)
+                                }]
+                        }
+                        notes.append(
+                            f"Case is reported as importing the disease into Colombia, and country of origin is {entry['Nombre del país']}.")
+                    else:
+                        notes.append(
+                            f"Case is reported as importing the disease into Colombia, but country of origin is not specified")
                 elif entry["Tipo de contagio"].lower() == 'relacionado':
                     notes.append("Case was transmitted within Colombia.")
                 elif entry["Tipo de contagio"].lower() == 'en estudio':
                     notes.append(
                         "Case transmission under investigation (currently unknown).")
+
+                # Include severity of symptoms
+                if entry["Estado"].lower() in symptom_map.keys():
+                    notes.append(
+                        f"Symptom severity was {symptom_map.get(entry['Estado'].lower())}")
 
                 if entry['fecha reporte web']:
                     notes.append(
