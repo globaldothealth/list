@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,13 +17,13 @@ except ImportError:
     import parsing_lib
 
 
-import json
-import os
-import sys
-from datetime import date, datetime
-import csv
+# To geocode cases for Peru, we load dictionaries to map place names to coordinates. These are from ESRI Peru lookup table
+# Case locations are provided as District, Province, Department. For a subset of cases, only Department is specified.
+# place_coords_dict maps place names in the format District, Province, Department to coordinates, based on string matching from the lookup table.
+# place_capital_coords_dict does the same except for capitals of provinces, which are recorded differently.
+# If only the department is specified, department_coords_dict is used to
+# give the centroid of that department
 
-# Dicts to map place names to coordinates are from ESRI Peru lookup table (add more here)
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_dictionaries.json")) as json_file:
     geocoding_dictionaries = json.load(json_file)
 
@@ -69,10 +70,10 @@ def get_location(row, first_dict_places, capital_dict_places):
                 coords = place_capital_coords_dict[place_name]
         else:
             location["administrativeAreaLevel1"] = place_list[2]
-            location["name"] = place_name[2] + ', Peru'
+            location["name"] = place_list[2] + ', Peru'
             location['geoResolution'] = "Admin1"
+            coords = department_coords_dict[place_list[2]]
 
-        coords = department_coords_dict[place_list[2]]
         geometry = {'latitude': coords[1],
                     'longitude': coords[0]}
 
@@ -111,7 +112,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     }
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=';')
-        cases = []
         for entry in reader:
             if entry["UUID"] and entry['FECHA_RESULTADO']:
                 location = get_location(
@@ -137,7 +137,6 @@ def parse_cases(raw_data_file, source_id, source_url):
                             entry["EDAD"],
                             entry["SEXO"]),
                     }
-
                     yield case
 
 
