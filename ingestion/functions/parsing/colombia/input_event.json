@@ -1,7 +1,7 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "test/colombia/Colombia_Nov6_head5k.csv",
-    "sourceUrl": "s3://epid-sources-raw/test/colombia/Colombia_Nov6_head5k.csv",
-    "sourceId": "5f462389dd7c71003587b1ed"
+    "s3Key": "test/colombia/Colombia_Mar17_head5k.csv",
+    "sourceUrl": "https://www.datos.gov.co/api/views/gt2j-8ykr/rows.csv?accessType=DOWNLOAD",
+    "sourceId": "60019f21bed728005b7d5cc7"
 }
