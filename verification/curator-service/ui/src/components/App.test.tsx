@@ -9,6 +9,7 @@ import {
     screen,
     within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
@@ -217,27 +218,12 @@ describe('<App />', () => {
         const searchField = (await screen.findByPlaceholderText(
             /Search/i,
         )) as HTMLInputElement;
+        const columnHeader = screen.getByText(/Confirmed Date/i);
 
         expect(searchField).toBeInTheDocument();
         expect(searchField.value).toBe('');
+        userEvent.click(columnHeader);
 
-        // wait(() => {
-
-        //     // const theSearchField = screen.getByTestId('searchbar').querySelector('input')?.value;
-
-        //     console.log('theSearchField', theSearchField);
-
-        //     // expect(theSearchField).toBeInTheDocument();
-        //     // expect(screen.getByText('Confirmed date')).toBeInTheDocument();
-        //     // expect(theSearchField).toBe(undefined);
-
-        //     // fireEvent.click(screen.getByText('Confirmed date'));
-
-        //     console.log('theSearchField2222222', theSearchField);
-
-        //     expect(getByRole('textbox', { name: /searchbar/i })).toHaveValue(
-        //         'gfifykfhkgfkhfk',
-        //     );
-        // });
+        expect(searchField.value).toBe('dateconfirmedafter:');
     });
 });
