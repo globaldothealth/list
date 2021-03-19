@@ -207,29 +207,37 @@ describe('<App />', () => {
             initialEntries: ['/cases'],
             initialIndex: 0,
         });
-        const { getByText, getByRole } = render(
+
+        render(
             <Router history={history}>
                 <App />
             </Router>,
         );
 
-        wait(() => {
-            const theSearchField = getByRole('textbox', { name: /searchbar/i });
-            // const theSearchField = screen.getByTestId('searchbar').querySelector('input')?.value;
+        const searchField = (await screen.findByPlaceholderText(
+            /Search/i,
+        )) as HTMLInputElement;
 
-            console.log('theSearchField', theSearchField);
+        expect(searchField).toBeInTheDocument();
+        expect(searchField.value).toBe('');
 
-            // expect(theSearchField).toBeInTheDocument();
-            // expect(screen.getByText('Confirmed date')).toBeInTheDocument();
-            // expect(theSearchField).toBe(undefined);
+        // wait(() => {
 
-            // fireEvent.click(screen.getByText('Confirmed date'));
+        //     // const theSearchField = screen.getByTestId('searchbar').querySelector('input')?.value;
 
-            console.log('theSearchField2222222', theSearchField);
+        //     console.log('theSearchField', theSearchField);
 
-            expect(getByRole('textbox', { name: /searchbar/i })).toHaveValue(
-                'gfifykfhkgfkhfk',
-            );
-        });
+        //     // expect(theSearchField).toBeInTheDocument();
+        //     // expect(screen.getByText('Confirmed date')).toBeInTheDocument();
+        //     // expect(theSearchField).toBe(undefined);
+
+        //     // fireEvent.click(screen.getByText('Confirmed date'));
+
+        //     console.log('theSearchField2222222', theSearchField);
+
+        //     expect(getByRole('textbox', { name: /searchbar/i })).toHaveValue(
+        //         'gfifykfhkgfkhfk',
+        //     );
+        // });
     });
 });
