@@ -40,6 +40,7 @@
     "history": "^4.10.1",
     "http-proxy-middleware": "^1.0.5",
     "husky": "^4.3.0",
+    "jspdf": "^2.3.1",
     "lint-staged": "^10.4.0",
     "material-table": "1.67.1",
     "material-ui-chip-input": "^2.0.0-beta.2",
@@ -104,9 +105,6 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "resolutions": {
-    "jspdf/file-saver": "github:eligrey/FileSaver.js#e865e37af9f9947ddcced76b549e27dc45c1cb2e"
   },
   "lint-staged": {
     "*/**/*.{js,ts,tsx}": [
