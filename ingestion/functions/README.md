@@ -326,7 +326,7 @@ However, there is the possibility that a misconfiguration might prevent retrieva
 In this case, start with the following steps:
 
 1. Navigate to AWS Lambda in the AWS Console.
-2. Submit a test event for a parser that you wouldn't mind having run in production. An example of this might look like the following:
+2. Submit a test event *to the retrieval function* for a parser that you wouldn't mind having run in production. An example of this might look like the following:
 
 ```
 {
