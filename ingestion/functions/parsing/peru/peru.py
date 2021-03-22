@@ -62,6 +62,7 @@ def get_location(row, first_dict_places, capital_dict_places):
             location["administrativeAreaLevel3"] = place_list[0]
             location["administrativeAreaLevel2"] = place_list[1]
             location["administrativeAreaLevel1"] = place_list[2]
+            location["country"] = "Peru"
             location['geoResolution'] = "Admin3"
             location["name"] = place_name + ', Peru'
             if place_name in first_dict_places:
@@ -70,6 +71,7 @@ def get_location(row, first_dict_places, capital_dict_places):
                 coords = place_capital_coords_dict[place_name]
         else:
             location["administrativeAreaLevel1"] = place_list[2]
+            location["country"] = "Peru"     
             location["name"] = place_list[2] + ', Peru'
             location['geoResolution'] = "Admin1"
             coords = department_coords_dict[place_list[2]]
@@ -110,7 +112,7 @@ def parse_cases(raw_data_file, source_id, source_url):
         'PR': 'Serological test',
         'PCR': 'PCR test'
     }
-    with open(raw_data_file, "r") as f:
+    with open(raw_data_file, "r", encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=';')
         for entry in reader:
             if entry["UUID"] and entry['FECHA_RESULTADO']:
