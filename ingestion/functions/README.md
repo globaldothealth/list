@@ -315,6 +315,48 @@ Example live debugging workflow:
 
 Steps 5-6 may take longer than indicated.
 
+#### Debugging of retrieval function
+
+If the ingestion process is not running as intended, but the previous steps reveal no clear issues with the parsing logic, or there are no logs present at all, the issue might be located upstream in the retrieval function.
+
+The best place to start in this case is with the Cloudwatch logs, which should provide some hints in the case that the retrieval function was invoked but did not complete as intended.
+
+However, there is the possibility that a misconfiguration might prevent retrieval from even initiating, and that on top of that it might fail silently. In this more frustrating case, the only clue that something is wrong might be the sudden lack of invocations/logs.
+
+In this case, start with the following steps:
+
+1. Navigate to AWS Lambda in the AWS Console.
+2. Submit a test event *to the retrieval function* for a parser that you wouldn't mind having run in production. An example of this might look like the following:
+
+```
+{
+    "env": "prod", 
+    "sourceId": "5fc113a6e78c687887f68c5a"
+}
+```
+
+3. If there is something wrong with the configuration this should trigger an error.
+4. If there was no error, check the triggers to make sure that they are still in effect.
+5. If the triggers are still in effect, check the GitHub repository to make sure that there have been no recent changes to the function or to `template.yaml`
+
+##### EFS
+
+A common source for silent failure is a misconfiguration of the Security Group that allows access to EFS. If you think this might be the cause, check to make sure that the Security Group and Subnets are set as follows under the VPC tab:
+
+```
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-0f3446d2b82eff09a
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+```
+
 ### Deployment
 
 Deployment is accomplished automatically via a dedicated
