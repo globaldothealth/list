@@ -19,6 +19,9 @@ import {
     makeStyles,
     withStyles,
     LinearProgress,
+    InputLabel,
+    Select,
+    FormControl,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
@@ -71,6 +74,7 @@ interface LinelistTableState {
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
+    sortBy: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -189,6 +193,13 @@ const downloadDataModalStyles = makeStyles((theme: Theme) => ({
     },
     loader: {
         marginTop: '16px',
+    },
+}));
+
+const sortSelectStyles = makeStyles((theme: Theme) => ({
+    formControl: {
+        minWidth: 120,
+        margin: '0 20px 0 0',
     },
 }));
 
@@ -376,6 +387,46 @@ function RowMenu(props: {
     );
 }
 
+interface SortSelectProps {
+    sortBy: string;
+    handleSortByChange: (sortBy: string) => void;
+}
+
+export function SortSelect({
+    sortBy,
+    handleSortByChange,
+}: SortSelectProps): JSX.Element {
+    const classes = sortSelectStyles();
+
+    const sortKeywords = [
+        { name: 'None', value: 'none' },
+        { name: 'Confirmed date', value: 'confirmedDate' },
+        { name: 'Country', value: 'country' },
+        { name: 'Admin3', value: 'admin3' },
+    ];
+
+    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        handleSortByChange(event.target.value as string);
+    };
+
+    return (
+        <FormControl className={classes.formControl}>
+            <InputLabel id="sort-by-label">Sort by</InputLabel>
+            <Select
+                labelId="sort-by-label"
+                value={sortBy}
+                onChange={handleChange}
+            >
+                {sortKeywords.map((keyword) => (
+                    <MenuItem value={keyword.value} key={keyword.value}>
+                        {keyword.name}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    );
+}
+
 export function DownloadButton(): JSX.Element {
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
         false,
@@ -440,6 +491,7 @@ export function DownloadButton(): JSX.Element {
         </>
     );
 }
+
 interface ColumnHeaderProps {
     theClass: any;
     columnTitle: string;
@@ -489,6 +541,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
+            sortBy: 'none',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -501,6 +554,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             this,
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
+        this.handleSortByChange = this.handleSortByChange.bind(this);
     }
 
     componentDidMount() {
@@ -525,6 +579,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
     }
     componentWillUnmount(): void {
         this.unlisten();
+    }
+
+    handleSortByChange(sortBy: string): void {
+        this.setState(
+            { page: 0, sortBy },
+            this.tableRef.current?.onQueryChange(),
+        );
     }
 
     async deleteCases(): Promise<void> {
@@ -1026,6 +1087,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             listUrl += '&page=' + (this.state.page + 1);
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                             listUrl += '&count_limit=10000';
+                            listUrl += '&sort_by=' + this.state.sortBy;
                             if (this.state.searchQuery !== '') {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
@@ -1131,6 +1193,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                     <Typography className={classes.tableTitle}>
                                         COVID-19 Linelist
                                     </Typography>
+
+                                    <SortSelect
+                                        sortBy={this.state.sortBy}
+                                        handleSortByChange={
+                                            this.handleSortByChange
+                                        }
+                                    />
 
                                     {this.props.filterBreadcrumbs.length >
                                         0 && (
