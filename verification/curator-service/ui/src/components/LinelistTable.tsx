@@ -418,10 +418,7 @@ export function DownloadButton({
     const downloadDataSet = async (formatType: string, dataSet: string) => {
         setIsLoading(true);
 
-        const searchQuery: string = encodeURIComponent(
-            URLToSearchQuery(location.search),
-        );
-
+        const searchQuery: string = URLToSearchQuery(location.search);
         switch (dataSet) {
             case 'fullDataset':
                 try {

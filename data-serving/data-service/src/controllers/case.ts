@@ -83,12 +83,12 @@ export class CasesController {
 
             let matchingCases: any;
             if (req.body.limit) {
-                matchingCases = await Case.aggregate(casesIgnoringExcluded)
-                    .collation({
-                        locale: 'en_US',
-                        strength: 2,
-                    })
-                    .limit(Number(req.body.limit));
+                matchingCases = await Case.aggregate(
+                    casesIgnoringExcluded,
+                ).collation({
+                    locale: 'en_US',
+                    strength: 2,
+                });
             } else {
                 matchingCases = await Case.aggregate(
                     casesIgnoringExcluded,
