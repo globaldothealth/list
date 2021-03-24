@@ -1,7 +1,7 @@
 {
     "env": "local",
     "s3Bucket": "epid-sources-raw",
-    "s3Key": "test/argentina/content.csv",
-    "sourceUrl": "s3://epid-sources-raw/test/argentina/content.csv",
-    "sourceId": "5f36f28820a86b00357e2df5"
+    "s3Key": "argentina_test_Mar21/content.csv",
+    "sourceUrl": "https://sisa.msal.gov.ar/datos/descargas/covid-19/files/Covid19Casos.csv",
+    "sourceId": "604f40985005d80036af99bb"
 }

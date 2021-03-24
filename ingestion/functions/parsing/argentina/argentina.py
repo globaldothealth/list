@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -16,6 +17,26 @@ except ImportError:
             os.pardir,os.pardir, 'common'))
     import parsing_lib
 
+
+# The location data for Argentinian cases is obtained by using a lookup table (from https://datos.gob.ar/dataset/ign-unidades-territoriales/archivo/ign_01.03.02) which allows for cross-referencing of location down to administrative level 2 and latitude/longitude
+# This data has been collated into several dictionaries: 
+# "mismatch_locations" has entries where the spelling in the case data and the lookup table differs
+# "department_lat_long" has information from source regarding longitude/latitude of administrative level 2 locations
+# "province_lat_long" has information from source regarding longitude/latitude of administrative level 1 locations
+# "country_iso2" maps Spanish country names to their ISO-2 codes, and also includes common alternative spellings of country names as observed in data (e.g. lack of accents, common typos)
+# 'country_translate_lat_long' maps country ISO-2 codes to longitude/latitude of country centroids, obtained from https://raw.githubusercontent.com/google/dspl/master/samples/google/canonical/countries.csv, as well as the corresponding country name in English
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json"), encoding='utf-8') as json_file:
+    dictionaries = json.load(json_file)
+
+_MISMATCH_LOCATIONS = dictionaries["mismatch_locations"]
+
+_DEPARTMENT_LAT_LONG_MAP = dictionaries["department_lat_long"]
+
+_PROVINCE_LAT_LONG_MAP = dictionaries["province_lat_long"]
+
+_COUNTRY_ISO2_MAP = dictionaries["country_iso2"]
+
+_COUNTRY_LAT_LONG_MAP = dictionaries['country_translate_lat_long']
 
 private_public_map = {'Público': 'Public', 'Privado': 'Private'}
 
@@ -40,18 +61,99 @@ def convert_gender(raw_gender):
 
 def convert_location(entry):
     '''
-    The only information we have is the province where case was diagnosed/hospitalised
-    Geocoding function can't parse CABA so replacing with Buenos Aires.
+    This gets the residential address of the patient, which is given to administrative level 2 in most cases.
+    When it is not, we default to the administrative level 1 residence data.
+    In some cases, residence of patient is reported as outside Argentina, or residence location is not reported at all; in these cases the case location to administrative level 1 ('carga_provincia_nombre') is used to provide location information.
     '''
-    if entry['carga_provincia_nombre']:
-        if entry['carga_provincia_nombre'] == 'CABA':
-            return {
-                "query": "Buenos Aires, Argentina"}
+    location = {}
+    geometry = {}
+    country = entry["residencia_pais_nombre"]
+    admin1 = entry["residencia_provincia_nombre"]
+    admin1_case = entry['carga_provincia_nombre']
+    admin2 = entry["residencia_departamento_nombre"]
+    # Deal with cases where the spelling of the administrative level 2 or 1 locations do not exactly match official source of latitude/longitude data
+    if admin2 in _MISMATCH_LOCATIONS.keys():
+        admin2 = _MISMATCH_LOCATIONS[admin2]
+    if admin1 in _MISMATCH_LOCATIONS.keys():
+        admin1 = _MISMATCH_LOCATIONS[admin1]
+    if admin1_case in _MISMATCH_LOCATIONS.keys():
+        admin1_case = _MISMATCH_LOCATIONS[admin1_case]
+
+    if country == 'Argentina':
+        if admin2 in _DEPARTMENT_LAT_LONG_MAP.keys():
+            location["administrativeAreaLevel2"] = admin2
+            location["country"] = country
+            location["administrativeAreaLevel1"] = admin1
+            location["geoResolution"] = "Admin2"
+            location["name"] = ", ".join([admin2, admin1, country])
+            
+            geometry["latitude"] = _DEPARTMENT_LAT_LONG_MAP[admin2]["latitude"]
+            geometry["longitude"] = _DEPARTMENT_LAT_LONG_MAP[admin2]["longitude"]
+            location["geometry"] = geometry
+        elif admin1 in _PROVINCE_LAT_LONG_MAP.keys():
+            location["country"] = country
+            location["administrativeAreaLevel1"] = admin1
+            location["geoResolution"] = "Admin1"
+            location["name"] = ", ".join([admin1, country])
+            
+            geometry["latitude"] = _PROVINCE_LAT_LONG_MAP[admin1]["latitude"]
+            geometry["longitude"] = _PROVINCE_LAT_LONG_MAP[admin1]["longitude"]
+            location["geometry"] = geometry
         else:
-            return {
-                "query": f"{entry['carga_provincia_nombre']}, Argentina"}
+            # In the case of neither administrative level 1 or 2 information provided, default to country information.
+            location["country"] = country
+            location["geoResolution"] = "Country"
+            location["name"] = country
+            
+            Argentina_ISO2 = _COUNTRY_ISO2_MAP[country.lower()]
+            geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[Argentina_ISO2]["latitude"]
+            geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[Argentina_ISO2]["longitude"]
+            location["geometry"] = geometry
     else:
-        return {"query": "Argentina"}
+        # This encompasses both cases where country == 'SIN ESPECIFICAR' or where country of residence is other than Argentina
+        # In these cases the case location to administrative level 1 (which is always an Argentinian province) is used for location information
+        if admin1_case in _PROVINCE_LAT_LONG_MAP.keys():
+            location["country"] = "Argentina"
+            location["administrativeAreaLevel1"] = admin1_case
+            location["geoResolution"] = "Admin1"
+            location["name"] = ", ".join([admin1_case, "Argentina"])
+            
+            geometry["latitude"] = _PROVINCE_LAT_LONG_MAP[admin1_case]["latitude"]
+            geometry["longitude"] = _PROVINCE_LAT_LONG_MAP[admin1_case]["longitude"]
+            location["geometry"] = geometry
+    if location:
+        return location
+    else:
+        return None
+
+
+def convert_travel(entry):
+    '''
+    When the residence location is a country other than Argentina we assume travel history.
+    '''
+    if entry not in ["Argentina", "SIN_ESPECIFICAR", "SIN ESPECIFICAR"]:
+        location = {}
+        geometry = {}
+        travel = {}
+        travel_countries = []
+        country = entry
+        
+        country_ISO2 = _COUNTRY_ISO2_MAP[country.lower()]
+
+        location["country"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
+        location["geoResolution"] = "Country"
+        location["name"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["name_english"]
+        geometry["latitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["latitude"]
+        geometry["longitude"] = _COUNTRY_LAT_LONG_MAP[country_ISO2]["longitude"]
+        location["geometry"] = geometry
+        
+        travel_countries.append({"location": location})
+        travel["traveledPrior30Days"] = True
+        travel["travel"] = travel_countries
+        if travel:
+            return travel
+        else:
+            return None
 
 
 def convert_age(entry):
@@ -59,10 +161,11 @@ def convert_age(entry):
     Want to return a float specifying age in years. If age field is empty, return None
     '''
     if entry['edad']:
-        if entry['edad_años_meses'] == 'Años':
-            return float(entry['edad'])
-        elif entry['edad_años_meses'] == 'Meses':
-            return float(entry['edad']) / 12
+        if int(entry['edad']) < 121:
+            if entry['edad_años_meses'] == 'Años':
+                return float(entry['edad'])
+            elif entry['edad_años_meses'] == 'Meses':
+                return float(entry['edad']) / 12
     return None
 
 
@@ -98,17 +201,14 @@ def get_confirmed_event(entry):
     return confirmed_event, note
 
 
-def convert_residential_location(entry):
+def convert_case_location(entry):
     '''
-    This gets the residential address of the patient. Note this is not used to locate the case.
+    Additional information is provided regarding where case was diagnosed/hospitalised, but to less detail than residential location.
     '''
-    query_terms = [term for term in [
-        entry.get("residencia_provincia_nombre", ""),
-        entry.get("residencia_departamento_nombre", ""),
-        entry.get("residencia_pais_nombre", "")]
-        if term]
-
-    return ", ".join(query_terms)
+    if entry['carga_provincia_nombre']:
+        return ", ".join([entry.get("carga_provincia_nombre", ""), "Argentina"])
+    else:
+        return "NOT REPORTED"
 
 
 def parse_cases(raw_data_file, source_id, source_url):
@@ -123,9 +223,8 @@ def parse_cases(raw_data_file, source_id, source_url):
     For cases classified as Confirmed but lacking a Date of Diagnosis, we use Date of Symptom onset where present,
     and Date of Case Opening where neither Date of Diagnosis or Date of Symptom Onset are present.
 
-    For case location, we use 'Province of case loading' (carga_provincia_nombre). This is where
-    the laboratory tests were carried out, so may not always correspond to the exact location of the case, but is
-    best proxy we have. The other location date refers to the residential address of the patient.
+    For case location, we use the residential address of the patient, as this gives more detailed location information (to department level)
+    than 'carga_provincia_nombre' (== location where test was carried out, given to province level).
 
     """
     with open(raw_data_file, "r") as f:
@@ -203,9 +302,12 @@ def parse_cases(raw_data_file, source_id, source_url):
                     elif "No Activo por criterio de laboratorio" in entry['clasificacion']:
                         notes.append(
                             "Patient recovery was confirmed by a negative laboratory test.")
+                
+                travel_history = convert_travel(entry["residencia_pais_nombre"])
+                case['travelHistory'] = travel_history
 
                 notes.append(
-                    f"Case was registered as being from {convert_residential_location(entry)}.")
+                    f"Province in charge of case reported as {convert_case_location(entry)}.")
                 notes.append(
                     f"Case last updated on {convert_date(entry['ultima_actualizacion'])}.")
                 if entry['origen_financiamiento'] in ['Público', 'Privado']:
