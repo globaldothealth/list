@@ -6,20 +6,20 @@ import Scroll from 'react-scroll';
 import { TextField } from 'formik-material-ui';
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li>Add any additional notes you want to include in the line list case</li>
-    </ul>
-  </StyledTooltip>
+    <StyledTooltip>
+        <ul>
+            <li>
+                Provide any additional detils that may not fit into any of the
+                previous sections.
+            </li>
+        </ul>
+    </StyledTooltip>
 );
 
 export default function Notes(): JSX.Element {
     return (
         <Scroll.Element name="notes">
-            <FieldTitle
-              title="Notes"
-              tooltip={<TooltipText />}
-            ></FieldTitle>
+            <FieldTitle title="Notes" tooltip={<TooltipText />}></FieldTitle>
             <FastField
                 label="Notes"
                 name="notes"

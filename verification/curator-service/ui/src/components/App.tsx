@@ -31,9 +31,9 @@ import CaseForm from './CaseForm';
 import Charts from './Charts';
 import Drawer from '@material-ui/core/Drawer';
 import EditCase from './EditCase';
-import { ReactComponent as GHListLogo } from './assets/GHListLogo.svg';
+import GHListLogo from './GHListLogo';
 import HomeIcon from '@material-ui/icons/Home';
-import LandingPage from './LandingPage';
+import LandingPage from './landing-page/LandingPage';
 import LinkIcon from '@material-ui/icons/Link';
 import List from '@material-ui/core/List';
 import ListIcon from '@material-ui/icons/List';
@@ -57,21 +57,23 @@ import clsx from 'clsx';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
-import useCookieBanner from '../hooks/useCookieBanner';
+import { Auth } from 'aws-amplify';
+import { useCookieBanner } from '../hooks/useCookieBanner';
+import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
 
 const theme = createMuiTheme({
     palette: {
         background: {
             default: '#ecf3f0',
-            paper: '#ffffff',
+            paper: '#fff',
         },
         primary: {
             main: '#0E7569',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         secondary: {
             main: '#00C6AF',
-            contrastText: '#ffffff',
+            contrastText: '#fff',
         },
         error: {
             main: '#FD685B',
@@ -121,6 +123,24 @@ const theme = createMuiTheme({
             },
         },
     },
+    custom: {
+        palette: {
+            button: {
+                buttonCaption: '#ECF3F0',
+                customizeButtonColor: '#ECF3F0',
+            },
+            tooltip: {
+                backgroundColor: '#FEEFC3',
+                textColor: 'rgba(0, 0, 0, 0.87)',
+            },
+            appBar: {
+                backgroundColor: '#31A497',
+            },
+            landingPage: {
+                descriptionTextColor: '#838D89',
+            },
+        },
+    },
 });
 
 const drawerWidth = 240;
@@ -157,6 +177,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     mapLink: {
         margin: '0 8px 0 16px',
+        whiteSpace: 'nowrap',
     },
     hide: {
         display: 'none',
@@ -265,18 +286,33 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                data-testid="profile-menu-dropdown"
             >
                 <Link to="/profile" onClick={handleClose}>
                     <MenuItem>Profile</MenuItem>
                 </Link>
 
-                <a className={classes.link} href="/auth/logout">
-                    <MenuItem>Logout</MenuItem>
-                </a>
+                <MenuItem
+                    onClick={() => {
+                        try {
+                            Auth.signOut();
+                        } catch (err) {
+                            console.error(err);
+                        }
+                        window.location.href = '/auth/logout';
+                    }}
+                >
+                    Logout
+                </MenuItem>
                 <Divider className={classes.divider} />
-                <Link to="/terms" onClick={handleClose}>
-                    <MenuItem>About Global.Health</MenuItem>
-                </Link>
+                <a
+                    href="https://global.health/about/"
+                    onClick={handleClose}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <MenuItem>About Global.health</MenuItem>
+                </a>
                 <a
                     className={classes.link}
                     rel="noopener noreferrer"
@@ -290,10 +326,10 @@ function ProfileMenu(props: { user: User }): JSX.Element {
                     className={classes.link}
                     rel="noopener noreferrer"
                     target="_blank"
-                    href="https://github.com/globaldothealth/list/issues/new/choose"
+                    href="https://global.health/acknowledgement/"
                     onClick={handleClose}
                 >
-                    <MenuItem>Report an issue</MenuItem>
+                    <MenuItem>Data acknowledgments</MenuItem>
                 </a>
                 <a
                     href="https://github.com/globaldothealth/list#globalhealth-list"
@@ -312,8 +348,21 @@ interface LocationState {
     search: string;
 }
 
+export interface ChipData {
+    key: string;
+    value: string;
+}
+
 export default function App(): JSX.Element {
-    useCookieBanner();
+    const CookieBanner = () => {
+        const { initCookieBanner } = useCookieBanner();
+
+        useEffect(() => {
+            initCookieBanner();
+        }, [initCookieBanner]);
+
+        return null;
+    };
 
     const showMenu = useMediaQuery(theme.breakpoints.up('sm'));
     const [user, setUser] = useState<User | undefined>();
@@ -324,14 +373,21 @@ export default function App(): JSX.Element {
         setCreateNewButtonAnchorEl,
     ] = useState<Element | null>();
     const [selectedMenuIndex, setSelectedMenuIndex] = React.useState<number>();
-    const [searchLoading, setSearchLoading] = React.useState<boolean>(false);
     const [listPage, setListPage] = React.useState<number>(0);
     const [listPageSize, setListPageSize] = React.useState<number>(50);
     const rootRef = React.useRef<HTMLDivElement>(null);
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
+    const [search, setSearch] = React.useState<string>(
+        URLToSearchQuery(location.search),
+    );
+    const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
+        ChipData[]
+    >([]);
     const classes = useStyles();
+
+    const savedSearchQuery = localStorage.getItem('searchQuery');
 
     const menuList = user
         ? [
@@ -344,7 +400,7 @@ export default function App(): JSX.Element {
               {
                   text: 'Line list',
                   icon: <ListIcon />,
-                  to: { pathname: '/cases', state: { search: '' } },
+                  to: { pathname: '/cases', search: '' },
                   displayCheck: (): boolean => true,
               },
               {
@@ -368,9 +424,28 @@ export default function App(): JSX.Element {
           ]
         : [];
 
+    // Update search and filter breadcrumbs whenever location search changes
     useEffect(() => {
-        setDrawerOpen(showMenu);
-    }, [showMenu]);
+        const searchString = URLToSearchQuery(location.search);
+        if (searchString === search || location.pathname !== '/cases') return;
+
+        setSearch(searchString);
+        //eslint-disable-next-line
+    }, [location.search]);
+
+    // Update filter breadcrumbs
+    useEffect(() => {
+        if (location.pathname !== '/cases') return;
+
+        const searchParams = new URLSearchParams(location.search);
+        const tempFilterBreadcrumbs: ChipData[] = [];
+        searchParams.forEach((value, key) => {
+            tempFilterBreadcrumbs.push({ key, value });
+        });
+
+        setFilterBreadcrumbs(tempFilterBreadcrumbs);
+        //eslint-disable-next-line
+    }, [location.search]);
 
     useEffect(() => {
         const menuIndex = menuList.findIndex((menuItem) => {
@@ -433,9 +508,39 @@ export default function App(): JSX.Element {
         getUser();
     }, []);
 
+    useEffect(() => {
+        if (!user) return;
+
+        setDrawerOpen(hasAnyRole(['curator', 'admin']) && showMenu);
+        //eslint-disable-next-line
+    }, [user]);
+
+    useEffect(() => {
+        if (savedSearchQuery === null || savedSearchQuery === '') return;
+
+        setSearch(URLToSearchQuery(savedSearchQuery));
+    }, [savedSearchQuery]);
+
+    // Function for deleting filter breadcrumbs
+    const handleFilterBreadcrumbDelete = (breadcrumbToDelete: ChipData) => {
+        setFilterBreadcrumbs((filterBreadcrumbs) =>
+            filterBreadcrumbs.filter(
+                (breadcrumb) => breadcrumb.key !== breadcrumbToDelete.key,
+            ),
+        );
+
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.delete(breadcrumbToDelete.key);
+        history.push({
+            pathname: '/cases',
+            search: searchParams.toString(),
+        });
+    };
+
     return (
         <div className={classes.root} ref={rootRef}>
             <ThemeProvider theme={theme}>
+                <CookieBanner />
                 <CssBaseline />
                 <AppBar
                     position="fixed"
@@ -454,28 +559,26 @@ export default function App(): JSX.Element {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <Link to="/" data-testid="home-button">
-                            <GHListLogo />
-                        </Link>
+                        <GHListLogo />
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
                                     <SearchBar
-                                        searchQuery={
-                                            location.state?.search ?? ''
-                                        }
-                                        onSearchChange={(searchQuery): void => {
-                                            history.push('/cases', {
-                                                search: searchQuery,
+                                        search={search}
+                                        onSearchChange={(
+                                            searchInput: string,
+                                        ): void => {
+                                            history.push({
+                                                pathname: '/cases',
+                                                search: searchQueryToURL(
+                                                    searchInput,
+                                                ),
                                             });
                                         }}
-                                        loading={searchLoading}
                                         rootComponentRef={rootRef}
                                     ></SearchBar>
                                 </div>
-                                <DownloadButton
-                                    search={location.state?.search ?? ''}
-                                ></DownloadButton>
+                                <DownloadButton />
                             </>
                         ) : (
                             <span className={classes.spacer}></span>
@@ -486,7 +589,7 @@ export default function App(): JSX.Element {
                                     <a
                                         className={classes.mapLink}
                                         data-testid="mapLink"
-                                        href="http://covid-19.global.health"
+                                        href="https://map.covid-19.global.health/"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
@@ -606,21 +709,33 @@ export default function App(): JSX.Element {
                             >
                                 Data dictionary
                             </a>
-                            <Link
-                                to="/terms"
+                            <a
+                                href="https://global.health/acknowledgement/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="acknowledgmentsButton"
+                            >
+                                Data acknowledgments
+                            </a>
+                            <a
+                                href="https://global.health/terms-of-use"
+                                rel="noopener noreferrer"
+                                target="_blank"
                                 className={classes.link}
                                 data-testid="termsButton"
                             >
                                 Terms of use
-                            </Link>
-                            <PolicyLink
-                                type="privacy-policy"
-                                classes={{
-                                    root: classes.link,
-                                }}
+                            </a>
+                            <a
+                                href="https://global.health/privacy/"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                className={classes.link}
+                                data-testid="privacypolicybutton"
                             >
                                 Privacy policy
-                            </PolicyLink>
+                            </a>
                             <PolicyLink
                                 type="cookie-policy"
                                 classes={{
@@ -646,11 +761,16 @@ export default function App(): JSX.Element {
                             <Route exact path="/cases">
                                 <LinelistTable
                                     user={user}
-                                    setSearchLoading={setSearchLoading}
                                     page={listPage}
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
+                                    setSearch={setSearch}
+                                    search={search}
+                                    filterBreadcrumbs={filterBreadcrumbs}
+                                    handleBreadcrumbDelete={
+                                        handleFilterBreadcrumbDelete
+                                    }
                                 />
                             </Route>
                         )}
@@ -738,14 +858,20 @@ export default function App(): JSX.Element {
                             <TermsOfUse />
                         </Route>
                         <Route exact path="/">
-                            {hasAnyRole(['curator', 'admin']) ? (
+                            {hasAnyRole(['curator', 'admin']) &&
+                            search === '' ? (
                                 <Charts />
                             ) : user ? (
-                                <Redirect to="/cases" />
+                                <Redirect
+                                    to={{
+                                        pathname: '/cases',
+                                        search: searchQueryToURL(search),
+                                    }}
+                                />
                             ) : isLoadingUser ? (
                                 <></>
                             ) : (
-                                <LandingPage />
+                                <LandingPage setUser={setUser} />
                             )}
                         </Route>
                         {/* Redirect any unavailable URLs to / after the user has loaded. */}

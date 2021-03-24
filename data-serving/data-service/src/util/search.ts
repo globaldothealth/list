@@ -27,6 +27,7 @@ const keywords = new Map<string, string>([
     ['admin1', 'location.administrativeAreaLevel1'],
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
+    ['variant', 'variant.name'],
 ]);
 
 export default function parseSearchQuery(q: string): ParsedSearch {

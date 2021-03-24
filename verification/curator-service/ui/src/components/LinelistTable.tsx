@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { round } from 'lodash';
@@ -18,10 +18,12 @@ import {
     Typography,
     makeStyles,
     withStyles,
+    LinearProgress,
 } from '@material-ui/core';
 import { createStyles } from '@material-ui/core/styles';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import MaterialTable, { MTableToolbar, QueryResult } from 'material-table';
+import Chip from '@material-ui/core/Chip';
 
 import { Case, VerificationStatus } from './Case';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -41,6 +43,8 @@ import VerificationStatusIndicator from './VerificationStatusIndicator';
 import CaseExcludeDialog from './CaseExcludeDialog';
 import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
+import { URLToSearchQuery } from './util/searchQuery';
+import { ChipData } from './App';
 
 interface ListResponse {
     cases: Case[];
@@ -66,6 +70,7 @@ interface LinelistTableState {
     isDeleting: boolean;
 
     selectedVerificationStatus: VerificationStatus;
+    searchQuery: string;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -95,7 +100,6 @@ interface LocationState {
     newCaseIds: string[];
     editedCaseIds: string[];
     bulkMessage: string;
-    search: string;
     page: number;
     pageSize: number;
 }
@@ -104,42 +108,61 @@ interface Props
     extends RouteComponentProps<never, never, LocationState>,
         WithStyles<typeof styles> {
     user: User;
-    setSearchLoading: (a: boolean) => void;
     page: number;
     pageSize: number;
 
     onChangePage: (page: number) => void;
 
     onChangePageSize: (pageSize: number) => void;
+
+    setSearch: (value: string) => void;
+    search: string;
+    filterBreadcrumbs: ChipData[];
+    handleBreadcrumbDelete: (breadcrumbToDelete: ChipData) => void;
 }
 
 const styles = (theme: Theme) =>
     createStyles({
         alert: {
-            backgroundColor: 'white',
+            backgroundColor: theme.palette.background.paper,
             borderRadius: theme.spacing(1),
             marginTop: theme.spacing(1),
         },
         centeredContent: {
             display: 'flex',
             justifyContent: 'center',
+            cursor: 'pointer',
+            margin: 'auto',
+            width: 'fit-content',
+            paddingBottom: '1px',
+            '&:hover': {
+                borderBottomWidth: '1px',
+                borderBottomStyle: 'dotted',
+                borderColor: 'black',
+            },
         },
         dialogLoadingSpinner: {
             marginRight: theme.spacing(2),
             padding: '6px',
         },
-        spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
+            justifyContent: 'space-between',
             height: '64px',
+        },
+        tableTitle: {
+            minWidth: '150px',
         },
         tableToolbar: {
             backgroundColor: '#31A497',
         },
         toolbarItems: {
-            color: 'white',
+            color: theme.palette.background.paper,
+        },
+        breadcrumbChip: {
+            margin: theme.spacing(0.5),
         },
     });
 
@@ -150,6 +173,22 @@ const rowMenuStyles = makeStyles((theme: Theme) => ({
     dialogLoadingSpinner: {
         marginRight: theme.spacing(2),
         padding: '6px',
+    },
+}));
+
+const StyledDownloadButton = withStyles((theme: Theme) => ({
+    root: {
+        whiteSpace: 'nowrap',
+        minWidth: '240px',
+    },
+}))(Button);
+
+const downloadDataModalStyles = makeStyles((theme: Theme) => ({
+    downloadButton: {
+        margin: '16px 0',
+    },
+    loader: {
+        marginTop: '16px',
     },
 }));
 
@@ -337,30 +376,91 @@ function RowMenu(props: {
     );
 }
 
-export function DownloadButton(props: { search: string }): JSX.Element {
-    const formRef: RefObject<any> = React.createRef();
+export function DownloadButton(): JSX.Element {
+    const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
+        false,
+    );
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const classes = downloadDataModalStyles();
+
+    const downloadDataSet = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/cases/getDownloadLink');
+            window.location.href = response.data.signedUrl;
+            setIsLoading(false);
+            setIsDownloadModalOpen(false);
+        } catch (err) {
+            alert(
+                'There was an error while downloading data, please try again later.',
+            );
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
-            <form
-                hidden
-                ref={formRef}
-                method="POST"
-                action="/api/cases/download"
-            >
-                <input name="query" value={props.search.trim()} />
-            </form>
-            <Button
+            <StyledDownloadButton
                 variant="outlined"
                 color="primary"
-                onClick={(): void => formRef.current.submit()}
+                onClick={(): void => setIsDownloadModalOpen(true)}
                 startIcon={<SaveAltIcon />}
             >
-                Download
-            </Button>
+                Download full dataset
+            </StyledDownloadButton>
+            <Dialog
+                open={isDownloadModalOpen}
+                onClose={(): void => setIsDownloadModalOpen(false)}
+                // Stops the click being propagated to the table which
+                // would trigger the onRowClick action.
+                onClick={(e): void => e.stopPropagation()}
+            >
+                <DialogTitle>Download full dataset</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2">
+                        This download link provides access to the full
+                        Global.health line list dataset, cached daily at 12:00am
+                        UTC. Any cases added past that time will not be in the
+                        current download, but will be available the next day.
+                    </Typography>
+
+                    {isLoading && <LinearProgress className={classes.loader} />}
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.downloadButton}
+                        onClick={downloadDataSet}
+                        disabled={isLoading}
+                    >
+                        Download
+                    </Button>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
+interface ColumnHeaderProps {
+    theClass: any;
+    columnTitle: string;
+    onClickAction: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+const ColumnHeaderTitle: React.FC<ColumnHeaderProps> = ({
+    theClass,
+    columnTitle,
+    onClickAction,
+}) => {
+    return (
+        <div
+            className={theClass}
+            title="Click to add this filter"
+            onClick={onClickAction}
+        >
+            {columnTitle}
+        </div>
+    );
+};
 
 class LinelistTable extends React.Component<Props, LinelistTableState> {
     maxDeletionThreshold = 10000;
@@ -385,6 +485,10 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             isLoading: false,
             isDeleting: false,
             selectedVerificationStatus: VerificationStatus.Unverified,
+            searchQuery:
+                encodeURIComponent(
+                    URLToSearchQuery(this.props.location.search),
+                ) ?? '',
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -399,15 +503,24 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
     }
 
+    componentDidMount() {
+        localStorage.setItem('searchQuery', '');
+    }
+
     componentDidUpdate(
         prevProps: Readonly<Props>,
         prevState: Readonly<LinelistTableState>,
     ): void {
-        if (
-            this.props.location.state?.search !==
-            prevProps.location.state?.search
-        ) {
-            this.setState({ page: 0 }, this.tableRef.current?.onQueryChange);
+        if (this.props.location.search !== prevProps.location.search) {
+            this.setState(
+                {
+                    page: 0,
+                    searchQuery: encodeURIComponent(
+                        URLToSearchQuery(this.props.location.search),
+                    ),
+                },
+                this.tableRef.current?.onQueryChange(),
+            );
         }
     }
     componentWillUnmount(): void {
@@ -418,7 +531,9 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.setState({ error: '', isDeleting: true });
         let requestBody;
         if (this.hasSelectedRowsAcrossPages()) {
-            requestBody = { data: { query: this.props.location.state.search } };
+            requestBody = {
+                data: { query: decodeURIComponent(this.state.searchQuery) },
+            };
         } else {
             requestBody = {
                 data: {
@@ -453,7 +568,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             status: verificationStatus,
             ...(note ? { note } : {}),
             ...(this.hasSelectedRowsAcrossPages()
-                ? { query: this.props.location.state.search }
+                ? { query: decodeURIComponent(this.state.searchQuery) }
                 : { caseIds: rowData.map((row: TableRow) => row.id) }),
         };
 
@@ -532,8 +647,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
             .map(({ id }) => id);
     }
 
+    handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
+        e.preventDefault();
+        // Avoids duplicated search parameters
+        if (this.props.search.includes(filter)) return;
+
+        this.props.setSearch(
+            this.props.search +
+                (this.props.search ? ` ${filter}:` : `${filter}:`),
+        );
+    }
+
     render(): JSX.Element {
         const { history, classes } = this.props;
+
         return (
             <>
                 {this.state.error && (
@@ -740,7 +867,15 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             },
                         },
                         {
-                            title: 'Case ID',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Case ID"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'caseid')}
+                                />
+                            ),
                             field: 'id',
                             type: 'string',
                         },
@@ -749,26 +884,57 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),
-                            headerStyle: { whiteSpace: 'nowrap' },
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 3',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 3"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin3')}
+                                />
+                            ),
                             field: 'adminArea3',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 2',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 2"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin2')}
+                                />
+                            ),
                             field: 'adminArea2',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Admin 1',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Admin 1"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'admin1')}
+                                />
+                            ),
                             field: 'adminArea1',
-                            headerStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Country',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Country"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(e, 'country')
+                                    }
+                                />
+                            ),
+
                             field: 'country',
                         },
                         {
@@ -789,12 +955,32 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             cellStyle: { whiteSpace: 'nowrap' },
                         },
                         {
-                            title: 'Gender',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Gender"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) => this.handleAddFilterClick(e, 'gender')}
+                                />
+                            ),
                             field: 'gender',
+                            render: (rowData) => rowData.gender,
                         },
                         {
-                            title: 'Outcome',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Outcome"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(e, 'outcome')
+                                    }
+                                />
+                            ),
                             field: 'outcome',
+                            render: (rowData) => rowData.outcome,
                         },
                         {
                             title: 'Hospitalization date/period',
@@ -805,9 +991,22 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             field: 'symptomsOnsetDate',
                         },
                         {
-                            title: 'Source URL',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Source URL"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(
+                                            e,
+                                            'sourceurl',
+                                        )
+                                    }
+                                />
+                            ),
                             field: 'sourceUrl',
-                            headerStyle: { whiteSpace: 'nowrap' },
+                            render: (rowData) => rowData.sourceUrl,
                         },
                     ]}
                     isLoading={this.state.isLoading}
@@ -816,12 +1015,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             let listUrl = this.state.url;
                             listUrl += '?limit=' + query.pageSize;
                             listUrl += '&page=' + (this.state.page + 1);
-                            const trimmedQ = this.props.location.state?.search?.trim();
-                            if (trimmedQ) {
-                                listUrl += '&q=' + encodeURIComponent(trimmedQ);
+                            listUrl += '&count_limit=10000';
+                            if (this.state.searchQuery !== '') {
+                                // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
+                                listUrl += '&q=' + this.state.searchQuery;
                             }
                             this.setState({ isLoading: true, error: '' });
-                            this.props.setSearchLoading(true);
                             const response = axios.get<ListResponse>(listUrl);
 
                             response
@@ -910,7 +1109,6 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                 })
                                 .finally(() => {
                                     this.setState({ isLoading: false });
-                                    this.props.setSearchLoading(false);
                                 });
                         })
                     }
@@ -921,8 +1119,35 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         Pagination: (props): JSX.Element => {
                             return this.state.numSelectedRows === 0 ? (
                                 <div className={classes.tablePaginationBar}>
-                                    <Typography>Linelist</Typography>
-                                    <span className={classes.spacer}></span>
+                                    <Typography className={classes.tableTitle}>
+                                        COVID-19 Linelist
+                                    </Typography>
+
+                                    {this.props.filterBreadcrumbs.length >
+                                        0 && (
+                                        <Chip
+                                            label="Filters"
+                                            color="primary"
+                                            className={classes.breadcrumbChip}
+                                        />
+                                    )}
+                                    {this.props.filterBreadcrumbs.map(
+                                        (breadcrumb) => (
+                                            <Chip
+                                                key={breadcrumb.key}
+                                                label={`${breadcrumb.key} - ${breadcrumb.value}`}
+                                                onDelete={() =>
+                                                    this.props.handleBreadcrumbDelete(
+                                                        breadcrumb,
+                                                    )
+                                                }
+                                                className={
+                                                    classes.breadcrumbChip
+                                                }
+                                            />
+                                        ),
+                                    )}
+
                                     <TablePagination
                                         {...props}
                                         onChangeRowsPerPage={(event): void => {
@@ -947,12 +1172,14 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                             event,
                                             newPage: number,
                                         ): void => {
-                                            this.setState({ page: newPage });
+                                            this.setState({
+                                                page: newPage,
+                                            });
 
                                             this.props.onChangePage(newPage);
                                             props.onChangePage(event, newPage);
                                         }}
-                                    ></TablePagination>
+                                    />
                                 </div>
                             ) : (
                                 <></>
@@ -976,6 +1203,13 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         })
                     }
                     localization={{
+                        pagination: {
+                            labelDisplayedRows:
+                                // this value has to correspond to count_limit param in /api/cases query
+                                this.state.totalNumRows === 10000
+                                    ? '{from}-{to} of many'
+                                    : '{from}-{to} of {count}',
+                        },
                         toolbar: {
                             nRowsSelected:
                                 this.state.numSelectedRows === 1
@@ -1001,6 +1235,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                         maxBodyHeight: 'calc(100vh - 20em)',
                         headerStyle: {
                             zIndex: 1,
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
                         },
                         // TODO: style highlighted rows to spec
                         rowStyle: (rowData) => {
@@ -1036,8 +1272,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             ? [
                                   // Only allow selecting rows across pages if
                                   // there is a search query.
-                                  ...((this.props.location.state?.search?.trim() ??
-                                      '') !== ''
+                                  ...(this.state.searchQuery !== ''
                                       ? [
                                             {
                                                 icon: (): JSX.Element => (
@@ -1078,6 +1313,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                                                             .totalNumRows !==
                                                         this.state
                                                             .numSelectedRows;
+
                                                     await this.tableRef.current.onAllSelected(
                                                         shouldSelectAll,
                                                     );

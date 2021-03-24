@@ -108,9 +108,19 @@ final case in the CSV. If it was successful, the message will be `Success!`;
 otherwise, it's likely to say that the request failed with `422`, which means
 the data wasn't properly formatted. This is changing in the near future.
 
+#### Updating variants list
+
+Edit `./variantsofconcern.csv` to add the new variants, then run:
+
+    npm run prepare-variants
+
+This updates `src/assets/variants.json`, which you should then commit and push.
+
 ## Development
 
 The React application was built with the `create-react-app` new project generator.
+
+Prepare the variants of concern (VOC) data by running `npm run prepare-variants`. This step is included in `npm run build` so it's not necessary to do it yourself when preparing a production build.
 
 Run the stack by executing the `/dev/run_stack.sh` script or simply launch the UI alone by running `npm start` from this directory. Note that all API calls are proxied to `localhost:3001` by default so running the full stack is probably a better idea than just running the UI unless you want to change something that isn't API relevant.
 

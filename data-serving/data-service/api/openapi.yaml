@@ -1,1053 +1,1090 @@
 openapi: 3.0.3
 info:
-  title: Global Health data service
-  description: Server for CRUD operations on Global Health line-list data
-  termsOfService: "https://www.healthmap.org/about/termsofuse/"
-  contact:
-    name: Healthmap
-    url: http://www.diseasedaily.org/about
-    email: info@healthmap.org
-  license:
-    name: MIT
-    url: "https://opensource.org/licenses/MIT"
-  version: 1.0.0
+    title: Global Health data service
+    description: Server for CRUD operations on Global Health line-list data
+    termsOfService: 'https://www.healthmap.org/about/termsofuse/'
+    contact:
+        name: Healthmap
+        url: http://www.diseasedaily.org/about
+        email: info@healthmap.org
+    license:
+        name: MIT
+        url: 'https://opensource.org/licenses/MIT'
+    version: 1.0.0
 tags:
-  - name: Case
-    description: Case related operations
-  - name: Suggest
-    description: Suggestion for input of cases
-  - name: Geocode
-    description: Geolocation of a case
+    - name: Case
+      description: Case related operations
+    - name: Suggest
+      description: Suggestion for input of cases
+    - name: Geocode
+      description: Geolocation of a case
 paths:
-  /cases:
-    get:
-      summary: Lists cases
-      tags: [Case]
-      operationId: listCases
-      parameters:
-        - name: page
-          in: query
-          description: The pages of cases to skip before starting to collect the result set
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            default: 1
-        - name: limit
-          in: query
-          description: The number of items to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 10
-        - name: q
-          in: query
-          description: The search query
-          required: false
-          schema:
-            type: string
-          examples:
-            "full text search":
-              value: "this -butnotthis"
-              summary: Full text search with items that must or must not be present.
-            keywords:
-              value: "curator:foo@bar.com,baz@meh.com country:france"
-              summary: >
-                values are OR'ed for the same keyword and all keywords are AND'ed.
-                Keyword values can be quoted for multi-words matches and concatenated
-                with a comma to union them. Only equality operator is supported.
-                Supported keywords are: curator, gender, nationality, occupation,
-                country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
-                admin1, admin2, admin3
-      responses:
-        "200":
-          $ref: "#/components/responses/200CaseArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-    post:
-      summary: Creates one (or multiple identical) new cases
-      tags: [Case]
-      operationId: createCase
-      requestBody:
-        description: Case to add
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewCase"
-      parameters:
-        - name: validate_only
-          in: query
-          description: Whether to validate the case without creating it
-          required: false
-          schema:
-            type: boolean
-            default: false
-          allowEmptyValue: true
-        - name: num_cases
-          in: query
-          description: The number of cases to create
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            default: 1
-      responses:
-        "201":
-          $ref: "#/components/responses/201Create"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-    put:
-      summary: Upserts a case
-      tags: [Case]
-      description: >
-        Creates or updates a case, depending on whether the provided values for
-        the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
-        correspond to an existing case record.
-      operationId: upsertCase
-      requestBody:
-        description: Case to upsert
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/Case"
-              properties:
-                curator:
-                  $ref: "#/components/schemas/Curator"
-              required:
-                - caseReference
-                - curator
-      responses:
-        "200":
-          $ref: "#/components/responses/200Case"
-        "201":
-          $ref: "#/components/responses/201Case"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-    delete:
-      summary: >
-        Deletes multiple cases. It is required to supply exactly one of either 
-        caseIds or query in the request body. If caseIds are supplied, cases 
-        corresponding to those caseIds will be deleted. If query is supplied, 
-        all cases that match the query will be deleted.
-      tags: [Case]
-      operationId: deleteCases
-      requestBody:
-        description: Cases to delete
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                caseIds:
-                  description: Cases corresponding to these ids will be deleted
-                  type: array
-                  items:
-                    type: string
-                    pattern: '^[a-f\d]{24}$'
-                query:
-                  description: >
-                    Cases matching this query will be deleted. Must contain
-                    non-whitespace characters.
+    /cases:
+        get:
+            summary: Lists cases
+            tags: [Case]
+            operationId: listCases
+            parameters:
+                - name: page
+                  in: query
+                  description: The pages of cases to skip before starting to collect the result set
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 1
+                - name: limit
+                  in: query
+                  description: The number of items to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                - name: count_limit
+                  in: query
+                  description: The maximum number of documents that will be counted in mongoDB to make queries faster
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 100
+                      default: 10000
+                      maximum: 50000
+                - name: q
+                  in: query
+                  description: The search query
+                  required: false
+                  schema:
+                      type: string
+                  examples:
+                      'full text search':
+                          value: 'this -butnotthis'
+                          summary: Full text search with items that must or must not be present.
+                      keywords:
+                          value: 'curator:foo@bar.com,baz@meh.com country:france'
+                          summary: >
+                              values are OR'ed for the same keyword and all keywords are AND'ed.
+                              Keyword values can be quoted for multi-words matches and concatenated
+                              with a comma to union them. Bare words are compared for equality, e.g.
+                              country:Germany. The special character '*' matches any value, e.g. 
+                              variant:* returns any case where the variant is not empty.
+                              Supported keywords are: curator, gender, nationality, occupation,
+                              country, outcome, caseid, uploadid, sourceurl, verificationstatus, 
+                              admin1, admin2, admin3, variant
+            responses:
+                '200':
+                    $ref: '#/components/responses/200CaseArray'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        post:
+            summary: Creates one (or multiple identical) new cases
+            tags: [Case]
+            operationId: createCase
+            requestBody:
+                description: Case to add
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/NewCase'
+            parameters:
+                - name: validate_only
+                  in: query
+                  description: Whether to validate the case without creating it
+                  required: false
+                  schema:
+                      type: boolean
+                      default: false
+                  allowEmptyValue: true
+                - name: num_cases
+                  in: query
+                  description: The number of cases to create
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      default: 1
+            responses:
+                '201':
+                    $ref: '#/components/responses/201Create'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        put:
+            summary: Upserts a case
+            tags: [Case]
+            description: >
+                Creates or updates a case, depending on whether the provided values for
+                the `caseReference.sourceId` and `caseReference.sourceEntryId` fields
+                correspond to an existing case record.
+            operationId: upsertCase
+            requestBody:
+                description: Case to upsert
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: '#/components/schemas/Case'
+                            properties:
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                            required:
+                                - caseReference
+                                - curator
+            responses:
+                '200':
+                    $ref: '#/components/responses/200Case'
+                '201':
+                    $ref: '#/components/responses/201Case'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        delete:
+            summary: >
+                Deletes multiple cases. It is required to supply exactly one of either 
+                caseIds or query in the request body. If caseIds are supplied, cases 
+                corresponding to those caseIds will be deleted. If query is supplied, 
+                all cases that match the query will be deleted.
+            tags: [Case]
+            operationId: deleteCases
+            requestBody:
+                description: Cases to delete
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                caseIds:
+                                    description: Cases corresponding to these ids will be deleted
+                                    type: array
+                                    items:
+                                        type: string
+                                        pattern: '^[a-f\d]{24}$'
+                                query:
+                                    description: >
+                                        Cases matching this query will be deleted. Must contain
+                                        non-whitespace characters.
+                                    type: string
+                                    pattern: \S+
+                                maxCasesThreshold:
+                                    type: number
+                                    description: >
+                                        An optional safeguard against deletion of too many cases.
+                                        If you want to delete based on a query for example but fail
+                                        if the number of cases that's going to be deleted is more
+                                        than a given number, set this field to that desired number.
+                                        Failure will be indicated by a 422 error status code.
+                            oneOf:
+                                - required: [caseIds]
+                                - required: [query]
+            responses:
+                '204':
+                    description: Cases deleted
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/download:
+        post:
+            summary: >
+                Streams a CSV attachment of all cases. If a query is supplied the
+                CSV only contains cases matching the search query. If caseIds are
+                supplied the CSV only contains cases with those ids. You cannot supply
+                both query and caseIds.
+            tags: [Case]
+            operationId: downloadCases
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            maxProperties: 1
+                            properties:
+                                caseIds:
+                                    description: Cases corresponding to these ids will returned
+                                    type: array
+                                    items:
+                                        type: string
+                                        pattern: '^[a-f\d]{24}$'
+                                query:
+                                    description: >
+                                        Cases matching this query will be returned. This is ignored
+                                        if empty.
+                                    type: string
+            responses:
+                '200':
+                    $ref: '#/components/responses/200CasesDownload'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/batchUpsert:
+        post:
+            summary: Batch upserts cases
+            tags: [Case]
+            operationId: batchUpsertCases
+            requestBody:
+                description: Cases to upsert
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: '#/components/schemas/CaseArray'
+                            properties:
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                            required:
+                                - curator
+            responses:
+                '200':
+                    $ref: '#/components/responses/200BatchCaseUpsert'
+                '207':
+                    $ref: '#/components/responses/207BatchUpsertCaseResponse'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/batchUpdate:
+        post:
+            summary: Batch updates cases
+            tags: [Case]
+            operationId: batchUpdateCases
+            requestBody:
+                description: Cases to update
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: '#/components/schemas/CaseArray'
+                            properties:
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                            required:
+                                - curator
+            responses:
+                '200':
+                    $ref: '#/components/responses/200BatchUpdateResponse'
+                '400':
+                    $ref: '#/components/responses/400'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/batchUpdateQuery:
+        post:
+            summary: Batch updates cases that match the query property
+            tags: [Case]
+            operationId: batchUpdateQueryCases
+            requestBody:
+                description: Cases to update
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                                query:
+                                    description: >
+                                        Cases matching this query will be updated. Must contain
+                                        non-whitespace characters.
+                                    type: string
+                                    pattern: \S+
+                                case:
+                                    $ref: '#/components/schemas/Case'
+                            required:
+                                - curator
+                                - query
+                                - case
+            responses:
+                '200':
+                    $ref: '#/components/responses/200BatchUpdateResponse'
+                '400':
+                    $ref: '#/components/responses/400'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/symptoms:
+        get:
+            summary: Lists most frequently used symptoms
+            operationId: listSymptoms
+            tags: [Suggest]
+            parameters:
+                - name: limit
+                  in: query
+                  description: The number of items to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      maximum: 100
+                      default: 5
+            responses:
+                '200':
+                    $ref: '#/components/responses/200SymptomArray'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/placesOfTransmission:
+        get:
+            summary: Lists most frequently used places of transmission
+            operationId: listPlacesOfTransmission
+            tags: [Suggest]
+            parameters:
+                - name: limit
+                  in: query
+                  description: The number of items to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      maximum: 100
+                      default: 5
+            responses:
+                '200':
+                    $ref: '#/components/responses/200PlacesOfTransmissionArray'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/occupations:
+        get:
+            summary: Lists most frequently used occupations
+            tags: [Suggest]
+            operationId: listOccupations
+            parameters:
+                - name: limit
+                  in: query
+                  description: The number of items to return
+                  required: false
+                  schema:
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      maximum: 100
+                      default: 5
+            responses:
+                '200':
+                    $ref: '#/components/responses/200OccupationArray'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/{id}:
+        parameters:
+            - name: id
+              in: path
+              description: The case ID
+              required: true
+              schema:
                   type: string
-                  pattern: \S+
-                maxCasesThreshold:
-                  type: number
+                  pattern: '^[a-f\d]{24}$'
+        get:
+            summary: Gets a specific case
+            operationId: getCase
+            tags: [Case]
+            responses:
+                '200':
+                    $ref: '#/components/responses/200Case'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        put:
+            summary: Updates a specific case
+            operationId: updateCase
+            tags: [Case]
+            requestBody:
+                description: Case to update
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: '#/components/schemas/Case'
+                            properties:
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                            required:
+                                - curator
+            responses:
+                '200':
+                    $ref: '#/components/responses/200Case'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+        delete:
+            summary: Deletes a specific case
+            operationId: deleteCase
+            tags: [Case]
+            responses:
+                '204':
+                    description: Case deleted
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '404':
+                    $ref: '#/components/responses/404'
+                '500':
+                    $ref: '#/components/responses/500'
+    /cases/batchStatusChange:
+        post:
+            summary: Changes status for a list of cases
+            tags: [Case]
+            operationId: batchStatusChange
+            requestBody:
+                description: >
+                    Case IDs are passed through an array of strings, note may be provided as well.
+                    A query may be provided instead of list of IDs, this will change status for all
+                    cases matching the query.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                caseIds:
+                                    description: >
+                                        Cases having IDs provided here will have their
+                                        status changed to one specified in status field.
+                                    type: array
+                                    items:
+                                        type: string
+                                status:
+                                    $ref: '#/components/schemas/CaseStatus'
+                                query:
+                                    description: >
+                                        Cases matching this query will have their status
+                                        changed. Must contain non-whitespace characters.
+                                    type: string
+                                    pattern: \S+
+                                note:
+                                    description: >
+                                        The reason behind exclusion (or other important info).
+                                        This field is ignored if a status is not "Excluded".
+                                    type: string
+                                curator:
+                                    $ref: '#/components/schemas/Curator'
+                            oneOf:
+                                - required: [caseIds]
+                                - required: [query]
+                            required:
+                                - status
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+                '400':
+                    $ref: '#/components/responses/400'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /geocode/seed:
+        post:
+            tags: [Geocode]
+            summary: Adds geocodes to the geocoding database
+            operationId: seedGeocodes
+            requestBody:
+                description: A single geocode record
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+    /geocode/clear:
+        post:
+            tags: [Geocode]
+            summary: Clears geocodes from the geocoding database
+            operationId: clearGeocodes
+            responses:
+                '200':
+                    $ref: '#/components/responses/200'
+    /geocode/suggest:
+        get:
+            tags: [Suggest, Geocode]
+            summary: Suggests geocodes for a given query string
+            operationId: suggestGeocodes
+            parameters:
+                - name: q
+                  in: query
+                  description: The location string for which to find geocodes
+                  required: true
+                  allowReserved: true
+                  schema:
+                      type: string
+                - name: limitToResolution
+                  in: query
+                  allowReserved: true
+                  schema:
+                      type: string
                   description: >
-                    An optional safeguard against deletion of too many cases.
-                    If you want to delete based on a query for example but fail
-                    if the number of cases that's going to be deleted is more
-                    than a given number, set this field to that desired number.
-                    Failure will be indicated by a 422 error status code.
-              oneOf:
-                - required: [caseIds]
-                - required: [query]
-      responses:
-        "204":
-          description: Cases deleted
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "404":
-          $ref: "#/components/responses/404"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/download:
-    post:
-      summary: >
-        Streams a CSV attachment of all cases. If a query is supplied the
-        CSV only contains cases matching the search query. If caseIds are
-        supplied the CSV only contains cases with those ids. You cannot supply
-        both query and caseIds.
-      tags: [Case]
-      operationId: downloadCases
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              maxProperties: 1
-              properties:
-                caseIds:
-                  description: Cases corresponding to these ids will returned
-                  type: array
-                  items:
-                    type: string
-                    pattern: '^[a-f\d]{24}$'
-                query:
-                  description: >
-                    Cases matching this query will be returned. This is ignored
-                    if empty.
-                  type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/200CasesDownload"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchUpsert:
-    post:
-      summary: Batch upserts cases
-      tags: [Case]
-      operationId: batchUpsertCases
-      requestBody:
-        description: Cases to upsert
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CaseArray"
-              properties:
-                curator:
-                  $ref: "#/components/schemas/Curator"
-              required:
-                - curator
-      responses:
-        "200":
-          $ref: "#/components/responses/200BatchCaseUpsert"
-        "207":
-          $ref: "#/components/responses/207BatchUpsertCaseResponse"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchUpdate:
-    post:
-      summary: Batch updates cases
-      tags: [Case]
-      operationId: batchUpdateCases
-      requestBody:
-        description: Cases to update
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CaseArray"
-              properties:
-                curator:
-                  $ref: "#/components/schemas/Curator"
-              required:
-                - curator
-      responses:
-        "200":
-          $ref: "#/components/responses/200BatchUpdateResponse"
-        "400":
-          $ref: "#/components/responses/400"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchUpdateQuery:
-    post:
-      summary: Batch updates cases that match the query property
-      tags: [Case]
-      operationId: batchUpdateQueryCases
-      requestBody:
-        description: Cases to update
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                curator:
-                  $ref: "#/components/schemas/Curator"
-                query:
-                  description: >
-                    Cases matching this query will be updated. Must contain
-                    non-whitespace characters.
-                  type: string
-                  pattern: \S+
-                case:
-                  $ref: "#/components/schemas/Case"
-              required:
-                - curator
-                - query
-                - case
-      responses:
-        "200":
-          $ref: "#/components/responses/200BatchUpdateResponse"
-        "400":
-          $ref: "#/components/responses/400"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/symptoms:
-    get:
-      summary: Lists most frequently used symptoms
-      operationId: listSymptoms
-      tags: [Suggest]
-      parameters:
-        - name: limit
-          in: query
-          description: The number of items to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 5
-      responses:
-        "200":
-          $ref: "#/components/responses/200SymptomArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/placesOfTransmission:
-    get:
-      summary: Lists most frequently used places of transmission
-      operationId: listPlacesOfTransmission
-      tags: [Suggest]
-      parameters:
-        - name: limit
-          in: query
-          description: The number of items to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 5
-      responses:
-        "200":
-          $ref: "#/components/responses/200PlacesOfTransmissionArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/occupations:
-    get:
-      summary: Lists most frequently used occupations
-      tags: [Suggest]
-      operationId: listOccupations
-      parameters:
-        - name: limit
-          in: query
-          description: The number of items to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 5
-      responses:
-        "200":
-          $ref: "#/components/responses/200OccupationArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/{id}:
-    parameters:
-      - name: id
-        in: path
-        description: The case ID
-        required: true
-        schema:
-          type: string
-          pattern: '^[a-f\d]{24}$'
-    get:
-      summary: Gets a specific case
-      operationId: getCase
-      tags: [Case]
-      responses:
-        "200":
-          $ref: "#/components/responses/200Case"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "404":
-          $ref: "#/components/responses/404"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-    put:
-      summary: Updates a specific case
-      operationId: updateCase
-      tags: [Case]
-      requestBody:
-        description: Case to update
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/Case"
-              properties:
-                curator:
-                  $ref: "#/components/schemas/Curator"
-              required:
-                - curator
-      responses:
-        "200":
-          $ref: "#/components/responses/200Case"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "404":
-          $ref: "#/components/responses/404"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-    delete:
-      summary: Deletes a specific case
-      operationId: deleteCase
-      tags: [Case]
-      responses:
-        "204":
-          description: Case deleted
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "404":
-          $ref: "#/components/responses/404"
-        "500":
-          $ref: "#/components/responses/500"
-  /cases/batchStatusChange:
-    post:
-      summary: Changes status for a list of cases
-      tags: [Case]
-      operationId: batchStatusChange
-      requestBody:
-        description: >
-          Case IDs are passed through an array of strings, note may be provided as well.
-          A query may be provided instead of list of IDs, this will change status for all
-          cases matching the query.
-        required: true
-        content:
-          application/json:
-            schema:
-              properties:
-                caseIds:
-                  description: >
-                    Cases having IDs provided here will have their
-                    status changed to one specified in status field.
-                  type: array
-                  items:
-                    type: string
-                status:
-                  $ref: "#/components/schemas/CaseStatus"
-                query:
-                  description: >
-                    Cases matching this query will have their status
-                    changed. Must contain non-whitespace characters.
-                  type: string
-                  pattern: \S+
-                note:
-                  description: >
-                    The reason behind exclusion (or other important info).
-                    This field is ignored if a status is not "Excluded".
-                  type: string
-                curator:
-                  $ref: "#/components/schemas/Curator"
-              oneOf:
-                - required: [caseIds]
-                - required: [query]
-              required:
-                - status
-      responses:
-        "200":
-          $ref: "#/components/responses/200"
-        "400":
-          $ref: "#/components/responses/400"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /geocode/seed:
-    post:
-      tags: [Geocode]
-      summary: Adds geocodes to the geocoding database
-      operationId: seedGeocodes
-      requestBody:
-        description: A single geocode record
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        "200":
-          $ref: "#/components/responses/200"
-  /geocode/clear:
-    post:
-      tags: [Geocode]
-      summary: Clears geocodes from the geocoding database
-      operationId: clearGeocodes
-      responses:
-        "200":
-          $ref: "#/components/responses/200"
-  /geocode/suggest:
-    get:
-      tags: [Suggest, Geocode]
-      summary: Suggests geocodes for a given query string
-      operationId: suggestGeocodes
-      parameters:
-        - name: q
-          in: query
-          description: The location string for which to find geocodes
-          required: true
-          allowReserved: true
-          schema:
-            type: string
-        - name: limitToResolution
-          in: query
-          allowReserved: true
-          schema:
-            type: string
-          description: >
-            Comma-separated list of resolutions to restrict geocoding to.
-            Allowed values are: Point, Admin3, Admin2, Admin1, Country.
-      responses:
-        "200":
-          $ref: "#/components/responses/200LocationArray"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
-  /excludedCaseIds:
-    get:
-      summary: Lists IDs of excluded cases for a specified source
-      tags: [Case]
-      operationId: listExcludedCaseIds
-      parameters:
-        - name: sourceId
-          in: query
-          description: ID of source to filter out only excluded cases from.
-          required: true
-          schema:
-            type: string
-            pattern: '^[a-f\d]{24}$'
-        - name: dateFrom
-          in: query
-          description: Start date for excluded cases lookup
-          required: false
-          schema:
-            type: string
-            format: date
-        - name: dateTo
-          in: query
-          description: Start date for excluded cases lookup
-          required: false
-          schema:
-            type: string
-            format: date
-      responses:
-        "200":
-          $ref: "#/components/responses/200CaseIdsArray"
-        "400":
-          $ref: "#/components/responses/400"
-        "403":
-          $ref: "#/components/responses/403"
-        "422":
-          $ref: "#/components/responses/422"
-        "500":
-          $ref: "#/components/responses/500"
+                      Comma-separated list of resolutions to restrict geocoding to.
+                      Allowed values are: Point, Admin3, Admin2, Admin1, Country.
+            responses:
+                '200':
+                    $ref: '#/components/responses/200LocationArray'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
+    /excludedCaseIds:
+        get:
+            summary: Lists IDs of excluded cases for a specified source
+            tags: [Case]
+            operationId: listExcludedCaseIds
+            parameters:
+                - name: sourceId
+                  in: query
+                  description: ID of source to filter out only excluded cases from.
+                  required: true
+                  schema:
+                      type: string
+                      pattern: '^[a-f\d]{24}$'
+                - name: dateFrom
+                  in: query
+                  description: Start date for excluded cases lookup
+                  required: false
+                  schema:
+                      type: string
+                      format: date
+                - name: dateTo
+                  in: query
+                  description: Start date for excluded cases lookup
+                  required: false
+                  schema:
+                      type: string
+                      format: date
+            responses:
+                '200':
+                    $ref: '#/components/responses/200CaseIdsArray'
+                '400':
+                    $ref: '#/components/responses/400'
+                '403':
+                    $ref: '#/components/responses/403'
+                '422':
+                    $ref: '#/components/responses/422'
+                '500':
+                    $ref: '#/components/responses/500'
 components:
-  schemas:
-    BatchUpdateResponse:
-      description: Response to batch update cases API requests
-      properties:
-        numModified:
-          type: number
-      required:
-        - numModified
-    BatchUpsertCaseResponse:
-      description: Response to batch upsert case API requests
-      properties:
-        phase:
-          type: string
-          description: The last operation completed by the server
-          enum:
-            - GEOCODE
-            - VALIDATE
-            - UPSERT
-        numCreated:
-          type: number
-          description: The number of cases created by the request.
-        numUpdated:
-          type: number
-          description: >
-            The number of cases modified by the request. Note that this only
-            includes cases that are actually modified by the batch upsert. If a
-            case is included in the batch upsert request, but contains no
-            changes compared to the currently stored case, it won't be counted.
-        errors:
-          type: array
-          items:
-            type: object
+    schemas:
+        BatchUpdateResponse:
+            description: Response to batch update cases API requests
             properties:
-              index:
-                description: 0-based index of the case which triggered an error
-                type: integer
-              message:
-                type: string
-                description: what went wrong
-                example: Cannot parse age
+                numModified:
+                    type: number
             required:
-              - index
-              - message
-      required:
-        - phase
-        - numCreated
-        - numUpdated
-        - errors
-    Case:
-      description: A single line-list case.
-      properties:
-        caseReference:
-          type: object
-          properties:
-            sourceId:
-              type: string
-              pattern: '^[a-f\d]{24}$'
-            sourceUrl:
-              type: string
-            uploadIds:
-              description: >
-                An array of UUIDs of uploads where this case was created or updated
-                through bulk upload or automated ingestion.
-              type: array
-              items:
-                type: string
-                pattern: '^[a-f\d]{24}$'
-            verificationStatus:
-              description: >
-                Whether the case document has been manually verified for
-                correctness. For new cases, if this field isn't provided, a
-                default value of UNVERIFIED will be used.
-              type: string
-              enum:
-                - UNVERIFIED
-                - VERIFIED
-                - EXCLUDED
-            additionalSources:
-              type: array
-              items:
-                type: object
-                properties:
-                  sourceUrl:
-                    type: string
-        demographics:
-          type: object
-          properties:
-            gender:
-              type: string
-              enum: [null, Male, Female, Non-binary/Third gender, Other]
-            ageRange:
-              type: object
-              properties:
-                start:
-                  type: number
-                end:
-                  type: number
-            ethnicity:
-              type: string
-            nationalities:
-              type: array
-              items:
-                type: string
-            occupation:
-              type: string
-        location:
-          $ref: "#/components/schemas/Location"
-        events:
-          description: > 
-            An event with name "confirmed" must be specified. Other event names
-            include onsetSymptoms, firstClinicalConsultation, selfIsolation,
-            hospitalAdmission, icuAdmission, and outcome.
-          type: array
-          items:
-            type: object
+                - numModified
+        BatchUpsertCaseResponse:
+            description: Response to batch upsert case API requests
             properties:
-              name:
-                type: string
-              dateRange:
-                $ref: "#/components/schemas/DateRange"
-              value:
-                type: string
-        symptoms:
-          type: object
-          properties:
-            status:
-              type: string
-              enum: [null, Asymptomatic, Symptomatic, Presymptomatic]
-            values:
-              type: array
-              items:
-                type: string
-        preexistingConditions:
-          type: object
-          properties:
-            hasPreexistingConditions:
-              type: boolean
-            values:
-              type: array
-              items:
-                type: string
-        transmission:
-          type: object
-          properties:
-            routes:
-              type: array
-              items:
-                type: string
-            places:
-              type: array
-              items:
-                type: string
-            linkedCaseIds:
-              type: array
-              items:
-                type: string
-        travelHistory:
-          type: object
-          properties:
-            traveledPrior30Days:
-              type: boolean
-            travel:
-              type: array
-              items:
-                type: object
-                properties:
-                  dateRange:
-                    $ref: "#/components/schemas/DateRange"
-                  location:
-                    $ref: "#/components/schemas/Location"
-                  purpose:
+                phase:
                     type: string
-                    enum: [null, Business, Leisure, Family, Other]
-                  methods:
+                    description: The last operation completed by the server
+                    enum:
+                        - GEOCODE
+                        - VALIDATE
+                        - UPSERT
+                numCreated:
+                    type: number
+                    description: The number of cases created by the request.
+                numUpdated:
+                    type: number
+                    description: >
+                        The number of cases modified by the request. Note that this only
+                        includes cases that are actually modified by the batch upsert. If a
+                        case is included in the batch upsert request, but contains no
+                        changes compared to the currently stored case, it won't be counted.
+                errors:
                     type: array
                     items:
-                      type: string
-        genomeSequences:
-          type: array
-          items:
+                        type: object
+                        properties:
+                            index:
+                                description: 0-based index of the case which triggered an error
+                                type: integer
+                            message:
+                                type: string
+                                description: what went wrong
+                                example: Cannot parse age
+                        required:
+                            - index
+                            - message
+            required:
+                - phase
+                - numCreated
+                - numUpdated
+                - errors
+        Case:
+            description: A single line-list case.
+            properties:
+                caseReference:
+                    type: object
+                    properties:
+                        sourceId:
+                            type: string
+                            pattern: '^[a-f\d]{24}$'
+                        sourceUrl:
+                            type: string
+                        uploadIds:
+                            description: >
+                                An array of UUIDs of uploads where this case was created or updated
+                                through bulk upload or automated ingestion.
+                            type: array
+                            items:
+                                type: string
+                                pattern: '^[a-f\d]{24}$'
+                        verificationStatus:
+                            description: >
+                                Whether the case document has been manually verified for
+                                correctness. For new cases, if this field isn't provided, a
+                                default value of UNVERIFIED will be used.
+                            type: string
+                            enum:
+                                - UNVERIFIED
+                                - VERIFIED
+                                - EXCLUDED
+                        additionalSources:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    sourceUrl:
+                                        type: string
+                demographics:
+                    type: object
+                    properties:
+                        gender:
+                            type: string
+                            enum:
+                                [
+                                    null,
+                                    Male,
+                                    Female,
+                                    Non-binary/Third gender,
+                                    Other,
+                                ]
+                        ageRange:
+                            type: object
+                            properties:
+                                start:
+                                    type: number
+                                end:
+                                    type: number
+                        ethnicity:
+                            type: string
+                        nationalities:
+                            type: array
+                            items:
+                                type: string
+                        occupation:
+                            type: string
+                location:
+                    $ref: '#/components/schemas/Location'
+                events:
+                    description: >
+                        An event with name "confirmed" must be specified. Other event names
+                        include onsetSymptoms, firstClinicalConsultation, selfIsolation,
+                        hospitalAdmission, icuAdmission, and outcome.
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            name:
+                                type: string
+                            dateRange:
+                                $ref: '#/components/schemas/DateRange'
+                            value:
+                                type: string
+                symptoms:
+                    type: object
+                    properties:
+                        status:
+                            type: string
+                            enum:
+                                [
+                                    null,
+                                    Asymptomatic,
+                                    Symptomatic,
+                                    Presymptomatic,
+                                ]
+                        values:
+                            type: array
+                            items:
+                                type: string
+                preexistingConditions:
+                    type: object
+                    properties:
+                        hasPreexistingConditions:
+                            type: boolean
+                        values:
+                            type: array
+                            items:
+                                type: string
+                transmission:
+                    type: object
+                    properties:
+                        routes:
+                            type: array
+                            items:
+                                type: string
+                        places:
+                            type: array
+                            items:
+                                type: string
+                        linkedCaseIds:
+                            type: array
+                            items:
+                                type: string
+                travelHistory:
+                    type: object
+                    properties:
+                        traveledPrior30Days:
+                            type: boolean
+                        travel:
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    dateRange:
+                                        $ref: '#/components/schemas/DateRange'
+                                    location:
+                                        $ref: '#/components/schemas/Location'
+                                    purpose:
+                                        type: string
+                                        enum:
+                                            [
+                                                null,
+                                                Business,
+                                                Leisure,
+                                                Family,
+                                                Other,
+                                            ]
+                                    methods:
+                                        type: array
+                                        items:
+                                            type: string
+                variant:
+                    type: object
+                    properties:
+                        name:
+                            type: string
+                genomeSequences:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            sampleCollectionDate:
+                                $ref: '#/components/schemas/Date'
+                            repositoryUrl:
+                                type: string
+                            sequenceId:
+                                type: string
+                            sequenceName:
+                                type: string
+                            sequenceLength:
+                                type: integer
+                                format: int64
+                                minimum: 0
+                pathogens:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            name:
+                                type: string
+                            id:
+                                type: integer
+                                format: int32
+                                minimum: 0
+                notes:
+                    type: string
+                revisionMetadata:
+                    type: object
+                    properties:
+                        revisionNumber:
+                            type: integer
+                            format: int32
+                            minimum: 0
+                        creationMetadata:
+                            $ref: '#/components/schemas/EditMetadata'
+                        editMetadata:
+                            $ref: '#/components/schemas/EditMetadata'
+                    required:
+                        - revisionNumber
+        CaseArray:
             type: object
             properties:
-              sampleCollectionDate:
-                $ref: "#/components/schemas/Date"
-              repositoryUrl:
-                type: string
-              sequenceId:
-                type: string
-              sequenceName:
-                type: string
-              sequenceLength:
-                type: integer
-                format: int64
-                minimum: 0
-        pathogens:
-          type: array
-          items:
+                cases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Case'
+            required:
+                - cases
+        CaseIdsArray:
             type: object
             properties:
-              name:
-                type: string
-              id:
-                type: integer
-                format: int32
-                minimum: 0
-        notes:
-          type: string
-        revisionMetadata:
-          type: object
-          properties:
-            revisionNumber:
-              type: integer
-              format: int32
-              minimum: 0
-            creationMetadata:
-              $ref: "#/components/schemas/EditMetadata"
-            editMetadata:
-              $ref: "#/components/schemas/EditMetadata"
-          required:
-            - revisionNumber
-    CaseArray:
-      type: object
-      properties:
-        cases:
-          type: array
-          items:
-            $ref: "#/components/schemas/Case"
-      required:
-        - cases
-    CaseIdsArray:
-      type: object
-      properties:
-        cases:
-          type: array
-          items:
+                cases:
+                    type: array
+                    items:
+                        type: string
+            required:
+                - cases
+        CaseStatus:
             type: string
-      required:
-        - cases
-    CaseStatus:
-      type: string
-      enum: [UNVERIFIED, VERIFIED, EXCLUDED]
-    SymptomArray:
-      type: object
-      properties:
-        symptoms:
-          type: array
-          items:
-            type: string
-    PlacesOfTransmissionArray:
-      type: object
-      properties:
-        placesOfTransmission:
-          type: array
-          items:
-            type: string
-    OccupationArray:
-      type: object
-      properties:
-        occupations:
-          type: array
-          items:
-            type: string
-    Date:
-      oneOf:
-        - type: string
-        - type: object
-        - type: number
-    DateRange:
-      type: object
-      properties:
-        start:
-          $ref: "#/components/schemas/Date"
-        end:
-          $ref: "#/components/schemas/Date"
-    EditMetadata:
-      type: object
-      properties:
-        curator:
-          type: string
-        date:
-          $ref: "#/components/schemas/Date"
-        notes:
-          type: string
-    Location:
-      type: object
-      properties:
-        query:
-          type: string
-        country:
-          type: string
-        administrativeAreaLevel1:
-          type: string
-        administrativeAreaLevel2:
-          type: string
-        administrativeAreaLevel3:
-          type: string
-        place:
-          type: string
-        name:
-          type: string
-        geoResolution: 
-          type: string
-        geometry:
-          type: object
-          properties:
-            latitude:
-              type: number
-              minimum: -90
-              maximum: 90
-            longitude:
-              type: number
-              minimum: -180
-              maximum: 180
-          required:
-            - latitude
-            - longitude
-    Curator:
-      description: The logged-in user who submitted the case.
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-    NewCase:
-      description: >
-        A "#/components/schemas/Case" with additional required fields for
-        newly-created cases.
-      allOf:
-        - $ref: "#/components/schemas/Case"
-      properties:
-        caseReference:
-          required:
-            - sourceId
-            - sourceUrl
-        curator:
-          $ref: "#/components/schemas/Curator"
-      required:
-        - caseReference
-        - location
-        - events
-        - curator
-    LocationArray:
-      description: A list of geo locations
-      type: array
-      items:
-        $ref: "#/components/schemas/Location"
-  responses:
-    "200Case":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Case"
-    "200CaseArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/CaseArray"
-    "200CaseIdsArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/CaseIdsArray"
-    "200CasesDownload":
-      description: OK
-      content:
-        text/csv:
-          schema:
-            description: A CSV with headers detailing case data. 
-    "200BatchUpdateResponse":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/BatchUpdateResponse"
-    "200SymptomArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/SymptomArray"
-    "200PlacesOfTransmissionArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/PlacesOfTransmissionArray"
-    "200OccupationArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/OccupationArray"
-    "200LocationArray":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/LocationArray"
-    "201Case":
-      description: Created
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Case"
-    "201Create":
-      description: Created
-      content:
-        application/json:
-          schema:
-            anyOf:
-              - $ref: "#/components/schemas/Case"
-              - $ref: "#/components/schemas/CaseArray"
-    "200BatchCaseUpsert":
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/BatchUpsertCaseResponse"
-    "207BatchUpsertCaseResponse":
-      description: Multi-status
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/BatchUpsertCaseResponse'
-    "200":
-      description: OK
-    "400":
-      description: Malformed request
-    "403":
-      description: Forbidden
-    "404":
-      description: Not found
-    "422":
-      description: Unprocessable entity
-    "500":
-      description: Internal server error
+            enum: [UNVERIFIED, VERIFIED, EXCLUDED]
+        SymptomArray:
+            type: object
+            properties:
+                symptoms:
+                    type: array
+                    items:
+                        type: string
+        PlacesOfTransmissionArray:
+            type: object
+            properties:
+                placesOfTransmission:
+                    type: array
+                    items:
+                        type: string
+        OccupationArray:
+            type: object
+            properties:
+                occupations:
+                    type: array
+                    items:
+                        type: string
+        Date:
+            oneOf:
+                - type: string
+                - type: object
+                - type: number
+        DateRange:
+            type: object
+            properties:
+                start:
+                    $ref: '#/components/schemas/Date'
+                end:
+                    $ref: '#/components/schemas/Date'
+        EditMetadata:
+            type: object
+            properties:
+                curator:
+                    type: string
+                date:
+                    $ref: '#/components/schemas/Date'
+                notes:
+                    type: string
+        Location:
+            type: object
+            properties:
+                query:
+                    type: string
+                country:
+                    type: string
+                administrativeAreaLevel1:
+                    type: string
+                administrativeAreaLevel2:
+                    type: string
+                administrativeAreaLevel3:
+                    type: string
+                place:
+                    type: string
+                name:
+                    type: string
+                geoResolution:
+                    type: string
+                geometry:
+                    type: object
+                    properties:
+                        latitude:
+                            type: number
+                            minimum: -90
+                            maximum: 90
+                        longitude:
+                            type: number
+                            minimum: -180
+                            maximum: 180
+                    required:
+                        - latitude
+                        - longitude
+        Curator:
+            description: The logged-in user who submitted the case.
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+        NewCase:
+            description: >
+                A "#/components/schemas/Case" with additional required fields for
+                newly-created cases.
+            allOf:
+                - $ref: '#/components/schemas/Case'
+            properties:
+                caseReference:
+                    required:
+                        - sourceId
+                        - sourceUrl
+                curator:
+                    $ref: '#/components/schemas/Curator'
+            required:
+                - caseReference
+                - location
+                - events
+                - curator
+        LocationArray:
+            description: A list of geo locations
+            type: array
+            items:
+                $ref: '#/components/schemas/Location'
+    responses:
+        '200Case':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Case'
+        '200CaseArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/CaseArray'
+        '200CaseIdsArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/CaseIdsArray'
+        '200CasesDownload':
+            description: OK
+            content:
+                text/csv:
+                    schema:
+                        description: A CSV with headers detailing case data.
+        '200BatchUpdateResponse':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/BatchUpdateResponse'
+        '200SymptomArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/SymptomArray'
+        '200PlacesOfTransmissionArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/PlacesOfTransmissionArray'
+        '200OccupationArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/OccupationArray'
+        '200LocationArray':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/LocationArray'
+        '201Case':
+            description: Created
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Case'
+        '201Create':
+            description: Created
+            content:
+                application/json:
+                    schema:
+                        anyOf:
+                            - $ref: '#/components/schemas/Case'
+                            - $ref: '#/components/schemas/CaseArray'
+        '200BatchCaseUpsert':
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/BatchUpsertCaseResponse'
+        '207BatchUpsertCaseResponse':
+            description: Multi-status
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/BatchUpsertCaseResponse'
+        '200':
+            description: OK
+        '400':
+            description: Malformed request
+        '403':
+            description: Forbidden
+        '404':
+            description: Not found
+        '422':
+            description: Unprocessable entity
+        '500':
+            description: Internal server error
 servers:
-  - url: http://localhost:3000/api
-    description: Local server
+    - url: http://localhost:3000/api
+      description: Local server

@@ -216,6 +216,8 @@ export function DateField(props: DateFieldProps): JSX.Element {
 
 interface RequiredHelperTextProps {
     name: string;
+    wrongUrl?: boolean;
+    locationRequiredText?: string;
 }
 
 export function RequiredHelperText(
@@ -224,6 +226,14 @@ export function RequiredHelperText(
     const { values, touched } = useFormikContext<
         CaseFormValues | BulkCaseFormValues | AutomatedSourceFormValues
     >();
+    
+    let finalHelperText = "Required";
+    if (props.wrongUrl === false) {
+        finalHelperText = "Please enter a valid URL"
+    } else if (props.locationRequiredText) {
+        finalHelperText = props.locationRequiredText;
+    }
+    
     return (
         <div>
             <FormHelperText
@@ -232,10 +242,11 @@ export function RequiredHelperText(
                     touched[props.name] &&
                     hasKey(values, props.name) &&
                     (values[props.name] === undefined ||
-                        values[props.name] === null)
+                        values[props.name] === null || 
+                        props.wrongUrl === false) 
                 }
             >
-                Required
+                {finalHelperText}
             </FormHelperText>
         </div>
     );

@@ -8,6 +8,7 @@ import {
     WithStyles,
     createStyles,
     withStyles,
+    Switch,
 } from '@material-ui/core';
 import MaterialTable, { QueryResult } from 'material-table';
 import React, { RefObject } from 'react';
@@ -68,6 +69,7 @@ interface Source {
     automation?: Automation;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
+    excludeFromLineList?: boolean;
 }
 
 interface SourceTableState {
@@ -93,6 +95,7 @@ interface TableRow {
     awsScheduleExpression?: string;
     dateFilter?: DateFilter;
     notificationRecipients?: string[];
+    excludeFromLineList?: boolean;
 }
 
 // Return type isn't meaningful.
@@ -100,7 +103,7 @@ interface TableRow {
 const styles = (theme: Theme) =>
     createStyles({
         error: {
-            color: 'red',
+            color: theme.palette.error.main,
             marginTop: theme.spacing(2),
         },
         alert: {
@@ -114,7 +117,7 @@ const styles = (theme: Theme) =>
         spacer: { flex: 1 },
         tablePaginationBar: {
             alignItems: 'center',
-            backgroundColor: '#ECF3F0',
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             height: '64px',
         },
@@ -178,13 +181,33 @@ class SourceTable extends React.Component<Props, SourceTableState> {
             response
                 .then(() => {
                     this.setState({ error: '' });
-                    resolve();
+                    resolve(undefined);
                 })
                 .catch((e) => {
-                    this.setState({
-                        error: e.response?.data?.message || e.toString(),
-                    });
-                    reject(e);
+                    /*
+                     * Warning: this is not a nice kludge.
+                     * Updating the source can fail for multiple reasons:
+                     * 1. our backend won't save the update
+                     * 2. AWS won't accept the scheduling update
+                     * 3. The email notifying curators of the update doesn't get sent.
+                     *
+                     * Here, we check for the third case (email didn't get sent), and
+                     * call that a success anyway, so the table updates with the genuine
+                     * current values.
+                     */
+
+                    if (e.response?.data?.name === 'NotificationSendError') {
+                        this.setState({
+                            error:
+                                'Failed to send e-mail notifications to registered addresses',
+                        });
+                        resolve(undefined);
+                    } else {
+                        this.setState({
+                            error: e.response?.data?.message || e.toString(),
+                        });
+                        reject(e);
+                    }
                 });
         });
     }
@@ -226,6 +249,7 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                     ? rowData.dateFilter
                     : {},
             notificationRecipients: rowData.notificationRecipients,
+            excludeFromLineList: rowData.excludeFromLineList,
         };
     }
 
@@ -328,14 +352,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                         }
                                         defaultValue={props.value || ''}
                                     >
-                                        {['', 'JSON', 'CSV', 'XLSX'].map((value) => (
-                                            <MenuItem
-                                                key={`format-${value}`}
-                                                value={value || ''}
-                                            >
-                                                {value || 'Unknown'}
-                                            </MenuItem>
-                                        ))}
+                                        {['', 'JSON', 'CSV', 'XLSX'].map(
+                                            (value) => (
+                                                <MenuItem
+                                                    key={`format-${value}`}
+                                                    value={value || ''}
+                                                >
+                                                    {value || 'Unknown'}
+                                                </MenuItem>
+                                            ),
+                                        )}
                                     </TextField>
                                 ),
                             },
@@ -516,6 +542,16 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                 ),
                                 editable: 'never',
                             },
+                            {
+                                title: 'Exclude from line list?',
+                                field: 'excludeFromLineList',
+                                editComponent: (props): JSX.Element => (
+                                    <Switch checked={props.value ?? false} 
+                                    onChange={(event):void => {
+                                        props.onChange(event.target.checked)
+                                    }}/>
+                                ),
+                            },
                         ]}
                         data={(query): Promise<QueryResult<TableRow>> =>
                             new Promise((resolve, reject) => {
@@ -549,6 +585,8 @@ class SourceTable extends React.Component<Props, SourceTableState> {
                                                 dateFilter: s.dateFilter,
                                                 notificationRecipients:
                                                     s.notificationRecipients,
+                                                excludeFromLineList:
+                                                    s.excludeFromLineList,
                                             });
                                         }
                                         resolve({

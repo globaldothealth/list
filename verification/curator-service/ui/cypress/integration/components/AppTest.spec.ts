@@ -53,7 +53,7 @@ describe('App', function () {
 
         cy.contains('Detailed line list data');
         cy.contains('Terms of use');
-        cy.contains('Login to get started');
+        cy.contains('Or sign in with email');
     });
 
     it('Homepage with logged in user with no roles', function () {
@@ -164,28 +164,56 @@ describe('App', function () {
         cy.url().should('eq', 'http://localhost:3002/cases');
     });
 
-    it('Can navigate to terms of service', function () {
+    it('Terms of Service link is right and has target _blank', function () {
         cy.login();
         cy.visit('/');
         cy.contains('Line list');
 
         cy.contains('Global.health Terms of Use').should('not.exist');
-        cy.contains('Terms of use').click({ force: true });
-        cy.url().should('eq', 'http://localhost:3002/terms');
-        cy.contains('Global.health Terms of Use');
+        cy.contains('Terms of use');
+        cy.get('[data-testid="termsButton"]')
+            .should('have.attr', 'href')
+            .and('equal', 'https://global.health/terms-of-use');
+        cy.get('[data-testid="termsButton"]').should(
+            'have.attr',
+            'target',
+            '_blank',
+        );
     });
 
-    it('Can navigate to home screen by clicking on logo', function () {
+    it('Privacy policy link is right and has target _blank', function () {
+        cy.login();
+        cy.visit('/');
+        cy.contains('Line list');
+
+        cy.contains('Terms of use');
+        cy.get('[data-testid="privacypolicybutton"]')
+            .should('have.attr', 'href')
+            .and('equal', 'https://global.health/privacy/');
+        cy.get('[data-testid="privacypolicybutton"]').should(
+            'have.attr',
+            'target',
+            '_blank',
+        );
+    });
+
+    it('The logo GH part links to the marketing website', function () {
         cy.login();
         cy.visit('/cases');
         cy.contains('Line list');
 
-        cy.get('a[data-testid="home-button"').click();
+        cy.get('a[data-testid="home-button-gh"')
+            .should('have.attr', 'href')
+            .and('equal', 'https://global.health/');
+    });
 
-        cy.url().should('eq', 'http://localhost:3002/');
+    it('The logo DATA part links to the data home', function () {
+        cy.login();
+        cy.visit('/cases');
+        cy.contains('Line list');
 
-        cy.contains('Completeness').should('exist');
-        cy.contains('Cumulative').should('exist');
-        cy.contains('Freshness').should('exist');
+        cy.get('a[data-testid="home-button-data"')
+            .should('have.attr', 'href')
+            .and('equal', '/');
     });
 });

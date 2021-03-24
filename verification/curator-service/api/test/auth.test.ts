@@ -12,8 +12,15 @@ import express from 'express';
 import passport from 'passport';
 import request from 'supertest';
 import supertest from 'supertest';
+import MockLambdaClient from '../src/clients/aws-lambda-client';
 
 jest.mock('../src/clients/email-client', () => {
+    return jest.fn().mockImplementation(() => {
+        return { initialize: jest.fn().mockResolvedValue({}) };
+    });
+});
+
+jest.mock('../src/clients/aws-lambda-client', () => {
     return jest.fn().mockImplementation(() => {
         return { initialize: jest.fn().mockResolvedValue({}) };
     });
@@ -139,7 +146,11 @@ describe('mustHaveAnyRole', () => {
         // Setup a fake server.
         localApp = express();
         localApp.use(bodyParser.json());
-        const authController = new AuthController('/redirect-after-login');
+        const mLambdaClient = new MockLambdaClient('', '', '');
+        const authController = new AuthController(
+            '/redirect-after-login',
+            mLambdaClient,
+        );
         authController.configurePassport('foo', 'bar');
         authController.configureLocalAuth();
         localApp.use(passport.initialize());

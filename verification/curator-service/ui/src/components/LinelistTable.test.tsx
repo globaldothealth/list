@@ -25,6 +25,8 @@ afterEach(() => {
     mockedAxios.put.mockClear();
 });
 
+const setSearch = jest.fn();
+
 it('loads and displays cases', async () => {
     const cases = [
         {
@@ -105,17 +107,22 @@ it('loads and displays cases', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
 
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     expect(await findByText('www.example.com')).toBeInTheDocument();
     expect(await findByText('some admin 1')).toBeInTheDocument();
     expect(await findByText('some admin 2')).toBeInTheDocument();
@@ -174,11 +181,14 @@ it('API errors are displayed', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -242,16 +252,21 @@ it('can delete a row', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
@@ -336,16 +351,21 @@ it('can cancel delete action', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
@@ -410,16 +430,21 @@ it('cannot edit data if not curator', async () => {
                     roles: [],
                 }}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={50}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
     expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-    expect(mockedAxios.get).toHaveBeenCalledWith('/api/cases/?limit=50&page=1');
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+        '/api/cases/?limit=50&page=1&count_limit=10000',
+    );
     const row = await findByText('www.example.com');
     expect(row).toBeInTheDocument();
 
@@ -471,11 +496,14 @@ it('initializes with correct page and page size values', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={1}
                 pageSize={10}
                 onChangePage={jest.fn()}
                 onChangePageSize={jest.fn()}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );
@@ -535,11 +563,14 @@ it('paginates through data', async () => {
             <LinelistTable
                 user={curator}
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-                setSearchLoading={(x: boolean): void => {}}
+                search=""
+                setSearch={setSearch}
+                filterBreadcrumbs={[]}
                 page={0}
                 pageSize={10}
                 onChangePage={changePage}
                 onChangePageSize={changePageSize}
+                handleBreadcrumbDelete={jest.fn()}
             />
         </MemoryRouter>,
     );

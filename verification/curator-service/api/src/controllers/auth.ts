@@ -14,6 +14,10 @@ import { Router } from 'express';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import passport from 'passport';
+import AwsLambdaClient from '../clients/aws-lambda-client';
+
+// Global variable for newsletter acceptance
+let isNewsletterAccepted: boolean;
 
 /**
  * mustBeAuthenticated is a middleware that checks that the user making the call is authenticated.
@@ -107,7 +111,10 @@ interface GoogleProfile extends Profile {
  */
 export class AuthController {
     public router: Router;
-    constructor(private readonly afterLoginRedirURL: string) {
+    constructor(
+        private readonly afterLoginRedirURL: string,
+        public readonly lambdaClient: AwsLambdaClient,
+    ) {
         this.router = Router();
 
         this.router.get(
@@ -116,7 +123,6 @@ export class AuthController {
             // This 'google' string is hardcoded within passport.
             passport.authenticate('google', { prompt: 'select_account' }),
             (req: Request, res: Response): void => {
-                // User has successfully logged-in.
                 res.redirect(this.afterLoginRedirURL);
             },
         );
@@ -130,6 +136,14 @@ export class AuthController {
         // This will redirect the browser to the OAuth consent screen.
         this.router.get(
             '/google',
+            (req: Request, res: Response, next) => {
+                if (req.query.newsletterAccepted) {
+                    isNewsletterAccepted =
+                        req.query.newsletterAccepted === 'true' ? true : false;
+                }
+
+                return next();
+            },
             passport.authenticate('google', {
                 scope: ['email'],
                 prompt: 'select_account',
@@ -141,6 +155,63 @@ export class AuthController {
             mustBeAuthenticated,
             (req: Request, res: Response): void => {
                 res.json(req.user);
+            },
+        );
+
+        this.router.post(
+            '/signup',
+            async (req: Request, res: Response): Promise<void> => {
+                let user = await User.findOne({
+                    email: req.body.email,
+                }).exec();
+
+                // Update newsletter preferences
+                if (
+                    user &&
+                    user.newsletterAccepted === false &&
+                    req.body.newsletter
+                ) {
+                    user = await User.findOneAndUpdate(
+                        { email: req.body.email },
+                        { newsletterAccepted: req.body.newsletter },
+                    );
+                }
+
+                if (user) {
+                    req.login(user, (err: Error) => {
+                        if (!err) {
+                            res.json(user);
+                            return;
+                        }
+                        logger.error(err);
+                        res.sendStatus(500);
+                    });
+                } else {
+                    const newUser = await User.create({
+                        name: req.body.name,
+                        email: req.body.email,
+                        googleID: '42',
+                        roles: req.body.roles,
+                        newsletterAccepted: req.body.newsletter || false,
+                    });
+
+                    try {
+                        await this.lambdaClient.sendWelcomeEmail(
+                            req.body.email,
+                        );
+                    } catch (err) {
+                        logger.info('error: ' + JSON.stringify(err, null, 2));
+                    }
+
+                    req.login(newUser, (err: Error) => {
+                        if (!err) {
+                            res.json(newUser);
+                            return;
+                        }
+                        logger.error(err);
+                        res.sendStatus(500);
+                    });
+                }
             },
         );
     }
@@ -233,7 +304,18 @@ export class AuthController {
                                 )[0],
                                 roles: [],
                                 picture: picture,
+                                newsletterAccepted: isNewsletterAccepted,
                             });
+
+                            try {
+                                await this.lambdaClient.sendWelcomeEmail(
+                                    user.email,
+                                );
+                            } catch (err) {
+                                logger.info(
+                                    'error: ' + JSON.stringify(err, null, 2),
+                                );
+                            }
                         }
                         if (picture !== user.picture) {
                             logger.info(
@@ -242,6 +324,18 @@ export class AuthController {
                             user = await User.findOneAndUpdate(
                                 { googleID: googleProfile.id },
                                 { picture: picture },
+                            );
+                        }
+
+                        if (
+                            user &&
+                            !user.newsletterAccepted &&
+                            isNewsletterAccepted
+                        ) {
+                            logger.info('Updating newsletter preferences');
+                            user = await User.findOneAndUpdate(
+                                { googleID: googleProfile.id },
+                                { newsletterAccepted: true },
                             );
                         }
                         cb(undefined, user);

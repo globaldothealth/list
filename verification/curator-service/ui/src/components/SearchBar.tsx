@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Button,
     IconButton,
@@ -16,6 +16,7 @@ import HelpIcon from '@material-ui/icons/HelpOutline';
 import SearchIcon from '@material-ui/icons/Search';
 import clsx from 'clsx';
 import SearchGuideDialog from './SearchGuideDialog';
+import { useDebounce } from '../hooks/useDebounce';
 
 const searchBarStyles = makeStyles((theme: Theme) => ({
     searchRoot: {
@@ -26,7 +27,7 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
         flex: 1,
     },
     divider: {
-        backgroundColor: '#0E7569',
+        backgroundColor: theme.palette.primary.main,
         height: '40px',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
@@ -37,21 +38,24 @@ const searchBarStyles = makeStyles((theme: Theme) => ({
     },
 }));
 
-const StyledSearchTextField = withStyles({
+const StyledSearchTextField = withStyles((theme: Theme) => ({
     root: {
-        backgroundColor: 'white',
+        backgroundColor: theme.palette.background.paper,
         borderRadius: '8px',
         '& .MuiOutlinedInput-root': {
             borderRadius: '8px',
             '& fieldset': {
-                border: '1px solid #0E7569',
+                border: `1px solid  ${theme.palette.primary.main}`,
             },
             '&.Mui-focused fieldset': {
-                border: '1px solid #0E7569',
+                border: `1px solid  ${theme.palette.primary.main}`,
+            },
+            '& #search-field': {
+                minWidth: '100px',
             },
         },
     },
-})(TextField);
+}))(TextField);
 
 const StyledInputAdornment = withStyles({
     positionStart: {
@@ -59,24 +63,41 @@ const StyledInputAdornment = withStyles({
     },
 })(InputAdornment);
 
-export default function SearchBar(props: {
-    searchQuery: string;
+interface SearchBarProps {
     onSearchChange: (search: string) => void;
-    loading: boolean;
     rootComponentRef: React.RefObject<HTMLDivElement>;
-}): JSX.Element {
+    search: string;
+}
+
+export default function SearchBar({
+    onSearchChange,
+    rootComponentRef,
+    search,
+}: SearchBarProps): JSX.Element {
     const classes = searchBarStyles();
 
-    const [search, setSearch] = React.useState<string>(props.searchQuery ?? '');
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [isSearchGuideOpen, setIsSearchGuideOpen] = React.useState<boolean>(
-        false,
-    );
+    const [isUserTyping, setIsUserTyping] = useState<boolean>(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isSearchGuideOpen, setIsSearchGuideOpen] = useState<boolean>(false);
+    const [searchInput, setSearchInput] = useState<string>(search);
+
     const guideButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    React.useEffect(() => {
-        setSearch(props.searchQuery ?? '');
-    }, [props.searchQuery]);
+    // Set search query debounce to 1000ms
+    const debouncedSearch = useDebounce(searchInput, 1000);
+
+    useEffect(() => {
+        setSearchInput(search);
+    }, [search]);
+
+    // Apply filter parameters after delay
+    useEffect(() => {
+        if (!isUserTyping) return;
+
+        onSearchChange(debouncedSearch);
+        setIsUserTyping(false);
+        //eslint-disable-next-line
+    }, [debouncedSearch]);
 
     const handleFilterClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -89,7 +110,12 @@ export default function SearchBar(props: {
     };
 
     const clickItem = (text: string): void => {
-        setSearch(search + (search ? ` ${text}:` : `${text}:`));
+        if (!searchInput.includes(text)) {
+            setSearchInput(
+                searchInput + (searchInput ? ` ${text}:` : `${text}:`),
+            );
+        }
+
         handleFilterClose();
     };
 
@@ -97,24 +123,31 @@ export default function SearchBar(props: {
         setIsSearchGuideOpen((isOpen) => !isOpen);
     };
 
+    const handleKeyPress = (ev: React.KeyboardEvent<HTMLDivElement>): void => {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            onSearchChange(searchInput);
+            setIsUserTyping(false);
+        }
+    };
+
     return (
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
-                onKeyPress={(ev): void => {
-                    if (ev.key === 'Enter') {
-                        ev.preventDefault();
-                        props.onSearchChange(search);
+                onKeyPress={handleKeyPress}
+                onChange={(event): void => {
+                    setSearchInput(event.target.value);
+                }}
+                onKeyDown={() => {
+                    if (!isUserTyping) {
+                        setIsUserTyping(true);
                     }
                 }}
-                onChange={(event): void => {
-                    setSearch(event.target.value);
-                }}
                 placeholder="Search"
-                value={search}
+                value={searchInput}
                 variant="outlined"
                 fullWidth
-                disabled={props.loading}
                 InputProps={{
                     margin: 'dense',
                     startAdornment: (
@@ -144,7 +177,7 @@ export default function SearchBar(props: {
                                 <SearchGuideDialog
                                     isOpen={isSearchGuideOpen}
                                     onToggle={toggleSearchGuide}
-                                    rootComponentRef={props.rootComponentRef}
+                                    rootComponentRef={rootComponentRef}
                                     triggerComponentRef={guideButtonRef}
                                 />
                                 <div className={classes.divider}></div>
@@ -154,13 +187,13 @@ export default function SearchBar(props: {
                     ),
                     endAdornment: (
                         <InputAdornment position="end">
-                            {search && (
+                            {searchInput && (
                                 <IconButton
                                     color="primary"
                                     aria-label="clear search"
                                     onClick={(): void => {
-                                        setSearch('');
-                                        props.onSearchChange('');
+                                        setSearchInput('');
+                                        onSearchChange('');
                                     }}
                                 >
                                     <CloseIcon />
@@ -197,6 +230,7 @@ export default function SearchBar(props: {
                     { desc: 'location admin 1', value: 'admin1' },
                     { desc: 'location admin 2', value: 'admin2' },
                     { desc: 'location admin 3', value: 'admin3' },
+                    { desc: 'variant of concern', value: 'variant' },
                 ].map((item) => (
                     <MenuItem
                         key={item.value}

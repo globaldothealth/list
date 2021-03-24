@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema({
         enum: userRoles,
     },
     picture: String,
+    newsletterAccepted: Boolean,
+    downloads: [
+        {
+            timestamp: Date,
+        },
+    ],
 });
 
 export type UserDocument = mongoose.Document & {
@@ -22,6 +28,8 @@ export type UserDocument = mongoose.Document & {
     email: string;
     roles: [string];
     picture?: string;
+    newsletterAccepted?: boolean;
+    downloads?: [{ timestamp: Date }];
 };
 
 export const User = mongoose.model<UserDocument>('User', userSchema);

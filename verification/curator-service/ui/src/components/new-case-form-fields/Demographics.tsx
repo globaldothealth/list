@@ -49,21 +49,43 @@ const genderValues = [
 ];
 
 const TooltipText = () => (
-  <StyledTooltip>
-    <ul>
-      <li><strong>Gender:</strong> Enter the Gender of the case provided. If none provided leave blank</li>
-      <li><strong>Age:</strong> Enter the age of the case.
+    <StyledTooltip>
         <ul>
-          <li>If a range is provided enter in the Min and max fields.</li>
-          <li>If an exact age is provided just enter the age field.</li>
-          <li>Note: If the data source provides an age range such as 65{'>'} or 65+ then set the minimum age range as 65 and the maximum to the upper bound set for age of 120.</li>
+            <li>
+                <strong>Gender:</strong> Enter the Gender of the case provided.
+                If no gender is provided select Unknown.
+            </li>
+            <li>
+                <strong>Age:</strong> Enter the age of the case.
+                <ul>
+                    <li>
+                        If a range is provided enter in the min and max fields.
+                    </li>
+                    <li>
+                        If an exact age is provided enter it in the age field.
+                    </li>
+                    <li>
+                        Note: If the data source provides an age range such as
+                        65{'>'} or 65+ tthen set the minimum age value as 65 and
+                        the maximum age value to 120 (the maximum allowed age
+                        value).
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Ethnicity / Race:</strong> Enter the Ethnicity of the
+                case provided. If no data is provided leave blank.
+            </li>
+            <li>
+                <strong>Nationality:</strong> Enter the Nationality of the case.
+                If no data is provided leave blank.
+            </li>
+            <li>
+                <strong>Occupation:</strong> Enter the Occupation of the case.
+                If no data is provided leave blank.
+            </li>
         </ul>
-      </li>
-      <li><strong>Race / Ethnicity:</strong> Enter the Ethnicity of the case provided. If none provided leave blank</li>
-      <li><strong>Nationality:</strong> Enter the Nationality of the case. If none provided leave blank</li>
-      <li><strong>Occupation:</strong> Enter the Occupation of the case. A drop down list is provided, but if the occupation for the case is not available you can type in with free text. If none is provided leave blank</li>
-    </ul>
-  </StyledTooltip>
+    </StyledTooltip>
 );
 
 export default function Demographics(): JSX.Element {
@@ -86,8 +108,8 @@ export default function Demographics(): JSX.Element {
     return (
         <Scroll.Element name="demographics">
             <FieldTitle
-              title="Demographics"
-              tooltip={<TooltipText />}
+                title="Demographics"
+                tooltip={<TooltipText />}
             ></FieldTitle>
             <SelectField
                 name="gender"

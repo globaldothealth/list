@@ -18,9 +18,7 @@ except ImportError:
     import parsing_lib
 
 
-with open(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json")
-) as json_file:
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dictionaries.json"), encoding='utf-8') as json_file:
     maps = json.load(json_file)
 
 _COMORBIDITIES_DICT = maps["comorbidities"]
@@ -116,7 +114,8 @@ def convert_demographics(gender: str, age: str, nationality: str, national_origi
     if gender:
         demo["gender"] = convert_gender(gender)
     if age:
-        demo["ageRange"] = {"start": float(age), "end": float(age)}
+        if float(age) < 120:
+            demo["ageRange"] = {"start": float(age), "end": float(age)}
     if nationality == "1":
         demo["nationalities"] = ["Mexican"]
     elif nationality == "2":

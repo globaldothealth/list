@@ -12,8 +12,15 @@ _PARSED_CASE = [
             "sourceUrl": "foo.bar"
         },
         "location": {
-            "query": "SK Flensburg, Schleswig-Holstein, Germany",
-            "limitToResolution": "Country,Admin1,Admin2",
+            "administrativeAreaLevel3": "Flensburg",
+            "country": "Germany",
+            "administrativeAreaLevel1": "Schleswig-Holstein",
+            "geoResolution": "Point",
+            "name": "Flensburg, Schleswig-Holstein, Germany",
+            "geometry": {
+                "latitude": 54.78499143,
+                "longitude": 9.438526276
+            }
         },
         "events": [
             {
@@ -22,7 +29,14 @@ _PARSED_CASE = [
                     "start": "08/15/2020Z",
                     "end": "08/15/2020Z"
                 }
-            }
+            },
+            {
+                "name": "onsetSymptoms",
+                "dateRange": {
+                    "start": "08/15/2020Z",
+                    "end": "08/15/2020Z"
+                }
+            } 
         ],
         "demographics": {
             "gender": "Female",
@@ -38,30 +52,22 @@ _PARSED_CASE = [
             "sourceUrl": "foo.bar"
         },
         "location": {
-            "query": "SK Kiel, Schleswig-Holstein, Germany",
-            "limitToResolution": "Country,Admin1,Admin2",
+            "query": "Berlin, Germany"
         },
         "events": [
             {
                 "name": "confirmed",
                 "dateRange": {
-                    "start": "03/23/2020Z",
-                    "end": "03/23/2020Z"
+                    "start": "02/07/2021Z",
+                    "end": "02/07/2021Z"
                 }
-            },
-            {
-                "name": "onsetSymptoms",
-                "dateRange": {
-                    "start": "03/20/2020Z",
-                    "end": "03/20/2020Z"
-                }
-            }            
+            }           
         ],
         "demographics": {
-            "gender": "Male",
+            "gender": "Female",
             "ageRange": {
-                "start": 15.0,
-                "end": 34.0
+                "start": 80.0,
+                "end": 120.0
             }
         }
     }

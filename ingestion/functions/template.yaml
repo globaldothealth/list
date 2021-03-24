@@ -11,6 +11,18 @@ Globals:
     Layers:
       - !Ref CommonLibLayer
 
+Parameters:
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: sg-0f3446d2b82eff09a
+  SubnetIDs:
+    Type: CommaDelimitedList
+    Description: The list of SubnetIDs in your Virtual Private Cloud (VPC)
+    Default: subnet-01cdb8802584b0891,subnet-0ce56af866d39d69e,subnet-02ac7023a699cfce3,subnet-060e2152a9beb6300,subnet-00253e04dfd3b0269,subnet-0efa6c09f2e0ce2e1
+  EFSpath:
+    Type: String
+    Default: /mnt/efs
+
 Resources:
   RawSourcesBucket:
     Type: AWS::S3::Bucket
@@ -23,9 +35,17 @@ Resources:
       Handler: retrieval.lambda_handler
       Description: Retrieve raw source content
       MemorySize: 2048
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref SubnetIDs
+      FileSystemConfigs:
+        - Arn: arn:aws:elasticfilesystem:us-east-1:612888738066:access-point/fsap-047be197871c040c2
+          LocalMountPath: !Ref EFSpath
       # Function's execution role
       Policies:
         - AWSLambdaFullAccess
+        - AWSLambdaVPCAccessExecutionRole
+        - AmazonElasticFileSystemClientReadWriteAccess
         - S3WritePolicy:
             BucketName: !Ref RawSourcesBucket
   ParsingLibLayer:
@@ -446,6 +466,30 @@ Resources:
       CodeUri: parsing/new_zealand/
       Handler: new_zealand.lambda_handler
       Description: Parse case data for New Zealand
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  ScotlandParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/scotland/
+      Handler: scotland.lambda_handler
+      Description: Parse case data for Scotland
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  BrazilSantaCatarinaParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/brazil_santa_catarina/
+      Handler: santa_catarina.lambda_handler
+      Description: Parse case data for Santa Catarina State of Brazil
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

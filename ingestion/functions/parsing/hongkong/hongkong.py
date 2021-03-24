@@ -62,11 +62,20 @@ def convert_gender(raw_gender: str):
     return None
 
 
-def convert_age(age: float):
-    return {
-        "start": age,
-        "end": age,
-    }
+def convert_age(age: str):
+    if age.isdecimal():
+        # Ages are mostly reported in decimal years, but there are entries like '14 days' which need to be dealt with separately
+        return {
+            "start": float(age),
+            "end": float(age)
+        }
+    else:
+        only_age = float("".join([i for i in age if not i.isalpha()]))
+        # 365.25 is average number of days a year
+        return {
+            "start": round(only_age / 365.25, 3),
+            "end": round(only_age / 365.25, 3)
+        }
 
 
 def parse_cases(raw_data_file: str, source_id: str, source_url: str):
@@ -90,7 +99,7 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
                 "location": _LOCATION,
                 "demographics": {
                     "gender": convert_gender(row[_GENDER_INDEX]),
-                    "ageRange": convert_age(float(row[_AGE_INDEX])),
+                    "ageRange": convert_age(row[_AGE_INDEX]),
                 },
                 "events": [
                     {
