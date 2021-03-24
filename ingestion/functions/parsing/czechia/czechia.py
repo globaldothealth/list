@@ -67,15 +67,17 @@ def convert_demographics(gender: str, age: str):
 
 def convert_location(region, district):
     # Both the regions and districts are entered in a slighty altered ISO 3166-2 format, where the '-' is replaced with a '0'
-    region = region.replace("0", "-", 1)
-    district = district.replace("0", "-", 1)
     location = []
-    for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
-        if region_district.code == district:
-            location.append(region_district.name)
-    for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
-        if region_district.code == region:
-            location.append(region_district.name)
+    if district:
+        district = district.replace("0", "-", 1)
+        for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
+            if region_district.code == district:
+                location.append(region_district.name)
+    if region:
+        region = region.replace("0", "-", 1)
+        for region_district in list(pycountry.subdivisions.get(country_code="CZ")):
+            if region_district.code == region:
+                location.append(region_district.name)
     if location:
         location.append("Czech Republic")
         return ", ".join(location)
@@ -106,26 +108,28 @@ def parse_cases(raw_data_file: str, source_id: str, source_url: str):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=",")
         for row in reader:
-            try:
-                case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceUrl": source_url
-                    },
-                    "location": {
-                        "query": convert_location(row[_REGION], row[_DISTRICT])
-                    },
-                    "demographics": convert_demographics(
-                        row[_GENDER], row[_AGE]
-                    ),
-                    "events": convert_events(
-                        row[_DATE_CONFIRMED]
-                    ),
-                    "travelHistory": convert_travel(row[_TRAVEL_YN], row[_TRAVEL_LOCATION])
-                }
-                yield case
-            except ValueError as ve:
-                raise ValueError(f"error converting case: {ve}")
+            confirmation_date = convert_date(row[_DATE_CONFIRMED])
+            if confirmation_date is not None:
+                try:
+                    case = {
+                        "caseReference": {
+                            "sourceId": source_id,
+                            "sourceUrl": source_url
+                        },
+                        "location": {
+                            "query": convert_location(row[_REGION], row[_DISTRICT])
+                        },
+                        "demographics": convert_demographics(
+                            row[_GENDER], row[_AGE]
+                        ),
+                        "events": convert_events(
+                            row[_DATE_CONFIRMED]
+                        ),
+                        "travelHistory": convert_travel(row[_TRAVEL_YN], row[_TRAVEL_LOCATION])
+                    }
+                    yield case
+                except ValueError as ve:
+                    raise ValueError(f"error converting case: {ve}")
 
 
 def lambda_handler(event, context):

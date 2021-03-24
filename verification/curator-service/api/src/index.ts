@@ -30,6 +30,7 @@ import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import validateEnv from './util/validate-env';
 import { logger } from './util/logger';
+import S3 from 'aws-sdk/clients/s3';
 
 const app = express();
 
@@ -107,17 +108,6 @@ if (process.env.NODE_ENV === 'production') {
     }
 }
 app.use(session(sess));
-const authController = new AuthController(env.AFTER_LOGIN_REDIRECT_URL);
-authController.configurePassport(
-    env.GOOGLE_OAUTH_CLIENT_ID,
-    env.GOOGLE_OAUTH_CLIENT_SECRET,
-);
-if (env.ENABLE_LOCAL_AUTH) {
-    authController.configureLocalAuth();
-}
-app.use(passport.initialize());
-app.use(passport.session());
-app.use('/auth', authController.router);
 
 // Configure connection to AWS services.
 const awsLambdaClient = new AwsLambdaClient(
@@ -130,6 +120,23 @@ const awsEventsClient = new AwsEventsClient(
     awsLambdaClient,
     env.SERVICE_ENV,
 );
+const s3Client = new S3({ region: 'us-east-1', signatureVersion: 'v4' });
+
+// Configure auth controller
+const authController = new AuthController(
+    env.AFTER_LOGIN_REDIRECT_URL,
+    awsLambdaClient,
+);
+authController.configurePassport(
+    env.GOOGLE_OAUTH_CLIENT_ID,
+    env.GOOGLE_OAUTH_CLIENT_SECRET,
+);
+if (env.ENABLE_LOCAL_AUTH) {
+    authController.configureLocalAuth();
+}
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/auth', authController.router);
 
 // API validation.
 app.use(
@@ -211,7 +218,10 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
         );
 
         // Configure cases controller proxying to data service.
-        const casesController = new CasesController(env.DATASERVER_URL);
+        const casesController = new CasesController(
+            env.DATASERVER_URL,
+            s3Client,
+        );
         apiRouter.get('/cases', mustBeAuthenticated, casesController.list);
         apiRouter.get(
             '/cases/symptoms',
@@ -232,6 +242,11 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             '/cases/:id([a-z0-9]{24})',
             mustBeAuthenticated,
             casesController.get,
+        );
+        apiRouter.get(
+            '/cases/getDownloadLink',
+            mustBeAuthenticated,
+            casesController.getDownloadLink,
         );
         apiRouter.post(
             '/cases',

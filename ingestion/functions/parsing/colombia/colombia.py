@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -14,6 +15,15 @@ except ImportError:
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             'common/python'))
     import parsing_lib
+
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_dictionaries.json")) as json_file:
+    geocoding_dictionaries = json.load(json_file)
+
+mun_code_coord = geocoding_dictionaries['mun_code_coord']
+mun_code_place_name = geocoding_dictionaries['mun_code_place_name']
+spanish_country_code_dict = geocoding_dictionaries['spanish_country_code_dict']
+iso_country_coord_map = geocoding_dictionaries['iso_country_coord_map']
 
 
 def convert_date(raw_date: str, dataserver=True):
@@ -38,15 +48,50 @@ def convert_gender(raw_gender):
     return None
 
 
-def convert_location(raw_entry):
-    query_terms = [
-        term for term in [
-            raw_entry.get("Nombre municipio", ""),
-            raw_entry.get("Nombre departamento", ""),
-            "Colombia"]
-        if term != '']
+def get_location(raw_entry):
+    '''
+    Uses a dict mapping based on common municipality code of lookup table ('MPIO_CCNCT') and source dataset ('Código DIVIPOLA municipio')
+    '''
+    try:
+        long, lat = mun_code_coord[raw_entry['Código DIVIPOLA municipio']][1:]
+        geometry = {'latitude': lat,
+                    'longitude': long}
+        mun, dep = mun_code_place_name[raw_entry['Código DIVIPOLA municipio']]
+        place_name = f"{mun}, {dep}, Colombia"
 
-    return {"query": ", ".join(query_terms)}
+        location = {}
+        location["country"] = "Colombia"
+        location["geoResolution"] = "Admin2"
+        location["name"] = place_name
+        location["geometry"] = geometry
+        location["administrativeAreaLevel1"] = dep
+        location["administrativeAreaLevel2"] = mun
+
+        return location
+
+    except BaseException:
+        print(raw_entry)
+        return None
+
+
+def get_travel_history_location(raw_entry):
+    country_spanish = raw_entry['Nombre del país']
+
+    try:
+        iso2 = spanish_country_code_dict[country_spanish.lower()]
+        lat, long, country = iso_country_coord_map[iso2]
+        geometry = {'latitude': lat,
+                    'longitude': long}
+
+        location = {}
+        location["country"] = country
+        location["geoResolution"] = "Country"
+        location["name"] = country
+        location["geometry"] = geometry
+
+        return location
+    except BaseException:
+        print(country_spanish)
 
 
 def convert_demographics(entry):
@@ -111,7 +156,8 @@ def parse_cases(raw_data_file, source_id, source_url):
     - Tipo recuperación refers to how they decided the patient had recovered: either by 21 days elapsing since
     symptoms, or a negative PCR/antigen test
 
-    - No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'
+    - No dates for travel history, only distinction is between cases of type: 'Importado' vs. 'Relacionado'.
+    We assume cases listed as importado (imported) have travelled in the last 30 days, and geocode their country of origin.
 
     """
 
@@ -122,138 +168,155 @@ def parse_cases(raw_data_file, source_id, source_url):
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f)
         for entry in reader:
-            notes = []
-            case = {
-                "caseReference": {
-                    "sourceId": source_id,
-                    "sourceEntryId": entry["ID de caso"],
-                    "sourceUrl": source_url
-                },
-                "location": convert_location(entry),
-                "demographics": convert_demographics(entry)
-            }
-
+            location = get_location(entry)
             if entry["Fecha de diagnóstico"]:
-                case["events"] = [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(entry["Fecha de diagnóstico"]),
-                            "end": convert_date(entry["Fecha de diagnóstico"])
-                        }
-                    },
-                ]
+                confirmation_date = convert_date(entry["Fecha de diagnóstico"])
             else:
-                case["events"] = [
-                    {
-                        "name": "confirmed",
-                        "dateRange":
-                        {
-                            "start": convert_date(entry["fecha reporte web"]),
-                            "end": convert_date(entry["fecha reporte web"])
-                        }
+                confirmation_date = convert_date(entry["fecha reporte web"])
+            if location and confirmation_date:
+                notes = []
+                case = {
+                    "caseReference": {
+                        "sourceId": source_id,
+                        "sourceEntryId": entry["ID de caso"],
+                        "sourceUrl": source_url
                     },
-                ]
-                notes.append(
-                    "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later.")
-
-            # If patient was symptomatic, mark date of onsetSymptoms, otherwise
-            # asymptomatic
-            # maybe change to elif clause and check if can parse field as date
-            if entry["Fecha de inicio de síntomas"]:
-                case["symptoms"] = {
-                    "status": "Symptomatic",
-                }
-                case["events"].append({
-                    "name": "onsetSymptoms",
-                    "dateRange": {
-                        "start": convert_date(entry['Fecha de inicio de síntomas']),
-                        "end": convert_date(entry['Fecha de inicio de síntomas']),
-                    }
-                })
-
-            else:
-                case["symptoms"] = {
-                    "status": "Asymptomatic",
+                    "location": location,
+                    "demographics": convert_demographics(entry)
                 }
 
-            # Include severity of symptoms
-            if entry["Estado"].lower() in symptom_map.keys():
-                case["symptoms"]["values"] = [
-                    symptom_map.get(entry['Estado'].lower())]
+                if entry["Fecha de diagnóstico"]:
+                    case["events"] = [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
+                            {
+                                "start": confirmation_date,
+                                "end": confirmation_date
+                            }
+                        },
+                    ]
+                else:
+                    case["events"] = [
+                        {
+                            "name": "confirmed",
+                            "dateRange":
+                            {
+                                "start": confirmation_date,
+                                "end": confirmation_date
+                            }
+                        },
+                    ]
+                    notes.append(
+                        "No Date of Diagnosis provided, so using Date Reported Online (fecha reporte web) as a proxy. This is normally approx. 1 week later.")
 
-            # Patient Outcome
-            # If patient died, mark date
-            if entry["Fecha de muerte"]:
-                case["events"].append({
-                    "name": "outcome",
-                    "value": "Death",
-                    "dateRange": {
-                        "start": convert_date(entry['Fecha de muerte']),
-                        "end": convert_date(entry['Fecha de muerte']),
+                # If patient was symptomatic, mark date of onsetSymptoms,
+                # otherwise asymptomatic
+                if entry["Fecha de inicio de síntomas"]:
+                    case["symptoms"] = {
+                        "status": "Symptomatic",
                     }
-                })
-                if entry["Recuperado"].lower() != "fallecido":
-                    notes.append("Died from something other than Covid-19.")
+                    case["events"].append({
+                        "name": "onsetSymptoms",
+                        "dateRange": {
+                            "start": convert_date(entry['Fecha de inicio de síntomas']),
+                            "end": convert_date(entry['Fecha de inicio de síntomas']),
+                        }
+                    })
 
-            elif entry["Recuperado"].lower() == "recuperado":
-                case["events"].append({
-                    "name": "outcome",
-                    "value": "Recovered",
-                    "dateRange": {
-                        "start": convert_date(entry['Fecha de recuperación']),
-                        "end": convert_date(entry['Fecha de recuperación']),
+                else:
+                    case["symptoms"] = {
+                        "status": "Asymptomatic",
                     }
-                })
 
-            elif entry['Recuperado'].lower() == 'activo':
-                notes.append('Case still active')
+                # Patient Outcome - If patient died, mark date
+                if entry["Fecha de muerte"]:
+                    case["events"].append({
+                        "name": "outcome",
+                        "value": "Death",
+                        "dateRange": {
+                            "start": convert_date(entry['Fecha de muerte']),
+                            "end": convert_date(entry['Fecha de muerte']),
+                        }
+                    })
+                    if entry["Recuperado"].lower() != "fallecido":
+                        notes.append(
+                            "Died from something other than Covid-19.")
 
-            if entry["Ubicación del caso"].lower() == "hospital":
-                case["events"].append({
-                    "name": "hospitalAdmission",
-                    "value": "Yes"
-                })
-            if entry["Ubicación del caso"].lower() == 'hospital uci':
-                case["events"].append({
-                    "name": "icuAdmission",
-                    "value": "Yes"
-                })
+                elif entry["Recuperado"].lower() == "recuperado":
+                    case["events"].append({
+                        "name": "outcome",
+                        "value": "Recovered",
+                        "dateRange": {
+                            "start": convert_date(entry['Fecha de recuperación']),
+                            "end": convert_date(entry['Fecha de recuperación']),
+                        }
+                    })
 
-            if entry["Ubicación del caso"].lower() == 'casa':
-                notes.append("Patient self-isolated and recovered at home.")
+                elif entry['Recuperado'].lower() == 'activo':
+                    notes.append('Case still active')
 
-            # Add notes for each case
-            # Travel History - we currently do not have any travel dates, so
-            # unknown whether in last 30 days
-            if entry["Tipo de contagio"].lower() == "importado":
-                notes.append(
-                    f"Case is reported as importing the disease into Colombia, and country of origin is {entry['Nombre del país']}.")
-            elif entry["Tipo de contagio"].lower() == 'relacionado':
-                notes.append("Case was transmitted within Colombia.")
-            elif entry["Tipo de contagio"].lower() == 'en estudio':
-                notes.append(
-                    "Case transmission under investigation (currently unknown).")
+                if entry["Ubicación del caso"].lower() == "hospital":
+                    case["events"].append({
+                        "name": "hospitalAdmission",
+                        "value": "Yes"
+                    })
+                if entry["Ubicación del caso"].lower() == 'hospital uci':
+                    case["events"].append({
+                        "name": "icuAdmission",
+                        "value": "Yes"
+                    })
 
-            if entry['fecha reporte web']:
-                notes.append(
-                    f"Date reported online was {convert_date(entry['fecha reporte web'],dataserver=False)}.")
-            if entry['Fecha de notificación']:
-                notes.append(
-                    f"Date reported to SIVIGILA was {convert_date(entry['Fecha de notificación'],dataserver=False)}.")
+                if entry["Ubicación del caso"].lower() == 'casa':
+                    notes.append(
+                        "Patient self-isolated and recovered at home.")
 
-            if entry['Tipo de recuperación'] == 'PCR':
-                notes.append(
-                    f"Patient recovery was confirmed by a negative PCR test.")
-            elif entry['Tipo de recuperación'] == 'Tiempo':
-                notes.append(
-                    f"Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+                # Add travelHistory and notes for imported cases - we currently do not have any travel dates,
+                # so unknown whether in last 30 days, assuming YES
+                if entry["Tipo de contagio"].lower() == "importado":
+                    if entry['Nombre del país']:
+                        country_of_origin = entry['Nombre del país']
+                        case["travelHistory"] = {
+                            "traveledPrior30Days": True,
+                            "travel": [
+                                {
+                                    "location": get_travel_history_location(entry)
+                                }]
+                        }
+                        notes.append(
+                            f"Case is reported as importing the disease into Colombia, and country of origin is {entry['Nombre del país']}.")
+                    else:
+                        notes.append(
+                            f"Case is reported as importing the disease into Colombia, but country of origin is not specified")
+                elif entry["Tipo de contagio"].lower() == 'relacionado':
+                    notes.append("Case was transmitted within Colombia.")
+                elif entry["Tipo de contagio"].lower() == 'en estudio':
+                    notes.append(
+                        "Case transmission under investigation (currently unknown).")
 
-            if notes:
-                case["notes"] = " \n".join(notes)
+                # Include severity of symptoms
+                if entry["Estado"].lower() in symptom_map.keys():
+                    notes.append(
+                        f"Symptom severity was {symptom_map.get(entry['Estado'].lower())}")
 
-            yield case
+                if entry['fecha reporte web']:
+                    notes.append(
+                        f"Date reported online was {convert_date(entry['fecha reporte web'],dataserver=False)}.")
+                if entry['Fecha de notificación']:
+                    notes.append(
+                        f"Date reported to SIVIGILA was {convert_date(entry['Fecha de notificación'],dataserver=False)}.")
+
+                if entry['Tipo de recuperación'] == 'PCR':
+                    notes.append(
+                        f"Patient recovery was confirmed by a negative PCR test.")
+                elif entry['Tipo de recuperación'] == 'Tiempo':
+                    notes.append(
+                        f"Patient recovery was confirmed by 21 days elapsing with no symptoms.")
+
+                if notes:
+                    case["notes"] = ", ".join(notes)
+
+                yield case
 
 
 def lambda_handler(event, context):

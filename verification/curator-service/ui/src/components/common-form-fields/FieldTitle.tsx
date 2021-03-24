@@ -2,11 +2,11 @@ import { Theme, createStyles } from '@material-ui/core/styles';
 
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
 import { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withStyles } from '@material-ui/core';
+import { AppTooltip } from './AppTooltip';
 
-const styles = () =>
+const styles = (theme: Theme) =>
     createStyles({
         container: {
             alignItems: 'center',
@@ -16,28 +16,16 @@ const styles = () =>
         title: { marginRight: '1em' },
     });
 
-const AppTooltip = withStyles((theme: Theme) => ({
-    arrow: {
-        color: theme.palette.primary.main,
-    },
-    tooltip: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
-        boxShadow: theme.shadows[1],
-        fontSize: 16,
-        fontWeight: 'normal',
-        padding: '1rem',
-    },
-}))(Tooltip);
-
 interface FieldTitleProps extends WithStyles<typeof styles> {
     title: string;
     tooltip?: string | JSX.Element;
     interactive?: boolean;
+    widetooltip?: boolean;
 }
 
 function FieldTitle(props: FieldTitleProps): JSX.Element {
     const { classes } = props;
+
     return (
         <div className={classes.container}>
             <div className={classes.title}>
@@ -47,7 +35,8 @@ function FieldTitle(props: FieldTitleProps): JSX.Element {
                 <AppTooltip
                     arrow
                     interactive={props.interactive}
-                    title={props.tooltip}
+                    title={props.tooltip || ''}
+                    maxwidth={props.widetooltip ? '40vw' : 'auto'}
                 >
                     <HelpOutlineIcon fontSize="small" />
                 </AppTooltip>

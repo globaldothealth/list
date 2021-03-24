@@ -77,7 +77,7 @@ def test_format_url(mock_today):
 
 
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
-                            mock_source_api_url_fixture):
+                            mock_source_api_url_fixture, tempdir="/tmp"):
     from retrieval import retrieval  # Import locally to avoid superseding mock
 
     # Mock/stub retrieving credentials, invoking the parser lambda, and S3.
@@ -113,7 +113,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock, s3,
     # Mock the request to retrieve source content.
     requests_mock.get(origin_url, json={"data": "yes"})
 
-    response = retrieval.lambda_handler(valid_event, "")
+    response = retrieval.lambda_handler(valid_event, "", tempdir=tempdir)
 
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
@@ -236,11 +236,11 @@ def test_retrieve_content_persists_downloaded_json_locally(requests_mock):
     content_url = "http://foo.bar/"
     format = "JSON"
     requests_mock.get(content_url, json={"data": "yes"})
-    retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, format, {}, {})
+    files_s3_keys = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
-    with open("/tmp/content.json", "r") as f:
+    with open(files_s3_keys[0][0], "r") as f:
         assert json.load(f)["data"] == "yes"
 
 
@@ -249,24 +249,38 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     source_id = "id"
     content_url = "http://foo.bar/"
     format = "CSV"
-    requests_mock.get(content_url, content=b"foo,bar")
-    retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, format, {}, {})
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\n")
+    files_s3_keys = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, tempdir="/tmp")
     assert requests_mock.request_history[0].url == content_url
     assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
-    with open("/tmp/content.csv", "r") as f:
-        assert f.read() == "foo,bar"
+    with open(files_s3_keys[0][0], "r") as f:
+        assert f.read().strip() == "foo,bar\nbaz,quux"
 
+def test_retrieve_content_persists_downloaded_csv_locally_chunked(requests_mock):
+    from retrieval import retrieval  # Import locally to avoid superseding mock
+    source_id = "id"
+    content_url = "http://foo.bar/"
+    format = "CSV"
+    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\nbuzz,beak\ndew,drop\n")
+    files_s3_keys = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, format, {}, {}, chunk_bytes=16, tempdir="/tmp")
+    assert requests_mock.request_history[0].url == content_url
+    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
+    with open(files_s3_keys[0][0], "r") as f:
+        assert f.read().strip() == "foo,bar\nbaz,quux"
+    with open(files_s3_keys[1][0], "r") as f:
+        assert f.read().strip() == "foo,bar\nbuzz,beak\ndew,drop"
 
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
     content_url = "http://foo.bar/"
     requests_mock.get(content_url, json={"data": "yes"})
-    result = retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, "JSON", {}, {})
-    assert "/tmp/" in result[0]
-    assert source_id in result[1]
+    results = retrieval.retrieve_content(
+        "env", source_id, "upload_id", content_url, "JSON", {}, {}, tempdir="/tmp")
+    assert all("/tmp/" in fn for fn, s3key in results)
+    assert all(source_id in s3key for fn, s3key in results)
 
 
 def test_retrieve_content_raises_error_for_non_supported_format(
@@ -281,7 +295,7 @@ def test_retrieve_content_raises_error_for_non_supported_format(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, bad_format, {}, {})
+            "env", source_id, upload_id, content_url, bad_format, {}, {}, tempdir="/tmp")
     except ValueError:
         assert requests_mock.request_history[0].url == update_upload_url
         assert requests_mock.request_history[-1].json(
@@ -304,7 +318,7 @@ def test_retrieve_content_raises_error_for_source_content_not_found(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, "JSON", {}, {})
+            "env", source_id, upload_id, content_url, "JSON", {}, {}, tempdir="/tmp")
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -328,7 +342,7 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
 
     try:
         retrieval.retrieve_content(
-            "env", source_id, upload_id, content_url, "JSON", {}, {})
+            "env", source_id, upload_id, content_url, "JSON", {}, {}, tempdir="/tmp")
     except Exception:
         assert requests_mock.request_history[0].url == content_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -389,7 +403,7 @@ def test_raw_content_unzips():
 
     url = 'http://mock/url.zip'
     with open(name, "rb") as f:
-        wrappedBytes = retrieval.raw_content(url, f.read())
+        wrappedBytes = retrieval.raw_content(url, f.read(), tempdir="/tmp")
         # Content should be the content of the first file in the zip.
         assert wrappedBytes.read() == b'foo'
 
@@ -397,5 +411,5 @@ def test_raw_content_unzips():
 def test_raw_content_ignores_unknown_mimetypes():
     from retrieval import retrieval
     url = 'http://mock/url'
-    wrappedBytes = retrieval.raw_content(url, b'foo')
+    wrappedBytes = retrieval.raw_content(url, b'foo', tempdir="/tmp")
     assert wrappedBytes.read() == b'foo'

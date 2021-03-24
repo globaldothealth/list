@@ -1,5 +1,6 @@
 # Local AWS testing and deployment artifacts.
 .aws
+.aws-sam
 # Log file for conversion warnings
 conversion_errors.tsv
 

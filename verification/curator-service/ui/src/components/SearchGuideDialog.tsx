@@ -115,48 +115,32 @@ const SearchGuideDialog = ({
                         </Box>
                         <Box mb={1}>
                             <Typography className={classes.title}>
-                                Search syntax
-                            </Typography>
-                        </Box>
-                        <Box mt={3} mb={1}>
-                            <Typography className={classes.subtitle}>
-                                Full text search
+                                Welcome to Global.health Data!
                             </Typography>
                         </Box>
                         <Typography>
-                            Example: <i>"got infected at work" - India</i>
-                            <br />
-                            You can use arbitrary strings to search over those
-                            text fields:
+                            You can use the following keywords to search our
+                            line-list database by selecting from the filter
+                            list, clicking on a column header, or manually
+                            entering in the search box using the syntax
+                            "keyword: value"
                         </Typography>
                         <ul className={classes.list}>
-                            <li>notes</li>
-                            <li>country</li>
-                            <li>pathogen</li>
                             <li>curator</li>
-                            <li>admin1</li>
-                            <li>name</li>
+                            <li>gender</li>
+                            <li>nationality</li>
                             <li>occupation</li>
+                            <li>country</li>
+                            <li>outcome</li>
+                            <li>caseid</li>
+                            <li>sourceurl</li>
+                            <li>verificationstatus</li>
+                            <li>uploadid</li>
+                            <li>admin1</li>
                             <li>admin2</li>
-                            <li>source URL</li>
-                            <li>nationalities</li>
-                            <li>place</li>
-                            <li>upload ID</li>
-                            <li>ethnicity</li>
-                            <li>location name</li>
-                            <li>verification status</li>
+                            <li>admin3</li>
+                            <li>variant</li>
                         </ul>
-                        <Box mt={3} mb={1}>
-                            <Typography className={classes.subtitle}>
-                                Keyboard text search
-                            </Typography>
-                        </Box>
-                        <Typography>
-                            Example: lorem ipsum
-                            <br />
-                            Supported keywords are shown when the filter button
-                            is clicked.
-                        </Typography>
                     </Box>
                 </div>
             </Draggable>

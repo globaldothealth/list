@@ -59,7 +59,7 @@ class CzechiaTest(unittest.TestCase):
                         "end": 38.0
                     }
                 },
-                "events":[
+                "events": [
                     {
                         "name": "confirmed",
                         "dateRange": {

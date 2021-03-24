@@ -110,6 +110,7 @@ interface AgeRange {
  * Composed of fields present in the standardized manual upload CSV. Comments
  * denote sections of the canonical case object to which fields correspond,
  * where applicable.
+ * Variant of concern has been added, which wasn't in the CSV.
  */
 interface RawParsedCase {
     // Interface index
@@ -147,6 +148,9 @@ interface RawParsedCase {
     // Symptoms
     symptoms?: string; // semicolon delimited list
     symptomStatus?: string;
+
+    // variant of concern
+    variantOfConcern?: string;
 
     // Location
     country: string;
@@ -408,6 +412,9 @@ class BulkCaseForm extends React.Component<
             preexistingConditions: preexistingConditions,
             symptoms: symptoms,
             caseCount: c.caseCount,
+            variant: {
+                name: c.variantOfConcern,
+            },
         };
     }
 
