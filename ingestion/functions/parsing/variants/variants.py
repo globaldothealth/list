@@ -87,8 +87,8 @@ def get_preexisting_conditions(entry):
 
 def get_travel_history(entry):
     travel_history = {}
-    travel_history['traveledPrior30Days'] = entry['travelHistory.traveledPrior30Days']
-    if entry['travelHistory.traveledPrior30Days'] in ['Yes', 'yes']:
+    if entry['travelHistory.traveledPrior30Days'].lower() == 'yes':
+        travel_history['traveledPrior30Days'] = True
         travel = {}
         if entry['travelHistory.travel.methods']:
             travel['methods'] = entry['travelHistory.travel.methods']
@@ -103,9 +103,11 @@ def get_travel_history(entry):
                     entry['travelHistory.travel.dateRange.start']), 'end': convert_date(
                     entry['travelHistory.travel.dateRange.end'])}
 
-        travel_history['travel'] = travel
-
-    return travel_history or None
+        travel_history['travel'] = [travel]
+        return travel_history
+    elif entry['travelHistory.traveledPrior30Days'].lower() == 'no':
+        travel_history['traveledPrior30Days'] = False
+        return travel_history
 
 
 def get_genome_data(entry):
@@ -121,14 +123,13 @@ def get_genome_data(entry):
     if entry['genomeSequences.sequence.length']:
         genome_data['sequenceLength'] = entry['genomeSequences.sequence.length']
 
-    return genome_data
+    return [genome_data]
 
 
-def parse_cases(raw_data_file, source_id):
+def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses variant data from a number of sources, combining GISAID and manually added variants from the news
     """
-
     case_count = 1
     with open(raw_data_file, "r") as f:
         reader = csv.DictReader(f, delimiter=',')
@@ -173,7 +174,6 @@ def parse_cases(raw_data_file, source_id):
             for _ in range(int(entry['number.of.cases'])):
                 case["caseReference"]["sourceEntryId"] = f"B.1.351_{case_count}"
                 case_count += 1
-
                 yield case
 
 
