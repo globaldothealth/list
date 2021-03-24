@@ -233,6 +233,14 @@ except ImportError:
             os.pardir, 'parsing/paraguay'))
     import paraguay
 try:
+    import peru
+except ImportError:
+    sys.path.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            os.pardir, 'parsing/peru'))
+    import peru
+try:
     import republic_of_korea
 except ImportError:
     sys.path.append(
@@ -564,7 +572,7 @@ def invoke_parser(
     elif country == 'BrazilSantaCatarina':
        santa_catarina.lambda_handler(payload)
     elif country == 'CHZurich':
-       ch_zurich.lambda_handler(payload)
+       zurich.lambda_handler(payload)
     elif country == 'Canada':
        canada.lambda_handler(payload)
     elif country == 'Colombia':
@@ -594,7 +602,7 @@ def invoke_parser(
     elif country == 'RepublicOfKorea':
        republic_of_korea.lambda_handler(payload)  
     elif country == 'SaoPaolo':
-       sa.lambda_handler(payload)
+       saopaolo.lambda_handler(payload)
     elif country == 'Scotland':
        scotland.lambda_handler(payload)
     elif country == 'SouthAfrica':
