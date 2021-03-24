@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -17,6 +18,24 @@ except ImportError:
     import parsing_lib
 
 
+<<<<<<< HEAD
+=======
+# To geocode cases for Peru, we load dictionaries to map place names to coordinates. These are from ESRI Peru lookup table
+# Case locations are provided as District, Province, Department. For a subset of cases, only Department is specified.
+# place_coords_dict maps place names in the format District, Province, Department to coordinates, based on string matching from the lookup table.
+# place_capital_coords_dict does the same except for capitals of provinces, which are recorded differently.
+# If only the department is specified, department_coords_dict is used to
+# give the centroid of that department
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "geocoding_dictionaries.json")) as json_file:
+    geocoding_dictionaries = json.load(json_file)
+
+
+place_coords_dict = geocoding_dictionaries['place_coords_dict']
+place_capital_coords_dict = geocoding_dictionaries['place_capital_coords_dict']
+department_coords_dict = geocoding_dictionaries['department_coords_dict']
+
+>>>>>>> main
 
 def convert_date(raw_date: str):
     """
@@ -36,27 +55,46 @@ def convert_gender(raw_gender):
     return None
 
 
-def convert_location(raw_entry):
-    query_terms = [
-        term for term in [
-            raw_entry.get("DISTRITO", ""),
-            raw_entry.get("PROVINCIA", ""),
-            raw_entry.get("DEPARTAMENTO", ""),
-            "Peru"]
-        if term != "EN INVESTIGACIÓN"]
-    if len(query_terms) > 2:
-        if query_terms[2] == 'LIMA':
-            query_terms[2] = 'Lima Province'
+def get_location(row, first_dict_places, capital_dict_places):
+    location = {}
+    place_list = [row['DISTRITO'], row['PROVINCIA'], row['DEPARTAMENTO']]
+    if place_list[2] == 'LIMA REGION':
+        place_list[2] = 'LIMA'
+    place_name = ", ".join(place_list)
+    try:
+        if place_list[0] != 'EN INVESTIGACIÓN':
+            location["administrativeAreaLevel3"] = place_list[0]
+            location["administrativeAreaLevel2"] = place_list[1]
+            location["administrativeAreaLevel1"] = place_list[2]
+            location["country"] = "Peru"
+            location['geoResolution'] = "Admin3"
+            location["name"] = place_name + ', Peru'
+            if place_name in first_dict_places:
+                coords = place_coords_dict[place_name]
+            elif place_name in capital_dict_places:
+                coords = place_capital_coords_dict[place_name]
+        else:
+            location["administrativeAreaLevel1"] = place_list[2]
+            location["country"] = "Peru"     
+            location["name"] = place_list[2] + ', Peru'
+            location['geoResolution'] = "Admin1"
+            coords = department_coords_dict[place_list[2]]
 
-    return {"query": ", ".join(query_terms)}
+        geometry = {'latitude': coords[1],
+                    'longitude': coords[0]}
+
+        location["geometry"] = geometry
+
+        return location
+    except Exception as e:
+        print(place_name)
+        return None
 
 
 def convert_demographics(age: str, sex: str):
     demo = {}
     if age:
-        if float(age) > 120:
-            pass
-        else:
+        if float(age) < 120:
             demo["ageRange"] = {
                 "start": float(age),
                 "end": float(age)
@@ -71,40 +109,41 @@ def parse_cases(raw_data_file, source_id, source_url):
     Parses G.h-format case data from raw API data.
     Creates a dict to map type of confirming diagnostic test from Spanish abbreviation to English.
     Assuming PR = prueba rapida (rapid serological test) and PCR = PCR test
-    "Lima" is often provided as all three locations ("Lima, Lima, Lima, Peru") - to geocode this with mapbox
-    the final Lima needs to be replaced with "Lima Province".
     """
-
+    first_dict_places = place_coords_dict.keys()
+    capital_dict_places = place_capital_coords_dict.keys()
     conf_methods = {
         'PR': 'Serological test',
         'PCR': 'PCR test'
     }
-
-    with open(raw_data_file, "r") as f:
+    with open(raw_data_file, "r", encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=';')
         for entry in reader:
             if entry["UUID"] and entry['FECHA_RESULTADO']:
-                case = {
-                    "caseReference": {
-                        "sourceId": source_id,
-                        "sourceEntryId": entry["UUID"],
-                        "sourceUrl": source_url
-                    },
-                    "location": convert_location(entry),
-                    "events": [
-                        {
-                            "name": "confirmed",
-                            "value": conf_methods.get(entry['METODODX']),
-                            "dateRange":
-                                {
-                                    "start": convert_date(entry["FECHA_RESULTADO"]),
-                                    "end": convert_date(entry["FECHA_RESULTADO"])
-                            }
-                        }
-                    ],
-                    "demographics": convert_demographics(entry["EDAD"], entry["SEXO"]),
-                }
-                yield case
+                location = get_location(
+                    entry, first_dict_places, capital_dict_places)
+                if location:
+                    case = {
+                        "caseReference": {
+                            "sourceId": source_id,
+                            "sourceEntryId": entry["UUID"],
+                            "sourceUrl": source_url},
+                        "location": location,
+                        "events": [
+                            {
+                                "name": "confirmed",
+                                "value": conf_methods.get(
+                                    entry['METODODX']),
+                                "dateRange": {
+                                    "start": convert_date(
+                                        entry["FECHA_RESULTADO"]),
+                                    "end": convert_date(
+                                        entry["FECHA_RESULTADO"])}}],
+                        "demographics": convert_demographics(
+                            entry["EDAD"],
+                            entry["SEXO"]),
+                    }
+                    yield case
 
 
 
