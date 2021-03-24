@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from datetime import datetime
@@ -18,8 +17,6 @@ except ImportError:
     import parsing_lib
 
 
-<<<<<<< HEAD
-=======
 # To geocode cases for Peru, we load dictionaries to map place names to coordinates. These are from ESRI Peru lookup table
 # Case locations are provided as District, Province, Department. For a subset of cases, only Department is specified.
 # place_coords_dict maps place names in the format District, Province, Department to coordinates, based on string matching from the lookup table.
@@ -35,7 +32,6 @@ place_coords_dict = geocoding_dictionaries['place_coords_dict']
 place_capital_coords_dict = geocoding_dictionaries['place_capital_coords_dict']
 department_coords_dict = geocoding_dictionaries['department_coords_dict']
 
->>>>>>> main
 
 def convert_date(raw_date: str):
     """
@@ -146,11 +142,5 @@ def parse_cases(raw_data_file, source_id, source_url):
                     yield case
 
 
-
-def lambda_handler(event):
-    return parsing_lib.run_lambda(event, parse_cases)
-
-if __name__ == "__main__":
-    with open('input_event.json') as f:
-        event = json.load(f)
-        lambda_handler(event)
+def lambda_handler(event, context):
+    return parsing_lib.run_lambda(event, context, parse_cases)
