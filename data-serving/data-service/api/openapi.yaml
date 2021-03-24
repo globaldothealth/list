@@ -803,7 +803,11 @@ components:
                                     dateRange:
                                         $ref: '#/components/schemas/DateRange'
                                     location:
-                                        $ref: '#/components/schemas/Location'
+                                        description: A location object, or the string "unknown".
+                                        oneOf:
+                                            - $ref: '#/components/schemas/Location'
+                                            - type: string
+                                              enum: [ unknown ]
                                     purpose:
                                         type: string
                                         enum:
