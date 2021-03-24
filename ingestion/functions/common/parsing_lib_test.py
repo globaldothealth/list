@@ -17,14 +17,7 @@ from moto import mock_s3
 try:
     import common_lib
 except ImportError:
-    sys.path.append(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.pardir,
-            os.pardir,
-            os.pardir,
-            os.pardir,
-            'common'))
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     import common_lib
 
 _SOURCE_API_URL = "http://bar.baz"
@@ -150,7 +143,7 @@ class FakeContext:
 def test_run_lambda_e2e(
     input_event, sample_data, requests_mock, s3,
         mock_source_api_url_fixture):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
     common_lib.login = MagicMock(name="login")
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
@@ -197,8 +190,7 @@ def test_run_lambda_e2e(
                   "status_code": 200}])
 
     response = parsing_lib.run_lambda(
-        input_event, FakeContext(),
-        fake_parsing_fn)
+        input_event, fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == excluded_case_ids_url
@@ -209,7 +201,7 @@ def test_run_lambda_e2e(
 
 
 def test_batch_of():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     items = iter([1, 2, 3, 4, 5])
     assert parsing_lib.batch_of(items, 3) == [1, 2, 3]
     assert parsing_lib.batch_of(items, 3) == [4, 5]
@@ -218,7 +210,7 @@ def test_batch_of():
 
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
         input_event, s3, sample_data):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
@@ -236,7 +228,7 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
 
 
 def test_extract_event_fields_returns_all_present_fields(input_event):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
         input_event[parsing_lib.ENV_FIELD],
         input_event[parsing_lib.SOURCE_URL_FIELD],
@@ -250,28 +242,28 @@ def test_extract_event_fields_returns_all_present_fields(input_event):
 
 
 def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
         del input_event[parsing_lib.S3_BUCKET_FIELD]
         parsing_lib.extract_event_fields(input_event)
 
 
 def test_extract_event_fields_errors_if_missing_key_field(input_event):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_KEY_FIELD):
         del input_event[parsing_lib.S3_KEY_FIELD]
         parsing_lib.extract_event_fields(input_event)
 
 
 def test_extract_event_fields_errors_if_missing_env_field(input_event):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.ENV_FIELD):
         del input_event[parsing_lib.ENV_FIELD]
         parsing_lib.extract_event_fields(input_event)
 
 
 def test_prepare_cases_adds_upload_id():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
     upload_id = "123456789012345678901234"
     result = parsing_lib.prepare_cases(
@@ -282,7 +274,7 @@ def test_prepare_cases_adds_upload_id():
 
 
 def test_prepare_cases_removes_nones():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
     case["demographics"] = None
     result = parsing_lib.prepare_cases(
@@ -293,7 +285,7 @@ def test_prepare_cases_removes_nones():
 
 
 def test_prepare_cases_removes_empty_strings():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     case = copy.deepcopy(_PARSED_CASE)
     case["notes"] = ""
     result = parsing_lib.prepare_cases(
@@ -305,7 +297,7 @@ def test_prepare_cases_removes_empty_strings():
 
 def test_write_to_server_returns_created_and_updated_count(
         requests_mock, mock_source_api_url_fixture):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
     num_created = 10
     num_updated = 5
@@ -318,7 +310,7 @@ def test_write_to_server_returns_created_and_updated_count(
         iter([_PARSED_CASE]),
         "env", _SOURCE_ID, "upload_id", {},
         {},
-        parsing_lib.CASES_BATCH_SIZE, lambda: 42)
+        parsing_lib.CASES_BATCH_SIZE)
     assert requests_mock.request_history[0].url == full_source_url
     assert count_created == num_created
     assert count_updated == num_updated
@@ -326,7 +318,7 @@ def test_write_to_server_returns_created_and_updated_count(
 
 def test_write_to_server_raises_error_for_failed_batch_upsert(
         requests_mock, mock_source_api_url_fixture):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     # TODO: Complete removal of URL env var.
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
@@ -343,7 +335,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
     try:
         parsing_lib.write_to_server(
             iter([_PARSED_CASE, _PARSED_CASE]),
-            "env", _SOURCE_ID, upload_id, {}, {}, 1, lambda: 42)
+            "env", _SOURCE_ID, upload_id, {}, {}, 1)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == full_source_url
@@ -357,7 +349,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert(
 
 def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_errors(
         requests_mock, mock_source_api_url_fixture):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     # TODO: Complete removal of URL env var.
     os.environ["SOURCE_API_URL"] = _SOURCE_API_URL
     full_source_url = f"{_SOURCE_API_URL}/cases/batchUpsert"
@@ -372,7 +364,7 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
             iter([_PARSED_CASE]),
             "env", _SOURCE_ID, upload_id, {},
             {},
-            parsing_lib.CASES_BATCH_SIZE, lambda: 42)
+            parsing_lib.CASES_BATCH_SIZE)
     except RuntimeError:
         assert requests_mock.request_history[0].url == full_source_url
         assert requests_mock.request_history[1].url == update_upload_url
@@ -383,9 +375,9 @@ def test_write_to_server_raises_error_for_failed_batch_upsert_with_validation_er
     assert False
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_keeps_exact_with_EQ(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
@@ -395,9 +387,9 @@ def test_filter_cases_by_date_keeps_exact_with_EQ(mock_today):
     assert list(cases) == [CASE_JUNE_FIFTH]
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_removes_nonexact_with_EQ(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 10, 10)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
@@ -407,9 +399,9 @@ def test_filter_cases_by_date_removes_nonexact_with_EQ(mock_today):
     assert not next(cases, None)
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_removes_exact_with_LT(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
@@ -419,9 +411,9 @@ def test_filter_cases_by_date_removes_exact_with_LT(mock_today):
     assert not next(cases, None)
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_keeps_before_LT(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 10)
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
@@ -431,9 +423,9 @@ def test_filter_cases_by_date_keeps_before_LT(mock_today):
     assert next(cases) == CASE_JUNE_FIFTH
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_removes_exact_with_GT(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 8)
     cases = parsing_lib.filter_cases_by_date(
         [CASE_JUNE_FIFTH],
@@ -443,9 +435,9 @@ def test_filter_cases_by_date_removes_exact_with_GT(mock_today):
     assert not next(cases, None)
 
 
-@patch('parsing_lib.parsing_lib.get_today')
+@patch('parsing_lib.get_today')
 def test_filter_cases_by_date_keeps_after_GT(mock_today):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     mock_today.return_value = datetime.datetime(2020, 6, 7)
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
@@ -457,7 +449,7 @@ def test_filter_cases_by_date_keeps_after_GT(mock_today):
 
 def test_filter_cases_by_date_unsupported_op(
         requests_mock, mock_source_api_url_fixture):
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     upload_id = "123456789012345678901234"
     update_upload_url = f"{_SOURCE_API_URL}/sources/{_SOURCE_ID}/uploads/{upload_id}"
     requests_mock.put(
@@ -481,7 +473,7 @@ def test_filter_cases_by_date_unsupported_op(
 
 
 def test_filter_cases_by_date_within_range():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
         None,
@@ -491,7 +483,7 @@ def test_filter_cases_by_date_within_range():
 
 
 def test_filter_cases_by_date_equals_range():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
         None,
@@ -501,7 +493,7 @@ def test_filter_cases_by_date_equals_range():
 
 
 def test_filter_cases_by_date_outside_range():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     cases = parsing_lib.filter_cases_by_date(
         (CASE_JUNE_FIFTH,),
         None,
@@ -511,7 +503,7 @@ def test_filter_cases_by_date_outside_range():
 
 
 def test_filter_cases_by_date_handles_two_date_formats():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
 
     # Date format is %m/%d/%YZ in CASE_JUNE_FIFTH.
     # Date parsing also handles strings without the 'Z'.
@@ -531,7 +523,7 @@ def test_filter_cases_by_date_handles_two_date_formats():
 
 
 def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
     data = {"keep1": 0, "keep2": False, "keep3": [], "drop1": None,
             "multi": {"multikeep": "ok", "multidrop": None},
             "emptyobject": {"dropped": None},
@@ -542,7 +534,7 @@ def test_remove_nested_none_and_empty_removes_only_nones_and_empty_str():
     assert parsing_lib.remove_nested_none_and_empty(data) == expected
 
 def test_excluded_case_are_removed_from_cases():
-    from parsing_lib import parsing_lib  # Import locally to avoid superseding mock
+    import parsing_lib  # Import locally to avoid superseding mock
 
     valid_case = copy.deepcopy(_PARSED_CASE)
     excluded_case = copy.deepcopy(_PARSED_CASE)
