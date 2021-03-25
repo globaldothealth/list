@@ -95,7 +95,7 @@ export class CasesController {
                 )
                 .then((yamlRes) => {
                     const dataDictionary = yaml.safeLoad(yamlRes.data);
-                    const columns = txtRes.data.split('\n');
+                    const columns = yamlRes.data.split('\n');
                     const parsedCases = _.map(
                         matchingCases,
                         parseDownloadedCase,
