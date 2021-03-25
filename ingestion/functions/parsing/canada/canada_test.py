@@ -68,9 +68,10 @@ def sample_data():
 
 def test_parse_cases_converts_fields_to_ghdsi_schema(sample_data):
     from canada import canada  # Import locally to avoid superseding mock
-    with tempfile.NamedTemporaryFile("w") as f:
+    fd, fname = tempfile.mkstemp()
+    with os.fdopen(fd, "w") as f:
         f.write(sample_data)
         f.flush()
 
-        result, = canada.parse_cases(f.name, _SOURCE_ID, _SOURCE_URL)
+        result, = canada.parse_cases(fname, _SOURCE_ID, _SOURCE_URL)
         assert result == _PARSED_CASE
