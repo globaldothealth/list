@@ -47,6 +47,23 @@ export const locationSchema = new mongoose.Schema(
     { _id: false },
 );
 
+export const fuzzyLocationSchema = new mongoose.Schema(
+    {
+        country: String,
+        administrativeAreaLevel1: String,
+        administrativeAreaLevel2: String,
+        administrativeAreaLevel3: String,
+        // Place represents a precise location, such as an establishment or POI.
+        place: String,
+        // A human-readable name of the location.
+        name: String,
+        geoResolution: String,
+        geometry: geometrySchema,
+        query: String,
+    },
+    { _id: false },
+);
+
 interface Geometry {
     latitude: number;
     longitude: number;
@@ -60,6 +77,18 @@ export type LocationDocument = mongoose.Document & {
     place?: string;
     name: string;
     geoResolution: string;
+    geometry?: Geometry;
+    query?: string;
+};
+
+export type FuzzyLocationDocument = mongoose.Document & {
+    country?: string;
+    administrativeAreaLevel1?: string;
+    administrativeAreaLevel2?: string;
+    administrativeAreaLevel3?: string;
+    place?: string;
+    name?: string;
+    geoResolution?: string;
     geometry?: Geometry;
     query?: string;
 };
