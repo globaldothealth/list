@@ -247,7 +247,7 @@
         "properties": {
           "travel": {
             "bsonType": "array",
-            "uniqueItems": true,
+            "uniqueItems": false,
             "items": {
               "bsonType": "object",
               "additionalProperties": false,
@@ -283,10 +283,6 @@
                     "geometry": {
                       "bsonType": "object",
                       "additionalProperties": false,
-                      "required": [
-                        "latitude",
-                        "longitude"
-                      ],
                       "properties": {
                         "latitude": {
                           "bsonType": "number",

@@ -805,18 +805,26 @@ export class CasesController {
 
     /**
      * Geocodes a single location.
+     * @param canBeFuzzy The location is allowed to be "fuzzy", in which case it may not get geocoded.
      * @returns The geocoded location.
      * @throws GeocodeNotFoundError if no geocode could be found.
      * @throws InvalidParamError if location.query is not specified and location
      *         is not complete already.
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async geocodeLocation(location: any): Promise<any> {
+    private async geocodeLocation(
+        location: any,
+        canBeFuzzy: boolean,
+    ): Promise<any> {
         // Geocode using location.query if no lat lng were provided.
         if (location?.geometry?.latitude && location.geometry?.longitude) {
             return location;
         }
         if (!location?.query) {
+            if (canBeFuzzy) {
+                // no problem, just give back what we received
+                return location;
+            }
             throw new InvalidParamError(
                 'location.query must be specified to be able to geocode',
             );
@@ -876,9 +884,15 @@ export class CasesController {
     // batch geocoding API for such cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private async geocode(req: Request | any): Promise<void> {
-        req.body['location'] = await this.geocodeLocation(req.body['location']);
+        req.body['location'] = await this.geocodeLocation(
+            req.body['location'],
+            false,
+        );
         for (const travel of req.body.travelHistory?.travel || []) {
-            travel['location'] = await this.geocodeLocation(travel.location);
+            travel['location'] = await this.geocodeLocation(
+                travel.location,
+                true,
+            );
         }
     }
 }
