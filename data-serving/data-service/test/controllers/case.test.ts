@@ -653,7 +653,7 @@ describe('POST', () => {
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).toContain(
-                '_id,caseReference.verificationStatus,caseReference.sourceId',
+                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
             );
             expect(res.text).toContain(c._id);
             expect(res.text).toContain(c.caseReference.verificationStatus);
@@ -700,7 +700,7 @@ describe('POST', () => {
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).toContain(
-                '_id,caseReference.verificationStatus,caseReference.sourceId',
+                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
             );
             expect(res.text).toContain(matchingCase._id);
             expect(res.text).toContain(matchingCase2._id);
