@@ -91,18 +91,11 @@ export class CasesController {
             res.setHeader('Pragma', 'no-cache');
             axios
                 .get<string>(
-                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
                 )
                 .then((yamlRes) => {
                     const dataDictionary = yaml.safeLoad(yamlRes.data);
-                    const columns = (dataDictionary as Array<{
-                        name: string;
-                        description: string;
-                    }>).map((datum) => datum.name);
-                    const parsedCases = _.map(
-                        matchingCases,
-                        parseDownloadedCase,
-                    );
+                    const columns = yamlRes.data.split('\n');
                     const stringifiedCases = stringify(parsedCases, {
                         header: true,
                         columns: columns,
