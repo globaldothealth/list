@@ -94,13 +94,8 @@ export class CasesController {
                 .get<string>(
                     'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
                 )
-<<<<<<< HEAD
-                .then((yamlRes) => {
-                    const columns = yamlRes.data.split('\n');
-=======
                 .then((txtRes) => {
                     const columns = txtRes.data.split('\n');
->>>>>>> fcbfdc68 (Updated tests)
                     const parsedCases = _.map(
                         matchingCases,
                         parseDownloadedCase,
