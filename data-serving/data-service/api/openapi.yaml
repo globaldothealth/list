@@ -59,7 +59,15 @@ paths:
                   description: Keyword to sort by
                   required: false
                   schema:
-                      type: string
+                      type: integer
+                      default: 0
+                - name: order
+                  in: query
+                  description: Sorting order
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
                 - name: q
                   in: query
                   description: The search query

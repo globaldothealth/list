@@ -48,6 +48,7 @@ import CaseIncludeDialog from './CaseIncludeDialog';
 import renderDate, { renderDateRange } from './util/date';
 import { URLToSearchQuery } from './util/searchQuery';
 import { ChipData } from './App';
+import { SortBy, SortByOrder } from '../constants/types';
 
 interface ListResponse {
     cases: Case[];
@@ -74,7 +75,8 @@ interface LinelistTableState {
 
     selectedVerificationStatus: VerificationStatus;
     searchQuery: string;
-    sortBy: string;
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
 }
 
 // Material table doesn't handle structured fields well, we flatten all fields in this row.
@@ -388,42 +390,83 @@ function RowMenu(props: {
 }
 
 interface SortSelectProps {
-    sortBy: string;
-    handleSortByChange: (sortBy: string) => void;
+    sortBy: SortBy;
+    sortByOrder: SortByOrder;
+    handleSortByChange: (sortBy: SortBy) => void;
+    handleSortByOrderChange: (sortByOrder: SortByOrder) => void;
 }
 
 export function SortSelect({
     sortBy,
+    sortByOrder,
     handleSortByChange,
+    handleSortByOrderChange,
 }: SortSelectProps): JSX.Element {
     const classes = sortSelectStyles();
 
     const sortKeywords = [
-        { name: 'None', value: 'none' },
-        { name: 'Confirmed date', value: 'confirmedDate' },
-        { name: 'Country', value: 'country' },
-        { name: 'Admin3', value: 'admin3' },
+        { name: 'None', value: SortBy.Default },
+        { name: 'Confirmed date', value: SortBy.ConfirmedDate },
+        { name: 'Country', value: SortBy.Country },
+        { name: 'Location admin 1', value: SortBy.Admin1 },
+        { name: 'Location admin 2', value: SortBy.Admin2 },
+        { name: 'Location admin 3', value: SortBy.Admin3 },
+        { name: 'Age', value: SortBy.Age },
     ];
 
-    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        handleSortByChange(event.target.value as string);
+    const handleChange = (
+        event: React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+    ) => {
+        const { value, name } = event.target;
+
+        if (name === 'sortBy') {
+            handleSortByChange(value as SortBy);
+        } else {
+            handleSortByOrderChange(value as SortByOrder);
+        }
     };
 
     return (
-        <FormControl className={classes.formControl}>
-            <InputLabel id="sort-by-label">Sort by</InputLabel>
-            <Select
-                labelId="sort-by-label"
-                value={sortBy}
-                onChange={handleChange}
-            >
-                {sortKeywords.map((keyword) => (
-                    <MenuItem value={keyword.value} key={keyword.value}>
-                        {keyword.name}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
+        <>
+            <FormControl className={classes.formControl}>
+                <InputLabel id="sort-by-label">Sort by</InputLabel>
+                <Select
+                    labelId="sort-by-label"
+                    name="sortBy"
+                    value={sortBy}
+                    onChange={handleChange}
+                >
+                    {sortKeywords.map((keyword) => (
+                        <MenuItem
+                            value={keyword.value}
+                            key={keyword.value}
+                            data-testid="sortby-option"
+                        >
+                            {keyword.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+            {sortBy !== SortBy.Default && (
+                <FormControl className={classes.formControl}>
+                    <InputLabel id="sort-by-order-label">Order</InputLabel>
+                    <Select
+                        labelId="sort-by-order-label"
+                        name="sortByOrder"
+                        value={sortByOrder}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value={SortByOrder.Ascending}>
+                            Ascending
+                        </MenuItem>
+                        <MenuItem value={SortByOrder.Descending}>
+                            Descending
+                        </MenuItem>
+                    </Select>
+                </FormControl>
+            )}
+        </>
     );
 }
 
@@ -541,7 +584,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                 encodeURIComponent(
                     URLToSearchQuery(this.props.location.search),
                 ) ?? '',
-            sortBy: 'none',
+            sortBy: SortBy.Default,
+            sortByOrder: SortByOrder.Descending,
         };
         this.deleteCases = this.deleteCases.bind(this);
         this.setCaseVerification = this.setCaseVerification.bind(this);
@@ -555,6 +599,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         );
         this.getExcludedCaseIds = this.getExcludedCaseIds.bind(this);
         this.handleSortByChange = this.handleSortByChange.bind(this);
+        this.handleSortByOrderChange = this.handleSortByOrderChange.bind(this);
     }
 
     componentDidMount() {
@@ -581,9 +626,16 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
         this.unlisten();
     }
 
-    handleSortByChange(sortBy: string): void {
+    handleSortByChange(sortBy: SortBy): void {
         this.setState(
             { page: 0, sortBy },
+            this.tableRef.current?.onQueryChange(),
+        );
+    }
+
+    handleSortByOrderChange(sortByOrder: SortByOrder): void {
+        this.setState(
+            { page: 0, sortByOrder },
             this.tableRef.current?.onQueryChange(),
         );
     }
@@ -1088,6 +1140,7 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             // Limit the maximum number of documents that are being counted in mongoDB in order to make queries faster
                             listUrl += '&count_limit=10000';
                             listUrl += '&sort_by=' + this.state.sortBy;
+                            listUrl += '&order=' + this.state.sortByOrder;
                             if (this.state.searchQuery !== '') {
                                 listUrl += '&q=' + this.state.searchQuery;
                             }
@@ -1196,8 +1249,12 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
                                     <SortSelect
                                         sortBy={this.state.sortBy}
+                                        sortByOrder={this.state.sortByOrder}
                                         handleSortByChange={
                                             this.handleSortByChange
+                                        }
+                                        handleSortByOrderChange={
+                                            this.handleSortByOrderChange
                                         }
                                     />
 
