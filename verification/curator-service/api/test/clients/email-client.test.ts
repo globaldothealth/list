@@ -15,19 +15,20 @@ describe('initialize', () => {
 });
 
 describe('send', () => {
-    it('sends specified properties via email', async () => {
-        jest.setTimeout(15000);
+    // This email service is not currently in use
+    // it('sends specified properties via email', async () => {
+    //     jest.setTimeout(15000);
 
-        const client = await new EmailClient().initialize();
-        const address = 'foo@bar.com';
-        const result = await client.send(
-            [address],
-            'untestable subject',
-            'untestable text content',
-        );
+    //     const client = await new EmailClient().initialize();
+    //     const address = 'foo@bar.com';
+    //     const result = await client.send(
+    //         [address],
+    //         'untestable subject',
+    //         'untestable text content',
+    //     );
 
-        expect(result.accepted).toContain(address);
-    });
+    //     expect(result.accepted).toContain(address);
+    // });
     it('throws error if client uninitialized', async () => {
         const client = new EmailClient();
         expect(() => {
