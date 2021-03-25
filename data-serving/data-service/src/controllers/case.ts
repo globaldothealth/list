@@ -91,14 +91,11 @@ export class CasesController {
             res.setHeader('Pragma', 'no-cache');
             axios
                 .get<string>(
-                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
                 )
                 .then((yamlRes) => {
                     const dataDictionary = yaml.safeLoad(yamlRes.data);
-                    const columns = (dataDictionary as Array<{
-                        name: string;
-                        description: string;
-                    }>).map((datum) => datum.name);
+                    const columns = yamlRes.data.split('\n');
                     const parsedCases = _.map(
                         matchingCases,
                         parseDownloadedCase,
@@ -130,6 +127,7 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
+        
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -757,17 +755,18 @@ export class CasesController {
     private caseAggregationFromQuery(queryText: string) {
         let casesQuery: any[] = [];
         const parsedSearch = parseSearchQuery(queryText);
+
         const query = parsedSearch.fullTextSearch
             ? {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
-        casesQuery = [
-            {
-                $match: query,
-            },
-        ];
-        const filters = parsedSearch.filters.map((f) => {
+            
+            casesQuery = [
+               {$match: query}
+             ];             
+   
+        const filters = parsedSearch.filters.map((f) => {            
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
                 if (searchTerm === '*') {
@@ -778,12 +777,17 @@ export class CasesController {
                             },
                         },
                     };
-                } else {
-                    return {
-                        $match: {
-                            [f.path]: f.values[0],
-                        },
-                    };
+                } else {                    
+                    if (f.dateOperator) {
+                        return {
+                            $match: {[f.path]: { [f.dateOperator]: new Date(f.values[0].toString())}}}
+                    } else {
+                        return {
+                            $match: {
+                                [f.path]: f.values[0],
+                            },
+                        };
+                    }
                 }
             } else {
                 return {
