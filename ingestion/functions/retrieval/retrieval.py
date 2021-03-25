@@ -720,5 +720,7 @@ def lambda_handler(tempdir=EFS_PATH):
         "upload_id": upload_id,
     }
 
-lambda_handler(tempdir=EFS_PATH)
+
+if __name__ == "__main__":
+    lambda_handler(tempdir=EFS_PATH)
 
