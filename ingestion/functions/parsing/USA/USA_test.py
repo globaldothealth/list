@@ -28,7 +28,7 @@ class USATest(unittest.TestCase):
                     "name": "United States",
                     "geometry": {
                         "latitude": 37.0902,
-                        "longitude": 95.7129
+                        "longitude": -95.7129
                     }
                 },
                 "events": [
