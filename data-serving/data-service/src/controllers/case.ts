@@ -5,6 +5,7 @@ import { ObjectId, QuerySelector } from 'mongodb';
 import { GeocodeOptions, Geocoder, Resolution } from '../geocoding/geocoder';
 import { NextFunction, Request, Response } from 'express';
 import parseSearchQuery, { ParsingError } from '../util/search';
+import { SortBy, SortByOrder, getSortByKeyword } from '../util/case';
 import { parseDownloadedCase } from '../util/case';
 
 import axios from 'axios';
@@ -126,7 +127,9 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
-        const sortBy = String(req.query.sort_by);
+        const sortBy = Number(req.query.sort_by);
+        const sortByOrder = Number(req.query.order);
+
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -150,11 +153,8 @@ export class CasesController {
             const excludingRestrictedSources = this.excludeRestrictedSourcesFromCaseAggregation(
                 caseAggregation,
             );
-            //@TODO: create function to return correct keyword
-            const sortByKeyword =
-                sortBy === 'confirmedDate'
-                    ? 'events.0.dateRange.start'
-                    : 'revisionMetadata.creationMetadata.date';
+
+            const sortByKeyword = getSortByKeyword(sortBy);
 
             const addingCount = _.concat(excludingRestrictedSources, [
                 {
@@ -173,7 +173,10 @@ export class CasesController {
                         docs: [
                             {
                                 $sort: {
-                                    [sortByKeyword]: -1,
+                                    [sortByKeyword]:
+                                        sortByOrder === SortByOrder.Ascending
+                                            ? 1
+                                            : -1,
                                 },
                             },
                             {
@@ -182,11 +185,6 @@ export class CasesController {
                             {
                                 $limit: limit + 1,
                             },
-                            // {
-                            //     $sort: {
-                            //         'revisionMetadata.creationMetadata.date': -1,
-                            //     },
-                            // },
                         ],
                     },
                 },
