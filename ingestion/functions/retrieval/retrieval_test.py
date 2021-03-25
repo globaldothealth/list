@@ -396,8 +396,7 @@ def test_raw_content_unzips():
     from retrieval import retrieval
     # Creating a fake zip file with one file in it.
     name = None
-    with tempfile.NamedTemporaryFile('w', delete=False) as temp:
-        name = temp.name
+    _, name = tempfile.mkstemp()
     with zipfile.ZipFile(name, 'w') as zf:
         zf.writestr('somefile', 'foo')
 
