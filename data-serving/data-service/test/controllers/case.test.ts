@@ -732,7 +732,7 @@ describe('POST', () => {
                 .expect('Content-Type', 'text/csv')
                 .expect(200);
             expect(res.text).toContain(
-                '_id,caseReference.verificationStatus,caseReference.sourceId',
+                '_id,caseReference.additionalSources,caseReference.sourceEntryId,caseReference.sourceId',
             );
             expect(res.text).toContain(matchingNotes);
             expect(res.text).toContain(matchingCase._id);
