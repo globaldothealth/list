@@ -259,6 +259,11 @@ new EmailClient(env.EMAIL_USER_ADDRESS, env.EMAIL_USER_PASSWORD)
             casesController.download,
         );
         apiRouter.post(
+            '/cases/downloadAsync',
+            mustBeAuthenticated,
+            casesController.downloadAsync,
+        );
+        apiRouter.post(
             '/cases/batchUpsert',
             mustHaveAnyRole(['curator']),
             casesController.batchUpsert,

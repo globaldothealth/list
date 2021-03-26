@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-
+import { Worker } from 'worker_threads';
 import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
@@ -69,6 +69,30 @@ export default class CasesController {
                 res.status(err.response.status).send(err.response.data);
                 return;
             }
+            res.status(500).send(err);
+        }
+    };
+
+    /** DownloadAsync spawns a worker thread that forwards the request to the data service
+     * and emails the streamed response as a csv attachment. It will only email to the
+     * logged-in user, and it replies immediately with 204. Any error will be reported
+     * in the email, except the error of not being able to email which we can only log.
+     * 
+     * Question for code reviewers: do we want to retry on errors? If so we need to introduce
+     * a message bus rather than just using background workers, and we're probably back at the
+     * point where we use Batch for this.*/
+     downloadAsync = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const worker = new Worker('console.log("worker spawned");', { eval: true,
+            workerData: {
+                q: req.body.query as string,
+                email: undefined, // work out how to get the user's email
+            }});
+            /* we don't care what happens when the worker finishes, but for debugging
+             * I'm going to log this. */
+            worker.on('exit', (code) => { logger.info(`worker exited. code: ${code}`) });
+            res.status(204).end();
+        } catch (err) {
             res.status(500).send(err);
         }
     };

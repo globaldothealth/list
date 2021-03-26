@@ -38,6 +38,26 @@ For example: https://curator.ghdsi.org/api-docs/
 
 Run the stack by executing the `/dev/run_stack.sh` script or simply launch the curator service alone by running `npm start` from this directory.
 
+### Testing locally
+
+Whether you run the whole development stack or just start the curator service, you need to authenticate to use most of the API. First, POST a user description to the `/auth/register` endpoint, and make sure to save the headers as you'll need a cookie that's returned by the server. This endpoint is only enabled in local development.
+
+    $ curl -D /tmp/headers.txt -X POST -H "Content-Type: application/json" -d '{ "name": "A Developer", "email": "a.developer@example.com", "googleID": 42, "roles": [ "admin", "curator" ] }' http://localhost:3001/auth/register
+
+If successful, the API replies with the user object it just created in mongo:
+
+    {"roles":["admin","curator"],"_id":"605dbbc7fa70a600b0432e48","name":"A Developer","email":"a.developer@example.com","googleID":"42","downloads":[],"__v":0}
+
+Now look in `/tmp/headers.txt` or wherever you saved the headers. You'll see a `Set-Cookie:` header that looks something like this:
+
+    Set-Cookie: connect.sid=LONG_STRING_OF_NONSENSE; Path=/; HttpOnly; SameSite=Strict
+
+Copy everything from "connect.sid=LONG_STRING_OF_NONSENSE", excluding the semicolon. Now use that in your calls to other API endpoints like this:
+
+    $ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -F 'query=country:Brazil' --cookie 'connect.sid=s%LONG_STRING_OF_NONSENSE' http://localhost:3001/api/cases/download
+
+(notice that `/auth/register` doesn't have an `/api` prefix and all the other methods do!)
+
 ### Code structure
 
 `src/` contains the server code, it is compiled from Typescript to Javascript and reloaded automatically during development.
