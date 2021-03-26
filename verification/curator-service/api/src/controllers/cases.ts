@@ -84,10 +84,10 @@ export default class CasesController {
      downloadAsync = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = req.user as UserDocument;
-            const worker = new Worker(`console.log("worker spawned for ${user.email}");`, { eval: true,
-            workerData: {
-                q: req.body.query as string,
-                email: user.email, // work out how to get the user's email
+            const worker = new Worker('./src/workers/downloadAsync.js', { 
+                workerData: {
+                    query: req.body.query as string,
+                    email: user.email, // work out how to get the user's email
             }});
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this. */
