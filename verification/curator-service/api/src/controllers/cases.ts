@@ -84,10 +84,12 @@ export default class CasesController {
      downloadAsync = async (req: Request, res: Response): Promise<void> => {
         try {
             const user = req.user as UserDocument;
+            const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
             const worker = new Worker('./src/workers/downloadAsync.js', { 
                 workerData: {
                     query: req.body.query as string,
-                    email: user.email, // work out how to get the user's email
+                    email: user.email,
+                    url,
             }});
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this. */
