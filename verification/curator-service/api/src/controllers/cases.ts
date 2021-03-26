@@ -83,10 +83,11 @@ export default class CasesController {
      * point where we use Batch for this.*/
      downloadAsync = async (req: Request, res: Response): Promise<void> => {
         try {
-            const worker = new Worker('console.log("worker spawned");', { eval: true,
+            const user = req.user as UserDocument;
+            const worker = new Worker(`console.log("worker spawned for ${user.email}");`, { eval: true,
             workerData: {
                 q: req.body.query as string,
-                email: undefined, // work out how to get the user's email
+                email: user.email, // work out how to get the user's email
             }});
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this. */
