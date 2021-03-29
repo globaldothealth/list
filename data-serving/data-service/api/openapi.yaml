@@ -831,7 +831,7 @@ components:
                                     dateRange:
                                         $ref: '#/components/schemas/DateRange'
                                     location:
-                                        $ref: '#/components/schemas/Location'
+                                        $ref: '#/components/schemas/FuzzyLocation'
                                     purpose:
                                         type: string
                                         enum:
@@ -995,6 +995,56 @@ components:
                     required:
                         - latitude
                         - longitude
+        FuzzyLocation:
+            description: A geo location that can be unspecific. It may not be geocoded if it lacks information.
+            type: object
+            properties:
+                country:
+                    type: string
+                    description: English full name of a country
+                    example: Costa Rica
+                administrativeAreaLevel1:
+                    type: string
+                    description: First administrative subdivision of a country
+                    example: Any province in Costa Rica
+                administrativeAreaLevel2:
+                    type: string
+                    description: Second administrative subdivision of a country
+                    example: Any canton in Costa Rica
+                administrativeAreaLevel3:
+                    type: string
+                    description: Third administrative subdivision of a country
+                    example: Any district in Costa Rica
+                place:
+                    type: string
+                    description: Name of the place this location refers to
+                    example: Boston Children's Hospital
+                name:
+                    type: string
+                    description: >
+                        Full name of the location
+                    example: Lyon, Auvergne-Rhône-Alpes, France
+                geoResolution:
+                    type: string
+                    description: How granular the location is
+                    enum:
+                        - undefined
+                        - Point
+                        - Admin3
+                        - Admin2
+                        - Admin1
+                        - Country
+                geometry:
+                    type: object
+                    properties:
+                        latitude:
+                            type: number
+                            minimum: -90
+                            maximum: 90
+                        longitude:
+                            type: number
+                            minimum: -180
+                            maximum: 180
         Curator:
             description: The logged-in user who submitted the case.
             type: object

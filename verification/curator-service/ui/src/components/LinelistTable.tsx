@@ -1103,7 +1103,20 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
                             type: 'string',
                         },
                         {
-                            title: 'Confirmed date',
+                            title: (
+                                <ColumnHeaderTitle
+                                    theClass={classes.centeredContent}
+                                    columnTitle="Confirmed date"
+                                    onClickAction={(
+                                        e: React.MouseEvent<HTMLDivElement>,
+                                    ) =>
+                                        this.handleAddFilterClick(
+                                            e,
+                                            'dateconfirmedafter',
+                                        )
+                                    }
+                                />
+                            ),
                             field: 'confirmedDate',
                             render: (rowData): string =>
                                 renderDate(rowData.confirmedDate),

@@ -135,6 +135,8 @@ export default function SearchBar({
         <div className={classes.searchRoot}>
             <StyledSearchTextField
                 id="search-field"
+                data-testid="searchbar"
+                name="searchbar"
                 onKeyPress={handleKeyPress}
                 onChange={(event): void => {
                     setSearchInput(event.target.value);
@@ -231,6 +233,14 @@ export default function SearchBar({
                     { desc: 'location admin 2', value: 'admin2' },
                     { desc: 'location admin 3', value: 'admin3' },
                     { desc: 'variant of concern', value: 'variant' },
+                    {
+                        desc: 'date confirmed after',
+                        value: 'dateconfirmedafter',
+                    },
+                    {
+                        desc: 'date confirmed before',
+                        value: 'dateconfirmedbefore',
+                    },
                 ].map((item) => (
                     <MenuItem
                         key={item.value}
