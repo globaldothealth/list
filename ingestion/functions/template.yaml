@@ -496,12 +496,12 @@ Resources:
         - AWSLambdaReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
-  EnglandParsingFunction:
+  VariantsParsingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: parsing/england/
-      Handler: england.lambda_handler
-      Description: Parse case data for England
+      CodeUri: parsing/variants/
+      Handler: variants.lambda_handler
+      Description: Parse case data for Variants of Concern
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
