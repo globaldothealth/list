@@ -635,32 +635,29 @@ export function DownloadButton({
                             </span>
                         </Tooltip>
                     )}
-                    {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && (
-                        <Tooltip
-                            title={disabledButtonTooltipText}
-                            placement="top"
-                        >
-                            <span>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.downloadButton}
-                                    onClick={() =>
-                                        downloadDataSet(
-                                            fileFormat,
-                                            'mailDataset',
-                                        )
-                                    }
-                                    disabled={
-                                        isLoading || downloadButtonDisabled
-                                    }
-                                >
-                                    Download more than {DATA_LIMIT} rows through
-                                    link delivered by email
-                                </Button>
-                            </span>
-                        </Tooltip>
-                    )}
+                    {/* {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && ( */}
+                    <Tooltip title={disabledButtonTooltipText} placement="top">
+                        <span>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                className={classes.downloadButton}
+                                onClick={() =>
+                                    downloadDataSet(fileFormat, 'mailDataset')
+                                }
+                                disabled={isLoading || downloadButtonDisabled}
+                            >
+                                Download more than {DATA_LIMIT} rows through
+                                link delivered by email
+                            </Button>
+                            <p>
+                                Please add info@global.health to your email
+                                contacts list or check spam so that you don't
+                                miss the download link
+                            </p>
+                        </span>
+                    </Tooltip>
+                    {/* )} */}
                 </DialogContent>
             </Dialog>
         </>
