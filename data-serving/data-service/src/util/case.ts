@@ -91,7 +91,7 @@ export const getSortByKeyword = (sortBy: SortBy): string => {
 
     switch (sortBy) {
         case SortBy.ConfirmedDate:
-            keyword = 'events.0.dateRange.start';
+            keyword = 'events.dateRange.start';
             break;
         case SortBy.Country:
             keyword = 'location.country';
