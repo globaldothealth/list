@@ -119,7 +119,6 @@ def parse_cases(raw_data_file, source_id, source_url):
     """
     Parses variant data from a number of sources, combining GISAID and manually added variants from the news
     """
-    cases = []
     case_count = 1
     with open(raw_data_file, "r", encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=',')
@@ -164,8 +163,7 @@ def parse_cases(raw_data_file, source_id, source_url):
                 for _ in range(int(entry['number.of.cases'])):
                     case["caseReference"]["sourceEntryId"] = f"B.1.351_{case_count}"
                     case_count += 1
-                    cases.append(case) 
-    return cases
+                    yield case
                 
 def lambda_handler(event, context):
     return parsing_lib.run_lambda(event, context, parse_cases)

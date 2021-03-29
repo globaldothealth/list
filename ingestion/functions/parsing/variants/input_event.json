@@ -2,7 +2,7 @@
     "env": "local",
     "s3Bucket": "epid-sources-raw",
     "s3Key": "test/variants/B.1.351_Manual_Cases_Feb23.csv",
-    "sourceUrl": "s3://epid-sources-raw/test/variants/B.1.351_Manual_Cases_Feb23.csv",
+    "sourceUrl": "https://raw.githubusercontent.com/fojackson8/covid19_mapping/main/globalhealth_voc.csv",
     "sourceId": "60360c20cac8a600566de9f3"
 }
 
