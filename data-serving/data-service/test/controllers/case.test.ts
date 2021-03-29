@@ -1143,6 +1143,30 @@ describe('PUT', () => {
 
         expect(res.body.notes).toEqual(newNotes);
     });
+    it('update present item with unknown travel locations should be 200 OK', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+
+        const travelHistory = {
+            traveledPrior30Days: true,
+            travel: [
+                {
+                    methods: ['Flight'],
+                    dateRange: {
+                        start: '2020-11-24T00:00:00.000Z',
+                        end: '2020-11-24T00:00:00.000Z',
+                    },
+                },
+            ],
+        };
+        const res = await request(app)
+            .put(`/api/cases/${c._id}`)
+            .send({ ...curatorMetadata, travelHistory })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.travelHistory).toEqual(travelHistory);
+    });
     it('update present item should result in update metadata', async () => {
         const c = new Case(minimalCase);
         await c.save();
@@ -1219,6 +1243,42 @@ describe('PUT', () => {
         const cases = await Case.find();
         expect(cases[0].notes).toEqual(newNotes);
         expect(cases[1].notes).toEqual(newNotes2);
+    });
+    it('update many items without locations in travel history should return 200 OK', async () => {
+        const c = new Case(minimalCase);
+        await c.save();
+        const c2 = new Case(minimalCase);
+        await c2.save();
+        await new Case(minimalCase).save();
+
+        const newNotes = 'abc';
+        const date = '2020-11-24T00:00:00.000Z';
+        const travelHistory = {
+            traveledPrior30Days: true,
+            travel: [
+                {
+                    methods: ['Flight'],
+                    dateRange: { start: date, end: date },
+                },
+            ],
+        };
+
+        const res = await request(app)
+            .post('/api/cases/batchUpdate')
+            .send({
+                ...curatorMetadata,
+                cases: [
+                    { _id: c._id, notes: newNotes },
+                    { _id: c2._id, travelHistory },
+                ],
+            })
+            .expect('Content-Type', /json/)
+            .expect(200);
+
+        expect(res.body.numModified).toEqual(2);
+        const cases = await Case.find();
+        expect(cases[0].notes).toEqual(newNotes);
+        expect(cases[1].travelHistory.travel[0].methods[0]).toEqual('Flight');
     });
     it('update many items without _id should return 422', async () => {
         const c = new Case(minimalCase);
