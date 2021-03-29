@@ -11,10 +11,6 @@ class VariantsTest(unittest.TestCase):
         self.maxDiff = 5000
 
     def test_parse(self):
-        '''
-        Includes a row where province and district are unspecified, where it should return just
-        the department and country
-        '''
         current_dir = os.path.dirname(__file__)
         sample_data_file = os.path.join(current_dir, "sample_data.csv")
 
