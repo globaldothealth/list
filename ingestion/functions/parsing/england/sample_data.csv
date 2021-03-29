@@ -1,0 +1,11 @@
+Unnamed: 0,FINALID,pillar,age,sex,LTLA_name,UTLA_name,NHSER_name,specimen_date.x,sgtf,sgtf_under30CT,imd_decile,ethnicity_final.x,cat,dod,P2CH1CQ,P2CH2CQ,P2CH3CQ,P2CH4CQ,asymptomatic_indicator,covidcod,death_type28,death_type60cod,data_id
+2929855,2877343,Pillar 2,24,Female,"Bristol, City of","Bristol, City of",South West,2021-02-24,,,9.0,W,Other/Unknown,,,,,,Y,,,,20210225
+2929856,1819443,Pillar 2,35,Female,Cheltenham,Gloucestershire,South West,2021-02-24,,,2.0,W,Other/Unknown,,,,,,N,,,,20210225
+2929857,2271302,Pillar 2,30,Male,"Bristol, City of","Bristol, City of",South West,2021-02-24,,,1.0,W,Other/Unknown,,,,,,N,,,,20210225
+2929858,384704,Pillar 2,49,Male,Plymouth,Plymouth,South West,2021-02-24,,,4.0,W,Other/Unknown,,,,,,Y,,,,20210225
+2929859,1342437,Pillar 2,42,Female,South Somerset,Somerset,South West,2021-02-24,,,5.0,W,Other/Unknown,,,,,,Y,,,,20210225
+2929860,1841863,Pillar 2,55,Female,South Gloucestershire,South Gloucestershire,South West,2021-02-24,,,9.0,W,Other/Unknown,,,,,,Y,,,,20210225
+2929861,2576349,Pillar 2,35,Female,Mendip,Somerset,South West,2021-02-24,,,7.0,W,Other/Unknown,,,,,,N,,,,20210225
+2929862,2429985,Pillar 2,58,Male,Wiltshire,Wiltshire,South West,2021-02-24,,,7.0,W,Other/Unknown,,,,,,Y,,,,20210225
+2929863,597503,Pillar 2,6,Female,Cheltenham,Gloucestershire,South West,2021-02-24,,,10.0,W,Other/Unknown,,,,,,N,,,,20210225
+2929864,238701,Pillar 2,52,Female,Swindon,Swindon,South West,2021-02-24,,,5.0,W,Other/Unknown,,,,,,Y,,,,20210225
