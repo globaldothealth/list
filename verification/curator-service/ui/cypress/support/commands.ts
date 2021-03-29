@@ -15,6 +15,7 @@ declare global {
                 symptoms?: string[];
                 transmissionPlaces?: string[];
                 uploadIds?: string[];
+                startConfirmedDate?: any;
             }) => void;
             login: (opts?: {
                 name: string;
@@ -39,6 +40,7 @@ export function addCase(opts: {
     symptoms?: string[];
     transmissionPlaces?: string[];
     uploadIds?: string;
+    startConfirmedDate?: any;
 }): void {
     cy.request({
         method: 'POST',
@@ -66,7 +68,7 @@ export function addCase(opts: {
                 {
                     name: 'confirmed',
                     dateRange: {
-                        start: new Date().toJSON(),
+                        start: opts.startConfirmedDate || new Date().toJSON(),
                     },
                     value: opts.methodOfConfirmation,
                 },
