@@ -403,10 +403,12 @@ function RowMenu(props: {
 
 interface DownloadButtonProps {
     totalCasesCount: number;
+    userEmailAddress: string;
 }
 
 export function DownloadButton({
     totalCasesCount,
+    userEmailAddress,
 }: DownloadButtonProps): JSX.Element {
     const location = useLocation<LocationState>();
     const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(
@@ -440,21 +442,25 @@ export function DownloadButton({
                 break;
 
             case 'mailDataset':
-                alert('This function is not ready yet.');
-                // try {
-                //     const response = await axios({
-                //         method: 'post',
-                //         url: '/api/cases/downloadLarge',
-                //         data: { format: formatType, query: searchQuery },
-                //         headers: {
-                //             'Content-Type': 'application/json',
-                //         },
-                //     });
-                // } catch (err) {
-                //     alert(
-                //         'There was an error while downloading data, please try again later.',
-                //     );
-                // }
+                try {
+                    const response = await axios({
+                        method: 'post',
+                        url: '/api/cases/downloadLarge',
+                        data: {
+                            format: formatType,
+                            query: searchQuery,
+                            email: userEmailAddress,
+                        },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    console.log(response);
+                } catch (err) {
+                    alert(
+                        'There was an error while downloading data, please try again later.',
+                    );
+                }
                 break;
 
             case 'partialDataset':
@@ -635,29 +641,37 @@ export function DownloadButton({
                             </span>
                         </Tooltip>
                     )}
-                    {/* {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && ( */}
-                    <Tooltip title={disabledButtonTooltipText} placement="top">
-                        <span>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className={classes.downloadButton}
-                                onClick={() =>
-                                    downloadDataSet(fileFormat, 'mailDataset')
-                                }
-                                disabled={isLoading || downloadButtonDisabled}
-                            >
-                                Download more than {DATA_LIMIT} rows through
-                                link delivered by email
-                            </Button>
-                            <p>
-                                Please add info@global.health to your email
-                                contacts list or check spam so that you don't
-                                miss the download link
-                            </p>
-                        </span>
-                    </Tooltip>
-                    {/* )} */}
+                    {!showFullDatasetButton && totalCasesCount >= DATA_LIMIT && (
+                        <Tooltip
+                            title={disabledButtonTooltipText}
+                            placement="top"
+                        >
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.downloadButton}
+                                    onClick={() =>
+                                        downloadDataSet(
+                                            fileFormat,
+                                            'mailDataset',
+                                        )
+                                    }
+                                    disabled={
+                                        isLoading || downloadButtonDisabled
+                                    }
+                                >
+                                    Download more than {DATA_LIMIT} rows through
+                                    link delivered by email
+                                </Button>
+                                <p>
+                                    Please add info@global.health to your email
+                                    contacts list or check spam so that you
+                                    don't miss the download link
+                                </p>
+                            </span>
+                        </Tooltip>
+                    )}
                 </DialogContent>
             </Dialog>
         </>
