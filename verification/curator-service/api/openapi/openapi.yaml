@@ -585,6 +585,9 @@ paths:
                                 query:
                                     description: Search query to filter data to be downloaded
                                     type: string
+                                email:
+                                    description: Email address to which notification should be sourceEntryId
+                                    type: string
             responses:
                 '200':
                     $ref: '#components/responses/200CasesLargeDownload'
