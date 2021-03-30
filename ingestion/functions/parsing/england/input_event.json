@@ -1,0 +1,8 @@
+{
+    "env": "local",
+    "s3Bucket": "epid-sources-raw",
+    "s3Key": "test/england/england_head5k.csv",
+    "sourceUrl": "https://github.com/nicholasdavies/cfrvoc/tree/main/dataset",
+    "sourceId": "6061e69042b7ae9c589ac9e4"
+}
+
