@@ -1,11 +1,12 @@
 import { SearchParserResult, parse } from 'search-query-parser';
+import { ObjectId } from 'mongodb';
 
 export interface ParsedSearch {
     fullTextSearch?: string;
     dateOperator?: string;
     filters: {
         path: string;
-        values: string[];
+        values: string[] | ObjectId[];
         dateOperator: string;
     }[];
 }
@@ -60,26 +61,33 @@ export default function parseSearchQuery(q: string): ParsedSearch {
 
         // We don't tokenize so "text" is a string, not an array of strings.
         res.fullTextSearch = searchParsedResult.text as string;
-        
-        
-        
         // Get the keywords into our result struct.
         keywords.forEach((path, keyword): void => {
-
             // Enable to filter by date
-            keyword === 'dateconfirmedafter'  ? searchParsedResult.dateOperator = '$gt' : null;
-            keyword ===  'dateconfirmedbefore' ? searchParsedResult.dateOperator = '$lt' : null;
+            keyword === 'dateconfirmedafter'
+                ? (searchParsedResult.dateOperator = '$gt')
+                : null;
+            keyword === 'dateconfirmedbefore'
+                ? (searchParsedResult.dateOperator = '$lt')
+                : null;
 
             if (!searchParsedResult[keyword]) {
                 return;
-            }            
+            }
 
+            if (keyword === 'caseid') {
+                res.filters.push({
+                    path: path,
+                    values: [new ObjectId(searchParsedResult[keyword][0])],
+                    dateOperator: searchParsedResult.dateOperator,
+                });
+            } else {
                 res.filters.push({
                     path: path,
                     values: searchParsedResult[keyword],
                     dateOperator: searchParsedResult.dateOperator,
                 });
-            
+            }
         });
         if (res.filters.length === 0 && !res.fullTextSearch) {
             throw new ParsingError(`Invalid search query ${q}`);
