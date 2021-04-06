@@ -56,9 +56,9 @@ export default function ViewCase(props: Props): JSX.Element {
     useEffect(() => {
         setLoading(true);
         axios
-            .get<Case>(`/api/cases/${props.id}`)
+            .get<Case[]>(`/api/cases/${props.id}`)
             .then((resp) => {
-                setCase(resp.data);
+                setCase(resp.data[0]);
                 setErrorMessage(undefined);
             })
             .catch((e) => {
@@ -150,6 +150,17 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
             containerId: 'scroll-container',
         });
     };
+
+    const isExcluded = () => {
+        if (props.c.isSourceExcluded) {
+            return 'Excluded';
+        } else {
+            return props.c.caseReference.verificationStatus
+                ? props.c.caseReference.verificationStatus
+                : 'Unknown';
+        }
+    };
+
     return (
         <>
             {showNavMenu && (
@@ -242,8 +253,9 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                         </Link>
                     )}
                 </Typography>
-                {props.c.caseReference.verificationStatus ===
-                    VerificationStatus.Excluded && (
+                {(props.c.caseReference.verificationStatus ===
+                    VerificationStatus.Excluded ||
+                    props.c.isSourceExcluded) && (
                     <MuiAlert
                         classes={{ root: classes.alert }}
                         variant="outlined"
@@ -326,12 +338,7 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
 
                             {/* Consider surfacing this as a top-level icon on this page. */}
                             <RowHeader title="Verification status" />
-                            <RowContent
-                                content={
-                                    props.c.caseReference?.verificationStatus ||
-                                    'Unknown'
-                                }
-                            />
+                            <RowContent content={isExcluded()} />
 
                             {props.c.revisionMetadata?.updateMetadata && (
                                 <>
