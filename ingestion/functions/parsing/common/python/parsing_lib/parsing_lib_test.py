@@ -225,14 +225,17 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
 
-    with tempfile.NamedTemporaryFile("wb") as f:
+    fd, fname = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
         parsing_lib.retrieve_raw_data_file(
             input_event[parsing_lib.S3_BUCKET_FIELD],
             input_event[parsing_lib.S3_KEY_FIELD],
             f)
         f.flush()
-        with open(f.name, "r") as f:
+        with open(fname, "r") as f:
             assert json.load(f) == sample_data
+    if os.path.exists(fname):
+        os.remove(fname)
 
 
 def test_extract_event_fields_returns_all_present_fields(input_event):

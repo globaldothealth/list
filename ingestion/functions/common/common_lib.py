@@ -7,6 +7,7 @@ API calls, and it's information that could be easily encoded as state in an
 object.
 """
 
+import os
 import tempfile
 import requests
 
@@ -120,15 +121,16 @@ def obtain_api_credentials(s3_client):
     Creates HTTP headers credentialed for access to the Global Health Source API.
     """
     try:
-        with tempfile.NamedTemporaryFile() as local_creds_file:
+        fd, local_creds_file_name = tempfile.mkstemp()
+        with os.fdopen(fd) as _:
             print(
                 "Retrieving service account credentials from "
                 f"s3://{_METADATA_BUCKET}/{_SERVICE_ACCOUNT_CRED_FILE}")
             s3_client.download_file(_METADATA_BUCKET,
                                     _SERVICE_ACCOUNT_CRED_FILE,
-                                    local_creds_file.name)
+                                    local_creds_file_name)
             credentials = service_account.Credentials.from_service_account_file(
-                local_creds_file.name, scopes=["email"])
+                local_creds_file_name, scopes=["email"])
             headers = {}
             request = google.auth.transport.requests.Request()
             credentials.refresh(request)
