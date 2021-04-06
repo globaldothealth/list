@@ -124,6 +124,10 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: theme.spacing(1),
         marginTop: theme.spacing(1),
     },
+    casebox: {
+        paddingRight: '20px',
+        wordBreak: 'break-all',
+    },
 }));
 
 function ageRange(range?: { start: number; end: number }): string {
@@ -250,7 +254,10 @@ function CaseDetails(props: CaseDetailsProps): JSX.Element {
                     </MuiAlert>
                 )}
                 <Paper className={classes.paper} variant="outlined" square>
-                    <Scroll.Element name="case-data">
+                    <Scroll.Element
+                        name="case-data"
+                        className={classes.casebox}
+                    >
                         <Typography
                             className={classes.sectionTitle}
                             variant="overline"
