@@ -76,9 +76,14 @@ export default function parseSearchQuery(q: string): ParsedSearch {
             }
 
             if (keyword === 'caseid') {
+                const caseIds: ObjectId[] = [];
+                searchParsedResult[keyword].forEach((caseId: string) => {
+                    caseIds.push(new ObjectId(caseId));
+                });
+
                 res.filters.push({
                     path: path,
-                    values: [new ObjectId(searchParsedResult[keyword][0])],
+                    values: caseIds,
                     dateOperator: searchParsedResult.dateOperator,
                 });
             } else {
