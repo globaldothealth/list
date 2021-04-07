@@ -89,7 +89,7 @@ describe('<App />', () => {
         );
         expect(await findByTestId('dictionaryButton')).toHaveAttribute(
             'href',
-            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/case_fields.yaml',
+            'https://github.com/globaldothealth/list/blob/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
         );
         expect(await findByTestId('acknowledgmentsButton')).toHaveAttribute(
             'href',
