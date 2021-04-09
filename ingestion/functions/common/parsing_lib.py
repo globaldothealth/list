@@ -13,7 +13,7 @@ import common_lib
 
 ENV_FIELD = "env"
 SOURCE_URL_FIELD = "sourceUrl"
-S3_BUCKET_FIELD = os.environ.get("BUCKET_NAME" , "s3bucket")
+S3_BUCKET_FIELD = "s3Bucket"
 S3_KEY_FIELD = "s3Key"
 SOURCE_ID_FIELD = "sourceId"
 UPLOAD_ID_FIELD = "uploadId"

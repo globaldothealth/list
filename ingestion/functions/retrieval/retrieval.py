@@ -26,6 +26,14 @@ CSV_CHUNK_BYTES = 2 * 1024 * 1024
 lambda_client = boto3.client("lambda", region_name="us-east-1")
 s3_client = boto3.client("s3")
 
+if os.environ.get("DOCKERIZED"):
+    s3_client = boto3.client("s3",
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
+        region_name=os.environ.get("AWS_REGION", "us-east-1")
+    )
+
 # Layer code, like common_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
 # pylint: disable=import-error
