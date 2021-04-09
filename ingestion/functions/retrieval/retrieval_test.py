@@ -101,11 +101,10 @@ def test_lambda_handler_e2e(valid_event, requests_mock,
     # Mock the request to retrieval source details (e.g. format).
     date_filter = {"numDaysBeforeToday": 2, "op": "EQ"}
     full_source_url = f"{_SOURCE_API_URL}/sources/{source_id}"
-    lambda_arn = "arn"
     requests_mock.get(
         full_source_url,
         json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": lambda_arn}},
+              "automation": {"parser": {"awsLambdaArn": "arn"}},
               "dateFilter": date_filter})
 
     # Mock the request to retrieve source content.
@@ -116,7 +115,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock,
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         valid_event["env"],
-        lambda_arn, source_id, upload_id, {}, None,
+        source_id, upload_id, {}, None,
         response["key"],
         origin_url, date_filter, valid_event["parsingDateRange"])
     assert requests_mock.request_history[0].url == create_upload_url
