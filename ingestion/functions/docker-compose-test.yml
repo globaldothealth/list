@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile-test
+    env_file: ./.env
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - services=s3
+      - DEBUG=1
