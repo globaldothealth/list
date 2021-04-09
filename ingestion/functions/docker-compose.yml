@@ -8,6 +8,4 @@ services:
     env_file: ./.env
   localstack:
     image: localstack/localstack:latest
-    environment:
-      - services=s3
-      - DEBUG=1
+    env_file: ./.env
