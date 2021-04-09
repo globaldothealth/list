@@ -101,15 +101,6 @@ def mock_source_api_url_fixture():
 
 
 @pytest.fixture()
-def input_event():
-    """Loads valid Event input from file."""
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, "input_event.json")
-    with open(file_path) as event_file:
-        return json.load(event_file)
-
-
-@pytest.fixture()
 def sample_data():
     """Loads sample source data from file."""
     current_dir = os.path.dirname(__file__)
@@ -125,7 +116,7 @@ class FakeContext:
 
 @pytest.mark.skipif(True, reason="FIXME")
 def test_run_lambda_e2e(
-    input_event, sample_data, requests_mock,
+    sample_data, requests_mock,
         mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
