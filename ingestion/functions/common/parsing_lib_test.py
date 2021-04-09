@@ -14,10 +14,10 @@ import datetime
 from unittest.mock import MagicMock, patch
 
 try:
-    from parsing_lib import s3_client, S3_BUCKET_FIELD, S3_KEY_FIELD
+    from parsing_lib import s3_client
 except ImportError:
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from parsing_lib import s3_client, S3_BUCKET_FIELD, S3_KEY_FIELD
+    from parsing_lib import s3_client
 
 try:
     import common_lib
@@ -107,6 +107,15 @@ def mock_source_api_url_fixture():
 
 
 @pytest.fixture()
+def input_event():
+    """Loads valid Event input from file."""
+    current_dir = os.path.dirname(__file__)
+    file_path = os.path.join(current_dir, "input_event.json")
+    with open(file_path) as event_file:
+        return json.load(event_file)
+
+
+@pytest.fixture()
 def sample_data():
     """Loads sample source data from file."""
     current_dir = os.path.dirname(__file__)
@@ -120,18 +129,18 @@ class FakeContext:
         return 42
 
 
-# @pytest.mark.skipif(True, reason="FIXME")
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
 def test_run_lambda_e2e(
-    sample_data, requests_mock,
+    input_event, sample_data, requests_mock,
         mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
     common_lib.login = MagicMock(name="login")
-    # s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
 
     s3_client.put_object(
-        Bucket=S3_BUCKET_FIELD,
-        Key=S3_KEY_FIELD,
+        Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
+        Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
 
     # Mock the batch upsert call.
@@ -147,9 +156,8 @@ def test_run_lambda_e2e(
 
     # Delete the provided upload ID to force parsing_lib to create a new upload.
     # Mock the create and update upload calls.
-    # del input_event[parsing_lib.UPLOAD_ID_FIELD]
-    # base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
-    base_upload_url = f"{_SOURCE_API_URL}/sources/sourceId/uploads"
+    del input_event[parsing_lib.UPLOAD_ID_FIELD]
+    base_upload_url = f"{_SOURCE_API_URL}/sources/{input_event['sourceId']}/uploads"
     create_upload_url = base_upload_url
     upload_id = "123456789012345678901234"
     requests_mock.post(
@@ -164,26 +172,23 @@ def test_run_lambda_e2e(
               "summary": {"numCreated": num_created, "numUpdated": num_updated}})
 
     # Mock the excluded case IDs endpoint call.
-    # start_date = input_event[parsing_lib.DATE_RANGE_FIELD]["start"]
-    # end_date = input_event[parsing_lib.DATE_RANGE_FIELD]["end"]
-    start_date = "04/02/42"
-    end_date = "05/03/53"
+    start_date = input_event[parsing_lib.DATE_RANGE_FIELD]["start"]
+    end_date = input_event[parsing_lib.DATE_RANGE_FIELD]["end"]
     excluded_case_ids_url = f"{_SOURCE_API_URL}/excludedCaseIds?sourceId={_SOURCE_ID}&dateFrom={start_date}&dateTo={end_date}"
     requests_mock.register_uri(
                 "GET", excluded_case_ids_url,
                 [{"json": {"cases": []},
                   "status_code": 200}])
 
-    # response = parsing_lib.run_lambda(
-    #     input_event, fake_parsing_fn)
+    response = parsing_lib.run_lambda(
+        input_event, fake_parsing_fn)
 
-    # assert requests_mock.request_history[0].url == create_upload_url
-    # assert requests_mock.request_history[1].url == excluded_case_ids_url
-    # assert requests_mock.request_history[2].url == full_source_url
-    # assert requests_mock.request_history[3].url == update_upload_url
-    # assert response["count_created"] == num_created
-    # assert response["count_updated"] == num_updated
-    assert True
+    assert requests_mock.request_history[0].url == create_upload_url
+    assert requests_mock.request_history[1].url == excluded_case_ids_url
+    assert requests_mock.request_history[2].url == full_source_url
+    assert requests_mock.request_history[3].url == update_upload_url
+    assert response["count_created"] == num_created
+    assert response["count_updated"] == num_updated
 
 
 def test_batch_of():
@@ -194,11 +199,11 @@ def test_batch_of():
     assert parsing_lib.batch_of(items, 3) == []
 
 
-@pytest.mark.skipif(True, reason="FIXME")
-def test_retrieve_raw_data_file_stores_s3_in_local_file(sample_data):
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
+def test_retrieve_raw_data_file_stores_s3_in_local_file(input_event, sample_data):
     import parsing_lib  # Import locally to avoid superseding mock
-    # s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
-    s3.put_object(
+    s3_client.put_object(
         Bucket=input_event[parsing_lib.S3_BUCKET_FIELD],
         Key=input_event[parsing_lib.S3_KEY_FIELD],
         Body=json.dumps(sample_data))
@@ -216,8 +221,7 @@ def test_retrieve_raw_data_file_stores_s3_in_local_file(sample_data):
         os.remove(fname)
 
 
-@pytest.mark.skipif(True, reason="FIXME")
-def test_extract_event_fields_returns_all_present_fields():
+def test_extract_event_fields_returns_all_present_fields(input_event):
     import parsing_lib  # Import locally to avoid superseding mock
     assert parsing_lib.extract_event_fields(input_event) == (
         input_event[parsing_lib.ENV_FIELD],
@@ -231,24 +235,21 @@ def test_extract_event_fields_returns_all_present_fields():
         input_event[parsing_lib.AUTH_FIELD])
 
 
-@pytest.mark.skipif(True, reason="FIXME")
-def test_extract_event_fields_errors_if_missing_bucket_field():
+def test_extract_event_fields_errors_if_missing_bucket_field(input_event):
     import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_BUCKET_FIELD):
         del input_event[parsing_lib.S3_BUCKET_FIELD]
         parsing_lib.extract_event_fields(input_event)
 
 
-@pytest.mark.skipif(True, reason="FIXME")
-def test_extract_event_fields_errors_if_missing_key_field():
+def test_extract_event_fields_errors_if_missing_key_field(input_event):
     import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.S3_KEY_FIELD):
         del input_event[parsing_lib.S3_KEY_FIELD]
         parsing_lib.extract_event_fields(input_event)
 
 
-@pytest.mark.skipif(True, reason="FIXME")
-def test_extract_event_fields_errors_if_missing_env_field():
+def test_extract_event_fields_errors_if_missing_env_field(input_event):
     import parsing_lib  # Import locally to avoid superseding mock
     with pytest.raises(ValueError, match=parsing_lib.ENV_FIELD):
         del input_event[parsing_lib.ENV_FIELD]
