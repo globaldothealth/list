@@ -690,7 +690,9 @@ def lambda_handler(tempdir=EFS_PATH):
     #    event)
     env = os.environ['EPID_INGESTION_ENV']
     source_id = os.environ['EPID_INGESTION_SOURCE_ID']
-    parsing_date_range = os.getenv('EPID_INGESTION_PARSING_DATE_RANGE',{})
+    parsing_date_range = os.getenv('EPID_INGESTION_PARSING_DATE_RANGE', {})
+    if isinstance(parsing_date_range, str):  # date range specified with comma
+        parsing_date_range = dict(zip(["start", "end"], parsing_date_range.split(",")))
     local_auth = os.getenv('EPID_INGESTION_AUTH',{})
    
     auth_headers = None
