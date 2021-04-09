@@ -58,7 +58,7 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(
         url) == "http://foo.bar/2020-06-08/6/8.json"
 
-@pytest.skipIf(True)
+@pytest.mark.skipIf(True)
 def test_lambda_handler_e2e(valid_event, requests_mock, s3,
                             mock_source_api_url_fixture, tempdir="/tmp"):
     from retrieval import retrieval  # Import locally to avoid superseding mock
