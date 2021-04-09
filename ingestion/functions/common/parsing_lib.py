@@ -31,6 +31,14 @@ CASES_BATCH_SIZE = 250
 
 s3_client = boto3.client("s3")
 
+if os.environ.get("DOCKERIZED"):
+    s3_client = boto3.client("s3",
+        endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
+        region_name=os.environ.get("AWS_REGION", "us-east-1")
+    )
+
 def extract_event_fields(event: Dict):
     print('Extracting fields from event', event)
     if any(
