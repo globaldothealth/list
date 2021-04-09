@@ -359,11 +359,12 @@ def raw_content(url: str, content: bytes, tempdir: str = EFS_PATH) -> io.BytesIO
     if mimetype == "application/zip":
         print('File seems to be a zip file, decompressing it now')
         # Writing the zip file to temp dir.
-        with tempfile.NamedTemporaryFile("wb", delete=False, dir=tempdir) as temp:
+        fd, temp_name = tempfile.mkstemp(dir=tempdir)
+        with os.fdopen(fd, 'wb') as temp:
             temp.write(content)
             temp.flush()
             # Opening the zip file, extracting its first file.
-            with zipfile.ZipFile(temp.name, "r") as zf:
+            with zipfile.ZipFile(temp_name, "r") as zf:
                 for name in zf.namelist():
                     with zf.open(name) as f:
                         return io.BytesIO(f.read())
@@ -425,7 +426,8 @@ def retrieve_content_csv(
         chunk_s3 = []
         while content:
             lines = content.split("\n")
-            with tempfile.NamedTemporaryFile("w", encoding="utf-8", delete=False, dir=tempdir) as outfile:
+            fd, outfile_name = tempfile.mkstemp(dir=tempdir)
+            with os.fdopen(fd, "w", encoding="utf-8") as outfile:
                 if csv_header:
                     outfile.write(csv_header)
                 outfile.write(unwritten_chunk + "\n".join(lines[:-1]) + "\n")
@@ -434,12 +436,12 @@ def retrieve_content_csv(
                 f"{source_id}"
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
                 f"{key_filename_part}.{chunk_n}")
-            chunk_s3.append((outfile.name, s3_object_key))
+            chunk_s3.append((outfile_name, s3_object_key))
             chunk_n += 1
             content = text_stream.read(chunk_bytes)
 
         if unwritten_chunk:
-            with codecs.open(outfile.name, "a", 'utf-8') as outfile:
+            with codecs.open(outfile_name, "a", 'utf-8') as outfile:
                 outfile.write(unwritten_chunk)
 
         return chunk_s3
@@ -488,7 +490,8 @@ def retrieve_content(
         detected_enc = detect(bytesio.read(2 << 20))
         bytesio.seek(0)
         print(f'Source encoding is presumably {detected_enc}')
-        with tempfile.NamedTemporaryFile("w", encoding='utf-8', delete=False, dir=tempdir) as outfile:
+        fd, outfile_name = tempfile.mkstemp(dir=tempdir)
+        with os.fdopen(fd, "w", encoding='utf-8') as outfile:
             text_stream = codecs.getreader(detected_enc['encoding'])(bytesio)
             # Write the output file as utf-8 in chunks because decoding the
             # whole data in one shot becomes really slow with big files.
@@ -500,7 +503,7 @@ def retrieve_content(
                 f"{source_id}"
                 f"{datetime.now(timezone.utc).strftime(TIME_FILEPART_FORMAT)}"
                 f"{key_filename_part}")
-            return [(outfile.name, s3_object_key)]
+            return [(outfile_name, s3_object_key)]
     except requests.exceptions.RequestException as e:
         upload_error = (
             common_lib.UploadError.SOURCE_CONTENT_NOT_FOUND

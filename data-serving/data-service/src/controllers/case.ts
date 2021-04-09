@@ -91,14 +91,10 @@ export class CasesController {
             res.setHeader('Pragma', 'no-cache');
             axios
                 .get<string>(
-                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/case_fields.yaml',
+                    'https://raw.githubusercontent.com/globaldothealth/list/main/data-serving/scripts/export-data/functions/01-split/fields.txt',
                 )
                 .then((yamlRes) => {
-                    const dataDictionary = yaml.safeLoad(yamlRes.data);
-                    const columns = (dataDictionary as Array<{
-                        name: string;
-                        description: string;
-                    }>).map((datum) => datum.name);
+                    const columns = yamlRes.data.split('\n');
                     const parsedCases = _.map(
                         matchingCases,
                         parseDownloadedCase,
@@ -130,6 +126,7 @@ export class CasesController {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
         const countLimit = Number(req.query.count_limit) || 10000;
+        
         if (page < 1) {
             res.status(422).json({ message: 'page must be > 0' });
             return;
@@ -757,17 +754,18 @@ export class CasesController {
     private caseAggregationFromQuery(queryText: string) {
         let casesQuery: any[] = [];
         const parsedSearch = parseSearchQuery(queryText);
+
         const query = parsedSearch.fullTextSearch
             ? {
                   $text: { $search: parsedSearch.fullTextSearch },
               }
             : {};
-        casesQuery = [
-            {
-                $match: query,
-            },
-        ];
-        const filters = parsedSearch.filters.map((f) => {
+            
+            casesQuery = [
+               {$match: query}
+             ];             
+   
+        const filters = parsedSearch.filters.map((f) => {            
             if (f.values.length == 1) {
                 const searchTerm = f.values[0];
                 if (searchTerm === '*') {
@@ -778,12 +776,17 @@ export class CasesController {
                             },
                         },
                     };
-                } else {
-                    return {
-                        $match: {
-                            [f.path]: f.values[0],
-                        },
-                    };
+                } else {                    
+                    if (f.dateOperator) {
+                        return {
+                            $match: {[f.path]: { [f.dateOperator]: new Date(f.values[0].toString())}}}
+                    } else {
+                        return {
+                            $match: {
+                                [f.path]: f.values[0],
+                            },
+                        };
+                    }
                 }
             } else {
                 return {
@@ -801,18 +804,26 @@ export class CasesController {
 
     /**
      * Geocodes a single location.
+     * @param canBeFuzzy The location is allowed to be "fuzzy", in which case it may not get geocoded.
      * @returns The geocoded location.
      * @throws GeocodeNotFoundError if no geocode could be found.
      * @throws InvalidParamError if location.query is not specified and location
      *         is not complete already.
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private async geocodeLocation(location: any): Promise<any> {
+    private async geocodeLocation(
+        location: any,
+        canBeFuzzy: boolean,
+    ): Promise<any> {
         // Geocode using location.query if no lat lng were provided.
         if (location?.geometry?.latitude && location.geometry?.longitude) {
             return location;
         }
         if (!location?.query) {
+            if (canBeFuzzy) {
+                // no problem, just give back what we received
+                return location;
+            }
             throw new InvalidParamError(
                 'location.query must be specified to be able to geocode',
             );
@@ -872,9 +883,15 @@ export class CasesController {
     // batch geocoding API for such cases.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private async geocode(req: Request | any): Promise<void> {
-        req.body['location'] = await this.geocodeLocation(req.body['location']);
+        req.body['location'] = await this.geocodeLocation(
+            req.body['location'],
+            false,
+        );
         for (const travel of req.body.travelHistory?.travel || []) {
-            travel['location'] = await this.geocodeLocation(travel.location);
+            travel['location'] = await this.geocodeLocation(
+                travel.location,
+                true,
+            );
         }
     }
 }

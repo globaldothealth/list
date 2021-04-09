@@ -140,6 +140,8 @@ const SearchGuideDialog = ({
                             <li>admin2</li>
                             <li>admin3</li>
                             <li>variant</li>
+                            <li>dateconfirmedbefore</li>
+                            <li>dateconfirmedafter</li>
                         </ul>
                     </Box>
                 </div>
