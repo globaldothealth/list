@@ -9,8 +9,6 @@ import zipfile
 
 from unittest.mock import MagicMock, patch
 
-_SOURCE_API_URL = "http://foo.bar"
-
 try:
     import common_lib
 except ImportError:
@@ -20,6 +18,15 @@ except ImportError:
             os.pardir, 'common'))
     import common_lib
 
+
+s3_client = boto3.client("s3",
+    endpoint_url=os.environ.get("AWS_ENDPOINT", "http://localstack:4566"),
+    aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID", "test"),
+    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY", "test"),
+    region_name=os.environ.get("AWS_REGION", "us-east-1")
+)
+
+_SOURCE_API_URL = "http://foo.bar"
 
 @pytest.fixture()
 def mock_source_api_url_fixture():
@@ -58,7 +65,8 @@ def test_format_url(mock_today):
     assert retrieval.format_source_url(
         url) == "http://foo.bar/2020-06-08/6/8.json"
 
-@pytest.mark.skipif(True, reason="FIXME")
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
 def test_lambda_handler_e2e(valid_event, requests_mock,
                             mock_source_api_url_fixture, tempdir="/tmp"):
     from retrieval import retrieval  # Import locally to avoid superseding mock
@@ -69,7 +77,6 @@ def test_lambda_handler_e2e(valid_event, requests_mock,
     common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials", return_value={})
     retrieval.invoke_parser = MagicMock(name="invoke_parser")
-    s3.create_bucket(Bucket=retrieval.OUTPUT_BUCKET)
 
     # Set up mock request values used in multiple requests.
     # TODO: Complete removal of URL env var.
@@ -345,7 +352,8 @@ def test_retrieve_content_raises_error_if_other_errors_getting_source_content(
     assert not "Should have raised an exception."
 
 
-@pytest.mark.skipif(True, reason="FIXME")
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
 def test_upload_to_s3_writes_indicated_file_to_key():
     from retrieval import retrieval  # Import locally to avoid superseding mock
     local_file = "/tmp/data.txt"
@@ -353,17 +361,17 @@ def test_upload_to_s3_writes_indicated_file_to_key():
     with open(local_file, "w") as f:
         f.write(expected_data)
     expected_s3_bucket = retrieval.OUTPUT_BUCKET
-    s3.create_bucket(Bucket=expected_s3_bucket)
     expected_s3_key = "objectkey"
     retrieval.upload_to_s3(local_file, expected_s3_key,
                            "", "", "", {}, {})  # api creds
-    actual_object = s3.get_object(
+    actual_object = s3_client.get_object(
         Bucket=expected_s3_bucket, Key=expected_s3_key)
     s3_data = actual_object['Body'].read().decode("utf-8")
     assert s3_data == expected_data
 
 
-@pytest.mark.skipif(True, reason="FIXME")
+@pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
+                    reason="Running integration tests outside of mock environment disabled")
 def test_upload_to_s3_raises_error_on_s3_error(
         requests_mock, mock_source_api_url_fixture):
     from retrieval import retrieval  # Import locally to avoid superseding mock
