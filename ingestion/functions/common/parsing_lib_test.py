@@ -123,9 +123,9 @@ class FakeContext:
         return 42
 
 
-@pytest.mark.skipIf(True)
+@pytest.mark.skipif(True, reason="FIXME")
 def test_run_lambda_e2e(
-    input_event, sample_data, requests_mock, s3,
+    input_event, sample_data, requests_mock,
         mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
     common_lib = mock_source_api_url_fixture
@@ -192,9 +192,9 @@ def test_batch_of():
     assert parsing_lib.batch_of(items, 3) == []
 
 
-@pytest.mark.skipIf(True)
+@pytest.mark.skipif(True, reason="FIXME")
 def test_retrieve_raw_data_file_stores_s3_in_local_file(
-        input_event, s3, sample_data):
+        input_event, sample_data):
     import parsing_lib  # Import locally to avoid superseding mock
     s3.create_bucket(Bucket=input_event[parsing_lib.S3_BUCKET_FIELD])
     s3.put_object(
