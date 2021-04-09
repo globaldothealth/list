@@ -85,7 +85,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   IndiaParsingFunction:
@@ -97,7 +97,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   HongKongParsingFunction:
@@ -109,7 +109,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   ExampleParsingFunction:
@@ -121,7 +121,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
@@ -134,7 +134,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -147,7 +147,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
@@ -161,7 +161,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -174,7 +174,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   GermanyParsingFunction:
@@ -186,7 +186,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
@@ -199,7 +199,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -212,7 +212,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilParaibaParsingFunction:
@@ -224,7 +224,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilRGDSParsingFunction:
@@ -236,7 +236,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   ColombiaParsingFunction:
@@ -248,7 +248,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -261,7 +261,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   MexicoParsingFunction:
@@ -273,7 +273,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -286,7 +286,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -299,7 +299,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   SaoPaoloParsingFunction:
@@ -311,7 +311,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 512
       Layers:
         - !Ref ParsingLibLayer
@@ -324,7 +324,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilAcreParsingFunction:
@@ -336,7 +336,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilEspiritoSantoParsingFunction:
@@ -348,7 +348,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilGoiasParsingFunction:
@@ -360,7 +360,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   USAParsingFunction:
@@ -372,7 +372,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       MemorySize: 1024
       Layers:
         - !Ref ParsingLibLayer
@@ -385,7 +385,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   ParaguayParsingFunction:
@@ -397,7 +397,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   SouthAfricaParsingFunction:
@@ -409,7 +409,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   CzechiaParsingFunction:
@@ -421,7 +421,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilCearaParsingFunction:
@@ -433,7 +433,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilRioDeJaneiroParsingFunction:
@@ -445,7 +445,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   RepublicOfKoreaParsingFunction:
@@ -457,7 +457,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   NewZealandParsingFunction:
@@ -469,7 +469,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   ScotlandParsingFunction:
@@ -481,7 +481,7 @@ Resources:
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AWSLambdaReadOnlyAccess
+        - AWSLambda_ReadOnlyAccess
       Layers:
         - !Ref ParsingLibLayer
   BrazilSantaCatarinaParsingFunction:
@@ -490,6 +490,30 @@ Resources:
       CodeUri: parsing/brazil_santa_catarina/
       Handler: santa_catarina.lambda_handler
       Description: Parse case data for Santa Catarina State of Brazil
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  VariantsParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/variants/
+      Handler: variants.lambda_handler
+      Description: Parse case data for Variants of Concern
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+      Layers:
+        - !Ref ParsingLibLayer
+  EnglandParsingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: parsing/england/
+      Handler: england.lambda_handler
+      Description: Parse case data for England
       # Function's execution role
       Policies:
         - AWSLambdaBasicExecutionRole

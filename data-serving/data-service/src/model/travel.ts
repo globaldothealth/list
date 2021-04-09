@@ -1,12 +1,12 @@
 import { DateRangeDocument, dateRangeSchema } from './date-range';
-import { LocationDocument, locationSchema } from './location';
+import { FuzzyLocationDocument, fuzzyLocationSchema } from './location';
 
 import mongoose from 'mongoose';
 
 export const travelSchema = new mongoose.Schema(
     {
         dateRange: dateRangeSchema,
-        location: locationSchema,
+        location: fuzzyLocationSchema,
         methods: [String],
         purpose: String,
     },
@@ -15,7 +15,7 @@ export const travelSchema = new mongoose.Schema(
 
 export type TravelDocument = mongoose.Document & {
     dateRange: DateRangeDocument;
-    location: LocationDocument;
+    location: FuzzyLocationDocument;
     methods: [string];
     purpose: string;
 };

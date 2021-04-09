@@ -285,11 +285,12 @@ def run_lambda(
         upload_id = common_lib.create_upload_record(
             env, source_id, api_creds, cookies)
     try:
-        local_data_file = tempfile.NamedTemporaryFile("wb")
+        fd, local_data_file_name = tempfile.mkstemp()
+        local_data_file = os.fdopen(fd, "wb")
         retrieve_raw_data_file(s3_bucket, s3_key, local_data_file)
-        print(f'Raw file retrieved at {local_data_file.name}')
+        print(f'Raw file retrieved at {local_data_file_name}')
         case_data = parsing_function(
-            local_data_file.name, source_id,
+            local_data_file_name, source_id,
             source_url)
         excluded_case_ids = retrieve_excluded_case_ids(source_id, date_filter, date_range, env)
         final_cases = prepare_cases(case_data, upload_id, excluded_case_ids)
@@ -311,3 +312,7 @@ def run_lambda(
         common_lib.complete_with_error(
             e, env, common_lib.UploadError.INTERNAL_ERROR, source_id, upload_id,
             api_creds, cookies)
+    finally:
+        local_data_file.close()
+        if os.path.exists(local_data_file_name):
+            os.remove(local_data_file_name)

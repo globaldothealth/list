@@ -9,6 +9,7 @@ import {
     screen,
     within,
 } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 
 jest.mock('axios');
@@ -188,5 +189,41 @@ describe('<App />', () => {
                 within(profileMenu).getByText(/View source on Github/i),
             ).toBeInTheDocument();
         });
+    });
+
+    it('it adds the date confirmed filter by clicking on column header', async () => {
+        const axiosResponse = {
+            data: {
+                name: 'Alice Smith',
+                email: 'foo@bar.com',
+                roles: ['admin'],
+            },
+            status: 200,
+            statusText: 'OK',
+            config: {},
+            headers: {},
+        };
+        mockedAxios.get.mockResolvedValueOnce(axiosResponse);
+        const history = createMemoryHistory({
+            initialEntries: ['/cases'],
+            initialIndex: 0,
+        });
+
+        render(
+            <Router history={history}>
+                <App />
+            </Router>,
+        );
+
+        const searchField = (await screen.findByPlaceholderText(
+            /Search/i,
+        )) as HTMLInputElement;
+        const columnHeader = screen.getByText(/Confirmed Date/i);
+
+        expect(searchField).toBeInTheDocument();
+        expect(searchField.value).toBe('');
+        userEvent.click(columnHeader);
+
+        expect(searchField.value).toBe('dateconfirmedafter:');
     });
 });
