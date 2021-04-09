@@ -46,7 +46,8 @@ RUN poetry install --no-dev
 # `development` image is used during development / testing
 FROM python-base as development
 
-RUN apt-get update && apt-get upgrade -y curl
+RUN apt-get update && apt-get upgrade -y curl \
+      awscli
 
 WORKDIR $PYSETUP_PATH
 
