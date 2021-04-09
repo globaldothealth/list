@@ -236,6 +236,16 @@ are run with the correct Python version. E.g.,
 python3.8 -m pytest test/my_test.py
 ```
 
+#### Integration and End-to-end tests
+
+Testing beyond unit level happens inside of a docker-compose stack.
+
+To run, [install Docker](https://docs.docker.com/get-docker/), and then run
+
+```shell
+./test_docker.sh
+```
+
 #### Manual local run
 
 **IMPORTANT**: Local runs still require access to a service account hosted on s3. Follow #754 for updates on how to run functions with your own creds.
