@@ -233,7 +233,7 @@ def invoke_parser(
     }
     print(f"Invoking parser ({python_module})")
     sys.path.append(Path(__file__).parent.parent)  # ingestion/functions
-    importlib.import_module(python_module).lambda_handler(payload)
+    importlib.import_module(python_module).event_handler(payload)
 
 
 def get_today():
@@ -264,7 +264,7 @@ def format_source_url(url: str) -> str:
     return url
 
 
-def lambda_handler(tempdir=EFS_PATH):
+def run_retrieval(tempdir=EFS_PATH):
     """Global ingestion retrieval function.
 
     Parameters
@@ -330,5 +330,5 @@ def lambda_handler(tempdir=EFS_PATH):
 
 
 if __name__ == "__main__":
-    lambda_handler(tempdir=EFS_PATH)
+    run_retrieval(tempdir=EFS_PATH)
 

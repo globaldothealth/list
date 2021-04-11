@@ -131,7 +131,7 @@ class FakeContext:
 
 @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
                     reason="Running integration tests outside of mock environment disabled")
-def test_run_lambda_e2e(
+def test_e2e(
     input_event, sample_data, requests_mock,
         mock_source_api_url_fixture):
     import parsing_lib  # Import locally to avoid superseding mock
@@ -180,8 +180,7 @@ def test_run_lambda_e2e(
                 [{"json": {"cases": []},
                   "status_code": 200}])
 
-    response = parsing_lib.run_lambda(
-        input_event, fake_parsing_fn)
+    response = parsing_lib.run(input_event, fake_parsing_fn)
 
     assert requests_mock.request_history[0].url == create_upload_url
     assert requests_mock.request_history[1].url == excluded_case_ids_url

@@ -106,10 +106,10 @@ def parse_cases(raw_data_file, source_id, source_url):
 
 
 
-def lambda_handler(event):
-    return parsing_lib.run_lambda(event, parse_cases)
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
 
 if __name__ == "__main__":
     with open('input_event.json') as f:
         event = json.load(f)
-        lambda_handler(event)
+        event_handler(event)

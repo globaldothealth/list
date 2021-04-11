@@ -67,12 +67,11 @@ def test_format_url(mock_today):
 
 @pytest.mark.skipif(not os.environ.get("DOCKERIZED", False),
                     reason="Running integration tests outside of mock environment disabled")
-def test_lambda_handler_e2e(valid_event, requests_mock,
-                            mock_source_api_url_fixture, tempdir="/tmp"):
+def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/tmp"):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     print(valid_event)
 
-    # Mock/stub retrieving credentials, invoking the parser lambda, and S3.
+    # Mock/stub retrieving credentials, invoking the parser, and S3.
     common_lib = mock_source_api_url_fixture
     common_lib.obtain_api_credentials = MagicMock(
         name="obtain_api_credentials", return_value={})
@@ -110,7 +109,7 @@ def test_lambda_handler_e2e(valid_event, requests_mock,
     # Mock the request to retrieve source content.
     requests_mock.get(origin_url, json={"data": "yes"})
 
-    response = retrieval.lambda_handler(tempdir=tempdir)
+    response = retrieval.run_retrieval(tempdir=tempdir)
 
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
