@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import csv
+import json
 
 # Layer code, like parsing_lib, is added to the path by AWS.
 # To test locally (e.g. via pytest), we have to modify sys.path.
@@ -164,6 +165,12 @@ def parse_cases(raw_data_file, source_id, source_url):
                     case["caseReference"]["sourceEntryId"] = f"B.1.351_{case_count}"
                     case_count += 1
                     yield case
-                
-def lambda_handler(event, context):
-    return parsing_lib.run_lambda(event, context, parse_cases)
+
+
+def lambda_handler(event):
+    return parsing_lib.run_lambda(event, parse_cases)
+
+if __name__ == "__main__":
+    with open('input_event.json') as f:
+        event = json.load(f)
+        lambda_handler(event)
