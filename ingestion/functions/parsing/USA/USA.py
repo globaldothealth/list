@@ -203,10 +203,10 @@ def prepare_manual_import(raw_data_file: str, source_url: str, last_date: str = 
             f.write(json.dumps(c) + "\n")
 
 
-def lambda_handler(event):
-    return parsing_lib.run_lambda(event, parse_cases)
+def event_handler(event):
+    return parsing_lib.run(event, parse_cases)
 
 if __name__ == "__main__":
     with open('input_event.json') as f:
         event = json.load(f)
-        lambda_handler(event)
+        event_handler(event)

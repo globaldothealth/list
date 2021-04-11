@@ -245,7 +245,7 @@ def filter_cases_by_date(
         return case_data
 
 
-def run_lambda(
+def run(
         event: Dict,
         parsing_function: Callable[[str, str, str], Generator[Dict, None, None]]):
     """
@@ -257,11 +257,6 @@ def run_lambda(
         Input event JSON-as-dict.
         This must contain `s3Bucket`, `s3Key`, and `sourceUrl` fields specifying
         the details of the stored source content.
-
-    context: object, required
-        Lambda Context runtime methods and attributes.
-        For more information, see:
-          https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
     parsing_function: function, required
         Python function that parses raw source data into G.h case data.
