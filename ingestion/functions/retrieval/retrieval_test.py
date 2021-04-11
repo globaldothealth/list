@@ -254,21 +254,6 @@ def test_retrieve_content_persists_downloaded_csv_locally(requests_mock):
     with open(files_s3_keys[0][0], "r") as f:
         assert f.read().strip() == "foo,bar\nbaz,quux"
 
-def test_retrieve_content_persists_downloaded_csv_locally_chunked(requests_mock):
-    from retrieval import retrieval  # Import locally to avoid superseding mock
-    source_id = "id"
-    content_url = "http://foo.bar/"
-    format = "CSV"
-    requests_mock.get(content_url, content=b"foo,bar\nbaz,quux\nbuzz,beak\ndew,drop\n")
-    files_s3_keys = retrieval.retrieve_content(
-        "env", source_id, "upload_id", content_url, format, {}, {}, chunk_bytes=16, tempdir="/tmp")
-    assert requests_mock.request_history[0].url == content_url
-    assert "GHDSI" in requests_mock.request_history[0].headers["user-agent"]
-    with open(files_s3_keys[0][0], "r") as f:
-        assert f.read().strip() == "foo,bar\nbaz,quux"
-    with open(files_s3_keys[1][0], "r") as f:
-        assert f.read().strip() == "foo,bar\nbuzz,beak\ndew,drop"
-
 def test_retrieve_content_returns_local_and_s3_object_names(requests_mock):
     from retrieval import retrieval  # Import locally to avoid superseding mock
     source_id = "id"
