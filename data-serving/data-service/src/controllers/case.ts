@@ -754,7 +754,7 @@ export class CasesController {
     private caseAggregationFromQuery(queryText: string) {
         let casesQuery: any[] = [];
         const parsedSearch = parseSearchQuery(queryText);
-
+        
         const query = parsedSearch.fullTextSearch
             ? {
                   $text: { $search: parsedSearch.fullTextSearch },
@@ -798,7 +798,7 @@ export class CasesController {
                 };
             }
         });
-        casesQuery = _.concat(casesQuery, filters);
+        casesQuery = _.concat(casesQuery, filters);        
         return casesQuery;
     }
 
