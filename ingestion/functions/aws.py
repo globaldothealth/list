@@ -41,7 +41,7 @@ class AWSParserManager:
 
         parser = argparse.ArgumentParser(
             description="Manage AWS Batch for ingestion",
-            usage="""python aws.py <command> [--region=<region>]
+            usage="""python aws.py <command> [<options>]
 
 register\tRegister or update a Batch job definition
 list\t\tList parsers for which job definitions can be registered
@@ -51,9 +51,8 @@ list-compute\tList compute environments
         )
 
         parser.add_argument("command", help="Subcommand to run")
-        parser.add_argument("--region", help="AWS region", default=AWS_REGION)
-        args = parser.parse_args(sys.argv[1:2])  # only parse command
-        self.client = boto3.client("batch", args.region)
+        args = parser.parse_args(sys.argv[1:3])  # only parse command
+        self.client = boto3.client("batch", AWS_REGION)
         getattr(
             self,
             {"list-compute": "list_compute", "list": "list_jobs"}.get(
