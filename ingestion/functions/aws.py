@@ -117,9 +117,13 @@ list-compute\tList compute environments
 
         args = parser.parse_args(sys.argv[2:])
         if args.remote:
+            jobs = self.client.describe_job_definitions()
+            if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
+                pprint(jobs["ResponseMetadata"])
+                return
+            jobs = jobs["jobDefinitions"]
             print(
-                "Listing current job definitions on AWS\n"
-                "This functionality is not implemented yet."
+                "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in jobs)
             )
             return
         for source_id in self.source_id_parser_map:
