@@ -27,7 +27,7 @@ _ENV_TO_SOURCE_API_URL = {
 }
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
-
+MIN_SOURCE_ID_LENGTH, MAX_SOURCE_ID_LENGTH = 24, 24
 
 class UploadError(Enum):
     """Upload error categories corresponding to the G.h Source API."""
@@ -176,6 +176,8 @@ def get_source_id_parser_map(parser_root: Path = None):
     for input_event_file in input_event_files:
         input_event = json.loads(input_event_file.read_text())
         sourceId = input_event["sourceId"]
+        if not MIN_SOURCE_ID_LENGTH <= len(sourceId) <= MAX_SOURCE_ID_LENGTH:
+            continue
         del input_event["sourceId"]
         m[sourceId] = input_event
         m[sourceId]["python_module"] = python_module(input_event_file.parent, parser_root)
