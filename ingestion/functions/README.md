@@ -136,7 +136,7 @@ parsing/example
 ```
 
 At minima, a parser must generate a list of cases that conform to the openAPI
-specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://curator.ghdsi.org/api-docs/) as well.
+specifications. If you have a local stack running, go to the [OpenAPI UI](http://localhost:3001/api-docs) to check the structure of a `Case` object. Otherwise you can always [check it online](https://data.covid-19.global.health/api-docs/) as well.
 
 A minimal case looks like this:
 
@@ -315,7 +315,7 @@ For live parsers, you can look in the [AWS console](https://console.aws.amazon.c
 
 Example live debugging workflow:
 
-1. [Check the Curator portal for errors](https://curator.ghdsi.org/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
+1. [Check the Curator portal for errors](https://data.covid-19.global.health/uploads). In this example, I'll use the error in the Mexico parser from 2020-10-20.
 2. Use the AWS console to find the logs. I'm doing this in the command line, so `aws logs describe-log-groups` shows the log groups. Only one of them has "Mexico" in the name, so that's the one I want.
 3. `aws logs describe-log-streams --log-group-name {GROUP_NAME}` shows me the log stream names, conveniently ordered by date as it's the latest (the last in the list) that I want. They also are named after the date, if you're searching for a particular run.
 4. `aws logs get-log-events --log-group-name {GROUP_NAME} --log-stream-name '{STREAM_NAME}'` shows the log events. Notice that the stream name is in single quotes to avoid shell expansion of its name.
