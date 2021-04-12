@@ -63,6 +63,7 @@ list-compute\tList compute environments
 
     def register(self):
         parser = argparse.ArgumentParser(
+            prog="aws.py register",
             description="Register job definitions for a source ID"
         )
         parser.add_argument("source_id")
@@ -98,6 +99,7 @@ list-compute\tList compute environments
 
     def deregister(self):
         parser = argparse.ArgumentParser(
+            prog="aws.py deregister",
             description="Deregister job definitions for a source ID"
         )
         parser.add_argument("source_id")
@@ -106,6 +108,7 @@ list-compute\tList compute environments
 
     def list_jobs(self):
         parser = argparse.ArgumentParser(
+            prog="aws.py list",
             description="List available parsers for which jobs can be registered"
         )
         parser.add_argument(
