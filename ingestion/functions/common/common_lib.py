@@ -19,8 +19,8 @@ from google.oauth2 import service_account
 
 _ENV_TO_SOURCE_API_URL = {
     "local": "http://localhost:3001/api",
-    "dev": "https://dev-curator.ghdsi.org/api",
-    "prod": "https://curator.ghdsi.org/api"
+    "dev": "https://dev-data.covid-19.global.health/api",
+    "prod": "https://data.covid-19.global.health/api"
 }
 _SERVICE_ACCOUNT_CRED_FILE = "covid-19-map-277002-0943eeb6776b.json"
 _METADATA_BUCKET = "epid-ingestion"
