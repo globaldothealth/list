@@ -2,6 +2,7 @@ import sys
 import boto3
 import argparse
 from pprint import pprint
+from datetime import datetime
 from common.common_lib import get_source_id_parser_map
 
 AWS_REGION = "us-east-1"
@@ -9,6 +10,7 @@ AWS_IMAGE = "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest"
 AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
 DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
+DEFAULT_JOB_QUEUE = "ingestion-queue"
 
 
 def job_definition(
@@ -43,10 +45,11 @@ class AWSParserManager:
             description="Manage AWS Batch for ingestion",
             usage="""python aws.py <command> [<options>]
 
-register\tRegister or update a Batch job definition
-list\t\tList parsers for which job definitions can be registered
-deregister\tDeregister a Batch job definition
-list-compute\tList compute environments
+deregister      Deregister a Batch job definition
+register        Register or update a Batch job definition
+list            List parsers for which job definitions can be registered
+list-compute    List compute environments
+submit          Submit a job using a job definition
 """,
         )
 
@@ -96,6 +99,16 @@ list-compute\tList compute environments
                 )
             )
 
+    def _job_definitions(self):
+        jobs = self.client.describe_job_definitions()
+        if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
+            return (False, jobs["ResponseMetadata"])
+        return (True, jobs["jobDefinitions"])
+
+    def _job_definition_names(self):
+        success, data = self._job_definitions()
+        return [j["jobDefinitionName"] for j in data] if success else None
+
     def deregister(self):
         parser = argparse.ArgumentParser(
             prog="aws.py deregister", description="Deregister job definition"
@@ -103,19 +116,12 @@ list-compute\tList compute environments
         parser.add_argument("job_definition")
         args = parser.parse_args(sys.argv[2:])
 
-        jobs = self.client.describe_job_definitions()
-        if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
-            print("Error occurred while fetching list of job definitions")
-            pprint(jobs["ResponseMetadata"])
-            return
-        job_definition_names = [j["jobDefinitionName"] for j in jobs["jobDefinitions"]]
+        job_definition_names = self._job_definition_names()
         if args.job_definition in job_definition_names:
-            req = self.client.deregister_job_definition(
-                jobDefinition=args.job_definition
-            )
+            r = self.client.deregister_job_definition(jobDefinition=args.job_definition)
             print(
                 f"Job definition deregistered: {args.job_definition}"
-                if req["ResponseMetadata"]["HTTPStatusCode"] == 200
+                if r["ResponseMetadata"]["HTTPStatusCode"] == 200
                 else f"Failed to deregister job definition: {args.job_definition}"
             )
         else:
@@ -138,19 +144,45 @@ list-compute\tList compute environments
 
         args = parser.parse_args(sys.argv[2:])
         if args.remote:
-            jobs = self.client.describe_job_definitions()
-            if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
-                pprint(jobs["ResponseMetadata"])
+            success, data = self._job_definitions()
+            if not success:
+                pprint(data["ResponseMetadata"])
                 return
-            jobs = jobs["jobDefinitions"]
             print(
-                "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in jobs)
+                "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data)
             )
             return
         for source_id in self.source_id_parser_map:
             for key, val in self.source_id_parser_map[source_id].items():
                 print(f"{source_id}  {key}: {val}")
             print()
+
+    def submit(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py submit", description="Submit a job to AWS Batch"
+        )
+        parser.add_argument(
+            "job_definition", help="Job definition to use for submission"
+        )
+        parser.add_argument(
+            "-q", "--queue", help="Which job queue to use", default=DEFAULT_JOB_QUEUE
+        )
+        args = parser.parse_args(sys.argv[2:])
+        job_name = (
+            f"{datetime.utcnow().isoformat(timespec='seconds').replace(':', '')}Z"
+            f"_{args.job_definition}"
+        )
+        r = self.client.submit_job(
+            jobName=job_name, jobQueue=args.queue, jobDefinition=args.job_definition
+        )
+        if r["ResponseMetadata"]["HTTPStatusCode"] == 200:
+            print(
+                f"Submitted {job_name}\n"
+                f"Job definition {args.job_definition} in queue {args.queue}"
+            )
+        else:
+            print(f"Failed submission for definition {args.job_definition} in queue {args.queue}")
+            pprint(r["ResponseMetadata"])
 
     def list_compute(self):
         print("This functionality is not implemented yet.")
