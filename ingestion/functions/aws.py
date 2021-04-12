@@ -1,14 +1,19 @@
 import sys
 import boto3
 import argparse
+from pprint import pprint
 from common.common_lib import get_source_id_parser_map
 
 AWS_REGION = "us-east-1"
 AWS_IMAGE = "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest"
 AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
+DEFAULT_VCPU = 1
+DEFAULT_MEMORY_MIB = 2048
 
 
-def job_definition(source_id: str, env: str, vcpu: int = 1, memory: int = 2048):
+def job_definition(
+    source_id: str, env: str, vcpu: int = DEFAULT_VCPU, memory: int = DEFAULT_MEMORY_MIB
+):
     return {
         "jobDefinitionName": f"{source_id}-{env}",
         "type": "container",
@@ -69,8 +74,27 @@ list-compute\tList compute environments
         )
         args = parser.parse_args(sys.argv[2:])
         print(f"Register {args.source_id} (environment {args.env})")
+        if args.source_id == "all":
+            source_ids = self.source_id_parser_map.keys()
+        elif args.source_id in self.source_id_parser_map:
+            source_ids = [args.source_id]
+        else:
+            print(f"Source ID {args.source_id} not found")
+            return
         if args.env == "local":
-            print("Registration succeeded (this is always true for --env=local)")
+            return
+        for source_id in source_ids:
+            metadata = self.source_id_parser_map[source_id]
+            pprint(
+                self.client.register_job_definition(
+                    **job_definition(
+                        source_id,
+                        args.env,
+                        metadata.get("vcpu", DEFAULT_VCPU),
+                        metadata.get("memory", DEFAULT_MEMORY_MIB),
+                    )
+                )
+            )
 
     def deregister(self):
         parser = argparse.ArgumentParser(
