@@ -51,7 +51,7 @@ list-compute\tList compute environments
         )
 
         parser.add_argument("command", help="Subcommand to run")
-        args = parser.parse_args(sys.argv[1:3])  # only parse command
+        args = parser.parse_args(sys.argv[1:2])  # only parse command
         self.client = boto3.client("batch", AWS_REGION)
         getattr(
             self,
@@ -63,7 +63,7 @@ list-compute\tList compute environments
     def register(self):
         parser = argparse.ArgumentParser(
             prog="aws.py register",
-            description="Register job definitions for a source ID"
+            description="Register job definitions for a source ID",
         )
         parser.add_argument("source_id")
         parser.add_argument(
@@ -98,17 +98,36 @@ list-compute\tList compute environments
 
     def deregister(self):
         parser = argparse.ArgumentParser(
-            prog="aws.py deregister",
-            description="Deregister job definitions for a source ID"
+            prog="aws.py deregister", description="Deregister job definition"
         )
-        parser.add_argument("source_id")
+        parser.add_argument("job_definition")
         args = parser.parse_args(sys.argv[2:])
-        print(f"Deregister {args.source_id} (environment {args.env})")
+
+        jobs = self.client.describe_job_definitions()
+        if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
+            print("Error occurred while fetching list of job definitions")
+            pprint(jobs["ResponseMetadata"])
+            return
+        job_definition_names = [j["jobDefinitionName"] for j in jobs["jobDefinitions"]]
+        if args.job_definition in job_definition_names:
+            req = self.client.deregister_job_definition(
+                jobDefinition=args.job_definition
+            )
+            print(
+                f"Job definition deregistered: {args.job_definition}"
+                if req["ResponseMetadata"]["HTTPStatusCode"] == 200
+                else f"Failed to deregister job definition: {args.job_definition}"
+            )
+        else:
+            print(
+                f"Job definition not registered: {args.job_definition}\n"
+                f"\nCurrent job definitions:\n\n" + "\n".join(job_definition_names)
+            )
 
     def list_jobs(self):
         parser = argparse.ArgumentParser(
             prog="aws.py list",
-            description="List available parsers for which jobs can be registered"
+            description="List available parsers for which jobs can be registered",
         )
         parser.add_argument(
             "-r",
