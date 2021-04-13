@@ -45,11 +45,12 @@ class AWSParserManager:
             description="Manage AWS Batch for ingestion",
             usage="""python aws.py <command> [<options>]
 
-deregister      Deregister a Batch job definition
-register        Register or update a Batch job definition
-list            List parsers for which job definitions can be registered
-list-compute    List compute environments
-submit          Submit a job using a job definition
+submit        Submit a job using a job definition
+compute       List compute environments
+jobdefs       List job definitions on Batch
+parsers       List parsers for which job definitions can be registered
+register      Register or update a Batch job definition
+deregister    Deregister a Batch job definition
 """,
         )
 
@@ -130,32 +131,26 @@ submit          Submit a job using a job definition
                 f"\nCurrent job definitions:\n\n" + "\n".join(job_definition_names)
             )
 
-    def list_jobs(self):
-        parser = argparse.ArgumentParser(
-            prog="aws.py list",
-            description="List available parsers for which jobs can be registered",
-        )
-        parser.add_argument(
-            "-r",
-            "--remote",
-            help="List current job definitions on AWS",
-            action="store_true",
-        )
-
-        args = parser.parse_args(sys.argv[2:])
-        if args.remote:
-            success, data = self._job_definitions()
-            if not success:
-                pprint(data["ResponseMetadata"])
-                return
-            print(
-                "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data)
-            )
-            return
+    def parsers(self):
+        "List available parsers locally"
         for source_id in self.source_id_parser_map:
             for key, val in self.source_id_parser_map[source_id].items():
                 print(f"{source_id}  {key}: {val}")
             print()
+
+    def jobdefs(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py jobdefs",
+            description="List available job definitions which can be used for job submission",
+        )
+        args = parser.parse_args(sys.argv[2:])
+        success, data = self._job_definitions()
+        if not success:
+            pprint(data["ResponseMetadata"])
+            return
+        print(
+            "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data)
+        )
 
     def submit(self):
         parser = argparse.ArgumentParser(
