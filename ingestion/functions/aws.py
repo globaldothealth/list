@@ -3,7 +3,7 @@ import boto3
 import argparse
 from pprint import pprint
 from datetime import datetime
-from common.common_lib import get_source_id_parser_map
+import common.common_lib as common_lib
 
 AWS_REGION = "us-east-1"
 AWS_IMAGE = "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest"
@@ -11,6 +11,20 @@ AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
 DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
 DEFAULT_JOB_QUEUE = "ingestion-queue"
+
+
+def get_parser_name_source(source_id, env):
+    s3_client = boto3.client("s3", AWS_REGION)
+    from retrieval import retrieval
+
+    auth_headers = common_lib.obtain_api_credentials(s3_client)
+    try:
+        url, source_format, parser, date_filter = retrieval.get_source_details(
+            env, source_id, "", auth_headers, None
+        )
+    except RuntimeError:
+        return (False, None)
+    return (True, parser) if len(parser.split(".")) == 2 else (True, None)
 
 
 def job_definition(
@@ -39,7 +53,6 @@ def job_definition(
 
 class AWSParserManager:
     def __init__(self):
-        self.source_id_parser_map = get_source_id_parser_map()
 
         parser = argparse.ArgumentParser(
             description="Manage AWS Batch for ingestion",
@@ -71,33 +84,55 @@ deregister    Deregister a Batch job definition
         )
         parser.add_argument("source_id")
         parser.add_argument(
+            "-e",
             "--env",
             help="Which environment to deploy to",
             choices=["local", "dev", "prod"],
             default="local",
         )
+        parser.add_argument(
+            "-c",
+            "--cpu",
+            help="Number of virtual CPUs (default=1)",
+            type=int,
+            default=DEFAULT_VCPU,
+        )
+        parser.add_argument(
+            "-m",
+            "--memory",
+            help="Memory allocated to job in MiB (default=2048)",
+            type=int,
+            default=DEFAULT_MEMORY_MIB,
+        )
+
         args = parser.parse_args(sys.argv[2:])
-        print(f"Register {args.source_id} (environment {args.env})")
-        if args.source_id == "all":
-            source_ids = self.source_id_parser_map.keys()
-        elif args.source_id in self.source_id_parser_map:
-            source_ids = [args.source_id]
-        else:
-            print(f"Source ID {args.source_id} not found")
-            return
         if args.env == "local":
+            print("Can't test local AWS Batch job definition registration")
             return
-        for source_id in source_ids:
-            metadata = self.source_id_parser_map[source_id]
+        print(f"Register {args.source_id} (environment {args.env})")
+        success, parser = get_parser_name_source(args.source_id, args.env)
+        if not success:
+            print(
+                f"Failed to register {args.source_id} due to error in fetching from curator API"
+            )
+            return
+        if parser:
+            print(f"Source {args.source_id} will be parsed by parsing.{parser}")
             pprint(
                 self.client.register_job_definition(
                     **job_definition(
-                        source_id,
+                        args.source_id,
                         args.env,
-                        metadata.get("vcpu", DEFAULT_VCPU),
-                        metadata.get("memory", DEFAULT_MEMORY_MIB),
+                        args.cpu,
+                        args.memory,
                     )
                 )
+            )
+        else:
+            print(
+                f"No corresponding parser found for {args.source_id}\n"
+                "Set the parser function in the curator portal, the value\n"
+                "should be 'folder.parser' if the parser is at parsing/folder/parser.py"
             )
 
     def _job_definitions(self):
@@ -133,8 +168,8 @@ deregister    Deregister a Batch job definition
 
     def parsers(self):
         "List available parsers locally"
-        for source_id in self.source_id_parser_map:
-            for key, val in self.source_id_parser_map[source_id].items():
+        for source_id in (m := common_lib.get_source_id_parser_map()):
+            for key, val in m[source_id].items():
                 print(f"{source_id}  {key}: {val}")
             print()
 
@@ -143,14 +178,12 @@ deregister    Deregister a Batch job definition
             prog="aws.py jobdefs",
             description="List available job definitions which can be used for job submission",
         )
-        args = parser.parse_args(sys.argv[2:])
+        _ = parser.parse_args(sys.argv[2:])
         success, data = self._job_definitions()
         if not success:
             pprint(data["ResponseMetadata"])
             return
-        print(
-            "\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data)
-        )
+        print("\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data))
 
     def submit(self):
         parser = argparse.ArgumentParser(
@@ -176,7 +209,9 @@ deregister    Deregister a Batch job definition
                 f"Job definition {args.job_definition} in queue {args.queue}"
             )
         else:
-            print(f"Failed submission for definition {args.job_definition} in queue {args.queue}")
+            print(
+                f"Failed submission for definition {args.job_definition} in queue {args.queue}"
+            )
             pprint(r["ResponseMetadata"])
 
     def list_compute(self):
