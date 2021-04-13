@@ -43,6 +43,7 @@ describe('search query', () => {
                 'caseid:abc123 uploadid:def456 sourceurl:wsj.com  verificationstatus:verified ' +
                 'admin1:"some admin 1" admin2:"some admin 2" admin3:"some admin 3"',
         );
+
         expect(res).toEqual({
             filters: [
                 {
@@ -66,7 +67,7 @@ describe('search query', () => {
                     values: ['switzerland'],
                 },
                 {
-                    path: 'outcome',
+                    path: 'events.value',
                     values: ['recovered'],
                 },
                 {
