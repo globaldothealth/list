@@ -1,13 +1,11 @@
 import codecs
 import io
-import json
 import mimetypes
 import os
 import sys
 import tempfile
 import zipfile
 import importlib
-import functools
 from chardet import detect
 from pathlib import Path
 
@@ -15,7 +13,6 @@ import boto3
 import requests
 
 from datetime import datetime, timezone
-from common.common_lib import get_source_id_parser_map
 
 EFS_PATH = "/mnt/efs"
 ENV_FIELD = "env"
@@ -189,10 +186,9 @@ def upload_to_s3(
 
 
 def invoke_parser(
-    env, source_id, upload_id, api_headers, cookies, s3_object_key,
+    env, parser, source_id, upload_id, api_headers, cookies, s3_object_key,
         source_url, date_filter, parsing_date_range):
-    source_id_parser_map = get_source_id_parser_map()
-    python_module = source_id_parser_map[source_id]["python_module"]
+    python_module = f"parsing.{parser}"
     payload = {
         "env": env,
         "s3Bucket": OUTPUT_BUCKET,
@@ -279,8 +275,7 @@ def run_retrieval(tempdir=EFS_PATH):
         auth_headers = common_lib.obtain_api_credentials(s3_client)
     upload_id = common_lib.create_upload_record(
         env, source_id, auth_headers, cookies)
-    # TODO: Need get_source_details() for anything except date_filter?
-    url, source_format, _, date_filter = get_source_details(
+    url, source_format, parser, date_filter = get_source_details(
         env, source_id, upload_id, auth_headers, cookies)
     url = format_source_url(url)
     file_names_s3_object_keys = retrieve_content(
@@ -288,10 +283,10 @@ def run_retrieval(tempdir=EFS_PATH):
     for file_name, s3_object_key in file_names_s3_object_keys:
         upload_to_s3(file_name, s3_object_key, env,
                      source_id, upload_id, auth_headers, cookies)
-    if source_id in get_source_id_parser_map():
+    if parser:
         for _, s3_object_key in file_names_s3_object_keys:
             invoke_parser(
-                env,
+                env, parser,
                 source_id, upload_id, auth_headers, cookies,
                 s3_object_key, url, date_filter, parsing_date_range)
     return {

@@ -103,7 +103,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     requests_mock.get(
         full_source_url,
         json={"origin": {"url": origin_url, "license": "MIT"}, "format": "JSON",
-              "automation": {"parser": {"awsLambdaArn": "arn"}},
+              "automation": {"parser": {"awsLambdaArn": "parser.example.example"}},
               "dateFilter": date_filter})
 
     # Mock the request to retrieve source content.
@@ -114,6 +114,7 @@ def test_e2e(valid_event, requests_mock, mock_source_api_url_fixture, tempdir="/
     common_lib.obtain_api_credentials.assert_called_once()
     retrieval.invoke_parser.assert_called_once_with(
         valid_event["env"],
+        "parser.example.example",
         source_id, upload_id, {}, None,
         response["key"],
         origin_url, date_filter, valid_event["parsingDateRange"])
