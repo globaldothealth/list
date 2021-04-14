@@ -6,6 +6,10 @@ on:
     paths:
     - '.github/workflows/ingestion-functions-python.yml'
     - 'ingestion/functions/**'
+  pull_request:
+    paths:
+    - '.github/workflows/ingestion-functions-python.yml'
+    - 'ingestion/functions/**'
 
 jobs:
   deploy:
