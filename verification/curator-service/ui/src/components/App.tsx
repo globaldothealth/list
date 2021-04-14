@@ -59,7 +59,6 @@ import { useLastLocation } from 'react-router-last-location';
 import PolicyLink from './PolicyLink';
 import { Auth } from 'aws-amplify';
 import { useCookieBanner } from '../hooks/useCookieBanner';
-import { URLToSearchQuery, searchQueryToURL } from './util/searchQuery';
 
 const theme = createMuiTheme({
     palette: {
@@ -379,9 +378,6 @@ export default function App(): JSX.Element {
     const lastLocation = useLastLocation();
     const history = useHistory();
     const location = useLocation<LocationState>();
-    const [search, setSearch] = React.useState<string>(
-        URLToSearchQuery(location.search),
-    );
     const [filterBreadcrumbs, setFilterBreadcrumbs] = React.useState<
         ChipData[]
     >([]);
@@ -424,18 +420,10 @@ export default function App(): JSX.Element {
           ]
         : [];
 
-    // Update search and filter breadcrumbs whenever location search changes
-    useEffect(() => {
-        const searchString = URLToSearchQuery(location.search);
-        if (searchString === search || location.pathname !== '/cases') return;
-
-        setSearch(searchString);
-        //eslint-disable-next-line
-    }, [location.search]);
-
     // Update filter breadcrumbs
     useEffect(() => {
-        if (location.pathname !== '/cases') return;
+        if (location.pathname !== '/cases' || location.search.includes('?q='))
+            return;
 
         const searchParams = new URLSearchParams(location.search);
         const tempFilterBreadcrumbs: ChipData[] = [];
@@ -515,10 +503,13 @@ export default function App(): JSX.Element {
         //eslint-disable-next-line
     }, [user]);
 
+    // Update search query based on stored search from landing page
     useEffect(() => {
         if (savedSearchQuery === null || savedSearchQuery === '') return;
 
-        setSearch(URLToSearchQuery(savedSearchQuery));
+        history.push({ pathname: '/cases', search: savedSearchQuery });
+
+        // eslint-disable-next-line
     }, [savedSearchQuery]);
 
     // Function for deleting filter breadcrumbs
@@ -563,20 +554,7 @@ export default function App(): JSX.Element {
                         {location.pathname === '/cases' && user ? (
                             <>
                                 <div className={classes.searchBar}>
-                                    <SearchBar
-                                        search={search}
-                                        onSearchChange={(
-                                            searchInput: string,
-                                        ): void => {
-                                            history.push({
-                                                pathname: '/cases',
-                                                search: searchQueryToURL(
-                                                    searchInput,
-                                                ),
-                                            });
-                                        }}
-                                        rootComponentRef={rootRef}
-                                    ></SearchBar>
+                                    <SearchBar rootComponentRef={rootRef} />
                                 </div>
                                 <DownloadButton />
                             </>
@@ -765,8 +743,6 @@ export default function App(): JSX.Element {
                                     pageSize={listPageSize}
                                     onChangePage={setListPage}
                                     onChangePageSize={setListPageSize}
-                                    setSearch={setSearch}
-                                    search={search}
                                     filterBreadcrumbs={filterBreadcrumbs}
                                     handleBreadcrumbDelete={
                                         handleFilterBreadcrumbDelete
@@ -859,13 +835,13 @@ export default function App(): JSX.Element {
                         </Route>
                         <Route exact path="/">
                             {hasAnyRole(['curator', 'admin']) &&
-                            search === '' ? (
+                            location.search === '' ? (
                                 <Charts />
                             ) : user ? (
                                 <Redirect
                                     to={{
                                         pathname: '/cases',
-                                        search: searchQueryToURL(search),
+                                        search: savedSearchQuery || '',
                                     }}
                                 />
                             ) : isLoadingUser ? (

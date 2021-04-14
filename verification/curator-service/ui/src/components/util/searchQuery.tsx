@@ -1,24 +1,23 @@
+import { FilterFormValues } from '../FiltersModal';
+
 export const searchQueryToURL = (searchQuery: string): string => {
-    const withFilters = searchQuery.includes(':');
-    let searchParams;
+    const searchParams = searchQuery.replace(/\s/g, '+');
+    return searchParams === '' ? '' : 'q=' + searchParams;
+};
 
-    if (withFilters) {
-        const filters = searchQuery.trim().match(/\w+:/g) ?? [];
-        const params = searchQuery.trim().split(/\w+:/g).slice(1) ?? [];
+export const filtersToURL = (filters: FilterFormValues): string => {
+    const searchParams = new URLSearchParams();
 
-        searchParams = new URLSearchParams();
-        for (let i = 0; i < filters.length; i++) {
-            searchParams.append(
-                filters[i].replace(':', '').trim(),
-                params[i].trim(),
-            );
+    for (const [key, value] of Object.entries(filters)) {
+        if (value) {
+            const parsedValue = value.toString().includes(' ')
+                ? `"${value}"`
+                : value;
+            searchParams.append(key, parsedValue);
         }
-
-        return searchParams.toString();
-    } else {
-        searchParams = searchQuery.replace(/\s/g, '+');
-        return searchParams === '' ? '' : 'q=' + searchParams;
     }
+
+    return searchParams.toString();
 };
 
 export const URLToSearchQuery = (url: string): string => {
@@ -36,4 +35,26 @@ export const URLToSearchQuery = (url: string): string => {
     } else {
         return url.replace('?q=', '').replace(/[+]/g, ' ');
     }
+};
+
+export const URLToFilters = (url: string): FilterFormValues => {
+    const isQuery = url.includes('?q=');
+
+    if (isQuery) return {};
+
+    const searchParams = new URLSearchParams(url);
+    let filters: FilterFormValues = {};
+
+    searchParams.forEach((value, key) => {
+        const parsedValue = value.includes('"')
+            ? value.replaceAll('"', '')
+            : value;
+
+        filters = {
+            ...filters,
+            [key]: parsedValue,
+        };
+    });
+
+    return filters;
 };
