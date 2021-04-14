@@ -200,7 +200,7 @@ def invoke_parser(
         "dateRange": parsing_date_range,
     }
     print(f"Invoking parser ({python_module})")
-    sys.path.append(Path(__file__).parent.parent)  # ingestion/functions
+    sys.path.append(str(Path(__file__).parent.parent))  # ingestion/functions
     importlib.import_module(python_module).event_handler(payload)
 
 
