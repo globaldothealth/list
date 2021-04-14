@@ -297,5 +297,5 @@ def run_retrieval(tempdir=EFS_PATH):
 
 
 if __name__ == "__main__":
-    run_retrieval(tempdir=EFS_PATH)
+    run_retrieval(tempdir=(EFS_PATH if len(sys.argv) == 1 else sys.argv[1]))
 
