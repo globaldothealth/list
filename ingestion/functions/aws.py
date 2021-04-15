@@ -37,11 +37,11 @@ def get_parser_name_source(source_id, env):
 
 
 def job_definition(
-    source_id: str, env: str, vcpu: int = DEFAULT_VCPU,
+    source_name: str, source_id: str, env: str, vcpu: int = DEFAULT_VCPU,
     memory: int = DEFAULT_MEMORY_MIB, timeout: int = DEFAULT_TIMEOUT_MIN
 ):
     return {
-        "jobDefinitionName": f"{source_id}-{env}",
+        "jobDefinitionName": f"{source_name}-{env}",
         "type": "container",
         "parameters": {},
         "timeout": {
@@ -99,9 +99,10 @@ deregister    Deregister a Batch job definition
     def register(self):
         parser = argparse.ArgumentParser(
             prog="aws.py register",
-            description="Register job definitions for a source ID",
+            description="Register a job definition for a source ID and corresponding parsing file",
         )
         parser.add_argument("source_id")
+        parser.add_argument("parser", help="Parsing module for the source ID; e.g. example.example")
         parser.add_argument(
             "-e",
             "--env",
@@ -136,14 +137,14 @@ deregister    Deregister a Batch job definition
             print("Can't test local AWS Batch job definition registration")
             return
         print(f"Register {args.source_id} (environment {args.env})")
-        success, parser = get_parser_name_source(args.source_id, args.env)
+        success, parser_name = get_parser_name_source(args.source_id, args.env)
         if not success:
             print(
                 f"Failed to register {args.source_id} due to error in fetching from curator API"
             )
-            return
-        if parser:
-            print(f"Source {args.source_id} will be parsed by parsing.{parser}")
+            sys.exit(1)
+        if parser_name:
+            print(f"Source {args.source_id} will be parsed by parsing.{parser_name}")
             pprint(
                 self.batch_client.register_job_definition(
                     **job_definition(
@@ -155,12 +156,31 @@ deregister    Deregister a Batch job definition
                     )
                 )
             )
+            if args.parser == parser_name:
+                print(f"Source {args.source_id} will be parsed by parsing.{parser_name}")
+            else:
+                print(f"Parser {parser_name} for source {args.source_id} in environment {args.env} does not match input {args.parser}")
+                sys.exit(1)
         else:
             print(
-                f"No corresponding parser found for {args.source_id}\n"
+                f"Missing parser for source {args.source_id} in environment {args.env}\n"
                 "Set the parser function in the curator portal, the value\n"
                 "should be 'folder.parser' if the parser is at parsing/folder/parser.py"
             )
+            sys.exit(1)
+        print(f"Register {args.source_id} (environment {args.env})")
+        source_name = args.parser.replace(".", "-")
+        print(f"Registering job definition for source {source_name}")
+        pprint(
+            self.client.register_job_definition(
+                **job_definition(
+                    source_name,
+                    args.env,
+                    args.cpu,
+                    args.memory,
+                )
+            )
+        )
 
     def _job_definitions(self):
         jobs = self.batch_client.describe_job_definitions()
