@@ -4,3 +4,4 @@ google-auth==1.16.1
 requests==2.23.0
 requests-mock==1.8.0
 pycountry==20.7.3
+python-slugify==5.0.0
