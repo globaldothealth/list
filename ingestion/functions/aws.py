@@ -1,16 +1,24 @@
-import sys
-import boto3
+#!/usr/bin/env python3
 import argparse
-from pprint import pprint
 from datetime import datetime
+from pprint import pprint
+import re
+import sys
+from uuid import uuid4
+
+import boto3
+
 import common.common_lib as common_lib
 
 AWS_REGION = "us-east-1"
 AWS_IMAGE = "612888738066.dkr.ecr.us-east-1.amazonaws.com/gdh-ingestor:latest"
 AWS_JOB_ROLE_ARN = "arn:aws:iam::612888738066:role/gdh-ingestion-job-role"
+AWS_EVENT_ROLE_ARN = "arn:aws:iam::612888738066:role/service-role/AWS_Events_Invoke_Batch_Job_Queue_1312384119"
+AWS_JOB_QUEUE_ARN = "arn:aws:batch:us-east-1:612888738066:job-queue/ingestion-queue"
 DEFAULT_VCPU = 1
 DEFAULT_MEMORY_MIB = 2048
 DEFAULT_JOB_QUEUE = "ingestion-queue"
+DEFAULT_SCHEDULE_EXPRESSION = "rate(1 day)"
 
 
 def get_parser_name_source(source_id, env):
@@ -55,12 +63,19 @@ class AWSParserManager:
     def __init__(self):
 
         parser = argparse.ArgumentParser(
-            description="Manage AWS Batch for ingestion",
+            description="Manage AWS Batch and EventBridge rules for ingestion",
             usage="""python aws.py <command> [<options>]
 
 submit        Submit a job using a job definition
 compute       List compute environments
 jobdefs       List job definitions on Batch
+rules         List EventBridge rules
+enable        Enable an EventBridge rule
+disable       Disable an EventBridge rule
+target        Set a Batch job definition as a target for an EventBridge rule
+untarget      Remove a Batch job definition as a target for an EventBridge rule
+schedule      Create an EventBridge schedule rule
+unschedule    Delete an EventBridge schedule rule
 parsers       List parsers for which job definitions can be registered
 register      Register or update a Batch job definition
 deregister    Deregister a Batch job definition
@@ -69,7 +84,8 @@ deregister    Deregister a Batch job definition
 
         parser.add_argument("command", help="Subcommand to run")
         args = parser.parse_args(sys.argv[1:2])  # only parse command
-        self.client = boto3.client("batch", AWS_REGION)
+        self.batch_client = boto3.client("batch", AWS_REGION)
+        self.event_bridge_client = boto3.client("events", AWS_REGION)
         getattr(
             self,
             {"list-compute": "list_compute", "list": "list_jobs"}.get(
@@ -119,7 +135,7 @@ deregister    Deregister a Batch job definition
         if parser:
             print(f"Source {args.source_id} will be parsed by parsing.{parser}")
             pprint(
-                self.client.register_job_definition(
+                self.batch_client.register_job_definition(
                     **job_definition(
                         args.source_id,
                         args.env,
@@ -136,7 +152,7 @@ deregister    Deregister a Batch job definition
             )
 
     def _job_definitions(self):
-        jobs = self.client.describe_job_definitions()
+        jobs = self.batch_client.describe_job_definitions()
         if jobs["ResponseMetadata"]["HTTPStatusCode"] != 200:
             return (False, jobs["ResponseMetadata"])
         return (True, jobs["jobDefinitions"])
@@ -154,7 +170,7 @@ deregister    Deregister a Batch job definition
 
         job_definition_names = self._job_definition_names()
         if args.job_definition in job_definition_names:
-            r = self.client.deregister_job_definition(jobDefinition=args.job_definition)
+            r = self.batch_client.deregister_job_definition(jobDefinition=args.job_definition)
             print(
                 f"Job definition deregistered: {args.job_definition}"
                 if r["ResponseMetadata"]["HTTPStatusCode"] == 200
@@ -185,6 +201,235 @@ deregister    Deregister a Batch job definition
             return
         print("\n".join(f"{j['status']:>8s} {j['jobDefinitionName']}" for j in data))
 
+    def rules(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py rules", description="List rules defined in AWS EventBridge"
+        )
+        parser.add_argument(
+            "-d", "--disabled", help="List disabled rules", action="store_true", required=False
+        )
+        parser.add_argument(
+            "-e", "--enabled", help="List enabled rules", action="store_true", required=False
+        )
+        parser.add_argument(
+            "-f", "--filter", help="Filter rule names", type=str, required=False
+        )
+        parser.add_argument(
+            "-t", "--targets", help="Show rule Batch targets", action="store_true", required=False
+        )
+        parser.add_argument(
+            "-v", "--verbose", help="Show all rule information", action="store_true", required=False
+        )
+
+        args = parser.parse_args(sys.argv[2:])
+        if args.enabled and args.disabled:
+            print("Enabled and disabled are mutually exclusive options")
+            sys.exit(2)
+
+        rules = self.event_bridge_client.list_rules().get("Rules")
+        if not rules:
+            print("Could not get EventBridge rules")
+            return
+        if args.filter:
+            rules = [rule for rule in rules if re.match(args.filter, rule.get("Name", ""))]
+        if args.enabled:
+            rules = [rule for rule in rules if rule.get("State") == "ENABLED"]
+        if args.disabled:
+            rules = [rule for rule in rules if rule.get("State") == "DISABLED"]
+        if args.targets:
+            for rule in rules:
+                rule_name = rule.get("Name")
+                rule["Targets"] = self.get_rule_targets(rule_name)
+        if args.verbose:
+            pprint(rules)
+        else:
+            if args.targets:
+                rules = [{"Name": rule.get("Name"), "Targets": rule.get("Targets")} for rule in rules]
+                pprint(rules)
+            else:
+                rule_names = [rule.get("Name") for rule in rules]
+                print(rule_names)
+
+    def get_rule_targets(self, rule_name):
+        batch_targets = {}
+        targets = self.event_bridge_client.list_targets_by_rule(Rule=rule_name)
+        for target in targets.get("Targets"):
+            target_id = target.get("Id")
+            if not target_id:
+                raise KeyError(f"Could not get target ID for {rule_name}")
+            batch_targets[target_id] = target.get("BatchParameters")
+        return batch_targets
+
+    def enable(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py enable", description="Enable AWS EventBridge rule"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule to enable"
+        )
+        args = parser.parse_args(sys.argv[2:])
+        try:
+            self.event_bridge_client.enable_rule(Rule=args.rule_name)
+        except Exception as exc:
+            print(f"An exception occurred while enabling rule {args.rule_name}: {exc}")
+            raise
+        print("Enabled rule {args.rule_name}")
+
+    def disable(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py disable", description="Disable AWS EventBridge rule"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule to disable"
+        )
+        args = parser.parse_args(sys.argv[2:])
+        try:
+            self.event_bridge_client.disable_rule(Rule=args.rule_name)
+        except Exception as exc:
+            print(f"An exception occurred while disabling rule {args.rule_name}: {exc}")
+            raise
+        print("Disabled rule {args.rule_name}")
+
+    def schedule(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py schedule", description="Create a new AWS EventBridge schedule rule"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule to create"
+        )
+        parser.add_argument(
+            "-t", "--target_name", help="Name of target AWS Batch job description for rule", type=str, required=False
+        )
+        parser.add_argument(
+            "-s", "--source_name", help="Name of data source", type=str, required=False
+        )
+        parser.add_argument(
+            "-j", "--job_name", help="Name of scheduled job", type=str, required=False
+        )
+        parser.add_argument(
+            "-e", "--enabled", help="Enable rule", action="store_true", required=False
+        )
+        args = parser.parse_args(sys.argv[2:])
+        state = "DISABLED"
+        description = ""
+        target_id = ""
+        if args.enabled:
+            state = "ENABLED"
+        if args.target_name:
+            if not args.source_name:
+                print("Data source name required for target creation")
+                sys.exit(2)
+            if not args.job_name:
+                print("Job name required for target creation")
+                sys.exit(2)
+            description = f"Scheduled Batch ingestion rule for source: {args.source_name}"
+
+        try:
+            self.event_bridge_client.put_rule(
+                Name=args.rule_name,
+                ScheduleExpression=DEFAULT_SCHEDULE_EXPRESSION,
+                State=state,
+                Description=description
+            )
+        except Exception as exc:
+            print(f"An exception occurred while creating rule {args.rule_name}: {exc}")
+            raise
+        print(f"Created rule {args.rule_name}")
+
+        if args.target_name:
+            target_id = str(uuid4())
+            target = [{
+                "Id": target_id,
+                "Arn": AWS_JOB_QUEUE_ARN,
+                "RoleArn": AWS_EVENT_ROLE_ARN,
+                "BatchParameters": {
+                    "JobDefinition": args.target_name,
+                    "JobName": args.job_name
+                }
+            }]
+            try:
+                self.event_bridge_client.put_targets(Rule=args.rule_name, Targets=target)
+            except Exception as exc:
+                print(f"An exception occurred while targeting {args.target_name} for rule {args.rule_name}: {exc}")
+                raise
+            print(f"Targeted rule {args.rule_name} to {args.target_name}")
+
+    def unschedule(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py unschedule", description="Delete rule defined in AWS EventBridge"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule to delete"
+        )
+        args = parser.parse_args(sys.argv[2:])
+        try:
+            self.event_bridge_client.delete_rule(Name=args.rule_name)
+        except Exception as exc:
+            print(f"An exception occurred while deleting rule {args.rule_name}: {exc}")
+            raise
+        print(f"Deleted rule {args.rule_name}")
+
+    def target(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py target", description="Create or modify target for rule defined in AWS EventBridge"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule"
+        )
+        parser.add_argument(
+            "-t", "--target_name", help="Name of target AWS Batch job description for rule"
+        )
+        parser.add_argument(
+            "-j", "--job_name", help="Name of scheduled job"
+        )
+        args = parser.parse_args(sys.argv[2:])
+        try:
+            target_id = str(uuid4())
+            target = [{
+                "Id": target_id,
+                "Arn": AWS_JOB_QUEUE_ARN,
+                "RoleArn": AWS_EVENT_ROLE_ARN,
+                "BatchParameters": {
+                    "JobDefinition": args.target_name,
+                    "JobName": args.job_name
+                }
+            }]
+            self.event_bridge_client.put_targets(Rule=args.rule_name, Targets=target)
+        except Exception as exc:
+            print(f"An exception occurred while setting target for rule {args.rule_name}: {exc}")
+            raise
+        print(f"Set target {args.target_name} for rule {args.rule_name}")
+
+    def untarget(self):
+        parser = argparse.ArgumentParser(
+            prog="aws.py untarget", description="Delete targets for rule defined in AWS EventBridge"
+        )
+        parser.add_argument(
+            "rule_name", help="Name of rule with targets to delete"
+        )
+        args = parser.parse_args(sys.argv[2:])
+        target_ids = []
+        try:
+            self.event_bridge_client.list_targets_by_rule(Rule=args.rule_name)
+            targets = self.event_bridge_client.list_targets_by_rule(Rule=args.rule_name)
+            for target in targets.get("Targets"):
+                target_id = target.get("Id")
+                if not target_id:
+                    raise KeyError(f"Could not get target ID for rule {args.rule_name}")
+                target_ids.append(target_id)
+            if len(target_ids) == 0:
+                print(f"No targets found for rule {args.rule_name}")
+                return
+        except Exception as exc:
+            print(f"An exception occurred while getting target ids for rule {args.rule_name}: {exc}")
+            raise
+        try:
+            self.event_bridge_client.remove_targets(Rule=args.rule_name, Ids=target_ids)
+        except Exception as exc:
+            print(f"An exception occurred while deleting targets {target_ids} for rule {args.rule_name}: {exc}")
+            raise
+        print(f"Deleted targets {target_ids} for rule {args.rule_name}")
+
     def submit(self):
         parser = argparse.ArgumentParser(
             prog="aws.py submit", description="Submit a job to AWS Batch"
@@ -200,7 +445,7 @@ deregister    Deregister a Batch job definition
             f"{datetime.utcnow().isoformat(timespec='seconds').replace(':', '')}Z"
             f"_{args.job_definition}"
         )
-        r = self.client.submit_job(
+        r = self.batch_client.submit_job(
             jobName=job_name, jobQueue=args.queue, jobDefinition=args.job_definition
         )
         if r["ResponseMetadata"]["HTTPStatusCode"] == 200:
