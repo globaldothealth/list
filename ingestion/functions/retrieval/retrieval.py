@@ -14,7 +14,7 @@ import requests
 
 from datetime import datetime, timezone
 
-EFS_PATH = "/mnt/efs"
+TEMP_PATH = "/tmp"
 ENV_FIELD = "env"
 OUTPUT_BUCKET = "epid-sources-raw"
 SOURCE_ID_FIELD = "sourceId"
@@ -94,7 +94,7 @@ def get_source_details(env, source_id, upload_id, api_headers, cookies):
             api_headers, cookies)
 
 
-def raw_content(url: str, content: bytes, tempdir: str = EFS_PATH) -> io.BytesIO:
+def raw_content(url: str, content: bytes, tempdir: str = TEMP_PATH) -> io.BytesIO:
     # Detect the mimetype of a given URL.
     print(f'Guessing mimetype of {url}')
     mimetype, _ = mimetypes.guess_type(url)
@@ -116,7 +116,7 @@ def raw_content(url: str, content: bytes, tempdir: str = EFS_PATH) -> io.BytesIO
 
 
 def retrieve_content(
-        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, tempdir=EFS_PATH):
+        env, source_id, upload_id, url, source_format, api_headers, cookies, chunk_bytes=CSV_CHUNK_BYTES, tempdir=TEMP_PATH):
     """ Retrieves and locally persists the content at the provided URL. """
     try:
         if (
@@ -232,7 +232,7 @@ def format_source_url(url: str) -> str:
     return url
 
 
-def run_retrieval(tempdir=EFS_PATH):
+def run_retrieval(tempdir=TEMP_PATH):
     """Global ingestion retrieval function.
 
     Parameters
@@ -250,8 +250,7 @@ def run_retrieval(tempdir=EFS_PATH):
           https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
     tempdir: str, optional
-        Temporary folder to store retrieve content in. Should be /tmp for test runs
-        and EFS_PATH for actual runs (the default)
+        Temporary folder to store retrieve content in
 
     Returns
     ------
@@ -297,5 +296,4 @@ def run_retrieval(tempdir=EFS_PATH):
 
 
 if __name__ == "__main__":
-    run_retrieval(tempdir=(EFS_PATH if len(sys.argv) == 1 else sys.argv[1]))
-
+    run_retrieval(tempdir=(TEMP_PATH if len(sys.argv) == 1 else sys.argv[1]))
