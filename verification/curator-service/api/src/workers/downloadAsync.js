@@ -4,6 +4,8 @@ const AWS = require('aws-sdk');
 
 // make the request to the data service
 try {
+    console.error('workerData');
+    console.error(workerData);
     axios({
         method: 'post',
         url: workerData.url,
@@ -37,10 +39,14 @@ try {
             },
             ReturnPath: 'downloads@global.health',
             Source: 'downloads@global.health',
-        }).then((data) => {
+        },(err, data) => {
+            if (err)
+            {
+                console.error(err);
+            }
             console.log(`sent email for query ${workerData.query} for user ${workerData.email}`);
             console.log(`response from Amazon: ${data}`);
-        }).catch((err) => { throw err; });
+        });
     });
 } catch (err) {
     console.error(err);
