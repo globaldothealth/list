@@ -4,6 +4,7 @@ import { User, UserDocument } from '../model/user';
 import axios from 'axios';
 import { logger } from '../util/logger';
 import AWS from 'aws-sdk';
+import crypto from 'crypto';
 
 // Don't set client-side timeouts for requests to the data service.
 // TODO: Make this more fine-grained once we fix
@@ -89,6 +90,7 @@ export default class CasesController {
             const region = process.env.AWS_SERVICE_REGION;
             const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
             const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
+            const correlationId = crypto.randomBytes(16).toString("hex");
             const worker = new Worker('./src/workers/downloadAsync.js', { 
                 workerData: {
                     query: req.body.query as string,
@@ -97,12 +99,12 @@ export default class CasesController {
                     region,
                     accessKeyId,
                     secretKey,
+                    correlationId,
             }});
             /* we don't care what happens when the worker finishes, but for debugging
              * I'm going to log this.
-             * TODO create a correlation ID so logs from the request and the thread can be tied together.
              */
-            worker.on('exit', (code) => { logger.info(`worker exited. code: ${code}`) });
+            worker.on('exit', (code) => { logger.info(`worker with id ${correlationId} exited. code: ${code}`) });
             res.status(204).end();
         } catch (err) {
             res.status(500).send(err);
