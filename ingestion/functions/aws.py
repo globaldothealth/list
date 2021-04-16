@@ -51,8 +51,6 @@ def job_definition(
                 {"name": "EPID_INGESTION_ENV", "value": env},
                 {"name": "EPID_INGESTION_SOURCE_ID", "value": source_id},
             ],
-            "volumes": [{"host": {"sourcePath": "/mnt/efs"}, "name": "efs"}],
-            "mountPoints": [{"containerPath": "/mnt/efs", "sourceVolume": "efs"}],
             "ulimits": [],
             "resourceRequirements": [],
         },
