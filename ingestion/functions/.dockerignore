@@ -1,3 +1,7 @@
+# Python virtual environments
+venv
+.venv
+
 # Local AWS testing and deployment artifacts.
 .aws
 .aws-sam
@@ -10,10 +14,6 @@ conversion_errors.tsv
 # Plausible GCP project service account credentials.
 # (Out of an abundance of caution.)
 covid-19-map-*.json
-
-# Cypress generates videos, do not store them in revision history.
-**/cypress/**/*.mp4
-**/cypress/**/*.png
 
 # Secrets for kubernetes.
 kustomization.yaml
