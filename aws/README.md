@@ -134,6 +134,7 @@ Deployments require secrets to connect to MongoDB for example or set up OAuth.
 
 Here is the list of environment variables that should be filled with secrets and their purpose:
 
+- `AWS_SERVICE_REGION`: Amazon Web Services region used for the Simple Email Service.
 - `AWS_ACCESS_KEY_ID`: _(optional)_ Amazon Web Services Access Key ID for a service account used to talk to Lambda/Cloudwatch AWS services. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this access key from the [AWS console](https://console.aws.amazon.com/).
 - `AWS_SECRET_ACCESS_KEY`: _(optional)_ Amazon Web Services Secret Access Key that is shown to you only once when generating a new access key from the AWS console or CLI. This must be the secret access key correpsonding to the specified `AWS_ACCESS_KEY_ID`. You can leave this one out when developing locally and have no need to talk work with the automated ingestion pipeline. Configure this secret access key from the [AWS console](https://console.aws.amazon.com/).
 - `DB_CONNECTION_STRING`: _(required)_ The Mongo DB connection string as per [official documentation](https://docs.mongodb.com/manual/reference/connection-string/). Cases, sources, users and sessions are stored in MongoDB so this is required. Configure this connection string from the [Mongo Atlas console](https://cloud.mongodb.com/v2/5ea89a90db26a511f1804cf8#security/database/users).

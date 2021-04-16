@@ -38,9 +38,9 @@ if (process.env.NODE_ENV !== 'test') {
     app.use(expressStatusMonitor());
 }
 
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(express.json({ limit: '50mb', type: 'application/json' }));
 app.use(
-    bodyParser.urlencoded({
+    express.urlencoded({
         limit: '50mb',
         extended: true,
     }),
