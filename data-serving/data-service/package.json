@@ -10,7 +10,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "dev": "nodemon",
+    "dev": "nodemon --inspect dist/server.js",
     "import-data": "mongoimport --db covid19 --collection cases --jsonArray --file ../samples/cases.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "node dist/server.js",

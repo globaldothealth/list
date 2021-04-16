@@ -12,6 +12,8 @@ services:
       AFTER_LOGIN_REDIRECT_URL: "http://localhost:3002"
   data:
     command: "npm run dev"
+    ports:
+      - "9229:9229"
     volumes:
       - ../data-serving/data-service/src:/usr/src/app/data-serving/data-service/src
       - ../data-serving/data-service/api:/usr/src/app/data-serving/data-service/api
