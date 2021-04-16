@@ -85,14 +85,23 @@ export default class CasesController {
         try {
             const user = req.user as UserDocument;
             const url = this.dataServerURL + '/api' + req.url.replace('Async', '');
+            // the worker needs access to the AWS configuration.
+            const region = process.env.AWS_SERVICE_REGION;
+            const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+            const secretKey = process.env.AWS_SECRET_ACCESS_KEY;
             const worker = new Worker('./src/workers/downloadAsync.js', { 
                 workerData: {
                     query: req.body.query as string,
                     email: user.email,
                     url,
+                    region,
+                    accessKeyId,
+                    secretKey,
             }});
             /* we don't care what happens when the worker finishes, but for debugging
-             * I'm going to log this. */
+             * I'm going to log this.
+             * TODO create a correlation ID so logs from the request and the thread can be tied together.
+             */
             worker.on('exit', (code) => { logger.info(`worker exited. code: ${code}`) });
             res.status(204).end();
         } catch (err) {
