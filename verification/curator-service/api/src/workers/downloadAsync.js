@@ -1,5 +1,7 @@
 const { workerData } = require('worker_threads');
 const axios = require('axios');
+const AWS = require('aws-sdk');
+
 // make the request to the data service
 try {
     axios({
@@ -11,9 +13,35 @@ try {
         responseType: 'stream',
     }).then((response) => {
         // send the email using SES
-        console.log(`got data for query ${workerData.query} for user ${workerData.email}`);
+        AWS.config.update({
+            accessKeyId: workerData.accessKeyId,
+            secretAccessKey: workerData.secretKey,
+            region: workerData.region,
+        });
+        const ses = new AWS.SES({apiVersion: '2010-12-01'});
+        ses.sendEmail({
+            Destination: {
+                ToAddresses: [workerData.email],
+            },
+            Message: {
+                Body: {
+                    Text: {
+                        Charset: 'UTF-8',
+                        Data: 'Here is your global.health download',
+                    },
+                },
+                Subject: {
+                    Charset: 'UTF-8',
+                    Data: 'Greetings from global.health',
+                },
+            },
+            ReturnPath: 'downloads@global.health',
+            Source: 'downloads@global.health',
+        }).then((data) => {
+            console.log(`sent email for query ${workerData.query} for user ${workerData.email}`);
+            console.log(`response from Amazon: ${data}`);
+        }).catch((err) => { throw err; });
     });
 } catch (err) {
     console.error(err);
-    throw err; // err is available in the main process
 }
