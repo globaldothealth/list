@@ -91,7 +91,10 @@ export default function SearchBar({
 
     // Update search input based on search query
     useEffect(() => {
-        if (!location.search.includes('?q=')) return;
+        if (!location.search.includes('?q=')) {
+            setSearchInput('');
+            return;
+        }
 
         setSearchInput(URLToSearchQuery(location.search));
     }, [location.search]);

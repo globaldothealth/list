@@ -422,8 +422,10 @@ export default function App(): JSX.Element {
 
     // Update filter breadcrumbs
     useEffect(() => {
-        if (location.pathname !== '/cases' || location.search.includes('?q='))
+        if (location.pathname !== '/cases' || location.search.includes('?q=')) {
+            setFilterBreadcrumbs([]);
             return;
+        }
 
         const searchParams = new URLSearchParams(location.search);
         const tempFilterBreadcrumbs: ChipData[] = [];

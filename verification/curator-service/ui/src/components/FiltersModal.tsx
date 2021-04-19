@@ -12,9 +12,14 @@ import {
     Button,
     Select,
     MenuItem,
-    InputLabel,
     FormControl,
+    InputLabel,
+    OutlinedInput,
+    InputAdornment,
+    IconButton,
 } from '@material-ui/core';
+import { HelpOutline } from '@material-ui/icons';
+import { AppTooltip } from './common-form-fields/AppTooltip';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,9 +29,13 @@ const useStyles = makeStyles((theme: Theme) =>
                 width: '25ch',
             },
         },
+        textField: {
+            width: '25ch',
+            margin: theme.spacing(1),
+        },
         formControl: {
             margin: theme.spacing(1),
-            minWidth: 223,
+            minWidth: '25ch',
         },
         searchBtnContainer: {
             width: '100%',
@@ -42,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
             height: '1px',
             width: '90%',
             backgroundColor: '#ccc',
+        },
+        helpIcon: {
+            color: '#ccc',
         },
     }),
 );
@@ -106,6 +118,48 @@ export default function FiltersModal({
         handleClose();
     };
 
+    const tooltipHelpIcon = (tooltipContent: JSX.Element) => {
+        return (
+            <InputAdornment position="end">
+                <AppTooltip maxwidth="auto" arrow title={tooltipContent}>
+                    <IconButton edge="end">
+                        <HelpOutline className={classes.helpIcon} />
+                    </IconButton>
+                </AppTooltip>
+            </InputAdornment>
+        );
+    };
+
+    const admin1Tooltip = (
+        <>
+            <strong>Location admin 1</strong>
+            <p>
+                Aliqua esse officia nostrud veniam id ut nostrud in
+                reprehenderit ea reprehenderit excepteur cillum.
+            </p>
+        </>
+    );
+
+    const admin2Tooltip = (
+        <>
+            <strong>Location admin 2</strong>
+            <p>
+                Aliqua esse officia nostrud veniam id ut nostrud in
+                reprehenderit ea reprehenderit excepteur cillum.
+            </p>
+        </>
+    );
+
+    const admin3Tooltip = (
+        <>
+            <strong>Location admin 3</strong>
+            <p>
+                Aliqua esse officia nostrud veniam id ut nostrud in
+                reprehenderit ea reprehenderit excepteur cillum.
+            </p>
+        </>
+    );
+
     return (
         <Dialog open={isOpen} maxWidth={'xl'} onClose={handleClose}>
             <DialogTitle>Apply filters</DialogTitle>
@@ -169,54 +223,57 @@ export default function FiltersModal({
 
                     {/* LOCATION ADMIN */}
                     <div>
-                        <TextField
-                            id="admin1"
-                            label="Location admin 1"
-                            name="admin1"
-                            type="text"
+                        <FormControl
                             variant="outlined"
-                            value={formik.values.admin1 || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.admin1 &&
-                                Boolean(formik.errors.admin1)
-                            }
-                            helperText={
-                                formik.touched.admin1 && formik.errors.admin1
-                            }
-                        />
-                        <TextField
-                            id="admin2"
-                            label="Location admin 2"
-                            name="admin2"
-                            type="text"
+                            className={classes.textField}
+                        >
+                            <InputLabel htmlFor="admin1">
+                                Location admin 1
+                            </InputLabel>
+                            <OutlinedInput
+                                id="admin1"
+                                type="text"
+                                label="Location admin 1"
+                                name="admin1"
+                                value={formik.values.admin1}
+                                onChange={formik.handleChange}
+                                endAdornment={tooltipHelpIcon(admin1Tooltip)}
+                            />
+                        </FormControl>
+                        <FormControl
                             variant="outlined"
-                            value={formik.values.admin2 || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.admin2 &&
-                                Boolean(formik.errors.admin2)
-                            }
-                            helperText={
-                                formik.touched.admin2 && formik.errors.admin2
-                            }
-                        />
-                        <TextField
-                            id="admin3"
-                            label="Location admin 3"
-                            name="admin3"
-                            type="text"
+                            className={classes.textField}
+                        >
+                            <InputLabel htmlFor="admin2">
+                                Location admin 2
+                            </InputLabel>
+                            <OutlinedInput
+                                id="admin2"
+                                type="text"
+                                label="Location admin 2"
+                                name="admin2"
+                                value={formik.values.admin2}
+                                onChange={formik.handleChange}
+                                endAdornment={tooltipHelpIcon(admin2Tooltip)}
+                            />
+                        </FormControl>
+                        <FormControl
                             variant="outlined"
-                            value={formik.values.admin3 || ''}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.admin3 &&
-                                Boolean(formik.errors.admin3)
-                            }
-                            helperText={
-                                formik.touched.admin3 && formik.errors.admin3
-                            }
-                        />
+                            className={classes.textField}
+                        >
+                            <InputLabel htmlFor="admin3">
+                                Location admin 3
+                            </InputLabel>
+                            <OutlinedInput
+                                id="admin3"
+                                type="text"
+                                label="Location admin 3"
+                                name="admin3"
+                                value={formik.values.admin3}
+                                onChange={formik.handleChange}
+                                endAdornment={tooltipHelpIcon(admin3Tooltip)}
+                            />
+                        </FormControl>
                     </div>
 
                     <div className={classes.divider} />
@@ -296,8 +353,9 @@ export default function FiltersModal({
                             id="dateconfirmedbefore"
                             label="Date confirmed before"
                             name="dateconfirmedbefore"
-                            type="text"
+                            type="date"
                             variant="outlined"
+                            InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedbefore || ''}
                             onChange={formik.handleChange}
                             error={
@@ -313,8 +371,9 @@ export default function FiltersModal({
                             id="dateconfirmedafter"
                             label="Date confirmed after"
                             name="dateconfirmedafter"
-                            type="text"
+                            type="date"
                             variant="outlined"
+                            InputLabelProps={{ shrink: true }}
                             value={formik.values.dateconfirmedafter || ''}
                             onChange={formik.handleChange}
                             error={

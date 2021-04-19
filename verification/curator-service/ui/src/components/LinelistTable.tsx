@@ -647,7 +647,8 @@ class LinelistTable extends React.Component<Props, LinelistTableState> {
 
     handleAddFilterClick(e: React.MouseEvent<HTMLDivElement>, filter: string) {
         e.preventDefault();
-        // Avoids duplicated search parameters
+
+        // @TODO: Open filters modal and focus appropriate input
     }
 
     render(): JSX.Element {
