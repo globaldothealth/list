@@ -30,8 +30,8 @@ const keywords = new Map<string, string>([
     ['admin2', 'location.administrativeAreaLevel2'],
     ['admin3', 'location.administrativeAreaLevel3'],
     ['variant', 'variant.name'],
-    ['dateconfirmedafter', 'events.dateRange.start'],
-    ['dateconfirmedbefore', 'events.dateRange.end'],
+    ['dateconfirmedafter', 'events'],
+    ['dateconfirmedbefore', 'events'],
 ]);
 
 export default function parseSearchQuery(q: string): ParsedSearch {
@@ -61,25 +61,25 @@ export default function parseSearchQuery(q: string): ParsedSearch {
         // We don't tokenize so "text" is a string, not an array of strings.
         res.fullTextSearch = searchParsedResult.text as string;
 
-        
-
         // Get the keywords into our result struct.
         keywords.forEach((path, keyword): void => {
-
             // Enable to filter by date
-            keyword === 'dateconfirmedafter'  ? searchParsedResult.dateOperator = '$gt' : null;
-            keyword ===  'dateconfirmedbefore' ? searchParsedResult.dateOperator = '$lt' : null;
+            keyword === 'dateconfirmedafter'
+                ? (searchParsedResult.dateOperator = '$gt')
+                : null;
+            keyword === 'dateconfirmedbefore'
+                ? (searchParsedResult.dateOperator = '$lt')
+                : null;
 
             if (!searchParsedResult[keyword]) {
                 return;
-            }            
+            }
 
-                res.filters.push({
-                    path: path,
-                    values: searchParsedResult[keyword],
-                    dateOperator: searchParsedResult.dateOperator,
-                });
-            
+            res.filters.push({
+                path: path,
+                values: searchParsedResult[keyword],
+                dateOperator: searchParsedResult.dateOperator,
+            });
         });
         if (res.filters.length === 0 && !res.fullTextSearch) {
             throw new ParsingError(`Invalid search query ${q}`);
